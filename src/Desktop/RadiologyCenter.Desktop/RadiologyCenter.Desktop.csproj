@@ -34,13 +34,9 @@
         <!-- App Identifier -->
         <ApplicationId>com.companyname.radiologycenter.desktop</ApplicationId>
 
-        <!-- Versions - overridden by CI build -->
-        <ApplicationDisplayVersion Condition="'$(Version)' != ''">$(Version)</ApplicationDisplayVersion>
-        <ApplicationDisplayVersion Condition="'$(Version)' == ''">1.0.0</ApplicationDisplayVersion>
-        <ApplicationVersion Condition="'$(Version)' != ''">$(Version)</ApplicationVersion>
-        <ApplicationVersion Condition="'$(Version)' == ''">1</ApplicationVersion>
-        <AssemblyVersion Condition="'$(Version)' != ''">$(Version)</AssemblyVersion>
-        <FileVersion Condition="'$(Version)' != ''">$(Version)</FileVersion>
+        <!-- Versions -->
+        <ApplicationDisplayVersion Condition="'$(ApplicationDisplayVersion)' == ''">1.0</ApplicationDisplayVersion>
+        <ApplicationVersion Condition="'$(ApplicationVersion)' == ''">1</ApplicationVersion>
 
         <!-- To develop, package, and publish an app to the Microsoft Store, see: https://aka.ms/MauiTemplateUnpackaged -->
         <WindowsPackageType>None</WindowsPackageType>
