@@ -1,0 +1,72 @@
+name: Build and Release
+
+on:
+  push:
+    tags:
+      - "v*"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "10.0.x"
+
+      - name: Install MAUI workload
+        run: dotnet workload install maui
+
+      - name: Install Velopack CLI
+        run: dotnet tool install -g vpk
+
+      - name: Get version from tag
+        id: version
+        shell: pwsh
+        run: |
+          $version = "${{ github.ref_name }}" -replace '^v', ''
+          echo "VERSION=$version" >> $env:GITHUB_OUTPUT
+
+      - name: Restore dependencies
+        run: dotnet restore src\RadiologyCenter.slnx
+
+      - name: Publish Desktop app
+        run: |
+          dotnet publish src\Desktop\RadiologyCenter.Desktop\RadiologyCenter.Desktop.csproj `
+            -c Release `
+            -f net10.0-windows10.0.19041.0 `
+            -p:Version=${{ steps.version.outputs.VERSION }} `
+            -p:WindowsPackageType=None `
+            -o publish\app
+
+      - name: Publish Localhost
+        run: |
+          dotnet publish src\Backend\Localhost\RadiologyCenter.Localhost\RadiologyCenter.Localhost.csproj `
+            -c Release `
+            -f net10.0 `
+            --self-contained `
+            -r win-x64 `
+            -p:Version=${{ steps.version.outputs.VERSION }} `
+            -p:PublishSingleFile=true `
+            -o publish\app\localhost
+
+      - name: Pack with Velopack
+        run: |
+          vpk pack `
+            -u "https://github.com/AhmedAFarhan/radiology-center-management" `
+            -p publish\app `
+            -e RadiologyCenter.Desktop.exe `
+            -o release
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: release/*
+          generate_release_notes: true
