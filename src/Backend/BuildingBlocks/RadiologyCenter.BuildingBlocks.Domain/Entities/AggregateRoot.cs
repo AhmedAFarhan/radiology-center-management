@@ -2,7 +2,7 @@ using RadiologyCenter.BuildingBlocks.Domain.Events;
 
 namespace RadiologyCenter.BuildingBlocks.Domain.Entities;
 
-public abstract class AggregateRoot<TId> : Entity<TId>
+public abstract class AggregateRoot<TId> : Entity<TId>, IAggregateRoot
     where TId : notnull
 {
     private readonly List<IDomainEvent> _domainEvents = [];

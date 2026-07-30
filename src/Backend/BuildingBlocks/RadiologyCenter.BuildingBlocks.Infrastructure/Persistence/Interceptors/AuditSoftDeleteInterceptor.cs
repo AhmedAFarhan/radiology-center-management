@@ -1,12 +1,22 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
+using RadiologyCenter.BuildingBlocks.Application.Abstractions;
 using RadiologyCenter.BuildingBlocks.Domain.Auditing;
 using RadiologyCenter.BuildingBlocks.Domain.SoftDeletable;
 
-namespace RadiologyCenter.BuildingBlocks.Infrastructure.Persistence;
+namespace RadiologyCenter.BuildingBlocks.Infrastructure.Persistence.Interceptors;
 
 public class AuditSoftDeleteInterceptor : SaveChangesInterceptor
 {
+    private readonly IClock _clock;
+    private readonly ICurrentUser _currentUser;
+
+    public AuditSoftDeleteInterceptor(IClock clock, ICurrentUser currentUser)
+    {
+        _clock = clock;
+        _currentUser = currentUser;
+    }
+
     public override ValueTask<InterceptionResult<int>> SavingChangesAsync(
         DbContextEventData eventData,
         InterceptionResult<int> result,
@@ -32,18 +42,21 @@ public class AuditSoftDeleteInterceptor : SaveChangesInterceptor
         return base.SavingChanges(eventData, result);
     }
 
-    private static void ApplyAudit(DbContext context)
+    private void ApplyAudit(DbContext context)
     {
+        var now = _clock.UtcNow;
+        var user = _currentUser.Name ?? "system";
+
         var entries = context.ChangeTracker.Entries<IAuditable>();
         foreach (var entry in entries)
         {
             switch (entry.State)
             {
                 case EntityState.Added:
-                    entry.Entity.SetCreated("system", DateTime.UtcNow);
+                    entry.Entity.SetCreated(user, now);
                     break;
                 case EntityState.Modified:
-                    entry.Entity.SetModified("system", DateTime.UtcNow);
+                    entry.Entity.SetModified(user, now);
                     entry.Property(nameof(IAuditable.CreatedAt)).IsModified = false;
                     entry.Property(nameof(IAuditable.CreatedBy)).IsModified = false;
                     break;
@@ -51,15 +64,17 @@ public class AuditSoftDeleteInterceptor : SaveChangesInterceptor
         }
     }
 
-    private static void ApplySoftDelete(DbContext context)
+    private void ApplySoftDelete(DbContext context)
     {
+        var user = _currentUser.Name ?? "system";
+
         var entries = context.ChangeTracker.Entries<ISoftDeletable>();
         foreach (var entry in entries)
         {
             if (entry.State is EntityState.Deleted)
             {
                 entry.State = EntityState.Modified;
-                entry.Entity.Delete("system");
+                entry.Entity.Delete(user);
             }
         }
     }
