@@ -1,0 +1,137 @@
+using Microsoft.AspNetCore.Identity;
+using RadiologyCenter.BuildingBlocks.Domain.Common;
+using RadiologyCenter.BuildingBlocks.Domain.Entities;
+using RadiologyCenter.BuildingBlocks.Domain.Events;
+using RadiologyCenter.Idnetity.Domain.Events;
+
+namespace RadiologyCenter.Idnetity.Domain.Entities;
+
+public sealed class User : IdentityUser<Guid>, IAggregateRoot
+{
+    public string FirstName { get; private set; }
+    public string LastName { get; private set; }
+    public bool IsActive { get; private set; }
+    public bool MustChangePassword { get; private set; }
+    public DateTime? LastLoginAt { get; private set; }
+    public string? ProfilePictureUrl { get; private set; }
+
+    private readonly List<RefreshToken> _refreshTokens = [];
+    public IReadOnlyCollection<RefreshToken> RefreshTokens => _refreshTokens.AsReadOnly();
+
+    private readonly List<IDomainEvent> _domainEvents = [];
+    public IReadOnlyCollection<IDomainEvent> DomainEvents => _domainEvents.AsReadOnly();
+    public void ClearDomainEvents() => _domainEvents.Clear();
+    private void RaiseDomainEvent(IDomainEvent domainEvent) => _domainEvents.Add(domainEvent);
+
+    private User()
+    {
+        FirstName = null!;
+        LastName = null!;
+    }
+
+    public static User Create(string userName, string email, string firstName, string lastName)
+    {
+        Guard.AgainstNullOrWhiteSpace(userName, nameof(userName));
+        Guard.AgainstNullOrWhiteSpace(email, nameof(email));
+        Guard.AgainstNullOrWhiteSpace(firstName, nameof(firstName));
+        Guard.AgainstNullOrWhiteSpace(lastName, nameof(lastName));
+
+        var user = new User
+        {
+            Id = Guid.NewGuid(),
+            UserName = userName,
+            NormalizedUserName = userName.ToUpperInvariant(),
+            Email = email,
+            NormalizedEmail = email.ToUpperInvariant(),
+            FirstName = firstName,
+            LastName = lastName,
+            IsActive = true,
+            LockoutEnabled = true,
+            SecurityStamp = Guid.NewGuid().ToString("D"),
+            ConcurrencyStamp = Guid.NewGuid().ToString("D")
+        };
+
+        user.RaiseDomainEvent(new UserRegisteredEvent(user.Id, userName, email));
+        return user;
+    }
+
+    public void UpdateProfile(string firstName, string lastName, string? phoneNumber)
+    {
+        Guard.AgainstNullOrWhiteSpace(firstName, nameof(firstName));
+        Guard.AgainstNullOrWhiteSpace(lastName, nameof(lastName));
+
+        FirstName = firstName;
+        LastName = lastName;
+        PhoneNumber = phoneNumber;
+    }
+
+    public void ConfirmEmail() => EmailConfirmed = true;
+
+    public void SetPasswordHash(string passwordHash)
+    {
+        PasswordHash = Guard.AgainstNullOrWhiteSpace(passwordHash, nameof(passwordHash));
+        SecurityStamp = Guid.NewGuid().ToString("D");
+    }
+
+    public void RequirePasswordChange() => MustChangePassword = true;
+
+    public void PasswordChanged()
+    {
+        MustChangePassword = false;
+        SecurityStamp = Guid.NewGuid().ToString("D");
+    }
+
+    public void Activate()
+    {
+        if (IsActive) return;
+        IsActive = true;
+        RaiseDomainEvent(new UserReactivatedEvent(Id));
+    }
+
+    public void Deactivate()
+    {
+        if (!IsActive) return;
+        IsActive = false;
+        RaiseDomainEvent(new UserDeactivatedEvent(Id));
+    }
+
+    public void RecordLogin()
+    {
+        LastLoginAt = DateTime.UtcNow;
+        AccessFailedCount = 0;
+        RaiseDomainEvent(new UserLoggedInEvent(Id));
+    }
+
+    public void IncrementAccessFailedCount() => AccessFailedCount++;
+
+    public void ResetAccessFailedCount() => AccessFailedCount = 0;
+
+    public void Lock(DateTimeOffset lockoutEnd) => LockoutEnd = lockoutEnd;
+
+    public void Unlock()
+    {
+        LockoutEnd = null;
+        AccessFailedCount = 0;
+    }
+
+    public void SetTwoFactorEnabled(bool enabled) => TwoFactorEnabled = enabled;
+
+    public RefreshToken AddRefreshToken(string token, DateTime expiresAtUtc)
+    {
+        var refreshToken = new RefreshToken(token, expiresAtUtc);
+        _refreshTokens.Add(refreshToken);
+        return refreshToken;
+    }
+
+    public void RevokeRefreshToken(string token) =>
+        _refreshTokens.FirstOrDefault(rt => rt.Token == token)?.Revoke();
+
+    public void RevokeAllRefreshTokens()
+    {
+        foreach (var rt in _refreshTokens)
+            rt.Revoke();
+    }
+
+    public bool HasValidRefreshToken(string token) =>
+        _refreshTokens.Any(rt => rt.Token == token && !rt.IsExpired && !rt.IsRevoked);
+}
