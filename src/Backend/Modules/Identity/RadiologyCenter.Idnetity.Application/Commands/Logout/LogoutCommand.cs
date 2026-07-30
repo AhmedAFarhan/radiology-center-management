@@ -1,3 +1,3 @@
 namespace RadiologyCenter.Idnetity.Application.Commands.Logout;
 
-public record LogoutCommand(Guid UserId, string? RefreshToken = null);
+public record LogoutCommand(Guid UserId, string? RefreshToken = null) : ICommand;
