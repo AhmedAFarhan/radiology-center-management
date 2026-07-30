@@ -33,11 +33,11 @@ public sealed class UpdateService
         }
     }
 
-    public async Task<bool> DownloadUpdateAsync(UpdateInfo update)
+    public async Task<bool> DownloadUpdateAsync(UpdateInfo update, Action<int>? progress = null)
     {
         try
         {
-            await GetManager().DownloadUpdatesAsync(update);
+            await GetManager().DownloadUpdatesAsync(update, progress);
             return true;
         }
         catch

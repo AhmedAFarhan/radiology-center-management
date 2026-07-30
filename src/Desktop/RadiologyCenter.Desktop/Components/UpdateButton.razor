@@ -6,12 +6,28 @@
     {
         <div class="alert alert-info">Checking for updates...</div>
     }
+    else if (_state == UpdateState.Downloading)
+    {
+        <div class="alert alert-info">
+            <div class="d-flex justify-content-between mb-1">
+                <span>Downloading update...</span>
+                <span>@_downloadProgress%</span>
+            </div>
+            <div class="progress" style="height: 6px;">
+                <div class="progress-bar progress-bar-striped progress-bar-animated"
+                     role="progressbar"
+                     style="width: @(_downloadProgress)%;"
+                     aria-valuenow="@_downloadProgress" aria-valuemin="0" aria-valuemax="100">
+                </div>
+            </div>
+        </div>
+    }
     else if (_state == UpdateState.Available)
     {
         <div class="alert alert-warning d-flex align-items-center justify-content-between">
             <span>Version @_latestVersion is available</span>
-            <button class="btn btn-primary btn-sm" @onclick="StartUpdate" disabled="@(_state == UpdateState.Downloading)">
-                @(_state == UpdateState.Downloading ? "Downloading..." : "Update & Restart")
+            <button class="btn btn-primary btn-sm" @onclick="StartUpdate">
+                Update & Restart
             </button>
         </div>
     }
@@ -37,6 +53,7 @@
     private string? _latestVersion;
     private string? _errorMessage;
     private UpdateInfo? _updateInfo;
+    private int _downloadProgress;
 
     protected override async Task OnInitializedAsync()
     {
@@ -63,8 +80,15 @@
     {
         if (_updateInfo is null) return;
 
+        _downloadProgress = 0;
         _state = UpdateState.Downloading;
-        var success = await UpdateService.DownloadUpdateAsync(_updateInfo);
+        StateHasChanged();
+
+        var success = await UpdateService.DownloadUpdateAsync(_updateInfo, p =>
+        {
+            _downloadProgress = p;
+            StateHasChanged();
+        });
 
         if (success)
         {
@@ -77,6 +101,7 @@
         {
             _state = UpdateState.Error;
             _errorMessage = "Download failed. Check your connection.";
+            StateHasChanged();
         }
     }
 }
