@@ -8,6 +8,12 @@
   <Folder Name="/Backend/Localhost/">
     <Project Path="Backend/Localhost/RadiologyCenter.Localhost/RadiologyCenter.Localhost.csproj" />
   </Folder>
+  <Folder Name="/Backend/Modules/" />
+  <Folder Name="/Backend/Modules/Identity/">
+    <Project Path="Backend/Modules/Identity/RadiologyCenter.Idnetity.Application/RadiologyCenter.Idnetity.Application.csproj" />
+    <Project Path="Backend/Modules/Identity/RadiologyCenter.Idnetity.Domain/RadiologyCenter.Idnetity.Domain.csproj" />
+    <Project Path="Backend/Modules/Identity/RadiologyCenter.Idnetity.Infrastructure/RadiologyCenter.Idnetity.Infrastructure.csproj" />
+  </Folder>
   <Folder Name="/Desktop/">
     <Project Path="Desktop/RadiologyCenter.Desktop/RadiologyCenter.Desktop.csproj" />
   </Folder>
