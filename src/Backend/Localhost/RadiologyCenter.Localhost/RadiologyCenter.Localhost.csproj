@@ -8,6 +8,13 @@
 
   <ItemGroup>
     <PackageReference Include="Swashbuckle.AspNetCore" Version="7.3.1" />
+    <PackageReference Include="WolverineFx" Version="6.24.0" />
+    <PackageReference Include="WolverineFx.EntityFrameworkCore" Version="6.24.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\BuildingBlocks\RadiologyCenter.BuildingBlocks.Application\RadiologyCenter.BuildingBlocks.Application.csproj" />
+    <ProjectReference Include="..\..\BuildingBlocks\RadiologyCenter.BuildingBlocks.Infrastructure\RadiologyCenter.BuildingBlocks.Infrastructure.csproj" />
   </ItemGroup>
 
 </Project>
