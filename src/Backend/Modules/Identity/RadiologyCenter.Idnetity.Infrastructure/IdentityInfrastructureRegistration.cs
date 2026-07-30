@@ -3,6 +3,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using RadiologyCenter.BuildingBlocks.Application.Abstractions;
 using RadiologyCenter.BuildingBlocks.Infrastructure.Persistence;
+using RadiologyCenter.BuildingBlocks.Infrastructure.Persistence.Interceptors;
 using RadiologyCenter.Idnetity.Application.Abstractions;
 using RadiologyCenter.Idnetity.Infrastructure.Persistence;
 using RadiologyCenter.Idnetity.Infrastructure.Repositories;
@@ -15,8 +16,9 @@ public static class IdentityInfrastructureRegistration
     {
         var connectionString = configuration.GetConnectionString("DefaultConnection");
 
-        services.AddDbContext<IdentityDbContext>(options =>
-            options.UseSqlServer(connectionString));
+        services.AddDbContext<IdentityDbContext>((sp, options) =>
+            options.UseSqlServer(connectionString)
+                   .AddInterceptors(sp.GetRequiredService<AuditSoftDeleteInterceptor>()));
 
         services.AddScoped<AppDbContext>(sp => sp.GetRequiredService<IdentityDbContext>());
 

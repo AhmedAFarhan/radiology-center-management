@@ -31,10 +31,10 @@ public class UserRepository : IUserRepository
         await _users.Include(u => u.AssignedRoles).ThenInclude(r => r.Permissions).ToListAsync(ct);
 
     public async Task<bool> ExistsByEmailAsync(string email, CancellationToken ct = default) =>
-        await _users.AnyAsync(u => u.Email == email, ct);
+        await _users.AsNoTracking().AnyAsync(u => u.Email == email, ct);
 
     public async Task<bool> ExistsByUserNameAsync(string userName, CancellationToken ct = default) =>
-        await _users.AnyAsync(u => u.UserName == userName, ct);
+        await _users.AsNoTracking().AnyAsync(u => u.UserName == userName, ct);
 
     public async Task<User> AddAsync(User user, CancellationToken ct = default)
     {
@@ -56,8 +56,9 @@ public class UserRepository : IUserRepository
 
     public async Task<PagedResult<User>> GetPagedAsync(QueryRequest request, CancellationToken ct = default)
     {
-        var query = _users.Include(u => u.AssignedRoles).AsNoTracking();
+        var query = _users.AsNoTracking();
         var totalCount = await query.CountAsync(ct);
+        query = query.Include(u => u.AssignedRoles);
         var items = await query
             .Skip((request.Pagination.PageNumber - 1) * request.Pagination.PageSize)
             .Take(request.Pagination.PageSize)

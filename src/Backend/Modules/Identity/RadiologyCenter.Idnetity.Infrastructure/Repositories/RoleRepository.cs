@@ -28,7 +28,7 @@ public class RoleRepository : IRoleRepository
         await _roles.Include(r => r.Permissions).ToListAsync(ct);
 
     public async Task<bool> ExistsByNameAsync(string name, CancellationToken ct = default) =>
-        await _roles.AnyAsync(r => r.Name == name, ct);
+        await _roles.AsNoTracking().AnyAsync(r => r.Name == name, ct);
 
     public async Task<Role> AddAsync(Role role, CancellationToken ct = default)
     {
@@ -50,8 +50,9 @@ public class RoleRepository : IRoleRepository
 
     public async Task<PagedResult<Role>> GetPagedAsync(QueryRequest request, CancellationToken ct = default)
     {
-        var query = _roles.Include(r => r.Permissions).AsNoTracking();
+        var query = _roles.AsNoTracking();
         var totalCount = await query.CountAsync(ct);
+        query = query.Include(r => r.Permissions);
         var items = await query
             .Skip((request.Pagination.PageNumber - 1) * request.Pagination.PageSize)
             .Take(request.Pagination.PageSize)

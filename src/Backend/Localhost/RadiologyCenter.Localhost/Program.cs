@@ -1,6 +1,8 @@
 using Wolverine;
 using RadiologyCenter.BuildingBlocks.Application;
 using RadiologyCenter.BuildingBlocks.Infrastructure;
+using RadiologyCenter.Idnetity.Application;
+using RadiologyCenter.Idnetity.Infrastructure;
 using RadiologyCenter.Localhost.Filters;
 using RadiologyCenter.Localhost.Middleware;
 
@@ -15,6 +17,8 @@ builder.Services.AddSwaggerGen();
 
 builder.Services.AddApplication();
 builder.Services.AddInfrastructure(builder.Configuration);
+builder.Services.AddIdentityApplication();
+builder.Services.AddIdentityInfrastructure(builder.Configuration);
 
 builder.Host.UseWolverine();
 
