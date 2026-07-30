@@ -14,6 +14,10 @@ public sealed class User : IdentityUser<Guid>, IAggregateRoot
     public bool MustChangePassword { get; private set; }
     public DateTime? LastLoginAt { get; private set; }
     public string? ProfilePictureUrl { get; private set; }
+    public DateTime CreatedAt { get; private set; }
+
+    private readonly List<Role> _assignedRoles = [];
+    public IReadOnlyCollection<Role> AssignedRoles => _assignedRoles.AsReadOnly();
 
     private readonly List<RefreshToken> _refreshTokens = [];
     public IReadOnlyCollection<RefreshToken> RefreshTokens => _refreshTokens.AsReadOnly();
@@ -48,7 +52,8 @@ public sealed class User : IdentityUser<Guid>, IAggregateRoot
             IsActive = true,
             LockoutEnabled = true,
             SecurityStamp = Guid.NewGuid().ToString("D"),
-            ConcurrencyStamp = Guid.NewGuid().ToString("D")
+            ConcurrencyStamp = Guid.NewGuid().ToString("D"),
+            CreatedAt = DateTime.UtcNow
         };
 
         user.RaiseDomainEvent(new UserRegisteredEvent(user.Id, userName, email));
@@ -80,6 +85,34 @@ public sealed class User : IdentityUser<Guid>, IAggregateRoot
         MustChangePassword = false;
         SecurityStamp = Guid.NewGuid().ToString("D");
     }
+
+    public void AssignRole(Role role)
+    {
+        Guard.AgainstNull(role, nameof(role));
+        if (_assignedRoles.Any(r => r.Id == role.Id)) return;
+
+        _assignedRoles.Add(role);
+        RaiseDomainEvent(new UserRolesUpdatedEvent(Id, _assignedRoles.Select(r => r.Id).ToList()));
+    }
+
+    public void RemoveRole(Role role)
+    {
+        Guard.AgainstNull(role, nameof(role));
+        if (_assignedRoles.RemoveAll(r => r.Id == role.Id) == 0) return;
+
+        RaiseDomainEvent(new UserRolesUpdatedEvent(Id, _assignedRoles.Select(r => r.Id).ToList()));
+    }
+
+    public bool HasRole(Guid roleId) => _assignedRoles.Any(r => r.Id == roleId);
+
+    public bool HasPermission(string permissionCode)
+    {
+        Guard.AgainstNullOrWhiteSpace(permissionCode, nameof(permissionCode));
+        return _assignedRoles.Any(r => r.HasPermission(permissionCode));
+    }
+
+    public IReadOnlyCollection<string> GetEffectivePermissions() =>
+        _assignedRoles.SelectMany(r => r.Permissions).Select(p => p.Code).Distinct().ToList();
 
     public void Activate()
     {

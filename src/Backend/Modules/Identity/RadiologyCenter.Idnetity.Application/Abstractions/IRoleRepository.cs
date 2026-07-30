@@ -1,0 +1,17 @@
+using RadiologyCenter.BuildingBlocks.Application.Common;
+using RadiologyCenter.BuildingBlocks.Domain.Pagination;
+using RadiologyCenter.Idnetity.Domain.Entities;
+
+namespace RadiologyCenter.Idnetity.Application.Abstractions;
+
+public interface IRoleRepository
+{
+    Task<Role?> GetByIdAsync(Guid id, CancellationToken ct = default);
+    Task<Role?> GetByNameAsync(string name, CancellationToken ct = default);
+    Task<IReadOnlyList<Role>> GetAllAsync(CancellationToken ct = default);
+    Task<bool> ExistsByNameAsync(string name, CancellationToken ct = default);
+    Task<Role> AddAsync(Role role, CancellationToken ct = default);
+    Task UpdateAsync(Role role, CancellationToken ct = default);
+    Task DeleteAsync(Role role, CancellationToken ct = default);
+    Task<PagedResult<Role>> GetPagedAsync(QueryRequest request, CancellationToken ct = default);
+}

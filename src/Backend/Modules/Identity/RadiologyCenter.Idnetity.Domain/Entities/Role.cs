@@ -11,6 +11,7 @@ public sealed class Role : IdentityRole<Guid>, IAggregateRoot
     public string? Description { get; private set; }
     public bool IsSystem { get; private set; }
     public bool IsActive { get; private set; }
+    public DateTime CreatedAt { get; private set; }
 
     private readonly List<Permission> _permissions = [];
     public IReadOnlyCollection<Permission> Permissions => _permissions.AsReadOnly();
@@ -33,7 +34,8 @@ public sealed class Role : IdentityRole<Guid>, IAggregateRoot
             NormalizedName = name.ToUpperInvariant(),
             Description = description,
             IsSystem = isSystem,
-            IsActive = true
+            IsActive = true,
+            CreatedAt = DateTime.UtcNow
         };
 
         role.RaiseDomainEvent(new RoleCreatedEvent(role.Id, name));

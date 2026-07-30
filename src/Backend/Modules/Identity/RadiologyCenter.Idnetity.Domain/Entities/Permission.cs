@@ -1,3 +1,5 @@
+using System.Security.Cryptography;
+using System.Text;
 using RadiologyCenter.BuildingBlocks.Domain.Common;
 using RadiologyCenter.BuildingBlocks.Domain.Entities;
 
@@ -12,8 +14,8 @@ public sealed class Permission : Entity<Guid>
 
     private Permission() => (Code, Name) = (null!, null!);
 
-    public Permission(string code, string name, string? description = null, string? group = null)
-        : base(Guid.NewGuid())
+    public Permission(Guid id, string code, string name, string? description = null, string? group = null)
+        : base(id)
     {
         Code = Guard.AgainstNullOrWhiteSpace(code, nameof(code));
         Name = Guard.AgainstNullOrWhiteSpace(name, nameof(name));
@@ -21,10 +23,9 @@ public sealed class Permission : Entity<Guid>
         Group = group;
     }
 
-    public void Update(string name, string? description, string? group)
+    internal static Guid CreateDeterministicId(string code)
     {
-        Name = Guard.AgainstNullOrWhiteSpace(name, nameof(name));
-        Description = description;
-        Group = group;
+        var hash = MD5.HashData(Encoding.UTF8.GetBytes(code));
+        return new Guid(hash);
     }
 }
