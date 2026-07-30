@@ -64,9 +64,7 @@
         if (_updateInfo is null) return;
 
         _state = UpdateState.Downloading;
-        StateHasChanged();
-
-        var (success, error) = await UpdateService.DownloadUpdateAsync(_updateInfo);
+        var success = await UpdateService.DownloadUpdateAsync(_updateInfo);
 
         if (success)
         {
@@ -78,8 +76,7 @@
         else
         {
             _state = UpdateState.Error;
-            _errorMessage = error ?? "Download failed";
-            StateHasChanged();
+            _errorMessage = "Download failed. Check your connection.";
         }
     }
 }
