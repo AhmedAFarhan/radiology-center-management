@@ -1,3 +1,4 @@
+using RadiologyCenter.BuildingBlocks.Application.Common;
 using RadiologyCenter.BuildingBlocks.Domain.Entities;
 using RadiologyCenter.BuildingBlocks.Domain.Pagination;
 using RadiologyCenter.BuildingBlocks.Domain.Specifications;
@@ -16,4 +17,5 @@ public interface IBaseRepository<TEntity, in TId>
     void Update(TEntity entity);
     void Remove(TEntity entity);
     Task<PagedResult<TEntity>> GetPagedAsync(PaginationParams pagination, CancellationToken ct = default);
+    Task<PagedResult<TEntity>> GetPagedAsync(QueryRequest request, CancellationToken ct = default);
 }

@@ -1,6 +1,8 @@
 using Microsoft.EntityFrameworkCore;
-using RadiologyCenter.BuildingBlocks.Domain.Entities;
 using RadiologyCenter.BuildingBlocks.Application.Abstractions;
+using RadiologyCenter.BuildingBlocks.Application.Common;
+using RadiologyCenter.BuildingBlocks.Application.Services;
+using RadiologyCenter.BuildingBlocks.Domain.Entities;
 using RadiologyCenter.BuildingBlocks.Domain.Pagination;
 using RadiologyCenter.BuildingBlocks.Domain.Specifications;
 using RadiologyCenter.BuildingBlocks.Infrastructure.Persistence;
@@ -54,6 +56,36 @@ public class BaseRepository<TEntity, TId> : IBaseRepository<TEntity, TId>
             .ToListAsync(ct);
 
         return PagedResult<TEntity>.Create(items, totalCount, pagination.PageNumber, pagination.PageSize);
+    }
+
+    public virtual async Task<PagedResult<TEntity>> GetPagedAsync(QueryRequest request, CancellationToken ct = default)
+    {
+        var criteria = FilterExpressionBuilder.Build<TEntity>(request.Filters);
+        var spec = new DynamicSpecification<TEntity>(criteria);
+
+        if (!string.IsNullOrWhiteSpace(request.SortBy))
+        {
+            var param = System.Linq.Expressions.Expression.Parameter(typeof(TEntity), "e");
+            var property = typeof(TEntity).GetProperty(request.SortBy, System.Reflection.BindingFlags.IgnoreCase | System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance);
+            if (property is not null)
+            {
+                var lambda = System.Linq.Expressions.Expression.Lambda<Func<TEntity, object>>(
+                    System.Linq.Expressions.Expression.Convert(
+                        System.Linq.Expressions.Expression.Property(param, property), typeof(object)), param);
+                if (request.SortDescending)
+                    spec.ApplyOrderByDescending(lambda);
+                else
+                    spec.ApplyOrderBy(lambda);
+            }
+        }
+
+        spec.ApplyPaging((request.Pagination.PageNumber - 1) * request.Pagination.PageSize, request.Pagination.PageSize);
+
+        var query = ApplySpecification(spec);
+        var totalCount = await query.CountAsync(ct);
+        var items = await query.ToListAsync(ct);
+
+        return PagedResult<TEntity>.Create(items, totalCount, request.Pagination.PageNumber, request.Pagination.PageSize);
     }
 
     private IQueryable<TEntity> ApplySpecification(ISpecification<TEntity> spec) =>
