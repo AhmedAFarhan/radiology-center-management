@@ -1,10 +1,13 @@
 <Solution>
   <Folder Name="/Backend/" />
+  <Folder Name="/Backend/BuildingBlocks/">
+    <Project Path="Backend/BuildingBlocks/RadiologyCenter.BuildingBlocks.Application/RadiologyCenter.BuildingBlocks.Application.csproj" />
+    <Project Path="Backend/BuildingBlocks/RadiologyCenter.BuildingBlocks.Domain/RadiologyCenter.BuildingBlocks.Domain.csproj" />
+    <Project Path="Backend/BuildingBlocks/RadiologyCenter.BuildingBlocks.Infrastructure/RadiologyCenter.BuildingBlocks.Infrastructure.csproj" />
+  </Folder>
   <Folder Name="/Backend/Localhost/">
     <Project Path="Backend/Localhost/RadiologyCenter.Localhost/RadiologyCenter.Localhost.csproj" />
   </Folder>
-  <Folder Name="/Backend/BuildingBlocks/" />
-  <Folder Name="/Backend/Modules/" />
   <Folder Name="/Desktop/">
     <Project Path="Desktop/RadiologyCenter.Desktop/RadiologyCenter.Desktop.csproj" />
   </Folder>
