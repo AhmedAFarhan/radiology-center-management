@@ -64,7 +64,7 @@ jobs:
       - name: Pack with Velopack
         shell: pwsh
         run: |
-          vpk pack --packId RadiologyCenter --packVersion ${{ steps.version.outputs.VERSION }} --packDir publish\app --mainExe RadiologyCenter.Desktop.exe --updateUrl https://github.com/AhmedAFarhan/radiology-center-management --output release
+          vpk pack -u RadiologyCenter -v ${{ steps.version.outputs.VERSION }} -p publish\app --mainExe RadiologyCenter.Desktop.exe -o release
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
