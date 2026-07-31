@@ -1,0 +1,14 @@
+using Mapster;
+using RadiologyCenter.Idnetity.Application.DTOs;
+using RadiologyCenter.Idnetity.Domain.Entities;
+
+namespace RadiologyCenter.Idnetity.Application;
+
+public static class IdentityMappingConfig
+{
+    public static void Configure()
+    {
+        TypeAdapterConfig<Role, RoleDto>.NewConfig()
+            .Map(d => d.Permissions, s => s.Permissions.Select(p => p.Code).ToList());
+    }
+}

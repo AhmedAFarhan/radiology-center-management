@@ -1,3 +1,4 @@
+using Mapster;
 using RadiologyCenter.Idnetity.Application.Abstractions;
 using RadiologyCenter.Idnetity.Application.DTOs;
 
@@ -14,16 +15,6 @@ public static class GetRoleByIdQueryHandler
         if (role is null)
             return Result.Failure<RoleDto>(Error.NotFound("Role", query.Id));
 
-        return Result.Success(Map(role));
+        return Result.Success(role.Adapt<RoleDto>());
     }
-
-    private static RoleDto Map(Role role) => new(
-        role.Id,
-        role.Name!,
-        role.Description,
-        role.IsSystem,
-        role.IsActive,
-        role.CreatedAt,
-        role.Permissions.Select(p => p.Code).ToList()
-    );
 }

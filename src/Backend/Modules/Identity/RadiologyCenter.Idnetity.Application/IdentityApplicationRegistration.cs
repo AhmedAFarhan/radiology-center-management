@@ -10,6 +10,7 @@ public static class IdentityApplicationRegistration
     {
         services.AddValidatorsFromAssembly(typeof(IdentityApplicationRegistration).Assembly);
         ApplicationAssemblyRegistry.Register(typeof(IdentityApplicationRegistration).Assembly);
+        IdentityMappingConfig.Configure();
         return services;
     }
 }

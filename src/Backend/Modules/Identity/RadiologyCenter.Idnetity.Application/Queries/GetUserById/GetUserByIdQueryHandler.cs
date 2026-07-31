@@ -1,3 +1,4 @@
+using Mapster;
 using RadiologyCenter.Idnetity.Application.Abstractions;
 using RadiologyCenter.Idnetity.Application.DTOs;
 
@@ -14,22 +15,6 @@ public static class GetUserByIdQueryHandler
         if (user is null)
             return Result.Failure<UserDto>(Error.NotFound("User", query.Id));
 
-        return Result.Success(Map(user));
+        return Result.Success(user.Adapt<UserDto>());
     }
-
-    private static UserDto Map(User user) => new(
-        user.Id,
-        user.UserName!,
-        user.Email!,
-        user.FirstName,
-        user.LastName,
-        user.PhoneNumber,
-        user.IsActive,
-        user.EmailConfirmed,
-        user.TwoFactorEnabled,
-        user.LockoutEnabled,
-        user.LockoutEnd,
-        user.LastLoginAt,
-        user.CreatedAt
-    );
 }

@@ -25,6 +25,7 @@ builder.Services.AddSwaggerGen();
 builder.Host.ConfigureWolverine();
 
 builder.Services.AddApplication();
+builder.Services.AddMapster();
 builder.Services.AddInfrastructure(builder.Configuration);
 builder.Services.AddIdentityApplication();
 builder.Services.AddIdentityInfrastructure(builder.Configuration);

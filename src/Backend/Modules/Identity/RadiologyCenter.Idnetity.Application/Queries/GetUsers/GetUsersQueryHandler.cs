@@ -1,3 +1,4 @@
+using Mapster;
 using RadiologyCenter.BuildingBlocks.Domain.Pagination;
 using RadiologyCenter.Idnetity.Application.Abstractions;
 using RadiologyCenter.Idnetity.Application.DTOs;
@@ -12,7 +13,7 @@ public static class GetUsersQueryHandler
         CancellationToken ct)
     {
         var paged = await userRepository.GetPagedAsync(query.Request, ct);
-        var dtos = paged.Items.Select(Map).ToList();
+        var dtos = paged.Items.Select(u => u.Adapt<UserDto>()).ToList();
 
         return Result.Success(new PagedResult<UserDto>(
             dtos,
@@ -21,20 +22,4 @@ public static class GetUsersQueryHandler
             paged.PageSize
         ));
     }
-
-    private static UserDto Map(User user) => new(
-        user.Id,
-        user.UserName!,
-        user.Email!,
-        user.FirstName,
-        user.LastName,
-        user.PhoneNumber,
-        user.IsActive,
-        user.EmailConfirmed,
-        user.TwoFactorEnabled,
-        user.LockoutEnabled,
-        user.LockoutEnd,
-        user.LastLoginAt,
-        user.CreatedAt
-    );
 }
