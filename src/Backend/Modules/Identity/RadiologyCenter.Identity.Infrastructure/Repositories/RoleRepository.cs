@@ -4,6 +4,7 @@ using RadiologyCenter.BuildingBlocks.Application.Services;
 using RadiologyCenter.BuildingBlocks.Domain.Pagination;
 using RadiologyCenter.BuildingBlocks.Domain.Specifications;
 using RadiologyCenter.BuildingBlocks.Infrastructure.Persistence;
+using RadiologyCenter.BuildingBlocks.Infrastructure.Services;
 using RadiologyCenter.Identity.Application.Abstractions;
 using RadiologyCenter.Identity.Domain.Entities;
 using RadiologyCenter.Identity.Infrastructure.Persistence;

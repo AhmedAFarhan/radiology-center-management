@@ -1,6 +1,7 @@
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Text.Json;
+using RadiologyCenter.BuildingBlocks.Domain.Common;
 using RadiologyCenter.BuildingBlocks.Domain.Specifications;
 
 namespace RadiologyCenter.BuildingBlocks.Application.Services;
@@ -32,14 +33,60 @@ public static class FilterExpressionBuilder
 
     private static Expression? BuildCondition<T>(ParameterExpression param, FilterCriteria filter)
     {
-        var property = GetProperty<T>(filter.Field);
-        if (property is null) return null;
+        var segments = filter.Field.Split('.', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+        if (segments.Length is 0)
+            return null;
 
-        var left = Expression.Property(param, property);
-        var leftType = Nullable.GetUnderlyingType(property.PropertyType) ?? property.PropertyType;
+        return BuildRecursive(param, typeof(T), segments, 0, filter);
+    }
+
+    private static Expression? BuildRecursive(
+        Expression instance,
+        Type currentType,
+        string[] segments,
+        int index,
+        FilterCriteria filter)
+    {
+        var segment = segments[index];
+        var property = currentType.GetProperty(segment, BindingFlags.IgnoreCase | BindingFlags.Public | BindingFlags.Instance);
+        if (property is null)
+            return null;
+
+        var isLast = index == segments.Length - 1;
+        var propertyType = property.PropertyType;
+
+        if (!isLast && TryGetElementType(propertyType, out var elementType) && elementType is not null)
+        {
+            var anyParam = Expression.Parameter(elementType, "c");
+            var inner = BuildRecursive(anyParam, elementType, segments, index + 1, filter);
+            if (inner is null)
+                return null;
+
+            var anyMethod = typeof(Enumerable)
+                .GetMethods(BindingFlags.Static | BindingFlags.Public)
+                .First(m => m.Name is nameof(Enumerable.Any) && m.GetParameters().Length is 2)
+                .MakeGenericMethod(elementType);
+
+            return Expression.Call(
+                anyMethod,
+                Expression.Property(instance, property),
+                Expression.Lambda(inner, anyParam));
+        }
+
+        var left = Expression.Property(instance, property);
+
+        if (!isLast)
+            return BuildRecursive(left, propertyType, segments, index + 1, filter);
+
+        return ApplyOperator(left, propertyType, filter);
+    }
+
+    private static Expression? ApplyOperator(Expression left, Type propertyType, FilterCriteria filter)
+    {
+        var leftType = Nullable.GetUnderlyingType(propertyType) ?? propertyType;
 
         if (filter.Operator is FilterOperator.In or FilterOperator.NotIn)
-            return BuildInExpression<T>(left, filter);
+            return BuildInExpression(left, filter);
 
         object? convertedValue = ConvertValue(filter.Value, leftType);
 
@@ -49,42 +96,55 @@ public static class FilterExpressionBuilder
             if (convertedValue is null || secondValue is null) return null;
 
             var greater = Expression.GreaterThan(
-                left, Expression.Constant(convertedValue, property.PropertyType));
+                left, Expression.Constant(convertedValue, propertyType));
             var less = Expression.LessThan(
-                left, Expression.Constant(secondValue, property.PropertyType));
+                left, Expression.Constant(secondValue, propertyType));
             return Expression.AndAlso(greater, less);
         }
 
         return filter.Operator switch
         {
-            FilterOperator.Equals => BuildEquality(left, convertedValue, property.PropertyType),
-            FilterOperator.NotEquals => Expression.Not(BuildEquality(left, convertedValue, property.PropertyType)),
+            FilterOperator.Equals => BuildEquality(left, convertedValue, propertyType),
+            FilterOperator.NotEquals => Expression.Not(BuildEquality(left, convertedValue, propertyType)),
             FilterOperator.Contains => BuildStringMethod(left, convertedValue, nameof(string.Contains)),
             FilterOperator.StartsWith => BuildStringMethod(left, convertedValue, nameof(string.StartsWith)),
             FilterOperator.EndsWith => BuildStringMethod(left, convertedValue, nameof(string.EndsWith)),
-            FilterOperator.GreaterThan => Expression.GreaterThan(left, Expression.Constant(convertedValue, property.PropertyType)),
-            FilterOperator.GreaterThanOrEqual => Expression.GreaterThanOrEqual(left, Expression.Constant(convertedValue, property.PropertyType)),
-            FilterOperator.LessThan => Expression.LessThan(left, Expression.Constant(convertedValue, property.PropertyType)),
-            FilterOperator.LessThanOrEqual => Expression.LessThanOrEqual(left, Expression.Constant(convertedValue, property.PropertyType)),
+            FilterOperator.GreaterThan => Expression.GreaterThan(left, Expression.Constant(convertedValue, propertyType)),
+            FilterOperator.GreaterThanOrEqual => Expression.GreaterThanOrEqual(left, Expression.Constant(convertedValue, propertyType)),
+            FilterOperator.LessThan => Expression.LessThan(left, Expression.Constant(convertedValue, propertyType)),
+            FilterOperator.LessThanOrEqual => Expression.LessThanOrEqual(left, Expression.Constant(convertedValue, propertyType)),
             _ => null,
         };
     }
 
-    private static Expression? BuildInExpression<T>(Expression left, FilterCriteria filter)
+    private static Expression? BuildInExpression(Expression left, FilterCriteria filter)
     {
-        if (filter.Value is not IEnumerable<object> values) return null;
-        if (!values.Any()) return null;
+        IEnumerable<object>? values = filter.Value switch
+        {
+            IEnumerable<object> list => list,
+            JsonElement { ValueKind: JsonValueKind.Array } element => element.EnumerateArray().Select(v => (object)v),
+            _ => null,
+        };
+
+        if (values is null || !values.Any()) return null;
 
         var propertyType = left.Type;
-        var convertedValues = values.Select(v => ConvertValue(v, propertyType));
+        var convertedValues = values.Select(v => ConvertValue(v, propertyType)).ToArray();
+
+        var cast = typeof(Enumerable)
+            .GetMethod(nameof(Enumerable.Cast), BindingFlags.Static | BindingFlags.Public)!
+            .MakeGenericMethod(propertyType);
+        var typedValues = cast.Invoke(null, [convertedValues]);
+
+        var listType = typeof(List<>).MakeGenericType(propertyType);
+        var valueList = Activator.CreateInstance(listType, typedValues);
+
         var containsMethod = typeof(Enumerable)
             .GetMethods(BindingFlags.Static | BindingFlags.Public)
             .First(m => m.Name is nameof(Enumerable.Contains) && m.GetParameters().Length is 2)
             .MakeGenericMethod(propertyType);
 
-        var constant = Expression.Constant(
-            Activator.CreateInstance(typeof(List<>).MakeGenericType(propertyType), convertedValues),
-            typeof(IEnumerable<>).MakeGenericType(propertyType));
+        var constant = Expression.Constant(valueList, listType);
 
         Expression contains = Expression.Call(containsMethod, constant, left);
 
@@ -93,18 +153,20 @@ public static class FilterExpressionBuilder
             : contains;
     }
 
-    private static PropertyInfo? GetProperty<T>(string fieldName)
+    private static bool TryGetElementType(Type type, out Type? elementType)
     {
-        var type = typeof(T);
-        PropertyInfo? result = null;
-        foreach (var part in fieldName.Split('.'))
-        {
-            var prop = type.GetProperty(part, BindingFlags.IgnoreCase | BindingFlags.Public | BindingFlags.Instance);
-            if (prop is null) return null;
-            result = prop;
-            type = prop.PropertyType;
-        }
-        return result;
+        elementType = null;
+        if (type == typeof(string) || type == typeof(byte[]))
+            return false;
+
+        var enumerable = type.GetInterfaces()
+            .Prepend(type)
+            .FirstOrDefault(i => i.IsGenericType && i.GetGenericTypeDefinition() == typeof(IEnumerable<>));
+        if (enumerable is null)
+            return false;
+
+        elementType = enumerable.GetGenericArguments()[0];
+        return true;
     }
 
     private static Expression BuildEquality(Expression left, object? value, Type propertyType)
@@ -130,6 +192,9 @@ public static class FilterExpressionBuilder
 
         var underlying = Nullable.GetUnderlyingType(targetType) ?? targetType;
 
+        if (underlying != typeof(string) && typeof(Enumeration).IsAssignableFrom(underlying))
+            return ConvertEnumerationValue(value, underlying);
+
         if (value is JsonElement { ValueKind: not JsonValueKind.Null and not JsonValueKind.Undefined } element)
         {
             if (underlying.IsEnum)
@@ -141,5 +206,27 @@ public static class FilterExpressionBuilder
             return Enum.Parse(underlying, value.ToString()!, ignoreCase: true);
 
         return Convert.ChangeType(value, underlying);
+    }
+
+    private static object? ConvertEnumerationValue(object? value, Type enumerationType)
+    {
+        string raw;
+        if (value is JsonElement element)
+            raw = element.ValueKind is JsonValueKind.Number ? element.GetRawText() : element.GetString() ?? string.Empty;
+        else
+            raw = value?.ToString() ?? string.Empty;
+
+        if (int.TryParse(raw, out var numeric))
+        {
+            var fromValue = typeof(Enumeration)
+                .GetMethod(nameof(Enumeration.FromValue), BindingFlags.Public | BindingFlags.Static)!
+                .MakeGenericMethod(enumerationType);
+            return fromValue.Invoke(null, [numeric]);
+        }
+
+        var fromName = typeof(Enumeration)
+            .GetMethod(nameof(Enumeration.FromName), BindingFlags.Public | BindingFlags.Static)!
+            .MakeGenericMethod(enumerationType);
+        return fromName.Invoke(null, [raw]);
     }
 }

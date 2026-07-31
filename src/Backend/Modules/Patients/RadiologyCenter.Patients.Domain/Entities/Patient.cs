@@ -24,12 +24,10 @@ public sealed class Patient : SoftDeletableAggregateRoot<Guid>
     public string? ReferringPhysician { get; private set; }
     public bool IsActive { get; private set; }
 
-    private int? _age;
-
     public string FullName => string.Join(' ',
         new[] { FirstName, MiddleName, LastName }.Where(p => !string.IsNullOrWhiteSpace(p)));
 
-    public int? Age => DateOfBirth.HasValue ? CalculateAge(DateOfBirth.Value) : _age;
+    public int? Age { get; private set; }
 
     private Patient()
     {
@@ -140,7 +138,7 @@ public sealed class Patient : SoftDeletableAggregateRoot<Guid>
     private void SetBirthDetails(DateTime? dateOfBirth, int? age)
     {
         DateOfBirth = dateOfBirth;
-        _age = dateOfBirth.HasValue ? CalculateAge(dateOfBirth.Value) : age;
+        Age = dateOfBirth.HasValue ? CalculateAge(dateOfBirth.Value) : age;
     }
 
     private static (string FirstName, string? MiddleName, string LastName) SplitFullName(string fullName)

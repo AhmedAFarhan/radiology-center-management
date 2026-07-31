@@ -6,6 +6,7 @@ using RadiologyCenter.BuildingBlocks.Domain.Entities;
 using RadiologyCenter.BuildingBlocks.Domain.Pagination;
 using RadiologyCenter.BuildingBlocks.Domain.Specifications;
 using RadiologyCenter.BuildingBlocks.Infrastructure.Persistence;
+using RadiologyCenter.BuildingBlocks.Infrastructure.Services;
 
 namespace RadiologyCenter.BuildingBlocks.Infrastructure.Repositories;
 

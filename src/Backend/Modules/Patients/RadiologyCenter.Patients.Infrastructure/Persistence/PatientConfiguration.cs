@@ -39,6 +39,6 @@ public class PatientConfiguration : IEntityTypeConfiguration<Patient>
                 b => b == null ? (int?)null : b.Value,
                 v => v.HasValue ? BloodType.FromValue<BloodType>(v.Value) : null);
 
-        builder.Property("_age").HasColumnName("Age");
+        builder.Property(p => p.Age);
     }
 }
