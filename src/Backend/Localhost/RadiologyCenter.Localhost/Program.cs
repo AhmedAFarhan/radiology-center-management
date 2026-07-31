@@ -1,10 +1,13 @@
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Wolverine;
 using RadiologyCenter.BuildingBlocks.Application;
 using RadiologyCenter.BuildingBlocks.Infrastructure;
 using RadiologyCenter.Idnetity.Application;
+using RadiologyCenter.Idnetity.Domain.Entities;
 using RadiologyCenter.Idnetity.Infrastructure;
 using RadiologyCenter.Idnetity.Infrastructure.Persistence;
+using RadiologyCenter.Idnetity.Infrastructure.Persistence.Seed;
 using RadiologyCenter.Localhost.Filters;
 using RadiologyCenter.Localhost.Middleware;
 
@@ -22,7 +25,11 @@ builder.Services.AddInfrastructure(builder.Configuration);
 builder.Services.AddIdentityApplication();
 builder.Services.AddIdentityInfrastructure(builder.Configuration);
 
-builder.Host.UseWolverine();
+builder.Host.UseWolverine(opts =>
+{
+    opts.RestoreV5Defaults();
+    opts.Discovery.IncludeAssembly(typeof(IdentityApplicationRegistration).Assembly);
+});
 
 var app = builder.Build();
 
@@ -30,6 +37,9 @@ using (var scope = app.Services.CreateScope())
 {
     var identityDb = scope.ServiceProvider.GetRequiredService<IdentityDbContext>();
     identityDb.Database.Migrate();
+    await IdentityDbSeeder.SeedAsync(
+        identityDb,
+        scope.ServiceProvider.GetRequiredService<IPasswordHasher<User>>());
 }
 
 app.UseMiddleware<ExceptionMiddleware>();

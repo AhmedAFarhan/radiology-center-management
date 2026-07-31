@@ -1,6 +1,7 @@
 using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -9,6 +10,7 @@ using RadiologyCenter.BuildingBlocks.Application.Abstractions;
 using RadiologyCenter.BuildingBlocks.Infrastructure.Persistence;
 using RadiologyCenter.BuildingBlocks.Infrastructure.Persistence.Interceptors;
 using RadiologyCenter.Idnetity.Application.Abstractions;
+using RadiologyCenter.Idnetity.Domain.Entities;
 using RadiologyCenter.Idnetity.Infrastructure.Authorization;
 using RadiologyCenter.Idnetity.Infrastructure.Persistence;
 using RadiologyCenter.Idnetity.Infrastructure.Repositories;
@@ -33,6 +35,7 @@ public static class IdentityInfrastructureRegistration
 
         services.AddScoped<IUserRepository, UserRepository>();
         services.AddScoped<IRoleRepository, RoleRepository>();
+        services.AddScoped<IPasswordHasher<User>, PasswordHasher<User>>();
 
         services.Configure<JwtOptions>(configuration.GetSection("Jwt"));
         services.AddScoped<ITokenService, TokenService>();

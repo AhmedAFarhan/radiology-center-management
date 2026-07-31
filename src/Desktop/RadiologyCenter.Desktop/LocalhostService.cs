@@ -6,6 +6,8 @@ namespace RadiologyCenter.Desktop;
 public sealed class LocalhostService : IDisposable
 {
     private const int Port = 5224;
+    private const int StartupTimeoutMs = 10000;
+    private const int HealthCheckIntervalMs = 500;
 
 #if WINDOWS
     private Process? _process;
@@ -18,11 +20,13 @@ public sealed class LocalhostService : IDisposable
 #endif
     }
 
-    public Task StartAsync()
+    public async Task StartAsync()
     {
 #if WINDOWS
         EnsurePortIsFree();
         var (exePath, workDir, isDevelopment) = ResolveLocalhostPaths();
+
+        var stderr = new StringWriter();
 
         _process = new Process
         {
@@ -33,6 +37,7 @@ public sealed class LocalhostService : IDisposable
                 WorkingDirectory = workDir,
                 UseShellExecute = false,
                 CreateNoWindow = true,
+                RedirectStandardError = true,
                 EnvironmentVariables =
                 {
                     ["ASPNETCORE_ENVIRONMENT"] = isDevelopment ? "Development" : "Production",
@@ -42,9 +47,24 @@ public sealed class LocalhostService : IDisposable
             EnableRaisingEvents = true,
         };
 
+        _process.ErrorDataReceived += (_, e) =>
+        {
+            if (e.Data is not null)
+                stderr.WriteLine(e.Data);
+        };
+
         _process.Start();
+        _process.BeginErrorReadLine();
+
+        var started = await WaitForStartupAsync();
+        if (!started)
+        {
+            _process.Kill(entireProcessTree: true);
+            var error = stderr.ToString();
+            throw new InvalidOperationException(
+                $"Localhost failed to start within {StartupTimeoutMs}ms.\nError output:\n{error}");
+        }
 #endif
-        return Task.CompletedTask;
     }
 
     public void Stop()
@@ -58,6 +78,32 @@ public sealed class LocalhostService : IDisposable
     public void Dispose() => Stop();
 
 #if WINDOWS
+    private async Task<bool> WaitForStartupAsync()
+    {
+        var elapsed = 0;
+        while (elapsed < StartupTimeoutMs)
+        {
+            if (_process is null || _process.HasExited)
+                return false;
+
+            try
+            {
+                using var httpClient = new HttpClient { Timeout = TimeSpan.FromSeconds(2) };
+                var response = await httpClient.GetAsync($"http://localhost:{Port}/swagger/v1/swagger.json");
+                if (response.IsSuccessStatusCode)
+                    return true;
+            }
+            catch
+            {
+                // not ready yet
+            }
+
+            await Task.Delay(HealthCheckIntervalMs);
+            elapsed += HealthCheckIntervalMs;
+        }
+        return false;
+    }
+
     private void KillProcess()
     {
         if (_process is { HasExited: false })
@@ -96,12 +142,10 @@ public sealed class LocalhostService : IDisposable
 
     private static (string exePath, string workDir, bool isDevelopment) ResolveLocalhostPaths()
     {
-        // Production: Localhost published alongside the Desktop app
         var productionExe = Path.Combine(AppContext.BaseDirectory, "localhost", "RadiologyCenter.Localhost.exe");
         if (File.Exists(productionExe))
             return (productionExe, Path.Combine(AppContext.BaseDirectory, "localhost"), false);
 
-        // Development: walk up to find the solution root
         var dir = new DirectoryInfo(AppContext.BaseDirectory);
         while (dir is not null && !Directory.Exists(Path.Combine(dir.FullName, "Backend", "Localhost")))
             dir = dir.Parent;
