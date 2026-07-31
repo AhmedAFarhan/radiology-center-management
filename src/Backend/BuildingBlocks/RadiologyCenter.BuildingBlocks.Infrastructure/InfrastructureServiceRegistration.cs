@@ -25,7 +25,6 @@ public static class InfrastructureServiceRegistration
         services.AddScoped(typeof(IBaseRepository<,>), typeof(BaseRepository<,>));
         services.AddScoped<IUnitOfWork, UnitOfWork<AppDbContext>>();
         services.AddScoped(typeof(IUnitOfWork<>), typeof(UnitOfWork<>));
-        services.AddScoped<ITransaction, TransactionManager>();
 
         services.AddSingleton<IClock, SystemClock>();
         services.AddScoped<ICurrentUser, CurrentUserService>();

@@ -1,6 +1,7 @@
 using System.Data;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage;
 using RadiologyCenter.Patients.Application.Abstractions;
 using RadiologyCenter.Patients.Infrastructure.Persistence;
 
@@ -21,6 +22,7 @@ public class PatientCodeGenerator : IPatientCodeGenerator
             await connection.OpenAsync(ct);
 
         await using var command = connection.CreateCommand();
+        command.Transaction = _context.Database.CurrentTransaction?.GetDbTransaction();
         command.CommandText =
             """
             MERGE [Patients].[PatientNumberSequences] WITH (HOLDLOCK) AS target

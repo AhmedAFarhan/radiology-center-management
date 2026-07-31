@@ -21,6 +21,8 @@ public static class CreatePatientCommandHandler
             ? BloodType.FromName<BloodType>(command.BloodType)
             : null;
 
+        await using var transaction = await unitOfWork.BeginTransactionAsync(ct);
+
         var patientCode = await patientCodeGenerator.GenerateNextAsync(ct);
 
         var patient = Patient.Create(
@@ -39,7 +41,7 @@ public static class CreatePatientCommandHandler
             command.ReferringPhysician);
 
         await patientRepository.AddAsync(patient, ct);
-        await unitOfWork.SaveChangesAsync(ct);
+        await transaction.CommitAsync(ct);
 
         return Result.Success(patient.Adapt<PatientDto>());
     }

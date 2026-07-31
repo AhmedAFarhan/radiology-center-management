@@ -1,3 +1,4 @@
+using Microsoft.EntityFrameworkCore.Storage;
 using RadiologyCenter.BuildingBlocks.Application.Abstractions;
 using RadiologyCenter.BuildingBlocks.Domain.Entities;
 
@@ -22,6 +23,12 @@ public class UnitOfWork<TContext> : IUnitOfWork, IUnitOfWork<TContext>
         return result;
     }
 
+    public async Task<IUnitOfWorkTransaction> BeginTransactionAsync(CancellationToken ct = default)
+    {
+        var transaction = await _context.Database.BeginTransactionAsync(ct);
+        return new DbUnitOfWorkTransaction(transaction, this);
+    }
+
     private async Task DispatchDomainEventsAsync(CancellationToken ct)
     {
         var entries = _context.ChangeTracker
@@ -35,4 +42,36 @@ public class UnitOfWork<TContext> : IUnitOfWork, IUnitOfWork<TContext>
             await _eventDispatcher.DispatchAsync(entity, ct);
         }
     }
+}
+
+internal sealed class DbUnitOfWorkTransaction : IUnitOfWorkTransaction
+{
+    private readonly IDbContextTransaction _transaction;
+    private readonly IUnitOfWork _unitOfWork;
+
+    public DbUnitOfWorkTransaction(IDbContextTransaction transaction, IUnitOfWork unitOfWork)
+    {
+        _transaction = transaction;
+        _unitOfWork = unitOfWork;
+    }
+
+    public async Task CommitAsync(CancellationToken ct = default)
+    {
+        try
+        {
+            await _unitOfWork.SaveChangesAsync(ct);
+            await _transaction.CommitAsync(ct);
+        }
+        catch
+        {
+            await RollbackAsync(ct);
+            throw;
+        }
+    }
+
+    public async Task RollbackAsync(CancellationToken ct = default) =>
+        await _transaction.RollbackAsync(ct);
+
+    public async ValueTask DisposeAsync() =>
+        await _transaction.DisposeAsync();
 }
