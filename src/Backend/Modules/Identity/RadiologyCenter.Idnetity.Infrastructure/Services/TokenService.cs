@@ -5,6 +5,7 @@ using System.Text;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using RadiologyCenter.Idnetity.Application.Abstractions;
+using RadiologyCenter.Idnetity.Domain;
 using RadiologyCenter.Idnetity.Domain.Entities;
 using RadiologyCenter.Idnetity.Infrastructure.Settings;
 
@@ -30,8 +31,17 @@ public class TokenService : ITokenService
         foreach (var role in user.AssignedRoles)
             claims.Add(new(ClaimTypes.Role, role.Name!));
 
-        foreach (var permission in user.GetEffectivePermissions())
-            claims.Add(new("permission", permission));
+        if (user.AssignedRoles.Any(r => r.IsSystem))
+        {
+            claims.Add(new("isAdmin", "true"));
+            foreach (var permission in Permissions.All)
+                claims.Add(new("permission", permission.Code));
+        }
+        else
+        {
+            foreach (var permission in user.GetEffectivePermissions())
+                claims.Add(new("permission", permission));
+        }
 
         var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_options.SecretKey));
         var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);

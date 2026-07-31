@@ -1,5 +1,6 @@
 using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -8,6 +9,7 @@ using RadiologyCenter.BuildingBlocks.Application.Abstractions;
 using RadiologyCenter.BuildingBlocks.Infrastructure.Persistence;
 using RadiologyCenter.BuildingBlocks.Infrastructure.Persistence.Interceptors;
 using RadiologyCenter.Idnetity.Application.Abstractions;
+using RadiologyCenter.Idnetity.Infrastructure.Authorization;
 using RadiologyCenter.Idnetity.Infrastructure.Persistence;
 using RadiologyCenter.Idnetity.Infrastructure.Repositories;
 using RadiologyCenter.Idnetity.Infrastructure.Services;
@@ -34,6 +36,8 @@ public static class IdentityInfrastructureRegistration
 
         services.Configure<JwtOptions>(configuration.GetSection("Jwt"));
         services.AddScoped<ITokenService, TokenService>();
+        services.AddScoped<IAuthorizationHandler, PermissionAuthorizationHandler>();
+        services.AddSingleton<IAuthorizationPolicyProvider, PermissionPolicyProvider>();
 
         services.AddAuthentication(options =>
         {
@@ -53,6 +57,8 @@ public static class IdentityInfrastructureRegistration
                 IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtOptions.SecretKey)),
             };
         });
+
+        services.AddAuthorization();
 
         return services;
     }

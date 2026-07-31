@@ -10,6 +10,7 @@ using RadiologyCenter.Idnetity.Application.DTOs;
 using RadiologyCenter.Idnetity.Application.Queries.GetRoleById;
 using RadiologyCenter.Idnetity.Application.Queries.GetRoles;
 using Wolverine;
+using static RadiologyCenter.Idnetity.Domain.Permissions;
 
 namespace RadiologyCenter.Localhost.Controllers.Identity;
 
@@ -21,6 +22,7 @@ public class RolesController : ControllerBase
 
     public RolesController(IMessageBus bus) => _bus = bus;
 
+    [HasPermission(RolesReadCode)]
     [HttpGet("{id:guid}")]
     public async Task<IActionResult> GetByIdAsync(Guid id, CancellationToken ct)
     {
@@ -28,6 +30,7 @@ public class RolesController : ControllerBase
         return result.ToActionResult();
     }
 
+    [HasPermission(RolesReadCode)]
     [HttpPost("all")]
     public async Task<IActionResult> GetAllAsync([FromBody] QueryRequest request, CancellationToken ct)
     {
@@ -35,6 +38,7 @@ public class RolesController : ControllerBase
         return result.ToActionResult();
     }
 
+    [HasPermission(RolesCreateCode)]
     [HttpPost]
     public async Task<IActionResult> CreateAsync([FromBody] CreateRoleCommand command, CancellationToken ct)
     {
@@ -42,6 +46,7 @@ public class RolesController : ControllerBase
         return result.ToActionResult();
     }
 
+    [HasPermission(RolesUpdateCode)]
     [HttpPut("{id:guid}")]
     public async Task<IActionResult> UpdateAsync(Guid id, [FromBody] UpdateRoleCommand command, CancellationToken ct)
     {
@@ -49,6 +54,7 @@ public class RolesController : ControllerBase
         return result.ToActionResult();
     }
 
+    [HasPermission(RolesManagePermissionsCode)]
     [HttpPost("{id:guid}/permissions")]
     public async Task<IActionResult> AddPermissionAsync(Guid id, [FromBody] AddPermissionToRoleCommand command, CancellationToken ct)
     {
@@ -56,6 +62,7 @@ public class RolesController : ControllerBase
         return result.ToActionResult();
     }
 
+    [HasPermission(RolesManagePermissionsCode)]
     [HttpDelete("{id:guid}/permissions/{permissionCode}")]
     public async Task<IActionResult> RemovePermissionAsync(Guid id, string permissionCode, CancellationToken ct)
     {
