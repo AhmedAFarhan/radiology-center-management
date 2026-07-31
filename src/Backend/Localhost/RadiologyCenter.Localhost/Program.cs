@@ -10,6 +10,9 @@ using RadiologyCenter.Identity.Infrastructure.Persistence;
 using RadiologyCenter.Identity.Infrastructure.Persistence.Seed;
 using RadiologyCenter.Localhost.Filters;
 using RadiologyCenter.Localhost.Middleware;
+using RadiologyCenter.Patients.Application;
+using RadiologyCenter.Patients.Infrastructure;
+using RadiologyCenter.Patients.Infrastructure.Persistence;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -51,6 +54,8 @@ builder.Services.AddMapster();
 builder.Services.AddInfrastructure(builder.Configuration);
 builder.Services.AddIdentityApplication();
 builder.Services.AddIdentityInfrastructure(builder.Configuration);
+builder.Services.AddPatientsApplication();
+builder.Services.AddPatientsInfrastructure(builder.Configuration);
 
 var app = builder.Build();
 
@@ -61,6 +66,9 @@ using (var scope = app.Services.CreateScope())
     await IdentityDbSeeder.SeedAsync(
         identityDb,
         scope.ServiceProvider.GetRequiredService<IPasswordHasher<User>>());
+
+    var patientsDb = scope.ServiceProvider.GetRequiredService<PatientsDbContext>();
+    patientsDb.Database.Migrate();
 }
 
 app.UseMiddleware<ExceptionMiddleware>();

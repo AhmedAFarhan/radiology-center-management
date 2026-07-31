@@ -8,7 +8,7 @@ public static class CreateRoleCommandHandler
     public static async Task<Result> HandleAsync(
         CreateRoleCommand command,
         IRoleRepository roleRepository,
-        IUnitOfWork unitOfWork,
+        IIdentityUnitOfWork unitOfWork,
         CancellationToken ct)
     {
         var role = Role.Create(command.Name, command.Description, command.IsSystem);

@@ -60,8 +60,10 @@ public class BaseRepository<TEntity, TId> : IBaseRepository<TEntity, TId>
 
     public virtual async Task<PagedResult<TEntity>> GetPagedAsync(QueryRequest request, CancellationToken ct = default)
     {
-        var criteria = FilterExpressionBuilder.Build<TEntity>(request.Filters);
-        var spec = new DynamicSpecification<TEntity>(criteria);
+        var spec = new DynamicSpecification<TEntity>(FilterExpressionBuilder.Build<TEntity>(request.Filters));
+
+        if (SearchExpressionBuilder.Build<TEntity>(request.SearchTerm, request.SearchFields) is { } searchCriteria)
+            spec.AddCriteria(searchCriteria);
 
         if (SortExpressionBuilder.TryBuildSelector<TEntity>(request.SortBy, out var sortSelector))
         {
@@ -80,6 +82,6 @@ public class BaseRepository<TEntity, TId> : IBaseRepository<TEntity, TId>
 
         return PagedResult<TEntity>.Create(items, totalCount, request.Pagination.PageNumber, request.Pagination.PageSize);
     }
-    private IQueryable<TEntity> ApplySpecification(ISpecification<TEntity> spec) =>
+    protected IQueryable<TEntity> ApplySpecification(ISpecification<TEntity> spec) =>
         SpecificationEvaluator<TEntity>.GetQuery(DbSet.AsQueryable(), spec);
 }

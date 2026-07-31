@@ -1,10 +1,11 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using RadiologyCenter.BuildingBlocks.Application.Abstractions;
-using RadiologyCenter.BuildingBlocks.Infrastructure.Persistence;
 using RadiologyCenter.BuildingBlocks.Infrastructure.Persistence.Interceptors;
+using RadiologyCenter.Patients.Application.Abstractions;
 using RadiologyCenter.Patients.Infrastructure.Persistence;
+using RadiologyCenter.Patients.Infrastructure.Repositories;
+using RadiologyCenter.Patients.Infrastructure.Services;
 
 namespace RadiologyCenter.Patients.Infrastructure;
 
@@ -18,7 +19,9 @@ public static class PatientsInfrastructureRegistration
             options.UseSqlServer(connectionString)
                    .AddInterceptors(sp.GetRequiredService<AuditSoftDeleteInterceptor>()));
 
-        services.AddScoped<IUnitOfWork<PatientsDbContext>, UnitOfWork<PatientsDbContext>>();
+        services.AddScoped<IPatientRepository, PatientRepository>();
+        services.AddScoped<IPatientCodeGenerator, PatientCodeGenerator>();
+        services.AddScoped<IPatientsUnitOfWork, PatientsUnitOfWork>();
 
         return services;
     }

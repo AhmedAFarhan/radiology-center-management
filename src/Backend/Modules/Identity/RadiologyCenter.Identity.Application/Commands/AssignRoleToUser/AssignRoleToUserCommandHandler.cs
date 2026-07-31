@@ -9,7 +9,7 @@ public static class AssignRoleToUserCommandHandler
         AssignRoleToUserCommand command,
         IUserRepository userRepository,
         IRoleRepository roleRepository,
-        IUnitOfWork unitOfWork,
+        IIdentityUnitOfWork unitOfWork,
         CancellationToken ct)
     {
         var user = await userRepository.GetByIdAsync(command.UserId, ct);

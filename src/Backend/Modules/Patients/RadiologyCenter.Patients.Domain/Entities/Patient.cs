@@ -14,7 +14,7 @@ public sealed class Patient : SoftDeletableAggregateRoot<Guid>
     public string LastName { get; private set; }
     public DateTime? DateOfBirth { get; private set; }
     public Gender Gender { get; private set; }
-    public string? PhoneNumber { get; private set; }
+    public string PhoneNumber { get; private set; }
     public string? Email { get; private set; }
     public string? Address { get; private set; }
     public string? NationalId { get; private set; }
@@ -37,6 +37,7 @@ public sealed class Patient : SoftDeletableAggregateRoot<Guid>
         FirstName = null!;
         LastName = null!;
         Gender = null!;
+        PhoneNumber = null!;
     }
 
     public static Patient Create(
@@ -45,7 +46,7 @@ public sealed class Patient : SoftDeletableAggregateRoot<Guid>
         Gender gender,
         DateTime? dateOfBirth = null,
         int? age = null,
-        string? phoneNumber = null,
+        string phoneNumber = null!,
         string? email = null,
         string? address = null,
         string? nationalId = null,
@@ -56,6 +57,7 @@ public sealed class Patient : SoftDeletableAggregateRoot<Guid>
     {
         Guard.AgainstNullOrWhiteSpace(patientCode, nameof(patientCode));
         Guard.AgainstNullOrWhiteSpace(fullName, nameof(fullName));
+        Guard.AgainstNullOrWhiteSpace(phoneNumber, nameof(phoneNumber));
         Guard.AgainstNull(gender, nameof(gender));
         ValidateBirthDetails(dateOfBirth, age);
 
@@ -90,7 +92,7 @@ public sealed class Patient : SoftDeletableAggregateRoot<Guid>
         Gender gender,
         DateTime? dateOfBirth = null,
         int? age = null,
-        string? phoneNumber = null,
+        string phoneNumber = null!,
         string? email = null,
         string? address = null,
         string? nationalId = null,
@@ -100,6 +102,7 @@ public sealed class Patient : SoftDeletableAggregateRoot<Guid>
         string? referringPhysician = null)
     {
         Guard.AgainstNullOrWhiteSpace(fullName, nameof(fullName));
+        Guard.AgainstNullOrWhiteSpace(phoneNumber, nameof(phoneNumber));
         Guard.AgainstNull(gender, nameof(gender));
         ValidateBirthDetails(dateOfBirth, age);
 

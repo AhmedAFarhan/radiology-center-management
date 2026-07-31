@@ -8,7 +8,7 @@ public static class LogoutCommandHandler
     public static async Task<Result> HandleAsync(
         LogoutCommand command,
         IUserRepository userRepository,
-        IUnitOfWork unitOfWork,
+        IIdentityUnitOfWork unitOfWork,
         CancellationToken ct)
     {
         var user = await userRepository.GetByIdAsync(command.UserId, ct);

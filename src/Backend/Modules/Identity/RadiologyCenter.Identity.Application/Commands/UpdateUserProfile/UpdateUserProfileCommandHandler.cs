@@ -8,7 +8,7 @@ public static class UpdateUserProfileCommandHandler
     public static async Task<Result> HandleAsync(
         UpdateUserProfileCommand command,
         IUserRepository userRepository,
-        IUnitOfWork unitOfWork,
+        IIdentityUnitOfWork unitOfWork,
         CancellationToken ct)
     {
         var user = await userRepository.GetByIdAsync(command.UserId, ct);

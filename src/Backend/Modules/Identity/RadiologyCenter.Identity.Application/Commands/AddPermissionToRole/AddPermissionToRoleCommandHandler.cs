@@ -8,7 +8,7 @@ public static class AddPermissionToRoleCommandHandler
     public static async Task<Result> HandleAsync(
         AddPermissionToRoleCommand command,
         IRoleRepository roleRepository,
-        IUnitOfWork unitOfWork,
+        IIdentityUnitOfWork unitOfWork,
         CancellationToken ct)
     {
         var role = await roleRepository.GetByIdAsync(command.RoleId, ct);

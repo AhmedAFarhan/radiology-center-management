@@ -14,7 +14,7 @@ public static class LoginCommandHandler
         IUserRepository userRepository,
         IPasswordHasher<User> passwordHasher,
         ITokenService tokenService,
-        IUnitOfWork unitOfWork,
+        IIdentityUnitOfWork unitOfWork,
         IOptions<AccountLockoutOptions> AccountLockoutOptions,
         CancellationToken ct)
     {

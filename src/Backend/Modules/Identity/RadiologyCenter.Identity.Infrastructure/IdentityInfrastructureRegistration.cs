@@ -33,7 +33,7 @@ public static class IdentityInfrastructureRegistration
                    .AddInterceptors(sp.GetRequiredService<AuditSoftDeleteInterceptor>()));
 
         services.AddScoped<AppDbContext>(sp => sp.GetRequiredService<IdentityDbContext>());
-        services.AddScoped<IUnitOfWork<IdentityDbContext>, UnitOfWork<IdentityDbContext>>();
+        services.AddScoped<IIdentityUnitOfWork, IdentityUnitOfWork>();
 
         services.AddScoped<IUserRepository, UserRepository>();
         services.AddScoped<IRoleRepository, RoleRepository>();

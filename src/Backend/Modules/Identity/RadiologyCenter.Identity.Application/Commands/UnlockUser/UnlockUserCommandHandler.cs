@@ -8,7 +8,7 @@ public static class UnlockUserCommandHandler
     public static async Task<Result> HandleAsync(
         UnlockUserCommand command,
         IUserRepository userRepository,
-        IUnitOfWork unitOfWork,
+        IIdentityUnitOfWork unitOfWork,
         CancellationToken ct)
     {
         var user = await userRepository.GetByIdAsync(command.UserId, ct);

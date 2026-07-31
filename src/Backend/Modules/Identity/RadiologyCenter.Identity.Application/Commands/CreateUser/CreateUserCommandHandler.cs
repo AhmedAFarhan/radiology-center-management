@@ -10,7 +10,7 @@ public static class CreateUserCommandHandler
         CreateUserCommand command,
         IUserRepository userRepository,
         IRoleRepository roleRepository,
-        IUnitOfWork unitOfWork,
+        IIdentityUnitOfWork unitOfWork,
         IPasswordHasher<User> passwordHasher,
         CancellationToken ct)
     {

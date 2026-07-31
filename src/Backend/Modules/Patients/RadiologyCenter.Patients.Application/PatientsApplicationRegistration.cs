@@ -10,6 +10,7 @@ public static class PatientsApplicationRegistration
     {
         services.AddValidatorsFromAssembly(typeof(PatientsApplicationRegistration).Assembly);
         ApplicationAssemblyRegistry.Register(typeof(PatientsApplicationRegistration).Assembly);
+        PatientsMappingConfig.Configure();
         return services;
     }
 }

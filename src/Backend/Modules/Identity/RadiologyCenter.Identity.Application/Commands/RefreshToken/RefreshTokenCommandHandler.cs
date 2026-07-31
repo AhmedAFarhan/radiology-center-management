@@ -10,7 +10,7 @@ public static class RefreshTokenCommandHandler
         RefreshTokenCommand command,
         IUserRepository userRepository,
         ITokenService tokenService,
-        IUnitOfWork unitOfWork,
+        IIdentityUnitOfWork unitOfWork,
         CancellationToken ct)
     {
         var user = await userRepository.GetByRefreshTokenAsync(command.Token, ct);

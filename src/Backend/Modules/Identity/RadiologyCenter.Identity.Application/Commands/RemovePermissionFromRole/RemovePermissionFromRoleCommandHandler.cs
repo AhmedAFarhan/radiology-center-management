@@ -8,7 +8,7 @@ public static class RemovePermissionFromRoleCommandHandler
     public static async Task<Result> HandleAsync(
         RemovePermissionFromRoleCommand command,
         IRoleRepository roleRepository,
-        IUnitOfWork unitOfWork,
+        IIdentityUnitOfWork unitOfWork,
         CancellationToken ct)
     {
         var role = await roleRepository.GetByIdAsync(command.RoleId, ct);

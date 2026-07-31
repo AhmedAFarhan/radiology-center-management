@@ -23,6 +23,8 @@
     <ProjectReference Include="..\..\BuildingBlocks\RadiologyCenter.BuildingBlocks.Infrastructure\RadiologyCenter.BuildingBlocks.Infrastructure.csproj" />
     <ProjectReference Include="..\..\Modules\Identity\RadiologyCenter.Identity.Application\RadiologyCenter.Identity.Application.csproj" />
     <ProjectReference Include="..\..\Modules\Identity\RadiologyCenter.Identity.Infrastructure\RadiologyCenter.Identity.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\Modules\Patients\RadiologyCenter.Patients.Application\RadiologyCenter.Patients.Application.csproj" />
+    <ProjectReference Include="..\..\Modules\Patients\RadiologyCenter.Patients.Infrastructure\RadiologyCenter.Patients.Infrastructure.csproj" />
   </ItemGroup>
 
 </Project>
