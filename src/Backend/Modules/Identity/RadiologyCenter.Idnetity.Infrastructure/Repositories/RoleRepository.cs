@@ -1,6 +1,9 @@
 using Microsoft.EntityFrameworkCore;
 using RadiologyCenter.BuildingBlocks.Application.Common;
+using RadiologyCenter.BuildingBlocks.Application.Services;
 using RadiologyCenter.BuildingBlocks.Domain.Pagination;
+using RadiologyCenter.BuildingBlocks.Domain.Specifications;
+using RadiologyCenter.BuildingBlocks.Infrastructure.Persistence;
 using RadiologyCenter.Idnetity.Application.Abstractions;
 using RadiologyCenter.Idnetity.Domain.Entities;
 using RadiologyCenter.Idnetity.Infrastructure.Persistence;
@@ -50,13 +53,34 @@ public class RoleRepository : IRoleRepository
 
     public async Task<PagedResult<Role>> GetPagedAsync(QueryRequest request, CancellationToken ct = default)
     {
-        var query = _roles.AsNoTracking();
+        var spec = new DynamicSpecification<Role>(FilterExpressionBuilder.Build<Role>(request.Filters));
+
+        if (!string.IsNullOrWhiteSpace(request.SearchTerm))
+        {
+            var search = request.SearchTerm.Trim();
+            spec.AddCriteria(r =>
+                r.Name!.Contains(search) ||
+                (r.Description != null && r.Description.Contains(search)));
+        }
+
+        spec.AddInclude(r => r.Permissions);
+
+        if (SortExpressionBuilder.TryBuildSelector<Role>(request.SortBy, out var sortSelector))
+        {
+            if (request.SortDescending)
+                spec.ApplyOrderByDescending(sortSelector);
+            else
+                spec.ApplyOrderBy(sortSelector);
+        }
+
+        var query = SpecificationEvaluator<Role>.GetQuery(_roles.AsNoTracking(), spec);
         var totalCount = await query.CountAsync(ct);
-        query = query.Include(r => r.Permissions);
-        var items = await query
-            .Skip((request.Pagination.PageNumber - 1) * request.Pagination.PageSize)
-            .Take(request.Pagination.PageSize)
-            .ToListAsync(ct);
+
+        spec.ApplyPaging(
+            (request.Pagination.PageNumber - 1) * request.Pagination.PageSize,
+            request.Pagination.PageSize);
+
+        var items = await SpecificationEvaluator<Role>.GetQuery(_roles.AsNoTracking(), spec).ToListAsync(ct);
 
         return new PagedResult<Role>(items, totalCount, request.Pagination.PageNumber, request.Pagination.PageSize);
     }

@@ -15,11 +15,13 @@ public static class InfrastructureServiceRegistration
     {
         var connectionString = configuration.GetConnectionString("DefaultConnection");
 
+        services.AddHttpContextAccessor();
         services.AddScoped<AuditSoftDeleteInterceptor>();
         services.AddDbContext<AppDbContext>((sp, options) =>
             options.UseSqlServer(connectionString)
                    .AddInterceptors(sp.GetRequiredService<AuditSoftDeleteInterceptor>()));
 
+        services.AddScoped<DbContext>(sp => sp.GetRequiredService<AppDbContext>());
         services.AddScoped(typeof(IBaseRepository<,>), typeof(BaseRepository<,>));
         services.AddScoped<IUnitOfWork, UnitOfWork>();
         services.AddScoped<ITransaction, TransactionManager>();

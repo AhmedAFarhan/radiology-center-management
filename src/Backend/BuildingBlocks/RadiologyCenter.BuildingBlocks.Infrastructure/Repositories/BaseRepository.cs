@@ -63,31 +63,23 @@ public class BaseRepository<TEntity, TId> : IBaseRepository<TEntity, TId>
         var criteria = FilterExpressionBuilder.Build<TEntity>(request.Filters);
         var spec = new DynamicSpecification<TEntity>(criteria);
 
-        if (!string.IsNullOrWhiteSpace(request.SortBy))
+        if (SortExpressionBuilder.TryBuildSelector<TEntity>(request.SortBy, out var sortSelector))
         {
-            var param = System.Linq.Expressions.Expression.Parameter(typeof(TEntity), "e");
-            var property = typeof(TEntity).GetProperty(request.SortBy, System.Reflection.BindingFlags.IgnoreCase | System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance);
-            if (property is not null)
-            {
-                var lambda = System.Linq.Expressions.Expression.Lambda<Func<TEntity, object>>(
-                    System.Linq.Expressions.Expression.Convert(
-                        System.Linq.Expressions.Expression.Property(param, property), typeof(object)), param);
-                if (request.SortDescending)
-                    spec.ApplyOrderByDescending(lambda);
-                else
-                    spec.ApplyOrderBy(lambda);
-            }
+            if (request.SortDescending)
+                spec.ApplyOrderByDescending(sortSelector);
+            else
+                spec.ApplyOrderBy(sortSelector);
         }
-
-        spec.ApplyPaging((request.Pagination.PageNumber - 1) * request.Pagination.PageSize, request.Pagination.PageSize);
 
         var query = ApplySpecification(spec);
         var totalCount = await query.CountAsync(ct);
-        var items = await query.ToListAsync(ct);
+
+        spec.ApplyPaging((request.Pagination.PageNumber - 1) * request.Pagination.PageSize, request.Pagination.PageSize);
+
+        var items = await ApplySpecification(spec).ToListAsync(ct);
 
         return PagedResult<TEntity>.Create(items, totalCount, request.Pagination.PageNumber, request.Pagination.PageSize);
     }
-
     private IQueryable<TEntity> ApplySpecification(ISpecification<TEntity> spec) =>
         SpecificationEvaluator<TEntity>.GetQuery(DbSet.AsQueryable(), spec);
 }

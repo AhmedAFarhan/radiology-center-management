@@ -1,5 +1,6 @@
 using System.Linq.Expressions;
 using System.Reflection;
+using System.Text.Json;
 using RadiologyCenter.BuildingBlocks.Domain.Specifications;
 
 namespace RadiologyCenter.BuildingBlocks.Application.Services;
@@ -95,14 +96,15 @@ public static class FilterExpressionBuilder
     private static PropertyInfo? GetProperty<T>(string fieldName)
     {
         var type = typeof(T);
+        PropertyInfo? result = null;
         foreach (var part in fieldName.Split('.'))
         {
             var prop = type.GetProperty(part, BindingFlags.IgnoreCase | BindingFlags.Public | BindingFlags.Instance);
             if (prop is null) return null;
+            result = prop;
             type = prop.PropertyType;
         }
-        return type.GetProperty(fieldName.Split('.').Last(),
-            BindingFlags.IgnoreCase | BindingFlags.Public | BindingFlags.Instance);
+        return result;
     }
 
     private static Expression BuildEquality(Expression left, object? value, Type propertyType)
@@ -127,6 +129,13 @@ public static class FilterExpressionBuilder
         if (targetType.IsInstanceOfType(value)) return value;
 
         var underlying = Nullable.GetUnderlyingType(targetType) ?? targetType;
+
+        if (value is JsonElement { ValueKind: not JsonValueKind.Null and not JsonValueKind.Undefined } element)
+        {
+            if (underlying.IsEnum)
+                return Enum.Parse(underlying, element.GetString() ?? string.Empty, ignoreCase: true);
+            return element.Deserialize(underlying);
+        }
 
         if (underlying is { IsEnum: true })
             return Enum.Parse(underlying, value.ToString()!, ignoreCase: true);

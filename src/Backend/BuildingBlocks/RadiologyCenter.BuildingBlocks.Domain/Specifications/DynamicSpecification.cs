@@ -18,9 +18,29 @@ public class DynamicSpecification<T> : ISpecification<T>
         Criteria = criteria;
     }
 
-    public void AddCriteria(Expression<Func<T, bool>> criteria) =>
-        Criteria = Criteria is null ? criteria : Expression.Lambda<Func<T, bool>>(
-            Expression.AndAlso(Criteria.Body, criteria.Body), Criteria.Parameters);
+    public void AddCriteria(Expression<Func<T, bool>> criteria)
+    {
+        if (Criteria is null)
+        {
+            Criteria = criteria;
+            return;
+        }
+
+        var param = Criteria.Parameters[0];
+        var other = new ParameterRebinder(param).Visit(criteria.Body);
+        Criteria = Expression.Lambda<Func<T, bool>>(
+            Expression.AndAlso(Criteria.Body, other), [param]);
+    }
+
+    private sealed class ParameterRebinder : ExpressionVisitor
+    {
+        private readonly ParameterExpression _replacement;
+
+        public ParameterRebinder(ParameterExpression replacement) => _replacement = replacement;
+
+        protected override Expression VisitParameter(ParameterExpression node) =>
+            node.Type == _replacement.Type ? _replacement : node;
+    }
 
     public void AddInclude(Expression<Func<T, object>> includeExpression) =>
         Includes.Add(includeExpression);

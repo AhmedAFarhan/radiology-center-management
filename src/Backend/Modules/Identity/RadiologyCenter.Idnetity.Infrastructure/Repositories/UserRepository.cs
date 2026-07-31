@@ -1,6 +1,9 @@
 using Microsoft.EntityFrameworkCore;
 using RadiologyCenter.BuildingBlocks.Application.Common;
+using RadiologyCenter.BuildingBlocks.Application.Services;
 using RadiologyCenter.BuildingBlocks.Domain.Pagination;
+using RadiologyCenter.BuildingBlocks.Domain.Specifications;
+using RadiologyCenter.BuildingBlocks.Infrastructure.Persistence;
 using RadiologyCenter.Idnetity.Application.Abstractions;
 using RadiologyCenter.Idnetity.Domain.Entities;
 using RadiologyCenter.Idnetity.Infrastructure.Persistence;
@@ -60,13 +63,36 @@ public class UserRepository : IUserRepository
 
     public async Task<PagedResult<User>> GetPagedAsync(QueryRequest request, CancellationToken ct = default)
     {
-        var query = _users.AsNoTracking();
+        var spec = new DynamicSpecification<User>(FilterExpressionBuilder.Build<User>(request.Filters));
+
+        if (!string.IsNullOrWhiteSpace(request.SearchTerm))
+        {
+            var search = request.SearchTerm.Trim();
+            spec.AddCriteria(u =>
+                u.UserName!.Contains(search) ||
+                u.Email!.Contains(search) ||
+                u.FirstName.Contains(search) ||
+                u.LastName.Contains(search));
+        }
+
+        spec.AddInclude(u => u.AssignedRoles);
+
+        if (SortExpressionBuilder.TryBuildSelector<User>(request.SortBy, out var sortSelector))
+        {
+            if (request.SortDescending)
+                spec.ApplyOrderByDescending(sortSelector);
+            else
+                spec.ApplyOrderBy(sortSelector);
+        }
+
+        var query = SpecificationEvaluator<User>.GetQuery(_users.AsNoTracking(), spec);
         var totalCount = await query.CountAsync(ct);
-        query = query.Include(u => u.AssignedRoles);
-        var items = await query
-            .Skip((request.Pagination.PageNumber - 1) * request.Pagination.PageSize)
-            .Take(request.Pagination.PageSize)
-            .ToListAsync(ct);
+
+        spec.ApplyPaging(
+            (request.Pagination.PageNumber - 1) * request.Pagination.PageSize,
+            request.Pagination.PageSize);
+
+        var items = await SpecificationEvaluator<User>.GetQuery(_users.AsNoTracking(), spec).ToListAsync(ct);
 
         return new PagedResult<User>(items, totalCount, request.Pagination.PageNumber, request.Pagination.PageSize);
     }

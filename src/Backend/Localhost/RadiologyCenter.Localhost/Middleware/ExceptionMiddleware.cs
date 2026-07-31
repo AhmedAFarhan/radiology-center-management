@@ -33,6 +33,13 @@ public class ExceptionMiddleware
             await WriteResponse(context, HttpStatusCode.BadRequest,
                 ApiResponse.Fail(ex.Message, new ApiError { Code = "Validation", Message = ex.Message, Details = ex.Errors }));
         }
+        catch (FluentValidation.ValidationException ex)
+        {
+            _logger.LogWarning(ex, "Fluent validation failed");
+            var details = ex.Errors.Select(e => new { e.PropertyName, e.ErrorMessage });
+            await WriteResponse(context, HttpStatusCode.BadRequest,
+                ApiResponse.Fail(ex.Message, new ApiError { Code = "Validation", Message = ex.Message, Details = details }));
+        }
         catch (BusinessRuleViolationException ex)
         {
             _logger.LogWarning(ex, "Business rule violated");
