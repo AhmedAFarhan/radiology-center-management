@@ -2,17 +2,17 @@ using Microsoft.AspNetCore.Mvc;
 using RadiologyCenter.BuildingBlocks.Application.Common;
 using RadiologyCenter.BuildingBlocks.Domain.Pagination;
 using RadiologyCenter.BuildingBlocks.Domain.Results;
-using RadiologyCenter.Idnetity.Application.Commands.AddPermissionToRole;
-using RadiologyCenter.Idnetity.Application.Commands.CreateRole;
-using RadiologyCenter.Idnetity.Application.Commands.RemovePermissionFromRole;
-using RadiologyCenter.Idnetity.Application.Commands.UpdateRole;
-using RadiologyCenter.Idnetity.Application.DTOs;
-using RadiologyCenter.Idnetity.Application.Queries.GetRoleById;
-using RadiologyCenter.Idnetity.Application.Queries.GetRoles;
+using RadiologyCenter.Identity.Application.Commands.AddPermissionToRole;
+using RadiologyCenter.Identity.Application.Commands.CreateRole;
+using RadiologyCenter.Identity.Application.Commands.RemovePermissionFromRole;
+using RadiologyCenter.Identity.Application.Commands.UpdateRole;
+using RadiologyCenter.Identity.Application.DTOs;
+using RadiologyCenter.Identity.Application.Queries.GetRoleById;
+using RadiologyCenter.Identity.Application.Queries.GetRoles;
 using RadiologyCenter.Localhost.Authorization;
 using RadiologyCenter.Localhost.Extensions;
 using Wolverine;
-using static RadiologyCenter.Idnetity.Domain.Permissions;
+using static RadiologyCenter.Identity.Domain.Permissions;
 
 namespace RadiologyCenter.Localhost.Controllers.Identity;
 

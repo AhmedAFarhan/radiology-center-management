@@ -21,8 +21,8 @@
   <ItemGroup>
     <ProjectReference Include="..\..\BuildingBlocks\RadiologyCenter.BuildingBlocks.Application\RadiologyCenter.BuildingBlocks.Application.csproj" />
     <ProjectReference Include="..\..\BuildingBlocks\RadiologyCenter.BuildingBlocks.Infrastructure\RadiologyCenter.BuildingBlocks.Infrastructure.csproj" />
-    <ProjectReference Include="..\..\Modules\Identity\RadiologyCenter.Idnetity.Application\RadiologyCenter.Idnetity.Application.csproj" />
-    <ProjectReference Include="..\..\Modules\Identity\RadiologyCenter.Idnetity.Infrastructure\RadiologyCenter.Idnetity.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\Modules\Identity\RadiologyCenter.Identity.Application\RadiologyCenter.Identity.Application.csproj" />
+    <ProjectReference Include="..\..\Modules\Identity\RadiologyCenter.Identity.Infrastructure\RadiologyCenter.Identity.Infrastructure.csproj" />
   </ItemGroup>
 
 </Project>

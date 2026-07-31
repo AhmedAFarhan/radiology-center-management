@@ -1,9 +1,9 @@
 using Microsoft.AspNetCore.Mvc;
 using RadiologyCenter.BuildingBlocks.Domain.Results;
-using RadiologyCenter.Idnetity.Application.Commands.Login;
-using RadiologyCenter.Idnetity.Application.Commands.Logout;
-using RadiologyCenter.Idnetity.Application.Commands.RefreshToken;
-using RadiologyCenter.Idnetity.Application.DTOs;
+using RadiologyCenter.Identity.Application.Commands.Login;
+using RadiologyCenter.Identity.Application.Commands.Logout;
+using RadiologyCenter.Identity.Application.Commands.RefreshToken;
+using RadiologyCenter.Identity.Application.DTOs;
 using RadiologyCenter.Localhost.Extensions;
 using Wolverine;
 

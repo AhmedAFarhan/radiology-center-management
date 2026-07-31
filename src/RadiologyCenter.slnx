@@ -10,9 +10,9 @@
   </Folder>
   <Folder Name="/Backend/Modules/" />
   <Folder Name="/Backend/Modules/Identity/">
-    <Project Path="Backend/Modules/Identity/RadiologyCenter.Idnetity.Application/RadiologyCenter.Idnetity.Application.csproj" />
-    <Project Path="Backend/Modules/Identity/RadiologyCenter.Idnetity.Domain/RadiologyCenter.Idnetity.Domain.csproj" />
-    <Project Path="Backend/Modules/Identity/RadiologyCenter.Idnetity.Infrastructure/RadiologyCenter.Idnetity.Infrastructure.csproj" />
+    <Project Path="Backend/Modules/Identity/RadiologyCenter.Identity.Application/RadiologyCenter.Identity.Application.csproj" />
+    <Project Path="Backend/Modules/Identity/RadiologyCenter.Identity.Domain/RadiologyCenter.Identity.Domain.csproj" />
+    <Project Path="Backend/Modules/Identity/RadiologyCenter.Identity.Infrastructure/RadiologyCenter.Identity.Infrastructure.csproj" />
   </Folder>
   <Folder Name="/Desktop/">
     <Project Path="Desktop/RadiologyCenter.Desktop/RadiologyCenter.Desktop.csproj" />

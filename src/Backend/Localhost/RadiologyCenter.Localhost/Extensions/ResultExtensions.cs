@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using RadiologyCenter.BuildingBlocks.Application.Common;
 using RadiologyCenter.BuildingBlocks.Domain.Results;
@@ -14,6 +15,7 @@ public static class ResultExtensions
                 "NotFound" => new NotFoundObjectResult(ApiResponse.FromResult(result)),
                 "Unauthorized" => new UnauthorizedObjectResult(ApiResponse.FromResult(result)),
                 "Conflict" => new ConflictObjectResult(ApiResponse.FromResult(result)),
+                "LockedOut" => new ObjectResult(ApiResponse.FromResult(result)) { StatusCode = StatusCodes.Status423Locked },
                 _ => new BadRequestObjectResult(ApiResponse.FromResult(result))
             };
 
@@ -25,6 +27,7 @@ public static class ResultExtensions
                 "NotFound" => new NotFoundObjectResult(ApiResponse.FromResult(result)),
                 "Unauthorized" => new UnauthorizedObjectResult(ApiResponse.FromResult(result)),
                 "Conflict" => new ConflictObjectResult(ApiResponse.FromResult(result)),
+                "LockedOut" => new ObjectResult(ApiResponse.FromResult(result)) { StatusCode = StatusCodes.Status423Locked },
                 _ => new BadRequestObjectResult(ApiResponse.FromResult(result))
             };
 }
