@@ -16,4 +16,5 @@ public interface IUserRepository
     Task UpdateAsync(User user, CancellationToken ct = default);
     Task DeleteAsync(User user, CancellationToken ct = default);
     Task<PagedResult<User>> GetPagedAsync(QueryRequest request, CancellationToken ct = default);
+    Task<User?> GetByRefreshTokenAsync(string refreshToken, CancellationToken ct = default);
 }

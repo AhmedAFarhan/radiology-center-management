@@ -4,8 +4,7 @@ namespace RadiologyCenter.Idnetity.Domain;
 
 public static class Permissions
 {
-    private static Permission Create(string code, string name, string? description = null, string? group = null) =>
-        new(Permission.CreateDeterministicId(code), code, name, description, group);
+    private static Permission Create(string code, string name, string? description = null, string? group = null) => new(Permission.CreateDeterministicId(code), code, name, description, group);
 
     public static readonly Permission PatientsCreate  = Create("patients.create",  "Create Patients",  "Create new patient records",     "Patients");
     public static readonly Permission PatientsRead    = Create("patients.read",    "Read Patients",    "View patient records",           "Patients");

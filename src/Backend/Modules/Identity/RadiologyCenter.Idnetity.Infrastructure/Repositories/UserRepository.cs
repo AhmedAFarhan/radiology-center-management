@@ -36,6 +36,10 @@ public class UserRepository : IUserRepository
     public async Task<bool> ExistsByUserNameAsync(string userName, CancellationToken ct = default) =>
         await _users.AsNoTracking().AnyAsync(u => u.UserName == userName, ct);
 
+    public async Task<User?> GetByRefreshTokenAsync(string refreshToken, CancellationToken ct = default) =>
+        await _users.Include(u => u.AssignedRoles).ThenInclude(r => r.Permissions)
+            .FirstOrDefaultAsync(u => u.RefreshTokens.Any(rt => rt.Token == refreshToken), ct);
+
     public async Task<User> AddAsync(User user, CancellationToken ct = default)
     {
         await _users.AddAsync(user, ct);
