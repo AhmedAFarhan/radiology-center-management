@@ -103,6 +103,25 @@ public sealed class User : IdentityUser<Guid>, IAggregateRoot
         RaiseDomainEvent(new UserRolesUpdatedEvent(Id, _assignedRoles.Select(r => r.Id).ToList()));
     }
 
+    public void UpdateRoles(IEnumerable<Role> roles)
+    {
+        Guard.AgainstNull(roles, nameof(roles));
+        var targetRoles = roles.DistinctBy(r => r.Id).ToList();
+
+        var added = targetRoles.Where(r => !_assignedRoles.Any(ar => ar.Id == r.Id)).ToList();
+        var removed = _assignedRoles.Where(ar => targetRoles.All(r => r.Id != ar.Id)).ToList();
+
+        if (added.Count == 0 && removed.Count == 0) return;
+
+        foreach (var role in removed)
+            _assignedRoles.Remove(role);
+
+        foreach (var role in added)
+            _assignedRoles.Add(role);
+
+        RaiseDomainEvent(new UserRolesUpdatedEvent(Id, _assignedRoles.Select(r => r.Id).ToList()));
+    }
+
     public bool HasRole(Guid roleId) => _assignedRoles.Any(r => r.Id == roleId);
 
     public bool HasPermission(string permissionCode)

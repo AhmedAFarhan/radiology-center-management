@@ -24,6 +24,14 @@ public class RoleRepository : IRoleRepository
     public async Task<Role?> GetByIdAsync(Guid id, CancellationToken ct = default) =>
         await _roles.Include(r => r.Permissions).FirstOrDefaultAsync(r => r.Id == id, ct);
 
+    public async Task<IReadOnlyList<Role>> GetByIdsAsync(IEnumerable<Guid> ids, CancellationToken ct = default)
+    {
+        var idList = ids.Distinct().ToList();
+        return await _roles.Include(r => r.Permissions)
+            .Where(r => idList.Contains(r.Id))
+            .ToListAsync(ct);
+    }
+
     public async Task<Role?> GetByNameAsync(string name, CancellationToken ct = default) =>
         await _roles.Include(r => r.Permissions).FirstOrDefaultAsync(r => r.Name == name, ct);
 

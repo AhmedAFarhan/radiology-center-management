@@ -1,21 +1,20 @@
-using Microsoft.AspNetCore.Identity;
 using RadiologyCenter.BuildingBlocks.Application.Abstractions;
 using RadiologyCenter.Identity.Application.Abstractions;
 
-namespace RadiologyCenter.Identity.Application.Commands.CreateUser;
+namespace RadiologyCenter.Identity.Application.Commands.UpdateUserRoles;
 
-public static class CreateUserCommandHandler
+public static class UpdateUserRolesCommandHandler
 {
     public static async Task<Result> HandleAsync(
-        CreateUserCommand command,
+        UpdateUserRolesCommand command,
         IUserRepository userRepository,
         IRoleRepository roleRepository,
         IUnitOfWork unitOfWork,
-        IPasswordHasher<User> passwordHasher,
         CancellationToken ct)
     {
-        var user = User.Create(command.UserName, command.Email, command.FirstName, command.LastName);
-        user.SetPasswordHash(passwordHasher.HashPassword(user, command.Password));
+        var user = await userRepository.GetByIdAsync(command.UserId, ct);
+        if (user is null)
+            return Result.Failure(Error.NotFound("User", command.UserId));
 
         var roles = await roleRepository.GetByIdsAsync(command.RoleIds, ct);
         var missingRoleId = command.RoleIds.Distinct().FirstOrDefault(id => roles.All(r => r.Id != id));
@@ -23,8 +22,7 @@ public static class CreateUserCommandHandler
             return Result.Failure(Error.NotFound("Role", missingRoleId));
 
         user.UpdateRoles(roles);
-
-        await userRepository.AddAsync(user, ct);
+        await userRepository.UpdateAsync(user, ct);
         await unitOfWork.SaveChangesAsync(ct);
         return Result.Success();
     }

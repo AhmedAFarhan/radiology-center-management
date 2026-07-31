@@ -11,6 +11,7 @@ using RadiologyCenter.Identity.Application.Commands.LockUser;
 using RadiologyCenter.Identity.Application.Commands.RemoveRoleFromUser;
 using RadiologyCenter.Identity.Application.Commands.UnlockUser;
 using RadiologyCenter.Identity.Application.Commands.UpdateUserProfile;
+using RadiologyCenter.Identity.Application.Commands.UpdateUserRoles;
 using RadiologyCenter.Identity.Application.DTOs;
 using RadiologyCenter.Identity.Application.Queries.GetUserById;
 using RadiologyCenter.Identity.Application.Queries.GetUsers;
@@ -105,6 +106,14 @@ public class UsersController : ControllerBase
     public async Task<IActionResult> RemoveRoleAsync(Guid userId, Guid roleId, CancellationToken ct)
     {
         var result = await _bus.InvokeAsync<Result>(new RemoveRoleFromUserCommand(userId, roleId), ct);
+        return result.ToActionResult();
+    }
+
+    [HasPermission(UsersManageRolesCode)]
+    [HttpPut("{userId:guid}/roles")]
+    public async Task<IActionResult> UpdateRolesAsync(Guid userId, [FromBody] UpdateUserRolesCommand command, CancellationToken ct)
+    {
+        var result = await _bus.InvokeAsync<Result>(command with { UserId = userId }, ct);
         return result.ToActionResult();
     }
 }
