@@ -14,6 +14,11 @@
     <Project Path="Backend/Modules/Identity/RadiologyCenter.Identity.Domain/RadiologyCenter.Identity.Domain.csproj" />
     <Project Path="Backend/Modules/Identity/RadiologyCenter.Identity.Infrastructure/RadiologyCenter.Identity.Infrastructure.csproj" />
   </Folder>
+  <Folder Name="/Backend/Modules/Patients/">
+    <Project Path="Backend/Modules/Patients/RadiologyCenter.Patients.Application/RadiologyCenter.Patients.Application.csproj" />
+    <Project Path="Backend/Modules/Patients/RadiologyCenter.Patients.Domain/RadiologyCenter.Patients.Domain.csproj" />
+    <Project Path="Backend/Modules/Patients/RadiologyCenter.Patients.Infrastructure/RadiologyCenter.Patients.Infrastructure.csproj" />
+  </Folder>
   <Folder Name="/Desktop/">
     <Project Path="Desktop/RadiologyCenter.Desktop/RadiologyCenter.Desktop.csproj" />
   </Folder>

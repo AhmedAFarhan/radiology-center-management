@@ -3,12 +3,13 @@ using RadiologyCenter.BuildingBlocks.Domain.Entities;
 
 namespace RadiologyCenter.BuildingBlocks.Infrastructure.Persistence;
 
-public class UnitOfWork : IUnitOfWork
+public class UnitOfWork<TContext> : IUnitOfWork, IUnitOfWork<TContext>
+    where TContext : AppDbContext
 {
-    private readonly AppDbContext _context;
+    private readonly TContext _context;
     private readonly IDomainEventDispatcher _eventDispatcher;
 
-    public UnitOfWork(AppDbContext context, IDomainEventDispatcher eventDispatcher)
+    public UnitOfWork(TContext context, IDomainEventDispatcher eventDispatcher)
     {
         _context = context;
         _eventDispatcher = eventDispatcher;

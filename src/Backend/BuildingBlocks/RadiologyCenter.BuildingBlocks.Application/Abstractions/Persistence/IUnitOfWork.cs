@@ -4,3 +4,8 @@ public interface IUnitOfWork
 {
     Task<int> SaveChangesAsync(CancellationToken ct = default);
 }
+
+public interface IUnitOfWork<TContext>
+{
+    Task<int> SaveChangesAsync(CancellationToken ct = default);
+}
