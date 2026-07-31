@@ -1,4 +1,5 @@
 using FluentValidation;
+using RadiologyCenter.BuildingBlocks.Application.Validation;
 using RadiologyCenter.Patients.Domain.Enumerations;
 
 namespace RadiologyCenter.Patients.Application.Commands.UpdatePatient;
@@ -13,7 +14,7 @@ public class UpdatePatientCommandValidator : AbstractValidator<UpdatePatientComm
             .WithMessage("Full name must contain at least a first name and a last name.");
         RuleFor(x => x.Gender).NotEmpty().Must(IsValidGender)
             .WithMessage("Gender must be one of: Male, Female, Other.");
-        RuleFor(x => x.PhoneNumber).NotEmpty().MaximumLength(30);
+        RuleFor(x => x.PhoneNumber).NotEmpty().IsEgyptianPhoneNumber().MaximumLength(30);
         RuleFor(x => x).Must(x => x.DateOfBirth is not null || x.Age is not null)
             .WithMessage("Either date of birth or age must be provided.");
         RuleFor(x => x.DateOfBirth).Must(d => d is null || d.Value.Date <= DateTime.UtcNow.Date)

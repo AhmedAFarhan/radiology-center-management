@@ -34,7 +34,7 @@ public static class IdentityDbSeeder
 
         if (adminUser is null)
         {
-            adminUser = User.Create(AdminUserName, "admin@radiologycenter.local", "Admin", "System");
+            adminUser = User.Create(AdminUserName, "admin@radiologycenter.local", "Admin", "System", "01000000000");
             adminUser.SetPasswordHash(passwordHasher.HashPassword(adminUser, AdminPassword));
             adminUser.ConfirmEmail();
             adminUser.AssignRole(adminRole);

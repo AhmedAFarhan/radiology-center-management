@@ -14,7 +14,7 @@ public static class CreateUserCommandHandler
         IPasswordHasher<User> passwordHasher,
         CancellationToken ct)
     {
-        var user = User.Create(command.UserName, command.Email, command.FirstName, command.LastName);
+        var user = User.Create(command.UserName, command.Email, command.FirstName, command.LastName, command.PhoneNumber);
         user.SetPasswordHash(passwordHasher.HashPassword(user, command.Password));
 
         var roles = await roleRepository.GetByIdsAsync(command.RoleIds, ct);

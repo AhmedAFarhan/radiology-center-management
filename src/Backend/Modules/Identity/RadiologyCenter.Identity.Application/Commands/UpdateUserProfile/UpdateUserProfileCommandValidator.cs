@@ -1,4 +1,5 @@
 using FluentValidation;
+using RadiologyCenter.BuildingBlocks.Application.Validation;
 
 namespace RadiologyCenter.Identity.Application.Commands.UpdateUserProfile;
 
@@ -9,5 +10,6 @@ public class UpdateUserProfileCommandValidator : AbstractValidator<UpdateUserPro
         RuleFor(x => x.UserId).NotEmpty();
         RuleFor(x => x.FirstName).NotEmpty().MaximumLength(100);
         RuleFor(x => x.LastName).NotEmpty().MaximumLength(100);
+        RuleFor(x => x.PhoneNumber).IsEgyptianPhoneNumber().When(x => !string.IsNullOrWhiteSpace(x.PhoneNumber));
     }
 }

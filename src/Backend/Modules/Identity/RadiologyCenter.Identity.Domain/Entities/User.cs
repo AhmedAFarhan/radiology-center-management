@@ -33,12 +33,13 @@ public sealed class User : IdentityUser<Guid>, IAggregateRoot
         LastName = null!;
     }
 
-    public static User Create(string userName, string email, string firstName, string lastName)
+    public static User Create(string userName, string email, string firstName, string lastName, string phoneNumber)
     {
         Guard.AgainstNullOrWhiteSpace(userName, nameof(userName));
         Guard.AgainstNullOrWhiteSpace(email, nameof(email));
         Guard.AgainstNullOrWhiteSpace(firstName, nameof(firstName));
         Guard.AgainstNullOrWhiteSpace(lastName, nameof(lastName));
+        Guard.AgainstNullOrWhiteSpace(phoneNumber, nameof(phoneNumber));
 
         var user = new User
         {
@@ -49,6 +50,7 @@ public sealed class User : IdentityUser<Guid>, IAggregateRoot
             NormalizedEmail = email.ToUpperInvariant(),
             FirstName = firstName,
             LastName = lastName,
+            PhoneNumber = phoneNumber,
             IsActive = true,
             LockoutEnabled = true,
             SecurityStamp = Guid.NewGuid().ToString("D"),

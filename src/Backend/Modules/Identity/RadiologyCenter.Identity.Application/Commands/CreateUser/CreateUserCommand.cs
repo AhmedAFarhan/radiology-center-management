@@ -5,5 +5,6 @@ public record CreateUserCommand(
     string Email,
     string FirstName,
     string LastName,
+    string PhoneNumber,
     string Password,
     IReadOnlyList<Guid> RoleIds) : ICommand;
