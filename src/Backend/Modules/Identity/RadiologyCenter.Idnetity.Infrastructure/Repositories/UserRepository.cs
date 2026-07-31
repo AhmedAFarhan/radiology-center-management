@@ -65,15 +65,8 @@ public class UserRepository : IUserRepository
     {
         var spec = new DynamicSpecification<User>(FilterExpressionBuilder.Build<User>(request.Filters));
 
-        if (!string.IsNullOrWhiteSpace(request.SearchTerm))
-        {
-            var search = request.SearchTerm.Trim();
-            spec.AddCriteria(u =>
-                u.UserName!.Contains(search) ||
-                u.Email!.Contains(search) ||
-                u.FirstName.Contains(search) ||
-                u.LastName.Contains(search));
-        }
+        if (SearchExpressionBuilder.Build<User>(request.SearchTerm, request.SearchFields) is { } searchCriteria)
+            spec.AddCriteria(searchCriteria);
 
         spec.AddInclude(u => u.AssignedRoles);
 

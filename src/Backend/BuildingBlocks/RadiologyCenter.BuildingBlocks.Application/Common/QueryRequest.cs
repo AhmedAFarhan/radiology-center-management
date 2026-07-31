@@ -9,5 +9,6 @@ public class QueryRequest
     public string? SortBy { get; init; }
     public bool SortDescending { get; init; }
     public string? SearchTerm { get; init; }
+    public List<string>? SearchFields { get; init; }
     public List<FilterCriteria>? Filters { get; init; }
 }

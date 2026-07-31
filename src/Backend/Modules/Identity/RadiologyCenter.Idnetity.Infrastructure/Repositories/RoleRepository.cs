@@ -55,13 +55,8 @@ public class RoleRepository : IRoleRepository
     {
         var spec = new DynamicSpecification<Role>(FilterExpressionBuilder.Build<Role>(request.Filters));
 
-        if (!string.IsNullOrWhiteSpace(request.SearchTerm))
-        {
-            var search = request.SearchTerm.Trim();
-            spec.AddCriteria(r =>
-                r.Name!.Contains(search) ||
-                (r.Description != null && r.Description.Contains(search)));
-        }
+        if (SearchExpressionBuilder.Build<Role>(request.SearchTerm, request.SearchFields) is { } searchCriteria)
+            spec.AddCriteria(searchCriteria);
 
         spec.AddInclude(r => r.Permissions);
 
