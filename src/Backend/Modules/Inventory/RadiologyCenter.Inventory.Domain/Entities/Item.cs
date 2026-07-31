@@ -97,4 +97,9 @@ public sealed class Item : SoftDeletableAggregateRoot<Guid>
         if (!IsActive) return;
         IsActive = false;
     }
+
+    public void ReportLowStock(int stockOnHand)
+    {
+        RaiseDomainEvent(new StockBelowReorderLevelEvent(Id, Name, stockOnHand, ReorderLevel));
+    }
 }
