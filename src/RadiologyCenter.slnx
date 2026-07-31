@@ -17,6 +17,7 @@
   <Folder Name="/Backend/Modules/Inventory/">
     <Project Path="Backend/Modules/Inventory/RadiologyCenter.Inventory.Domain/RadiologyCenter.Inventory.Domain.csproj" />
     <Project Path="Backend/Modules/Inventory/RadiologyCenter.Inventory.Application/RadiologyCenter.Inventory.Application.csproj" />
+    <Project Path="Backend/Modules/Inventory/RadiologyCenter.Inventory.Infrastructure/RadiologyCenter.Inventory.Infrastructure.csproj" />
   </Folder>
   <Folder Name="/Backend/Modules/Patients/">
     <Project Path="Backend/Modules/Patients/RadiologyCenter.Patients.Application/RadiologyCenter.Patients.Application.csproj" />
