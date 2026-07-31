@@ -2,7 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using RadiologyCenter.BuildingBlocks.Application.Common;
 using RadiologyCenter.BuildingBlocks.Domain.Results;
 
-namespace RadiologyCenter.Localhost.Controllers.Identity;
+namespace RadiologyCenter.Localhost.Extensions;
 
 public static class ResultExtensions
 {

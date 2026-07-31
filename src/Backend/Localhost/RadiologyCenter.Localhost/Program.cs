@@ -1,8 +1,10 @@
+using Microsoft.EntityFrameworkCore;
 using Wolverine;
 using RadiologyCenter.BuildingBlocks.Application;
 using RadiologyCenter.BuildingBlocks.Infrastructure;
 using RadiologyCenter.Idnetity.Application;
 using RadiologyCenter.Idnetity.Infrastructure;
+using RadiologyCenter.Idnetity.Infrastructure.Persistence;
 using RadiologyCenter.Localhost.Filters;
 using RadiologyCenter.Localhost.Middleware;
 
@@ -23,6 +25,12 @@ builder.Services.AddIdentityInfrastructure(builder.Configuration);
 builder.Host.UseWolverine();
 
 var app = builder.Build();
+
+using (var scope = app.Services.CreateScope())
+{
+    var identityDb = scope.ServiceProvider.GetRequiredService<IdentityDbContext>();
+    identityDb.Database.Migrate();
+}
 
 app.UseMiddleware<ExceptionMiddleware>();
 

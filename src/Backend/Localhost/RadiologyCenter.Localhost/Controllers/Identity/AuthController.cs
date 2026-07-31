@@ -4,6 +4,7 @@ using RadiologyCenter.Idnetity.Application.Commands.Login;
 using RadiologyCenter.Idnetity.Application.Commands.Logout;
 using RadiologyCenter.Idnetity.Application.Commands.RefreshToken;
 using RadiologyCenter.Idnetity.Application.DTOs;
+using RadiologyCenter.Localhost.Extensions;
 using Wolverine;
 
 namespace RadiologyCenter.Localhost.Controllers.Identity;

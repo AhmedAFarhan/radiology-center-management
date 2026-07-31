@@ -14,6 +14,8 @@ using RadiologyCenter.Idnetity.Application.Commands.UpdateUserProfile;
 using RadiologyCenter.Idnetity.Application.DTOs;
 using RadiologyCenter.Idnetity.Application.Queries.GetUserById;
 using RadiologyCenter.Idnetity.Application.Queries.GetUsers;
+using RadiologyCenter.Localhost.Authorization;
+using RadiologyCenter.Localhost.Extensions;
 using Wolverine;
 
 namespace RadiologyCenter.Localhost.Controllers.Identity;
