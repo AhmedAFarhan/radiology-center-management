@@ -1,7 +1,5 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using Wolverine;
-using Wolverine.FluentValidation;
 using RadiologyCenter.BuildingBlocks.Application;
 using RadiologyCenter.BuildingBlocks.Infrastructure;
 using RadiologyCenter.Idnetity.Application;
@@ -24,17 +22,12 @@ builder.Services.AddControllers(options =>
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+builder.Host.ConfigureWolverine();
+
 builder.Services.AddApplication();
 builder.Services.AddInfrastructure(builder.Configuration);
 builder.Services.AddIdentityApplication();
 builder.Services.AddIdentityInfrastructure(builder.Configuration);
-
-builder.Host.UseWolverine(opts =>
-{
-    opts.RestoreV5Defaults();
-    opts.UseFluentValidation(RegistrationBehavior.ExplicitRegistration);
-    opts.Discovery.IncludeAssembly(typeof(IdentityApplicationRegistration).Assembly);
-});
 
 var app = builder.Build();
 
