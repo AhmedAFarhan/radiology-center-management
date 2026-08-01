@@ -1,3 +1,4 @@
+using System.Data.Common;
 using Microsoft.EntityFrameworkCore.Storage;
 using RadiologyCenter.BuildingBlocks.Application.Abstractions;
 using RadiologyCenter.BuildingBlocks.Domain.Entities;
@@ -54,6 +55,8 @@ internal sealed class DbUnitOfWorkTransaction : IUnitOfWorkTransaction
         _transaction = transaction;
         _unitOfWork = unitOfWork;
     }
+
+    public DbTransaction? DbTransaction => _transaction.GetDbTransaction();
 
     public async Task CommitAsync(CancellationToken ct = default)
     {

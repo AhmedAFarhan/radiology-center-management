@@ -12,7 +12,6 @@ public class InventoryDbContext : AppDbContext
     public DbSet<StockMovement> StockMovements => Set<StockMovement>();
     public DbSet<PurchaseOrder> PurchaseOrders => Set<PurchaseOrder>();
     public DbSet<PurchaseOrderItem> PurchaseOrderItems => Set<PurchaseOrderItem>();
-    public DbSet<OrderNumberSequence> OrderNumberSequences => Set<OrderNumberSequence>();
 
     public InventoryDbContext(DbContextOptions<InventoryDbContext> options) : base(options) { }
 

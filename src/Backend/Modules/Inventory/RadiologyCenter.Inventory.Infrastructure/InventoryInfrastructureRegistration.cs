@@ -5,7 +5,6 @@ using RadiologyCenter.BuildingBlocks.Infrastructure.Persistence.Interceptors;
 using RadiologyCenter.Inventory.Application.Abstractions;
 using RadiologyCenter.Inventory.Infrastructure.Persistence;
 using RadiologyCenter.Inventory.Infrastructure.Repositories;
-using RadiologyCenter.Inventory.Infrastructure.Services;
 
 namespace RadiologyCenter.Inventory.Infrastructure;
 
@@ -24,7 +23,6 @@ public static class InventoryInfrastructureRegistration
         services.AddScoped<IStockBatchRepository, StockBatchRepository>();
         services.AddScoped<IStockMovementRepository, StockMovementRepository>();
         services.AddScoped<IPurchaseOrderRepository, PurchaseOrderRepository>();
-        services.AddScoped<IOrderNumberGenerator, OrderNumberGenerator>();
         services.AddScoped<IInventoryUnitOfWork, InventoryUnitOfWork>();
 
         return services;

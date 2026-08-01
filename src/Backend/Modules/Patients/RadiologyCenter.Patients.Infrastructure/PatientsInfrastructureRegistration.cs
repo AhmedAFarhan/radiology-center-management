@@ -5,7 +5,6 @@ using RadiologyCenter.BuildingBlocks.Infrastructure.Persistence.Interceptors;
 using RadiologyCenter.Patients.Application.Abstractions;
 using RadiologyCenter.Patients.Infrastructure.Persistence;
 using RadiologyCenter.Patients.Infrastructure.Repositories;
-using RadiologyCenter.Patients.Infrastructure.Services;
 
 namespace RadiologyCenter.Patients.Infrastructure;
 
@@ -20,7 +19,6 @@ public static class PatientsInfrastructureRegistration
                    .AddInterceptors(sp.GetRequiredService<AuditSoftDeleteInterceptor>()));
 
         services.AddScoped<IPatientRepository, PatientRepository>();
-        services.AddScoped<IPatientCodeGenerator, PatientCodeGenerator>();
         services.AddScoped<IPatientsUnitOfWork, PatientsUnitOfWork>();
 
         return services;

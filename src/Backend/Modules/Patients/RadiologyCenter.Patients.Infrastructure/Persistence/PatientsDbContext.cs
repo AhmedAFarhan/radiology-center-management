@@ -7,7 +7,6 @@ namespace RadiologyCenter.Patients.Infrastructure.Persistence;
 public class PatientsDbContext : AppDbContext
 {
     public DbSet<Patient> Patients => Set<Patient>();
-    public DbSet<PatientNumberSequence> PatientNumberSequences => Set<PatientNumberSequence>();
 
     public PatientsDbContext(DbContextOptions<PatientsDbContext> options) : base(options) { }
 

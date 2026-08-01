@@ -9,6 +9,18 @@ public class AppDbContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        if (GetType() == typeof(AppDbContext))
+        {
+            modelBuilder.Entity<NumberSequence>(entity =>
+            {
+                entity.ToTable("NumberSequences", "System");
+                entity.HasKey(s => new { s.Name, s.Year });
+                entity.Property(s => s.Name).HasMaxLength(50).ValueGeneratedNever();
+                entity.Property(s => s.Year).ValueGeneratedNever();
+                entity.Property(s => s.LastNumber).IsRequired();
+            });
+        }
+
         modelBuilder.ApplyConfigurationsFromAssembly(typeof(AppDbContext).Assembly);
         ApplySoftDeleteFilter(modelBuilder);
         base.OnModelCreating(modelBuilder);

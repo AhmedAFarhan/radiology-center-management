@@ -7,7 +7,6 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using RadiologyCenter.BuildingBlocks.Application.Abstractions;
-using RadiologyCenter.BuildingBlocks.Infrastructure.Persistence;
 using RadiologyCenter.BuildingBlocks.Infrastructure.Persistence.Interceptors;
 using RadiologyCenter.Identity.Application.Abstractions;
 using RadiologyCenter.Identity.Application.Settings;
@@ -32,7 +31,6 @@ public static class IdentityInfrastructureRegistration
             options.UseSqlServer(connectionString)
                    .AddInterceptors(sp.GetRequiredService<AuditSoftDeleteInterceptor>()));
 
-        services.AddScoped<AppDbContext>(sp => sp.GetRequiredService<IdentityDbContext>());
         services.AddScoped<IIdentityUnitOfWork, IdentityUnitOfWork>();
 
         services.AddScoped<IUserRepository, UserRepository>();

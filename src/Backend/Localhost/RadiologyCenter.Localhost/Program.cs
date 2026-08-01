@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 using RadiologyCenter.BuildingBlocks.Application;
 using RadiologyCenter.BuildingBlocks.Infrastructure;
+using RadiologyCenter.BuildingBlocks.Infrastructure.Persistence;
 using RadiologyCenter.Identity.Application;
 using RadiologyCenter.Identity.Domain.Entities;
 using RadiologyCenter.Identity.Infrastructure;
@@ -66,6 +67,9 @@ var app = builder.Build();
 
 using (var scope = app.Services.CreateScope())
 {
+    var appDb = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+    appDb.Database.Migrate();
+
     var identityDb = scope.ServiceProvider.GetRequiredService<IdentityDbContext>();
     identityDb.Database.Migrate();
     await IdentityDbSeeder.SeedAsync(

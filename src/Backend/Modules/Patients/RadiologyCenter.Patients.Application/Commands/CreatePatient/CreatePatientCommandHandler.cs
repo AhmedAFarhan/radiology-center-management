@@ -1,5 +1,6 @@
 using Mapster;
 using RadiologyCenter.BuildingBlocks.Application.Abstractions;
+using RadiologyCenter.BuildingBlocks.Application.Abstractions.Services;
 using RadiologyCenter.Patients.Application.Abstractions;
 using RadiologyCenter.Patients.Application.DTOs;
 using RadiologyCenter.Patients.Domain.Entities;
@@ -12,7 +13,7 @@ public static class CreatePatientCommandHandler
     public static async Task<Result<PatientDto>> HandleAsync(
         CreatePatientCommand command,
         IPatientRepository patientRepository,
-        IPatientCodeGenerator patientCodeGenerator,
+        INumberSequenceGenerator numberSequenceGenerator,
         IPatientsUnitOfWork unitOfWork,
         CancellationToken ct)
     {
@@ -23,7 +24,12 @@ public static class CreatePatientCommandHandler
 
         await using var transaction = await unitOfWork.BeginTransactionAsync(ct);
 
-        var patientCode = await patientCodeGenerator.GenerateNextAsync(ct);
+        var patientCode = await numberSequenceGenerator.GenerateNextAsync(
+            "Patient",
+            "PTN",
+            4,
+            transaction.DbTransaction,
+            ct);
 
         var patient = Patient.Create(
             patientCode,

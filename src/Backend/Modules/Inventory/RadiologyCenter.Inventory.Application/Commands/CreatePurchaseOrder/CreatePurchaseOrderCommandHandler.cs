@@ -1,3 +1,4 @@
+using RadiologyCenter.BuildingBlocks.Application.Abstractions.Services;
 using RadiologyCenter.Inventory.Application.Abstractions;
 using RadiologyCenter.Inventory.Application.DTOs;
 
@@ -10,13 +11,18 @@ public static class CreatePurchaseOrderCommandHandler
         IPurchaseOrderRepository purchaseOrderRepository,
         IItemRepository itemRepository,
         ISupplierRepository supplierRepository,
-        IOrderNumberGenerator orderNumberGenerator,
+        INumberSequenceGenerator numberSequenceGenerator,
         IInventoryUnitOfWork unitOfWork,
         CancellationToken ct)
     {
-        var orderNumber = await orderNumberGenerator.GenerateNextAsync(ct);
-
         await using var transaction = await unitOfWork.BeginTransactionAsync(ct);
+
+        var orderNumber = await numberSequenceGenerator.GenerateNextAsync(
+            "PurchaseOrder",
+            "PO",
+            4,
+            transaction.DbTransaction,
+            ct);
 
         var purchaseOrder = PurchaseOrder.Create(
             orderNumber,
