@@ -50,7 +50,7 @@ public sealed class PurchaseOrder : SoftDeletableAggregateRoot<Guid>
     public void AddItem(Guid itemId, int quantityOrdered, decimal unitCost)
     {
         EnsureDraft();
-        Guard.Against(_items.Any(i => i.ItemId == itemId), _ => true, $"Item '{itemId}' is already on purchase order '{OrderNumber}'.");
+        Guard.Against(_items.Any(i => i.ItemId == itemId), isDuplicate => isDuplicate, $"Item '{itemId}' is already on purchase order '{OrderNumber}'.");
 
         _items.Add(PurchaseOrderItem.Create(Id, itemId, quantityOrdered, unitCost));
     }

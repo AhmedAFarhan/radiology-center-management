@@ -64,6 +64,38 @@ public static class Permissions
     public static readonly Permission SettingsRead   = Create(SettingsReadCode,   "Read Settings",   "View system settings",   "Settings");
     public static readonly Permission SettingsUpdate = Create(SettingsUpdateCode, "Update Settings", "Modify system settings", "Settings");
 
+    public const string InventoryItemsCreateCode  = "inventory.items.create";
+    public const string InventoryItemsReadCode    = "inventory.items.read";
+    public const string InventoryItemsUpdateCode  = "inventory.items.update";
+    public const string InventoryItemsDeleteCode  = "inventory.items.delete";
+    public static readonly Permission InventoryItemsCreate  = Create(InventoryItemsCreateCode,  "Create Inventory Items",  "Add new inventory items",         "Inventory");
+    public static readonly Permission InventoryItemsRead    = Create(InventoryItemsReadCode,    "Read Inventory Items",    "View inventory items",            "Inventory");
+    public static readonly Permission InventoryItemsUpdate  = Create(InventoryItemsUpdateCode,  "Update Inventory Items",  "Modify inventory items",          "Inventory");
+    public static readonly Permission InventoryItemsDelete  = Create(InventoryItemsDeleteCode,  "Delete Inventory Items",  "Remove inventory items",          "Inventory");
+
+    public const string InventorySuppliersCreateCode  = "inventory.suppliers.create";
+    public const string InventorySuppliersReadCode    = "inventory.suppliers.read";
+    public const string InventorySuppliersUpdateCode  = "inventory.suppliers.update";
+    public const string InventorySuppliersDeleteCode  = "inventory.suppliers.delete";
+    public static readonly Permission InventorySuppliersCreate  = Create(InventorySuppliersCreateCode,  "Create Inventory Suppliers",  "Add new suppliers",   "Inventory");
+    public static readonly Permission InventorySuppliersRead    = Create(InventorySuppliersReadCode,    "Read Inventory Suppliers",    "View suppliers",      "Inventory");
+    public static readonly Permission InventorySuppliersUpdate  = Create(InventorySuppliersUpdateCode,  "Update Inventory Suppliers",  "Modify suppliers",    "Inventory");
+    public static readonly Permission InventorySuppliersDelete  = Create(InventorySuppliersDeleteCode,  "Delete Inventory Suppliers",  "Remove suppliers",    "Inventory");
+
+    public const string InventoryPurchaseOrdersCreateCode  = "inventory.purchase-orders.create";
+    public const string InventoryPurchaseOrdersReadCode    = "inventory.purchase-orders.read";
+    public const string InventoryPurchaseOrdersUpdateCode  = "inventory.purchase-orders.update";
+    public const string InventoryPurchaseOrdersDeleteCode  = "inventory.purchase-orders.delete";
+    public static readonly Permission InventoryPurchaseOrdersCreate  = Create(InventoryPurchaseOrdersCreateCode,  "Create Purchase Orders",  "Create purchase orders",   "Inventory");
+    public static readonly Permission InventoryPurchaseOrdersRead    = Create(InventoryPurchaseOrdersReadCode,    "Read Purchase Orders",    "View purchase orders",     "Inventory");
+    public static readonly Permission InventoryPurchaseOrdersUpdate  = Create(InventoryPurchaseOrdersUpdateCode,  "Update Purchase Orders",  "Modify purchase orders",   "Inventory");
+    public static readonly Permission InventoryPurchaseOrdersDelete  = Create(InventoryPurchaseOrdersDeleteCode,  "Delete Purchase Orders",  "Remove purchase orders",   "Inventory");
+
+    public const string InventoryStockReadCode  = "inventory.stock.read";
+    public const string InventoryStockIssueCode = "inventory.stock.issue";
+    public static readonly Permission InventoryStockRead  = Create(InventoryStockReadCode,  "Read Stock",     "View stock levels and movements", "Inventory");
+    public static readonly Permission InventoryStockIssue = Create(InventoryStockIssueCode, "Issue Stock",    "Issue stock to patients",         "Inventory");
+
     private static readonly List<Permission> _all =
     [
         PatientsCreate, PatientsRead, PatientsUpdate, PatientsDelete,
@@ -71,7 +103,11 @@ public static class Permissions
         ReportsCreate, ReportsRead, ReportsUpdate, ReportsDelete, ReportsExport,
         UsersCreate, UsersRead, UsersUpdate, UsersDelete, UsersManageRoles,
         RolesCreate, RolesRead, RolesUpdate, RolesDelete, RolesManagePermissions,
-        SettingsRead, SettingsUpdate
+        SettingsRead, SettingsUpdate,
+        InventoryItemsCreate, InventoryItemsRead, InventoryItemsUpdate, InventoryItemsDelete,
+        InventorySuppliersCreate, InventorySuppliersRead, InventorySuppliersUpdate, InventorySuppliersDelete,
+        InventoryPurchaseOrdersCreate, InventoryPurchaseOrdersRead, InventoryPurchaseOrdersUpdate, InventoryPurchaseOrdersDelete,
+        InventoryStockRead, InventoryStockIssue
     ];
 
     public static IReadOnlyList<Permission> All => _all.AsReadOnly();
