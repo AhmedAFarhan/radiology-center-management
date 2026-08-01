@@ -12,7 +12,7 @@ public static class GetVisitsQueryHandler
         IExaminationTypeRepository examinationTypeRepository,
         CancellationToken ct)
     {
-        var paged = await visitRepository.GetPagedAsync(query.Request, ct);
+        var paged = await visitRepository.GetPagedWithExaminationsAsync(query.Request, ct);
 
         var examinationTypeIds = paged.Items
             .SelectMany(v => v.Examinations)

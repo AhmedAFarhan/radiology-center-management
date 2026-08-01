@@ -32,6 +32,9 @@ public static class CreateVisitCommandHandler
             if (!typesById.TryGetValue(input.ExaminationTypeId, out var type))
                 return Result.Failure<VisitDto>(Error.NotFound("ExaminationType", input.ExaminationTypeId));
 
+            if (!type.IsActive)
+                return Result.Failure<VisitDto>(Error.Validation("ExaminationTypeInactive", $"Examination type '{type.Name}' is deactivated and cannot be used."));
+
             var priority = ExaminationPriority.FromName<ExaminationPriority>(input.Priority);
 
             ExaminationSeeding.Add(

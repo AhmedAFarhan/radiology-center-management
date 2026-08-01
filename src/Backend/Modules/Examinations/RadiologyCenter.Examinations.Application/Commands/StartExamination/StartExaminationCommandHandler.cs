@@ -8,13 +8,17 @@ public static class StartExaminationCommandHandler
         StartExaminationCommand command,
         IVisitRepository visitRepository,
         IExaminationsUnitOfWork unitOfWork,
+        ICurrentUser currentUser,
         CancellationToken ct)
     {
         var visit = await visitRepository.GetWithExaminationsAsync(command.VisitId, ct);
         if (visit is null)
             return Result.Failure(Error.NotFound("Visit", command.VisitId));
 
-        visit.StartExamination(command.ExaminationId, command.PerformedByUserId);
+        if (!Guid.TryParse(currentUser.Id, out var performedByUserId))
+            return Result.Failure(Error.Unauthorized("An authenticated user is required to start an examination."));
+
+        visit.StartExamination(command.ExaminationId, performedByUserId);
 
         visitRepository.Update(visit);
         await unitOfWork.SaveChangesAsync(ct);

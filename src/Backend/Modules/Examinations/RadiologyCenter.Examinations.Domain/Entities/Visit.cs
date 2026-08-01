@@ -158,8 +158,16 @@ public sealed class Visit : SoftDeletableAggregateRoot<Guid>
         if (Status != VisitStatus.CheckedIn) return;
         if (_examinations.Count == 0 || _examinations.Any(e => !e.IsTerminal)) return;
 
-        Status = VisitStatus.Completed;
-        RaiseDomainEvent(new VisitCompletedEvent(Id));
+        if (_examinations.All(e => e.Status == ExaminationStatus.Cancelled))
+        {
+            Status = VisitStatus.Cancelled;
+            RaiseDomainEvent(new VisitCancelledEvent(Id));
+        }
+        else
+        {
+            Status = VisitStatus.Completed;
+            RaiseDomainEvent(new VisitCompletedEvent(Id));
+        }
     }
 
     private Examination GetExamination(Guid examinationId)

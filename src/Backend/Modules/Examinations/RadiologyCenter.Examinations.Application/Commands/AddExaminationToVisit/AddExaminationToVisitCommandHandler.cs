@@ -21,6 +21,9 @@ public static class AddExaminationToVisitCommandHandler
         if (examinationType is null)
             return Result.Failure<ExaminationDto>(Error.NotFound("ExaminationType", command.ExaminationTypeId));
 
+        if (!examinationType.IsActive)
+            return Result.Failure<ExaminationDto>(Error.Validation("ExaminationTypeInactive", $"Examination type '{examinationType.Name}' is deactivated and cannot be used."));
+
         var priority = ExaminationPriority.FromName<ExaminationPriority>(command.Priority);
 
         var examination = ExaminationSeeding.Add(
