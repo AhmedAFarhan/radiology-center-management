@@ -32,7 +32,4 @@
   <Folder Name="/Desktop/">
     <Project Path="Desktop/RadiologyCenter.Desktop/RadiologyCenter.Desktop.csproj" />
   </Folder>
-  <Folder Name="/UI/">
-    <Project Path="UI/RadiologyCenter.UI/RadiologyCenter.UI.csproj" />
-  </Folder>
 </Solution>
