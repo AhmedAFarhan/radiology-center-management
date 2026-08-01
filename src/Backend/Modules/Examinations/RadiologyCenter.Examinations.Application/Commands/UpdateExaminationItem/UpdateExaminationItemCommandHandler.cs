@@ -17,6 +17,7 @@ public static class UpdateExaminationItemCommandHandler
         visit.UpdateExaminationItem(
             command.ExaminationId,
             command.ExaminationItemId,
+            command.ItemId,
             command.Quantity,
             command.IsContrast,
             command.IsRequired,

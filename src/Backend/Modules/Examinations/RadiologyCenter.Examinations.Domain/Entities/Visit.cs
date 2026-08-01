@@ -30,6 +30,12 @@ public sealed class Visit : SoftDeletableAggregateRoot<Guid>
     {
         Guard.AgainstEmpty(patientId, nameof(patientId));
 
+        if (visitedAt is not null)
+        {
+            Guard.Against(visitedAt.Value, v => v == default, "VisitedAt cannot be the default value.");
+            Guard.Against(visitedAt.Value, v => v > DateTime.UtcNow.AddMinutes(1), "VisitedAt cannot be in the future.");
+        }
+
         var visit = new Visit
         {
             Id = Guid.NewGuid(),
@@ -123,13 +129,14 @@ public sealed class Visit : SoftDeletableAggregateRoot<Guid>
     public void UpdateExaminationItem(
         Guid examinationId,
         Guid examinationItemId,
+        Guid itemId,
         int quantity,
         bool isContrast,
         bool isRequired,
         string? notes = null)
     {
         EnsureCheckedIn();
-        GetExamination(examinationId).UpdateItem(examinationItemId, quantity, isContrast, isRequired, notes);
+        GetExamination(examinationId).UpdateItem(examinationItemId, itemId, quantity, isContrast, isRequired, notes);
     }
 
     public void RemoveExaminationItem(Guid examinationId, Guid examinationItemId)

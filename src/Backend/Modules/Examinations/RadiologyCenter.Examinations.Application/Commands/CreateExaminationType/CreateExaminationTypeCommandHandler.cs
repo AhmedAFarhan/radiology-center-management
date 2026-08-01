@@ -15,6 +15,9 @@ public static class CreateExaminationTypeCommandHandler
     {
         var modality = Modality.FromName<Modality>(command.Modality);
 
+        if (await examinationTypeRepository.ExistsByCodeAsync(command.Code, ct: ct))
+            return Result.Failure<ExaminationTypeDto>(Error.Validation("ExaminationTypeCodeExists", $"An examination type with code '{command.Code}' already exists."));
+
         var examinationType = ExaminationType.Create(
             command.Code,
             command.Name,

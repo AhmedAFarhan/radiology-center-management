@@ -8,4 +8,5 @@ public interface IExaminationTypeRepository : IBaseRepository<ExaminationType, G
     Task<ExaminationType?> GetWithItemsAsync(Guid id, CancellationToken ct = default);
     Task<IReadOnlyList<ExaminationType>> GetWithItemsByIdsAsync(IEnumerable<Guid> ids, CancellationToken ct = default);
     Task<PagedResult<ExaminationType>> GetPagedWithItemsAsync(QueryRequest request, CancellationToken ct = default);
+    Task<bool> ExistsByCodeAsync(string code, Guid? excludeId = null, CancellationToken ct = default);
 }

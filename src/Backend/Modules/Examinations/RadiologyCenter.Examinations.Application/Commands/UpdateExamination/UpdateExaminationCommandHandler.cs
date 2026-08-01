@@ -29,14 +29,18 @@ public static class UpdateExaminationCommandHandler
             command.Notes);
 
         if (command.Items is not null)
-            ReconcileItems(visit, examination, command.Items);
+        {
+            var reconcileResult = ReconcileItems(visit, examination, command.Items);
+            if (reconcileResult is not null)
+                return reconcileResult;
+        }
 
         visitRepository.Update(visit);
         await unitOfWork.SaveChangesAsync(ct);
         return Result.Success();
     }
 
-    private static void ReconcileItems(
+    private static Result? ReconcileItems(
         Visit visit,
         Examination examination,
         IReadOnlyList<UpdateExaminationItemRequest> requested)
@@ -52,12 +56,15 @@ public static class UpdateExaminationCommandHandler
 
         foreach (var request in requested)
         {
-            if (request.ExaminationItemId is not null &&
-                currentItems.Any(i => i.Id == request.ExaminationItemId.Value))
+            if (request.ExaminationItemId is not null)
             {
+                if (currentItems.All(i => i.Id != request.ExaminationItemId.Value))
+                    return Result.Failure(Error.Validation("ExaminationItemNotFound", $"Examination item '{request.ExaminationItemId.Value}' is not on examination '{examination.Id}'."));
+
                 visit.UpdateExaminationItem(
                     examination.Id,
                     request.ExaminationItemId.Value,
+                    request.ItemId,
                     request.Quantity,
                     request.IsContrast,
                     request.IsRequired,
@@ -74,5 +81,7 @@ public static class UpdateExaminationCommandHandler
                     request.Notes);
             }
         }
+
+        return null;
     }
 }

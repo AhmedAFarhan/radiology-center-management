@@ -80,14 +80,16 @@ public sealed class Examination : SoftDeletableAggregateRoot<Guid>
 
     public void UpdateItem(
         Guid examinationItemId,
+        Guid itemId,
         int quantity,
         bool isContrast,
         bool isRequired,
         string? notes = null)
     {
         EnsureNotTerminal();
+        Guard.Against(_items.Any(i => i.ItemId == itemId && i.Id != examinationItemId), isDuplicate => isDuplicate, $"Item '{itemId}' is already on examination '{Id}'.");
         var item = GetItem(examinationItemId);
-        item.Update(quantity, isContrast, isRequired, notes);
+        item.Update(itemId, quantity, isContrast, isRequired, notes);
     }
 
     public void RemoveItem(Guid examinationItemId)
@@ -120,6 +122,7 @@ public sealed class Examination : SoftDeletableAggregateRoot<Guid>
     {
         EnsureStatus(ExaminationStatus.Requested);
         Guard.Against(scheduledAt, s => s == default, "Scheduled time cannot be the default value.");
+        Guard.Against(scheduledAt, s => s < DateTime.UtcNow.AddMinutes(-1), "Scheduled time cannot be in the past.");
 
         ScheduledAt = scheduledAt;
         Status = ExaminationStatus.Scheduled;

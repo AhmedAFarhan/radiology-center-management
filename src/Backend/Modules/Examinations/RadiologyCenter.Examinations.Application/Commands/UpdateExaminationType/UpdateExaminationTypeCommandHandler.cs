@@ -15,6 +15,9 @@ public static class UpdateExaminationTypeCommandHandler
         if (examinationType is null)
             return Result.Failure(Error.NotFound("ExaminationType", command.ExaminationTypeId));
 
+        if (await examinationTypeRepository.ExistsByCodeAsync(command.Code, command.ExaminationTypeId, ct))
+            return Result.Failure(Error.Validation("ExaminationTypeCodeExists", $"An examination type with code '{command.Code}' already exists."));
+
         var modality = Modality.FromName<Modality>(command.Modality);
 
         examinationType.Update(
@@ -28,14 +31,18 @@ public static class UpdateExaminationTypeCommandHandler
             command.RequiresConsent);
 
         if (command.Items is not null)
-            ReconcileItems(examinationType, command.Items);
+        {
+            var reconcileResult = ReconcileItems(examinationType, command.Items);
+            if (reconcileResult is not null)
+                return reconcileResult;
+        }
 
         examinationTypeRepository.Update(examinationType);
         await unitOfWork.SaveChangesAsync(ct);
         return Result.Success();
     }
 
-    private static void ReconcileItems(
+    private static Result? ReconcileItems(
         ExaminationType examinationType,
         IReadOnlyList<UpdateExaminationTypeItemRequest> requested)
     {
@@ -50,11 +57,14 @@ public static class UpdateExaminationTypeCommandHandler
 
         foreach (var request in requested)
         {
-            if (request.ExaminationTypeItemId is not null &&
-                currentItems.Any(i => i.Id == request.ExaminationTypeItemId.Value))
+            if (request.ExaminationTypeItemId is not null)
             {
+                if (currentItems.All(i => i.Id != request.ExaminationTypeItemId.Value))
+                    return Result.Failure(Error.Validation("ExaminationTypeItemNotFound", $"Preference item '{request.ExaminationTypeItemId.Value}' is not on examination type '{examinationType.Code}'."));
+
                 examinationType.UpdateItem(
                     request.ExaminationTypeItemId.Value,
+                    request.ItemId,
                     request.Quantity,
                     request.IsContrast,
                     request.IsRequired,
@@ -70,5 +80,7 @@ public static class UpdateExaminationTypeCommandHandler
                     request.Notes);
             }
         }
+
+        return null;
     }
 }

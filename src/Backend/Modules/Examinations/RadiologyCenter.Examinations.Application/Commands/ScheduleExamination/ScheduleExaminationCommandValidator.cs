@@ -9,5 +9,8 @@ public class ScheduleExaminationCommandValidator : AbstractValidator<ScheduleExa
         RuleFor(x => x.VisitId).NotEmpty();
         RuleFor(x => x.ExaminationId).NotEmpty();
         RuleFor(x => x.ScheduledAt).NotEmpty();
+        RuleFor(x => x.ScheduledAt)
+            .Must(s => s >= DateTime.UtcNow.AddMinutes(-1))
+            .WithMessage("Scheduled time cannot be in the past.");
     }
 }

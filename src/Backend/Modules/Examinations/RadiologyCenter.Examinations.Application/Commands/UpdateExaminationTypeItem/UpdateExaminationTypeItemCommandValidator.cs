@@ -8,6 +8,7 @@ public class UpdateExaminationTypeItemCommandValidator : AbstractValidator<Updat
     {
         RuleFor(x => x.ExaminationTypeId).NotEmpty();
         RuleFor(x => x.ExaminationTypeItemId).NotEmpty();
+        RuleFor(x => x.ItemId).NotEmpty();
         RuleFor(x => x.Quantity).GreaterThan(0);
         RuleFor(x => x.Notes).MaximumLength(500).When(x => !string.IsNullOrWhiteSpace(x.Notes));
     }
