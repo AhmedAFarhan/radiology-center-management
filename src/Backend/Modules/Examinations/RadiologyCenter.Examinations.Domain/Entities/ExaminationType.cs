@@ -3,6 +3,7 @@ using RadiologyCenter.BuildingBlocks.Domain.Exceptions;
 using RadiologyCenter.BuildingBlocks.Domain.SoftDeletable;
 using RadiologyCenter.Examinations.Domain.Enumerations;
 using RadiologyCenter.Examinations.Domain.Events;
+using RadiologyCenter.Examinations.Domain.ValueObjects;
 
 namespace RadiologyCenter.Examinations.Domain.Entities;
 
@@ -135,6 +136,9 @@ public sealed class ExaminationType : SoftDeletableAggregateRoot<Guid>
         if (IsActive) return;
         IsActive = true;
     }
+
+    public ExaminationTypeSnapshot ToSnapshot() =>
+        new(Id, Code, Name, Modality, BodyPart, Price, StandardDurationMinutes);
 
     public void Deactivate()
     {

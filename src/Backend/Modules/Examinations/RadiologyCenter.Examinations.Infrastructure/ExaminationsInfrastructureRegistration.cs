@@ -21,6 +21,7 @@ public static class ExaminationsInfrastructureRegistration
         services.AddScoped<IVisitRepository, VisitRepository>();
         services.AddScoped<IExaminationRepository, ExaminationRepository>();
         services.AddScoped<IExaminationTypeRepository, ExaminationTypeRepository>();
+        services.AddScoped<IExaminationHistoryRepository, ExaminationHistoryRepository>();
         services.AddScoped<IExaminationsUnitOfWork, ExaminationsUnitOfWork>();
 
         return services;

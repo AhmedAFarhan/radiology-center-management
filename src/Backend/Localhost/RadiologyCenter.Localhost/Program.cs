@@ -9,6 +9,8 @@ using RadiologyCenter.Identity.Domain.Entities;
 using RadiologyCenter.Identity.Infrastructure;
 using RadiologyCenter.Identity.Infrastructure.Persistence;
 using RadiologyCenter.Identity.Infrastructure.Persistence.Seed;
+using RadiologyCenter.Examinations.Application.Abstractions;
+using RadiologyCenter.Localhost.Extensions;
 using RadiologyCenter.Localhost.Filters;
 using RadiologyCenter.Localhost.Middleware;
 using RadiologyCenter.Patients.Application;
@@ -67,6 +69,7 @@ builder.Services.AddInventoryApplication();
 builder.Services.AddInventoryInfrastructure(builder.Configuration);
 builder.Services.AddExaminationsApplication();
 builder.Services.AddExaminationsInfrastructure(builder.Configuration);
+builder.Services.AddScoped<IItemSnapshotResolver, ItemSnapshotResolver>();
 
 var app = builder.Build();
 
