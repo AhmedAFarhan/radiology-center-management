@@ -17,6 +17,7 @@ using RadiologyCenter.Patients.Infrastructure.Persistence;
 using RadiologyCenter.Inventory.Application;
 using RadiologyCenter.Inventory.Infrastructure;
 using RadiologyCenter.Inventory.Infrastructure.Persistence;
+using RadiologyCenter.Examinations.Application;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -62,6 +63,7 @@ builder.Services.AddPatientsApplication();
 builder.Services.AddPatientsInfrastructure(builder.Configuration);
 builder.Services.AddInventoryApplication();
 builder.Services.AddInventoryInfrastructure(builder.Configuration);
+builder.Services.AddExaminationsApplication();
 
 var app = builder.Build();
 
