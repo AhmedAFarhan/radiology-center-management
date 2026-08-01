@@ -23,21 +23,14 @@ public static class AddExaminationToVisitCommandHandler
 
         var priority = ExaminationPriority.FromName<ExaminationPriority>(command.Priority);
 
-        var examination = visit.AddExamination(
-            command.ExaminationTypeId,
+        var examination = ExaminationSeeding.Add(
+            visit,
+            examinationType,
             command.ReferringDoctor,
             command.ClinicalIndication,
             priority,
-            command.Notes);
-
-        foreach (var preference in examinationType.Items)
-            visit.AddExaminationItem(
-                examination.Id,
-                preference.ItemId,
-                preference.Quantity,
-                preference.IsContrast,
-                preference.IsRequired,
-                preference.Notes);
+            command.Notes,
+            command.Items);
 
         visitRepository.Update(visit);
         await unitOfWork.SaveChangesAsync(ct);

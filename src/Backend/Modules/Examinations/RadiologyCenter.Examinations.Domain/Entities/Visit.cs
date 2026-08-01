@@ -71,6 +71,17 @@ public sealed class Visit : SoftDeletableAggregateRoot<Guid>
         GetExamination(examinationId).Schedule(scheduledAt);
     }
 
+    public void UpdateExamination(
+        Guid examinationId,
+        string referringDoctor,
+        string clinicalIndication,
+        ExaminationPriority priority,
+        string? notes = null)
+    {
+        EnsureCheckedIn();
+        GetExamination(examinationId).Update(referringDoctor, clinicalIndication, priority, notes);
+    }
+
     public void CheckInExamination(Guid examinationId)
     {
         EnsureCheckedIn();

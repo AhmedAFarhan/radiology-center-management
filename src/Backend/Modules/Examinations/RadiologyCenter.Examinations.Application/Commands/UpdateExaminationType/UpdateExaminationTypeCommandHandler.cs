@@ -27,8 +27,48 @@ public static class UpdateExaminationTypeCommandHandler
             command.RequiresPreparation,
             command.RequiresConsent);
 
+        if (command.Items is not null)
+            ReconcileItems(examinationType, command.Items);
+
         examinationTypeRepository.Update(examinationType);
         await unitOfWork.SaveChangesAsync(ct);
         return Result.Success();
+    }
+
+    private static void ReconcileItems(
+        ExaminationType examinationType,
+        IReadOnlyList<UpdateExaminationTypeItemRequest> requested)
+    {
+        var currentItems = examinationType.Items.ToList();
+        var requestedIds = requested
+            .Where(i => i.ExaminationTypeItemId is not null)
+            .Select(i => i.ExaminationTypeItemId!.Value)
+            .ToHashSet();
+
+        foreach (var item in currentItems.Where(i => !requestedIds.Contains(i.Id)))
+            examinationType.RemoveItem(item.Id);
+
+        foreach (var request in requested)
+        {
+            if (request.ExaminationTypeItemId is not null &&
+                currentItems.Any(i => i.Id == request.ExaminationTypeItemId.Value))
+            {
+                examinationType.UpdateItem(
+                    request.ExaminationTypeItemId.Value,
+                    request.Quantity,
+                    request.IsContrast,
+                    request.IsRequired,
+                    request.Notes);
+            }
+            else
+            {
+                examinationType.AddItem(
+                    request.ItemId,
+                    request.Quantity,
+                    request.IsContrast,
+                    request.IsRequired,
+                    request.Notes);
+            }
+        }
     }
 }

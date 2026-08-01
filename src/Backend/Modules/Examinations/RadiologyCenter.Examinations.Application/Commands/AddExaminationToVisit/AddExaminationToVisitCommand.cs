@@ -6,4 +6,5 @@ public record AddExaminationToVisitCommand(
     string ReferringDoctor,
     string ClinicalIndication,
     string Priority,
-    string? Notes = null) : ICommand;
+    string? Notes = null,
+    IReadOnlyList<AddExaminationToVisitItem>? Items = null) : ICommand;

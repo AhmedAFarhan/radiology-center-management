@@ -99,6 +99,23 @@ public sealed class Examination : SoftDeletableAggregateRoot<Guid>
         _items.Remove(item);
     }
 
+    public void Update(
+        string referringDoctor,
+        string clinicalIndication,
+        ExaminationPriority priority,
+        string? notes = null)
+    {
+        EnsureNotTerminal();
+        Guard.AgainstNullOrWhiteSpace(referringDoctor, nameof(referringDoctor));
+        Guard.AgainstNullOrWhiteSpace(clinicalIndication, nameof(clinicalIndication));
+        Guard.AgainstNull(priority, nameof(priority));
+
+        ReferringDoctor = referringDoctor.Trim();
+        ClinicalIndication = clinicalIndication.Trim();
+        Priority = priority;
+        Notes = notes?.Trim();
+    }
+
     public void Schedule(DateTime scheduledAt)
     {
         EnsureStatus(ExaminationStatus.Requested);

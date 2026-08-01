@@ -1,14 +1,14 @@
 using FluentValidation;
 using RadiologyCenter.Examinations.Domain.Enumerations;
 
-namespace RadiologyCenter.Examinations.Application.Commands.AddExaminationToVisit;
+namespace RadiologyCenter.Examinations.Application.Commands.UpdateExamination;
 
-public class AddExaminationToVisitCommandValidator : AbstractValidator<AddExaminationToVisitCommand>
+public class UpdateExaminationCommandValidator : AbstractValidator<UpdateExaminationCommand>
 {
-    public AddExaminationToVisitCommandValidator()
+    public UpdateExaminationCommandValidator()
     {
         RuleFor(x => x.VisitId).NotEmpty();
-        RuleFor(x => x.ExaminationTypeId).NotEmpty();
+        RuleFor(x => x.ExaminationId).NotEmpty();
         RuleFor(x => x.ReferringDoctor).NotEmpty().MaximumLength(200);
         RuleFor(x => x.ClinicalIndication).NotEmpty().MaximumLength(1000);
         RuleFor(x => x.Priority).NotEmpty().Must(IsValidPriority)
