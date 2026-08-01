@@ -6,7 +6,6 @@ namespace RadiologyCenter.Examinations.Infrastructure.Persistence;
 
 public class ExaminationsDbContext : AppDbContext
 {
-    public DbSet<Visit> Visits => Set<Visit>();
     public DbSet<Examination> Examinations => Set<Examination>();
     public DbSet<ExaminationItem> ExaminationItems => Set<ExaminationItem>();
     public DbSet<ExaminationType> ExaminationTypes => Set<ExaminationType>();

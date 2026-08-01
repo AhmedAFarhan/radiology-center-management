@@ -37,16 +37,4 @@ public sealed class ExaminationTypeItem : Entity<Guid>
             Notes = notes?.Trim()
         };
     }
-
-    public void Update(Guid itemId, int quantity, bool isContrast, bool isRequired, string? notes = null)
-    {
-        Guard.AgainstEmpty(itemId, nameof(itemId));
-        Guard.AgainstNegativeOrZero(quantity, nameof(quantity));
-
-        ItemId = itemId;
-        Quantity = quantity;
-        IsContrast = isContrast;
-        IsRequired = isRequired;
-        Notes = notes?.Trim();
-    }
 }

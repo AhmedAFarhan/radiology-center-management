@@ -6,17 +6,16 @@ public static class CheckInExaminationCommandHandler
 {
     public static async Task<Result> HandleAsync(
         CheckInExaminationCommand command,
-        IVisitRepository visitRepository,
+        IExaminationRepository examinationRepository,
         IExaminationsUnitOfWork unitOfWork,
         CancellationToken ct)
     {
-        var visit = await visitRepository.GetWithExaminationsAsync(command.VisitId, ct);
-        if (visit is null)
-            return Result.Failure(Error.NotFound("Visit", command.VisitId));
+        var examination = await examinationRepository.GetByIdAsync(command.ExaminationId, ct);
+        if (examination is null)
+            return Result.Failure(Error.NotFound("Examination", command.ExaminationId));
 
-        visit.CheckInExamination(command.ExaminationId);
+        examination.CheckIn();
 
-        visitRepository.Update(visit);
         await unitOfWork.SaveChangesAsync(ct);
         return Result.Success();
     }

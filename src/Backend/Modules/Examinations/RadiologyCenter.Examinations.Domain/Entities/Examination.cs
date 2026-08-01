@@ -1,16 +1,16 @@
+using RadiologyCenter.BuildingBlocks.Domain.Auditing;
 using RadiologyCenter.BuildingBlocks.Domain.Common;
 using RadiologyCenter.BuildingBlocks.Domain.Exceptions;
-using RadiologyCenter.BuildingBlocks.Domain.SoftDeletable;
 using RadiologyCenter.Examinations.Domain.Enumerations;
 using RadiologyCenter.Examinations.Domain.Events;
 
 namespace RadiologyCenter.Examinations.Domain.Entities;
 
-public sealed class Examination : SoftDeletableAggregateRoot<Guid>
+public sealed class Examination : AuditableAggregateRoot<Guid>
 {
     private readonly List<ExaminationItem> _items = [];
 
-    public Guid VisitId { get; private set; }
+    public Guid PatientId { get; private set; }
     public Guid ExaminationTypeId { get; private set; }
     public string ReferringDoctor { get; private set; }
     public string ClinicalIndication { get; private set; }
@@ -22,6 +22,11 @@ public sealed class Examination : SoftDeletableAggregateRoot<Guid>
     public Guid? PerformedByUserId { get; private set; }
     public string? Notes { get; private set; }
     public string? CancellationReason { get; private set; }
+    public decimal Price { get; private set; }
+    public decimal Discount { get; private set; }
+    public bool IsDiscountPercentage { get; private set; }
+    public decimal Paid { get; private set; }
+    public decimal Remaining { get; private set; }
 
     public IReadOnlyCollection<ExaminationItem> Items => _items.AsReadOnly();
 
@@ -34,32 +39,47 @@ public sealed class Examination : SoftDeletableAggregateRoot<Guid>
     }
 
     public static Examination Create(
-        Guid visitId,
+        Guid patientId,
         Guid examinationTypeId,
         string referringDoctor,
         string clinicalIndication,
         ExaminationPriority priority,
+        decimal price,
+        decimal discount = 0,
+        bool isDiscountPercentage = false,
+        decimal paid = 0,
         string? notes = null)
     {
-        Guard.AgainstEmpty(visitId, nameof(visitId));
+        Guard.AgainstEmpty(patientId, nameof(patientId));
         Guard.AgainstEmpty(examinationTypeId, nameof(examinationTypeId));
         Guard.AgainstNullOrWhiteSpace(referringDoctor, nameof(referringDoctor));
         Guard.AgainstNullOrWhiteSpace(clinicalIndication, nameof(clinicalIndication));
         Guard.AgainstNull(priority, nameof(priority));
+        Guard.Against(price, p => p < 0, "Price cannot be negative.");
+        Guard.Against(discount, d => d < 0, "Discount cannot be negative.");
+        if (isDiscountPercentage)
+            Guard.Against(discount, d => d > 100, "Percentage discount cannot exceed 100.");
+        Guard.Against(paid, p => p < 0, "Paid amount cannot be negative.");
 
         var examination = new Examination
         {
             Id = Guid.NewGuid(),
-            VisitId = visitId,
+            PatientId = patientId,
             ExaminationTypeId = examinationTypeId,
             ReferringDoctor = referringDoctor.Trim(),
             ClinicalIndication = clinicalIndication.Trim(),
             Priority = priority,
             Status = ExaminationStatus.Requested,
+            Price = price,
+            Discount = discount,
+            IsDiscountPercentage = isDiscountPercentage,
+            Paid = paid,
+            Remaining = 0,
             Notes = notes?.Trim()
         };
+        examination.RecalculateRemaining();
 
-        examination.RaiseDomainEvent(new ExaminationCreatedEvent(examination.VisitId, examination.Id, examination.ExaminationTypeId));
+        examination.RaiseDomainEvent(new ExaminationCreatedEvent(examination.Id, examination.ExaminationTypeId));
         return examination;
     }
 
@@ -76,20 +96,6 @@ public sealed class Examination : SoftDeletableAggregateRoot<Guid>
         var item = ExaminationItem.Create(Id, itemId, quantity, isContrast, isRequired, notes);
         _items.Add(item);
         return item;
-    }
-
-    public void UpdateItem(
-        Guid examinationItemId,
-        Guid itemId,
-        int quantity,
-        bool isContrast,
-        bool isRequired,
-        string? notes = null)
-    {
-        EnsureNotTerminal();
-        Guard.Against(_items.Any(i => i.ItemId == itemId && i.Id != examinationItemId), isDuplicate => isDuplicate, $"Item '{itemId}' is already on examination '{Id}'.");
-        var item = GetItem(examinationItemId);
-        item.Update(itemId, quantity, isContrast, isRequired, notes);
     }
 
     public void RemoveItem(Guid examinationItemId)
@@ -126,7 +132,7 @@ public sealed class Examination : SoftDeletableAggregateRoot<Guid>
 
         ScheduledAt = scheduledAt;
         Status = ExaminationStatus.Scheduled;
-        RaiseDomainEvent(new ExaminationScheduledEvent(VisitId, Id, scheduledAt));
+        RaiseDomainEvent(new ExaminationScheduledEvent(Id, scheduledAt));
     }
 
     public void CheckIn()
@@ -134,7 +140,7 @@ public sealed class Examination : SoftDeletableAggregateRoot<Guid>
         EnsureStatus(ExaminationStatus.Requested, ExaminationStatus.Scheduled);
 
         Status = ExaminationStatus.CheckedIn;
-        RaiseDomainEvent(new ExaminationCheckedInEvent(VisitId, Id));
+        RaiseDomainEvent(new ExaminationCheckedInEvent(Id));
     }
 
     public void Start(Guid performedByUserId)
@@ -145,7 +151,7 @@ public sealed class Examination : SoftDeletableAggregateRoot<Guid>
         PerformedByUserId = performedByUserId;
         StartedAt = DateTime.UtcNow;
         Status = ExaminationStatus.InProgress;
-        RaiseDomainEvent(new ExaminationStartedEvent(VisitId, Id, performedByUserId));
+        RaiseDomainEvent(new ExaminationStartedEvent(Id, performedByUserId));
     }
 
     public void Complete()
@@ -154,7 +160,7 @@ public sealed class Examination : SoftDeletableAggregateRoot<Guid>
 
         CompletedAt = DateTime.UtcNow;
         Status = ExaminationStatus.Completed;
-        RaiseDomainEvent(new ExaminationCompletedEvent(VisitId, Id));
+        RaiseDomainEvent(new ExaminationCompletedEvent(Id));
     }
 
     public void Cancel(string? reason = null)
@@ -163,10 +169,40 @@ public sealed class Examination : SoftDeletableAggregateRoot<Guid>
 
         CancellationReason = reason?.Trim();
         Status = ExaminationStatus.Cancelled;
-        RaiseDomainEvent(new ExaminationCancelledEvent(VisitId, Id));
+        RaiseDomainEvent(new ExaminationCancelledEvent(Id));
     }
 
     public bool IsTerminal => Status == ExaminationStatus.Completed || Status == ExaminationStatus.Cancelled;
+
+    public void SetBilling(decimal discount, bool isDiscountPercentage, decimal? paid = null)
+    {
+        Guard.Against(discount, d => d < 0, "Discount cannot be negative.");
+        if (isDiscountPercentage)
+            Guard.Against(discount, d => d > 100, "Percentage discount cannot exceed 100.");
+        if (paid.HasValue)
+            Guard.Against(paid.Value, p => p < 0, "Paid amount cannot be negative.");
+
+        Discount = discount;
+        IsDiscountPercentage = isDiscountPercentage;
+        if (paid.HasValue)
+            Paid = paid.Value;
+        RecalculateRemaining();
+    }
+
+    public void RecordPayment(decimal amount)
+    {
+        Guard.Against(amount, a => a < 0, "Payment cannot be negative.");
+
+        Paid += amount;
+        RecalculateRemaining();
+    }
+
+    private void RecalculateRemaining()
+    {
+        var discountValue = IsDiscountPercentage ? Price * Discount / 100m : Discount;
+        Remaining = Price - discountValue - Paid;
+        if (Remaining < 0) Remaining = 0;
+    }
 
     private ExaminationItem GetItem(Guid examinationItemId)
     {

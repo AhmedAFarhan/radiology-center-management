@@ -1,5 +1,4 @@
 using RadiologyCenter.Examinations.Application.Abstractions;
-using RadiologyCenter.Examinations.Domain.Entities;
 using RadiologyCenter.Examinations.Domain.Events;
 
 namespace RadiologyCenter.Examinations.Application.Events;
@@ -8,15 +7,14 @@ public static class ExaminationCompletedEventHandler
 {
     public static async Task HandleAsync(
         ExaminationCompletedEvent e,
-        IVisitRepository visitRepository,
+        IExaminationRepository examinationRepository,
         IExaminationTypeRepository examinationTypeRepository,
         IItemSnapshotResolver itemSnapshotResolver,
         IExaminationHistoryRepository historyRepository,
         IExaminationsUnitOfWork unitOfWork,
         CancellationToken ct)
     {
-        var visit = await visitRepository.GetWithExaminationsAsync(e.VisitId, ct);
-        var examination = visit?.Examinations.FirstOrDefault(x => x.Id == e.ExaminationId);
+        var examination = await examinationRepository.GetWithItemsAsync(e.ExaminationId, ct);
         if (examination is null)
             return;
 

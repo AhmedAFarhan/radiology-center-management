@@ -26,7 +26,6 @@ namespace RadiologyCenter.Examinations.Infrastructure.Persistence.Migrations
             modelBuilder.Entity("RadiologyCenter.Examinations.Domain.Entities.Examination", b =>
                 {
                     b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("CancellationReason")
@@ -47,16 +46,14 @@ namespace RadiologyCenter.Examinations.Infrastructure.Persistence.Migrations
                     b.Property<string>("CreatedBy")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<DateTime?>("DeletedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("DeletedBy")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<decimal>("Discount")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<Guid>("ExaminationTypeId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<bool>("IsDeleted")
+                    b.Property<bool>("IsDiscountPercentage")
                         .HasColumnType("bit");
 
                     b.Property<DateTime?>("LastModifiedAt")
@@ -69,8 +66,19 @@ namespace RadiologyCenter.Examinations.Infrastructure.Persistence.Migrations
                         .HasMaxLength(500)
                         .HasColumnType("nvarchar(500)");
 
+                    b.Property<decimal>("Paid")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<Guid>("PatientId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<Guid?>("PerformedByUserId")
                         .HasColumnType("uniqueidentifier");
+
+                    b.Property<decimal>("Price")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<int>("Priority")
                         .HasColumnType("int");
@@ -79,6 +87,10 @@ namespace RadiologyCenter.Examinations.Infrastructure.Persistence.Migrations
                         .IsRequired()
                         .HasMaxLength(200)
                         .HasColumnType("nvarchar(200)");
+
+                    b.Property<decimal>("Remaining")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<DateTime?>("ScheduledAt")
                         .HasColumnType("datetime2");
@@ -89,16 +101,13 @@ namespace RadiologyCenter.Examinations.Infrastructure.Persistence.Migrations
                     b.Property<int>("Status")
                         .HasColumnType("int");
 
-                    b.Property<Guid>("VisitId")
-                        .HasColumnType("uniqueidentifier");
-
                     b.HasKey("Id");
 
                     b.HasIndex("ExaminationTypeId");
 
-                    b.HasIndex("Status");
+                    b.HasIndex("PatientId");
 
-                    b.HasIndex("VisitId");
+                    b.HasIndex("Status");
 
                     b.ToTable("Examinations", "Examinations");
                 });
@@ -121,18 +130,30 @@ namespace RadiologyCenter.Examinations.Infrastructure.Persistence.Migrations
                     b.Property<DateTime?>("CompletedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<Guid>("ExaminationId")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<decimal>("Discount")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<Guid>("ExaminationTypeId")
                         .HasColumnType("uniqueidentifier");
+
+                    b.Property<bool>("IsDiscountPercentage")
+                        .HasColumnType("bit");
 
                     b.Property<string>("Notes")
                         .HasMaxLength(500)
                         .HasColumnType("nvarchar(500)");
 
+                    b.Property<decimal>("Paid")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
                     b.Property<Guid?>("PerformedByUserId")
                         .HasColumnType("uniqueidentifier");
+
+                    b.Property<decimal>("Price")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<int>("Priority")
                         .HasColumnType("int");
@@ -141,6 +162,10 @@ namespace RadiologyCenter.Examinations.Infrastructure.Persistence.Migrations
                         .IsRequired()
                         .HasMaxLength(200)
                         .HasColumnType("nvarchar(200)");
+
+                    b.Property<decimal>("Remaining")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<DateTime?>("ScheduledAt")
                         .HasColumnType("datetime2");
@@ -173,15 +198,9 @@ namespace RadiologyCenter.Examinations.Infrastructure.Persistence.Migrations
                     b.Property<int>("TypeStandardDurationMinutes")
                         .HasColumnType("int");
 
-                    b.Property<Guid>("VisitId")
-                        .HasColumnType("uniqueidentifier");
-
                     b.HasKey("Id");
 
                     b.HasIndex("CompletedAt");
-
-                    b.HasIndex("ExaminationId")
-                        .IsUnique();
 
                     b.HasIndex("ExaminationTypeId");
 
@@ -236,7 +255,6 @@ namespace RadiologyCenter.Examinations.Infrastructure.Persistence.Migrations
             modelBuilder.Entity("RadiologyCenter.Examinations.Domain.Entities.ExaminationItem", b =>
                 {
                     b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<Guid>("ExaminationId")
@@ -339,7 +357,6 @@ namespace RadiologyCenter.Examinations.Infrastructure.Persistence.Migrations
             modelBuilder.Entity("RadiologyCenter.Examinations.Domain.Entities.ExaminationTypeItem", b =>
                 {
                     b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<Guid>("ExaminationTypeId")
@@ -368,67 +385,6 @@ namespace RadiologyCenter.Examinations.Infrastructure.Persistence.Migrations
                     b.HasIndex("ItemId");
 
                     b.ToTable("ExaminationTypeItems", "Examinations");
-                });
-
-            modelBuilder.Entity("RadiologyCenter.Examinations.Domain.Entities.Visit", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid?>("AppointmentId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("CreatedBy")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime?>("DeletedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("DeletedBy")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
-                    b.Property<DateTime?>("LastModifiedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("LastModifiedBy")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Notes")
-                        .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)");
-
-                    b.Property<Guid>("PatientId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<int>("Status")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("VisitedAt")
-                        .HasColumnType("datetime2");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("PatientId");
-
-                    b.HasIndex("VisitedAt");
-
-                    b.ToTable("Visits", "Examinations");
-                });
-
-            modelBuilder.Entity("RadiologyCenter.Examinations.Domain.Entities.Examination", b =>
-                {
-                    b.HasOne("RadiologyCenter.Examinations.Domain.Entities.Visit", null)
-                        .WithMany("Examinations")
-                        .HasForeignKey("VisitId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
                 });
 
             modelBuilder.Entity("RadiologyCenter.Examinations.Domain.Entities.ExaminationHistoryItem", b =>
@@ -471,11 +427,6 @@ namespace RadiologyCenter.Examinations.Infrastructure.Persistence.Migrations
             modelBuilder.Entity("RadiologyCenter.Examinations.Domain.Entities.ExaminationType", b =>
                 {
                     b.Navigation("Items");
-                });
-
-            modelBuilder.Entity("RadiologyCenter.Examinations.Domain.Entities.Visit", b =>
-                {
-                    b.Navigation("Examinations");
                 });
 #pragma warning restore 612, 618
         }

@@ -9,7 +9,6 @@ using RadiologyCenter.Examinations.Application.Commands.DeactivateExaminationTyp
 using RadiologyCenter.Examinations.Application.Commands.DeleteExaminationType;
 using RadiologyCenter.Examinations.Application.Commands.RemoveExaminationTypeItem;
 using RadiologyCenter.Examinations.Application.Commands.UpdateExaminationType;
-using RadiologyCenter.Examinations.Application.Commands.UpdateExaminationTypeItem;
 using RadiologyCenter.Examinations.Application.DTOs;
 using RadiologyCenter.Examinations.Application.Queries.GetExaminationTypeById;
 using RadiologyCenter.Examinations.Application.Queries.GetExaminationTypes;
@@ -89,14 +88,6 @@ public class ExaminationTypesController : ControllerBase
     public async Task<IActionResult> AddItemAsync(Guid id, [FromBody] AddExaminationTypeItemCommand command, CancellationToken ct)
     {
         var result = await _bus.InvokeAsync<Result<ExaminationTypeItemDto>>(command with { ExaminationTypeId = id }, ct);
-        return result.ToActionResult();
-    }
-
-    [HasPermission(ExaminationsTypesManageCode)]
-    [HttpPut("{id:guid}/items/{examinationTypeItemId:guid}")]
-    public async Task<IActionResult> UpdateItemAsync(Guid id, Guid examinationTypeItemId, [FromBody] UpdateExaminationTypeItemCommand command, CancellationToken ct)
-    {
-        var result = await _bus.InvokeAsync<Result>(command with { ExaminationTypeId = id, ExaminationTypeItemId = examinationTypeItemId }, ct);
         return result.ToActionResult();
     }
 

@@ -6,7 +6,6 @@ public class ScheduleExaminationCommandValidator : AbstractValidator<ScheduleExa
 {
     public ScheduleExaminationCommandValidator()
     {
-        RuleFor(x => x.VisitId).NotEmpty();
         RuleFor(x => x.ExaminationId).NotEmpty();
         RuleFor(x => x.ScheduledAt).NotEmpty();
         RuleFor(x => x.ScheduledAt)

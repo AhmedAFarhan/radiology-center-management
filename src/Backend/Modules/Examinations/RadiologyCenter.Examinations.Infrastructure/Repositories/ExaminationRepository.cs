@@ -1,5 +1,10 @@
 using Microsoft.EntityFrameworkCore;
+using RadiologyCenter.BuildingBlocks.Application.Common;
+using RadiologyCenter.BuildingBlocks.Application.Services;
+using RadiologyCenter.BuildingBlocks.Domain.Pagination;
+using RadiologyCenter.BuildingBlocks.Domain.Specifications;
 using RadiologyCenter.BuildingBlocks.Infrastructure.Repositories;
+using RadiologyCenter.BuildingBlocks.Infrastructure.Services;
 using RadiologyCenter.Examinations.Application.Abstractions;
 using RadiologyCenter.Examinations.Domain.Entities;
 using RadiologyCenter.Examinations.Domain.Enumerations;
@@ -14,10 +19,38 @@ public class ExaminationRepository : BaseRepository<Examination, Guid>, IExamina
     public override async Task<Examination?> GetByIdAsync(Guid id, CancellationToken ct = default) =>
         await DbSet.FirstOrDefaultAsync(e => e.Id == id, ct);
 
+    public async Task<Examination?> GetWithItemsAsync(Guid id, CancellationToken ct = default) =>
+        await DbSet
+            .Include(e => e.Items)
+            .FirstOrDefaultAsync(e => e.Id == id, ct);
+
+    public async Task<PagedResult<Examination>> GetPagedWithItemsAsync(QueryRequest request, CancellationToken ct = default)
+    {
+        var spec = new DynamicSpecification<Examination>(FilterExpressionBuilder.Build<Examination>(request.Filters));
+
+        if (SearchExpressionBuilder.Build<Examination>(request.SearchTerm, request.SearchFields) is { } searchCriteria)
+            spec.AddCriteria(searchCriteria);
+
+        if (SortExpressionBuilder.TryBuildSelector<Examination>(request.SortBy, out var sortSelector))
+        {
+            if (request.SortDescending)
+                spec.ApplyOrderByDescending(sortSelector);
+            else
+                spec.ApplyOrderBy(sortSelector);
+        }
+
+        var query = ApplySpecification(spec).Include(e => e.Items);
+        var totalCount = await query.CountAsync(ct);
+
+        spec.ApplyPaging((request.Pagination.PageNumber - 1) * request.Pagination.PageSize, request.Pagination.PageSize);
+        var items = await ApplySpecification(spec).Include(e => e.Items).ToListAsync(ct);
+
+        return PagedResult<Examination>.Create(items, totalCount, request.Pagination.PageNumber, request.Pagination.PageSize);
+    }
+
     public async Task<bool> HasActiveExaminationsByTypeAsync(Guid examinationTypeId, CancellationToken ct = default) =>
         await DbSet.AnyAsync(
             e => e.ExaminationTypeId == examinationTypeId
-                 && !e.IsDeleted
                  && e.Status != ExaminationStatus.Completed
                  && e.Status != ExaminationStatus.Cancelled,
             ct);

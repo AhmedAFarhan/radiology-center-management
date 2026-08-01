@@ -13,7 +13,9 @@ public class ExaminationConfiguration : IEntityTypeConfiguration<Examination>
 
         builder.HasKey(e => e.Id);
 
-        builder.Property(e => e.VisitId).IsRequired();
+        builder.Property(e => e.Id).ValueGeneratedNever();
+
+        builder.Property(e => e.PatientId).IsRequired();
         builder.Property(e => e.ExaminationTypeId).IsRequired();
         builder.Property(e => e.ReferringDoctor).IsRequired().HasMaxLength(200);
         builder.Property(e => e.ClinicalIndication).IsRequired().HasMaxLength(1000);
@@ -27,8 +29,13 @@ public class ExaminationConfiguration : IEntityTypeConfiguration<Examination>
         builder.Property(e => e.PerformedByUserId);
         builder.Property(e => e.Notes).HasMaxLength(500);
         builder.Property(e => e.CancellationReason).HasMaxLength(500);
+        builder.Property(e => e.Price).HasPrecision(18, 2).IsRequired();
+        builder.Property(e => e.Discount).HasPrecision(18, 2).IsRequired();
+        builder.Property(e => e.IsDiscountPercentage).IsRequired();
+        builder.Property(e => e.Paid).HasPrecision(18, 2).IsRequired();
+        builder.Property(e => e.Remaining).HasPrecision(18, 2).IsRequired();
 
-        builder.HasIndex(e => e.VisitId);
+        builder.HasIndex(e => e.PatientId);
         builder.HasIndex(e => e.ExaminationTypeId);
         builder.HasIndex(e => e.Status);
 

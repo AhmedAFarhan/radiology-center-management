@@ -15,7 +15,6 @@ public static class DeactivateExaminationTypeCommandHandler
             return Result.Failure(Error.NotFound("ExaminationType", command.ExaminationTypeId));
 
         examinationType.Deactivate();
-        examinationTypeRepository.Update(examinationType);
         await unitOfWork.SaveChangesAsync(ct);
         return Result.Success();
     }

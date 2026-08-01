@@ -18,7 +18,6 @@ public static class ExaminationsInfrastructureRegistration
             options.UseSqlServer(connectionString)
                    .AddInterceptors(sp.GetRequiredService<AuditSoftDeleteInterceptor>()));
 
-        services.AddScoped<IVisitRepository, VisitRepository>();
         services.AddScoped<IExaminationRepository, ExaminationRepository>();
         services.AddScoped<IExaminationTypeRepository, ExaminationTypeRepository>();
         services.AddScoped<IExaminationHistoryRepository, ExaminationHistoryRepository>();

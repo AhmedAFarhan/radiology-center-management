@@ -6,7 +6,6 @@ public class StartExaminationCommandValidator : AbstractValidator<StartExaminati
 {
     public StartExaminationCommandValidator()
     {
-        RuleFor(x => x.VisitId).NotEmpty();
         RuleFor(x => x.ExaminationId).NotEmpty();
     }
 }

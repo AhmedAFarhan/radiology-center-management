@@ -6,7 +6,6 @@ public class CancelExaminationCommandValidator : AbstractValidator<CancelExamina
 {
     public CancelExaminationCommandValidator()
     {
-        RuleFor(x => x.VisitId).NotEmpty();
         RuleFor(x => x.ExaminationId).NotEmpty();
         RuleFor(x => x.Reason).MaximumLength(500).When(x => !string.IsNullOrWhiteSpace(x.Reason));
     }

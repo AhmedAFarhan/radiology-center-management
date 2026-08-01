@@ -23,7 +23,7 @@ public sealed class ItemSnapshotResolver : IItemSnapshotResolver
 
         var spec = new DynamicSpecification<Item>();
         spec.AddCriteria(i => ids.Contains(i.Id));
-        var items = await _itemRepository.FindAsync(spec, ct);
+        var items = await _itemRepository.FindIncludingDeletedAsync(spec, ct);
 
         return items.ToDictionary(i => i.Id, i => new ItemSnapshot(i.Id, i.Name, i.Category.Value));
     }

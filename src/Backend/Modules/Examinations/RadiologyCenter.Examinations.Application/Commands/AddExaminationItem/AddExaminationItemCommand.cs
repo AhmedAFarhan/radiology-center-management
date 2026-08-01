@@ -1,7 +1,6 @@
 namespace RadiologyCenter.Examinations.Application.Commands.AddExaminationItem;
 
 public record AddExaminationItemCommand(
-    Guid VisitId,
     Guid ExaminationId,
     Guid ItemId,
     int Quantity,

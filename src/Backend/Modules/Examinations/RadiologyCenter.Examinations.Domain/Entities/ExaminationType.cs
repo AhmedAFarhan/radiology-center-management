@@ -110,20 +110,6 @@ public sealed class ExaminationType : SoftDeletableAggregateRoot<Guid>
         return item;
     }
 
-    public void UpdateItem(
-        Guid examinationTypeItemId,
-        Guid itemId,
-        int quantity,
-        bool isContrast,
-        bool isRequired,
-        string? notes = null)
-    {
-        Guard.Against(_items.Any(i => i.ItemId == itemId && i.Id != examinationTypeItemId), isDuplicate => isDuplicate, $"Item '{itemId}' is already in the preferences for examination type '{Code}'.");
-        var item = _items.FirstOrDefault(i => i.Id == examinationTypeItemId)
-            ?? throw new DomainException($"Preference item '{examinationTypeItemId}' is not on examination type '{Code}'.");
-        item.Update(itemId, quantity, isContrast, isRequired, notes);
-    }
-
     public void RemoveItem(Guid examinationTypeItemId)
     {
         var item = _items.FirstOrDefault(i => i.Id == examinationTypeItemId)

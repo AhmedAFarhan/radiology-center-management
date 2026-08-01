@@ -6,21 +6,20 @@ public static class StartExaminationCommandHandler
 {
     public static async Task<Result> HandleAsync(
         StartExaminationCommand command,
-        IVisitRepository visitRepository,
+        IExaminationRepository examinationRepository,
         IExaminationsUnitOfWork unitOfWork,
         ICurrentUser currentUser,
         CancellationToken ct)
     {
-        var visit = await visitRepository.GetWithExaminationsAsync(command.VisitId, ct);
-        if (visit is null)
-            return Result.Failure(Error.NotFound("Visit", command.VisitId));
-
         if (!Guid.TryParse(currentUser.Id, out var performedByUserId))
             return Result.Failure(Error.Unauthorized("An authenticated user is required to start an examination."));
 
-        visit.StartExamination(command.ExaminationId, performedByUserId);
+        var examination = await examinationRepository.GetByIdAsync(command.ExaminationId, ct);
+        if (examination is null)
+            return Result.Failure(Error.NotFound("Examination", command.ExaminationId));
 
-        visitRepository.Update(visit);
+        examination.Start(performedByUserId);
+
         await unitOfWork.SaveChangesAsync(ct);
         return Result.Success();
     }

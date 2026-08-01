@@ -9,8 +9,6 @@ public sealed class ExaminationHistory : Entity<Guid>
 {
     private readonly List<ExaminationHistoryItem> _items = [];
 
-    public Guid ExaminationId { get; private set; }
-    public Guid VisitId { get; private set; }
     public Guid ExaminationTypeId { get; private set; }
     public string TypeCode { get; private set; }
     public string TypeName { get; private set; }
@@ -21,6 +19,11 @@ public sealed class ExaminationHistory : Entity<Guid>
     public string ReferringDoctor { get; private set; }
     public string ClinicalIndication { get; private set; }
     public ExaminationPriority Priority { get; private set; }
+    public decimal Price { get; private set; }
+    public decimal Discount { get; private set; }
+    public bool IsDiscountPercentage { get; private set; }
+    public decimal Paid { get; private set; }
+    public decimal Remaining { get; private set; }
     public DateTime? ScheduledAt { get; private set; }
     public DateTime? StartedAt { get; private set; }
     public DateTime? CompletedAt { get; private set; }
@@ -53,8 +56,6 @@ public sealed class ExaminationHistory : Entity<Guid>
         var history = new ExaminationHistory
         {
             Id = Guid.NewGuid(),
-            ExaminationId = examination.Id,
-            VisitId = examination.VisitId,
             ExaminationTypeId = examination.ExaminationTypeId,
             TypeCode = type.Code,
             TypeName = type.Name,
@@ -65,6 +66,11 @@ public sealed class ExaminationHistory : Entity<Guid>
             ReferringDoctor = examination.ReferringDoctor,
             ClinicalIndication = examination.ClinicalIndication,
             Priority = examination.Priority,
+            Price = examination.Price,
+            Discount = examination.Discount,
+            IsDiscountPercentage = examination.IsDiscountPercentage,
+            Paid = examination.Paid,
+            Remaining = examination.Remaining,
             ScheduledAt = examination.ScheduledAt,
             StartedAt = examination.StartedAt,
             CompletedAt = examination.CompletedAt,
@@ -75,12 +81,14 @@ public sealed class ExaminationHistory : Entity<Guid>
 
         foreach (var item in examination.Items)
         {
-            var snapshot = itemSnapshots.GetValueOrDefault(item.ItemId);
+            if (!itemSnapshots.TryGetValue(item.ItemId, out var snapshot))
+                continue;
+
             history._items.Add(ExaminationHistoryItem.Create(
                 history.Id,
                 item.ItemId,
-                snapshot?.Name ?? string.Empty,
-                snapshot?.CategoryValue ?? 0,
+                snapshot.Name,
+                snapshot.CategoryValue,
                 item.Quantity,
                 item.IsContrast,
                 item.IsRequired,

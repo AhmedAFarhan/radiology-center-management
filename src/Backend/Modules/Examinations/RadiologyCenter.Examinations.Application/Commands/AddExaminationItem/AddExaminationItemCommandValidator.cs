@@ -6,7 +6,6 @@ public class AddExaminationItemCommandValidator : AbstractValidator<AddExaminati
 {
     public AddExaminationItemCommandValidator()
     {
-        RuleFor(x => x.VisitId).NotEmpty();
         RuleFor(x => x.ExaminationId).NotEmpty();
         RuleFor(x => x.ItemId).NotEmpty();
         RuleFor(x => x.Quantity).GreaterThan(0);

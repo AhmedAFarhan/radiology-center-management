@@ -13,8 +13,6 @@ public class ExaminationHistoryConfiguration : IEntityTypeConfiguration<Examinat
 
         builder.HasKey(h => h.Id);
 
-        builder.Property(h => h.ExaminationId).IsRequired();
-        builder.Property(h => h.VisitId).IsRequired();
         builder.Property(h => h.ExaminationTypeId).IsRequired();
         builder.Property(h => h.TypeCode).IsRequired().HasMaxLength(20);
         builder.Property(h => h.TypeName).IsRequired().HasMaxLength(200);
@@ -27,6 +25,11 @@ public class ExaminationHistoryConfiguration : IEntityTypeConfiguration<Examinat
         builder.Property(h => h.ClinicalIndication).IsRequired().HasMaxLength(1000);
         builder.Property(h => h.Priority)
             .HasConversion(p => p.Value, v => ExaminationPriority.FromValue<ExaminationPriority>(v));
+        builder.Property(h => h.Price).HasPrecision(18, 2).IsRequired();
+        builder.Property(h => h.Discount).HasPrecision(18, 2).IsRequired();
+        builder.Property(h => h.IsDiscountPercentage).IsRequired();
+        builder.Property(h => h.Paid).HasPrecision(18, 2).IsRequired();
+        builder.Property(h => h.Remaining).HasPrecision(18, 2).IsRequired();
         builder.Property(h => h.ScheduledAt);
         builder.Property(h => h.StartedAt);
         builder.Property(h => h.CompletedAt);
@@ -34,7 +37,6 @@ public class ExaminationHistoryConfiguration : IEntityTypeConfiguration<Examinat
         builder.Property(h => h.Notes).HasMaxLength(500);
         builder.Property(h => h.CancellationReason).HasMaxLength(500);
 
-        builder.HasIndex(h => h.ExaminationId).IsUnique();
         builder.HasIndex(h => h.ExaminationTypeId);
         builder.HasIndex(h => h.CompletedAt);
 

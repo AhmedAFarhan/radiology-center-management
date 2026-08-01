@@ -31,56 +31,27 @@ public static class UpdateExaminationTypeCommandHandler
             command.RequiresConsent);
 
         if (command.Items is not null)
-        {
-            var reconcileResult = ReconcileItems(examinationType, command.Items);
-            if (reconcileResult is not null)
-                return reconcileResult;
-        }
+            ReconcileItems(examinationType, command.Items);
 
-        examinationTypeRepository.Update(examinationType);
         await unitOfWork.SaveChangesAsync(ct);
         return Result.Success();
     }
 
-    private static Result? ReconcileItems(
+    private static void ReconcileItems(
         ExaminationType examinationType,
         IReadOnlyList<UpdateExaminationTypeItemRequest> requested)
     {
-        var currentItems = examinationType.Items.ToList();
-        var requestedIds = requested
-            .Where(i => i.ExaminationTypeItemId is not null)
-            .Select(i => i.ExaminationTypeItemId!.Value)
-            .ToHashSet();
-
-        foreach (var item in currentItems.Where(i => !requestedIds.Contains(i.Id)))
+        foreach (var item in examinationType.Items.ToList())
             examinationType.RemoveItem(item.Id);
 
         foreach (var request in requested)
         {
-            if (request.ExaminationTypeItemId is not null)
-            {
-                if (currentItems.All(i => i.Id != request.ExaminationTypeItemId.Value))
-                    return Result.Failure(Error.Validation("ExaminationTypeItemNotFound", $"Preference item '{request.ExaminationTypeItemId.Value}' is not on examination type '{examinationType.Code}'."));
-
-                examinationType.UpdateItem(
-                    request.ExaminationTypeItemId.Value,
-                    request.ItemId,
-                    request.Quantity,
-                    request.IsContrast,
-                    request.IsRequired,
-                    request.Notes);
-            }
-            else
-            {
-                examinationType.AddItem(
-                    request.ItemId,
-                    request.Quantity,
-                    request.IsContrast,
-                    request.IsRequired,
-                    request.Notes);
-            }
+            examinationType.AddItem(
+                request.ItemId,
+                request.Quantity,
+                request.IsContrast,
+                request.IsRequired,
+                request.Notes);
         }
-
-        return null;
     }
 }

@@ -16,7 +16,6 @@ public static class RemoveExaminationTypeItemCommandHandler
 
         examinationType.RemoveItem(command.ExaminationTypeItemId);
 
-        examinationTypeRepository.Update(examinationType);
         await unitOfWork.SaveChangesAsync(ct);
         return Result.Success();
     }

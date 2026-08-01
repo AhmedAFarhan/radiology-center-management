@@ -6,7 +6,6 @@ public class CheckInExaminationCommandValidator : AbstractValidator<CheckInExami
 {
     public CheckInExaminationCommandValidator()
     {
-        RuleFor(x => x.VisitId).NotEmpty();
         RuleFor(x => x.ExaminationId).NotEmpty();
     }
 }

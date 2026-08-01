@@ -15,7 +15,6 @@ public static class ActivateExaminationTypeCommandHandler
             return Result.Failure(Error.NotFound("ExaminationType", command.ExaminationTypeId));
 
         examinationType.Activate();
-        examinationTypeRepository.Update(examinationType);
         await unitOfWork.SaveChangesAsync(ct);
         return Result.Success();
     }

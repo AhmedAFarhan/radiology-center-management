@@ -2,7 +2,7 @@ namespace RadiologyCenter.Examinations.Application.DTOs;
 
 public record ExaminationDto(
     Guid Id,
-    Guid VisitId,
+    Guid PatientId,
     Guid ExaminationTypeId,
     string ExaminationTypeName,
     string ReferringDoctor,
@@ -15,4 +15,9 @@ public record ExaminationDto(
     Guid? PerformedByUserId,
     string? Notes,
     string? CancellationReason,
+    decimal Price,
+    decimal Discount,
+    bool IsDiscountPercentage,
+    decimal Paid,
+    decimal Remaining,
     IReadOnlyList<ExaminationItemDto> Items);

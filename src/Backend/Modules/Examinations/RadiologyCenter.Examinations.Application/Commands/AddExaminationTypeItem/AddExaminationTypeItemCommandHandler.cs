@@ -23,7 +23,6 @@ public static class AddExaminationTypeItemCommandHandler
             command.IsRequired,
             command.Notes);
 
-        examinationTypeRepository.Update(examinationType);
         await unitOfWork.SaveChangesAsync(ct);
 
         return Result.Success(item.Adapt<ExaminationTypeItemDto>());
