@@ -96,6 +96,21 @@ public static class Permissions
     public static readonly Permission InventoryStockRead  = Create(InventoryStockReadCode,  "Read Stock",     "View stock levels and movements", "Inventory");
     public static readonly Permission InventoryStockIssue = Create(InventoryStockIssueCode, "Issue Stock",    "Issue stock to patients",         "Inventory");
 
+    public const string ExaminationsTypesManageCode = "examinations.types.manage";
+    public const string ExaminationsCreateCode     = "examinations.create";
+    public const string ExaminationsReadCode       = "examinations.read";
+    public const string ExaminationsUpdateCode     = "examinations.update";
+    public const string ExaminationsDeleteCode     = "examinations.delete";
+    public const string ExaminationsPerformCode    = "examinations.perform";
+    public const string ExaminationsCancelCode     = "examinations.cancel";
+    public static readonly Permission ExaminationsTypesManage = Create(ExaminationsTypesManageCode, "Manage Examination Types",  "Create, update, delete and activate examination types", "Examinations");
+    public static readonly Permission ExaminationsCreate       = Create(ExaminationsCreateCode,     "Create Examinations",         "Create visits and add examinations",                  "Examinations");
+    public static readonly Permission ExaminationsRead         = Create(ExaminationsReadCode,       "Read Examinations",           "View visits and examinations",                        "Examinations");
+    public static readonly Permission ExaminationsUpdate       = Create(ExaminationsUpdateCode,     "Update Examinations",         "Modify examinations and their items",                 "Examinations");
+    public static readonly Permission ExaminationsDelete       = Create(ExaminationsDeleteCode,     "Delete Examinations",         "Remove examinations",                                 "Examinations");
+    public static readonly Permission ExaminationsPerform      = Create(ExaminationsPerformCode,    "Perform Examinations",        "Start and complete examinations",                     "Examinations");
+    public static readonly Permission ExaminationsCancel       = Create(ExaminationsCancelCode,     "Cancel Examinations",         "Cancel visits and examinations",                      "Examinations");
+
     private static readonly List<Permission> _all =
     [
         PatientsCreate, PatientsRead, PatientsUpdate, PatientsDelete,
@@ -107,7 +122,8 @@ public static class Permissions
         InventoryItemsCreate, InventoryItemsRead, InventoryItemsUpdate, InventoryItemsDelete,
         InventorySuppliersCreate, InventorySuppliersRead, InventorySuppliersUpdate, InventorySuppliersDelete,
         InventoryPurchaseOrdersCreate, InventoryPurchaseOrdersRead, InventoryPurchaseOrdersUpdate, InventoryPurchaseOrdersDelete,
-        InventoryStockRead, InventoryStockIssue
+        InventoryStockRead, InventoryStockIssue,
+        ExaminationsTypesManage, ExaminationsCreate, ExaminationsRead, ExaminationsUpdate, ExaminationsDelete, ExaminationsPerform, ExaminationsCancel
     ];
 
     public static IReadOnlyList<Permission> All => _all.AsReadOnly();

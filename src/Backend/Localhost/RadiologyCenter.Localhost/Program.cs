@@ -18,6 +18,8 @@ using RadiologyCenter.Inventory.Application;
 using RadiologyCenter.Inventory.Infrastructure;
 using RadiologyCenter.Inventory.Infrastructure.Persistence;
 using RadiologyCenter.Examinations.Application;
+using RadiologyCenter.Examinations.Infrastructure;
+using RadiologyCenter.Examinations.Infrastructure.Persistence;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -64,6 +66,7 @@ builder.Services.AddPatientsInfrastructure(builder.Configuration);
 builder.Services.AddInventoryApplication();
 builder.Services.AddInventoryInfrastructure(builder.Configuration);
 builder.Services.AddExaminationsApplication();
+builder.Services.AddExaminationsInfrastructure(builder.Configuration);
 
 var app = builder.Build();
 
@@ -83,6 +86,9 @@ using (var scope = app.Services.CreateScope())
 
     var inventoryDb = scope.ServiceProvider.GetRequiredService<InventoryDbContext>();
     inventoryDb.Database.Migrate();
+
+    var examinationsDb = scope.ServiceProvider.GetRequiredService<ExaminationsDbContext>();
+    examinationsDb.Database.Migrate();
 }
 
 app.UseMiddleware<ExceptionMiddleware>();

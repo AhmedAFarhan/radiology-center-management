@@ -11,7 +11,7 @@ public static class UpdateExaminationTypeCommandHandler
         IExaminationsUnitOfWork unitOfWork,
         CancellationToken ct)
     {
-        var examinationType = await examinationTypeRepository.GetByIdAsync(command.ExaminationTypeId, ct);
+        var examinationType = await examinationTypeRepository.GetWithItemsAsync(command.ExaminationTypeId, ct);
         if (examinationType is null)
             return Result.Failure(Error.NotFound("ExaminationType", command.ExaminationTypeId));
 

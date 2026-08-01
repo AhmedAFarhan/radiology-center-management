@@ -1,4 +1,3 @@
-using RadiologyCenter.BuildingBlocks.Domain.Specifications;
 using RadiologyCenter.Examinations.Application.Abstractions;
 using RadiologyCenter.Examinations.Application.Commands.AddExaminationToVisit;
 using RadiologyCenter.Examinations.Application.DTOs;
@@ -19,9 +18,7 @@ public static class CreateVisitCommandHandler
             return Result.Failure<VisitDto>(Error.Validation("ExaminationsRequired", "A visit must include at least one examination."));
 
         var typeIds = command.Examinations.Select(e => e.ExaminationTypeId).Distinct().ToList();
-        var spec = new DynamicSpecification<ExaminationType>();
-        spec.AddCriteria(t => typeIds.Contains(t.Id));
-        var types = await examinationTypeRepository.FindAsync(spec, ct);
+        var types = await examinationTypeRepository.GetWithItemsByIdsAsync(typeIds, ct);
         var typesById = types.ToDictionary(t => t.Id, t => t);
 
         var visit = Visit.Create(

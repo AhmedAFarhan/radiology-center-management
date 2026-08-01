@@ -10,7 +10,7 @@ public static class CheckInExaminationCommandHandler
         IExaminationsUnitOfWork unitOfWork,
         CancellationToken ct)
     {
-        var visit = await visitRepository.GetByIdAsync(command.VisitId, ct);
+        var visit = await visitRepository.GetWithExaminationsAsync(command.VisitId, ct);
         if (visit is null)
             return Result.Failure(Error.NotFound("Visit", command.VisitId));
 

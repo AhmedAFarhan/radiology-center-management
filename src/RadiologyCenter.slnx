@@ -27,6 +27,7 @@
   <Folder Name="/Backend/Modules/Examinations/">
     <Project Path="Backend/Modules/Examinations/RadiologyCenter.Examinations.Domain/RadiologyCenter.Examinations.Domain.csproj" />
     <Project Path="Backend/Modules/Examinations/RadiologyCenter.Examinations.Application/RadiologyCenter.Examinations.Application.csproj" />
+    <Project Path="Backend/Modules/Examinations/RadiologyCenter.Examinations.Infrastructure/RadiologyCenter.Examinations.Infrastructure.csproj" />
   </Folder>
   <Folder Name="/Desktop/">
     <Project Path="Desktop/RadiologyCenter.Desktop/RadiologyCenter.Desktop.csproj" />

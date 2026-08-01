@@ -11,7 +11,7 @@ public static class GetVisitByIdQueryHandler
         IExaminationTypeRepository examinationTypeRepository,
         CancellationToken ct)
     {
-        var visit = await visitRepository.GetByIdAsync(query.Id, ct);
+        var visit = await visitRepository.GetWithExaminationsAsync(query.Id, ct);
         if (visit is null)
             return Result.Failure<VisitDto>(Error.NotFound("Visit", query.Id));
 

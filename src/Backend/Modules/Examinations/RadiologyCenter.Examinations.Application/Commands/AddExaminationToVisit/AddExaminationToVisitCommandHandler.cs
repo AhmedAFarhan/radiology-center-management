@@ -13,11 +13,11 @@ public static class AddExaminationToVisitCommandHandler
         IExaminationsUnitOfWork unitOfWork,
         CancellationToken ct)
     {
-        var visit = await visitRepository.GetByIdAsync(command.VisitId, ct);
+        var visit = await visitRepository.GetWithExaminationsAsync(command.VisitId, ct);
         if (visit is null)
             return Result.Failure<ExaminationDto>(Error.NotFound("Visit", command.VisitId));
 
-        var examinationType = await examinationTypeRepository.GetByIdAsync(command.ExaminationTypeId, ct);
+        var examinationType = await examinationTypeRepository.GetWithItemsAsync(command.ExaminationTypeId, ct);
         if (examinationType is null)
             return Result.Failure<ExaminationDto>(Error.NotFound("ExaminationType", command.ExaminationTypeId));
 
