@@ -1,0 +1,20 @@
+<MudCard Elevation="3" Class="stat-card h-100">
+    <MudCardContent>
+        <MudGrid>
+            <MudItem xs="8" Class="d-flex flex-column justify-content-center">
+                <MudText Typo="Typo.h4" Class="stat-value">@Value</MudText>
+                <MudText Typo="Typo.body2" Class="text-secondary">@Label</MudText>
+            </MudItem>
+            <MudItem xs="4" Class="d-flex align-items-center justify-content-end">
+                <MudIcon Icon="@Icon" Color="@Color" Size="Size.Large" />
+            </MudItem>
+        </MudGrid>
+    </MudCardContent>
+</MudCard>
+
+@code {
+    [Parameter] public string Label { get; set; } = string.Empty;
+    [Parameter] public string Value { get; set; } = string.Empty;
+    [Parameter] public string Icon { get; set; } = string.Empty;
+    [Parameter] public Color Color { get; set; } = Color.Primary;
+}

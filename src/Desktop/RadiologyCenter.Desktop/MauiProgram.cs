@@ -1,5 +1,8 @@
 ﻿using Microsoft.Extensions.Logging;
+using MudBlazor;
 using MudBlazor.Services;
+using Microsoft.AspNetCore.Components.Authorization;
+using RadiologyCenter.Desktop.Services;
 
 namespace RadiologyCenter.Desktop;
 
@@ -19,8 +22,20 @@ public static class MauiProgram
             });
 
         builder.Services.AddMauiBlazorWebView();
+        builder.Services.AddAuthorizationCore();
         builder.Services.AddSingleton(updateService);
         builder.Services.AddMudServices();
+
+        builder.Services.AddSingleton<TokenStorage>();
+        builder.Services.AddScoped<AppAuthenticationStateProvider>();
+        builder.Services.AddScoped<AuthenticationStateProvider>(sp => sp.GetRequiredService<AppAuthenticationStateProvider>());
+        builder.Services.AddScoped<ApiClient>();
+        builder.Services.AddScoped<AuthService>();
+        builder.Services.AddScoped<DashboardService>();
+        builder.Services.AddScoped<PatientService>();
+        builder.Services.AddScoped<InventoryService>();
+        builder.Services.AddScoped<ExaminationService>();
+        builder.Services.AddScoped<IdentityService>();
 
 #if DEBUG
         builder.Services.AddBlazorWebViewDeveloperTools();

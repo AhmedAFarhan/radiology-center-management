@@ -1,0 +1,144 @@
+@page "/roles"
+@attribute [Authorize]
+@inject IdentityService IdentityService
+@inject IDialogService DialogService
+@inject ISnackbar Snackbar
+@implements IDisposable
+
+<MudToolBar Dense="true" Class="mb-4">
+    <MudText Typo="Typo.h5">Roles</MudText>
+    <MudText Typo="Typo.body2" Class="text-secondary ms-2">Manage roles and their permissions</MudText>
+    <MudSpacer />
+    <MudTextField T="string"
+                  Value="_search"
+                  ValueChanged="OnSearchChanged"
+                  Placeholder="Search roles..."
+                  Variant="Variant.Outlined"
+                  Margin="Margin.Dense"
+                  Immediate="true"
+                  Adornment="Adornment.Start"
+                  AdornmentIcon="@Icons.Material.Filled.Search"
+                  Class="search-field" />
+    <MudIconButton Icon="@Icons.Material.Filled.Refresh" Color="Color.Default" aria-label="Refresh" OnClick="ReloadAsync" />
+    <MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Add" OnClick="OpenCreateDialogAsync">New Role</MudButton>
+</MudToolBar>
+
+<MudTable T="RoleDto" @ref="_table" ServerData="LoadServerData" Dense="true" Hover="true" Striped="true" Elevation="1" RowsPerPage="10">
+    <HeaderContent>
+        <MudTh><MudTableSortLabel T="RoleDto" SortLabel="@("Name")">Name</MudTableSortLabel></MudTh>
+        <MudTh><MudTableSortLabel T="RoleDto" SortLabel="@("Description")">Description</MudTableSortLabel></MudTh>
+        <MudTh>Permissions</MudTh>
+        <MudTh><MudTableSortLabel T="RoleDto" SortLabel="@("CreatedAt")">Created</MudTableSortLabel></MudTh>
+        <MudTh>Actions</MudTh>
+    </HeaderContent>
+    <RowTemplate>
+        <MudTd DataLabel="Name">
+            <MudText Class="font-weight-medium">@context.Name</MudText>
+            @if (context.IsSystem)
+            {
+                <MudChip T="string" Size="Size.Small" Color="Color.Primary" Variant="Variant.Outlined">System</MudChip>
+            }
+        </MudTd>
+        <MudTd DataLabel="Description">@(string.IsNullOrWhiteSpace(context.Description) ? "-" : context.Description)</MudTd>
+        <MudTd DataLabel="Permissions">
+            <MudChip T="string" Size="Size.Small" Color="@(context.Permissions.Count == 0 ? Color.Default : Color.Success)">@context.Permissions.Count permission(s)</MudChip>
+        </MudTd>
+        <MudTd DataLabel="Created">@context.CreatedAt.ToString("g")</MudTd>
+        <MudTd DataLabel="Actions">
+            <MudIconButton Icon="@Icons.Material.Filled.Edit" Size="Size.Small" Color="Color.Default" aria-label="Edit role" OnClick="@(() => OpenEditDialogAsync(context))" />
+            <MudIconButton Icon="@Icons.Material.Filled.Key" Size="Size.Small" Color="Color.Info" aria-label="Manage permissions" OnClick="@(() => OpenPermissionsDialogAsync(context))" />
+        </MudTd>
+    </RowTemplate>
+    <NoRecordsContent>
+        <MudText Class="pa-4">No roles found.</MudText>
+    </NoRecordsContent>
+    <PagerContent>
+        <MudTablePager PageSizeOptions="@(new[] { 10, 25, 50 })" />
+    </PagerContent>
+</MudTable>
+
+@code {
+    private MudTable<RoleDto>? _table;
+    private string? _search;
+    private CancellationTokenSource? _searchCts;
+
+    private async Task<TableData<RoleDto>> LoadServerData(TableState state, CancellationToken ct)
+    {
+        try
+        {
+            var page = await IdentityService.GetRolesPagedAsync(
+                _search,
+                state.SortLabel,
+                state.SortDirection == SortDirection.Descending,
+                state.Page + 1,
+                state.PageSize,
+                ct);
+
+            return new TableData<RoleDto> { Items = page.Items, TotalItems = page.TotalCount };
+        }
+        catch (ApiException ex)
+        {
+            Snackbar.Add(ex.Message, Severity.Error);
+            return new TableData<RoleDto> { Items = Array.Empty<RoleDto>(), TotalItems = 0 };
+        }
+        catch (Exception)
+        {
+            Snackbar.Add("Unable to reach the server.", Severity.Error);
+            return new TableData<RoleDto> { Items = Array.Empty<RoleDto>(), TotalItems = 0 };
+        }
+    }
+
+    private async Task OnSearchChanged(string? value)
+    {
+        _search = value;
+
+        _searchCts?.Cancel();
+        var cts = _searchCts = new CancellationTokenSource();
+        try
+        {
+            await Task.Delay(400, cts.Token);
+        }
+        catch (TaskCanceledException)
+        {
+            return;
+        }
+
+        if (_table is not null)
+            await _table.ReloadServerData();
+    }
+
+    private Task ReloadAsync()
+        => _table is null ? Task.CompletedTask : _table.ReloadServerData();
+
+    private async Task OpenCreateDialogAsync()
+    {
+        var options = new DialogOptions { MaxWidth = MaxWidth.Small, FullWidth = true };
+        var dialog = await DialogService.ShowAsync<RoleEditorDialog>("New Role", options);
+        await ReloadIfSavedAsync(dialog);
+    }
+
+    private async Task OpenEditDialogAsync(RoleDto role)
+    {
+        var parameters = new DialogParameters { ["Role"] = role };
+        var options = new DialogOptions { MaxWidth = MaxWidth.Small, FullWidth = true };
+        var dialog = await DialogService.ShowAsync<RoleEditorDialog>($"Edit {role.Name}", parameters, options);
+        await ReloadIfSavedAsync(dialog);
+    }
+
+    private async Task OpenPermissionsDialogAsync(RoleDto role)
+    {
+        var parameters = new DialogParameters { ["Role"] = role };
+        var options = new DialogOptions { MaxWidth = MaxWidth.Large, FullWidth = true };
+        var dialog = await DialogService.ShowAsync<RolePermissionsDialog>($"Permissions - {role.Name}", parameters, options);
+        await ReloadIfSavedAsync(dialog);
+    }
+
+    private async Task ReloadIfSavedAsync(IDialogReference dialog)
+    {
+        var result = await dialog.Result;
+        if (result is { Canceled: false })
+            await ReloadAsync();
+    }
+
+    public void Dispose() => _searchCts?.Cancel();
+}

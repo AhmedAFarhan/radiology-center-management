@@ -1,0 +1,94 @@
+@page "/"
+@layout Layout.LoginLayout
+@using System.ComponentModel.DataAnnotations
+@inject AuthService AuthService
+@inject ISnackbar Snackbar
+@inject NavigationManager Navigation
+@inject AuthenticationStateProvider AuthState
+
+<MudCard Elevation="8" Class="login-card">
+    <MudCardContent>
+        <div class="text-center mb-4">
+            <MudAvatar Class="mb-3" Color="Color.Primary" Variant="Variant.Filled">
+                <MudIcon Icon="@Icons.Material.Filled.MedicalServices" />
+            </MudAvatar>
+            <MudText Typo="Typo.h5" Class="mb-1">Radiology Center</MudText>
+            <MudText Typo="Typo.body2" Class="text-secondary">Sign in to your account</MudText>
+        </div>
+
+        <EditForm Model="@_model" OnValidSubmit="@SubmitAsync">
+            <DataAnnotationsValidator />
+            <MudTextField @bind-Value="_model.UserName"
+                          Label="Username"
+                          Variant="Variant.Outlined"
+                          Margin="Margin.Dense"
+                          Immediate="true" />
+            <MudTextField @bind-Value="_model.Password"
+                          Label="Password"
+                          Variant="Variant.Outlined"
+                          Margin="Margin.Dense"
+                          InputType="InputType.Password"
+                          Immediate="true" />
+            <MudButton ButtonType="ButtonType.Submit"
+                       Color="Color.Primary"
+                       Variant="Variant.Filled"
+                       FullWidth="true"
+                       Size="Size.Large"
+                       Class="mt-4"
+                       StartIcon="@Icons.Material.Filled.Login"
+                       Disabled="@_busy">
+                @if (_busy)
+                {
+                    <MudProgressCircular Size="Size.Small" Indeterminate="true" Class="mx-1" />
+                }
+                else
+                {
+                    <text>Sign In</text>
+                }
+            </MudButton>
+        </EditForm>
+    </MudCardContent>
+</MudCard>
+
+@code {
+    private readonly LoginModel _model = new();
+    private bool _busy;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var state = await AuthState.GetAuthenticationStateAsync();
+        if (state.User.Identity?.IsAuthenticated == true)
+            Navigation.NavigateTo("/dashboard");
+    }
+
+    private async Task SubmitAsync()
+    {
+        _busy = true;
+        try
+        {
+            await AuthService.SignInAsync(_model.UserName, _model.Password);
+            Navigation.NavigateTo("/dashboard");
+        }
+        catch (ApiException ex)
+        {
+            Snackbar.Add(ex.Message, Severity.Error);
+        }
+        catch (Exception)
+        {
+            Snackbar.Add("Unable to reach the server. Please try again.", Severity.Error);
+        }
+        finally
+        {
+            _busy = false;
+        }
+    }
+
+    private sealed class LoginModel
+    {
+        [Required(ErrorMessage = "Username is required.")]
+        public string UserName { get; set; } = string.Empty;
+
+        [Required(ErrorMessage = "Password is required.")]
+        public string Password { get; set; } = string.Empty;
+    }
+}

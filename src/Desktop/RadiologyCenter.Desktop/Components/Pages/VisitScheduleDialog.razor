@@ -1,0 +1,75 @@
+@inject ExaminationService ExaminationService
+@inject ISnackbar Snackbar
+
+<MudDialog>
+    <DialogContent>
+        <MudText Typo="Typo.subtitle1" Class="mb-2">Schedule @Visit.ExaminationTypeName</MudText>
+        <MudDatePicker @bind-Date="_scheduledAt"
+                       Label="Scheduled Date"
+                       Variant="Variant.Outlined"
+                       Margin="Margin.Dense"
+                       Class="w-100" />
+        <MudTimePicker @bind-Time="_scheduledTime"
+                       Label="Scheduled Time"
+                       Variant="Variant.Outlined"
+                       Margin="Margin.Dense"
+                       Class="w-100" />
+    </DialogContent>
+    <DialogActions>
+        <MudButton Color="Color.Default" OnClick="CancelAsync" Disabled="_busy">Cancel</MudButton>
+        <MudButton Color="Color.Primary" Variant="Variant.Filled" OnClick="SubmitAsync" Disabled="_busy">
+            @if (_busy)
+            {
+                <MudProgressCircular Size="Size.Small" Indeterminate="true" Class="mx-1" />
+            }
+            else
+            {
+                <text>Schedule</text>
+            }
+        </MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    [Parameter] public ExaminationDto Visit { get; set; } = default!;
+
+    [CascadingParameter] public IMudDialogInstance MudDialog { get; set; } = default!;
+
+    private DateTime? _scheduledAt = DateTime.Today;
+    private TimeSpan? _scheduledTime = TimeSpan.FromHours(9);
+    private bool _busy;
+
+    private async Task SubmitAsync()
+    {
+        if (_scheduledAt is null || _scheduledTime is null)
+        {
+            Snackbar.Add("Select a date and time.", Severity.Warning);
+            return;
+        }
+
+        var scheduledAt = _scheduledAt.Value.Date + _scheduledTime.Value;
+
+        _busy = true;
+        try
+        {
+            await ExaminationService.ScheduleAsync(Visit.Id, scheduledAt);
+            Snackbar.Add("Visit scheduled.", Severity.Success);
+            MudDialog.Close(DialogResult.Ok(true));
+        }
+        catch (ApiException ex)
+        {
+            Snackbar.Add(ex.Message, Severity.Error);
+        }
+        catch (Exception)
+        {
+            Snackbar.Add("Unable to reach the server.", Severity.Error);
+        }
+        finally
+        {
+            _busy = false;
+        }
+    }
+
+    private void CancelAsync()
+        => MudDialog.Cancel();
+}

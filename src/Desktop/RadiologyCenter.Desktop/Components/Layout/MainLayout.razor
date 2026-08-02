@@ -1,17 +1,52 @@
 ﻿@inherits LayoutComponentBase
+@inject NavigationManager Navigation
+@inject AuthService AuthService
+@inject ISnackbar Snackbar
 
-<div class="page">
-    <div class="sidebar">
+<MudLayout>
+    <MudAppBar Elevation="1" Class="app-bar">
+        <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="@(() => _drawerOpen = !_drawerOpen)" />
+        <MudText Typo="Typo.h6" Class="ms-2">Radiology Center</MudText>
+        <MudSpacer />
+        <MudText Typo="Typo.body2" Class="me-3 app-bar-user">@_userName</MudText>
+        <MudIconButton Icon="@Icons.Material.Filled.Logout" Color="Color.Inherit" aria-label="Sign out" OnClick="@OnLogout" />
+    </MudAppBar>
+
+    <MudDrawer @bind-Open="_drawerOpen" Variant="DrawerVariant.Persistent" Elevation="2" ClipMode="DrawerClipMode.Always">
         <NavMenu />
-    </div>
+    </MudDrawer>
 
-    <main>
-        <div class="top-row px-4">
-            <a href="https://learn.microsoft.com/aspnet/core/" target="_blank">About</a>
-        </div>
-
-        <article class="content px-4">
+    <MudMainContent Class="app-main">
+        <MudContainer MaxWidth="MaxWidth.ExtraLarge" Class="mt-4 pb-4">
             @Body
-        </article>
-    </main>
-</div>
+        </MudContainer>
+    </MudMainContent>
+</MudLayout>
+
+@code {
+    [CascadingParameter]
+    private Task<AuthenticationState>? AuthStateTask { get; set; }
+
+    private bool _drawerOpen = true;
+    private string _userName = string.Empty;
+
+    protected override void OnParametersSet()
+    {
+        base.OnParametersSet();
+        if (AuthStateTask is not null)
+            _ = RefreshUserAsync(AuthStateTask);
+    }
+
+    private async Task RefreshUserAsync(Task<AuthenticationState> task)
+    {
+        var state = await task;
+        _userName = state.User.Identity?.Name ?? string.Empty;
+    }
+
+    private async Task OnLogout()
+    {
+        await AuthService.SignOutAsync();
+        Snackbar.Add("You have been signed out.", Severity.Info);
+        Navigation.NavigateTo("/");
+    }
+}

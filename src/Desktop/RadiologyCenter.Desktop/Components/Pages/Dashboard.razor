@@ -1,0 +1,136 @@
+@page "/dashboard"
+@attribute [Authorize]
+@inject DashboardService DashboardService
+
+<MudText Typo="Typo.h4">Dashboard</MudText>
+<MudText Typo="Typo.body1" Class="text-secondary mb-4">Live overview of your radiology center.</MudText>
+
+@if (_loading)
+{
+    <MudProgressLinear Color="Color.Primary" Indeterminate="true" Class="mb-4" />
+}
+else if (_error)
+{
+    <MudPaper Class="pa-8 text-center">
+        <MudIcon Icon="@Icons.Material.Filled.CloudOff" Size="Size.Large" Color="Color.Error" />
+        <MudText Class="mt-2">We couldn't load the dashboard.</MudText>
+        <MudButton Color="Color.Primary" Variant="Variant.Filled" Class="mt-3" OnClick="@LoadAsync">Retry</MudButton>
+    </MudPaper>
+}
+else
+{
+    <MudGrid>
+        <MudItem xs="12" sm="6" md="3">
+            <StatCard Label="Total Patients" Value="@_data!.TotalPatients.ToString()" Icon="@Icons.Material.Filled.People" Color="Color.Primary" />
+        </MudItem>
+        <MudItem xs="12" sm="6" md="3">
+            <StatCard Label="Total Examinations" Value="@_data!.TotalExaminations.ToString()" Icon="@Icons.Material.Filled.MedicalServices" Color="Color.Secondary" />
+        </MudItem>
+        <MudItem xs="12" sm="6" md="3">
+            <StatCard Label="In Progress" Value="@_data!.ExamsInProgress.ToString()" Icon="@Icons.Material.Filled.HourglassTop" Color="Color.Warning" />
+        </MudItem>
+        <MudItem xs="12" sm="6" md="3">
+            <StatCard Label="Inventory Items" Value="@_data!.TotalInventoryItems.ToString()" Icon="@Icons.Material.Filled.Inventory2" Color="Color.Info" />
+        </MudItem>
+    </MudGrid>
+
+    <MudGrid Class="mt-2">
+        <MudItem xs="12" lg="7">
+            <MudCard Elevation="2">
+                <MudCardHeader>
+                    <MudText Typo="Typo.h6">Recent Examinations</MudText>
+                </MudCardHeader>
+                <MudCardContent>
+                    <MudTable Items="@_data!.RecentExaminations" Dense="true" Hover="true" Striped="true">
+                        <ColGroup>
+                            <col style="width: 30%" />
+                            <col style="width: 20%" />
+                            <col style="width: 20%" />
+                            <col style="width: 30%" />
+                        </ColGroup>
+                        <HeaderContent>
+                            <MudTh>Type</MudTh>
+                            <MudTh>Status</MudTh>
+                            <MudTh>Priority</MudTh>
+                            <MudTh>Referring Doctor</MudTh>
+                        </HeaderContent>
+                        <RowTemplate>
+                            <MudTd DataLabel="Type">@context.ExaminationTypeName</MudTd>
+                            <MudTd DataLabel="Status">
+                                <MudChip T="string" Size="Size.Small" Color="@StatusColor(context.Status)">@context.Status</MudChip>
+                            </MudTd>
+                            <MudTd DataLabel="Priority">@context.Priority</MudTd>
+                            <MudTd DataLabel="Referring Doctor">@context.ReferringDoctor</MudTd>
+                        </RowTemplate>
+                        <NoRecordsContent>
+                            <MudText Class="pa-4">No examinations yet.</MudText>
+                        </NoRecordsContent>
+                    </MudTable>
+                </MudCardContent>
+            </MudCard>
+        </MudItem>
+
+        <MudItem xs="12" lg="5">
+            <MudCard Elevation="2">
+                <MudCardHeader>
+                    <MudText Typo="Typo.h6">Recent Patients</MudText>
+                </MudCardHeader>
+                <MudCardContent>
+                    <MudList T="string" Dense="true">
+                        @foreach (var patient in _data!.RecentPatients)
+                        {
+                            <MudListItem T="string"
+                                          Icon="@Icons.Material.Filled.Person"
+                                          IconColor="Color.Primary"
+                                          Text="@patient.FullName"
+                                          SecondaryText="@($"{patient.PatientCode} · {patient.Gender}")" />
+                        }
+                        @if (_data!.RecentPatients.Count == 0)
+                        {
+                            <MudText Class="pa-4">No patients yet.</MudText>
+                        }
+                    </MudList>
+                </MudCardContent>
+            </MudCard>
+        </MudItem>
+    </MudGrid>
+}
+
+@code {
+    private DashboardData? _data;
+    private bool _loading = true;
+    private bool _error;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadAsync();
+    }
+
+    private async Task LoadAsync()
+    {
+        _loading = true;
+        _error = false;
+        try
+        {
+            _data = await DashboardService.LoadAsync();
+        }
+        catch
+        {
+            _error = true;
+        }
+        finally
+        {
+            _loading = false;
+        }
+    }
+
+    private static Color StatusColor(string status) => status switch
+    {
+        "Completed" => Color.Success,
+        "Cancelled" => Color.Default,
+        "InProgress" => Color.Warning,
+        "CheckedIn" => Color.Info,
+        "Scheduled" => Color.Secondary,
+        _ => Color.Primary,
+    };
+}

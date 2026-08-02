@@ -1,0 +1,128 @@
+@page "/inventory/stock-movements"
+@attribute [Authorize]
+@inject InventoryService InventoryService
+@inject ISnackbar Snackbar
+@implements IDisposable
+
+<MudToolBar Dense="true" Class="mb-4">
+    <MudText Typo="Typo.h5">Stock Movements</MudText>
+    <MudText Typo="Typo.body2" Class="text-secondary ms-2">History of receives, issues and adjustments</MudText>
+    <MudSpacer />
+    <MudTextField T="string"
+                  Value="_search"
+                  ValueChanged="OnSearchChanged"
+                  Placeholder="Search movements..."
+                  Variant="Variant.Outlined"
+                  Margin="Margin.Dense"
+                  Immediate="true"
+                  Adornment="Adornment.Start"
+                  AdornmentIcon="@Icons.Material.Filled.Search"
+                  Class="search-field" />
+    <MudIconButton Icon="@Icons.Material.Filled.Refresh" Color="Color.Default" aria-label="Refresh" OnClick="ReloadAsync" />
+</MudToolBar>
+
+<MudTable T="StockMovementDto" @ref="_table" ServerData="LoadServerData" Dense="true" Hover="true" Striped="true" Elevation="1" RowsPerPage="10">
+    <HeaderContent>
+        <MudTh><MudTableSortLabel T="StockMovementDto" SortLabel="@("CreatedAt")">Date</MudTableSortLabel></MudTh>
+        <MudTh><MudTableSortLabel T="StockMovementDto" SortLabel="@("MovementType")">Type</MudTableSortLabel></MudTh>
+        <MudTh><MudTableSortLabel T="StockMovementDto" SortLabel="@("Quantity")">Quantity</MudTableSortLabel></MudTh>
+        <MudTh>Unit Cost</MudTh>
+        <MudTh>Item</MudTh>
+        <MudTh>Reference</MudTh>
+        <MudTh>Notes</MudTh>
+    </HeaderContent>
+    <RowTemplate>
+        <MudTd DataLabel="Date">@context.CreatedAt.ToLocalTime().ToString("dd MMM yyyy HH:mm")</MudTd>
+        <MudTd DataLabel="Type">
+            <MudChip T="string" Size="Size.Small" Color="@MovementColor(context.MovementType)">@FormatMovementType(context.MovementType)</MudChip>
+        </MudTd>
+        <MudTd DataLabel="Quantity">
+            <MudText Color="@(context.Quantity < 0 ? Color.Error : Color.Success)">@(context.Quantity > 0 ? $"+{context.Quantity}" : context.Quantity.ToString())</MudText>
+        </MudTd>
+        <MudTd DataLabel="Unit Cost">@(context.UnitCost?.ToString("C") ?? "-")</MudTd>
+        <MudTd DataLabel="Item" Class="mono-text">@ShortId(context.ItemId)</MudTd>
+        <MudTd DataLabel="Reference">@(context.Reference ?? "-")</MudTd>
+        <MudTd DataLabel="Notes">@(context.Notes ?? "-")</MudTd>
+    </RowTemplate>
+    <NoRecordsContent>
+        <MudText Class="pa-4">No stock movements found.</MudText>
+    </NoRecordsContent>
+    <PagerContent>
+        <MudTablePager PageSizeOptions="@(new[] { 10, 25, 50 })" />
+    </PagerContent>
+</MudTable>
+
+@code {
+    private MudTable<StockMovementDto>? _table;
+    private string? _search;
+    private CancellationTokenSource? _searchCts;
+
+    private async Task<TableData<StockMovementDto>> LoadServerData(TableState state, CancellationToken ct)
+    {
+        try
+        {
+            var page = await InventoryService.GetStockMovementsPagedAsync(
+                _search,
+                state.SortLabel,
+                state.SortDirection == SortDirection.Descending,
+                state.Page + 1,
+                state.PageSize,
+                ct);
+
+            return new TableData<StockMovementDto> { Items = page.Items, TotalItems = page.TotalCount };
+        }
+        catch (ApiException ex)
+        {
+            Snackbar.Add(ex.Message, Severity.Error);
+            return new TableData<StockMovementDto> { Items = Array.Empty<StockMovementDto>(), TotalItems = 0 };
+        }
+        catch (Exception)
+        {
+            Snackbar.Add("Unable to reach the server.", Severity.Error);
+            return new TableData<StockMovementDto> { Items = Array.Empty<StockMovementDto>(), TotalItems = 0 };
+        }
+    }
+
+    private async Task OnSearchChanged(string? value)
+    {
+        _search = value;
+
+        _searchCts?.Cancel();
+        var cts = _searchCts = new CancellationTokenSource();
+        try
+        {
+            await Task.Delay(400, cts.Token);
+        }
+        catch (TaskCanceledException)
+        {
+            return;
+        }
+
+        if (_table is not null)
+            await _table.ReloadServerData();
+    }
+
+    private Task ReloadAsync()
+        => _table is null ? Task.CompletedTask : _table.ReloadServerData();
+
+    private static string FormatMovementType(string type) => type switch
+    {
+        "ReturnToSupplier" => "Return to Supplier",
+        _ => type,
+    };
+
+    private static Color MovementColor(string type) => type switch
+    {
+        "Receive" => Color.Success,
+        "Issue" => Color.Warning,
+        "Adjustment" => Color.Info,
+        "ReturnToSupplier" => Color.Secondary,
+        "Disposal" => Color.Error,
+        _ => Color.Primary,
+    };
+
+    private static string ShortId(string id)
+        => id.Length > 8 ? id[..8] : id;
+
+    public void Dispose() => _searchCts?.Cancel();
+}

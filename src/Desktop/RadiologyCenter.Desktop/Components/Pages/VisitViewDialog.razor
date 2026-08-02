@@ -1,0 +1,219 @@
+@inject ExaminationService ExaminationService
+@inject PatientService PatientService
+@inject InventoryService InventoryService
+
+<MudDialog>
+    <DialogContent>
+        @if (_loading)
+        {
+            <div class="d-flex justify-content-center pa-6">
+                <MudProgressCircular Indeterminate="true" />
+            </div>
+        }
+        else if (_loadError is not null)
+        {
+            <MudPaper Class="pa-4 text-center">
+                <MudIcon Icon="@Icons.Material.Filled.CloudOff" Size="Size.Large" Color="Color.Error" />
+                <MudText Class="mt-2">@_loadError</MudText>
+                <MudButton Color="Color.Primary" Variant="Variant.Filled" Class="mt-2" OnClick="LoadAsync">Retry</MudButton>
+            </MudPaper>
+        }
+        else if (_visit is not null)
+        {
+            <MudGrid Spacing="2">
+                <MudItem xs="12" sm="6">
+                    <MudText Typo="Typo.caption" Class="text-secondary">Patient</MudText>
+                    <MudText Typo="Typo.subtitle1">@_patientName</MudText>
+                </MudItem>
+                <MudItem xs="12" sm="6">
+                    <MudText Typo="Typo.caption" Class="text-secondary">Examination</MudText>
+                    <MudText Typo="Typo.subtitle1">@_visit.ExaminationTypeName</MudText>
+                </MudItem>
+                <MudItem xs="12" sm="6">
+                    <MudText Typo="Typo.caption" Class="text-secondary">Status</MudText>
+                    <MudChip T="string" Size="Size.Small" Color="@(StatusColor(_visit.Status))">@_visit.Status</MudChip>
+                </MudItem>
+                <MudItem xs="12" sm="6">
+                    <MudText Typo="Typo.caption" Class="text-secondary">Priority</MudText>
+                    <MudChip T="string" Size="Size.Small" Color="@(PriorityColor(_visit.Priority))">@_visit.Priority</MudChip>
+                </MudItem>
+                <MudItem xs="12">
+                    <MudText Typo="Typo.caption" Class="text-secondary">Referring Doctor</MudText>
+                    <MudText Typo="Typo.subtitle1">@(string.IsNullOrWhiteSpace(_visit.ReferringDoctor) ? "-" : _visit.ReferringDoctor)</MudText>
+                </MudItem>
+                <MudItem xs="12">
+                    <MudText Typo="Typo.caption" Class="text-secondary">Clinical Indication</MudText>
+                    <MudText Typo="Typo.body1">@(string.IsNullOrWhiteSpace(_visit.ClinicalIndication) ? "-" : _visit.ClinicalIndication)</MudText>
+                </MudItem>
+                <MudItem xs="12" sm="4">
+                    <MudText Typo="Typo.caption" Class="text-secondary">Scheduled</MudText>
+                    <MudText Typo="Typo.body1">@(_visit.ScheduledAt?.ToString("g") ?? "-")</MudText>
+                </MudItem>
+                <MudItem xs="12" sm="4">
+                    <MudText Typo="Typo.caption" Class="text-secondary">Started</MudText>
+                    <MudText Typo="Typo.body1">@(_visit.StartedAt?.ToString("g") ?? "-")</MudText>
+                </MudItem>
+                <MudItem xs="12" sm="4">
+                    <MudText Typo="Typo.caption" Class="text-secondary">Completed</MudText>
+                    <MudText Typo="Typo.body1">@(_visit.CompletedAt?.ToString("g") ?? "-")</MudText>
+                </MudItem>
+
+                @if (!string.IsNullOrWhiteSpace(_visit.CancellationReason))
+                {
+                    <MudItem xs="12">
+                        <MudText Typo="Typo.caption" Class="text-secondary">Cancellation Reason</MudText>
+                        <MudText Typo="Typo.body1" Color="Color.Error">@_visit.CancellationReason</MudText>
+                    </MudItem>
+                }
+
+                <MudDivider Class="my-1" />
+                <MudItem xs="12">
+                    <MudText Typo="Typo.subtitle2" Class="mb-1">Billing</MudText>
+                </MudItem>
+                <MudItem xs="6" sm="3">
+                    <MudText Typo="Typo.caption" Class="text-secondary">Price</MudText>
+                    <MudText Typo="Typo.body1">@_visit.Price.ToString("C")</MudText>
+                </MudItem>
+                <MudItem xs="6" sm="3">
+                    <MudText Typo="Typo.caption" Class="text-secondary">Discount</MudText>
+                    <MudText Typo="Typo.body1">@(_visit.IsDiscountPercentage ? $"{_visit.Discount}%" : _visit.Discount.ToString("C"))</MudText>
+                </MudItem>
+                <MudItem xs="6" sm="3">
+                    <MudText Typo="Typo.caption" Class="text-secondary">Paid</MudText>
+                    <MudText Typo="Typo.body1">@_visit.Paid.ToString("C")</MudText>
+                </MudItem>
+                <MudItem xs="6" sm="3">
+                    <MudText Typo="Typo.caption" Class="text-secondary">Remaining</MudText>
+                    <MudText Typo="Typo.body1" Color="@(_visit.Remaining > 0 ? Color.Error : Color.Success)">@_visit.Remaining.ToString("C")</MudText>
+                </MudItem>
+
+                <MudDivider Class="my-1" />
+                <MudItem xs="12">
+                    <MudText Typo="Typo.subtitle2" Class="mb-1">Items</MudText>
+                </MudItem>
+                <MudItem xs="12">
+                    <MudSimpleTable Dense="true">
+                        <thead>
+                            <tr>
+                                <th>Item</th>
+                                <th>Qty</th>
+                                <th>Type</th>
+                                <th>Required</th>
+                                <th>Notes</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @if (_visit.Items.Count == 0)
+                            {
+                                <tr>
+                                    <td colspan="5">No items on this visit.</td>
+                                </tr>
+                            }
+                            else
+                            {
+                                @foreach (var item in _visit.Items)
+                                {
+                                    <tr>
+                                        <td>@ResolveItemName(item.ItemId)</td>
+                                        <td>@item.Quantity</td>
+                                        <td>
+                                            <MudChip T="string" Size="Size.Small" Color="@(item.IsContrast ? Color.Secondary : Color.Default)" Variant="Variant.Outlined">@(item.IsContrast ? "Contrast" : "Consumable")</MudChip>
+                                        </td>
+                                        <td>@(item.IsRequired ? "Yes" : "No")</td>
+                                        <td>@(string.IsNullOrWhiteSpace(item.Notes) ? "-" : item.Notes)</td>
+                                    </tr>
+                                }
+                            }
+                        </tbody>
+                    </MudSimpleTable>
+                </MudItem>
+
+                @if (!string.IsNullOrWhiteSpace(_visit.Notes))
+                {
+                    <MudItem xs="12">
+                        <MudText Typo="Typo.caption" Class="text-secondary">Notes</MudText>
+                        <MudText Typo="Typo.body1">@_visit.Notes</MudText>
+                    </MudItem>
+                }
+            </MudGrid>
+        }
+    </DialogContent>
+    <DialogActions>
+        <MudButton Color="Color.Default" OnClick="CloseAsync">Close</MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    [Parameter] public ExaminationDto Visit { get; set; } = default!;
+
+    [CascadingParameter] public IMudDialogInstance MudDialog { get; set; } = default!;
+
+    private ExaminationDto? _visit;
+    private string _patientName = "Loading...";
+    private string? _loadError;
+    private bool _loading = true;
+    private readonly Dictionary<string, string> _itemNames = new();
+
+    protected override async Task OnInitializedAsync()
+        => await LoadAsync();
+
+    private async Task LoadAsync()
+    {
+        _loading = true;
+        _loadError = null;
+        try
+        {
+            var itemsTask = InventoryService.GetItemsPagedAsync(null, "Name", false, 1, 500);
+            _visit = await ExaminationService.GetByIdAsync(Visit.Id);
+
+            var items = await itemsTask;
+            foreach (var item in items.Items)
+                _itemNames[item.Id] = item.Name;
+
+            try
+            {
+                var patient = await PatientService.GetByIdAsync(_visit.PatientId);
+                _patientName = patient.FullName;
+            }
+            catch
+            {
+                _patientName = Visit.PatientId;
+            }
+        }
+        catch (ApiException ex)
+        {
+            _loadError = ex.Message;
+        }
+        catch (Exception)
+        {
+            _loadError = "Unable to reach the server.";
+        }
+        finally
+        {
+            _loading = false;
+        }
+    }
+
+    private string ResolveItemName(string itemId)
+        => _itemNames.TryGetValue(itemId, out var name) ? name : itemId;
+
+    private static Color PriorityColor(string priority) => priority switch
+    {
+        "Stat" => Color.Error,
+        "Urgent" => Color.Warning,
+        _ => Color.Default,
+    };
+
+    private static Color StatusColor(string status) => status switch
+    {
+        "Completed" => Color.Success,
+        "Cancelled" => Color.Default,
+        "InProgress" => Color.Secondary,
+        "CheckedIn" => Color.Info,
+        "Scheduled" => Color.Primary,
+        _ => Color.Default,
+    };
+
+    private void CloseAsync()
+        => MudDialog.Cancel();
+}

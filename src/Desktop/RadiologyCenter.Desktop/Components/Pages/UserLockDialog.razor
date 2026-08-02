@@ -1,0 +1,82 @@
+@inject IdentityService IdentityService
+@inject ISnackbar Snackbar
+
+<MudDialog>
+    <DialogContent>
+        <MudText Typo="Typo.body2" Class="text-secondary mb-3">
+            Lock @User.UserName until a specified date and time.
+        </MudText>
+        <MudDatePicker @bind-Date="_lockoutDate"
+                       Label="Lock Until"
+                       Variant="Variant.Outlined"
+                       Margin="Margin.Dense"
+                       Class="w-100" />
+        <MudTimePicker @bind-Time="_lockoutTime"
+                       Label="Lock Until Time"
+                       Variant="Variant.Outlined"
+                       Margin="Margin.Dense"
+                       Class="w-100" />
+    </DialogContent>
+    <DialogActions>
+        <MudButton Color="Color.Default" OnClick="CancelAsync" Disabled="_busy">Cancel</MudButton>
+        <MudButton Color="Color.Warning" Variant="Variant.Filled" OnClick="SubmitAsync" Disabled="_busy">
+            @if (_busy)
+            {
+                <MudProgressCircular Size="Size.Small" Indeterminate="true" Class="mx-1" />
+            }
+            else
+            {
+                <text>Lock User</text>
+            }
+        </MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    [Parameter] public UserDto User { get; set; } = default!;
+
+    [CascadingParameter] public IMudDialogInstance MudDialog { get; set; } = default!;
+
+    private DateTime? _lockoutDate = DateTime.Today.AddDays(1);
+    private TimeSpan? _lockoutTime = TimeSpan.FromHours(8);
+    private bool _busy;
+
+    private async Task SubmitAsync()
+    {
+        if (_lockoutDate is null || _lockoutTime is null)
+        {
+            Snackbar.Add("Select a date and time.", Severity.Warning);
+            return;
+        }
+
+        var lockoutEnd = _lockoutDate.Value.Date + _lockoutTime.Value;
+        if (lockoutEnd <= DateTime.Now)
+        {
+            Snackbar.Add("Lock-until must be in the future.", Severity.Warning);
+            return;
+        }
+
+        _busy = true;
+        try
+        {
+            await IdentityService.LockUserAsync(User.Id, lockoutEnd);
+            Snackbar.Add($"{User.UserName} locked until {lockoutEnd:g}.", Severity.Success);
+            MudDialog.Close(DialogResult.Ok(true));
+        }
+        catch (ApiException ex)
+        {
+            Snackbar.Add(ex.Message, Severity.Error);
+        }
+        catch (Exception)
+        {
+            Snackbar.Add("Unable to reach the server.", Severity.Error);
+        }
+        finally
+        {
+            _busy = false;
+        }
+    }
+
+    private void CancelAsync()
+        => MudDialog.Cancel();
+}

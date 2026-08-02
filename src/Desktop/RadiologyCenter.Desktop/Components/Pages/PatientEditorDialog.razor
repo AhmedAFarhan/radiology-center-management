@@ -1,0 +1,263 @@
+@inject PatientService PatientService
+@inject ISnackbar Snackbar
+
+<MudDialog>
+    <DialogContent>
+        <EditForm EditContext="_editContext">
+            <DataAnnotationsValidator />
+            <MudGrid Spacing="2">
+                <MudItem xs="12">
+                    <MudTextField @bind-Value="_model.FullName"
+                                  Label="Full Name"
+                                  Variant="Variant.Outlined"
+                                  Margin="Margin.Dense"
+                                  Immediate="true"
+                                  For="@(() => _model.FullName)" />
+                </MudItem>
+                <MudItem xs="12" sm="6">
+                    <MudSelect T="string"
+                               @bind-Value="_model.Gender"
+                               Label="Gender"
+                               Variant="Variant.Outlined"
+                               Margin="Margin.Dense"
+                               For="@(() => _model.Gender)">
+                        @foreach (var gender in Genders)
+                        {
+                            <MudSelectItem T="string" Value="@gender">@gender</MudSelectItem>
+                        }
+                    </MudSelect>
+                </MudItem>
+                <MudItem xs="12" sm="6">
+                    <MudNumericField T="int?"
+                                     @bind-Value="_model.Age"
+                                     Label="Age"
+                                     Variant="Variant.Outlined"
+                                     Margin="Margin.Dense"
+                                     Min="0"
+                                     Max="150"
+                                     For="@(() => _model.Age)" />
+                </MudItem>
+                <MudItem xs="12" sm="6">
+                    <MudDatePicker @bind-Date="_model.DateOfBirth"
+                                   Label="Date of Birth"
+                                   Variant="Variant.Outlined"
+                                   Margin="Margin.Dense"
+                                   Clearable="true"
+                                   For="@(() => _model.DateOfBirth)" />
+                </MudItem>
+                <MudItem xs="12" sm="6">
+                    <MudTextField @bind-Value="_model.PhoneNumber"
+                                  Label="Phone Number"
+                                  Variant="Variant.Outlined"
+                                  Margin="Margin.Dense"
+                                  Immediate="true"
+                                  For="@(() => _model.PhoneNumber)" />
+                </MudItem>
+                <MudItem xs="12" sm="6">
+                    <MudTextField @bind-Value="_model.Email"
+                                  Label="Email"
+                                  Variant="Variant.Outlined"
+                                  Margin="Margin.Dense"
+                                  Immediate="true"
+                                  For="@(() => _model.Email)" />
+                </MudItem>
+                <MudItem xs="12" sm="6">
+                    <MudTextField @bind-Value="_model.NationalId"
+                                  Label="National ID"
+                                  Variant="Variant.Outlined"
+                                  Margin="Margin.Dense"
+                                  Immediate="true" />
+                </MudItem>
+                <MudItem xs="12" sm="6">
+                    <MudSelect T="string"
+                               @bind-Value="_model.BloodType"
+                               Label="Blood Type"
+                               Variant="Variant.Outlined"
+                               Margin="Margin.Dense"
+                               Clearable="true">
+                        @foreach (var bloodType in BloodTypes)
+                        {
+                            <MudSelectItem T="string" Value="@bloodType">@bloodType</MudSelectItem>
+                        }
+                    </MudSelect>
+                </MudItem>
+                <MudItem xs="12">
+                    <MudTextField @bind-Value="_model.Address"
+                                  Label="Address"
+                                  Variant="Variant.Outlined"
+                                  Margin="Margin.Dense"
+                                  Immediate="true" />
+                </MudItem>
+                <MudItem xs="12" sm="6">
+                    <MudTextField @bind-Value="_model.ReferringPhysician"
+                                  Label="Referring Physician"
+                                  Variant="Variant.Outlined"
+                                  Margin="Margin.Dense"
+                                  Immediate="true" />
+                </MudItem>
+                <MudItem xs="12" sm="6">
+                    <MudTextField @bind-Value="_model.Allergies"
+                                  Label="Allergies"
+                                  Variant="Variant.Outlined"
+                                  Margin="Margin.Dense"
+                                  Immediate="true" />
+                </MudItem>
+                <MudItem xs="12">
+                    <MudTextField @bind-Value="_model.MedicalHistory"
+                                  Label="Medical History"
+                                  Variant="Variant.Outlined"
+                                  Margin="Margin.Dense"
+                                  Lines="3"
+                                  Immediate="true" />
+                </MudItem>
+            </MudGrid>
+        </EditForm>
+    </DialogContent>
+    <DialogActions>
+        <MudButton Color="Color.Default" OnClick="CancelAsync" Disabled="_busy">Cancel</MudButton>
+        <MudButton Color="Color.Primary" Variant="Variant.Filled" OnClick="SubmitAsync" Disabled="_busy">
+            @if (_busy)
+            {
+                <MudProgressCircular Size="Size.Small" Indeterminate="true" Class="mx-1" />
+            }
+            else
+            {
+                <text>@(IsEdit ? "Save Changes" : "Create Patient")</text>
+            }
+        </MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    [Parameter] public PatientDto? Patient { get; set; }
+
+    [CascadingParameter] public IMudDialogInstance MudDialog { get; set; } = default!;
+
+    private static readonly string[] Genders = { "Male", "Female", "Other" };
+    private static readonly string[] BloodTypes = { "A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-" };
+
+    private readonly PatientFormModel _model = new();
+    private EditContext _editContext = default!;
+    private bool _busy;
+
+    private bool IsEdit => Patient is not null;
+
+    protected override void OnInitialized()
+    {
+        _editContext = new EditContext(_model);
+
+        if (Patient is null)
+            return;
+
+        _model.FullName = Patient.FullName;
+        _model.Gender = Patient.Gender;
+        _model.DateOfBirth = Patient.DateOfBirth;
+        _model.Age = Patient.Age;
+        _model.PhoneNumber = Patient.PhoneNumber;
+        _model.Email = Patient.Email;
+        _model.Address = Patient.Address;
+        _model.NationalId = Patient.NationalId;
+        _model.BloodType = Patient.BloodType;
+        _model.Allergies = Patient.Allergies;
+        _model.MedicalHistory = Patient.MedicalHistory;
+        _model.ReferringPhysician = Patient.ReferringPhysician;
+    }
+
+    private async Task SubmitAsync()
+    {
+        if (!_editContext.Validate())
+            return;
+
+        _busy = true;
+        try
+        {
+            var input = new PatientInput
+            {
+                FullName = _model.FullName,
+                Gender = _model.Gender,
+                DateOfBirth = _model.DateOfBirth,
+                Age = _model.Age,
+                PhoneNumber = _model.PhoneNumber,
+                Email = _model.Email,
+                Address = _model.Address,
+                NationalId = _model.NationalId,
+                BloodType = _model.BloodType,
+                Allergies = _model.Allergies,
+                MedicalHistory = _model.MedicalHistory,
+                ReferringPhysician = _model.ReferringPhysician,
+            };
+
+            if (IsEdit)
+                await PatientService.UpdateAsync(Patient!.Id, input);
+            else
+                await PatientService.CreateAsync(input);
+
+            Snackbar.Add(IsEdit ? "Patient updated." : "Patient created.", Severity.Success);
+            MudDialog.Close(DialogResult.Ok(true));
+        }
+        catch (ApiException ex)
+        {
+            Snackbar.Add(ex.Message, Severity.Error);
+        }
+        catch (Exception)
+        {
+            Snackbar.Add("Unable to reach the server. Please try again.", Severity.Error);
+        }
+        finally
+        {
+            _busy = false;
+        }
+    }
+
+    private void CancelAsync()
+        => MudDialog.Cancel();
+
+    private sealed class PatientFormModel : IValidatableObject
+    {
+        [Required(ErrorMessage = "Full name is required.")]
+        public string FullName { get; set; } = string.Empty;
+
+        [Required(ErrorMessage = "Gender is required.")]
+        public string Gender { get; set; } = string.Empty;
+
+        public DateTime? DateOfBirth { get; set; }
+        public int? Age { get; set; }
+
+        [Required(ErrorMessage = "Phone number is required.")]
+        public string PhoneNumber { get; set; } = string.Empty;
+
+        [EmailAddress(ErrorMessage = "Enter a valid email address.")]
+        public string? Email { get; set; }
+
+        public string? Address { get; set; }
+        public string? NationalId { get; set; }
+        public string? BloodType { get; set; }
+        public string? Allergies { get; set; }
+        public string? MedicalHistory { get; set; }
+        public string? ReferringPhysician { get; set; }
+
+        public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
+        {
+            if (DateOfBirth is null && Age is null)
+                yield return new ValidationResult(
+                    "Either date of birth or age must be provided.",
+                    new[] { nameof(DateOfBirth) });
+
+            if (DateOfBirth is not null && DateOfBirth.Value.Date > DateTime.UtcNow.Date)
+                yield return new ValidationResult(
+                    "Date of birth cannot be in the future.",
+                    new[] { nameof(DateOfBirth) });
+
+            if (Age is not null && Age.Value is < 0 or > 150)
+                yield return new ValidationResult(
+                    "Age must be between 0 and 150.",
+                    new[] { nameof(Age) });
+
+            var parts = FullName?.Split(' ', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+            if (parts is null || parts.Length < 2)
+                yield return new ValidationResult(
+                    "Full name must contain at least a first name and a last name.",
+                    new[] { nameof(FullName) });
+        }
+    }
+}

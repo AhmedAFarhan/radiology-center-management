@@ -1,0 +1,288 @@
+@inject ExaminationService ExaminationService
+@inject InventoryService InventoryService
+@inject ISnackbar Snackbar
+
+<MudDialog>
+    <DialogContent>
+        <EditForm EditContext="_editContext">
+            <DataAnnotationsValidator />
+            <MudGrid Spacing="2">
+                <MudItem xs="12" sm="4">
+                    <MudTextField @bind-Value="_model.Code"
+                                  Label="Code"
+                                  Variant="Variant.Outlined"
+                                  Margin="Margin.Dense"
+                                  Immediate="true"
+                                  For="@(() => _model.Code)" />
+                </MudItem>
+                <MudItem xs="12" sm="8">
+                    <MudTextField @bind-Value="_model.Name"
+                                  Label="Name"
+                                  Variant="Variant.Outlined"
+                                  Margin="Margin.Dense"
+                                  Immediate="true"
+                                  For="@(() => _model.Name)" />
+                </MudItem>
+                <MudItem xs="12" sm="6">
+                    <MudSelect T="string"
+                               @bind-Value="_model.Modality"
+                               Label="Modality"
+                               Variant="Variant.Outlined"
+                               Margin="Margin.Dense"
+                               For="@(() => _model.Modality)">
+                        @foreach (var modality in Modalities)
+                        {
+                            <MudSelectItem T="string" Value="@modality">@modality</MudSelectItem>
+                        }
+                    </MudSelect>
+                </MudItem>
+                <MudItem xs="12" sm="6">
+                    <MudTextField @bind-Value="_model.BodyPart"
+                                  Label="Body Part"
+                                  Variant="Variant.Outlined"
+                                  Margin="Margin.Dense"
+                                  Immediate="true"
+                                  For="@(() => _model.BodyPart)" />
+                </MudItem>
+                <MudItem xs="12" sm="6">
+                    <MudNumericField T="int"
+                                     @bind-Value="_model.StandardDurationMinutes"
+                                     Label="Standard Duration (min)"
+                                     Variant="Variant.Outlined"
+                                     Margin="Margin.Dense"
+                                     Min="0"
+                                     For="@(() => _model.StandardDurationMinutes)" />
+                </MudItem>
+                <MudItem xs="12" sm="6">
+                    <MudNumericField T="decimal"
+                                     @bind-Value="_model.Price"
+                                     Label="Price"
+                                     Variant="Variant.Outlined"
+                                     Margin="Margin.Dense"
+                                     Min="0"
+                                     For="@(() => _model.Price)" />
+                </MudItem>
+                <MudItem xs="12" sm="6">
+                    <MudSwitch T="bool" @bind-Value="_model.RequiresPreparation" Color="Color.Info">Requires Preparation</MudSwitch>
+                </MudItem>
+                <MudItem xs="12" sm="6">
+                    <MudSwitch T="bool" @bind-Value="_model.RequiresConsent" Color="Color.Warning">Requires Consent</MudSwitch>
+                </MudItem>
+            </MudGrid>
+
+            <MudDivider Class="my-3" />
+            <div class="d-flex align-center justify-space-between mb-2">
+                <MudText Typo="Typo.subtitle2">Consumables / Preference Items</MudText>
+                <MudButton Variant="Variant.Text" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Add" OnClick="AddItem" Size="Size.Small">Add Item</MudButton>
+            </div>
+
+            @foreach (var item in _model.Items)
+            {
+                <MudGrid Spacing="2" Class="align-center mb-2">
+                    <MudItem xs="12" sm="5">
+                        <MudSelect T="string"
+                                   @bind-Value="item.ItemId"
+                                   Label="Inventory Item"
+                                   Variant="Variant.Outlined"
+                                   Margin="Margin.Dense">
+                            @foreach (var invItem in _inventoryItems)
+                            {
+                                <MudSelectItem T="string" Value="@invItem.Id">@invItem.Name</MudSelectItem>
+                            }
+                        </MudSelect>
+                    </MudItem>
+                    <MudItem xs="12" sm="2">
+                        <MudNumericField T="int"
+                                         @bind-Value="item.Quantity"
+                                         Label="Qty"
+                                         Variant="Variant.Outlined"
+                                         Margin="Margin.Dense"
+                                         Min="1" />
+                    </MudItem>
+                    <MudItem xs="12" sm="4">
+                        <MudSwitch T="bool" @bind-Value="item.IsContrast" Color="Color.Secondary" Class="me-3">Contrast</MudSwitch>
+                        <MudSwitch T="bool" @bind-Value="item.IsRequired" Color="Color.Primary">Required</MudSwitch>
+                    </MudItem>
+                    <MudItem xs="12" sm="1">
+                        <MudIconButton Icon="@Icons.Material.Filled.RemoveCircleOutline"
+                                       Size="Size.Small"
+                                       Color="Color.Error"
+                                       aria-label="Remove item"
+                                       OnClick="@(() => RemoveItem(item))" />
+                    </MudItem>
+                </MudGrid>
+            }
+            @if (_model.Items.Count == 0)
+            {
+                <MudText Typo="Typo.body2" Class="text-secondary">No preference items defined.</MudText>
+            }
+        </EditForm>
+    </DialogContent>
+    <DialogActions>
+        <MudButton Color="Color.Default" OnClick="CancelAsync" Disabled="_busy">Cancel</MudButton>
+        <MudButton Color="Color.Primary" Variant="Variant.Filled" OnClick="SubmitAsync" Disabled="_busy">
+            @if (_busy)
+            {
+                <MudProgressCircular Size="Size.Small" Indeterminate="true" Class="mx-1" />
+            }
+            else
+            {
+                <text>@(IsEdit ? "Save Changes" : "Create Type")</text>
+            }
+        </MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    [Parameter] public ExaminationTypeDto? Type { get; set; }
+
+    [CascadingParameter] public IMudDialogInstance MudDialog { get; set; } = default!;
+
+    private static readonly string[] Modalities = { "XRay", "CT", "MRI", "Ultrasound", "Mammography", "Fluoroscopy", "DEXA", "Other" };
+
+    private readonly TypeFormModel _model = new();
+    private EditContext _editContext = default!;
+    private List<ItemDto> _inventoryItems = new();
+    private bool _busy;
+
+    private bool IsEdit => Type is not null;
+
+    protected override async Task OnInitializedAsync()
+    {
+        _editContext = new EditContext(_model);
+
+        try
+        {
+            var items = await InventoryService.GetItemsPagedAsync(null, "Name", false, 1, 200);
+            _inventoryItems = items.Items.ToList();
+        }
+        catch (ApiException ex)
+        {
+            Snackbar.Add(ex.Message, Severity.Error);
+        }
+        catch (Exception)
+        {
+            Snackbar.Add("Unable to load inventory items.", Severity.Error);
+        }
+
+        if (Type is null)
+            return;
+
+        _model.Code = Type.Code;
+        _model.Name = Type.Name;
+        _model.Modality = Type.Modality;
+        _model.BodyPart = Type.BodyPart;
+        _model.StandardDurationMinutes = Type.StandardDurationMinutes;
+        _model.Price = Type.Price;
+        _model.RequiresPreparation = Type.RequiresPreparation;
+        _model.RequiresConsent = Type.RequiresConsent;
+        _model.Items = Type.Items.Select(i => new TypeItemModel
+        {
+            ItemId = i.ItemId,
+            Quantity = i.Quantity,
+            IsContrast = i.IsContrast,
+            IsRequired = i.IsRequired,
+            Notes = i.Notes,
+        }).ToList();
+    }
+
+    private void AddItem() => _model.Items.Add(new TypeItemModel { Quantity = 1 });
+
+    private void RemoveItem(TypeItemModel item) => _model.Items.Remove(item);
+
+    private async Task SubmitAsync()
+    {
+        if (!_editContext.Validate())
+            return;
+
+        var missingItems = _model.Items.Any(i => string.IsNullOrWhiteSpace(i.ItemId));
+        var duplicateItems = _model.Items.GroupBy(i => i.ItemId).Any(g => g.Count() > 1);
+        var invalidQuantities = _model.Items.Any(i => i.Quantity <= 0);
+
+        if (missingItems || duplicateItems || invalidQuantities)
+        {
+            Snackbar.Add("Each item needs a selection, a positive quantity, and no duplicates.", Severity.Warning);
+            return;
+        }
+
+        _busy = true;
+        try
+        {
+            var input = new ExaminationTypeInput
+            {
+                Code = _model.Code,
+                Name = _model.Name,
+                Modality = _model.Modality,
+                BodyPart = _model.BodyPart,
+                StandardDurationMinutes = _model.StandardDurationMinutes,
+                Price = _model.Price,
+                RequiresPreparation = _model.RequiresPreparation,
+                RequiresConsent = _model.RequiresConsent,
+                Items = _model.Items.Select(i => new ExaminationTypeItemInput
+                {
+                    ItemId = i.ItemId,
+                    Quantity = i.Quantity,
+                    IsContrast = i.IsContrast,
+                    IsRequired = i.IsRequired,
+                    Notes = i.Notes,
+                }).ToList(),
+            };
+
+            if (IsEdit)
+                await ExaminationService.UpdateTypeAsync(Type!.Id, input);
+            else
+                await ExaminationService.CreateTypeAsync(input);
+
+            Snackbar.Add(IsEdit ? "Examination type updated." : "Examination type created.", Severity.Success);
+            MudDialog.Close(DialogResult.Ok(true));
+        }
+        catch (ApiException ex)
+        {
+            Snackbar.Add(ex.Message, Severity.Error);
+        }
+        catch (Exception)
+        {
+            Snackbar.Add("Unable to reach the server. Please try again.", Severity.Error);
+        }
+        finally
+        {
+            _busy = false;
+        }
+    }
+
+    private void CancelAsync()
+        => MudDialog.Cancel();
+
+    private sealed class TypeFormModel
+    {
+        [Required(ErrorMessage = "Code is required.")]
+        [MaxLength(20, ErrorMessage = "Code must be 20 characters or fewer.")]
+        public string Code { get; set; } = string.Empty;
+
+        [Required(ErrorMessage = "Name is required.")]
+        [MaxLength(200, ErrorMessage = "Name must be 200 characters or fewer.")]
+        public string Name { get; set; } = string.Empty;
+
+        [Required(ErrorMessage = "Modality is required.")]
+        public string Modality { get; set; } = string.Empty;
+
+        [Required(ErrorMessage = "Body part is required.")]
+        [MaxLength(200, ErrorMessage = "Body part must be 200 characters or fewer.")]
+        public string BodyPart { get; set; } = string.Empty;
+
+        public int StandardDurationMinutes { get; set; }
+        public decimal Price { get; set; }
+        public bool RequiresPreparation { get; set; }
+        public bool RequiresConsent { get; set; }
+        public List<TypeItemModel> Items { get; set; } = new();
+    }
+
+    private sealed class TypeItemModel
+    {
+        public string ItemId { get; set; } = string.Empty;
+        public int Quantity { get; set; }
+        public bool IsContrast { get; set; }
+        public bool IsRequired { get; set; }
+        public string? Notes { get; set; }
+    }
+}

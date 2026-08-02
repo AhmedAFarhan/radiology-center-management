@@ -1,0 +1,219 @@
+@inject InventoryService InventoryService
+@inject ISnackbar Snackbar
+
+<MudDialog>
+    <DialogContent>
+        <EditForm EditContext="_editContext">
+            <DataAnnotationsValidator />
+            <MudGrid Spacing="2">
+                <MudItem xs="12" sm="8">
+                    <MudTextField @bind-Value="_model.Name"
+                                  Label="Name"
+                                  Variant="Variant.Outlined"
+                                  Margin="Margin.Dense"
+                                  Immediate="true"
+                                  For="@(() => _model.Name)" />
+                </MudItem>
+                <MudItem xs="12" sm="4">
+                    <MudTextField @bind-Value="_model.Brand"
+                                  Label="Brand"
+                                  Variant="Variant.Outlined"
+                                  Margin="Margin.Dense"
+                                  Immediate="true" />
+                </MudItem>
+                <MudItem xs="12" sm="6">
+                    <MudSelect T="string"
+                               @bind-Value="_model.Category"
+                               Label="Category"
+                               Variant="Variant.Outlined"
+                               Margin="Margin.Dense"
+                               For="@(() => _model.Category)">
+                        @foreach (var category in Categories)
+                        {
+                            <MudSelectItem T="string" Value="@category.Key">@category.Value</MudSelectItem>
+                        }
+                    </MudSelect>
+                </MudItem>
+                <MudItem xs="12" sm="6">
+                    <MudSelect T="string"
+                               @bind-Value="_model.Unit"
+                               Label="Unit"
+                               Variant="Variant.Outlined"
+                               Margin="Margin.Dense"
+                               For="@(() => _model.Unit)">
+                        @foreach (var unit in Units)
+                        {
+                            <MudSelectItem T="string" Value="@unit">@unit</MudSelectItem>
+                        }
+                    </MudSelect>
+                </MudItem>
+                <MudItem xs="6">
+                    <MudNumericField T="int"
+                                     @bind-Value="_model.ReorderLevel"
+                                     Label="Reorder Level"
+                                     Variant="Variant.Outlined"
+                                     Margin="Margin.Dense"
+                                     Min="0"
+                                     For="@(() => _model.ReorderLevel)" />
+                </MudItem>
+                <MudItem xs="6">
+                    <MudNumericField T="int"
+                                     @bind-Value="_model.ReorderQuantity"
+                                     Label="Reorder Quantity"
+                                     Variant="Variant.Outlined"
+                                     Margin="Margin.Dense"
+                                     Min="0"
+                                     For="@(() => _model.ReorderQuantity)" />
+                </MudItem>
+                <MudItem xs="12" sm="6">
+                    <MudSelect T="string"
+                               @bind-Value="_model.LotTracked"
+                               Label="Lot Tracking"
+                               Variant="Variant.Outlined"
+                               Margin="Margin.Dense">
+                        <MudSelectItem T="string" Value="@("No")">No</MudSelectItem>
+                        <MudSelectItem T="string" Value="@("Yes")">Yes</MudSelectItem>
+                    </MudSelect>
+                </MudItem>
+                <MudItem xs="12" sm="6" Class="d-flex align-items-center">
+                    <MudText Typo="Typo.body2" Class="text-secondary">
+                        Lots are tracked per batch for expiry and stock control.
+                    </MudText>
+                </MudItem>
+                <MudItem xs="12">
+                    <MudTextField @bind-Value="_model.StorageInstructions"
+                                  Label="Storage Instructions"
+                                  Variant="Variant.Outlined"
+                                  Margin="Margin.Dense"
+                                  Lines="3"
+                                  Immediate="true" />
+                </MudItem>
+            </MudGrid>
+        </EditForm>
+    </DialogContent>
+    <DialogActions>
+        <MudButton Color="Color.Default" OnClick="CancelAsync" Disabled="_busy">Cancel</MudButton>
+        <MudButton Color="Color.Primary" Variant="Variant.Filled" OnClick="SubmitAsync" Disabled="_busy">
+            @if (_busy)
+            {
+                <MudProgressCircular Size="Size.Small" Indeterminate="true" Class="mx-1" />
+            }
+            else
+            {
+                <text>@(IsEdit ? "Save Changes" : "Create Item")</text>
+            }
+        </MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    [Parameter] public ItemDto? Item { get; set; }
+
+    [CascadingParameter] public IMudDialogInstance MudDialog { get; set; } = default!;
+
+    private static readonly Dictionary<string, string> Categories = new()
+    {
+        ["ContrastMedia"] = "Contrast Media",
+        ["Drug"] = "Drug",
+        ["MedicalSupply"] = "Medical Supply",
+        ["Consumable"] = "Consumable",
+        ["Other"] = "Other",
+    };
+
+    private static readonly string[] Units = { "Piece", "Box", "Bottle", "Vial", "Ampoule", "Pack", "Tube", "Roll", "Sheet", "Kit" };
+
+    private readonly ItemFormModel _model = new();
+    private EditContext _editContext = default!;
+    private bool _busy;
+
+    private bool IsEdit => Item is not null;
+
+    protected override void OnInitialized()
+    {
+        _editContext = new EditContext(_model);
+
+        if (Item is null)
+            return;
+
+        _model.Name = Item.Name;
+        _model.Brand = Item.Brand;
+        _model.Category = Item.Category;
+        _model.Unit = Item.Unit;
+        _model.ReorderLevel = Item.ReorderLevel;
+        _model.ReorderQuantity = Item.ReorderQuantity;
+        _model.LotTracked = Item.LotTracked ? "Yes" : "No";
+        _model.StorageInstructions = Item.StorageInstructions;
+    }
+
+    private async Task SubmitAsync()
+    {
+        if (!_editContext.Validate())
+            return;
+
+        _busy = true;
+        try
+        {
+            var input = new ItemInput
+            {
+                Name = _model.Name,
+                Brand = _model.Brand,
+                Category = _model.Category,
+                Unit = _model.Unit,
+                ReorderLevel = _model.ReorderLevel,
+                ReorderQuantity = _model.ReorderQuantity,
+                LotTracked = string.Equals(_model.LotTracked, "Yes", StringComparison.OrdinalIgnoreCase),
+                StorageInstructions = _model.StorageInstructions,
+            };
+
+            if (IsEdit)
+                await InventoryService.UpdateItemAsync(Item!.Id, input);
+            else
+                await InventoryService.CreateItemAsync(input);
+
+            Snackbar.Add(IsEdit ? "Item updated." : "Item created.", Severity.Success);
+            MudDialog.Close(DialogResult.Ok(true));
+        }
+        catch (ApiException ex)
+        {
+            Snackbar.Add(ex.Message, Severity.Error);
+        }
+        catch (Exception)
+        {
+            Snackbar.Add("Unable to reach the server. Please try again.", Severity.Error);
+        }
+        finally
+        {
+            _busy = false;
+        }
+    }
+
+    private void CancelAsync()
+        => MudDialog.Cancel();
+
+    private sealed class ItemFormModel : IValidatableObject
+    {
+        [Required(ErrorMessage = "Name is required.")]
+        public string Name { get; set; } = string.Empty;
+
+        [Required(ErrorMessage = "Category is required.")]
+        public string Category { get; set; } = string.Empty;
+
+        [Required(ErrorMessage = "Unit is required.")]
+        public string Unit { get; set; } = string.Empty;
+
+        public string? Brand { get; set; }
+        public int ReorderLevel { get; set; }
+        public int ReorderQuantity { get; set; }
+        public string LotTracked { get; set; } = "No";
+        public string? StorageInstructions { get; set; }
+
+        public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
+        {
+            if (ReorderLevel < 0)
+                yield return new ValidationResult("Reorder level cannot be negative.", new[] { nameof(ReorderLevel) });
+
+            if (ReorderQuantity < 0)
+                yield return new ValidationResult("Reorder quantity cannot be negative.", new[] { nameof(ReorderQuantity) });
+        }
+    }
+}

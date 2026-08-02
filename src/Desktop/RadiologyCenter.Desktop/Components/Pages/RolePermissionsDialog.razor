@@ -1,0 +1,170 @@
+@inject IdentityService IdentityService
+@inject ISnackbar Snackbar
+
+<MudDialog>
+    <DialogContent>
+        <MudText Typo="Typo.body2" Class="text-secondary mb-3">
+            Manage permissions for @Role.Name.
+        </MudText>
+
+        <MudGrid Spacing="2">
+                @foreach (var group in PermissionCatalog.Groups())
+                {
+                    <MudItem xs="12" sm="6">
+                        <MudPaper Elevation="0" Class="pa-3 mb-2 permission-group">
+                            <MudText Typo="Typo.subtitle2" Class="mb-1">@group</MudText>
+                            @foreach (var permission in PermissionCatalog.ByGroup(group))
+                            {
+                                <div>
+                                    <MudSwitch T="bool"
+                                               @bind-Value="_selected[permission.Code]"
+                                               Color="Color.Primary"
+                                               Size="Size.Small">
+                                        <MudText Typo="Typo.body2">@permission.Name</MudText>
+                                        <MudText Typo="Typo.caption" Class="text-secondary d-block">@permission.Code</MudText>
+                                    </MudSwitch>
+                                </div>
+                            }
+                        </MudPaper>
+                    </MudItem>
+                }
+            </MudGrid>
+        }
+    </DialogContent>
+    <DialogActions>
+        <MudButton Color="Color.Default" OnClick="CancelAsync" Disabled="_busy">Cancel</MudButton>
+        <MudButton Color="Color.Primary" Variant="Variant.Filled" OnClick="SubmitAsync" Disabled="_busy">
+            @if (_busy)
+            {
+                <MudProgressCircular Size="Size.Small" Indeterminate="true" Class="mx-1" />
+            }
+            else
+            {
+                <text>Save Permissions</text>
+            }
+        </MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    [Parameter] public RoleDto Role { get; set; } = default!;
+
+    [CascadingParameter] public IMudDialogInstance MudDialog { get; set; } = default!;
+
+    private readonly Dictionary<string, bool> _selected = new();
+    private bool _busy;
+
+    protected override void OnInitialized()
+    {
+        foreach (var permission in PermissionCatalog.All)
+            _selected[permission.Code] = Role.Permissions.Contains(permission.Code, StringComparer.OrdinalIgnoreCase);
+    }
+
+    private async Task SubmitAsync()
+    {
+        _busy = true;
+        try
+        {
+            var current = Role.Permissions.Select(p => p.ToLowerInvariant()).ToHashSet();
+            var next = _selected.Where(kv => kv.Value).Select(kv => kv.Key.ToLowerInvariant()).ToHashSet();
+
+            foreach (var add in next.Except(current))
+                await IdentityService.AddPermissionToRoleAsync(Role.Id, add);
+
+            foreach (var remove in current.Except(next))
+                await IdentityService.RemovePermissionFromRoleAsync(Role.Id, remove);
+
+            Snackbar.Add("Permissions updated.", Severity.Success);
+            MudDialog.Close(DialogResult.Ok(true));
+        }
+        catch (ApiException ex)
+        {
+            Snackbar.Add(ex.Message, Severity.Error);
+        }
+        catch (Exception)
+        {
+            Snackbar.Add("Unable to reach the server.", Severity.Error);
+        }
+        finally
+        {
+            _busy = false;
+        }
+    }
+
+    private void CancelAsync()
+        => MudDialog.Cancel();
+
+    private static class PermissionCatalog
+    {
+        public static readonly IReadOnlyList<PermissionDto> All = new List<PermissionDto>
+        {
+            new("patients.create", "Create Patients", "Create new patient records", "Patients"),
+            new("patients.read", "Read Patients", "View patient records", "Patients"),
+            new("patients.update", "Update Patients", "Modify existing patient records", "Patients"),
+            new("patients.delete", "Delete Patients", "Remove patient records", "Patients"),
+
+            new("appointments.create", "Create Appointments", "Schedule new appointments", "Appointments"),
+            new("appointments.read", "Read Appointments", "View appointment details", "Appointments"),
+            new("appointments.update", "Update Appointments", "Modify existing appointments", "Appointments"),
+            new("appointments.delete", "Delete Appointments", "Cancel or remove appointments", "Appointments"),
+            new("appointments.confirm", "Confirm Appointments", "Confirm scheduled appointments", "Appointments"),
+
+            new("reports.create", "Create Reports", "Generate new radiology reports", "Reports"),
+            new("reports.read", "Read Reports", "View radiology reports", "Reports"),
+            new("reports.update", "Update Reports", "Modify existing reports", "Reports"),
+            new("reports.delete", "Delete Reports", "Remove reports", "Reports"),
+            new("reports.export", "Export Reports", "Export reports to external formats", "Reports"),
+
+            new("users.create", "Create Users", "Create new user accounts", "Identity"),
+            new("users.read", "Read Users", "View user accounts", "Identity"),
+            new("users.update", "Update Users", "Modify user accounts", "Identity"),
+            new("users.delete", "Delete Users", "Remove user accounts", "Identity"),
+            new("users.manage-roles", "Manage User Roles", "Assign or remove roles from users", "Identity"),
+
+            new("roles.create", "Create Roles", "Create new roles", "Identity"),
+            new("roles.read", "Read Roles", "View roles", "Identity"),
+            new("roles.update", "Update Roles", "Modify role details", "Identity"),
+            new("roles.delete", "Delete Roles", "Remove roles", "Identity"),
+            new("roles.manage-permissions", "Manage Role Permissions", "Assign or remove permissions from roles", "Identity"),
+
+            new("settings.read", "Read Settings", "View system settings", "Settings"),
+            new("settings.update", "Update Settings", "Modify system settings", "Settings"),
+
+            new("inventory.items.create", "Create Inventory Items", "Add new inventory items", "Inventory"),
+            new("inventory.items.read", "Read Inventory Items", "View inventory items", "Inventory"),
+            new("inventory.items.update", "Update Inventory Items", "Modify inventory items", "Inventory"),
+            new("inventory.items.delete", "Delete Inventory Items", "Remove inventory items", "Inventory"),
+
+            new("inventory.suppliers.create", "Create Inventory Suppliers", "Add new suppliers", "Inventory"),
+            new("inventory.suppliers.read", "Read Inventory Suppliers", "View suppliers", "Inventory"),
+            new("inventory.suppliers.update", "Update Inventory Suppliers", "Modify suppliers", "Inventory"),
+            new("inventory.suppliers.delete", "Delete Inventory Suppliers", "Remove suppliers", "Inventory"),
+
+            new("inventory.purchase-orders.create", "Create Purchase Orders", "Create purchase orders", "Inventory"),
+            new("inventory.purchase-orders.read", "Read Purchase Orders", "View purchase orders", "Inventory"),
+            new("inventory.purchase-orders.update", "Update Purchase Orders", "Modify purchase orders", "Inventory"),
+            new("inventory.purchase-orders.delete", "Delete Purchase Orders", "Remove purchase orders", "Inventory"),
+
+            new("inventory.stock.read", "Read Stock", "View stock levels and movements", "Inventory"),
+            new("inventory.stock.issue", "Issue Stock", "Issue stock to patients", "Inventory"),
+
+            new("examinations.types.manage", "Manage Examination Types", "Create, update, delete and activate examination types", "Examinations"),
+            new("examinations.create", "Create Examinations", "Create visits and add examinations", "Examinations"),
+            new("examinations.read", "Read Examinations", "View visits and examinations", "Examinations"),
+            new("examinations.update", "Update Examinations", "Modify examinations and their items", "Examinations"),
+            new("examinations.delete", "Delete Examinations", "Remove examinations", "Examinations"),
+            new("examinations.perform", "Perform Examinations", "Start and complete examinations", "Examinations"),
+            new("examinations.cancel", "Cancel Examinations", "Cancel visits and examinations", "Examinations"),
+        };
+
+        public static IEnumerable<string> Groups()
+            => All.Select(p => p.Group)
+                  .Where(g => !string.IsNullOrWhiteSpace(g))
+                  .Cast<string>()
+                  .Distinct()
+                  .OrderBy(g => g);
+
+        public static IEnumerable<PermissionDto> ByGroup(string group)
+            => All.Where(p => string.Equals(p.Group, group, StringComparison.Ordinal)).OrderBy(p => p.Name);
+    }
+}

@@ -1,0 +1,242 @@
+@inject IdentityService IdentityService
+@inject ISnackbar Snackbar
+
+<MudDialog>
+    <DialogContent>
+        <EditForm EditContext="_editContext">
+            <DataAnnotationsValidator />
+            <MudGrid Spacing="2">
+                @if (!IsEdit)
+                {
+                    <MudItem xs="12" sm="6">
+                        <MudTextField @bind-Value="_model.UserName"
+                                      Label="Username"
+                                      Variant="Variant.Outlined"
+                                      Margin="Margin.Dense"
+                                      Immediate="true"
+                                      For="@(() => _model.UserName)" />
+                    </MudItem>
+                    <MudItem xs="12" sm="6">
+                        <MudTextField @bind-Value="_model.Email"
+                                      Label="Email"
+                                      Variant="Variant.Outlined"
+                                      Margin="Margin.Dense"
+                                      Immediate="true"
+                                      For="@(() => _model.Email)" />
+                    </MudItem>
+                }
+                else
+                {
+                    <MudItem xs="12" sm="6">
+                        <MudTextField Value="@_model.UserName"
+                                      Label="Username"
+                                      Variant="Variant.Outlined"
+                                      Margin="Margin.Dense"
+                                      ReadOnly="true" />
+                    </MudItem>
+                    <MudItem xs="12" sm="6">
+                        <MudTextField Value="@_model.Email"
+                                      Label="Email"
+                                      Variant="Variant.Outlined"
+                                      Margin="Margin.Dense"
+                                      ReadOnly="true" />
+                    </MudItem>
+                }
+                <MudItem xs="12" sm="6">
+                    <MudTextField @bind-Value="_model.FirstName"
+                                  Label="First Name"
+                                  Variant="Variant.Outlined"
+                                  Margin="Margin.Dense"
+                                  Immediate="true"
+                                  For="@(() => _model.FirstName)" />
+                </MudItem>
+                <MudItem xs="12" sm="6">
+                    <MudTextField @bind-Value="_model.LastName"
+                                  Label="Last Name"
+                                  Variant="Variant.Outlined"
+                                  Margin="Margin.Dense"
+                                  Immediate="true"
+                                  For="@(() => _model.LastName)" />
+                </MudItem>
+                <MudItem xs="12" sm="6">
+                    <MudTextField @bind-Value="_model.PhoneNumber"
+                                  Label="Phone"
+                                  Variant="Variant.Outlined"
+                                  Margin="Margin.Dense"
+                                  Immediate="true" />
+                </MudItem>
+                @if (!IsEdit)
+                {
+                    <MudItem xs="12" sm="6">
+                        <MudTextField @bind-Value="_model.Password"
+                                      Label="Password"
+                                      Variant="Variant.Outlined"
+                                      Margin="Margin.Dense"
+                                      InputType="InputType.Password"
+                                      For="@(() => _model.Password)" />
+                    </MudItem>
+                    <MudItem xs="12">
+                        <MudSelect T="string"
+                                   SelectedValues="@_model.SelectedRoleIds"
+                                   SelectedValuesChanged="@(vals => _model.SelectedRoleIds = vals)"
+                                   Label="Roles"
+                                   Variant="Variant.Outlined"
+                                   Margin="Margin.Dense"
+                                   MultiSelection="true">
+                            @foreach (var role in _roles)
+                            {
+                                <MudSelectItem T="string" Value="@role.Id">@role.Name</MudSelectItem>
+                            }
+                        </MudSelect>
+                    </MudItem>
+                }
+            </MudGrid>
+        </EditForm>
+    </DialogContent>
+    <DialogActions>
+        <MudButton Color="Color.Default" OnClick="CancelAsync" Disabled="_busy">Cancel</MudButton>
+        <MudButton Color="Color.Primary" Variant="Variant.Filled" OnClick="SubmitAsync" Disabled="_busy || (!IsEdit && _roles.Count == 0)">
+            @if (_busy)
+            {
+                <MudProgressCircular Size="Size.Small" Indeterminate="true" Class="mx-1" />
+            }
+            else
+            {
+                <text>@(IsEdit ? "Save Changes" : "Create User")</text>
+            }
+        </MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    [Parameter] public UserDto? User { get; set; }
+
+    [CascadingParameter] public IMudDialogInstance MudDialog { get; set; } = default!;
+
+    private readonly UserFormModel _model = new();
+    private EditContext _editContext = default!;
+    private List<RoleDto> _roles = new();
+    private bool _busy;
+
+    private bool IsEdit => User is not null;
+
+    protected override async Task OnInitializedAsync()
+    {
+        _editContext = new EditContext(_model);
+
+        try
+        {
+            var roles = await IdentityService.GetRolesPagedAsync(null, "Name", false, 1, 100);
+            _roles = roles.Items.ToList();
+        }
+        catch (ApiException ex)
+        {
+            Snackbar.Add(ex.Message, Severity.Error);
+        }
+        catch (Exception)
+        {
+            Snackbar.Add("Unable to load roles.", Severity.Error);
+        }
+
+        if (User is null)
+            return;
+
+        _model.UserName = User.UserName;
+        _model.Email = User.Email;
+        _model.Password = "placeholder";
+        _model.FirstName = User.FirstName;
+        _model.LastName = User.LastName;
+        _model.PhoneNumber = User.PhoneNumber;
+    }
+
+    private async Task SubmitAsync()
+    {
+        if (!_editContext.Validate())
+            return;
+
+        _busy = true;
+        try
+        {
+            if (IsEdit)
+            {
+                await IdentityService.UpdateUserProfileAsync(User!.Id, new UpdateUserProfileInput
+                {
+                    FirstName = _model.FirstName,
+                    LastName = _model.LastName,
+                    PhoneNumber = _model.PhoneNumber,
+                });
+                Snackbar.Add("User profile updated.", Severity.Success);
+            }
+            else
+            {
+                if (string.IsNullOrWhiteSpace(_model.Password))
+                {
+                    Snackbar.Add("Password is required.", Severity.Warning);
+                    return;
+                }
+
+                if (!_model.SelectedRoleIds.Any())
+                {
+                    Snackbar.Add("Select at least one role.", Severity.Warning);
+                    return;
+                }
+
+                await IdentityService.CreateUserAsync(new CreateUserInput
+                {
+                    UserName = _model.UserName,
+                    Email = _model.Email,
+                    FirstName = _model.FirstName,
+                    LastName = _model.LastName,
+                    PhoneNumber = _model.PhoneNumber ?? string.Empty,
+                    Password = _model.Password,
+                    RoleIds = _model.SelectedRoleIds.ToList(),
+                });
+                Snackbar.Add("User created.", Severity.Success);
+            }
+
+            MudDialog.Close(DialogResult.Ok(true));
+        }
+        catch (ApiException ex)
+        {
+            Snackbar.Add(ex.Message, Severity.Error);
+        }
+        catch (Exception)
+        {
+            Snackbar.Add("Unable to reach the server. Please try again.", Severity.Error);
+        }
+        finally
+        {
+            _busy = false;
+        }
+    }
+
+    private void CancelAsync()
+        => MudDialog.Cancel();
+
+    private sealed class UserFormModel
+    {
+        [Required(ErrorMessage = "Username is required.")]
+        [MaxLength(256, ErrorMessage = "Username must be 256 characters or fewer.")]
+        public string UserName { get; set; } = string.Empty;
+
+        [Required(ErrorMessage = "Email is required.")]
+        [EmailAddress(ErrorMessage = "Enter a valid email address.")]
+        public string Email { get; set; } = string.Empty;
+
+        [Required(ErrorMessage = "First name is required.")]
+        [MaxLength(200, ErrorMessage = "First name must be 200 characters or fewer.")]
+        public string FirstName { get; set; } = string.Empty;
+
+        [Required(ErrorMessage = "Last name is required.")]
+        [MaxLength(200, ErrorMessage = "Last name must be 200 characters or fewer.")]
+        public string LastName { get; set; } = string.Empty;
+
+        public string? PhoneNumber { get; set; }
+
+        [Required(ErrorMessage = "Password is required.")]
+        [MinLength(6, ErrorMessage = "Password must be at least 6 characters.")]
+        public string Password { get; set; } = string.Empty;
+
+        public IReadOnlyCollection<string> SelectedRoleIds { get; set; } = new List<string>();
+    }
+}

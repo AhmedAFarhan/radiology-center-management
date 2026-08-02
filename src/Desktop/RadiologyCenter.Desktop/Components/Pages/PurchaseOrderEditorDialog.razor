@@ -1,0 +1,209 @@
+@inject InventoryService InventoryService
+@inject ISnackbar Snackbar
+
+<MudDialog>
+    <DialogContent>
+        <EditForm EditContext="_editContext">
+            <DataAnnotationsValidator />
+            <MudGrid Spacing="2">
+                <MudItem xs="12" sm="8">
+                    <MudSelect T="string"
+                               @bind-Value="_model.SupplierId"
+                               Label="Supplier"
+                               Variant="Variant.Outlined"
+                               Margin="Margin.Dense"
+                               For="@(() => _model.SupplierId)">
+                        @foreach (var supplier in _suppliers)
+                        {
+                            <MudSelectItem T="string" Value="@supplier.Id">@supplier.Name</MudSelectItem>
+                        }
+                    </MudSelect>
+                </MudItem>
+                <MudItem xs="12" sm="4">
+                    <MudDatePicker @bind-Date="_model.ExpectedDeliveryAt"
+                                   Label="Expected Delivery"
+                                   Variant="Variant.Outlined"
+                                   Margin="Margin.Dense"
+                                   Clearable="true" />
+                </MudItem>
+            </MudGrid>
+
+            <MudDivider Class="my-3" />
+            <div class="d-flex align-center justify-space-between mb-2">
+                <MudText Typo="Typo.subtitle2">Items</MudText>
+                <MudButton Variant="Variant.Text" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Add" OnClick="AddLine" Size="Size.Small">Add Item</MudButton>
+            </div>
+
+            @foreach (var line in _model.Items)
+            {
+                <MudGrid Spacing="2" Class="align-center mb-2">
+                    <MudItem xs="12" sm="5">
+                        <MudSelect T="string"
+                                   @bind-Value="line.ItemId"
+                                   Label="Item"
+                                   Variant="Variant.Outlined"
+                                   Margin="Margin.Dense">
+                            @foreach (var item in _items)
+                            {
+                                <MudSelectItem T="string" Value="@item.Id">@item.Name</MudSelectItem>
+                            }
+                        </MudSelect>
+                    </MudItem>
+                    <MudItem xs="12" sm="3">
+                        <MudNumericField T="int"
+                                         @bind-Value="line.QuantityOrdered"
+                                         Label="Qty"
+                                         Variant="Variant.Outlined"
+                                         Margin="Margin.Dense"
+                                         Min="1" />
+                    </MudItem>
+                    <MudItem xs="12" sm="3">
+                        <MudNumericField T="decimal"
+                                         @bind-Value="line.UnitCost"
+                                         Label="Unit Cost"
+                                         Variant="Variant.Outlined"
+                                         Margin="Margin.Dense"
+                                         Min="0" />
+                    </MudItem>
+                    <MudItem xs="12" sm="1">
+                        <MudIconButton Icon="@Icons.Material.Filled.RemoveCircleOutline"
+                                       Size="Size.Small"
+                                       Color="Color.Error"
+                                       aria-label="Remove item"
+                                       OnClick="@(() => RemoveLine(line))" />
+                    </MudItem>
+                </MudGrid>
+            }
+            @if (_model.Items.Count == 0)
+            {
+                <MudText Typo="Typo.body2" Class="text-secondary">Add at least one item to the order.</MudText>
+            }
+
+            <MudDivider Class="my-3" />
+            <MudTextField @bind-Value="_model.Notes"
+                          Label="Notes"
+                          Variant="Variant.Outlined"
+                          Margin="Margin.Dense"
+                          Lines="3"
+                          Immediate="true" />
+        </EditForm>
+    </DialogContent>
+    <DialogActions>
+        <MudButton Color="Color.Default" OnClick="CancelAsync" Disabled="_busy">Cancel</MudButton>
+        <MudButton Color="Color.Primary" Variant="Variant.Filled" OnClick="SubmitAsync" Disabled="_busy || _suppliers.Count == 0">
+            @if (_busy)
+            {
+                <MudProgressCircular Size="Size.Small" Indeterminate="true" Class="mx-1" />
+            }
+            else
+            {
+                <text>Create Order</text>
+            }
+        </MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    [CascadingParameter] public IMudDialogInstance MudDialog { get; set; } = default!;
+
+    private readonly PurchaseOrderFormModel _model = new();
+    private EditContext _editContext = default!;
+    private List<SupplierDto> _suppliers = new();
+    private List<ItemDto> _items = new();
+    private bool _busy;
+
+    protected override async Task OnInitializedAsync()
+    {
+        _editContext = new EditContext(_model);
+
+        try
+        {
+            var suppliersTask = InventoryService.GetSuppliersPagedAsync(null, null, false, 1, 200);
+            var itemsTask = InventoryService.GetItemsPagedAsync(null, "Name", false, 1, 200);
+
+            _suppliers = (await suppliersTask).Items.ToList();
+            _items = (await itemsTask).Items.ToList();
+        }
+        catch (ApiException ex)
+        {
+            Snackbar.Add(ex.Message, Severity.Error);
+        }
+        catch (Exception)
+        {
+            Snackbar.Add("Unable to load suppliers and items.", Severity.Error);
+        }
+    }
+
+    private void AddLine() => _model.Items.Add(new PurchaseOrderLineModel());
+
+    private void RemoveLine(PurchaseOrderLineModel line) => _model.Items.Remove(line);
+
+    private async Task SubmitAsync()
+    {
+        if (!_editContext.Validate())
+            return;
+
+        var missingItems = _model.Items.Any(i => string.IsNullOrWhiteSpace(i.ItemId));
+        var duplicateItems = _model.Items.GroupBy(i => i.ItemId).Any(g => g.Count() > 1);
+        var invalidQuantities = _model.Items.Any(i => i.QuantityOrdered <= 0);
+
+        if (missingItems || duplicateItems || invalidQuantities)
+        {
+            Snackbar.Add("Each line needs an item, a positive quantity, and no duplicates.", Severity.Warning);
+            return;
+        }
+
+        _busy = true;
+        try
+        {
+            var input = new CreatePurchaseOrderInput
+            {
+                SupplierId = _model.SupplierId,
+                ExpectedDeliveryAt = _model.ExpectedDeliveryAt,
+                Notes = _model.Notes,
+                Items = _model.Items.Select(i => new PurchaseOrderLineInput
+                {
+                    ItemId = i.ItemId,
+                    QuantityOrdered = i.QuantityOrdered,
+                    UnitCost = i.UnitCost,
+                }).ToList(),
+            };
+
+            await InventoryService.CreatePurchaseOrderAsync(input);
+            Snackbar.Add("Purchase order created.", Severity.Success);
+            MudDialog.Close(DialogResult.Ok(true));
+        }
+        catch (ApiException ex)
+        {
+            Snackbar.Add(ex.Message, Severity.Error);
+        }
+        catch (Exception)
+        {
+            Snackbar.Add("Unable to reach the server. Please try again.", Severity.Error);
+        }
+        finally
+        {
+            _busy = false;
+        }
+    }
+
+    private void CancelAsync()
+        => MudDialog.Cancel();
+
+    private sealed class PurchaseOrderFormModel
+    {
+        [Required(ErrorMessage = "Supplier is required.")]
+        public string SupplierId { get; set; } = string.Empty;
+
+        public DateTime? ExpectedDeliveryAt { get; set; }
+        public string? Notes { get; set; }
+        public List<PurchaseOrderLineModel> Items { get; set; } = new();
+    }
+
+    private sealed class PurchaseOrderLineModel
+    {
+        public string ItemId { get; set; } = string.Empty;
+        public int QuantityOrdered { get; set; }
+        public decimal UnitCost { get; set; }
+    }
+}

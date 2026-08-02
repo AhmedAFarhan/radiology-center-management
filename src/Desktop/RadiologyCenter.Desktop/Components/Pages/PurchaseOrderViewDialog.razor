@@ -1,0 +1,129 @@
+@inject InventoryService InventoryService
+@inject ISnackbar Snackbar
+
+<MudDialog>
+    <DialogContent>
+        @if (_loading)
+        {
+            <div class="d-flex justify-content-center pa-6">
+                <MudProgressCircular Indeterminate="true" />
+            </div>
+        }
+        else if (_error is not null)
+        {
+            <MudPaper Class="pa-4 text-center">
+                <MudIcon Icon="@Icons.Material.Filled.CloudOff" Size="Size.Large" Color="Color.Error" />
+                <MudText Class="mt-2">@_error</MudText>
+                <MudButton Color="Color.Primary" Variant="Variant.Filled" Class="mt-2" OnClick="LoadAsync">Retry</MudButton>
+            </MudPaper>
+        }
+        else if (_po is not null)
+        {
+            <MudText Typo="Typo.h6">@_po.OrderNumber</MudText>
+            <MudText Typo="Typo.body2" Class="text-secondary mb-3">
+                @_po.SupplierName · <MudChip T="string" Size="Size.Small" Color="@StatusColor(_po.Status)">@FormatStatus(_po.Status)</MudChip>
+            </MudText>
+
+            <MudSimpleTable Dense="true">
+                <thead>
+                    <tr>
+                        <th>Item</th>
+                        <th>Ordered</th>
+                        <th>Received</th>
+                        <th>Unit Cost</th>
+                        <th>Total</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in _po.Items)
+                    {
+                        <tr>
+                            <td>@item.ItemName</td>
+                            <td>@item.QuantityOrdered</td>
+                            <td>@item.QuantityReceived</td>
+                            <td>@item.UnitCost.ToString("C")</td>
+                            <td>@((item.QuantityOrdered * item.UnitCost).ToString("C"))</td>
+                        </tr>
+                    }
+                    <tr>
+                        <td colspan="4" class="font-weight-medium text-right">Total</td>
+                        <td class="font-weight-medium">@Total().ToString("C")</td>
+                    </tr>
+                </tbody>
+            </MudSimpleTable>
+
+            @if (!string.IsNullOrWhiteSpace(_po.Notes))
+            {
+                <MudText Typo="Typo.body2" Class="mt-3 text-secondary">@_po.Notes</MudText>
+            }
+
+            <MudText Typo="Typo.caption" Class="mt-3 text-secondary">
+                Expected delivery: @(_po.ExpectedDeliveryAt?.ToString("dd MMM yyyy") ?? "Not set")
+                @if (_po.ReceivedAt is not null)
+                {
+                    <text> · Received: @_po.ReceivedAt.Value.ToLocalTime().ToString("dd MMM yyyy HH:mm")</text>
+                }
+            </MudText>
+        }
+    </DialogContent>
+    <DialogActions>
+        <MudButton Color="Color.Default" OnClick="CloseAsync">Close</MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    [Parameter] public string PurchaseOrderId { get; set; } = string.Empty;
+
+    [CascadingParameter] public IMudDialogInstance MudDialog { get; set; } = default!;
+
+    private PurchaseOrderDto? _po;
+    private string? _error;
+    private bool _loading;
+
+    protected override async Task OnInitializedAsync()
+        => await LoadAsync();
+
+    private async Task LoadAsync()
+    {
+        _loading = true;
+        _error = null;
+        try
+        {
+            _po = await InventoryService.GetPurchaseOrderByIdAsync(PurchaseOrderId);
+        }
+        catch (ApiException ex)
+        {
+            _error = ex.Message;
+        }
+        catch (Exception)
+        {
+            _error = "Unable to reach the server.";
+        }
+        finally
+        {
+            _loading = false;
+        }
+    }
+
+    private decimal Total()
+        => _po is null ? 0 : _po.Items.Sum(i => i.QuantityOrdered * i.UnitCost);
+
+    private static string FormatStatus(string status) => status switch
+    {
+        "PartiallyReceived" => "Partially Received",
+        _ => status,
+    };
+
+    private static Color StatusColor(string status) => status switch
+    {
+        "Draft" => Color.Default,
+        "Ordered" => Color.Primary,
+        "PartiallyReceived" => Color.Warning,
+        "Received" => Color.Success,
+        "Cancelled" => Color.Error,
+        _ => Color.Primary,
+    };
+
+    private void CloseAsync()
+        => MudDialog.Close();
+}

@@ -1,0 +1,287 @@
+@page "/visits"
+@attribute [Authorize]
+@inject ExaminationService ExaminationService
+@inject PatientService PatientService
+@inject IDialogService DialogService
+@inject ISnackbar Snackbar
+@implements IDisposable
+
+<MudToolBar Dense="true" Class="mb-4">
+    <MudText Typo="Typo.h5">Visits</MudText>
+    <MudText Typo="Typo.body2" Class="text-secondary ms-2">Patient examinations and their lifecycle</MudText>
+    <MudSpacer />
+    <MudTextField T="string"
+                  Value="_search"
+                  ValueChanged="OnSearchChanged"
+                  Placeholder="Search visits..."
+                  Variant="Variant.Outlined"
+                  Margin="Margin.Dense"
+                  Immediate="true"
+                  Adornment="Adornment.Start"
+                  AdornmentIcon="@Icons.Material.Filled.Search"
+                  Class="search-field" />
+    <MudIconButton Icon="@Icons.Material.Filled.Refresh" Color="Color.Default" aria-label="Refresh" OnClick="ReloadAsync" />
+    <MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Add" OnClick="OpenCreateDialogAsync">New Visit</MudButton>
+</MudToolBar>
+
+<MudTable T="ExaminationDto" @ref="_table" ServerData="LoadServerData" Dense="true" Hover="true" Striped="true" Elevation="1" RowsPerPage="10">
+    <HeaderContent>
+        <MudTh><MudTableSortLabel T="ExaminationDto" SortLabel="@("PatientId")">Patient</MudTableSortLabel></MudTh>
+        <MudTh><MudTableSortLabel T="ExaminationDto" SortLabel="@("ExaminationTypeName")">Examination</MudTableSortLabel></MudTh>
+        <MudTh><MudTableSortLabel T="ExaminationDto" SortLabel="@("Priority")">Priority</MudTableSortLabel></MudTh>
+        <MudTh><MudTableSortLabel T="ExaminationDto" SortLabel="@("Status")">Status</MudTableSortLabel></MudTh>
+        <MudTh><MudTableSortLabel T="ExaminationDto" SortLabel="@("ScheduledAt")">Scheduled</MudTableSortLabel></MudTh>
+        <MudTh><MudTableSortLabel T="ExaminationDto" SortLabel="@("Remaining")">Balance</MudTableSortLabel></MudTh>
+        <MudTh>Actions</MudTh>
+    </HeaderContent>
+    <RowTemplate>
+        <MudTd DataLabel="Patient">
+            <MudText Class="font-weight-medium">@ResolvePatientName(context.PatientId)</MudText>
+        </MudTd>
+        <MudTd DataLabel="Examination">@context.ExaminationTypeName</MudTd>
+        <MudTd DataLabel="Priority">
+            <MudChip T="string" Size="Size.Small" Color="@(PriorityColor(context.Priority))">@context.Priority</MudChip>
+        </MudTd>
+        <MudTd DataLabel="Status">
+            <MudChip T="string" Size="Size.Small" Color="@(StatusColor(context.Status))">@context.Status</MudChip>
+        </MudTd>
+        <MudTd DataLabel="Scheduled">@FormatScheduled(context.ScheduledAt)</MudTd>
+        <MudTd DataLabel="Balance">
+            @if (context.Remaining > 0)
+            {
+                <MudText Color="Color.Error">@context.Remaining.ToString("C")</MudText>
+            }
+            else
+            {
+                <MudText Color="Color.Success">Paid</MudText>
+            }
+        </MudTd>
+        <MudTd DataLabel="Actions">
+            <MudIconButton Icon="@Icons.Material.Filled.Visibility" Size="Size.Small" Color="Color.Default" aria-label="View" OnClick="@(() => OpenViewDialogAsync(context))" />
+            @if (context.Status is "Requested" or "Scheduled")
+            {
+                <MudIconButton Icon="@Icons.Material.Filled.Edit" Size="Size.Small" Color="Color.Default" aria-label="Edit" OnClick="@(() => OpenEditDialogAsync(context))" />
+            }
+            @if (context.Status is "Requested" or "Scheduled")
+            {
+                <MudIconButton Icon="@Icons.Material.Filled.Schedule" Size="Size.Small" Color="Color.Info" aria-label="Schedule" OnClick="@(() => OpenScheduleDialogAsync(context))" />
+            }
+            @if (context.Status == "Scheduled")
+            {
+                <MudIconButton Icon="@Icons.Material.Filled.Login" Size="Size.Small" Color="Color.Primary" aria-label="Check in" OnClick="@(() => CheckInAsync(context))" />
+            }
+            @if (context.Status == "CheckedIn")
+            {
+                <MudIconButton Icon="@Icons.Material.Filled.PlayArrow" Size="Size.Small" Color="Color.Secondary" aria-label="Start" OnClick="@(() => StartAsync(context))" />
+            }
+            @if (context.Status == "InProgress")
+            {
+                <MudIconButton Icon="@Icons.Material.Filled.CheckCircle" Size="Size.Small" Color="Color.Success" aria-label="Complete" OnClick="@(() => CompleteAsync(context))" />
+            }
+            @if (context.Status is not "Completed" and not "Cancelled")
+            {
+                <MudIconButton Icon="@Icons.Material.Filled.Cancel" Size="Size.Small" Color="Color.Error" aria-label="Cancel" OnClick="@(() => CancelAsync(context))" />
+            }
+        </MudTd>
+    </RowTemplate>
+    <NoRecordsContent>
+        <MudText Class="pa-4">No visits found.</MudText>
+    </NoRecordsContent>
+    <PagerContent>
+        <MudTablePager PageSizeOptions="@(new[] { 10, 25, 50 })" />
+    </PagerContent>
+</MudTable>
+
+@code {
+    private MudTable<ExaminationDto>? _table;
+    private string? _search;
+    private CancellationTokenSource? _searchCts;
+    private readonly Dictionary<string, string> _patientNames = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            var page = await PatientService.GetPagedAsync(null, "LastName", false, 1, 1000);
+            foreach (var patient in page.Items)
+                _patientNames[patient.Id] = patient.FullName;
+        }
+        catch (Exception)
+        {
+            // patient names will fall back to the id
+        }
+    }
+
+    private string ResolvePatientName(string patientId)
+        => _patientNames.TryGetValue(patientId, out var name) ? name : patientId;
+
+    private async Task<TableData<ExaminationDto>> LoadServerData(TableState state, CancellationToken ct)
+    {
+        try
+        {
+            var page = await ExaminationService.GetPagedAsync(
+                _search,
+                state.SortLabel,
+                state.SortDirection == SortDirection.Descending,
+                state.Page + 1,
+                state.PageSize,
+                ct);
+
+            return new TableData<ExaminationDto> { Items = page.Items, TotalItems = page.TotalCount };
+        }
+        catch (ApiException ex)
+        {
+            Snackbar.Add(ex.Message, Severity.Error);
+            return new TableData<ExaminationDto> { Items = Array.Empty<ExaminationDto>(), TotalItems = 0 };
+        }
+        catch (Exception)
+        {
+            Snackbar.Add("Unable to reach the server.", Severity.Error);
+            return new TableData<ExaminationDto> { Items = Array.Empty<ExaminationDto>(), TotalItems = 0 };
+        }
+    }
+
+    private async Task OnSearchChanged(string? value)
+    {
+        _search = value;
+
+        _searchCts?.Cancel();
+        var cts = _searchCts = new CancellationTokenSource();
+        try
+        {
+            await Task.Delay(400, cts.Token);
+        }
+        catch (TaskCanceledException)
+        {
+            return;
+        }
+
+        if (_table is not null)
+            await _table.ReloadServerData();
+    }
+
+    private Task ReloadAsync()
+        => _table is null ? Task.CompletedTask : _table.ReloadServerData();
+
+    private async Task OpenCreateDialogAsync()
+    {
+        var options = new DialogOptions { MaxWidth = MaxWidth.Medium, FullWidth = true };
+        var dialog = await DialogService.ShowAsync<VisitEditorDialog>("New Visit", options);
+        await ReloadIfSavedAsync(dialog);
+    }
+
+    private async Task OpenEditDialogAsync(ExaminationDto visit)
+    {
+        var parameters = new DialogParameters { ["Visit"] = visit };
+        var options = new DialogOptions { MaxWidth = MaxWidth.Medium, FullWidth = true };
+        var dialog = await DialogService.ShowAsync<VisitEditorDialog>("Edit Visit", parameters, options);
+        await ReloadIfSavedAsync(dialog);
+    }
+
+    private async Task OpenScheduleDialogAsync(ExaminationDto visit)
+    {
+        var parameters = new DialogParameters { ["Visit"] = visit };
+        var options = new DialogOptions { MaxWidth = MaxWidth.Small, FullWidth = true };
+        var dialog = await DialogService.ShowAsync<VisitScheduleDialog>("Schedule Visit", parameters, options);
+        await ReloadIfSavedAsync(dialog);
+    }
+
+    private async Task OpenViewDialogAsync(ExaminationDto visit)
+    {
+        var parameters = new DialogParameters { ["Visit"] = visit };
+        var options = new DialogOptions { MaxWidth = MaxWidth.Medium, FullWidth = true };
+        var dialog = await DialogService.ShowAsync<VisitViewDialog>("Visit Details", parameters, options);
+        await ReloadIfSavedAsync(dialog);
+    }
+
+    private async Task ReloadIfSavedAsync(IDialogReference dialog)
+    {
+        var result = await dialog.Result;
+        if (result is { Canceled: false })
+            await ReloadAsync();
+    }
+
+    private async Task CheckInAsync(ExaminationDto visit)
+    {
+        try
+        {
+            await ExaminationService.CheckInAsync(visit.Id);
+            Snackbar.Add("Patient checked in.", Severity.Success);
+            await ReloadAsync();
+        }
+        catch (ApiException ex)
+        {
+            Snackbar.Add(ex.Message, Severity.Error);
+        }
+        catch (Exception)
+        {
+            Snackbar.Add("Unable to reach the server.", Severity.Error);
+        }
+    }
+
+    private async Task StartAsync(ExaminationDto visit)
+    {
+        try
+        {
+            await ExaminationService.StartAsync(visit.Id);
+            Snackbar.Add("Examination started.", Severity.Success);
+            await ReloadAsync();
+        }
+        catch (ApiException ex)
+        {
+            Snackbar.Add(ex.Message, Severity.Error);
+        }
+        catch (Exception)
+        {
+            Snackbar.Add("Unable to reach the server.", Severity.Error);
+        }
+    }
+
+    private async Task CompleteAsync(ExaminationDto visit)
+    {
+        try
+        {
+            await ExaminationService.CompleteAsync(visit.Id);
+            Snackbar.Add("Examination completed.", Severity.Success);
+            await ReloadAsync();
+        }
+        catch (ApiException ex)
+        {
+            Snackbar.Add(ex.Message, Severity.Error);
+        }
+        catch (Exception)
+        {
+            Snackbar.Add("Unable to reach the server.", Severity.Error);
+        }
+    }
+
+    private async Task CancelAsync(ExaminationDto visit)
+    {
+        var parameters = new DialogParameters { ["Visit"] = visit };
+        var options = new DialogOptions { MaxWidth = MaxWidth.Small, FullWidth = true };
+        var dialog = await DialogService.ShowAsync<CancelVisitDialog>("Cancel Visit", parameters, options);
+        await ReloadIfSavedAsync(dialog);
+    }
+
+    private static Color PriorityColor(string priority) => priority switch
+    {
+        "Stat" => Color.Error,
+        "Urgent" => Color.Warning,
+        _ => Color.Default,
+    };
+
+    private static Color StatusColor(string status) => status switch
+    {
+        "Completed" => Color.Success,
+        "Cancelled" => Color.Default,
+        "InProgress" => Color.Secondary,
+        "CheckedIn" => Color.Info,
+        "Scheduled" => Color.Primary,
+        _ => Color.Default,
+    };
+
+    private static string FormatScheduled(DateTime? scheduledAt)
+        => scheduledAt is null ? "-" : scheduledAt.Value.ToString("g");
+
+    public void Dispose() => _searchCts?.Cancel();
+}

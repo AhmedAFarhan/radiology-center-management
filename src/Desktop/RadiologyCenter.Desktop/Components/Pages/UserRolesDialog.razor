@@ -1,0 +1,115 @@
+@inject IdentityService IdentityService
+@inject ISnackbar Snackbar
+
+<MudDialog>
+    <DialogContent>
+        <MudText Typo="Typo.body2" Class="text-secondary mb-3">
+            Assign roles to @User.UserName. This replaces their current role set. Select all roles this user should have.
+        </MudText>
+        @if (_roles.Count == 0 && _loadError is null)
+        {
+            <div class="d-flex justify-content-center pa-4">
+                <MudProgressCircular Indeterminate="true" />
+            </div>
+        }
+        else if (_loadError is not null)
+        {
+            <MudText Color="Color.Error">@_loadError</MudText>
+        }
+        else
+        {
+            <MudList T="RoleDto" Dense="true">
+                @foreach (var role in _roles)
+                {
+                    <MudListItem T="RoleDto" Value="@role">
+                        <MudSwitch T="bool"
+                                   @bind-Value="_selected[role.Id]"
+                                   Color="Color.Primary">
+                            <MudText>@role.Name</MudText>
+                            @if (role.IsSystem)
+                            {
+                                <MudText Typo="Typo.caption" Class="text-secondary">System role</MudText>
+                            }
+                        </MudSwitch>
+                    </MudListItem>
+                }
+            </MudList>
+        }
+    </DialogContent>
+    <DialogActions>
+        <MudButton Color="Color.Default" OnClick="CancelAsync" Disabled="_busy">Cancel</MudButton>
+        <MudButton Color="Color.Primary" Variant="Variant.Filled" OnClick="SubmitAsync" Disabled="_busy || _roles.Count == 0">
+            @if (_busy)
+            {
+                <MudProgressCircular Size="Size.Small" Indeterminate="true" Class="mx-1" />
+            }
+            else
+            {
+                <text>Save Roles</text>
+            }
+        </MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    [Parameter] public UserDto User { get; set; } = default!;
+
+    [CascadingParameter] public IMudDialogInstance MudDialog { get; set; } = default!;
+
+    private List<RoleDto> _roles = new();
+    private readonly Dictionary<string, bool> _selected = new();
+    private string? _loadError;
+    private bool _busy;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            var roles = await IdentityService.GetRolesPagedAsync(null, "Name", false, 1, 100);
+            _roles = roles.Items.ToList();
+            foreach (var role in _roles)
+                _selected[role.Id] = false;
+        }
+        catch (ApiException ex)
+        {
+            _loadError = ex.Message;
+        }
+        catch (Exception)
+        {
+            _loadError = "Unable to load roles.";
+        }
+    }
+
+    private async Task SubmitAsync()
+    {
+        var selectedIds = _selected.Where(kv => kv.Value).Select(kv => kv.Key).ToList();
+        if (selectedIds.Count == 0)
+        {
+            Snackbar.Add("Select at least one role.", Severity.Warning);
+            return;
+        }
+
+        _busy = true;
+        try
+        {
+            await IdentityService.UpdateUserRolesAsync(User.Id, selectedIds);
+            Snackbar.Add("Roles updated.", Severity.Success);
+            MudDialog.Close(DialogResult.Ok(true));
+        }
+        catch (ApiException ex)
+        {
+            Snackbar.Add(ex.Message, Severity.Error);
+        }
+        catch (Exception)
+        {
+            Snackbar.Add("Unable to reach the server.", Severity.Error);
+        }
+        finally
+        {
+            _busy = false;
+        }
+    }
+
+    private void CancelAsync()
+        => MudDialog.Cancel();
+}
