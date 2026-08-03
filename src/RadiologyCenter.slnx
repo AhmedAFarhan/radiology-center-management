@@ -36,6 +36,8 @@
   </Folder>
   <Folder Name="/Backend/Modules/Payroll/">
     <Project Path="Backend/Modules/Payroll/RadiologyCenter.Payroll.Domain/RadiologyCenter.Payroll.Domain.csproj" />
+    <Project Path="Backend/Modules/Payroll/RadiologyCenter.Payroll.Application/RadiologyCenter.Payroll.Application.csproj" />
+    <Project Path="Backend/Modules/Payroll/RadiologyCenter.Payroll.Infrastructure/RadiologyCenter.Payroll.Infrastructure.csproj" />
   </Folder>
   <Folder Name="/Desktop/">
     <Project Path="Desktop/RadiologyCenter.Desktop/RadiologyCenter.Desktop.csproj" />

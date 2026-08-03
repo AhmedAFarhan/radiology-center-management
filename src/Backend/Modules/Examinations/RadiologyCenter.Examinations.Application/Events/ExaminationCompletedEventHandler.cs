@@ -10,6 +10,7 @@ public static class ExaminationCompletedEventHandler
         IExaminationRepository examinationRepository,
         IExaminationTypeRepository examinationTypeRepository,
         IItemSnapshotResolver itemSnapshotResolver,
+        IExaminationFeeResolver examinationFeeResolver,
         IExaminationHistoryRepository historyRepository,
         IExaminationsUnitOfWork unitOfWork,
         CancellationToken ct)
@@ -25,7 +26,24 @@ public static class ExaminationCompletedEventHandler
         var itemIds = examination.Items.Select(i => i.ItemId).Distinct().ToList();
         var itemSnapshots = await itemSnapshotResolver.ResolveAsync(itemIds, ct);
 
-        var history = ExaminationHistory.Create(examination, type.ToSnapshot(), itemSnapshots);
+        var typeSnapshot = type.ToSnapshot();
+
+        var fees = await examinationFeeResolver.ResolveAsync(
+            examination.ExaminationTypeId,
+            typeSnapshot.Price,
+            examination.RadiologistId,
+            examination.TechnicianId,
+            examination.ReferralDoctorId,
+            ct);
+
+        var history = ExaminationHistory.Create(
+            examination,
+            typeSnapshot,
+            itemSnapshots,
+            fees?.RadiologistFee,
+            fees?.TechnicianFee,
+            fees?.ReferralFee);
+
         await historyRepository.AddAsync(history, ct);
         await unitOfWork.SaveChangesAsync(ct);
     }

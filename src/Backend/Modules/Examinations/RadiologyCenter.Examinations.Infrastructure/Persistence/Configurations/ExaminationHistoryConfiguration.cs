@@ -24,6 +24,9 @@ public class ExaminationHistoryConfiguration : IEntityTypeConfiguration<Examinat
         builder.Property(h => h.ReferralDoctorId);
         builder.Property(h => h.RadiologistId).IsRequired();
         builder.Property(h => h.TechnicianId).IsRequired();
+        builder.Property(h => h.RadiologistFee).HasPrecision(18, 2);
+        builder.Property(h => h.TechnicianFee).HasPrecision(18, 2);
+        builder.Property(h => h.ReferralFee).HasPrecision(18, 2);
         builder.Property(h => h.ClinicalIndication).IsRequired().HasMaxLength(1000);
         builder.Property(h => h.Priority)
             .HasConversion(p => p.Value, v => ExaminationPriority.FromValue<ExaminationPriority>(v));

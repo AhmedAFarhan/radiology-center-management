@@ -25,6 +25,9 @@ using RadiologyCenter.Examinations.Infrastructure.Persistence;
 using RadiologyCenter.ResourceManagement.Application;
 using RadiologyCenter.ResourceManagement.Infrastructure;
 using RadiologyCenter.ResourceManagement.Infrastructure.Persistence;
+using RadiologyCenter.Payroll.Application;
+using RadiologyCenter.Payroll.Infrastructure;
+using RadiologyCenter.Payroll.Infrastructure.Persistence;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -74,7 +77,10 @@ builder.Services.AddExaminationsApplication();
 builder.Services.AddExaminationsInfrastructure(builder.Configuration);
 builder.Services.AddResourceManagementApplication();
 builder.Services.AddResourceManagementInfrastructure(builder.Configuration);
+builder.Services.AddPayrollApplication();
+builder.Services.AddPayrollInfrastructure(builder.Configuration);
 builder.Services.AddScoped<IItemSnapshotResolver, ItemSnapshotResolver>();
+builder.Services.AddScoped<IExaminationFeeResolver, ExaminationFeeResolver>();
 
 var app = builder.Build();
 
@@ -100,6 +106,9 @@ using (var scope = app.Services.CreateScope())
 
     var resourceManagementDb = scope.ServiceProvider.GetRequiredService<ResourceManagementDbContext>();
     resourceManagementDb.Database.Migrate();
+
+    var payrollDb = scope.ServiceProvider.GetRequiredService<PayrollDbContext>();
+    payrollDb.Database.Migrate();
 }
 
 app.UseMiddleware<ExceptionMiddleware>();

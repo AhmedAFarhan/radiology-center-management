@@ -31,6 +31,8 @@
     <ProjectReference Include="..\..\Modules\Examinations\RadiologyCenter.Examinations.Infrastructure\RadiologyCenter.Examinations.Infrastructure.csproj" />
     <ProjectReference Include="..\..\Modules\ResourceManagement\RadiologyCenter.ResourceManagement.Application\RadiologyCenter.ResourceManagement.Application.csproj" />
     <ProjectReference Include="..\..\Modules\ResourceManagement\RadiologyCenter.ResourceManagement.Infrastructure\RadiologyCenter.ResourceManagement.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\Modules\Payroll\RadiologyCenter.Payroll.Application\RadiologyCenter.Payroll.Application.csproj" />
+    <ProjectReference Include="..\..\Modules\Payroll\RadiologyCenter.Payroll.Infrastructure\RadiologyCenter.Payroll.Infrastructure.csproj" />
   </ItemGroup>
 
 </Project>

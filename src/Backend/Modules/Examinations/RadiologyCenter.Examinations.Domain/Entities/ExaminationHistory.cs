@@ -19,6 +19,9 @@ public sealed class ExaminationHistory : Entity<Guid>
     public Guid? ReferralDoctorId { get; private set; }
     public Guid RadiologistId { get; private set; }
     public Guid TechnicianId { get; private set; }
+    public decimal? RadiologistFee { get; private set; }
+    public decimal? TechnicianFee { get; private set; }
+    public decimal? ReferralFee { get; private set; }
     public string ClinicalIndication { get; private set; }
     public ExaminationPriority Priority { get; private set; }
     public decimal Price { get; private set; }
@@ -48,11 +51,17 @@ public sealed class ExaminationHistory : Entity<Guid>
     public static ExaminationHistory Create(
         Examination examination,
         ExaminationTypeSnapshot type,
-        IReadOnlyDictionary<Guid, ItemSnapshot> itemSnapshots)
+        IReadOnlyDictionary<Guid, ItemSnapshot> itemSnapshots,
+        decimal? radiologistFee = null,
+        decimal? technicianFee = null,
+        decimal? referralFee = null)
     {
         Guard.AgainstNull(examination, nameof(examination));
         Guard.AgainstNull(type, nameof(type));
         Guard.AgainstNull(itemSnapshots, nameof(itemSnapshots));
+        Guard.Against(radiologistFee, f => f.HasValue && f.Value < 0, "Radiologist fee cannot be negative.");
+        Guard.Against(technicianFee, f => f.HasValue && f.Value < 0, "Technician fee cannot be negative.");
+        Guard.Against(referralFee, f => f.HasValue && f.Value < 0, "Referral fee cannot be negative.");
 
         var history = new ExaminationHistory
         {
@@ -67,6 +76,9 @@ public sealed class ExaminationHistory : Entity<Guid>
             ReferralDoctorId = examination.ReferralDoctorId,
             RadiologistId = examination.RadiologistId,
             TechnicianId = examination.TechnicianId,
+            RadiologistFee = radiologistFee,
+            TechnicianFee = technicianFee,
+            ReferralFee = referralFee,
             ClinicalIndication = examination.ClinicalIndication,
             Priority = examination.Priority,
             Price = examination.Price,
