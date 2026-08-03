@@ -1,8 +1,7 @@
-using FluentValidation;
+using RadiologyCenter.BuildingBlocks.Application.Validation;
 
 namespace RadiologyCenter.ResourceManagement.Application.Queries.GetStaffById;
 
-public class GetStaffByIdQueryValidator : AbstractValidator<GetStaffByIdQuery>
+public class GetStaffByIdQueryValidator : EntityIdQueryValidatorBase<GetStaffByIdQuery>
 {
-    public GetStaffByIdQueryValidator() => RuleFor(x => x.Id).NotEmpty();
 }

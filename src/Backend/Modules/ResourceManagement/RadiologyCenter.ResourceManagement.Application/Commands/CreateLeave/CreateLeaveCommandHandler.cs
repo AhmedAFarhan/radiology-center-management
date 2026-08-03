@@ -10,9 +10,14 @@ public static class CreateLeaveCommandHandler
     public static async Task<Result<LeaveDto>> HandleAsync(
         CreateLeaveCommand command,
         ILeaveRepository leaveRepository,
+        IStaffRepository staffRepository,
         IResourceManagementUnitOfWork unitOfWork,
         CancellationToken ct)
     {
+        var staff = await staffRepository.GetByIdAsync(command.StaffId, ct);
+        if (staff is null)
+            return Result.Failure<LeaveDto>(Error.NotFound("Staff", command.StaffId));
+
         var leaveType = LeaveType.FromName<LeaveType>(command.LeaveType);
 
         var leave = Leave.Create(

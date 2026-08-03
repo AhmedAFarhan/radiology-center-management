@@ -1,8 +1,7 @@
-using FluentValidation;
+using RadiologyCenter.BuildingBlocks.Application.Validation;
 
 namespace RadiologyCenter.Inventory.Application.Queries.GetPurchaseOrderById;
 
-public class GetPurchaseOrderByIdQueryValidator : AbstractValidator<GetPurchaseOrderByIdQuery>
+public class GetPurchaseOrderByIdQueryValidator : EntityIdQueryValidatorBase<GetPurchaseOrderByIdQuery>
 {
-    public GetPurchaseOrderByIdQueryValidator() => RuleFor(x => x.Id).NotEmpty();
 }

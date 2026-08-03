@@ -1,3 +1,3 @@
 namespace RadiologyCenter.Patients.Application.Queries.GetPatientById;
 
-public record GetPatientByIdQuery(Guid Id) : IQuery;
+public record GetPatientByIdQuery(Guid Id) : IQuery, IEntityIdQuery;

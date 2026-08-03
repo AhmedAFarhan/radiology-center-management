@@ -16,7 +16,7 @@ using static RadiologyCenter.Identity.Domain.Permissions;
 namespace RadiologyCenter.Localhost.Controllers.Resources;
 
 [ApiController]
-[Route("api/resources/leave")]
+[Route("api/resources/leaves")]
 public class LeaveController : ControllerBase
 {
     private readonly IMessageBus _bus;

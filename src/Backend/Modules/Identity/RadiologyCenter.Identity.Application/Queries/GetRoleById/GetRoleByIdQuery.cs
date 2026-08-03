@@ -1,3 +1,3 @@
 namespace RadiologyCenter.Identity.Application.Queries.GetRoleById;
 
-public record GetRoleByIdQuery(Guid Id) : IQuery;
+public record GetRoleByIdQuery(Guid Id) : IQuery, IEntityIdQuery;

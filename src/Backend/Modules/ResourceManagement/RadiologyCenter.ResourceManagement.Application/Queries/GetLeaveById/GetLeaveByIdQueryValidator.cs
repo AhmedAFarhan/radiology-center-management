@@ -1,8 +1,7 @@
-using FluentValidation;
+using RadiologyCenter.BuildingBlocks.Application.Validation;
 
 namespace RadiologyCenter.ResourceManagement.Application.Queries.GetLeaveById;
 
-public class GetLeaveByIdQueryValidator : AbstractValidator<GetLeaveByIdQuery>
+public class GetLeaveByIdQueryValidator : EntityIdQueryValidatorBase<GetLeaveByIdQuery>
 {
-    public GetLeaveByIdQueryValidator() => RuleFor(x => x.Id).NotEmpty();
 }

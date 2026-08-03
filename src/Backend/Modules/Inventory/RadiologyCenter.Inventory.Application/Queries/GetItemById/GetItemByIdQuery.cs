@@ -1,3 +1,3 @@
 namespace RadiologyCenter.Inventory.Application.Queries.GetItemById;
 
-public record GetItemByIdQuery(Guid Id) : IQuery;
+public record GetItemByIdQuery(Guid Id) : IQuery, IEntityIdQuery;

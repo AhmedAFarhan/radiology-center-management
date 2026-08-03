@@ -1,8 +1,7 @@
-using FluentValidation;
+using RadiologyCenter.BuildingBlocks.Application.Validation;
 
 namespace RadiologyCenter.ResourceManagement.Application.Queries.GetWorkShiftById;
 
-public class GetWorkShiftByIdQueryValidator : AbstractValidator<GetWorkShiftByIdQuery>
+public class GetWorkShiftByIdQueryValidator : EntityIdQueryValidatorBase<GetWorkShiftByIdQuery>
 {
-    public GetWorkShiftByIdQueryValidator() => RuleFor(x => x.Id).NotEmpty();
 }

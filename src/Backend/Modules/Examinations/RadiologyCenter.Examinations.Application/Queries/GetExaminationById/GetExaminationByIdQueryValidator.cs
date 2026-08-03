@@ -1,11 +1,7 @@
-using FluentValidation;
+using RadiologyCenter.BuildingBlocks.Application.Validation;
 
 namespace RadiologyCenter.Examinations.Application.Queries.GetExaminationById;
 
-public class GetExaminationByIdQueryValidator : AbstractValidator<GetExaminationByIdQuery>
+public class GetExaminationByIdQueryValidator : EntityIdQueryValidatorBase<GetExaminationByIdQuery>
 {
-    public GetExaminationByIdQueryValidator()
-    {
-        RuleFor(x => x.Id).NotEmpty();
-    }
 }

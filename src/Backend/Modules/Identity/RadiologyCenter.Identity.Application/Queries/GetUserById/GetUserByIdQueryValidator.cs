@@ -1,8 +1,7 @@
-using FluentValidation;
+using RadiologyCenter.BuildingBlocks.Application.Validation;
 
 namespace RadiologyCenter.Identity.Application.Queries.GetUserById;
 
-public class GetUserByIdQueryValidator : AbstractValidator<GetUserByIdQuery>
+public class GetUserByIdQueryValidator : EntityIdQueryValidatorBase<GetUserByIdQuery>
 {
-    public GetUserByIdQueryValidator() => RuleFor(x => x.Id).NotEmpty();
 }

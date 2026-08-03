@@ -1,8 +1,7 @@
-using FluentValidation;
+using RadiologyCenter.BuildingBlocks.Application.Validation;
 
 namespace RadiologyCenter.Identity.Application.Queries.GetRoleById;
 
-public class GetRoleByIdQueryValidator : AbstractValidator<GetRoleByIdQuery>
+public class GetRoleByIdQueryValidator : EntityIdQueryValidatorBase<GetRoleByIdQuery>
 {
-    public GetRoleByIdQueryValidator() => RuleFor(x => x.Id).NotEmpty();
 }

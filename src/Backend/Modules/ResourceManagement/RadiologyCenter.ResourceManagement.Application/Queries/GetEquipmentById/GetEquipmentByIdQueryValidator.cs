@@ -1,8 +1,7 @@
-using FluentValidation;
+using RadiologyCenter.BuildingBlocks.Application.Validation;
 
 namespace RadiologyCenter.ResourceManagement.Application.Queries.GetEquipmentById;
 
-public class GetEquipmentByIdQueryValidator : AbstractValidator<GetEquipmentByIdQuery>
+public class GetEquipmentByIdQueryValidator : EntityIdQueryValidatorBase<GetEquipmentByIdQuery>
 {
-    public GetEquipmentByIdQueryValidator() => RuleFor(x => x.Id).NotEmpty();
 }

@@ -1,8 +1,7 @@
-using FluentValidation;
+using RadiologyCenter.BuildingBlocks.Application.Validation;
 
 namespace RadiologyCenter.ResourceManagement.Application.Queries.GetReferralDoctorById;
 
-public class GetReferralDoctorByIdQueryValidator : AbstractValidator<GetReferralDoctorByIdQuery>
+public class GetReferralDoctorByIdQueryValidator : EntityIdQueryValidatorBase<GetReferralDoctorByIdQuery>
 {
-    public GetReferralDoctorByIdQueryValidator() => RuleFor(x => x.Id).NotEmpty();
 }

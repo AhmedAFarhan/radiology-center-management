@@ -1,8 +1,7 @@
-using FluentValidation;
+using RadiologyCenter.BuildingBlocks.Application.Validation;
 
 namespace RadiologyCenter.Inventory.Application.Queries.GetSupplierById;
 
-public class GetSupplierByIdQueryValidator : AbstractValidator<GetSupplierByIdQuery>
+public class GetSupplierByIdQueryValidator : EntityIdQueryValidatorBase<GetSupplierByIdQuery>
 {
-    public GetSupplierByIdQueryValidator() => RuleFor(x => x.Id).NotEmpty();
 }
