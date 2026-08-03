@@ -2,7 +2,10 @@ namespace RadiologyCenter.ResourceManagement.Application.DTOs;
 
 public record ReferralDoctorDto(
     Guid Id,
-    string Name,
+    string FirstName,
+    string? MiddleName,
+    string LastName,
+    string FullName,
     string Phone,
     string? Email,
     string? Specialization,

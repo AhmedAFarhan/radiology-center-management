@@ -1,7 +1,7 @@
 namespace RadiologyCenter.ResourceManagement.Application.Commands.CreateReferralDoctor;
 
 public record CreateReferralDoctorCommand(
-    string Name,
+    string FullName,
     string Phone,
     string? Email = null,
     string? Specialization = null,

@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using RadiologyCenter.ResourceManagement.Infrastructure.Persistence;
 
@@ -11,9 +12,11 @@ using RadiologyCenter.ResourceManagement.Infrastructure.Persistence;
 namespace RadiologyCenter.ResourceManagement.Infrastructure.Persistence.Migrations
 {
     [DbContext(typeof(ResourceManagementDbContext))]
-    partial class ResourceManagementDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260803010605_ReferralDoctorPhoneUniqueAmongActive")]
+    partial class ReferralDoctorPhoneUniqueAmongActive
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

@@ -2,7 +2,7 @@ namespace RadiologyCenter.ResourceManagement.Application.Commands.UpdateReferral
 
 public record UpdateReferralDoctorCommand(
     Guid ReferralDoctorId,
-    string Name,
+    string FullName,
     string Phone,
     string? Email = null,
     string? Specialization = null,

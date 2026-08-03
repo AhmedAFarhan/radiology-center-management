@@ -8,10 +8,18 @@ public class UpdateReferralDoctorCommandValidator : AbstractValidator<UpdateRefe
     public UpdateReferralDoctorCommandValidator()
     {
         RuleFor(x => x.ReferralDoctorId).NotEmpty();
-        RuleFor(x => x.Name).NotEmpty().MaximumLength(200);
+        RuleFor(x => x.FullName).NotEmpty().MaximumLength(300);
+        RuleFor(x => x.FullName).Must(ContainsAtLeastTwoTokens)
+            .WithMessage("Full name must contain at least a first name and a last name.");
         RuleFor(x => x.Phone).NotEmpty().IsEgyptianPhoneNumber().MaximumLength(30);
         RuleFor(x => x.Email).EmailAddress().MaximumLength(200).When(x => !string.IsNullOrWhiteSpace(x.Email));
         RuleFor(x => x.Specialization).MaximumLength(200).When(x => !string.IsNullOrWhiteSpace(x.Specialization));
         RuleFor(x => x.Hospital).MaximumLength(200).When(x => !string.IsNullOrWhiteSpace(x.Hospital));
+    }
+
+    private static bool ContainsAtLeastTwoTokens(string fullName)
+    {
+        var parts = fullName?.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+        return parts is { Length: >= 2 };
     }
 }
