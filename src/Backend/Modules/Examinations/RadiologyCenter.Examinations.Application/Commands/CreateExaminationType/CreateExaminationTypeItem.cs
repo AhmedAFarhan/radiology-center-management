@@ -1,3 +1,5 @@
+using RadiologyCenter.Examinations.Application.Commands.Common;
+
 namespace RadiologyCenter.Examinations.Application.Commands.CreateExaminationType;
 
 public record CreateExaminationTypeItem(
@@ -5,4 +7,4 @@ public record CreateExaminationTypeItem(
     int Quantity,
     bool IsContrast = false,
     bool IsRequired = false,
-    string? Notes = null);
+    string? Notes = null) : IExaminationTypeItemFields;

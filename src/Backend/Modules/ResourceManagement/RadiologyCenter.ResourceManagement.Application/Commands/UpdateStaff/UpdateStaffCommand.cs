@@ -1,3 +1,5 @@
+using RadiologyCenter.ResourceManagement.Application.Commands.Common;
+
 namespace RadiologyCenter.ResourceManagement.Application.Commands.UpdateStaff;
 
 public record UpdateStaffCommand(
@@ -9,4 +11,4 @@ public record UpdateStaffCommand(
     DateTime HireDate,
     string? Department = null,
     string? Specialization = null,
-    string? LicenseNumber = null) : ICommand;
+    string? LicenseNumber = null) : ICommand, IStaffFields;

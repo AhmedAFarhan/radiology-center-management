@@ -1,3 +1,5 @@
+using RadiologyCenter.ResourceManagement.Application.Commands.Common;
+
 namespace RadiologyCenter.ResourceManagement.Application.Commands.UpdateEquipment;
 
 public record UpdateEquipmentCommand(
@@ -5,4 +7,4 @@ public record UpdateEquipmentCommand(
     string Name,
     string Modality,
     string? SerialNumber = null,
-    DateTime? PurchaseDate = null) : ICommand;
+    DateTime? PurchaseDate = null) : ICommand, IEquipmentFields;

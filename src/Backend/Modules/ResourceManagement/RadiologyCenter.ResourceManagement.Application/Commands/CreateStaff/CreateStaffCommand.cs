@@ -1,3 +1,5 @@
+using RadiologyCenter.ResourceManagement.Application.Commands.Common;
+
 namespace RadiologyCenter.ResourceManagement.Application.Commands.CreateStaff;
 
 public record CreateStaffCommand(
@@ -8,4 +10,4 @@ public record CreateStaffCommand(
     DateTime HireDate,
     string? Department = null,
     string? Specialization = null,
-    string? LicenseNumber = null) : ICommand;
+    string? LicenseNumber = null) : ICommand, IStaffFields;

@@ -1,3 +1,5 @@
+using RadiologyCenter.Patients.Application.Commands.Common;
+
 namespace RadiologyCenter.Patients.Application.Commands.CreatePatient;
 
 public record CreatePatientCommand(
@@ -12,4 +14,4 @@ public record CreatePatientCommand(
     string? BloodType = null,
     string? Allergies = null,
     string? MedicalHistory = null,
-    string? ReferringPhysician = null) : ICommand;
+    string? ReferringPhysician = null) : ICommand, IPatientFields;

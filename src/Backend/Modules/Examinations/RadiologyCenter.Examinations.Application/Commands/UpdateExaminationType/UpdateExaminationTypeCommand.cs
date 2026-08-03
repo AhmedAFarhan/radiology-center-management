@@ -1,3 +1,5 @@
+using RadiologyCenter.Examinations.Application.Commands.Common;
+
 namespace RadiologyCenter.Examinations.Application.Commands.UpdateExaminationType;
 
 public record UpdateExaminationTypeCommand(
@@ -10,4 +12,4 @@ public record UpdateExaminationTypeCommand(
     decimal Price = 0,
     bool RequiresPreparation = false,
     bool RequiresConsent = false,
-    IReadOnlyList<UpdateExaminationTypeItemRequest>? Items = null) : ICommand;
+    IReadOnlyList<UpdateExaminationTypeItemRequest>? Items = null) : ICommand, IExaminationTypeFields<UpdateExaminationTypeItemRequest>;

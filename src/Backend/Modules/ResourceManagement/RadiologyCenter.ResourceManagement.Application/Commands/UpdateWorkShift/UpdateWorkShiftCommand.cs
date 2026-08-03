@@ -1,3 +1,5 @@
+using RadiologyCenter.ResourceManagement.Application.Commands.Common;
+
 namespace RadiologyCenter.ResourceManagement.Application.Commands.UpdateWorkShift;
 
 public record UpdateWorkShiftCommand(
@@ -7,4 +9,4 @@ public record UpdateWorkShiftCommand(
     TimeSpan StartTime,
     TimeSpan EndTime,
     Guid? EquipmentId = null,
-    string? Notes = null) : ICommand;
+    string? Notes = null) : ICommand, IWorkShiftFields;

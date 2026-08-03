@@ -1,5 +1,4 @@
 using RadiologyCenter.BuildingBlocks.Domain.Common;
-using RadiologyCenter.BuildingBlocks.Domain.Exceptions;
 using RadiologyCenter.BuildingBlocks.Domain.SoftDeletable;
 
 namespace RadiologyCenter.ResourceManagement.Domain.Entities;
@@ -35,7 +34,7 @@ public sealed class ReferralDoctor : SoftDeletableAggregateRoot<Guid>
         Guard.AgainstNullOrWhiteSpace(fullName, nameof(fullName));
         Guard.AgainstNullOrWhiteSpace(phone, nameof(phone));
 
-        var (firstName, middleName, lastName) = SplitFullName(fullName);
+        var (firstName, middleName, lastName) = PersonName.Split(fullName);
 
         var referralDoctor = new ReferralDoctor
         {
@@ -63,7 +62,7 @@ public sealed class ReferralDoctor : SoftDeletableAggregateRoot<Guid>
         Guard.AgainstNullOrWhiteSpace(fullName, nameof(fullName));
         Guard.AgainstNullOrWhiteSpace(phone, nameof(phone));
 
-        var (firstName, middleName, lastName) = SplitFullName(fullName);
+        var (firstName, middleName, lastName) = PersonName.Split(fullName);
 
         FirstName = firstName;
         MiddleName = middleName;
@@ -84,18 +83,5 @@ public sealed class ReferralDoctor : SoftDeletableAggregateRoot<Guid>
     {
         if (!IsActive) return;
         IsActive = false;
-    }
-
-    private static (string FirstName, string? MiddleName, string LastName) SplitFullName(string fullName)
-    {
-        var parts = fullName.Split(' ', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
-        if (parts.Length < 2)
-            throw new DomainException("Full name must contain at least a first name and a last name.");
-
-        var firstName = parts[0];
-        var lastName = parts[^1];
-        var middleName = parts.Length > 2 ? string.Join(' ', parts[1..^1]) : null;
-
-        return (firstName, middleName, lastName);
     }
 }

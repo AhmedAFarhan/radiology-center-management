@@ -1,3 +1,5 @@
+using RadiologyCenter.Inventory.Application.Commands.Common;
+
 namespace RadiologyCenter.Inventory.Application.Commands.UpdateItem;
 
 public record UpdateItemCommand(
@@ -9,4 +11,4 @@ public record UpdateItemCommand(
     int ReorderLevel = 0,
     int ReorderQuantity = 0,
     bool LotTracked = false,
-    string? StorageInstructions = null) : ICommand;
+    string? StorageInstructions = null) : ICommand, IItemFields;

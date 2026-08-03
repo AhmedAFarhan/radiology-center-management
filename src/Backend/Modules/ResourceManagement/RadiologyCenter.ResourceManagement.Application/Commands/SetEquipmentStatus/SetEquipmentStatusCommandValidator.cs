@@ -1,4 +1,5 @@
 using FluentValidation;
+using RadiologyCenter.BuildingBlocks.Application.Validation;
 using RadiologyCenter.ResourceManagement.Domain.Enumerations;
 
 namespace RadiologyCenter.ResourceManagement.Application.Commands.SetEquipmentStatus;
@@ -8,10 +9,6 @@ public class SetEquipmentStatusCommandValidator : AbstractValidator<SetEquipment
     public SetEquipmentStatusCommandValidator()
     {
         RuleFor(x => x.EquipmentId).NotEmpty();
-        RuleFor(x => x.Status).NotEmpty().Must(IsValidStatus)
-            .WithMessage("Status must be one of: Operational, UnderMaintenance, OutOfService, Retired.");
+        RuleFor(x => x.Status).NotEmpty().IsEnumerationMember<EquipmentStatus, SetEquipmentStatusCommand>("Status");
     }
-
-    private static bool IsValidStatus(string status) =>
-        EquipmentStatus.GetAll<EquipmentStatus>().Any(s => s.Name.Equals(status, StringComparison.OrdinalIgnoreCase));
 }

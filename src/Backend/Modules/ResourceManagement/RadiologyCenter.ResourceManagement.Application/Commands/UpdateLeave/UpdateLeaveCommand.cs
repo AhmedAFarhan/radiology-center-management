@@ -1,3 +1,5 @@
+using RadiologyCenter.ResourceManagement.Application.Commands.Common;
+
 namespace RadiologyCenter.ResourceManagement.Application.Commands.UpdateLeave;
 
 public record UpdateLeaveCommand(
@@ -6,4 +8,4 @@ public record UpdateLeaveCommand(
     string LeaveType,
     DateTime StartDate,
     DateTime EndDate,
-    string? Reason = null) : ICommand;
+    string? Reason = null) : ICommand, ILeaveFields;

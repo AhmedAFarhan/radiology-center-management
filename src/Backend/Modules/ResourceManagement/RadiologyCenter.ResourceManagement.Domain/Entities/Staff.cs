@@ -1,5 +1,4 @@
 using RadiologyCenter.BuildingBlocks.Domain.Common;
-using RadiologyCenter.BuildingBlocks.Domain.Exceptions;
 using RadiologyCenter.BuildingBlocks.Domain.SoftDeletable;
 using RadiologyCenter.ResourceManagement.Domain.Enumerations;
 
@@ -46,7 +45,7 @@ public sealed class Staff : SoftDeletableAggregateRoot<Guid>
         Guard.AgainstNull(position, nameof(position));
         Guard.AgainstDefault(hireDate, nameof(hireDate));
 
-        var (firstName, middleName, lastName) = SplitFullName(fullName);
+        var (firstName, middleName, lastName) = PersonName.Split(fullName);
 
         var staff = new Staff
         {
@@ -83,7 +82,7 @@ public sealed class Staff : SoftDeletableAggregateRoot<Guid>
         Guard.AgainstNull(position, nameof(position));
         Guard.AgainstDefault(hireDate, nameof(hireDate));
 
-        var (firstName, middleName, lastName) = SplitFullName(fullName);
+        var (firstName, middleName, lastName) = PersonName.Split(fullName);
 
         UserId = userId;
         FirstName = firstName;
@@ -107,18 +106,5 @@ public sealed class Staff : SoftDeletableAggregateRoot<Guid>
     {
         if (!IsActive) return;
         IsActive = false;
-    }
-
-    private static (string FirstName, string? MiddleName, string LastName) SplitFullName(string fullName)
-    {
-        var parts = fullName.Split(' ', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
-        if (parts.Length < 2)
-            throw new DomainException("Full name must contain at least a first name and a last name.");
-
-        var firstName = parts[0];
-        var lastName = parts[^1];
-        var middleName = parts.Length > 2 ? string.Join(' ', parts[1..^1]) : null;
-
-        return (firstName, middleName, lastName);
     }
 }

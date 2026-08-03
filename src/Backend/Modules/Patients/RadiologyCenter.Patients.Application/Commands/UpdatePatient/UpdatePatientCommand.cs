@@ -1,3 +1,5 @@
+using RadiologyCenter.Patients.Application.Commands.Common;
+
 namespace RadiologyCenter.Patients.Application.Commands.UpdatePatient;
 
 public record UpdatePatientCommand(
@@ -13,4 +15,4 @@ public record UpdatePatientCommand(
     string? BloodType = null,
     string? Allergies = null,
     string? MedicalHistory = null,
-    string? ReferringPhysician = null) : ICommand;
+    string? ReferringPhysician = null) : ICommand, IPatientFields;
