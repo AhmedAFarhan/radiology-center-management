@@ -10,7 +10,8 @@ public class CreateExaminationCommandValidator : AbstractValidator<CreateExamina
     {
         RuleFor(x => x.PatientId).NotEmpty();
         RuleFor(x => x.ExaminationTypeId).NotEmpty();
-        RuleFor(x => x.ReferringDoctor).NotEmpty().MaximumLength(200);
+        RuleFor(x => x.RadiologistId).NotEmpty();
+        RuleFor(x => x.TechnicianId).NotEmpty();
         RuleFor(x => x.ClinicalIndication).NotEmpty().MaximumLength(1000);
         RuleFor(x => x.Priority).NotEmpty().IsEnumerationMember<ExaminationPriority, CreateExaminationCommand>("Priority");
         RuleFor(x => x.Discount).GreaterThanOrEqualTo(0);

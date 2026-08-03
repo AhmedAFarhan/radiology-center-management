@@ -16,7 +16,9 @@ public sealed class ExaminationHistory : Entity<Guid>
     public string TypeBodyPart { get; private set; }
     public decimal TypePrice { get; private set; }
     public int TypeStandardDurationMinutes { get; private set; }
-    public string ReferringDoctor { get; private set; }
+    public Guid? ReferralDoctorId { get; private set; }
+    public Guid RadiologistId { get; private set; }
+    public Guid TechnicianId { get; private set; }
     public string ClinicalIndication { get; private set; }
     public ExaminationPriority Priority { get; private set; }
     public decimal Price { get; private set; }
@@ -39,7 +41,6 @@ public sealed class ExaminationHistory : Entity<Guid>
         TypeName = null!;
         TypeModality = null!;
         TypeBodyPart = null!;
-        ReferringDoctor = null!;
         ClinicalIndication = null!;
         Priority = null!;
     }
@@ -63,7 +64,9 @@ public sealed class ExaminationHistory : Entity<Guid>
             TypeBodyPart = type.BodyPart,
             TypePrice = type.Price,
             TypeStandardDurationMinutes = type.StandardDurationMinutes,
-            ReferringDoctor = examination.ReferringDoctor,
+            ReferralDoctorId = examination.ReferralDoctorId,
+            RadiologistId = examination.RadiologistId,
+            TechnicianId = examination.TechnicianId,
             ClinicalIndication = examination.ClinicalIndication,
             Priority = examination.Priority,
             Price = examination.Price,

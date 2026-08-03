@@ -60,7 +60,7 @@ else
                                 <MudChip T="string" Size="Size.Small" Color="@StatusColor(context.Status)">@context.Status</MudChip>
                             </MudTd>
                             <MudTd DataLabel="Priority">@context.Priority</MudTd>
-                            <MudTd DataLabel="Referring Doctor">@context.ReferringDoctor</MudTd>
+                            <MudTd DataLabel="Referring Doctor">@(context.ReferralDoctorId ?? "-")</MudTd>
                         </RowTemplate>
                         <NoRecordsContent>
                             <MudText Class="pa-4">No examinations yet.</MudText>

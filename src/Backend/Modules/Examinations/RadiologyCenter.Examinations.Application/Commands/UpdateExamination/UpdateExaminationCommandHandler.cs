@@ -18,9 +18,11 @@ public static class UpdateExaminationCommandHandler
         var priority = ExaminationPriority.FromName<ExaminationPriority>(command.Priority);
 
         examination.Update(
-            command.ReferringDoctor,
+            command.RadiologistId,
+            command.TechnicianId,
             command.ClinicalIndication,
             priority,
+            command.ReferralDoctorId,
             command.Notes);
 
         if (command.Discount.HasValue || command.IsDiscountPercentage.HasValue || command.Paid.HasValue)

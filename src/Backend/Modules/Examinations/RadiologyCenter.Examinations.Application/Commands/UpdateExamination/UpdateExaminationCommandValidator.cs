@@ -9,7 +9,8 @@ public class UpdateExaminationCommandValidator : AbstractValidator<UpdateExamina
     public UpdateExaminationCommandValidator()
     {
         RuleFor(x => x.ExaminationId).NotEmpty();
-        RuleFor(x => x.ReferringDoctor).NotEmpty().MaximumLength(200);
+        RuleFor(x => x.RadiologistId).NotEmpty();
+        RuleFor(x => x.TechnicianId).NotEmpty();
         RuleFor(x => x.ClinicalIndication).NotEmpty().MaximumLength(1000);
         RuleFor(x => x.Priority).NotEmpty().IsEnumerationMember<ExaminationPriority, UpdateExaminationCommand>("Priority");
         RuleFor(x => x.Notes).MaximumLength(500).When(x => !string.IsNullOrWhiteSpace(x.Notes));

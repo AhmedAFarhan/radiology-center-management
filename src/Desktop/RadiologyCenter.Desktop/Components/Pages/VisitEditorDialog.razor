@@ -53,12 +53,27 @@
                     </MudItem>
                 }
                 <MudItem xs="12" sm="6">
-                    <MudTextField @bind-Value="_model.ReferringDoctor"
-                                  Label="Referring Doctor"
+                    <MudTextField @bind-Value="_model.RadiologistId"
+                                  Label="Radiologist ID"
                                   Variant="Variant.Outlined"
                                   Margin="Margin.Dense"
                                   Immediate="true"
-                                  For="@(() => _model.ReferringDoctor)" />
+                                  For="@(() => _model.RadiologistId)" />
+                </MudItem>
+                <MudItem xs="12" sm="6">
+                    <MudTextField @bind-Value="_model.TechnicianId"
+                                  Label="Technician ID"
+                                  Variant="Variant.Outlined"
+                                  Margin="Margin.Dense"
+                                  Immediate="true"
+                                  For="@(() => _model.TechnicianId)" />
+                </MudItem>
+                <MudItem xs="12" sm="6">
+                    <MudTextField @bind-Value="_model.ReferralDoctorId"
+                                  Label="Referral Doctor ID (optional)"
+                                  Variant="Variant.Outlined"
+                                  Margin="Margin.Dense"
+                                  Immediate="true" />
                 </MudItem>
                 <MudItem xs="12" sm="6">
                     <MudSelect T="string"
@@ -201,7 +216,9 @@
         {
             _model.PatientName = "Loading...";
             _model.ExaminationTypeName = Visit!.ExaminationTypeName;
-            _model.ReferringDoctor = Visit.ReferringDoctor;
+            _model.RadiologistId = Visit.RadiologistId;
+            _model.TechnicianId = Visit.TechnicianId;
+            _model.ReferralDoctorId = Visit.ReferralDoctorId;
             _model.ClinicalIndication = Visit.ClinicalIndication;
             _model.Priority = Visit.Priority;
             _model.Notes = Visit.Notes;
@@ -234,7 +251,9 @@
             {
                 await ExaminationService.UpdateAsync(Visit!.Id, new ExaminationUpdateInput
                 {
-                    ReferringDoctor = _model.ReferringDoctor,
+                    RadiologistId = _model.RadiologistId,
+                    TechnicianId = _model.TechnicianId,
+                    ReferralDoctorId = string.IsNullOrWhiteSpace(_model.ReferralDoctorId) ? null : _model.ReferralDoctorId,
                     ClinicalIndication = _model.ClinicalIndication,
                     Priority = _model.Priority,
                     Notes = _model.Notes,
@@ -249,7 +268,9 @@
                 {
                     PatientId = _selectedPatient!.Id,
                     ExaminationTypeId = _selectedType!.Id,
-                    ReferringDoctor = _model.ReferringDoctor,
+                    RadiologistId = _model.RadiologistId,
+                    TechnicianId = _model.TechnicianId,
+                    ReferralDoctorId = string.IsNullOrWhiteSpace(_model.ReferralDoctorId) ? null : _model.ReferralDoctorId,
                     ClinicalIndication = _model.ClinicalIndication,
                     Priority = _model.Priority,
                     Discount = _model.Discount,
@@ -284,9 +305,13 @@
         public string PatientName { get; set; } = string.Empty;
         public string ExaminationTypeName { get; set; } = string.Empty;
 
-        [Required(ErrorMessage = "Referring doctor is required.")]
-        [MaxLength(200, ErrorMessage = "Referring doctor must be 200 characters or fewer.")]
-        public string ReferringDoctor { get; set; } = string.Empty;
+        [Required(ErrorMessage = "Radiologist is required.")]
+        public string RadiologistId { get; set; } = string.Empty;
+
+        [Required(ErrorMessage = "Technician is required.")]
+        public string TechnicianId { get; set; } = string.Empty;
+
+        public string? ReferralDoctorId { get; set; }
 
         [Required(ErrorMessage = "Clinical indication is required.")]
         [MaxLength(1000, ErrorMessage = "Clinical indication must be 1000 characters or fewer.")]

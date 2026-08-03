@@ -38,8 +38,16 @@
                     <MudChip T="string" Size="Size.Small" Color="@(PriorityColor(_visit.Priority))">@_visit.Priority</MudChip>
                 </MudItem>
                 <MudItem xs="12">
-                    <MudText Typo="Typo.caption" Class="text-secondary">Referring Doctor</MudText>
-                    <MudText Typo="Typo.subtitle1">@(string.IsNullOrWhiteSpace(_visit.ReferringDoctor) ? "-" : _visit.ReferringDoctor)</MudText>
+                    <MudText Typo="Typo.caption" Class="text-secondary">Radiologist</MudText>
+                    <MudText Typo="Typo.subtitle1">@(_visit.RadiologistId ?? "-")</MudText>
+                </MudItem>
+                <MudItem xs="12">
+                    <MudText Typo="Typo.caption" Class="text-secondary">Technician</MudText>
+                    <MudText Typo="Typo.subtitle1">@(_visit.TechnicianId ?? "-")</MudText>
+                </MudItem>
+                <MudItem xs="12">
+                    <MudText Typo="Typo.caption" Class="text-secondary">Referral Doctor</MudText>
+                    <MudText Typo="Typo.subtitle1">@(string.IsNullOrWhiteSpace(_visit.ReferralDoctorId) ? "-" : _visit.ReferralDoctorId)</MudText>
                 </MudItem>
                 <MudItem xs="12">
                     <MudText Typo="Typo.caption" Class="text-secondary">Clinical Indication</MudText>

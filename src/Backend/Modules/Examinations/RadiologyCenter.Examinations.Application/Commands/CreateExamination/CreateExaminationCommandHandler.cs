@@ -23,10 +23,12 @@ public static class CreateExaminationCommandHandler
         var examination = Examination.Create(
             command.PatientId,
             examinationType.Id,
-            command.ReferringDoctor,
+            command.RadiologistId,
+            command.TechnicianId,
             command.ClinicalIndication,
             priority,
             examinationType.Price,
+            command.ReferralDoctorId,
             command.Discount,
             command.IsDiscountPercentage,
             command.Paid,

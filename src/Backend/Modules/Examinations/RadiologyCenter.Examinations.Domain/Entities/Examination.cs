@@ -12,7 +12,9 @@ public sealed class Examination : AuditableAggregateRoot<Guid>
 
     public Guid PatientId { get; private set; }
     public Guid ExaminationTypeId { get; private set; }
-    public string ReferringDoctor { get; private set; }
+    public Guid? ReferralDoctorId { get; private set; }
+    public Guid RadiologistId { get; private set; }
+    public Guid TechnicianId { get; private set; }
     public string ClinicalIndication { get; private set; }
     public ExaminationPriority Priority { get; private set; }
     public ExaminationStatus Status { get; private set; }
@@ -32,7 +34,6 @@ public sealed class Examination : AuditableAggregateRoot<Guid>
 
     private Examination()
     {
-        ReferringDoctor = null!;
         ClinicalIndication = null!;
         Priority = null!;
         Status = null!;
@@ -41,10 +42,12 @@ public sealed class Examination : AuditableAggregateRoot<Guid>
     public static Examination Create(
         Guid patientId,
         Guid examinationTypeId,
-        string referringDoctor,
+        Guid radiologistId,
+        Guid technicianId,
         string clinicalIndication,
         ExaminationPriority priority,
         decimal price,
+        Guid? referralDoctorId = null,
         decimal discount = 0,
         bool isDiscountPercentage = false,
         decimal paid = 0,
@@ -52,7 +55,8 @@ public sealed class Examination : AuditableAggregateRoot<Guid>
     {
         Guard.AgainstEmpty(patientId, nameof(patientId));
         Guard.AgainstEmpty(examinationTypeId, nameof(examinationTypeId));
-        Guard.AgainstNullOrWhiteSpace(referringDoctor, nameof(referringDoctor));
+        Guard.AgainstEmpty(radiologistId, nameof(radiologistId));
+        Guard.AgainstEmpty(technicianId, nameof(technicianId));
         Guard.AgainstNullOrWhiteSpace(clinicalIndication, nameof(clinicalIndication));
         Guard.AgainstNull(priority, nameof(priority));
         Guard.Against(price, p => p < 0, "Price cannot be negative.");
@@ -66,7 +70,9 @@ public sealed class Examination : AuditableAggregateRoot<Guid>
             Id = Guid.NewGuid(),
             PatientId = patientId,
             ExaminationTypeId = examinationTypeId,
-            ReferringDoctor = referringDoctor.Trim(),
+            ReferralDoctorId = referralDoctorId,
+            RadiologistId = radiologistId,
+            TechnicianId = technicianId,
             ClinicalIndication = clinicalIndication.Trim(),
             Priority = priority,
             Status = ExaminationStatus.Requested,
@@ -108,17 +114,22 @@ public sealed class Examination : AuditableAggregateRoot<Guid>
     }
 
     public void Update(
-        string referringDoctor,
+        Guid radiologistId,
+        Guid technicianId,
         string clinicalIndication,
         ExaminationPriority priority,
+        Guid? referralDoctorId = null,
         string? notes = null)
     {
         EnsureNotTerminal();
-        Guard.AgainstNullOrWhiteSpace(referringDoctor, nameof(referringDoctor));
+        Guard.AgainstEmpty(radiologistId, nameof(radiologistId));
+        Guard.AgainstEmpty(technicianId, nameof(technicianId));
         Guard.AgainstNullOrWhiteSpace(clinicalIndication, nameof(clinicalIndication));
         Guard.AgainstNull(priority, nameof(priority));
 
-        ReferringDoctor = referringDoctor.Trim();
+        RadiologistId = radiologistId;
+        TechnicianId = technicianId;
+        ReferralDoctorId = referralDoctorId;
         ClinicalIndication = clinicalIndication.Trim();
         Priority = priority;
         Notes = notes?.Trim();
