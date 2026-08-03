@@ -11,8 +11,8 @@ using RadiologyCenter.BuildingBlocks.Infrastructure.Persistence;
 namespace RadiologyCenter.BuildingBlocks.Infrastructure.Persistence.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260731182041_InitialSystem")]
-    partial class InitialSystem
+    [Migration("20260803234525_Init")]
+    partial class Init
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

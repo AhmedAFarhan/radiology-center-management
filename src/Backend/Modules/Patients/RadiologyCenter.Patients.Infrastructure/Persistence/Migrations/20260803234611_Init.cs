@@ -6,27 +6,13 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace RadiologyCenter.Patients.Infrastructure.Persistence.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialPatients : Migration
+    public partial class Init : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.EnsureSchema(
                 name: "Patients");
-
-            migrationBuilder.CreateTable(
-                name: "PatientNumberSequences",
-                schema: "Patients",
-                columns: table => new
-                {
-                    Year = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    LastNumber = table.Column<int>(type: "int", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_PatientNumberSequences", x => x.Year);
-                });
 
             migrationBuilder.CreateTable(
                 name: "Patients",
@@ -40,7 +26,7 @@ namespace RadiologyCenter.Patients.Infrastructure.Persistence.Migrations
                     LastName = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
                     DateOfBirth = table.Column<DateTime>(type: "datetime2", nullable: true),
                     Gender = table.Column<int>(type: "int", nullable: false),
-                    PhoneNumber = table.Column<string>(type: "nvarchar(30)", maxLength: 30, nullable: true),
+                    PhoneNumber = table.Column<string>(type: "nvarchar(30)", maxLength: 30, nullable: false),
                     Email = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: true),
                     Address = table.Column<string>(type: "nvarchar(300)", maxLength: 300, nullable: true),
                     NationalId = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
@@ -68,16 +54,13 @@ namespace RadiologyCenter.Patients.Infrastructure.Persistence.Migrations
                 schema: "Patients",
                 table: "Patients",
                 column: "PatientCode",
-                unique: true);
+                unique: true,
+                filter: "[IsDeleted] = 0");
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropTable(
-                name: "PatientNumberSequences",
-                schema: "Patients");
-
             migrationBuilder.DropTable(
                 name: "Patients",
                 schema: "Patients");

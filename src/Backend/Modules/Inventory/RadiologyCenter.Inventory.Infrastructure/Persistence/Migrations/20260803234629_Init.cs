@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace RadiologyCenter.Inventory.Infrastructure.Persistence.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialInventory : Migration
+    public partial class Init : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -40,19 +40,6 @@ namespace RadiologyCenter.Inventory.Infrastructure.Persistence.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Items", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "OrderNumberSequences",
-                schema: "Inventory",
-                columns: table => new
-                {
-                    Year = table.Column<int>(type: "int", nullable: false),
-                    LastNumber = table.Column<int>(type: "int", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_OrderNumberSequences", x => x.Year);
                 });
 
             migrationBuilder.CreateTable(
@@ -181,7 +168,8 @@ namespace RadiologyCenter.Inventory.Infrastructure.Persistence.Migrations
                 schema: "Inventory",
                 table: "Items",
                 column: "Name",
-                unique: true);
+                unique: true,
+                filter: "[IsDeleted] = 0");
 
             migrationBuilder.CreateIndex(
                 name: "IX_PurchaseOrderItems_PurchaseOrderId",
@@ -194,7 +182,8 @@ namespace RadiologyCenter.Inventory.Infrastructure.Persistence.Migrations
                 schema: "Inventory",
                 table: "PurchaseOrders",
                 column: "OrderNumber",
-                unique: true);
+                unique: true,
+                filter: "[IsDeleted] = 0");
 
             migrationBuilder.CreateIndex(
                 name: "IX_PurchaseOrders_SupplierId",
@@ -232,10 +221,6 @@ namespace RadiologyCenter.Inventory.Infrastructure.Persistence.Migrations
         {
             migrationBuilder.DropTable(
                 name: "Items",
-                schema: "Inventory");
-
-            migrationBuilder.DropTable(
-                name: "OrderNumberSequences",
                 schema: "Inventory");
 
             migrationBuilder.DropTable(

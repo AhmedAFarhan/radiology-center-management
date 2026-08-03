@@ -12,8 +12,8 @@ using RadiologyCenter.Identity.Infrastructure.Persistence;
 namespace RadiologyCenter.Identity.Infrastructure.Persistence.Migrations
 {
     [DbContext(typeof(IdentityDbContext))]
-    [Migration("20260803004436_SeedResourceManagementPermissions")]
-    partial class SeedResourceManagementPermissions
+    [Migration("20260803234553_Init")]
+    partial class Init
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -608,6 +608,62 @@ namespace RadiologyCenter.Identity.Infrastructure.Persistence.Migrations
                             Description = "Remove referral doctors",
                             Group = "Resources",
                             Name = "Delete Referral Doctors"
+                        },
+                        new
+                        {
+                            Id = new Guid("41fefb26-f3c2-e784-4c76-890dee36e6eb"),
+                            Code = "payroll.read",
+                            Description = "View payroll records",
+                            Group = "Payroll",
+                            Name = "Read Payroll"
+                        },
+                        new
+                        {
+                            Id = new Guid("af121ffb-79e2-804a-901f-97c3c40b0c9a"),
+                            Code = "payroll.salary-components.manage",
+                            Description = "Create, update, activate and delete salary components",
+                            Group = "Payroll",
+                            Name = "Manage Salary Components"
+                        },
+                        new
+                        {
+                            Id = new Guid("5999b9cd-e387-2bb4-0fe6-ddaa9e133ee7"),
+                            Code = "payroll.salary.manage",
+                            Description = "Create, update, activate and delete staff salaries",
+                            Group = "Payroll",
+                            Name = "Manage Salaries"
+                        },
+                        new
+                        {
+                            Id = new Guid("ecb71584-005e-bc07-3cea-0e99b44ce6b5"),
+                            Code = "payroll.allowances.manage",
+                            Description = "Create, update, activate and delete allowance assignments",
+                            Group = "Payroll",
+                            Name = "Manage Allowances"
+                        },
+                        new
+                        {
+                            Id = new Guid("9a611184-7476-b59a-382c-5918515fc4bd"),
+                            Code = "payroll.fees.manage",
+                            Description = "Create, update, activate and delete examination and referral fees",
+                            Group = "Payroll",
+                            Name = "Manage Payroll Fees"
+                        },
+                        new
+                        {
+                            Id = new Guid("7fd2558b-b5b3-6988-0f52-a4330c5717f2"),
+                            Code = "payroll.payruns.manage",
+                            Description = "Create pay runs and manage their payslips",
+                            Group = "Payroll",
+                            Name = "Manage Pay Runs"
+                        },
+                        new
+                        {
+                            Id = new Guid("163a203a-e0e1-db23-f09c-702f14888def"),
+                            Code = "payroll.payruns.run",
+                            Description = "Compute, approve, reject and pay pay runs",
+                            Group = "Payroll",
+                            Name = "Run Pay Rolls"
                         });
                 });
 

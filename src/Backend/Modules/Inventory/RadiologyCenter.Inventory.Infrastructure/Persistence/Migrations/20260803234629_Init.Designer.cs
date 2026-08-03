@@ -12,8 +12,8 @@ using RadiologyCenter.Inventory.Infrastructure.Persistence;
 namespace RadiologyCenter.Inventory.Infrastructure.Persistence.Migrations
 {
     [DbContext(typeof(InventoryDbContext))]
-    [Migration("20260803011557_ItemAndPurchaseOrderCodeUniqueAmongActive")]
-    partial class ItemAndPurchaseOrderCodeUniqueAmongActive
+    [Migration("20260803234629_Init")]
+    partial class Init
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

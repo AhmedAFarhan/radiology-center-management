@@ -12,8 +12,8 @@ using RadiologyCenter.Payroll.Infrastructure.Persistence;
 namespace RadiologyCenter.Payroll.Infrastructure.Persistence.Migrations
 {
     [DbContext(typeof(PayrollDbContext))]
-    [Migration("20260803195607_AddPayrollTables")]
-    partial class AddPayrollTables
+    [Migration("20260803234722_Init")]
+    partial class Init
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

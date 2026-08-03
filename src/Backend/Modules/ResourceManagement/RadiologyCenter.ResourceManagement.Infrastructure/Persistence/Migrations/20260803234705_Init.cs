@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace RadiologyCenter.ResourceManagement.Infrastructure.Persistence.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialResourceManagement : Migration
+    public partial class Init : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -69,7 +69,9 @@ namespace RadiologyCenter.ResourceManagement.Infrastructure.Persistence.Migratio
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    Name = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false),
+                    FirstName = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
+                    MiddleName = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: true),
+                    LastName = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
                     Phone = table.Column<string>(type: "nvarchar(30)", maxLength: 30, nullable: false),
                     Email = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: true),
                     Specialization = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: true),
@@ -95,7 +97,9 @@ namespace RadiologyCenter.ResourceManagement.Infrastructure.Persistence.Migratio
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     UserId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    EmployeeNumber = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
+                    FirstName = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
+                    MiddleName = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: true),
+                    LastName = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
                     PhoneNumber = table.Column<string>(type: "nvarchar(30)", maxLength: 30, nullable: false),
                     Position = table.Column<int>(type: "int", nullable: false),
                     Department = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: true),
@@ -148,11 +152,12 @@ namespace RadiologyCenter.ResourceManagement.Infrastructure.Persistence.Migratio
                 columns: new[] { "StaffId", "StartDate" });
 
             migrationBuilder.CreateIndex(
-                name: "IX_Staff_EmployeeNumber",
+                name: "IX_ReferralDoctors_Phone",
                 schema: "ResourceManagement",
-                table: "Staff",
-                column: "EmployeeNumber",
-                unique: true);
+                table: "ReferralDoctors",
+                column: "Phone",
+                unique: true,
+                filter: "[IsDeleted] = 0");
 
             migrationBuilder.CreateIndex(
                 name: "IX_WorkShifts_StaffId_Date",

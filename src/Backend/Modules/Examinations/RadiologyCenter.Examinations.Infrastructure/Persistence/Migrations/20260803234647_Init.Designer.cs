@@ -12,8 +12,8 @@ using RadiologyCenter.Examinations.Infrastructure.Persistence;
 namespace RadiologyCenter.Examinations.Infrastructure.Persistence.Migrations
 {
     [DbContext(typeof(ExaminationsDbContext))]
-    [Migration("20260801155917_ExaminationHistoryBilling")]
-    partial class ExaminationHistoryBilling
+    [Migration("20260803234647_Init")]
+    partial class Init
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -86,10 +86,11 @@ namespace RadiologyCenter.Examinations.Infrastructure.Persistence.Migrations
                     b.Property<int>("Priority")
                         .HasColumnType("int");
 
-                    b.Property<string>("ReferringDoctor")
-                        .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)");
+                    b.Property<Guid>("RadiologistId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid?>("ReferralDoctorId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<decimal>("Remaining")
                         .HasPrecision(18, 2)
@@ -103,6 +104,9 @@ namespace RadiologyCenter.Examinations.Infrastructure.Persistence.Migrations
 
                     b.Property<int>("Status")
                         .HasColumnType("int");
+
+                    b.Property<Guid>("TechnicianId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.HasKey("Id");
 
@@ -161,10 +165,19 @@ namespace RadiologyCenter.Examinations.Infrastructure.Persistence.Migrations
                     b.Property<int>("Priority")
                         .HasColumnType("int");
 
-                    b.Property<string>("ReferringDoctor")
-                        .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)");
+                    b.Property<decimal?>("RadiologistFee")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<Guid>("RadiologistId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid?>("ReferralDoctorId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<decimal?>("ReferralFee")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<decimal>("Remaining")
                         .HasPrecision(18, 2)
@@ -175,6 +188,13 @@ namespace RadiologyCenter.Examinations.Infrastructure.Persistence.Migrations
 
                     b.Property<DateTime?>("StartedAt")
                         .HasColumnType("datetime2");
+
+                    b.Property<decimal?>("TechnicianFee")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<Guid>("TechnicianId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("TypeBodyPart")
                         .IsRequired()
@@ -352,7 +372,8 @@ namespace RadiologyCenter.Examinations.Infrastructure.Persistence.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("Code")
-                        .IsUnique();
+                        .IsUnique()
+                        .HasFilter("[IsDeleted] = 0");
 
                     b.ToTable("ExaminationTypes", "Examinations");
                 });

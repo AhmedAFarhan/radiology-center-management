@@ -12,8 +12,8 @@ using RadiologyCenter.ResourceManagement.Infrastructure.Persistence;
 namespace RadiologyCenter.ResourceManagement.Infrastructure.Persistence.Migrations
 {
     [DbContext(typeof(ResourceManagementDbContext))]
-    [Migration("20260803010605_ReferralDoctorPhoneUniqueAmongActive")]
-    partial class ReferralDoctorPhoneUniqueAmongActive
+    [Migration("20260803234705_Init")]
+    partial class Init
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -221,10 +221,10 @@ namespace RadiologyCenter.ResourceManagement.Infrastructure.Persistence.Migratio
                         .HasMaxLength(200)
                         .HasColumnType("nvarchar(200)");
 
-                    b.Property<string>("EmployeeNumber")
+                    b.Property<string>("FirstName")
                         .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
 
                     b.Property<DateTime>("HireDate")
                         .HasColumnType("datetime2");
@@ -241,7 +241,16 @@ namespace RadiologyCenter.ResourceManagement.Infrastructure.Persistence.Migratio
                     b.Property<string>("LastModifiedBy")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("LastName")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
                     b.Property<string>("LicenseNumber")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("MiddleName")
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
@@ -261,9 +270,6 @@ namespace RadiologyCenter.ResourceManagement.Infrastructure.Persistence.Migratio
                         .HasColumnType("uniqueidentifier");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("EmployeeNumber")
-                        .IsUnique();
 
                     b.ToTable("Staff", "ResourceManagement");
                 });

@@ -12,8 +12,8 @@ using RadiologyCenter.Patients.Infrastructure.Persistence;
 namespace RadiologyCenter.Patients.Infrastructure.Persistence.Migrations
 {
     [DbContext(typeof(PatientsDbContext))]
-    [Migration("20260731153424_PatientSequenceYearNonIdentity")]
-    partial class PatientSequenceYearNonIdentity
+    [Migration("20260803234611_Init")]
+    partial class Init
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -35,6 +35,9 @@ namespace RadiologyCenter.Patients.Infrastructure.Persistence.Migrations
                     b.Property<string>("Address")
                         .HasMaxLength(300)
                         .HasColumnType("nvarchar(300)");
+
+                    b.Property<int?>("Age")
+                        .HasColumnType("int");
 
                     b.Property<string>("Allergies")
                         .HasMaxLength(1000)
@@ -105,6 +108,7 @@ namespace RadiologyCenter.Patients.Infrastructure.Persistence.Migrations
                         .HasColumnType("nvarchar(20)");
 
                     b.Property<string>("PhoneNumber")
+                        .IsRequired()
                         .HasMaxLength(30)
                         .HasColumnType("nvarchar(30)");
 
@@ -112,29 +116,13 @@ namespace RadiologyCenter.Patients.Infrastructure.Persistence.Migrations
                         .HasMaxLength(200)
                         .HasColumnType("nvarchar(200)");
 
-                    b.Property<int?>("_age")
-                        .HasColumnType("int")
-                        .HasColumnName("Age");
-
                     b.HasKey("Id");
 
                     b.HasIndex("PatientCode")
-                        .IsUnique();
+                        .IsUnique()
+                        .HasFilter("[IsDeleted] = 0");
 
                     b.ToTable("Patients", "Patients");
-                });
-
-            modelBuilder.Entity("RadiologyCenter.Patients.Infrastructure.Persistence.PatientNumberSequence", b =>
-                {
-                    b.Property<int>("Year")
-                        .HasColumnType("int");
-
-                    b.Property<int>("LastNumber")
-                        .HasColumnType("int");
-
-                    b.HasKey("Year");
-
-                    b.ToTable("PatientNumberSequences", "Patients");
                 });
 #pragma warning restore 612, 618
         }
