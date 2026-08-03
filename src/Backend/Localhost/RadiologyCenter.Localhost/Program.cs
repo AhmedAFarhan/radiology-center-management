@@ -22,6 +22,9 @@ using RadiologyCenter.Inventory.Infrastructure.Persistence;
 using RadiologyCenter.Examinations.Application;
 using RadiologyCenter.Examinations.Infrastructure;
 using RadiologyCenter.Examinations.Infrastructure.Persistence;
+using RadiologyCenter.ResourceManagement.Application;
+using RadiologyCenter.ResourceManagement.Infrastructure;
+using RadiologyCenter.ResourceManagement.Infrastructure.Persistence;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -69,6 +72,8 @@ builder.Services.AddInventoryApplication();
 builder.Services.AddInventoryInfrastructure(builder.Configuration);
 builder.Services.AddExaminationsApplication();
 builder.Services.AddExaminationsInfrastructure(builder.Configuration);
+builder.Services.AddResourceManagementApplication();
+builder.Services.AddResourceManagementInfrastructure(builder.Configuration);
 builder.Services.AddScoped<IItemSnapshotResolver, ItemSnapshotResolver>();
 
 var app = builder.Build();
@@ -92,6 +97,9 @@ using (var scope = app.Services.CreateScope())
 
     var examinationsDb = scope.ServiceProvider.GetRequiredService<ExaminationsDbContext>();
     examinationsDb.Database.Migrate();
+
+    var resourceManagementDb = scope.ServiceProvider.GetRequiredService<ResourceManagementDbContext>();
+    resourceManagementDb.Database.Migrate();
 }
 
 app.UseMiddleware<ExceptionMiddleware>();

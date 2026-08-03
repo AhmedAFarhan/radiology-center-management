@@ -445,6 +445,166 @@ namespace RadiologyCenter.Identity.Infrastructure.Persistence.Migrations
                             Description = "Cancel visits and examinations",
                             Group = "Examinations",
                             Name = "Cancel Examinations"
+                        },
+                        new
+                        {
+                            Id = new Guid("d8a19a08-1c83-5859-0163-7ce116ccbf1d"),
+                            Code = "resources.staff.create",
+                            Description = "Add new staff members",
+                            Group = "Resources",
+                            Name = "Create Staff"
+                        },
+                        new
+                        {
+                            Id = new Guid("b621ec27-1a85-5071-31d6-c48d94fdc07e"),
+                            Code = "resources.staff.read",
+                            Description = "View staff members",
+                            Group = "Resources",
+                            Name = "Read Staff"
+                        },
+                        new
+                        {
+                            Id = new Guid("faf46329-5963-eb14-13e3-957757d84b62"),
+                            Code = "resources.staff.update",
+                            Description = "Modify staff members",
+                            Group = "Resources",
+                            Name = "Update Staff"
+                        },
+                        new
+                        {
+                            Id = new Guid("4ff54837-8f20-a8b5-93aa-5c626742a079"),
+                            Code = "resources.staff.delete",
+                            Description = "Remove staff members",
+                            Group = "Resources",
+                            Name = "Delete Staff"
+                        },
+                        new
+                        {
+                            Id = new Guid("a15b39d5-580d-d2bc-109e-d2dcdfbfabaa"),
+                            Code = "resources.equipment.create",
+                            Description = "Add new equipment",
+                            Group = "Resources",
+                            Name = "Create Equipment"
+                        },
+                        new
+                        {
+                            Id = new Guid("26a1fa35-132a-d4a3-90ca-ba0fc0a78a39"),
+                            Code = "resources.equipment.read",
+                            Description = "View equipment",
+                            Group = "Resources",
+                            Name = "Read Equipment"
+                        },
+                        new
+                        {
+                            Id = new Guid("c09e4f7a-1fca-53f3-36bc-a16070f6e2cd"),
+                            Code = "resources.equipment.update",
+                            Description = "Modify equipment and its status",
+                            Group = "Resources",
+                            Name = "Update Equipment"
+                        },
+                        new
+                        {
+                            Id = new Guid("d34aa12a-13ac-fb27-68a7-2a8fcaf070dd"),
+                            Code = "resources.equipment.delete",
+                            Description = "Remove equipment",
+                            Group = "Resources",
+                            Name = "Delete Equipment"
+                        },
+                        new
+                        {
+                            Id = new Guid("891ac850-50b8-c0fd-75d4-72f57935a9cf"),
+                            Code = "resources.shifts.create",
+                            Description = "Add new work shifts",
+                            Group = "Resources",
+                            Name = "Create Work Shifts"
+                        },
+                        new
+                        {
+                            Id = new Guid("4b4bcccb-78a8-9410-5fa2-0b2b5ad02b2e"),
+                            Code = "resources.shifts.read",
+                            Description = "View work shifts",
+                            Group = "Resources",
+                            Name = "Read Work Shifts"
+                        },
+                        new
+                        {
+                            Id = new Guid("402f63c9-2c76-0acc-6e19-d80c01fe35d2"),
+                            Code = "resources.shifts.update",
+                            Description = "Modify work shifts",
+                            Group = "Resources",
+                            Name = "Update Work Shifts"
+                        },
+                        new
+                        {
+                            Id = new Guid("80dcaed2-5408-90c5-33ed-a0bad9c12f73"),
+                            Code = "resources.shifts.delete",
+                            Description = "Remove work shifts",
+                            Group = "Resources",
+                            Name = "Delete Work Shifts"
+                        },
+                        new
+                        {
+                            Id = new Guid("90420a38-f060-a86e-fb75-ca18548d1331"),
+                            Code = "resources.leave.create",
+                            Description = "Add new leave records",
+                            Group = "Resources",
+                            Name = "Create Leave"
+                        },
+                        new
+                        {
+                            Id = new Guid("f3b4c0c6-ed22-c0e9-bb34-df2f3fb348a1"),
+                            Code = "resources.leave.read",
+                            Description = "View leave records",
+                            Group = "Resources",
+                            Name = "Read Leave"
+                        },
+                        new
+                        {
+                            Id = new Guid("9cd729b1-31ce-5e23-0590-ec97a7b105d5"),
+                            Code = "resources.leave.update",
+                            Description = "Modify leave records",
+                            Group = "Resources",
+                            Name = "Update Leave"
+                        },
+                        new
+                        {
+                            Id = new Guid("fd9f1ca5-ef9b-f26a-a228-8ab82baf9b5d"),
+                            Code = "resources.leave.delete",
+                            Description = "Remove leave records",
+                            Group = "Resources",
+                            Name = "Delete Leave"
+                        },
+                        new
+                        {
+                            Id = new Guid("805ea172-9edb-bb9b-3fdd-fde364ecbe07"),
+                            Code = "resources.referrals.create",
+                            Description = "Add new referral doctors",
+                            Group = "Resources",
+                            Name = "Create Referral Doctors"
+                        },
+                        new
+                        {
+                            Id = new Guid("7415bdf8-1d07-18a7-136e-0d08cd337e2c"),
+                            Code = "resources.referrals.read",
+                            Description = "View referral doctors",
+                            Group = "Resources",
+                            Name = "Read Referral Doctors"
+                        },
+                        new
+                        {
+                            Id = new Guid("a9e36669-7b2a-d91f-10ca-d5899b40d9c9"),
+                            Code = "resources.referrals.update",
+                            Description = "Modify referral doctors",
+                            Group = "Resources",
+                            Name = "Update Referral Doctors"
+                        },
+                        new
+                        {
+                            Id = new Guid("e0083532-de12-5242-d6db-6ecf4cc91719"),
+                            Code = "resources.referrals.delete",
+                            Description = "Remove referral doctors",
+                            Group = "Resources",
+                            Name = "Delete Referral Doctors"
                         });
                 });
 

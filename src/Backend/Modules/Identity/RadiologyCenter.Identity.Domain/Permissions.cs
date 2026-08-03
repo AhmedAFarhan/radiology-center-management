@@ -111,6 +111,51 @@ public static class Permissions
     public static readonly Permission ExaminationsPerform      = Create(ExaminationsPerformCode,    "Perform Examinations",        "Start and complete examinations",                     "Examinations");
     public static readonly Permission ExaminationsCancel       = Create(ExaminationsCancelCode,     "Cancel Examinations",         "Cancel visits and examinations",                      "Examinations");
 
+    public const string StaffCreateCode      = "resources.staff.create";
+    public const string StaffReadCode        = "resources.staff.read";
+    public const string StaffUpdateCode      = "resources.staff.update";
+    public const string StaffDeleteCode      = "resources.staff.delete";
+    public static readonly Permission StaffCreate      = Create(StaffCreateCode,      "Create Staff",        "Add new staff members",             "Resources");
+    public static readonly Permission StaffRead        = Create(StaffReadCode,        "Read Staff",          "View staff members",                "Resources");
+    public static readonly Permission StaffUpdate      = Create(StaffUpdateCode,      "Update Staff",        "Modify staff members",              "Resources");
+    public static readonly Permission StaffDelete      = Create(StaffDeleteCode,      "Delete Staff",        "Remove staff members",              "Resources");
+
+    public const string EquipmentCreateCode = "resources.equipment.create";
+    public const string EquipmentReadCode   = "resources.equipment.read";
+    public const string EquipmentUpdateCode = "resources.equipment.update";
+    public const string EquipmentDeleteCode = "resources.equipment.delete";
+    public static readonly Permission EquipmentCreate = Create(EquipmentCreateCode, "Create Equipment",  "Add new equipment",                  "Resources");
+    public static readonly Permission EquipmentRead   = Create(EquipmentReadCode,   "Read Equipment",    "View equipment",                     "Resources");
+    public static readonly Permission EquipmentUpdate = Create(EquipmentUpdateCode, "Update Equipment",  "Modify equipment and its status",    "Resources");
+    public static readonly Permission EquipmentDelete = Create(EquipmentDeleteCode, "Delete Equipment",  "Remove equipment",                   "Resources");
+
+    public const string ShiftsCreateCode = "resources.shifts.create";
+    public const string ShiftsReadCode   = "resources.shifts.read";
+    public const string ShiftsUpdateCode = "resources.shifts.update";
+    public const string ShiftsDeleteCode = "resources.shifts.delete";
+    public static readonly Permission ShiftsCreate = Create(ShiftsCreateCode, "Create Work Shifts",  "Add new work shifts",   "Resources");
+    public static readonly Permission ShiftsRead   = Create(ShiftsReadCode,   "Read Work Shifts",    "View work shifts",      "Resources");
+    public static readonly Permission ShiftsUpdate = Create(ShiftsUpdateCode, "Update Work Shifts",  "Modify work shifts",    "Resources");
+    public static readonly Permission ShiftsDelete = Create(ShiftsDeleteCode, "Delete Work Shifts",  "Remove work shifts",    "Resources");
+
+    public const string LeaveCreateCode = "resources.leave.create";
+    public const string LeaveReadCode   = "resources.leave.read";
+    public const string LeaveUpdateCode = "resources.leave.update";
+    public const string LeaveDeleteCode = "resources.leave.delete";
+    public static readonly Permission LeaveCreate = Create(LeaveCreateCode, "Create Leave",  "Add new leave records",   "Resources");
+    public static readonly Permission LeaveRead   = Create(LeaveReadCode,   "Read Leave",    "View leave records",      "Resources");
+    public static readonly Permission LeaveUpdate = Create(LeaveUpdateCode, "Update Leave",  "Modify leave records",    "Resources");
+    public static readonly Permission LeaveDelete = Create(LeaveDeleteCode, "Delete Leave",  "Remove leave records",    "Resources");
+
+    public const string ReferralDoctorsCreateCode = "resources.referrals.create";
+    public const string ReferralDoctorsReadCode   = "resources.referrals.read";
+    public const string ReferralDoctorsUpdateCode = "resources.referrals.update";
+    public const string ReferralDoctorsDeleteCode = "resources.referrals.delete";
+    public static readonly Permission ReferralDoctorsCreate = Create(ReferralDoctorsCreateCode, "Create Referral Doctors",  "Add new referral doctors",   "Resources");
+    public static readonly Permission ReferralDoctorsRead   = Create(ReferralDoctorsReadCode,   "Read Referral Doctors",    "View referral doctors",      "Resources");
+    public static readonly Permission ReferralDoctorsUpdate = Create(ReferralDoctorsUpdateCode, "Update Referral Doctors",  "Modify referral doctors",    "Resources");
+    public static readonly Permission ReferralDoctorsDelete = Create(ReferralDoctorsDeleteCode, "Delete Referral Doctors",  "Remove referral doctors",    "Resources");
+
     private static readonly List<Permission> _all =
     [
         PatientsCreate, PatientsRead, PatientsUpdate, PatientsDelete,
@@ -123,7 +168,12 @@ public static class Permissions
         InventorySuppliersCreate, InventorySuppliersRead, InventorySuppliersUpdate, InventorySuppliersDelete,
         InventoryPurchaseOrdersCreate, InventoryPurchaseOrdersRead, InventoryPurchaseOrdersUpdate, InventoryPurchaseOrdersDelete,
         InventoryStockRead, InventoryStockIssue,
-        ExaminationsTypesManage, ExaminationsCreate, ExaminationsRead, ExaminationsUpdate, ExaminationsDelete, ExaminationsPerform, ExaminationsCancel
+        ExaminationsTypesManage, ExaminationsCreate, ExaminationsRead, ExaminationsUpdate, ExaminationsDelete, ExaminationsPerform, ExaminationsCancel,
+        StaffCreate, StaffRead, StaffUpdate, StaffDelete,
+        EquipmentCreate, EquipmentRead, EquipmentUpdate, EquipmentDelete,
+        ShiftsCreate, ShiftsRead, ShiftsUpdate, ShiftsDelete,
+        LeaveCreate, LeaveRead, LeaveUpdate, LeaveDelete,
+        ReferralDoctorsCreate, ReferralDoctorsRead, ReferralDoctorsUpdate, ReferralDoctorsDelete
     ];
 
     public static IReadOnlyList<Permission> All => _all.AsReadOnly();
