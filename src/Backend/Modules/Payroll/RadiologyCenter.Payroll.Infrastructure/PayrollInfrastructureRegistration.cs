@@ -18,8 +18,13 @@ public static class PayrollInfrastructureRegistration
             options.UseSqlServer(connectionString)
                    .AddInterceptors(sp.GetRequiredService<AuditSoftDeleteInterceptor>()));
 
+        services.AddScoped<ISalaryComponentRepository, SalaryComponentRepository>();
+        services.AddScoped<ISalaryRepository, SalaryRepository>();
+        services.AddScoped<IAllowanceAssignmentRepository, AllowanceAssignmentRepository>();
         services.AddScoped<IExaminationFeeRepository, ExaminationFeeRepository>();
         services.AddScoped<IReferralFeeRepository, ReferralFeeRepository>();
+        services.AddScoped<IPayRunRepository, PayRunRepository>();
+        services.AddScoped<IPayrollUnitOfWork, PayrollUnitOfWork>();
 
         return services;
     }

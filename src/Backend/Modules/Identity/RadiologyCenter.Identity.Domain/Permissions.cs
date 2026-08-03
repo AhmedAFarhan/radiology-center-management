@@ -156,6 +156,21 @@ public static class Permissions
     public static readonly Permission ReferralDoctorsUpdate = Create(ReferralDoctorsUpdateCode, "Update Referral Doctors",  "Modify referral doctors",    "Resources");
     public static readonly Permission ReferralDoctorsDelete = Create(ReferralDoctorsDeleteCode, "Delete Referral Doctors",  "Remove referral doctors",    "Resources");
 
+    public const string PayrollReadCode                    = "payroll.read";
+    public const string PayrollSalaryComponentsManageCode  = "payroll.salary-components.manage";
+    public const string PayrollSalaryManageCode            = "payroll.salary.manage";
+    public const string PayrollAllowancesManageCode        = "payroll.allowances.manage";
+    public const string PayrollFeesManageCode              = "payroll.fees.manage";
+    public const string PayrollPayRunsManageCode           = "payroll.payruns.manage";
+    public const string PayrollPayRunsRunCode              = "payroll.payruns.run";
+    public static readonly Permission PayrollRead                   = Create(PayrollReadCode,                   "Read Payroll",            "View payroll records",                           "Payroll");
+    public static readonly Permission PayrollSalaryComponentsManage = Create(PayrollSalaryComponentsManageCode, "Manage Salary Components", "Create, update, activate and delete salary components", "Payroll");
+    public static readonly Permission PayrollSalaryManage           = Create(PayrollSalaryManageCode,           "Manage Salaries",         "Create, update, activate and delete staff salaries",     "Payroll");
+    public static readonly Permission PayrollAllowancesManage       = Create(PayrollAllowancesManageCode,       "Manage Allowances",       "Create, update, activate and delete allowance assignments", "Payroll");
+    public static readonly Permission PayrollFeesManage             = Create(PayrollFeesManageCode,             "Manage Payroll Fees",     "Create, update, activate and delete examination and referral fees", "Payroll");
+    public static readonly Permission PayrollPayRunsManage          = Create(PayrollPayRunsManageCode,          "Manage Pay Runs",         "Create pay runs and manage their payslips",       "Payroll");
+    public static readonly Permission PayrollPayRunsRun             = Create(PayrollPayRunsRunCode,             "Run Pay Rolls",           "Compute, approve, reject and pay pay runs",       "Payroll");
+
     private static readonly List<Permission> _all =
     [
         PatientsCreate, PatientsRead, PatientsUpdate, PatientsDelete,
@@ -173,7 +188,8 @@ public static class Permissions
         EquipmentCreate, EquipmentRead, EquipmentUpdate, EquipmentDelete,
         ShiftsCreate, ShiftsRead, ShiftsUpdate, ShiftsDelete,
         LeaveCreate, LeaveRead, LeaveUpdate, LeaveDelete,
-        ReferralDoctorsCreate, ReferralDoctorsRead, ReferralDoctorsUpdate, ReferralDoctorsDelete
+        ReferralDoctorsCreate, ReferralDoctorsRead, ReferralDoctorsUpdate, ReferralDoctorsDelete,
+        PayrollRead, PayrollSalaryComponentsManage, PayrollSalaryManage, PayrollAllowancesManage, PayrollFeesManage, PayrollPayRunsManage, PayrollPayRunsRun
     ];
 
     public static IReadOnlyList<Permission> All => _all.AsReadOnly();

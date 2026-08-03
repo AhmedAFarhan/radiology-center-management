@@ -81,6 +81,11 @@ builder.Services.AddPayrollApplication();
 builder.Services.AddPayrollInfrastructure(builder.Configuration);
 builder.Services.AddScoped<IItemSnapshotResolver, ItemSnapshotResolver>();
 builder.Services.AddScoped<IExaminationFeeResolver, ExaminationFeeResolver>();
+builder.Services.AddScoped<RadiologyCenter.Payroll.Application.Abstractions.IPayrollStaffDirectory, PayrollStaffDirectory>();
+builder.Services.AddScoped<RadiologyCenter.Payroll.Application.Abstractions.IExaminationTypeDirectory, ExaminationTypeDirectory>();
+builder.Services.AddScoped<RadiologyCenter.Payroll.Application.Abstractions.IReferralDoctorDirectory, ReferralDoctorDirectory>();
+builder.Services.AddScoped<RadiologyCenter.Payroll.Application.Abstractions.IExamFeeIncomeResolver, PayrollFeeIncomeResolver>();
+builder.Services.AddScoped<RadiologyCenter.Payroll.Application.Abstractions.IStaffLeaveResolver, StaffLeaveDaysResolver>();
 
 var app = builder.Build();
 
