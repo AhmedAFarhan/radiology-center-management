@@ -8,7 +8,9 @@ public sealed class SalaryComponent : SoftDeletableAggregateRoot<Guid>
 {
     public string Name { get; private set; }
     public ComponentKind Kind { get; private set; }
+    public Frequency? Frequency { get; private set; }
     public bool IsPercentage { get; private set; }
+    public bool IsPerWorkDay { get; private set; }
     public decimal DefaultValue { get; private set; }
     public bool IsActive { get; private set; }
 
@@ -22,7 +24,9 @@ public sealed class SalaryComponent : SoftDeletableAggregateRoot<Guid>
         string name,
         ComponentKind kind,
         bool isPercentage = false,
-        decimal defaultValue = 0)
+        decimal defaultValue = 0,
+        Frequency? frequency = null,
+        bool isPerWorkDay = false)
     {
         Guard.AgainstNullOrWhiteSpace(name, nameof(name));
         Guard.AgainstNull(kind, nameof(kind));
@@ -34,14 +38,16 @@ public sealed class SalaryComponent : SoftDeletableAggregateRoot<Guid>
             Name = name.Trim(),
             Kind = kind,
             IsPercentage = isPercentage,
+            IsPerWorkDay = isPerWorkDay,
             DefaultValue = defaultValue,
+            Frequency = frequency,
             IsActive = true
         };
 
         return component;
     }
 
-    public void Update(string name, ComponentKind kind, bool isPercentage, decimal defaultValue)
+    public void Update(string name, ComponentKind kind, bool isPercentage, decimal defaultValue, Frequency? frequency = null, bool isPerWorkDay = false)
     {
         Guard.AgainstNullOrWhiteSpace(name, nameof(name));
         Guard.AgainstNull(kind, nameof(kind));
@@ -50,7 +56,9 @@ public sealed class SalaryComponent : SoftDeletableAggregateRoot<Guid>
         Name = name.Trim();
         Kind = kind;
         IsPercentage = isPercentage;
+        IsPerWorkDay = isPerWorkDay;
         DefaultValue = defaultValue;
+        Frequency = frequency;
     }
 
     public void Activate()
