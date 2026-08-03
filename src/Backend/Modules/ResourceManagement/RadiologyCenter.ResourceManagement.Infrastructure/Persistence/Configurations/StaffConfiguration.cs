@@ -14,8 +14,9 @@ public class StaffConfiguration : IEntityTypeConfiguration<Staff>
         builder.HasKey(s => s.Id);
 
         builder.Property(s => s.UserId).IsRequired();
-        builder.Property(s => s.EmployeeNumber).IsRequired().HasMaxLength(50);
-        builder.HasIndex(s => s.EmployeeNumber).IsUnique();
+        builder.Property(s => s.FirstName).IsRequired().HasMaxLength(100);
+        builder.Property(s => s.MiddleName).HasMaxLength(100);
+        builder.Property(s => s.LastName).IsRequired().HasMaxLength(100);
         builder.Property(s => s.PhoneNumber).IsRequired().HasMaxLength(30);
         builder.Property(s => s.Department).HasMaxLength(200);
         builder.Property(s => s.Specialization).HasMaxLength(200);

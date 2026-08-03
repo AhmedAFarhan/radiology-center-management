@@ -2,7 +2,7 @@ namespace RadiologyCenter.ResourceManagement.Application.Commands.CreateStaff;
 
 public record CreateStaffCommand(
     Guid UserId,
-    string EmployeeNumber,
+    string FullName,
     string PhoneNumber,
     string Position,
     DateTime HireDate,

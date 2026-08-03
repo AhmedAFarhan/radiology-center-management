@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using RadiologyCenter.ResourceManagement.Infrastructure.Persistence;
 
@@ -11,9 +12,11 @@ using RadiologyCenter.ResourceManagement.Infrastructure.Persistence;
 namespace RadiologyCenter.ResourceManagement.Infrastructure.Persistence.Migrations
 {
     [DbContext(typeof(ResourceManagementDbContext))]
-    partial class ResourceManagementDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260803012827_RemoveStaffEmployeeNumber")]
+    partial class RemoveStaffEmployeeNumber
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -218,11 +221,6 @@ namespace RadiologyCenter.ResourceManagement.Infrastructure.Persistence.Migratio
                         .HasMaxLength(200)
                         .HasColumnType("nvarchar(200)");
 
-                    b.Property<string>("FirstName")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
                     b.Property<DateTime>("HireDate")
                         .HasColumnType("datetime2");
 
@@ -238,16 +236,7 @@ namespace RadiologyCenter.ResourceManagement.Infrastructure.Persistence.Migratio
                     b.Property<string>("LastModifiedBy")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("LastName")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
                     b.Property<string>("LicenseNumber")
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.Property<string>("MiddleName")
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 

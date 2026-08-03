@@ -14,7 +14,7 @@ public class PurchaseOrderConfiguration : IEntityTypeConfiguration<PurchaseOrder
         builder.HasKey(p => p.Id);
 
         builder.Property(p => p.OrderNumber).IsRequired().HasMaxLength(20);
-        builder.HasIndex(p => p.OrderNumber).IsUnique();
+        builder.HasIndex(p => p.OrderNumber).IsUnique().HasFilter("[IsDeleted] = 0");
 
         builder.Property(p => p.Status)
             .HasConversion(s => s.Value, v => PurchaseOrderStatus.FromValue<PurchaseOrderStatus>(v));

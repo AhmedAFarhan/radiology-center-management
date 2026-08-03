@@ -19,7 +19,7 @@ public static class UpdateStaffCommandHandler
 
         staff.Update(
             command.UserId,
-            command.EmployeeNumber,
+            command.FullName,
             command.PhoneNumber,
             position,
             command.HireDate,

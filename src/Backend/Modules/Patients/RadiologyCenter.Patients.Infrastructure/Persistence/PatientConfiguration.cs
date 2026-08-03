@@ -18,7 +18,8 @@ public class PatientConfiguration : IEntityTypeConfiguration<Patient>
             .HasMaxLength(20);
 
         builder.HasIndex(p => p.PatientCode)
-            .IsUnique();
+            .IsUnique()
+            .HasFilter("[IsDeleted] = 0");
 
         builder.Property(p => p.FirstName).IsRequired().HasMaxLength(100);
         builder.Property(p => p.MiddleName).HasMaxLength(100);

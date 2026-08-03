@@ -14,7 +14,7 @@ public class ItemConfiguration : IEntityTypeConfiguration<Item>
         builder.HasKey(i => i.Id);
 
         builder.Property(i => i.Name).IsRequired().HasMaxLength(200);
-        builder.HasIndex(i => i.Name).IsUnique();
+        builder.HasIndex(i => i.Name).IsUnique().HasFilter("[IsDeleted] = 0");
 
         builder.Property(i => i.Brand).HasMaxLength(200);
         builder.Property(i => i.ReorderLevel).IsRequired();

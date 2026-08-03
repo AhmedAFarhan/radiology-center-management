@@ -14,7 +14,7 @@ public class ExaminationTypeConfiguration : IEntityTypeConfiguration<Examination
         builder.HasKey(t => t.Id);
 
         builder.Property(t => t.Code).IsRequired().HasMaxLength(20);
-        builder.HasIndex(t => t.Code).IsUnique();
+        builder.HasIndex(t => t.Code).IsUnique().HasFilter("[IsDeleted] = 0");
 
         builder.Property(t => t.Name).IsRequired().HasMaxLength(200);
         builder.Property(t => t.Modality)

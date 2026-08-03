@@ -3,7 +3,7 @@ namespace RadiologyCenter.ResourceManagement.Application.Commands.UpdateStaff;
 public record UpdateStaffCommand(
     Guid StaffId,
     Guid UserId,
-    string EmployeeNumber,
+    string FullName,
     string PhoneNumber,
     string Position,
     DateTime HireDate,

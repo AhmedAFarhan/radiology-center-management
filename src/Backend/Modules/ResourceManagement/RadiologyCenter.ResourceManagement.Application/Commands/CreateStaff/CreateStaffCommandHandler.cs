@@ -17,7 +17,7 @@ public static class CreateStaffCommandHandler
 
         var staff = Staff.Create(
             command.UserId,
-            command.EmployeeNumber,
+            command.FullName,
             command.PhoneNumber,
             position,
             command.HireDate,
