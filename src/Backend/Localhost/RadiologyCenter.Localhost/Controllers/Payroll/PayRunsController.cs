@@ -12,6 +12,7 @@ using RadiologyCenter.Payroll.Application.Commands.DeletePayRun;
 using RadiologyCenter.Payroll.Application.Commands.PayPayRun;
 using RadiologyCenter.Payroll.Application.Commands.RejectPayRun;
 using RadiologyCenter.Payroll.Application.Commands.RemovePayslip;
+using RadiologyCenter.Payroll.Application.Commands.RestartPayRun;
 using RadiologyCenter.Payroll.Application.DTOs;
 using RadiologyCenter.Payroll.Application.Queries.GetPayRunById;
 using RadiologyCenter.Payroll.Application.Queries.GetPayRuns;
@@ -89,6 +90,14 @@ public class PayRunsController : ControllerBase
     public async Task<IActionResult> RejectAsync(Guid id, CancellationToken ct)
     {
         var result = await _bus.InvokeAsync<Result>(new RejectPayRunCommand(id), ct);
+        return result.ToActionResult();
+    }
+
+    [HasPermission(PayrollPayRunsRunCode)]
+    [HttpPost("{id:guid}/restart")]
+    public async Task<IActionResult> RestartAsync(Guid id, CancellationToken ct)
+    {
+        var result = await _bus.InvokeAsync<Result>(new RestartPayRunCommand(id), ct);
         return result.ToActionResult();
     }
 
