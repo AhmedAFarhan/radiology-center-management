@@ -8,10 +8,10 @@ public static class AppTheme
     {
         PaletteLight = new PaletteLight
         {
-            Primary = "#1976D2",
-            PrimaryDarken = "#1565C0",
-            PrimaryLighten = "#42A5F5",
-            Secondary = "#0EA5A4",
+            Primary = "#5476FC",
+            PrimaryDarken = "#3A55D6",
+            PrimaryLighten = "#7F9BFD",
+            Secondary = "#9BB3FD",
             Tertiary = "#34A853",
             Info = "#2196F3",
             Success = "#2E7D32",
@@ -32,7 +32,7 @@ public static class AppTheme
         },
         PaletteDark = new PaletteDark
         {
-            Primary = "#90CAF9",
+            Primary = "#9BB3FD",
             Background = "#0B1220",
             Surface = "#111827",
         },
