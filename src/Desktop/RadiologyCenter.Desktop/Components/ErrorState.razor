@@ -1,0 +1,29 @@
+<MudStack AlignItems="AlignItems.Center" Spacing="1" Class="pa-6">
+    <MudIcon Icon="@Icon" Size="Size.Large" Color="@Color" />
+    <MudText Typo="Typo.subtitle1" Align="Align.Center" Class="font-weight-medium">@Title</MudText>
+    <MudText Typo="Typo.body2" Align="Align.Center" Class="text-secondary">@Message</MudText>
+    @if (Action.HasDelegate)
+    {
+        <MudButton Variant="Variant.Outlined" Color="@Color" OnClick="OnActionClick" Class="mt-2">
+            <MudIcon Icon="@Icons.Material.Filled.Refresh" Size="Size.Small" Class="mr-2" />
+            @RetryLabel
+        </MudButton>
+    }
+</MudStack>
+
+@code {
+    [Parameter] public string Icon { get; set; } = Icons.Material.Filled.ErrorOutline;
+
+    [Parameter] public Color Color { get; set; } = Color.Error;
+
+    [Parameter] public string Title { get; set; } = "Something went wrong";
+
+    [Parameter] public string Message { get; set; } = string.Empty;
+
+    [Parameter] public string RetryLabel { get; set; } = "Retry";
+
+    [Parameter] public EventCallback Action { get; set; }
+
+    private Task OnActionClick()
+        => Action.HasDelegate ? Action.InvokeAsync(null) : Task.CompletedTask;
+}

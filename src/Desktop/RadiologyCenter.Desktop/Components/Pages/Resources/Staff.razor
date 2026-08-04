@@ -5,23 +5,13 @@
 @inject ISnackbar Snackbar
 @implements IDisposable
 
-<MudToolBar Dense="true" Class="mb-4">
-    <MudText Typo="Typo.h5">Staff</MudText>
-    <MudText Typo="Typo.body2" Class="text-secondary ms-2">Manage staff members</MudText>
-    <MudSpacer />
-    <MudTextField T="string"
-                  Value="_search"
-                  ValueChanged="OnSearchChanged"
-                  Placeholder="Search staff..."
-                  Variant="Variant.Outlined"
-                  Margin="Margin.Dense"
-                  Immediate="true"
-                  Adornment="Adornment.Start"
-                  AdornmentIcon="@Icons.Material.Filled.Search"
-                  Class="search-field" />
-    <MudIconButton Icon="@Icons.Material.Filled.Refresh" Color="Color.Default" aria-label="Refresh" OnClick="ReloadAsync" />
+<PageHeader Title="Staff"
+            Subtitle="Manage staff members"
+            SearchValueChanged="OnSearchChanged"
+            SearchPlaceholder="Search staff..."
+            OnRefresh="ReloadAsync">
     <MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Add" OnClick="OpenCreateDialogAsync">Add Staff</MudButton>
-</MudToolBar>
+</PageHeader>
 
 <MudTable T="StaffDto" @ref="_table" ServerData="LoadServerData" Dense="true" Hover="true" Striped="true" Elevation="1" RowsPerPage="10">
     <HeaderContent>
@@ -57,7 +47,21 @@
         </MudTd>
     </RowTemplate>
     <NoRecordsContent>
-        <MudText Class="pa-4">No staff found.</MudText>
+        @if (_loadError is not null)
+        {
+            <ErrorState Icon="@(_offline ? Icons.Material.Filled.CloudOff : Icons.Material.Filled.ErrorOutline)"
+                        Title="Couldn't load data"
+                        Message="@_loadError"
+                        Action="ReloadAsync" />
+        }
+        else
+        {
+        <EmptyState Icon="@Icons.Material.Filled.Badge"
+                    Title="No staff members yet"
+                    Message="Add staff before assigning shifts, salaries, or payroll."
+                    ActionLabel="Add your first staff member"
+                    Action="OpenCreateDialogAsync" />
+        }
     </NoRecordsContent>
     <PagerContent>
         <MudTablePager PageSizeOptions="@(new[] { 10, 25, 50 })" />
@@ -68,6 +72,8 @@
     private MudTable<StaffDto>? _table;
     private string? _search;
     private CancellationTokenSource? _searchCts;
+    private string? _loadError;
+    private bool _offline;
 
     private async Task<TableData<StaffDto>> LoadServerData(TableState state, CancellationToken ct)
     {
@@ -81,16 +87,22 @@
                 state.PageSize,
                 ct);
 
+            _loadError = null;
+            _offline = false;
             return new TableData<StaffDto> { Items = page.Items, TotalItems = page.TotalCount };
         }
         catch (ApiException ex)
         {
             Snackbar.Add(ex.Message, Severity.Error);
+            _loadError = ex.Message;
+            _offline = false;
             return new TableData<StaffDto> { Items = Array.Empty<StaffDto>(), TotalItems = 0 };
         }
         catch (Exception)
         {
             Snackbar.Add("Unable to reach the server.", Severity.Error);
+            _loadError = "Unable to reach the server.";
+            _offline = true;
             return new TableData<StaffDto> { Items = Array.Empty<StaffDto>(), TotalItems = 0 };
         }
     }

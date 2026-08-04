@@ -6,15 +6,13 @@
         <MudText Typo="Typo.body2" Class="text-secondary mb-3">
             Assign roles to @User.UserName. This replaces their current role set. Select all roles this user should have.
         </MudText>
-        @if (_roles.Count == 0 && _loadError is null)
+        @if (_loadError is not null)
         {
-            <div class="d-flex justify-content-center pa-4">
-                <MudProgressCircular Indeterminate="true" />
-            </div>
+            <ErrorState Title="Couldn't load roles" Message="@_loadError" />
         }
-        else if (_loadError is not null)
+        else if (_roles.Count == 0)
         {
-            <MudText Color="Color.Error">@_loadError</MudText>
+            <PageSkeleton Rows="4" />
         }
         else
         {

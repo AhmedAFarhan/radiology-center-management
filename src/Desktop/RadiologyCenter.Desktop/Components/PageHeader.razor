@@ -1,0 +1,50 @@
+<MudToolBar Dense="true" Class="mb-4">
+    <MudText Typo="Typo.h5">@Title</MudText>
+    @if (!string.IsNullOrWhiteSpace(Subtitle))
+    {
+        <MudText Typo="Typo.body2" Class="text-secondary ms-2">@Subtitle</MudText>
+    }
+    <MudSpacer />
+    @if (ShowSearch)
+    {
+        <MudTextField T="string"
+                      Value="@_search"
+                      ValueChanged="OnLocalSearchChanged"
+                      Placeholder="@SearchPlaceholder"
+                      Variant="Variant.Outlined"
+                      Margin="Margin.Dense"
+                      Immediate="true"
+                      Adornment="Adornment.Start"
+                      AdornmentIcon="@Icons.Material.Filled.Search"
+                      Class="search-field" />
+    }
+    @if (OnRefresh is not null)
+    {
+        <MudIconButton Icon="@Icons.Material.Filled.Refresh" Color="Color.Default" aria-label="Refresh" OnClick="OnRefresh" />
+    }
+    @ChildContent
+</MudToolBar>
+
+@code {
+    [Parameter] public string Title { get; set; } = string.Empty;
+
+    [Parameter] public string Subtitle { get; set; } = string.Empty;
+
+    [Parameter] public string SearchPlaceholder { get; set; } = "Search...";
+
+    [Parameter] public EventCallback<string?> SearchValueChanged { get; set; }
+
+    [Parameter] public bool ShowSearch { get; set; } = true;
+
+    [Parameter] public Func<Task>? OnRefresh { get; set; }
+
+    [Parameter] public RenderFragment? ChildContent { get; set; }
+
+    private string? _search;
+
+    private Task OnLocalSearchChanged(string value)
+    {
+        _search = value;
+        return SearchValueChanged.InvokeAsync(value);
+    }
+}

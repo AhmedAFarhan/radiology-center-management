@@ -1,0 +1,26 @@
+<MudStack AlignItems="AlignItems.Center" Spacing="1" Class="pa-6">
+    <MudIcon Icon="@Icon" Size="Size.Large" Color="@Color" />
+    <MudText Typo="Typo.subtitle1" Align="Align.Center" Class="font-weight-medium">@Title</MudText>
+    <MudText Typo="Typo.body2" Align="Align.Center" Class="text-secondary">@Message</MudText>
+    @if (Action.HasDelegate)
+    {
+        <MudButton Variant="Variant.Text" Color="Color.Primary" OnClick="OnActionClick" Class="mt-2">@ActionLabel</MudButton>
+    }
+</MudStack>
+
+@code {
+    [Parameter] public string Icon { get; set; } = Icons.Material.Filled.Inbox;
+
+    [Parameter] public Color Color { get; set; } = Color.Default;
+
+    [Parameter] public string Title { get; set; } = "Nothing here yet";
+
+    [Parameter] public string Message { get; set; } = string.Empty;
+
+    [Parameter] public string ActionLabel { get; set; } = string.Empty;
+
+    [Parameter] public EventCallback Action { get; set; }
+
+    private Task OnActionClick()
+        => Action.HasDelegate ? Action.InvokeAsync(null) : Task.CompletedTask;
+}

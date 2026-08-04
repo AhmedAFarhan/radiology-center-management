@@ -7,23 +7,13 @@
 @inject ISnackbar Snackbar
 @implements IDisposable
 
-<MudToolBar Dense="true" Class="mb-4">
-    <MudText Typo="Typo.h5">Referral Fees</MudText>
-    <MudText Typo="Typo.body2" Class="text-secondary ms-2">Fees paid to referring doctors</MudText>
-    <MudSpacer />
-    <MudTextField T="string"
-                  Value="_search"
-                  ValueChanged="OnSearchChanged"
-                  Placeholder="Search fees..."
-                  Variant="Variant.Outlined"
-                  Margin="Margin.Dense"
-                  Immediate="true"
-                  Adornment="Adornment.Start"
-                  AdornmentIcon="@Icons.Material.Filled.Search"
-                  Class="search-field" />
-    <MudIconButton Icon="@Icons.Material.Filled.Refresh" Color="Color.Default" aria-label="Refresh" OnClick="ReloadAsync" />
+<PageHeader Title="Referral Fees"
+            Subtitle="Fees paid to referring doctors"
+            SearchValueChanged="OnSearchChanged"
+            SearchPlaceholder="Search fees..."
+            OnRefresh="ReloadAsync">
     <MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Add" OnClick="OpenCreateDialogAsync">New Fee</MudButton>
-</MudToolBar>
+</PageHeader>
 
 <MudTable T="ReferralFeeDto" @ref="_table" ServerData="LoadServerData" Dense="true" Hover="true" Striped="true" Elevation="1" RowsPerPage="10">
     <HeaderContent>
@@ -57,7 +47,21 @@
         </MudTd>
     </RowTemplate>
     <NoRecordsContent>
-        <MudText Class="pa-4">No referral fees found.</MudText>
+        @if (_loadError is not null)
+        {
+            <ErrorState Icon="@(_offline ? Icons.Material.Filled.CloudOff : Icons.Material.Filled.ErrorOutline)"
+                        Title="Couldn't load data"
+                        Message="@_loadError"
+                        Action="ReloadAsync" />
+        }
+        else
+        {
+        <EmptyState Icon="@Icons.Material.Filled.LocalHospital"
+                    Title="No referral fees yet"
+                    Message="Set referral fees to pay referring doctors for examinations."
+                    ActionLabel="Create your first fee"
+                    Action="OpenCreateDialogAsync" />
+        }
     </NoRecordsContent>
     <PagerContent>
         <MudTablePager PageSizeOptions="@(new[] { 10, 25, 50 })" />
@@ -68,6 +72,8 @@
     private MudTable<ReferralFeeDto>? _table;
     private string? _search;
     private CancellationTokenSource? _searchCts;
+    private string? _loadError;
+    private bool _offline;
     private IReadOnlyDictionary<string, string> _doctorNames = new Dictionary<string, string>();
     private IReadOnlyDictionary<string, string> _examTypeNames = new Dictionary<string, string>();
 
@@ -96,11 +102,15 @@
         catch (ApiException ex)
         {
             Snackbar.Add(ex.Message, Severity.Error);
+            _loadError = ex.Message;
+            _offline = false;
             return new TableData<ReferralFeeDto> { Items = Array.Empty<ReferralFeeDto>(), TotalItems = 0 };
         }
         catch (Exception)
         {
             Snackbar.Add("Unable to reach the server.", Severity.Error);
+            _loadError = "Unable to reach the server.";
+            _offline = true;
             return new TableData<ReferralFeeDto> { Items = Array.Empty<ReferralFeeDto>(), TotalItems = 0 };
         }
     }

@@ -7,7 +7,7 @@
     <DialogContent>
         @if (_payRun is null)
         {
-            <MudProgressCircular Indeterminate="true" Class="mx-auto d-block my-8" />
+            <PageSkeleton Rows="6" />
         }
         else
         {
@@ -323,9 +323,9 @@
         }
     }
 
-    private async Task RunLifecycleAsync(string verb, string confirmTitle, string confirmMessage)
+    private async Task RunLifecycleAsync(string verb, string confirmTitle, string confirmMessage, string confirmOk)
     {
-        var confirmed = await DialogService.ShowMessageBoxAsync(confirmTitle, confirmMessage, "Continue", "Cancel");
+        var confirmed = await DialogService.ShowMessageBoxAsync(confirmTitle, confirmMessage, confirmOk, "Cancel");
         if (confirmed != true)
             return;
 
@@ -358,11 +358,11 @@
         }
     }
 
-    private Task ComputeAsync() => RunLifecycleAsync("compute", "Compute Pay Run", "Generate payslips for all active staff in this period?");
-    private Task ApproveAsync() => RunLifecycleAsync("approve", "Approve Pay Run", "Approve this pay run for payment?");
-    private Task RejectAsync() => RunLifecycleAsync("reject", "Reject Pay Run", "Send this pay run back for review?");
-    private Task RestartAsync() => RunLifecycleAsync("restart", "Restart Pay Run", "Reopen this pay run as a draft?");
-    private Task PayAsync() => RunLifecycleAsync("pay", "Pay Pay Run", "Mark this pay run as paid? This cannot be undone.");
+    private Task ComputeAsync() => RunLifecycleAsync("compute", "Compute Pay Run", "Generate payslips for all active staff in this period?", "Compute");
+    private Task ApproveAsync() => RunLifecycleAsync("approve", "Approve Pay Run", "Approve this pay run for payment?", "Approve");
+    private Task RejectAsync() => RunLifecycleAsync("reject", "Reject Pay Run", "Send this pay run back for review?", "Reject");
+    private Task RestartAsync() => RunLifecycleAsync("restart", "Restart Pay Run", "Reopen this pay run as a draft?", "Restart");
+    private Task PayAsync() => RunLifecycleAsync("pay", "Pay Pay Run", "Mark this pay run as paid? This cannot be undone.", "Pay");
 
     private void CloseAsync()
         => MudDialog.Close(DialogResult.Ok(true));

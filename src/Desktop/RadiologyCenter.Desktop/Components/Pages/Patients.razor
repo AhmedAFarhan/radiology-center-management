@@ -5,23 +5,13 @@
 @inject ISnackbar Snackbar
 @implements IDisposable
 
-<MudToolBar Dense="true" Class="mb-4">
-    <MudText Typo="Typo.h5">Patients</MudText>
-    <MudText Typo="Typo.body2" Class="text-secondary ms-2">Manage patient records</MudText>
-    <MudSpacer />
-    <MudTextField T="string"
-                  Value="_search"
-                  ValueChanged="OnSearchChanged"
-                  Placeholder="Search patients..."
-                  Variant="Variant.Outlined"
-                  Margin="Margin.Dense"
-                  Immediate="true"
-                  Adornment="Adornment.Start"
-                  AdornmentIcon="@Icons.Material.Filled.Search"
-                  Class="search-field" />
-    <MudIconButton Icon="@Icons.Material.Filled.Refresh" Color="Color.Default" aria-label="Refresh" OnClick="ReloadAsync" />
+<PageHeader Title="Patients"
+            Subtitle="Manage patient records"
+            SearchValueChanged="OnSearchChanged"
+            SearchPlaceholder="Search patients..."
+            OnRefresh="ReloadAsync">
     <MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Add" OnClick="OpenCreateDialogAsync">Add Patient</MudButton>
-</MudToolBar>
+</PageHeader>
 
 <MudTable T="PatientDto" @ref="_table" ServerData="LoadServerData" Dense="true" Hover="true" Striped="true" Elevation="1" RowsPerPage="10">
     <HeaderContent>
@@ -55,7 +45,21 @@
         </MudTd>
     </RowTemplate>
     <NoRecordsContent>
-        <MudText Class="pa-4">No patients found.</MudText>
+        @if (_loadError is not null)
+        {
+            <ErrorState Icon="@(_offline ? Icons.Material.Filled.CloudOff : Icons.Material.Filled.ErrorOutline)"
+                        Title="Couldn't load data"
+                        Message="@_loadError"
+                        Action="ReloadAsync" />
+        }
+        else
+        {
+        <EmptyState Icon="@Icons.Material.Filled.Person"
+                    Title="No patients yet"
+                    Message="Add patients to start booking visits and examinations."
+                    ActionLabel="Add your first patient"
+                    Action="OpenCreateDialogAsync" />
+        }
     </NoRecordsContent>
     <PagerContent>
         <MudTablePager PageSizeOptions="@(new[] { 10, 25, 50 })" />
@@ -66,6 +70,8 @@
     private MudTable<PatientDto>? _table;
     private string? _search;
     private CancellationTokenSource? _searchCts;
+    private string? _loadError;
+    private bool _offline;
 
     private async Task<TableData<PatientDto>> LoadServerData(TableState state, CancellationToken ct)
     {
@@ -79,16 +85,22 @@
                 state.PageSize,
                 ct);
 
+            _loadError = null;
+            _offline = false;
             return new TableData<PatientDto> { Items = page.Items, TotalItems = page.TotalCount };
         }
         catch (ApiException ex)
         {
             Snackbar.Add(ex.Message, Severity.Error);
+            _loadError = ex.Message;
+            _offline = false;
             return new TableData<PatientDto> { Items = Array.Empty<PatientDto>(), TotalItems = 0 };
         }
         catch (Exception)
         {
             Snackbar.Add("Unable to reach the server.", Severity.Error);
+            _loadError = "Unable to reach the server.";
+            _offline = true;
             return new TableData<PatientDto> { Items = Array.Empty<PatientDto>(), TotalItems = 0 };
         }
     }

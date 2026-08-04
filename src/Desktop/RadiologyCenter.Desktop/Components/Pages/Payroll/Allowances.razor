@@ -6,23 +6,13 @@
 @inject ISnackbar Snackbar
 @implements IDisposable
 
-<MudToolBar Dense="true" Class="mb-4">
-    <MudText Typo="Typo.h5">Allowances</MudText>
-    <MudText Typo="Typo.body2" Class="text-secondary ms-2">Employee-specific allowance assignments</MudText>
-    <MudSpacer />
-    <MudTextField T="string"
-                  Value="_search"
-                  ValueChanged="OnSearchChanged"
-                  Placeholder="Search allowances..."
-                  Variant="Variant.Outlined"
-                  Margin="Margin.Dense"
-                  Immediate="true"
-                  Adornment="Adornment.Start"
-                  AdornmentIcon="@Icons.Material.Filled.Search"
-                  Class="search-field" />
-    <MudIconButton Icon="@Icons.Material.Filled.Refresh" Color="Color.Default" aria-label="Refresh" OnClick="ReloadAsync" />
+<PageHeader Title="Allowances"
+            Subtitle="Employee-specific allowance assignments"
+            SearchValueChanged="OnSearchChanged"
+            SearchPlaceholder="Search allowances..."
+            OnRefresh="ReloadAsync">
     <MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Add" OnClick="OpenCreateDialogAsync">New Allowance</MudButton>
-</MudToolBar>
+</PageHeader>
 
 <MudTable T="AllowanceAssignmentDto" @ref="_table" ServerData="LoadServerData" Dense="true" Hover="true" Striped="true" Elevation="1" RowsPerPage="10">
     <HeaderContent>
@@ -69,7 +59,21 @@
         </MudTd>
     </RowTemplate>
     <NoRecordsContent>
-        <MudText Class="pa-4">No allowances found.</MudText>
+        @if (_loadError is not null)
+        {
+            <ErrorState Icon="@(_offline ? Icons.Material.Filled.CloudOff : Icons.Material.Filled.ErrorOutline)"
+                        Title="Couldn't load data"
+                        Message="@_loadError"
+                        Action="ReloadAsync" />
+        }
+        else
+        {
+        <EmptyState Icon="@Icons.Material.Filled.AttachMoney"
+                    Title="No allowances yet"
+                    Message="Assign allowances to employees to include them in payroll."
+                    ActionLabel="Create your first allowance"
+                    Action="OpenCreateDialogAsync" />
+        }
     </NoRecordsContent>
     <PagerContent>
         <MudTablePager PageSizeOptions="@(new[] { 10, 25, 50 })" />
@@ -80,6 +84,8 @@
     private MudTable<AllowanceAssignmentDto>? _table;
     private string? _search;
     private CancellationTokenSource? _searchCts;
+    private string? _loadError;
+    private bool _offline;
     private IReadOnlyDictionary<string, string> _staffNames = new Dictionary<string, string>();
 
     private async Task<TableData<AllowanceAssignmentDto>> LoadServerData(TableState state, CancellationToken ct)
@@ -105,11 +111,15 @@
         catch (ApiException ex)
         {
             Snackbar.Add(ex.Message, Severity.Error);
+            _loadError = ex.Message;
+            _offline = false;
             return new TableData<AllowanceAssignmentDto> { Items = Array.Empty<AllowanceAssignmentDto>(), TotalItems = 0 };
         }
         catch (Exception)
         {
             Snackbar.Add("Unable to reach the server.", Severity.Error);
+            _loadError = "Unable to reach the server.";
+            _offline = true;
             return new TableData<AllowanceAssignmentDto> { Items = Array.Empty<AllowanceAssignmentDto>(), TotalItems = 0 };
         }
     }

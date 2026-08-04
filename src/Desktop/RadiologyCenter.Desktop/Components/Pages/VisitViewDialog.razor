@@ -6,17 +6,11 @@
     <DialogContent>
         @if (_loading)
         {
-            <div class="d-flex justify-content-center pa-6">
-                <MudProgressCircular Indeterminate="true" />
-            </div>
+            <PageSkeleton Rows="4" />
         }
         else if (_loadError is not null)
         {
-            <MudPaper Class="pa-4 text-center">
-                <MudIcon Icon="@Icons.Material.Filled.CloudOff" Size="Size.Large" Color="Color.Error" />
-                <MudText Class="mt-2">@_loadError</MudText>
-                <MudButton Color="Color.Primary" Variant="Variant.Filled" Class="mt-2" OnClick="LoadAsync">Retry</MudButton>
-            </MudPaper>
+            <ErrorState Title="Couldn't load visit" Message="@_loadError" Action="LoadAsync" />
         }
         else if (_visit is not null)
         {
