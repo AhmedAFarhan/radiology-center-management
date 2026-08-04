@@ -25,14 +25,12 @@ public static class AddPayslipCommandHandler
         if (draft is null)
             return Result.Failure<PayslipDto>(Error.Failure("Unable to calculate a payslip for the given staff."));
 
-        var payslip = payRun.AddPayslip(
+        var payslip = payRun.SetPayslipDraft(
             draft.StaffId,
             draft.BaseSalary,
             draft.UnpaidLeaveDays,
-            draft.UnpaidLeaveDeduction);
-
-        foreach (var component in draft.Components)
-            payslip.AddComponent(component.Name, component.Amount, component.IsDeduction);
+            draft.UnpaidLeaveDeduction,
+            draft.Components.Select(c => (c.Name, c.Amount, c.IsDeduction)).ToList());
 
         await unitOfWork.SaveChangesAsync(ct);
 

@@ -1,22 +1,19 @@
 using RadiologyCenter.Payroll.Application.Abstractions;
+using RadiologyCenter.Payroll.Application.Commands.Common;
 
 namespace RadiologyCenter.Payroll.Application.Commands.DeleteAllowanceAssignment;
 
 public static class DeleteAllowanceAssignmentCommandHandler
 {
-    public static async Task<Result> HandleAsync(
+    public static Task<Result> HandleAsync(
         DeleteAllowanceAssignmentCommand command,
-        IAllowanceAssignmentRepository allowanceAssignmentRepository,
+        IAllowanceAssignmentRepository repository,
         IPayrollUnitOfWork unitOfWork,
-        CancellationToken ct)
-    {
-        var assignment = await allowanceAssignmentRepository.GetByIdAsync(command.Id, ct);
-        if (assignment is null)
-            return Result.Failure(Error.NotFound("AllowanceAssignment", command.Id));
-
-        allowanceAssignmentRepository.Remove(assignment);
-        await unitOfWork.SaveChangesAsync(ct);
-
-        return Result.Success();
-    }
+        CancellationToken ct) =>
+        EntityCommands.DeleteAsync(
+            repository,
+            unitOfWork,
+            command.Id,
+            "AllowanceAssignment",
+            ct);
 }

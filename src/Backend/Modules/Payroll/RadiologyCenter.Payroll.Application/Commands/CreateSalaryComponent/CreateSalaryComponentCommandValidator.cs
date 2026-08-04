@@ -11,11 +11,6 @@ public class CreateSalaryComponentCommandValidator : AbstractValidator<CreateSal
         RuleFor(x => x.Name).NotEmpty().MaximumLength(100);
         RuleFor(x => x.Kind).NotEmpty().IsEnumerationMember<ComponentKind, CreateSalaryComponentCommand>("Kind");
         RuleFor(x => x.DefaultValue).GreaterThanOrEqualTo(0);
-        RuleFor(x => x.Frequency)
-            .Must(BeValidFrequency)
-            .WithMessage($"Frequency must be one of: {string.Join(", ", Frequency.GetAll<Frequency>().Select(f => f.Name))}.");
+        RuleFor(x => x.Frequency).IsEnumerationMemberOrEmpty<Frequency, CreateSalaryComponentCommand>("Frequency");
     }
-
-    private static bool BeValidFrequency(string? frequency) =>
-        string.IsNullOrWhiteSpace(frequency) || Frequency.GetAll<Frequency>().Any(f => f.Name.Equals(frequency, StringComparison.OrdinalIgnoreCase));
 }

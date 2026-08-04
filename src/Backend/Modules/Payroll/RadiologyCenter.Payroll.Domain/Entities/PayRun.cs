@@ -48,7 +48,9 @@ public sealed class PayRun : SoftDeletableAggregateRoot<Guid>
     {
         EnsureEditable();
         if (_payslips.Any(p => p.StaffId == staffId))
-            throw new DomainException($"Staff '{staffId}' already has a payslip in pay run '{Id}'.");
+            throw new BusinessRuleViolationException(
+                "DuplicatePayslip",
+                $"Staff '{staffId}' already has a payslip in pay run '{Id}'.");
 
         var payslip = Payslip.Create(Id, staffId, grossSalary, unpaidLeaveDays, unpaidLeaveDeduction, notes);
         _payslips.Add(payslip);
@@ -61,6 +63,29 @@ public sealed class PayRun : SoftDeletableAggregateRoot<Guid>
         var payslip = _payslips.FirstOrDefault(p => p.StaffId == staffId)
             ?? throw new DomainException($"Staff '{staffId}' has no payslip in pay run '{Id}'.");
         _payslips.Remove(payslip);
+    }
+
+    public Payslip SetPayslipDraft(
+        Guid staffId,
+        decimal baseSalary,
+        int unpaidLeaveDays,
+        decimal unpaidLeaveDeduction,
+        IReadOnlyList<(string Name, decimal Amount, bool IsDeduction)> components)
+    {
+        if (TryGetPayslip(staffId, out var existing))
+            RemovePayslip(staffId);
+
+        var payslip = AddPayslip(staffId, baseSalary, unpaidLeaveDays, unpaidLeaveDeduction);
+        foreach (var (name, amount, isDeduction) in components)
+            payslip.AddComponent(name, amount, isDeduction);
+
+        return payslip;
+    }
+
+    private bool TryGetPayslip(Guid staffId, out Payslip payslip)
+    {
+        payslip = _payslips.FirstOrDefault(p => p.StaffId == staffId)!;
+        return payslip is not null;
     }
 
     public void Compute(string? by = null)
@@ -87,6 +112,14 @@ public sealed class PayRun : SoftDeletableAggregateRoot<Guid>
         ProcessedAt = DateTime.UtcNow;
     }
 
+    public void Restart(string? by = null)
+    {
+        EnsureStatus(PayRunStatus.Rejected);
+        Status = PayRunStatus.Draft;
+        ProcessedBy = by;
+        ProcessedAt = null;
+    }
+
     public void Pay(string? by = null)
     {
         EnsureStatus(PayRunStatus.Approved, PayRunStatus.Paid);
@@ -98,12 +131,16 @@ public sealed class PayRun : SoftDeletableAggregateRoot<Guid>
     private void EnsureEditable()
     {
         if (Status != PayRunStatus.Draft)
-            throw new DomainException($"Pay run '{Id}' is {Status.Name} and cannot be modified.");
+            throw new BusinessRuleViolationException(
+                "PayRunNotEditable",
+                $"Pay run '{Id}' is {Status.Name} and cannot be modified.");
     }
 
     private void EnsureStatus(params PayRunStatus[] allowed)
     {
         if (!allowed.Contains(Status))
-            throw new DomainException($"Pay run '{Id}' is {Status.Name} and cannot transition to this state.");
+            throw new BusinessRuleViolationException(
+                "InvalidPayRunTransition",
+                $"Pay run '{Id}' is {Status.Name} and cannot transition to this state.");
     }
 }

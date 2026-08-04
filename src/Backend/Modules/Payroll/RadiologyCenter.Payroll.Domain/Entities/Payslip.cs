@@ -58,7 +58,9 @@ public sealed class Payslip : Entity<Guid>
     public void RemoveComponent(Guid componentId)
     {
         var component = _components.FirstOrDefault(c => c.Id == componentId)
-            ?? throw new DomainException($"Payslip component '{componentId}' not found on payslip '{Id}'.");
+            ?? throw new BusinessRuleViolationException(
+                "PayslipComponentNotFound",
+                $"Payslip component '{componentId}' not found on payslip '{Id}'.");
         _components.Remove(component);
     }
 }

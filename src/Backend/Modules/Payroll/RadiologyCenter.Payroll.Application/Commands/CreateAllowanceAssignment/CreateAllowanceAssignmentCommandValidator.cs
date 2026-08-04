@@ -1,4 +1,5 @@
 using FluentValidation;
+using RadiologyCenter.BuildingBlocks.Application.Validation;
 using RadiologyCenter.Payroll.Domain.Enumerations;
 
 namespace RadiologyCenter.Payroll.Application.Commands.CreateAllowanceAssignment;
@@ -14,11 +15,6 @@ public class CreateAllowanceAssignmentCommandValidator : AbstractValidator<Creat
         RuleFor(x => x.EndDate)
             .GreaterThanOrEqualTo(x => x.EffectiveDate)
             .When(x => x.EndDate.HasValue);
-        RuleFor(x => x.Frequency)
-            .Must(BeValidFrequency)
-            .WithMessage($"Frequency must be one of: {string.Join(", ", Frequency.GetAll<Frequency>().Select(f => f.Name))}.");
+        RuleFor(x => x.Frequency).IsEnumerationMemberOrEmpty<Frequency, CreateAllowanceAssignmentCommand>("Frequency");
     }
-
-    private static bool BeValidFrequency(string? frequency) =>
-        string.IsNullOrWhiteSpace(frequency) || Frequency.GetAll<Frequency>().Any(f => f.Name.Equals(frequency, StringComparison.OrdinalIgnoreCase));
 }

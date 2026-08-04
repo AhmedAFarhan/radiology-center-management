@@ -1,23 +1,20 @@
 using RadiologyCenter.Payroll.Application.Abstractions;
+using RadiologyCenter.Payroll.Application.Commands.Common;
 
 namespace RadiologyCenter.Payroll.Application.Commands.DeactivateReferralFee;
 
 public static class DeactivateReferralFeeCommandHandler
 {
-    public static async Task<Result> HandleAsync(
+    public static Task<Result> HandleAsync(
         DeactivateReferralFeeCommand command,
-        IReferralFeeRepository referralFeeRepository,
+        IReferralFeeRepository repository,
         IPayrollUnitOfWork unitOfWork,
-        CancellationToken ct)
-    {
-        var fee = await referralFeeRepository.GetByIdAsync(command.Id, ct);
-        if (fee is null)
-            return Result.Failure(Error.NotFound("ReferralFee", command.Id));
-
-        fee.Deactivate();
-        referralFeeRepository.Update(fee);
-        await unitOfWork.SaveChangesAsync(ct);
-
-        return Result.Success();
-    }
+        CancellationToken ct) =>
+        EntityCommands.SetActiveAsync(
+            repository,
+            unitOfWork,
+            command.Id,
+            "ReferralFee",
+            fee => fee.Deactivate(),
+            ct);
 }

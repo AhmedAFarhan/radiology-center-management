@@ -1,24 +1,20 @@
 using RadiologyCenter.Payroll.Application.Abstractions;
+using RadiologyCenter.Payroll.Application.Commands.Common;
 
 namespace RadiologyCenter.Payroll.Application.Commands.UpdateReferralFee;
 
 public static class UpdateReferralFeeCommandHandler
 {
-    public static async Task<Result> HandleAsync(
+    public static Task<Result> HandleAsync(
         UpdateReferralFeeCommand command,
         IReferralFeeRepository referralFeeRepository,
         IPayrollUnitOfWork unitOfWork,
-        CancellationToken ct)
-    {
-        var fee = await referralFeeRepository.GetByIdAsync(command.Id, ct);
-        if (fee is null)
-            return Result.Failure(Error.NotFound("ReferralFee", command.Id));
-
-        fee.Update(command.Amount, command.IsPercentage);
-
-        referralFeeRepository.Update(fee);
-        await unitOfWork.SaveChangesAsync(ct);
-
-        return Result.Success();
-    }
+        CancellationToken ct) =>
+        EntityCommands.UpdateAsync(
+            referralFeeRepository,
+            unitOfWork,
+            command.Id,
+            "ReferralFee",
+            fee => fee.Update(command.Amount, command.IsPercentage),
+            ct);
 }

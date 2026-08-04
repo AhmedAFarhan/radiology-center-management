@@ -1,30 +1,34 @@
 using RadiologyCenter.Payroll.Application.Abstractions;
+using RadiologyCenter.Payroll.Application.Commands.Common;
 using RadiologyCenter.Payroll.Domain.Enumerations;
 
 namespace RadiologyCenter.Payroll.Application.Commands.UpdateSalaryComponent;
 
 public static class UpdateSalaryComponentCommandHandler
 {
-    public static async Task<Result> HandleAsync(
+    public static Task<Result> HandleAsync(
         UpdateSalaryComponentCommand command,
         ISalaryComponentRepository salaryComponentRepository,
         IPayrollUnitOfWork unitOfWork,
-        CancellationToken ct)
-    {
-        var component = await salaryComponentRepository.GetByIdAsync(command.SalaryComponentId, ct);
-        if (component is null)
-            return Result.Failure(Error.NotFound("SalaryComponent", command.SalaryComponentId));
+        CancellationToken ct) =>
+        EntityCommands.UpdateAsync(
+            salaryComponentRepository,
+            unitOfWork,
+            command.SalaryComponentId,
+            "SalaryComponent",
+            component =>
+            {
+                var frequency = string.IsNullOrWhiteSpace(command.Frequency)
+                    ? null
+                    : Frequency.FromName<Frequency>(command.Frequency);
 
-        var kind = ComponentKind.FromName<ComponentKind>(command.Kind);
-        var frequency = string.IsNullOrWhiteSpace(command.Frequency)
-            ? null
-            : Frequency.FromName<Frequency>(command.Frequency);
-
-        component.Update(command.Name, kind, command.IsPercentage, command.DefaultValue, frequency, command.IsPerWorkDay);
-
-        salaryComponentRepository.Update(component);
-        await unitOfWork.SaveChangesAsync(ct);
-
-        return Result.Success();
-    }
+                component.Update(
+                    command.Name,
+                    ComponentKind.FromName<ComponentKind>(command.Kind),
+                    command.IsPercentage,
+                    command.DefaultValue,
+                    frequency,
+                    command.IsPerWorkDay);
+            },
+            ct);
 }

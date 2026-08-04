@@ -1,23 +1,20 @@
 using RadiologyCenter.Payroll.Application.Abstractions;
+using RadiologyCenter.Payroll.Application.Commands.Common;
 
 namespace RadiologyCenter.Payroll.Application.Commands.ActivateExaminationFee;
 
 public static class ActivateExaminationFeeCommandHandler
 {
-    public static async Task<Result> HandleAsync(
+    public static Task<Result> HandleAsync(
         ActivateExaminationFeeCommand command,
-        IExaminationFeeRepository examinationFeeRepository,
+        IExaminationFeeRepository repository,
         IPayrollUnitOfWork unitOfWork,
-        CancellationToken ct)
-    {
-        var fee = await examinationFeeRepository.GetByIdAsync(command.Id, ct);
-        if (fee is null)
-            return Result.Failure(Error.NotFound("ExaminationFee", command.Id));
-
-        fee.Activate();
-        examinationFeeRepository.Update(fee);
-        await unitOfWork.SaveChangesAsync(ct);
-
-        return Result.Success();
-    }
+        CancellationToken ct) =>
+        EntityCommands.SetActiveAsync(
+            repository,
+            unitOfWork,
+            command.Id,
+            "ExaminationFee",
+            fee => fee.Activate(),
+            ct);
 }

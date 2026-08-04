@@ -1,22 +1,19 @@
 using RadiologyCenter.Payroll.Application.Abstractions;
+using RadiologyCenter.Payroll.Application.Commands.Common;
 
 namespace RadiologyCenter.Payroll.Application.Commands.DeleteSalaryComponent;
 
 public static class DeleteSalaryComponentCommandHandler
 {
-    public static async Task<Result> HandleAsync(
+    public static Task<Result> HandleAsync(
         DeleteSalaryComponentCommand command,
-        ISalaryComponentRepository salaryComponentRepository,
+        ISalaryComponentRepository repository,
         IPayrollUnitOfWork unitOfWork,
-        CancellationToken ct)
-    {
-        var component = await salaryComponentRepository.GetByIdAsync(command.Id, ct);
-        if (component is null)
-            return Result.Failure(Error.NotFound("SalaryComponent", command.Id));
-
-        salaryComponentRepository.Remove(component);
-        await unitOfWork.SaveChangesAsync(ct);
-
-        return Result.Success();
-    }
+        CancellationToken ct) =>
+        EntityCommands.DeleteAsync(
+            repository,
+            unitOfWork,
+            command.Id,
+            "SalaryComponent",
+            ct);
 }

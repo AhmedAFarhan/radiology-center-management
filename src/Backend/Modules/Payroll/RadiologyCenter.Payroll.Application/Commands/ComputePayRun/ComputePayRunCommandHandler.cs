@@ -25,21 +25,16 @@ public static class ComputePayRunCommandHandler
 
         foreach (var staffId in staffIds)
         {
-            if (payRun.Payslips.Any(ps => ps.StaffId == staffId))
-                continue;
-
             var draft = await payslipCalculator.CalculateAsync(staffId, payRun.RunFrom, payRun.RunTo, ct);
             if (draft is null)
                 continue;
 
-            var payslip = payRun.AddPayslip(
+            payRun.SetPayslipDraft(
                 draft.StaffId,
                 draft.BaseSalary,
                 draft.UnpaidLeaveDays,
-                draft.UnpaidLeaveDeduction);
-
-            foreach (var component in draft.Components)
-                payslip.AddComponent(component.Name, component.Amount, component.IsDeduction);
+                draft.UnpaidLeaveDeduction,
+                draft.Components.Select(c => (c.Name, c.Amount, c.IsDeduction)).ToList());
         }
 
         payRun.Compute(currentUser.Name ?? currentUser.Id);
