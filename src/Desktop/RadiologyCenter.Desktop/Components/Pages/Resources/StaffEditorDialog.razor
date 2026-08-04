@@ -1,0 +1,266 @@
+@inject ResourceService ResourceService
+@inject IdentityService IdentityService
+@inject ISnackbar Snackbar
+
+<MudDialog>
+    <DialogContent>
+        <EditForm EditContext="_editContext">
+            <DataAnnotationsValidator />
+            <MudGrid Spacing="2">
+                <MudItem xs="12">
+                    <MudAutocomplete T="UserDto"
+                                     @bind-Value="_selectedUser"
+                                     Label="User account (search by name or username)"
+                                     Variant="Variant.Outlined"
+                                     Margin="Margin.Dense"
+                                     MinCharacters="1"
+                                     DebounceInterval="300"
+                                     SearchFunc="SearchUsersAsync"
+                                     ToStringFunc="@(u => u is null ? string.Empty : $"{u.FullName} ({u.UserName})")"
+                                     Clearable="true"
+                                     Disabled="_busy" />
+                </MudItem>
+                <MudItem xs="12">
+                    <MudTextField @bind-Value="_model.FullName"
+                                  Label="Full Name"
+                                  Variant="Variant.Outlined"
+                                  Margin="Margin.Dense"
+                                  Immediate="true"
+                                  For="@(() => _model.FullName)" />
+                </MudItem>
+                <MudItem xs="12" sm="6">
+                    <MudSelect T="string"
+                               @bind-Value="_model.Position"
+                               Label="Position"
+                               Variant="Variant.Outlined"
+                               Margin="Margin.Dense"
+                               For="@(() => _model.Position)">
+                        @foreach (var position in Positions)
+                        {
+                            <MudSelectItem T="string" Value="@position.Key">@position.Value</MudSelectItem>
+                        }
+                    </MudSelect>
+                </MudItem>
+                <MudItem xs="12" sm="6">
+                    <MudDatePicker @bind-Date="_model.HireDate"
+                                   Label="Hire Date"
+                                   Variant="Variant.Outlined"
+                                   Margin="Margin.Dense"
+                                   Class="w-100" />
+                </MudItem>
+                <MudItem xs="12" sm="6">
+                    <MudTextField @bind-Value="_model.PhoneNumber"
+                                  Label="Phone Number"
+                                  Variant="Variant.Outlined"
+                                  Margin="Margin.Dense"
+                                  Immediate="true"
+                                  For="@(() => _model.PhoneNumber)" />
+                </MudItem>
+                <MudItem xs="12" sm="6">
+                    <MudTextField @bind-Value="_model.Department"
+                                  Label="Department"
+                                  Variant="Variant.Outlined"
+                                  Margin="Margin.Dense"
+                                  Immediate="true" />
+                </MudItem>
+                <MudItem xs="12" sm="6">
+                    <MudTextField @bind-Value="_model.Specialization"
+                                  Label="Specialization"
+                                  Variant="Variant.Outlined"
+                                  Margin="Margin.Dense"
+                                  Immediate="true" />
+                </MudItem>
+                <MudItem xs="12" sm="6">
+                    <MudTextField @bind-Value="_model.LicenseNumber"
+                                  Label="License Number"
+                                  Variant="Variant.Outlined"
+                                  Margin="Margin.Dense"
+                                  Immediate="true" />
+                </MudItem>
+            </MudGrid>
+        </EditForm>
+    </DialogContent>
+    <DialogActions>
+        <MudButton Color="Color.Default" OnClick="CancelAsync" Disabled="_busy">Cancel</MudButton>
+        <MudButton Color="Color.Primary" Variant="Variant.Filled" OnClick="SubmitAsync" Disabled="_busy">
+            @if (_busy)
+            {
+                <MudProgressCircular Size="Size.Small" Indeterminate="true" Class="mx-1" />
+            }
+            else
+            {
+                <text>@(IsEdit ? "Save Changes" : "Create Staff")</text>
+            }
+        </MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    [Parameter] public StaffDto? Staff { get; set; }
+
+    [CascadingParameter] public IMudDialogInstance MudDialog { get; set; } = default!;
+
+    private static readonly Dictionary<string, string> Positions = new()
+    {
+        ["Technician"] = "Technician",
+        ["Radiologist"] = "Radiologist",
+        ["Receptionist"] = "Receptionist",
+        ["Nurse"] = "Nurse",
+        ["Other"] = "Other",
+    };
+
+    private readonly StaffFormModel _model = new();
+    private EditContext _editContext = default!;
+    private UserDto? _selectedUser;
+    private bool _busy;
+
+    private bool IsEdit => Staff is not null;
+
+    private async Task<IEnumerable<UserDto>> SearchUsersAsync(string? value, CancellationToken ct)
+    {
+        if (string.IsNullOrWhiteSpace(value))
+            return Array.Empty<UserDto>();
+
+        try
+        {
+            var page = await IdentityService.GetUsersPagedAsync(value, "LastName", false, 1, 20, ct);
+            return page.Items;
+        }
+        catch (ApiException ex)
+        {
+            Snackbar.Add(ex.Message, Severity.Error);
+            return Array.Empty<UserDto>();
+        }
+        catch (Exception)
+        {
+            Snackbar.Add("Unable to search users.", Severity.Error);
+            return Array.Empty<UserDto>();
+        }
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        _editContext = new EditContext(_model);
+
+        if (Staff is null)
+            return;
+
+        _model.FullName = Staff.FullName;
+        _model.PhoneNumber = Staff.PhoneNumber;
+        _model.Position = Staff.Position;
+        _model.HireDate = Staff.HireDate;
+        _model.Department = Staff.Department;
+        _model.Specialization = Staff.Specialization;
+        _model.LicenseNumber = Staff.LicenseNumber;
+
+        try
+        {
+            _selectedUser = await IdentityService.GetUserByIdAsync(Staff.UserId);
+        }
+        catch (Exception)
+        {
+            _selectedUser = new UserDto(
+                Staff.UserId,
+                string.Empty,
+                string.Empty,
+                string.Empty,
+                string.Empty,
+                null,
+                true,
+                false,
+                false,
+                false,
+                null,
+                null,
+                default);
+        }
+    }
+
+    private async Task SubmitAsync()
+    {
+        if (!_editContext.Validate())
+            return;
+
+        if (_selectedUser is null)
+        {
+            Snackbar.Add("Select a user account.", Severity.Warning);
+            return;
+        }
+
+        _busy = true;
+        try
+        {
+            var input = new StaffInput
+            {
+                UserId = _selectedUser.Id,
+                FullName = _model.FullName,
+                PhoneNumber = _model.PhoneNumber,
+                Position = _model.Position,
+                HireDate = _model.HireDate ?? DateTime.Today,
+                Department = _model.Department,
+                Specialization = _model.Specialization,
+                LicenseNumber = _model.LicenseNumber,
+            };
+
+            if (IsEdit)
+                await ResourceService.UpdateStaffAsync(Staff!.Id, input);
+            else
+                await ResourceService.CreateStaffAsync(input);
+
+            Snackbar.Add(IsEdit ? "Staff member updated." : "Staff member created.", Severity.Success);
+            MudDialog.Close(DialogResult.Ok(true));
+        }
+        catch (ApiException ex)
+        {
+            Snackbar.Add(ex.Message, Severity.Error);
+        }
+        catch (Exception)
+        {
+            Snackbar.Add("Unable to reach the server. Please try again.", Severity.Error);
+        }
+        finally
+        {
+            _busy = false;
+        }
+    }
+
+    private void CancelAsync()
+        => MudDialog.Cancel();
+
+    private sealed class StaffFormModel : IValidatableObject
+    {
+        [Required(ErrorMessage = "Full name is required.")]
+        [MaxLength(300, ErrorMessage = "Full name must be 300 characters or fewer.")]
+        public string FullName { get; set; } = string.Empty;
+
+        [Required(ErrorMessage = "Position is required.")]
+        public string Position { get; set; } = string.Empty;
+
+        [Required(ErrorMessage = "Phone number is required.")]
+        [MaxLength(30, ErrorMessage = "Phone number must be 30 characters or fewer.")]
+        public string PhoneNumber { get; set; } = string.Empty;
+
+        public DateTime? HireDate { get; set; }
+
+        [MaxLength(200, ErrorMessage = "Department must be 200 characters or fewer.")]
+        public string? Department { get; set; }
+
+        [MaxLength(200, ErrorMessage = "Specialization must be 200 characters or fewer.")]
+        public string? Specialization { get; set; }
+
+        [MaxLength(100, ErrorMessage = "License number must be 100 characters or fewer.")]
+        public string? LicenseNumber { get; set; }
+
+        public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
+        {
+            if (FullName.Trim().Split(' ', StringSplitOptions.RemoveEmptyEntries).Length < 2)
+                yield return new ValidationResult("Full name must include at least a first and last name.", new[] { nameof(FullName) });
+
+            if (HireDate is null)
+                yield return new ValidationResult("Hire date is required.", new[] { nameof(HireDate) });
+
+            if (!string.IsNullOrWhiteSpace(PhoneNumber) && !EgyptianPhoneNumber.IsValid(PhoneNumber))
+                yield return new ValidationResult("Phone number must be a valid Egyptian number (e.g. 01012345678).", new[] { nameof(PhoneNumber) });
+        }
+    }
+}

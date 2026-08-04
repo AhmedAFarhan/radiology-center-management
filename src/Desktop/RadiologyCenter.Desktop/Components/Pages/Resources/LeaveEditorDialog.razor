@@ -1,0 +1,216 @@
+@inject ResourceService ResourceService
+@inject ISnackbar Snackbar
+
+<MudDialog>
+    <DialogContent>
+        <EditForm EditContext="_editContext">
+            <DataAnnotationsValidator />
+            <MudGrid Spacing="2">
+                <MudItem xs="12">
+                    <MudAutocomplete T="StaffDto"
+                                     @bind-Value="_selectedStaff"
+                                     Label="Staff member (search by name)"
+                                     Variant="Variant.Outlined"
+                                     Margin="Margin.Dense"
+                                     MinCharacters="1"
+                                     DebounceInterval="300"
+                                     SearchFunc="SearchStaffAsync"
+                                     ToStringFunc="@(s => s is null ? string.Empty : s.FullName)"
+                                     Clearable="true"
+                                     Disabled="_busy" />
+                </MudItem>
+                <MudItem xs="12" sm="6">
+                    <MudSelect T="string"
+                               @bind-Value="_model.LeaveType"
+                               Label="Leave Type"
+                               Variant="Variant.Outlined"
+                               Margin="Margin.Dense"
+                               For="@(() => _model.LeaveType)">
+                        @foreach (var type in LeaveTypes)
+                        {
+                            <MudSelectItem T="string" Value="@type.Key">@type.Value</MudSelectItem>
+                        }
+                    </MudSelect>
+                </MudItem>
+                <MudItem xs="12" sm="6">
+                    <MudDatePicker @bind-Date="_model.StartDate"
+                                   Label="Start Date"
+                                   Variant="Variant.Outlined"
+                                   Margin="Margin.Dense"
+                                   Class="w-100" />
+                </MudItem>
+                <MudItem xs="12" sm="6">
+                    <MudDatePicker @bind-Date="_model.EndDate"
+                                   Label="End Date"
+                                   Variant="Variant.Outlined"
+                                   Margin="Margin.Dense"
+                                   Class="w-100" />
+                </MudItem>
+                <MudItem xs="12">
+                    <MudTextField @bind-Value="_model.Reason"
+                                  Label="Reason"
+                                  Variant="Variant.Outlined"
+                                  Margin="Margin.Dense"
+                                  Lines="3"
+                                  Immediate="true" />
+                </MudItem>
+            </MudGrid>
+        </EditForm>
+    </DialogContent>
+    <DialogActions>
+        <MudButton Color="Color.Default" OnClick="CancelAsync" Disabled="_busy">Cancel</MudButton>
+        <MudButton Color="Color.Primary" Variant="Variant.Filled" OnClick="SubmitAsync" Disabled="_busy">
+            @if (_busy)
+            {
+                <MudProgressCircular Size="Size.Small" Indeterminate="true" Class="mx-1" />
+            }
+            else
+            {
+                <text>@(IsEdit ? "Save Changes" : "Create Leave")</text>
+            }
+        </MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    [Parameter] public LeaveDto? Leave { get; set; }
+
+    [CascadingParameter] public IMudDialogInstance MudDialog { get; set; } = default!;
+
+    private static readonly Dictionary<string, string> LeaveTypes = new()
+    {
+        ["Annual"] = "Annual",
+        ["Sick"] = "Sick",
+        ["Unpaid"] = "Unpaid",
+        ["Maternity"] = "Maternity",
+        ["Other"] = "Other",
+    };
+
+    private readonly LeaveFormModel _model = new();
+    private EditContext _editContext = default!;
+    private StaffDto? _selectedStaff;
+    private bool _busy;
+
+    private bool IsEdit => Leave is not null;
+
+    private async Task<IEnumerable<StaffDto>> SearchStaffAsync(string? value, CancellationToken ct)
+    {
+        if (string.IsNullOrWhiteSpace(value))
+            return Array.Empty<StaffDto>();
+
+        try
+        {
+            var page = await ResourceService.GetStaffsPagedAsync(value, "LastName", false, 1, 20, ct);
+            return page.Items;
+        }
+        catch (ApiException ex)
+        {
+            Snackbar.Add(ex.Message, Severity.Error);
+            return Array.Empty<StaffDto>();
+        }
+        catch (Exception)
+        {
+            Snackbar.Add("Unable to search staff.", Severity.Error);
+            return Array.Empty<StaffDto>();
+        }
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        _editContext = new EditContext(_model);
+
+        if (Leave is null)
+        {
+            _model.StartDate = DateTime.Today;
+            _model.EndDate = DateTime.Today;
+            return;
+        }
+
+        _model.LeaveType = Leave.LeaveType;
+        _model.StartDate = Leave.StartDate;
+        _model.EndDate = Leave.EndDate;
+        _model.Reason = Leave.Reason;
+
+        try
+        {
+            _selectedStaff = await ResourceService.GetStaffByIdAsync(Leave.StaffId);
+        }
+        catch (Exception)
+        {
+            // name resolution is best-effort; ids are used as fallback on submit
+        }
+    }
+
+    private async Task SubmitAsync()
+    {
+        if (!_editContext.Validate())
+            return;
+
+        if (_selectedStaff is null)
+        {
+            Snackbar.Add("Select a staff member.", Severity.Warning);
+            return;
+        }
+
+        if (_model.StartDate is null || _model.EndDate is null)
+        {
+            Snackbar.Add("Select both start and end dates.", Severity.Warning);
+            return;
+        }
+
+        if (_model.EndDate < _model.StartDate)
+        {
+            Snackbar.Add("End date must be on or after start date.", Severity.Warning);
+            return;
+        }
+
+        _busy = true;
+        try
+        {
+            var input = new LeaveInput
+            {
+                StaffId = _selectedStaff.Id,
+                LeaveType = _model.LeaveType,
+                StartDate = _model.StartDate.Value.Date,
+                EndDate = _model.EndDate.Value.Date,
+                Reason = _model.Reason,
+            };
+
+            if (IsEdit)
+                await ResourceService.UpdateLeaveAsync(Leave!.Id, input);
+            else
+                await ResourceService.CreateLeaveAsync(input);
+
+            Snackbar.Add(IsEdit ? "Leave record updated." : "Leave record created.", Severity.Success);
+            MudDialog.Close(DialogResult.Ok(true));
+        }
+        catch (ApiException ex)
+        {
+            Snackbar.Add(ex.Message, Severity.Error);
+        }
+        catch (Exception)
+        {
+            Snackbar.Add("Unable to reach the server. Please try again.", Severity.Error);
+        }
+        finally
+        {
+            _busy = false;
+        }
+    }
+
+    private void CancelAsync()
+        => MudDialog.Cancel();
+
+    private sealed class LeaveFormModel
+    {
+        [Required(ErrorMessage = "Leave type is required.")]
+        public string LeaveType { get; set; } = string.Empty;
+
+        public DateTime? StartDate { get; set; }
+
+        public DateTime? EndDate { get; set; }
+
+        [MaxLength(500, ErrorMessage = "Reason must be 500 characters or fewer.")]
+        public string? Reason { get; set; }
+    }
+}

@@ -1,0 +1,178 @@
+@page "/resources/work-shifts"
+@attribute [Authorize]
+@inject ResourceService ResourceService
+@inject IDialogService DialogService
+@inject ISnackbar Snackbar
+@implements IDisposable
+
+<MudToolBar Dense="true" Class="mb-4">
+    <MudText Typo="Typo.h5">Work Shifts</MudText>
+    <MudText Typo="Typo.body2" Class="text-secondary ms-2">Schedule staff shifts and equipment</MudText>
+    <MudSpacer />
+    <MudTextField T="string"
+                  Value="_search"
+                  ValueChanged="OnSearchChanged"
+                  Placeholder="Search shifts..."
+                  Variant="Variant.Outlined"
+                  Margin="Margin.Dense"
+                  Immediate="true"
+                  Adornment="Adornment.Start"
+                  AdornmentIcon="@Icons.Material.Filled.Search"
+                  Class="search-field" />
+    <MudIconButton Icon="@Icons.Material.Filled.Refresh" Color="Color.Default" aria-label="Refresh" OnClick="ReloadAsync" />
+    <MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Add" OnClick="OpenCreateDialogAsync">Add Work Shift</MudButton>
+</MudToolBar>
+
+<MudTable T="WorkShiftDto" @ref="_table" ServerData="LoadServerData" Dense="true" Hover="true" Striped="true" Elevation="1" RowsPerPage="10">
+    <HeaderContent>
+        <MudTh><MudTableSortLabel T="WorkShiftDto" SortLabel="@("Date")">Date</MudTableSortLabel></MudTh>
+        <MudTh>Staff</MudTh>
+        <MudTh><MudTableSortLabel T="WorkShiftDto" SortLabel="@("StartTime")">Start</MudTableSortLabel></MudTh>
+        <MudTh><MudTableSortLabel T="WorkShiftDto" SortLabel="@("EndTime")">End</MudTableSortLabel></MudTh>
+        <MudTh>Equipment</MudTh>
+        <MudTh>Notes</MudTh>
+        <MudTh>Actions</MudTh>
+    </HeaderContent>
+    <RowTemplate>
+        <MudTd DataLabel="Date">
+            <MudText Class="font-weight-medium">@context.Date.ToString("yyyy-MM-dd")</MudText>
+            <MudText Typo="Typo.caption" Class="text-secondary">@context.Date.ToString("dddd")</MudText>
+        </MudTd>
+        <MudTd DataLabel="Staff">@(ResolveStaff(context.StaffId))</MudTd>
+        <MudTd DataLabel="Start">@context.StartTime.ToString(@"hh\:mm")</MudTd>
+        <MudTd DataLabel="End">@context.EndTime.ToString(@"hh\:mm")</MudTd>
+        <MudTd DataLabel="Equipment">@(string.IsNullOrWhiteSpace(context.EquipmentId) ? "-" : ResolveEquipment(context.EquipmentId))</MudTd>
+        <MudTd DataLabel="Notes">@(string.IsNullOrWhiteSpace(context.Notes) ? "-" : context.Notes)</MudTd>
+        <MudTd DataLabel="Actions">
+            <MudIconButton Icon="@Icons.Material.Filled.Edit" Size="Size.Small" Color="Color.Default" aria-label="Edit" OnClick="@(() => OpenEditDialogAsync(context))" />
+            <MudIconButton Icon="@Icons.Material.Filled.Delete" Size="Size.Small" Color="Color.Error" aria-label="Delete" OnClick="@(() => DeleteShiftAsync(context))" />
+        </MudTd>
+    </RowTemplate>
+    <NoRecordsContent>
+        <MudText Class="pa-4">No work shifts found.</MudText>
+    </NoRecordsContent>
+    <PagerContent>
+        <MudTablePager PageSizeOptions="@(new[] { 10, 25, 50 })" />
+    </PagerContent>
+</MudTable>
+
+@code {
+    private MudTable<WorkShiftDto>? _table;
+    private string? _search;
+    private CancellationTokenSource? _searchCts;
+    private IReadOnlyDictionary<string, string> _staffNames = new Dictionary<string, string>();
+    private IReadOnlyDictionary<string, string> _equipmentNames = new Dictionary<string, string>();
+
+    private async Task<TableData<WorkShiftDto>> LoadServerData(TableState state, CancellationToken ct)
+    {
+        try
+        {
+            var shiftsTask = ResourceService.GetWorkShiftsPagedAsync(
+                _search,
+                state.SortLabel,
+                state.SortDirection == SortDirection.Descending,
+                state.Page + 1,
+                state.PageSize,
+                ct);
+            var staffTask = ResourceService.GetStaffsPagedAsync(null, null, false, 1, 100, ct);
+            var equipmentTask = ResourceService.GetEquipmentPagedAsync(null, null, false, 1, 100, ct);
+
+            await Task.WhenAll(shiftsTask, staffTask, equipmentTask);
+
+            var shifts = await shiftsTask;
+            _staffNames = (await staffTask).Items.ToDictionary(s => s.Id, s => s.FullName);
+            _equipmentNames = (await equipmentTask).Items.ToDictionary(e => e.Id, e => e.Name);
+
+            return new TableData<WorkShiftDto> { Items = shifts.Items, TotalItems = shifts.TotalCount };
+        }
+        catch (ApiException ex)
+        {
+            Snackbar.Add(ex.Message, Severity.Error);
+            return new TableData<WorkShiftDto> { Items = Array.Empty<WorkShiftDto>(), TotalItems = 0 };
+        }
+        catch (Exception)
+        {
+            Snackbar.Add("Unable to reach the server.", Severity.Error);
+            return new TableData<WorkShiftDto> { Items = Array.Empty<WorkShiftDto>(), TotalItems = 0 };
+        }
+    }
+
+    private string ResolveStaff(string staffId)
+        => _staffNames.TryGetValue(staffId, out var name) ? name : staffId;
+
+    private string ResolveEquipment(string equipmentId)
+        => _equipmentNames.TryGetValue(equipmentId, out var name) ? name : equipmentId;
+
+    private async Task OnSearchChanged(string? value)
+    {
+        _search = value;
+
+        _searchCts?.Cancel();
+        var cts = _searchCts = new CancellationTokenSource();
+        try
+        {
+            await Task.Delay(400, cts.Token);
+        }
+        catch (TaskCanceledException)
+        {
+            return;
+        }
+
+        if (_table is not null)
+            await _table.ReloadServerData();
+    }
+
+    private Task ReloadAsync()
+        => _table is null ? Task.CompletedTask : _table.ReloadServerData();
+
+    private async Task OpenCreateDialogAsync()
+    {
+        var options = new DialogOptions { MaxWidth = MaxWidth.Medium, FullWidth = true };
+        var dialog = await DialogService.ShowAsync<WorkShiftEditorDialog>("New Work Shift", options);
+        await ReloadIfSavedAsync(dialog);
+    }
+
+    private async Task OpenEditDialogAsync(WorkShiftDto shift)
+    {
+        var parameters = new DialogParameters { ["Shift"] = shift };
+        var options = new DialogOptions { MaxWidth = MaxWidth.Medium, FullWidth = true };
+        var dialog = await DialogService.ShowAsync<WorkShiftEditorDialog>($"Edit Work Shift", parameters, options);
+        await ReloadIfSavedAsync(dialog);
+    }
+
+    private async Task ReloadIfSavedAsync(IDialogReference dialog)
+    {
+        var result = await dialog.Result;
+        if (result is { Canceled: false })
+            await ReloadAsync();
+    }
+
+    private async Task DeleteShiftAsync(WorkShiftDto shift)
+    {
+        var confirmed = await DialogService.ShowMessageBoxAsync(
+            "Delete Work Shift",
+            $"Are you sure you want to delete the shift on {shift.Date.ToString("yyyy-MM-dd")}? This cannot be undone.",
+            "Delete",
+            "Cancel");
+
+        if (confirmed != true)
+            return;
+
+        try
+        {
+            await ResourceService.DeleteWorkShiftAsync(shift.Id);
+            Snackbar.Add("Work shift deleted.", Severity.Success);
+            await ReloadAsync();
+        }
+        catch (ApiException ex)
+        {
+            Snackbar.Add(ex.Message, Severity.Error);
+        }
+        catch (Exception)
+        {
+            Snackbar.Add("Unable to reach the server.", Severity.Error);
+        }
+    }
+
+    public void Dispose() => _searchCts?.Cancel();
+}

@@ -1,0 +1,190 @@
+@page "/resources/referral-doctors"
+@attribute [Authorize]
+@inject ResourceService ResourceService
+@inject IDialogService DialogService
+@inject ISnackbar Snackbar
+@implements IDisposable
+
+<MudToolBar Dense="true" Class="mb-4">
+    <MudText Typo="Typo.h5">Referral Doctors</MudText>
+    <MudText Typo="Typo.body2" Class="text-secondary ms-2">Manage referring physicians</MudText>
+    <MudSpacer />
+    <MudTextField T="string"
+                  Value="_search"
+                  ValueChanged="OnSearchChanged"
+                  Placeholder="Search doctors..."
+                  Variant="Variant.Outlined"
+                  Margin="Margin.Dense"
+                  Immediate="true"
+                  Adornment="Adornment.Start"
+                  AdornmentIcon="@Icons.Material.Filled.Search"
+                  Class="search-field" />
+    <MudIconButton Icon="@Icons.Material.Filled.Refresh" Color="Color.Default" aria-label="Refresh" OnClick="ReloadAsync" />
+    <MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Add" OnClick="OpenCreateDialogAsync">Add Doctor</MudButton>
+</MudToolBar>
+
+<MudTable T="ReferralDoctorDto" @ref="_table" ServerData="LoadServerData" Dense="true" Hover="true" Striped="true" Elevation="1" RowsPerPage="10">
+    <HeaderContent>
+        <MudTh><MudTableSortLabel T="ReferralDoctorDto" SortLabel="@("LastName")">Name</MudTableSortLabel></MudTh>
+        <MudTh><MudTableSortLabel T="ReferralDoctorDto" SortLabel="@("Phone")">Phone</MudTableSortLabel></MudTh>
+        <MudTh><MudTableSortLabel T="ReferralDoctorDto" SortLabel="@("Email")">Email</MudTableSortLabel></MudTh>
+        <MudTh><MudTableSortLabel T="ReferralDoctorDto" SortLabel="@("Specialization")">Specialization</MudTableSortLabel></MudTh>
+        <MudTh><MudTableSortLabel T="ReferralDoctorDto" SortLabel="@("Hospital")">Hospital</MudTableSortLabel></MudTh>
+        <MudTh>Status</MudTh>
+        <MudTh>Actions</MudTh>
+    </HeaderContent>
+    <RowTemplate>
+        <MudTd DataLabel="Name">
+            <MudText Class="font-weight-medium">@context.FullName</MudText>
+        </MudTd>
+        <MudTd DataLabel="Phone">@context.Phone</MudTd>
+        <MudTd DataLabel="Email">@(string.IsNullOrWhiteSpace(context.Email) ? "-" : context.Email)</MudTd>
+        <MudTd DataLabel="Specialization">@(string.IsNullOrWhiteSpace(context.Specialization) ? "-" : context.Specialization)</MudTd>
+        <MudTd DataLabel="Hospital">@(string.IsNullOrWhiteSpace(context.Hospital) ? "-" : context.Hospital)</MudTd>
+        <MudTd DataLabel="Status">
+            <MudChip T="string" Size="Size.Small" Color="@(context.IsActive ? Color.Success : Color.Default)">@(context.IsActive ? "Active" : "Inactive")</MudChip>
+        </MudTd>
+        <MudTd DataLabel="Actions">
+            <MudIconButton Icon="@Icons.Material.Filled.Edit" Size="Size.Small" Color="Color.Default" aria-label="Edit" OnClick="@(() => OpenEditDialogAsync(context))" />
+            <MudIconButton Icon="@(context.IsActive ? Icons.Material.Filled.Block : Icons.Material.Filled.CheckCircle)"
+                           Size="Size.Small"
+                           Color="@(context.IsActive ? Color.Default : Color.Success)"
+                           aria-label="Toggle status"
+                           OnClick="@(() => ToggleActiveAsync(context))" />
+            <MudIconButton Icon="@Icons.Material.Filled.Delete" Size="Size.Small" Color="Color.Error" aria-label="Delete" OnClick="@(() => DeleteDoctorAsync(context))" />
+        </MudTd>
+    </RowTemplate>
+    <NoRecordsContent>
+        <MudText Class="pa-4">No referral doctors found.</MudText>
+    </NoRecordsContent>
+    <PagerContent>
+        <MudTablePager PageSizeOptions="@(new[] { 10, 25, 50 })" />
+    </PagerContent>
+</MudTable>
+
+@code {
+    private MudTable<ReferralDoctorDto>? _table;
+    private string? _search;
+    private CancellationTokenSource? _searchCts;
+
+    private async Task<TableData<ReferralDoctorDto>> LoadServerData(TableState state, CancellationToken ct)
+    {
+        try
+        {
+            var page = await ResourceService.GetReferralDoctorsPagedAsync(
+                _search,
+                state.SortLabel,
+                state.SortDirection == SortDirection.Descending,
+                state.Page + 1,
+                state.PageSize,
+                ct);
+
+            return new TableData<ReferralDoctorDto> { Items = page.Items, TotalItems = page.TotalCount };
+        }
+        catch (ApiException ex)
+        {
+            Snackbar.Add(ex.Message, Severity.Error);
+            return new TableData<ReferralDoctorDto> { Items = Array.Empty<ReferralDoctorDto>(), TotalItems = 0 };
+        }
+        catch (Exception)
+        {
+            Snackbar.Add("Unable to reach the server.", Severity.Error);
+            return new TableData<ReferralDoctorDto> { Items = Array.Empty<ReferralDoctorDto>(), TotalItems = 0 };
+        }
+    }
+
+    private async Task OnSearchChanged(string? value)
+    {
+        _search = value;
+
+        _searchCts?.Cancel();
+        var cts = _searchCts = new CancellationTokenSource();
+        try
+        {
+            await Task.Delay(400, cts.Token);
+        }
+        catch (TaskCanceledException)
+        {
+            return;
+        }
+
+        if (_table is not null)
+            await _table.ReloadServerData();
+    }
+
+    private Task ReloadAsync()
+        => _table is null ? Task.CompletedTask : _table.ReloadServerData();
+
+    private async Task OpenCreateDialogAsync()
+    {
+        var options = new DialogOptions { MaxWidth = MaxWidth.Medium, FullWidth = true };
+        var dialog = await DialogService.ShowAsync<ReferralDoctorEditorDialog>("New Referral Doctor", options);
+        await ReloadIfSavedAsync(dialog);
+    }
+
+    private async Task OpenEditDialogAsync(ReferralDoctorDto doctor)
+    {
+        var parameters = new DialogParameters { ["Doctor"] = doctor };
+        var options = new DialogOptions { MaxWidth = MaxWidth.Medium, FullWidth = true };
+        var dialog = await DialogService.ShowAsync<ReferralDoctorEditorDialog>($"Edit {doctor.FullName}", parameters, options);
+        await ReloadIfSavedAsync(dialog);
+    }
+
+    private async Task ReloadIfSavedAsync(IDialogReference dialog)
+    {
+        var result = await dialog.Result;
+        if (result is { Canceled: false })
+            await ReloadAsync();
+    }
+
+    private async Task ToggleActiveAsync(ReferralDoctorDto doctor)
+    {
+        try
+        {
+            if (doctor.IsActive)
+                await ResourceService.DeactivateReferralDoctorAsync(doctor.Id);
+            else
+                await ResourceService.ActivateReferralDoctorAsync(doctor.Id);
+
+            Snackbar.Add(doctor.IsActive ? "Doctor deactivated." : "Doctor activated.", Severity.Success);
+            await ReloadAsync();
+        }
+        catch (ApiException ex)
+        {
+            Snackbar.Add(ex.Message, Severity.Error);
+        }
+        catch (Exception)
+        {
+            Snackbar.Add("Unable to reach the server.", Severity.Error);
+        }
+    }
+
+    private async Task DeleteDoctorAsync(ReferralDoctorDto doctor)
+    {
+        var confirmed = await DialogService.ShowMessageBoxAsync(
+            "Delete Referral Doctor",
+            $"Are you sure you want to delete {doctor.FullName}? This cannot be undone.",
+            "Delete",
+            "Cancel");
+
+        if (confirmed != true)
+            return;
+
+        try
+        {
+            await ResourceService.DeleteReferralDoctorAsync(doctor.Id);
+            Snackbar.Add("Referral doctor deleted.", Severity.Success);
+            await ReloadAsync();
+        }
+        catch (ApiException ex)
+        {
+            Snackbar.Add(ex.Message, Severity.Error);
+        }
+        catch (Exception)
+        {
+            Snackbar.Add("Unable to reach the server.", Severity.Error);
+        }
+    }
+
+    public void Dispose() => _searchCts?.Cancel();
+}
