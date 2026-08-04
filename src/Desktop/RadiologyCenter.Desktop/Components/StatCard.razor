@@ -1,14 +1,31 @@
-<MudCard Elevation="3" Class="stat-card h-100">
+<MudCard Elevation="0" Class="stat-card h-100">
     <MudCardContent>
         <MudGrid>
             <MudItem xs="8" Class="d-flex flex-column justify-content-center">
-                <MudText Typo="Typo.h4" Class="stat-value">@Value</MudText>
                 <MudText Typo="Typo.body2" Class="text-secondary">@Label</MudText>
+                <MudText Typo="Typo.h4" Class="stat-value">@Value</MudText>
+                @if (!string.IsNullOrWhiteSpace(TrendText))
+                {
+                    <MudChip T="string"
+                             Size="Size.Small"
+                             Variant="Variant.Filled"
+                             Color="@(TrendUp ? Color.Success : Color.Error)"
+                             Class="mt-1 align-self-start">
+                        <MudIcon Icon="@(TrendUp ? Icons.Material.Filled.TrendingUp : Icons.Material.Filled.TrendingDown)" Size="Size.Small" Class="me-1" />
+                        @TrendText
+                    </MudChip>
+                }
             </MudItem>
             <MudItem xs="4" Class="d-flex align-items-center justify-content-end">
                 <MudIcon Icon="@Icon" Color="@Color" Size="Size.Large" />
             </MudItem>
         </MudGrid>
+        @if (Trend is not null)
+        {
+            <div class="mt-3">
+                @Trend
+            </div>
+        }
     </MudCardContent>
 </MudCard>
 
@@ -17,4 +34,7 @@
     [Parameter] public string Value { get; set; } = string.Empty;
     [Parameter] public string Icon { get; set; } = string.Empty;
     [Parameter] public Color Color { get; set; } = Color.Primary;
+    [Parameter] public string? TrendText { get; set; }
+    [Parameter] public bool TrendUp { get; set; } = true;
+    [Parameter] public RenderFragment? Trend { get; set; }
 }

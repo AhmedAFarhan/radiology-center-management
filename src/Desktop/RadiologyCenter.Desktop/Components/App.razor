@@ -1,4 +1,4 @@
-<MudThemeProvider />
+<MudThemeProvider Theme="@AppTheme.Default" />
 <MudPopoverProvider />
 <MudDialogProvider />
 <MudSnackbarProvider />
@@ -12,7 +12,7 @@
                 </NotAuthorized>
                 <Authorizing>
                     <div class="d-flex align-items-center justify-content-center" style="height: 100vh;">
-                        <MudSkeleton Type="SkeletonType.Rectangle" Width="320px" Height="180px" Animation="Animation.Pulse" Style="border-radius:12px" />
+                        <MudSkeleton SkeletonType="SkeletonType.Rectangle" Width="320px" Height="180px" Animation="Animation.Pulse" Style="border-radius:12px" />
                     </div>
                 </Authorizing>
             </AuthorizeRouteView>

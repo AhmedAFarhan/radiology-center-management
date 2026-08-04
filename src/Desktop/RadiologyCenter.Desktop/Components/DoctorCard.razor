@@ -1,0 +1,46 @@
+<MudCard Elevation="0" Class="dashboard-card h-100">
+    <MudCardHeader>
+        <CardHeaderContent>
+            <MudText Typo="Typo.subtitle1" Class="font-weight-medium">Top Referring Doctor</MudText>
+        </CardHeaderContent>
+    </MudCardHeader>
+    <MudCardContent>
+        <MudStack Spacing="1" Class="align-items-center text-center">
+            <MudAvatar Size="Size.Large" Color="Color.Primary" Class="text-h5 font-weight-medium">@Initials</MudAvatar>
+            <MudText Typo="Typo.subtitle1" Class="font-weight-medium">@Name</MudText>
+            <MudText Typo="Typo.body2" Class="text-secondary">@Specialty</MudText>
+            <MudDivider Class="my-2 w-100" />
+            <MudGrid Spacing="2" Class="w-100">
+                <MudItem xs="6">
+                    <MudText Typo="Typo.h5" Align="Align.Center" Class="font-weight-medium">@Referrals</MudText>
+                    <MudText Typo="Typo.caption" Align="Align.Center" Class="text-secondary">Referrals</MudText>
+                </MudItem>
+                <MudItem xs="6">
+                    <MudText Typo="Typo.h5" Align="Align.Center" Class="font-weight-medium">4.9</MudText>
+                    <MudText Typo="Typo.caption" Align="Align.Center" Class="text-secondary">Rating</MudText>
+                </MudItem>
+            </MudGrid>
+        </MudStack>
+    </MudCardContent>
+</MudCard>
+
+@code {
+    [Parameter] public string Name { get; set; } = string.Empty;
+
+    [Parameter] public string Specialty { get; set; } = string.Empty;
+
+    [Parameter] public int Referrals { get; set; }
+
+    private string Initials
+    {
+        get
+        {
+            if (string.IsNullOrWhiteSpace(Name))
+                return "?";
+
+            var parts = Name.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+            var letters = parts.Take(2).Select(p => p[0]);
+            return string.Concat(letters).ToUpperInvariant();
+        }
+    }
+}

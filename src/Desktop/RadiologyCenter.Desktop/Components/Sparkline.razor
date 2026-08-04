@@ -1,0 +1,36 @@
+@using ApexCharts
+
+<ApexChart TItem="SparkPoint" Height="@Height" Options="@_options">
+    <ApexPointSeries TItem="SparkPoint"
+                     Items="@_points"
+                     Name="Value"
+                     SeriesType="SeriesType.Line"
+                     XValue="@(p => p.Label)"
+                     YValue="@(p => p.Value)" />
+</ApexChart>
+
+@code {
+    [Parameter] public IReadOnlyList<decimal>? Values { get; set; }
+
+    [Parameter] public string Height { get; set; } = "60px";
+
+    private List<SparkPoint> _points = new();
+    private static readonly ApexChartOptions<SparkPoint> _options = new()
+    {
+        Chart = new ApexCharts.Chart
+        {
+            Toolbar = new Toolbar { Show = false },
+            Zoom = new Zoom { Enabled = false },
+        },
+        DataLabels = new DataLabels { Enabled = false },
+        Stroke = new Stroke { Curve = Curve.Smooth, Width = 2 },
+    };
+
+    protected override void OnParametersSet()
+    {
+        var data = Values ?? new List<decimal> { 10, 12, 11, 14, 13, 16, 15, 18 };
+        _points = data.Select((v, i) => new SparkPoint(i.ToString(), v)).ToList();
+    }
+
+    private sealed record SparkPoint(string Label, decimal Value);
+}

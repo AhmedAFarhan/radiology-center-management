@@ -1,0 +1,39 @@
+<MudCard Elevation="0" Class="dashboard-card h-100">
+    <MudCardHeader>
+        <CardHeaderContent>
+            <MudText Typo="Typo.subtitle1" Class="font-weight-medium">Doctor Availability</MudText>
+        </CardHeaderContent>
+    </MudCardHeader>
+    <MudCardContent>
+        <MudList T="DoctorAvailability" Dense="true">
+            @foreach (var doctor in Doctors)
+            {
+                <MudListItem T="DoctorAvailability">
+                    <MudStack Spacing="2" Row="true" AlignItems="AlignItems.Center" Class="w-100">
+                        <MudAvatar Size="Size.Small" Color="Color.Secondary">@Initials(doctor.Name)</MudAvatar>
+                        <MudStack Spacing="0" Class="flex-grow-1">
+                            <MudText Typo="Typo.body2" Class="font-weight-medium">@doctor.Name</MudText>
+                            <MudText Typo="Typo.caption" Class="text-secondary">@doctor.Specialty · Next @doctor.NextSlot</MudText>
+                        </MudStack>
+                        <MudChip T="string" Size="Size.Small" Color="@(doctor.Available ? Color.Success : Color.Default)" Variant="@(doctor.Available ? Variant.Filled : Variant.Outlined)">
+                            @(doctor.Available ? "Available" : "Busy")
+                        </MudChip>
+                    </MudStack>
+                </MudListItem>
+            }
+        </MudList>
+    </MudCardContent>
+</MudCard>
+
+@code {
+    [Parameter] public IReadOnlyList<DoctorAvailability> Doctors { get; set; } = Array.Empty<DoctorAvailability>();
+
+    private static string Initials(string name)
+    {
+        if (string.IsNullOrWhiteSpace(name))
+            return "?";
+
+        var parts = name.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+        return string.Concat(parts.Take(2).Select(p => p[0])).ToUpperInvariant();
+    }
+}

@@ -1,0 +1,42 @@
+<MudCard Elevation="0" Class="dashboard-card h-100">
+    <MudCardHeader>
+        <CardHeaderContent>
+            <MudText Typo="Typo.subtitle1" Class="font-weight-medium">Recent Examinations</MudText>
+        </CardHeaderContent>
+    </MudCardHeader>
+    <MudCardContent>
+        <MudTable T="ExaminationDto" Items="Items" Dense="true" Hover="true" Striped="true" Elevation="0">
+            <HeaderContent>
+                <MudTh>Type</MudTh>
+                <MudTh>Status</MudTh>
+                <MudTh>Priority</MudTh>
+                <MudTh>Referring Doctor</MudTh>
+            </HeaderContent>
+            <RowTemplate>
+                <MudTd DataLabel="Type">@context.ExaminationTypeName</MudTd>
+                <MudTd DataLabel="Status">
+                    <MudChip T="string" Size="Size.Small" Color="@StatusColor(context.Status)">@context.Status</MudChip>
+                </MudTd>
+                <MudTd DataLabel="Priority">@context.Priority</MudTd>
+                <MudTd DataLabel="Referring Doctor">@(context.ReferralDoctorId ?? "-")</MudTd>
+            </RowTemplate>
+            <NoRecordsContent>
+                <EmptyState Icon="@Icons.Material.Filled.EventNote" Title="No recent examinations" Message="Examinations will appear here." />
+            </NoRecordsContent>
+        </MudTable>
+    </MudCardContent>
+</MudCard>
+
+@code {
+    [Parameter] public IReadOnlyList<ExaminationDto> Items { get; set; } = Array.Empty<ExaminationDto>();
+
+    private static Color StatusColor(string status) => status switch
+    {
+        "Completed" => Color.Success,
+        "Cancelled" => Color.Default,
+        "InProgress" => Color.Warning,
+        "CheckedIn" => Color.Info,
+        "Scheduled" => Color.Secondary,
+        _ => Color.Primary,
+    };
+}

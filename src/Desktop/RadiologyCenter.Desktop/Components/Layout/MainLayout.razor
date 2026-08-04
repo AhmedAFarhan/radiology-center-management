@@ -3,25 +3,41 @@
 @inject AuthService AuthService
 @inject ISnackbar Snackbar
 
-<MudLayout>
-    <MudAppBar Elevation="1" Class="app-bar">
-        <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="@(() => _drawerOpen = !_drawerOpen)" />
-        <MudText Typo="Typo.h6" Class="ms-2">Radiology Center</MudText>
-        <MudSpacer />
-        <MudText Typo="Typo.body2" Class="me-3 app-bar-user">@_userName</MudText>
-        <MudIconButton Icon="@Icons.Material.Filled.Logout" Color="Color.Inherit" aria-label="Sign out" OnClick="@OnLogout" />
-    </MudAppBar>
+<div class="app-shell">
+    <aside class="app-sidebar @(_drawerOpen ? "open" : "collapsed")">
+        <div class="app-brand">
+            <img src="images/healthcare-logo-64.png" alt="EGCare" class="app-brand-logo" />
+            <span class="app-brand-text">EGCare</span>
+        </div>
+        <nav class="app-nav">
+            <NavMenu />
+        </nav>
+    </aside>
 
-    <MudDrawer @bind-Open="_drawerOpen" Variant="DrawerVariant.Persistent" Elevation="2" ClipMode="DrawerClipMode.Always">
-        <NavMenu />
-    </MudDrawer>
+    <div class="app-main-col">
+        <header class="app-topbar">
+            <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" OnClick="@(() => _drawerOpen = !_drawerOpen)" aria-label="Toggle navigation" />
+            <MudTextField T="string"
+                          Placeholder="Search..."
+                          Variant="Variant.Outlined"
+                          Margin="Margin.Dense"
+                          Adornment="Adornment.Start"
+                          AdornmentIcon="@Icons.Material.Filled.Search"
+                          Class="header-search app-bar-search" />
+            <MudSpacer />
+            <MudIconButton Icon="@Icons.Material.Filled.Notifications" Color="Color.Inherit" aria-label="Notifications" OnClick="OnNotifications" />
+            <MudAvatar Size="Size.Small" Color="Color.Primary" Class="mx-2 app-bar-avatar">@GetInitial()</MudAvatar>
+            <MudText Typo="Typo.body2" Class="me-2 app-bar-user">@_userName</MudText>
+            <MudIconButton Icon="@Icons.Material.Filled.Logout" Color="Color.Inherit" aria-label="Sign out" OnClick="@OnLogout" />
+        </header>
 
-    <MudMainContent Class="app-main">
-        <MudContainer MaxWidth="MaxWidth.ExtraLarge" Class="mt-4 pb-4">
-            @Body
-        </MudContainer>
-    </MudMainContent>
-</MudLayout>
+        <main class="app-main-content">
+            <MudContainer MaxWidth="MaxWidth.ExtraLarge" Class="mt-4 pb-4">
+                @Body
+            </MudContainer>
+        </main>
+    </div>
+</div>
 
 @code {
     [CascadingParameter]
@@ -48,5 +64,15 @@
         await AuthService.SignOutAsync();
         Snackbar.Add("You have been signed out.", Severity.Info);
         Navigation.NavigateTo("/");
+    }
+
+    private void OnNotifications()
+        => Snackbar.Add("No new notifications.", Severity.Info);
+
+    private string GetInitial()
+    {
+        if (string.IsNullOrWhiteSpace(_userName))
+            return "?";
+        return _userName[..1].ToUpperInvariant();
     }
 }

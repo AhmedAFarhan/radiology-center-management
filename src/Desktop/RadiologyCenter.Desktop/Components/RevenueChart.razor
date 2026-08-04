@@ -1,0 +1,39 @@
+@using ApexCharts
+
+<MudCard Elevation="0" Class="dashboard-card h-100">
+    <MudCardHeader>
+        <CardHeaderContent>
+            <MudText Typo="Typo.subtitle1" Class="font-weight-medium">Revenue Overview</MudText>
+            <MudText Typo="Typo.caption" Class="text-secondary">Monthly revenue</MudText>
+        </CardHeaderContent>
+        <CardHeaderActions>
+            <MudChip T="string" Size="MudBlazor.Size.Small" Color="MudBlazor.Color.Success" Variant="Variant.Filled">+12.4%</MudChip>
+        </CardHeaderActions>
+    </MudCardHeader>
+    <MudCardContent>
+        <ApexChart TItem="RevenuePoint" Height="300" Options="@_options">
+            <ApexPointSeries TItem="RevenuePoint"
+                             Items="Data"
+                             Name="Revenue"
+                             SeriesType="SeriesType.Area"
+                             XValue="@(r => r.Month)"
+                             YValue="@(r => r.Amount)" />
+        </ApexChart>
+    </MudCardContent>
+</MudCard>
+
+@code {
+    [Parameter] public IReadOnlyList<RevenuePoint> Data { get; set; } = Array.Empty<RevenuePoint>();
+
+    private static readonly ApexChartOptions<RevenuePoint> _options = new()
+    {
+        Chart = new ApexCharts.Chart
+        {
+            Toolbar = new Toolbar { Show = false },
+            Zoom = new Zoom { Enabled = false },
+        },
+        DataLabels = new DataLabels { Enabled = false },
+        Stroke = new Stroke { Curve = Curve.Smooth, Width = 3 },
+        Colors = new List<string> { "#1976D2" },
+    };
+}

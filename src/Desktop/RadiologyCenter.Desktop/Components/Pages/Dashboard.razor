@@ -15,79 +15,41 @@ else if (_error)
 }
 else
 {
-    <MudGrid>
-        <MudItem xs="12" sm="6" md="3">
-            <StatCard Label="Total Patients" Value="@_data!.TotalPatients.ToString()" Icon="@Icons.Material.Filled.People" Color="Color.Primary" />
+    <MudGrid Spacing="3">
+        <MudItem xs="12" sm="6" lg="3">
+            <StatCard Label="Total Patients" Value="@_data!.TotalPatients.ToString()" Icon="@Icons.Material.Filled.People" Color="Color.Primary" TrendText="+8.2%" TrendUp="true">
+                <Trend><Sparkline Values="@DashboardSampleData.SparklineUp" /></Trend>
+            </StatCard>
         </MudItem>
-        <MudItem xs="12" sm="6" md="3">
-            <StatCard Label="Total Examinations" Value="@_data!.TotalExaminations.ToString()" Icon="@Icons.Material.Filled.MedicalServices" Color="Color.Secondary" />
+        <MudItem xs="12" sm="6" lg="3">
+            <StatCard Label="Total Examinations" Value="@_data!.TotalExaminations.ToString()" Icon="@Icons.Material.Filled.MedicalServices" Color="Color.Secondary" TrendText="+5.7%" TrendUp="true">
+                <Trend><Sparkline Values="@DashboardSampleData.SparklineUp" /></Trend>
+            </StatCard>
         </MudItem>
-        <MudItem xs="12" sm="6" md="3">
-            <StatCard Label="In Progress" Value="@_data!.ExamsInProgress.ToString()" Icon="@Icons.Material.Filled.HourglassTop" Color="Color.Warning" />
+        <MudItem xs="12" sm="6" lg="3">
+            <StatCard Label="In Progress" Value="@_data!.ExamsInProgress.ToString()" Icon="@Icons.Material.Filled.HourglassTop" Color="Color.Warning" TrendText="-3.1%" TrendUp="false">
+                <Trend><Sparkline Values="@DashboardSampleData.SparklineDown" /></Trend>
+            </StatCard>
         </MudItem>
-        <MudItem xs="12" sm="6" md="3">
-            <StatCard Label="Inventory Items" Value="@_data!.TotalInventoryItems.ToString()" Icon="@Icons.Material.Filled.Inventory2" Color="Color.Info" />
+        <MudItem xs="12" sm="6" lg="3">
+            <StatCard Label="Inventory Items" Value="@_data!.TotalInventoryItems.ToString()" Icon="@Icons.Material.Filled.Inventory2" Color="Color.Info" TrendText="+1.2%" TrendUp="true">
+                <Trend><Sparkline Values="@DashboardSampleData.SparklineSteady" /></Trend>
+            </StatCard>
         </MudItem>
     </MudGrid>
 
-    <MudGrid Class="mt-2">
-        <MudItem xs="12" lg="7">
-            <MudCard Elevation="2">
-                <MudCardHeader>
-                    <MudText Typo="Typo.h6">Recent Examinations</MudText>
-                </MudCardHeader>
-                <MudCardContent>
-                    <MudTable Items="@_data!.RecentExaminations" Dense="true" Hover="true" Striped="true">
-                        <ColGroup>
-                            <col style="width: 30%" />
-                            <col style="width: 20%" />
-                            <col style="width: 20%" />
-                            <col style="width: 30%" />
-                        </ColGroup>
-                        <HeaderContent>
-                            <MudTh>Type</MudTh>
-                            <MudTh>Status</MudTh>
-                            <MudTh>Priority</MudTh>
-                            <MudTh>Referring Doctor</MudTh>
-                        </HeaderContent>
-                        <RowTemplate>
-                            <MudTd DataLabel="Type">@context.ExaminationTypeName</MudTd>
-                            <MudTd DataLabel="Status">
-                                <MudChip T="string" Size="Size.Small" Color="@StatusColor(context.Status)">@context.Status</MudChip>
-                            </MudTd>
-                            <MudTd DataLabel="Priority">@context.Priority</MudTd>
-                            <MudTd DataLabel="Referring Doctor">@(context.ReferralDoctorId ?? "-")</MudTd>
-                        </RowTemplate>
-                        <NoRecordsContent>
-                            <MudText Class="pa-4">No examinations yet.</MudText>
-                        </NoRecordsContent>
-                    </MudTable>
-                </MudCardContent>
-            </MudCard>
+    <MudGrid Spacing="3" Class="mt-1">
+        <MudItem xs="12" lg="8">
+            <RevenueChart Data="@DashboardSampleData.Revenue" />
         </MudItem>
-
-        <MudItem xs="12" lg="5">
-            <MudCard Elevation="2">
-                <MudCardHeader>
-                    <MudText Typo="Typo.h6">Recent Patients</MudText>
-                </MudCardHeader>
-                <MudCardContent>
-                    <MudList T="string" Dense="true">
-                        @foreach (var patient in _data!.RecentPatients)
-                        {
-                            <MudListItem T="string"
-                                          Icon="@Icons.Material.Filled.Person"
-                                          IconColor="Color.Primary"
-                                          Text="@patient.FullName"
-                                          SecondaryText="@($"{patient.PatientCode} · {patient.Gender}")" />
-                        }
-                        @if (_data!.RecentPatients.Count == 0)
-                        {
-                            <MudText Class="pa-4">No patients yet.</MudText>
-                        }
-                    </MudList>
-                </MudCardContent>
-            </MudCard>
+        <MudItem xs="12" lg="4">
+            <DoctorCard Name="@DashboardSampleData.TopDoctorName" Specialty="@DashboardSampleData.TopDoctorSpecialty" Referrals="@DashboardSampleData.TopDoctorReferrals" />
+        </MudItem>
+        <MudItem xs="12" lg="8">
+            <AppointmentsTable Items="@_data!.RecentExaminations" />
+        </MudItem>
+        <MudItem xs="12" lg="4">
+            <DoctorsList Doctors="@DashboardSampleData.Doctors" />
         </MudItem>
     </MudGrid>
 }
@@ -119,14 +81,4 @@ else
             _loading = false;
         }
     }
-
-    private static Color StatusColor(string status) => status switch
-    {
-        "Completed" => Color.Success,
-        "Cancelled" => Color.Default,
-        "InProgress" => Color.Warning,
-        "CheckedIn" => Color.Info,
-        "Scheduled" => Color.Secondary,
-        _ => Color.Primary,
-    };
 }
