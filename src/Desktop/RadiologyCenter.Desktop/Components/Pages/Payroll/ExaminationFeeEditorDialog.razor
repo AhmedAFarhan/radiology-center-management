@@ -1,0 +1,199 @@
+@inject PayrollService PayrollService
+@inject ExaminationService ExaminationService
+@inject ISnackbar Snackbar
+
+<MudDialog>
+    <DialogContent>
+        <EditForm EditContext="_editContext">
+            <DataAnnotationsValidator />
+            <MudGrid Spacing="2">
+                @if (IsEdit)
+                {
+                    <MudItem xs="12" sm="8">
+                        <MudTextField @bind-Value="_examTypeName"
+                                      Label="Examination Type"
+                                      Variant="Variant.Outlined"
+                                      Margin="Margin.Dense"
+                                      ReadOnly="true" />
+                    </MudItem>
+                    <MudItem xs="12" sm="4">
+                        <MudTextField @bind-Value="_model.Role"
+                                      Label="Role"
+                                      Variant="Variant.Outlined"
+                                      Margin="Margin.Dense"
+                                      ReadOnly="true" />
+                    </MudItem>
+                }
+                else
+                {
+                    <MudItem xs="12" sm="8">
+                        <MudAutocomplete T="ExaminationTypeDto"
+                                         @bind-Value="_selectedType"
+                                         Label="Examination Type (search by code or name)"
+                                         Variant="Variant.Outlined"
+                                         Margin="Margin.Dense"
+                                         MinCharacters="1"
+                                         DebounceInterval="300"
+                                         SearchFunc="SearchTypesAsync"
+                                         ToStringFunc="@(t => t is null ? string.Empty : $"{t.Code} - {t.Name}")"
+                                         Clearable="true"
+                                         Disabled="_busy" />
+                    </MudItem>
+                    <MudItem xs="12" sm="4">
+                        <MudSelect T="string"
+                                   @bind-Value="_model.Role"
+                                   Label="Role"
+                                   Variant="Variant.Outlined"
+                                   Margin="Margin.Dense"
+                                   For="@(() => _model.Role)">
+                            <MudSelectItem T="string" Value="@("Radiologist")">Radiologist</MudSelectItem>
+                            <MudSelectItem T="string" Value="@("Technician")">Technician</MudSelectItem>
+                        </MudSelect>
+                    </MudItem>
+                }
+                <MudItem xs="12" sm="6">
+                    <MudNumericField T="decimal"
+                                     @bind-Value="_model.Amount"
+                                     Label="@(_model.IsPercentage ? "Percentage (%)" : "Flat Amount")"
+                                     Variant="Variant.Outlined"
+                                     Margin="Margin.Dense"
+                                     Min="0"
+                                     For="@(() => _model.Amount)" />
+                </MudItem>
+                <MudItem xs="12" sm="6" Class="d-flex align-items-center">
+                    <MudSwitch T="bool" @bind-Value="_model.IsPercentage" Color="Color.Primary">Amount is a percentage</MudSwitch>
+                </MudItem>
+            </MudGrid>
+        </EditForm>
+    </DialogContent>
+    <DialogActions>
+        <MudButton Color="Color.Default" OnClick="CancelAsync" Disabled="_busy">Cancel</MudButton>
+        <MudButton Color="Color.Primary" Variant="Variant.Filled" OnClick="SubmitAsync" Disabled="_busy">
+            @if (_busy)
+            {
+                <MudProgressCircular Size="Size.Small" Indeterminate="true" Class="mx-1" />
+            }
+            else
+            {
+                <text>@(IsEdit ? "Save Changes" : "Create Fee")</text>
+            }
+        </MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    [Parameter] public ExaminationFeeDto? Fee { get; set; }
+
+    [CascadingParameter] public IMudDialogInstance MudDialog { get; set; } = default!;
+
+    private readonly ExaminationFeeFormModel _model = new();
+    private EditContext _editContext = default!;
+    private ExaminationTypeDto? _selectedType;
+    private string _examTypeId = string.Empty;
+    private string _examTypeName = string.Empty;
+    private bool _busy;
+
+    private bool IsEdit => Fee is not null;
+
+    private async Task<IEnumerable<ExaminationTypeDto>> SearchTypesAsync(string? value, CancellationToken ct)
+    {
+        if (string.IsNullOrWhiteSpace(value))
+            return Array.Empty<ExaminationTypeDto>();
+
+        try
+        {
+            var page = await ExaminationService.GetTypesPagedAsync(value, "Name", false, 1, 20, ct);
+            return page.Items;
+        }
+        catch (Exception)
+        {
+            return Array.Empty<ExaminationTypeDto>();
+        }
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        _editContext = new EditContext(_model);
+
+        if (Fee is null)
+            return;
+
+        _examTypeId = Fee.ExaminationTypeId;
+        _model.Role = Fee.Role;
+        _model.Amount = Fee.Amount;
+        _model.IsPercentage = Fee.IsPercentage;
+
+        try
+        {
+            var type = await ExaminationService.GetTypeByIdAsync(Fee.ExaminationTypeId);
+            _examTypeName = $"{type.Code} - {type.Name}";
+        }
+        catch (Exception)
+        {
+            _examTypeName = Fee.ExaminationTypeId;
+        }
+    }
+
+    private async Task SubmitAsync()
+    {
+        if (!_editContext.Validate())
+            return;
+
+        if (!IsEdit && _selectedType is null)
+        {
+            Snackbar.Add("Select an examination type.", Severity.Warning);
+            return;
+        }
+
+        if (_model.IsPercentage && _model.Amount > 100)
+        {
+            Snackbar.Add("Percentage must be 100 or less.", Severity.Warning);
+            return;
+        }
+
+        _busy = true;
+        try
+        {
+            var input = new ExaminationFeeInput
+            {
+                ExaminationTypeId = IsEdit ? _examTypeId : _selectedType!.Id,
+                Role = _model.Role,
+                Amount = _model.Amount,
+                IsPercentage = _model.IsPercentage,
+            };
+
+            if (IsEdit)
+                await PayrollService.UpdateExaminationFeeAsync(Fee!.Id, input);
+            else
+                await PayrollService.CreateExaminationFeeAsync(input);
+
+            Snackbar.Add(IsEdit ? "Examination fee updated." : "Examination fee created.", Severity.Success);
+            MudDialog.Close(DialogResult.Ok(true));
+        }
+        catch (ApiException ex)
+        {
+            Snackbar.Add(ex.Message, Severity.Error);
+        }
+        catch (Exception)
+        {
+            Snackbar.Add("Unable to reach the server. Please try again.", Severity.Error);
+        }
+        finally
+        {
+            _busy = false;
+        }
+    }
+
+    private void CancelAsync()
+        => MudDialog.Cancel();
+
+    private sealed class ExaminationFeeFormModel
+    {
+        [Required(ErrorMessage = "Role is required.")]
+        public string Role { get; set; } = "Radiologist";
+
+        public decimal Amount { get; set; }
+
+        public bool IsPercentage { get; set; }
+    }
+}

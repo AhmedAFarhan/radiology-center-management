@@ -37,6 +37,7 @@ public static class MauiProgram
         builder.Services.AddScoped<ExaminationService>();
         builder.Services.AddScoped<IdentityService>();
         builder.Services.AddScoped<ResourceService>();
+        builder.Services.AddScoped<PayrollService>();
 
 #if DEBUG
         builder.Services.AddBlazorWebViewDeveloperTools();

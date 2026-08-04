@@ -1,0 +1,169 @@
+@inject PayrollService PayrollService
+@inject ISnackbar Snackbar
+
+<MudDialog>
+    <DialogContent>
+        <EditForm EditContext="_editContext">
+            <DataAnnotationsValidator />
+            <MudGrid Spacing="2">
+                <MudItem xs="12" sm="7">
+                    <MudTextField @bind-Value="_model.Name"
+                                  Label="Name"
+                                  Variant="Variant.Outlined"
+                                  Margin="Margin.Dense"
+                                  Immediate="true"
+                                  For="@(() => _model.Name)" />
+                </MudItem>
+                <MudItem xs="12" sm="5">
+                    <MudSelect T="string"
+                               @bind-Value="_model.Kind"
+                               Label="Kind"
+                               Variant="Variant.Outlined"
+                               Margin="Margin.Dense"
+                               For="@(() => _model.Kind)">
+                        <MudSelectItem T="string" Value="@("Earning")">Earning</MudSelectItem>
+                        <MudSelectItem T="string" Value="@("Deduction")">Deduction</MudSelectItem>
+                    </MudSelect>
+                </MudItem>
+                <MudItem xs="12" sm="4">
+                    <MudSelect T="string"
+                               @bind-Value="_model.Frequency"
+                               Label="Frequency (optional)"
+                               Variant="Variant.Outlined"
+                               Margin="Margin.Dense">
+                        <MudSelectItem T="string" Value="@((string?)null)">Not set</MudSelectItem>
+                        @foreach (var frequency in Frequencies)
+                        {
+                            <MudSelectItem T="string" Value="@frequency">@FormatFrequency(frequency)</MudSelectItem>
+                        }
+                    </MudSelect>
+                </MudItem>
+                <MudItem xs="12" sm="4">
+                    <MudNumericField T="decimal"
+                                     @bind-Value="_model.DefaultValue"
+                                     Label="@(_model.IsPercentage ? "Default (%)" : "Default Value")"
+                                     Variant="Variant.Outlined"
+                                     Margin="Margin.Dense"
+                                     Min="0"
+                                     For="@(() => _model.DefaultValue)" />
+                </MudItem>
+                <MudItem xs="12" sm="4" Class="d-flex flex-column justify-center">
+                    <MudSwitch T="bool" @bind-Value="_model.IsPercentage" Color="Color.Primary">Value is a percentage</MudSwitch>
+                    <MudSwitch T="bool" @bind-Value="_model.IsPerWorkDay" Color="Color.Primary">Paid per work day</MudSwitch>
+                </MudItem>
+            </MudGrid>
+        </EditForm>
+    </DialogContent>
+    <DialogActions>
+        <MudButton Color="Color.Default" OnClick="CancelAsync" Disabled="_busy">Cancel</MudButton>
+        <MudButton Color="Color.Primary" Variant="Variant.Filled" OnClick="SubmitAsync" Disabled="_busy">
+            @if (_busy)
+            {
+                <MudProgressCircular Size="Size.Small" Indeterminate="true" Class="mx-1" />
+            }
+            else
+            {
+                <text>@(IsEdit ? "Save Changes" : "Create Component")</text>
+            }
+        </MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    [Parameter] public SalaryComponentDto? Component { get; set; }
+
+    [CascadingParameter] public IMudDialogInstance MudDialog { get; set; } = default!;
+
+    private static readonly string[] Frequencies = { "OneTime", "Monthly", "Quarterly", "Annual" };
+
+    private readonly SalaryComponentFormModel _model = new();
+    private EditContext _editContext = default!;
+    private bool _busy;
+
+    private bool IsEdit => Component is not null;
+
+    protected override void OnInitialized()
+    {
+        _editContext = new EditContext(_model);
+
+        if (Component is null)
+            return;
+
+        _model.Name = Component.Name;
+        _model.Kind = Component.Kind;
+        _model.Frequency = Component.Frequency;
+        _model.IsPercentage = Component.IsPercentage;
+        _model.IsPerWorkDay = Component.IsPerWorkDay;
+        _model.DefaultValue = Component.DefaultValue;
+    }
+
+    private async Task SubmitAsync()
+    {
+        if (!_editContext.Validate())
+            return;
+
+        _busy = true;
+        try
+        {
+            var input = new SalaryComponentInput
+            {
+                Name = _model.Name,
+                Kind = _model.Kind,
+                Frequency = string.IsNullOrWhiteSpace(_model.Frequency) ? null : _model.Frequency,
+                IsPercentage = _model.IsPercentage,
+                IsPerWorkDay = _model.IsPerWorkDay,
+                DefaultValue = _model.DefaultValue,
+            };
+
+            if (IsEdit)
+                await PayrollService.UpdateSalaryComponentAsync(Component!.Id, input);
+            else
+                await PayrollService.CreateSalaryComponentAsync(input);
+
+            Snackbar.Add(IsEdit ? "Component updated." : "Component created.", Severity.Success);
+            MudDialog.Close(DialogResult.Ok(true));
+        }
+        catch (ApiException ex)
+        {
+            Snackbar.Add(ex.Message, Severity.Error);
+        }
+        catch (Exception)
+        {
+            Snackbar.Add("Unable to reach the server. Please try again.", Severity.Error);
+        }
+        finally
+        {
+            _busy = false;
+        }
+    }
+
+    private void CancelAsync()
+        => MudDialog.Cancel();
+
+    private static string FormatFrequency(string frequency) => frequency switch
+    {
+        "OneTime" => "One Time",
+        "Monthly" => "Monthly",
+        "Quarterly" => "Quarterly",
+        "Annual" => "Annual",
+        _ => frequency,
+    };
+
+    private sealed class SalaryComponentFormModel
+    {
+        [Required(ErrorMessage = "Name is required.")]
+        [MaxLength(100, ErrorMessage = "Name must be 100 characters or fewer.")]
+        public string Name { get; set; } = string.Empty;
+
+        [Required(ErrorMessage = "Kind is required.")]
+        public string Kind { get; set; } = "Earning";
+
+        public string? Frequency { get; set; }
+
+        public bool IsPercentage { get; set; }
+
+        public bool IsPerWorkDay { get; set; }
+
+        public decimal DefaultValue { get; set; }
+    }
+}

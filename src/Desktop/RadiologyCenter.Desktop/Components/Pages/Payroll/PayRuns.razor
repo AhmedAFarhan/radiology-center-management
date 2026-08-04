@@ -1,0 +1,246 @@
+@page "/payroll/payruns"
+@attribute [Authorize]
+@inject PayrollService PayrollService
+@inject IDialogService DialogService
+@inject ISnackbar Snackbar
+@implements IDisposable
+
+<MudToolBar Dense="true" Class="mb-4">
+    <MudText Typo="Typo.h5">Pay Runs</MudText>
+    <MudText Typo="Typo.body2" Class="text-secondary ms-2">Create and process payroll cycles</MudText>
+    <MudSpacer />
+    <MudTextField T="string"
+                  Value="_search"
+                  ValueChanged="OnSearchChanged"
+                  Placeholder="Search pay runs..."
+                  Variant="Variant.Outlined"
+                  Margin="Margin.Dense"
+                  Immediate="true"
+                  Adornment="Adornment.Start"
+                  AdornmentIcon="@Icons.Material.Filled.Search"
+                  Class="search-field" />
+    <MudIconButton Icon="@Icons.Material.Filled.Refresh" Color="Color.Default" aria-label="Refresh" OnClick="ReloadAsync" />
+    <MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Add" OnClick="OpenCreateDialogAsync">New Pay Run</MudButton>
+</MudToolBar>
+
+@if (_statsLoaded)
+{
+    <MudGrid Spacing="2" Class="mb-4">
+        <MudItem xs="6" sm="4" md="2">
+            <MudPaper Elevation="0" Class="pa-3 d-flex flex-column align-center rounded" Style="border:1px solid rgba(0,0,0,.12)">
+                <MudText Typo="Typo.h5" Align="Align.Center">@_stats.Total</MudText>
+                <MudText Typo="Typo.caption" Align="Align.Center" Class="text-secondary">On Page</MudText>
+            </MudPaper>
+        </MudItem>
+        <MudItem xs="6" sm="4" md="2">
+            <MudPaper Elevation="0" Class="pa-3 d-flex flex-column align-center rounded" Style="border:1px solid rgba(0,0,0,.12)">
+                <MudText Typo="Typo.h5" Align="Align.Center" Class="text-secondary">@_stats.Draft</MudText>
+                <MudText Typo="Typo.caption" Align="Align.Center" Class="text-secondary">Draft</MudText>
+            </MudPaper>
+        </MudItem>
+        <MudItem xs="6" sm="4" md="2">
+            <MudPaper Elevation="0" Class="pa-3 d-flex flex-column align-center rounded" Style="border:1px solid rgba(0,0,0,.12)">
+                <MudText Typo="Typo.h5" Align="Align.Center" Class="text-info">@_stats.Computed</MudText>
+                <MudText Typo="Typo.caption" Align="Align.Center" Class="text-secondary">Computed</MudText>
+            </MudPaper>
+        </MudItem>
+        <MudItem xs="6" sm="4" md="2">
+            <MudPaper Elevation="0" Class="pa-3 d-flex flex-column align-center rounded" Style="border:1px solid rgba(0,0,0,.12)">
+                <MudText Typo="Typo.h5" Align="Align.Center" Class="text-primary">@_stats.Approved</MudText>
+                <MudText Typo="Typo.caption" Align="Align.Center" Class="text-secondary">Approved</MudText>
+            </MudPaper>
+        </MudItem>
+        <MudItem xs="6" sm="4" md="2">
+            <MudPaper Elevation="0" Class="pa-3 d-flex flex-column align-center rounded" Style="border:1px solid rgba(0,0,0,.12)">
+                <MudText Typo="Typo.h5" Align="Align.Center" Class="text-success">@_stats.Paid</MudText>
+                <MudText Typo="Typo.caption" Align="Align.Center" Class="text-secondary">Paid</MudText>
+            </MudPaper>
+        </MudItem>
+        <MudItem xs="6" sm="4" md="2">
+            <MudPaper Elevation="0" Class="pa-3 d-flex flex-column align-center rounded" Style="border:1px solid rgba(0,0,0,.12)">
+                <MudText Typo="Typo.h5" Align="Align.Center" Class="text-error">@_stats.Rejected</MudText>
+                <MudText Typo="Typo.caption" Align="Align.Center" Class="text-secondary">Rejected</MudText>
+            </MudPaper>
+        </MudItem>
+    </MudGrid>
+}
+
+<MudTable T="PayRunDto" @ref="_table" ServerData="LoadServerData" Dense="true" Hover="true" Striped="true" Elevation="1" RowsPerPage="10">
+    <HeaderContent>
+        <MudTh><MudTableSortLabel T="PayRunDto" SortLabel="@("RunFrom")">Period</MudTableSortLabel></MudTh>
+        <MudTh><MudTableSortLabel T="PayRunDto" SortLabel="@("Status")">Status</MudTableSortLabel></MudTh>
+        <MudTh>Employees</MudTh>
+        <MudTh>Net Pay</MudTh>
+        <MudTh><MudTableSortLabel T="PayRunDto" SortLabel="@("ProcessedAt")">Processed</MudTableSortLabel></MudTh>
+        <MudTh>Notes</MudTh>
+        <MudTh>Actions</MudTh>
+    </HeaderContent>
+    <RowTemplate>
+        <MudTd DataLabel="Period">
+            <MudText Class="font-weight-medium">@context.RunFrom.ToString("yyyy-MM-dd") → @context.RunTo.ToString("yyyy-MM-dd")</MudText>
+        </MudTd>
+        <MudTd DataLabel="Status">
+            <MudChip T="string" Size="Size.Small" Color="@StatusColor(context.Status)">@FormatStatus(context.Status)</MudChip>
+        </MudTd>
+        <MudTd DataLabel="Employees">@context.Payslips.Count</MudTd>
+        <MudTd DataLabel="Net Pay">@context.Payslips.Sum(p => p.NetSalary).ToString("N2")</MudTd>
+        <MudTd DataLabel="Processed">@(context.ProcessedAt?.ToString("g") ?? "-")</MudTd>
+        <MudTd DataLabel="Notes">@(string.IsNullOrWhiteSpace(context.Notes) ? "-" : context.Notes)</MudTd>
+        <MudTd DataLabel="Actions">
+            <MudIconButton Icon="@Icons.Material.Filled.Visibility" Size="Size.Small" Color="Color.Default" aria-label="View" OnClick="@(() => OpenDetailDialogAsync(context))" />
+            <MudIconButton Icon="@Icons.Material.Filled.Delete" Size="Size.Small" Color="Color.Error" aria-label="Delete" OnClick="@(() => DeletePayRunAsync(context))" />
+        </MudTd>
+    </RowTemplate>
+    <NoRecordsContent>
+        <MudText Class="pa-4">No pay runs found.</MudText>
+    </NoRecordsContent>
+    <PagerContent>
+        <MudTablePager PageSizeOptions="@(new[] { 10, 25, 50 })" />
+    </PagerContent>
+</MudTable>
+
+@code {
+    private MudTable<PayRunDto>? _table;
+    private string? _search;
+    private CancellationTokenSource? _searchCts;
+    private bool _statsLoaded;
+    private PayRunStats _stats = new();
+
+    private async Task<TableData<PayRunDto>> LoadServerData(TableState state, CancellationToken ct)
+    {
+        try
+        {
+            var page = await PayrollService.GetPayRunsPagedAsync(
+                _search,
+                state.SortLabel,
+                state.SortDirection == SortDirection.Descending,
+                state.Page + 1,
+                state.PageSize,
+                ct);
+
+            _stats = new PayRunStats
+            {
+                Total = page.Items.Count,
+                Draft = page.Items.Count(p => p.Status == "Draft"),
+                Computed = page.Items.Count(p => p.Status == "Computed"),
+                Approved = page.Items.Count(p => p.Status == "Approved"),
+                Paid = page.Items.Count(p => p.Status == "Paid"),
+                Rejected = page.Items.Count(p => p.Status == "Rejected"),
+            };
+            _statsLoaded = true;
+
+            return new TableData<PayRunDto> { Items = page.Items, TotalItems = page.TotalCount };
+        }
+        catch (ApiException ex)
+        {
+            Snackbar.Add(ex.Message, Severity.Error);
+            return new TableData<PayRunDto> { Items = Array.Empty<PayRunDto>(), TotalItems = 0 };
+        }
+        catch (Exception)
+        {
+            Snackbar.Add("Unable to reach the server.", Severity.Error);
+            return new TableData<PayRunDto> { Items = Array.Empty<PayRunDto>(), TotalItems = 0 };
+        }
+    }
+
+    private async Task OnSearchChanged(string? value)
+    {
+        _search = value;
+
+        _searchCts?.Cancel();
+        var cts = _searchCts = new CancellationTokenSource();
+        try
+        {
+            await Task.Delay(400, cts.Token);
+        }
+        catch (TaskCanceledException)
+        {
+            return;
+        }
+
+        if (_table is not null)
+            await _table.ReloadServerData();
+    }
+
+    private Task ReloadAsync()
+        => _table is null ? Task.CompletedTask : _table.ReloadServerData();
+
+    private async Task OpenCreateDialogAsync()
+    {
+        var options = new DialogOptions { MaxWidth = MaxWidth.Medium, FullWidth = true };
+        var dialog = await DialogService.ShowAsync<PayRunEditorDialog>("New Pay Run", options);
+        await ReloadIfSavedAsync(dialog);
+    }
+
+    private async Task OpenDetailDialogAsync(PayRunDto payRun)
+    {
+        var parameters = new DialogParameters { ["PayRunId"] = payRun.Id };
+        var options = new DialogOptions { MaxWidth = MaxWidth.Large, FullWidth = true };
+        var dialog = await DialogService.ShowAsync<PayRunDetailDialog>($"Pay Run {payRun.RunFrom.ToString("yyyy-MM-dd")} → {payRun.RunTo.ToString("yyyy-MM-dd")}", parameters, options);
+        await ReloadIfSavedAsync(dialog);
+    }
+
+    private async Task ReloadIfSavedAsync(IDialogReference dialog)
+    {
+        var result = await dialog.Result;
+        if (result is { Canceled: false })
+            await ReloadAsync();
+    }
+
+    private async Task DeletePayRunAsync(PayRunDto payRun)
+    {
+        var confirmed = await DialogService.ShowMessageBoxAsync(
+            "Delete Pay Run",
+            $"Are you sure you want to delete the pay run for {payRun.RunFrom.ToString("yyyy-MM-dd")} → {payRun.RunTo.ToString("yyyy-MM-dd")}? This cannot be undone.",
+            "Delete",
+            "Cancel");
+
+        if (confirmed != true)
+            return;
+
+        try
+        {
+            await PayrollService.DeletePayRunAsync(payRun.Id);
+            Snackbar.Add("Pay run deleted.", Severity.Success);
+            await ReloadAsync();
+        }
+        catch (ApiException ex)
+        {
+            Snackbar.Add(ex.Message, Severity.Error);
+        }
+        catch (Exception)
+        {
+            Snackbar.Add("Unable to reach the server.", Severity.Error);
+        }
+    }
+
+    private static string FormatStatus(string status) => status switch
+    {
+        "Computed" => "Computed",
+        "Approved" => "Approved",
+        "Rejected" => "Rejected",
+        _ => status,
+    };
+
+    private static Color StatusColor(string status) => status switch
+    {
+        "Draft" => Color.Default,
+        "Computed" => Color.Info,
+        "Approved" => Color.Primary,
+        "Paid" => Color.Success,
+        "Rejected" => Color.Error,
+        _ => Color.Default,
+    };
+
+    public void Dispose() => _searchCts?.Cancel();
+
+    private sealed class PayRunStats
+    {
+        public int Total { get; set; }
+        public int Draft { get; set; }
+        public int Computed { get; set; }
+        public int Approved { get; set; }
+        public int Paid { get; set; }
+        public int Rejected { get; set; }
+    }
+}

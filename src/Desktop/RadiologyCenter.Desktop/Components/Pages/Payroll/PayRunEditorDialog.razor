@@ -1,0 +1,118 @@
+@inject PayrollService PayrollService
+@inject ISnackbar Snackbar
+
+<MudDialog>
+    <DialogContent>
+        <EditForm EditContext="_editContext">
+            <DataAnnotationsValidator />
+            <MudGrid Spacing="2">
+                <MudItem xs="12" sm="6">
+                    <MudDatePicker @bind-Date="_model.RunFrom"
+                                   Label="Period From"
+                                   Variant="Variant.Outlined"
+                                   Margin="Margin.Dense"
+                                   Class="w-100" />
+                </MudItem>
+                <MudItem xs="12" sm="6">
+                    <MudDatePicker @bind-Date="_model.RunTo"
+                                   Label="Period To"
+                                   Variant="Variant.Outlined"
+                                   Margin="Margin.Dense"
+                                   Class="w-100" />
+                </MudItem>
+                <MudItem xs="12">
+                    <MudTextField @bind-Value="_model.Notes"
+                                  Label="Notes"
+                                  Variant="Variant.Outlined"
+                                  Margin="Margin.Dense"
+                                  Lines="3"
+                                  Immediate="true" />
+                </MudItem>
+            </MudGrid>
+        </EditForm>
+    </DialogContent>
+    <DialogActions>
+        <MudButton Color="Color.Default" OnClick="CancelAsync" Disabled="_busy">Cancel</MudButton>
+        <MudButton Color="Color.Primary" Variant="Variant.Filled" OnClick="SubmitAsync" Disabled="_busy">
+            @if (_busy)
+            {
+                <MudProgressCircular Size="Size.Small" Indeterminate="true" Class="mx-1" />
+            }
+            else
+            {
+                <text>Create Pay Run</text>
+            }
+        </MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    [CascadingParameter] public IMudDialogInstance MudDialog { get; set; } = default!;
+
+    private readonly PayRunFormModel _model = new();
+    private EditContext _editContext = default!;
+    private bool _busy;
+
+    protected override void OnInitialized()
+    {
+        _editContext = new EditContext(_model);
+        _model.RunFrom = new DateTime(DateTime.Today.Year, DateTime.Today.Month, 1);
+        _model.RunTo = _model.RunFrom.Value.AddMonths(1).AddDays(-1);
+    }
+
+    private async Task SubmitAsync()
+    {
+        if (!_editContext.Validate())
+            return;
+
+        if (_model.RunFrom is null || _model.RunTo is null)
+        {
+            Snackbar.Add("Select both period dates.", Severity.Warning);
+            return;
+        }
+
+        if (_model.RunTo < _model.RunFrom)
+        {
+            Snackbar.Add("Period To must be on or after Period From.", Severity.Warning);
+            return;
+        }
+
+        _busy = true;
+        try
+        {
+            await PayrollService.CreatePayRunAsync(new CreatePayRunInput
+            {
+                RunFrom = _model.RunFrom.Value.Date,
+                RunTo = _model.RunTo.Value.Date,
+                Notes = _model.Notes,
+            });
+
+            Snackbar.Add("Pay run created.", Severity.Success);
+            MudDialog.Close(DialogResult.Ok(true));
+        }
+        catch (ApiException ex)
+        {
+            Snackbar.Add(ex.Message, Severity.Error);
+        }
+        catch (Exception)
+        {
+            Snackbar.Add("Unable to reach the server. Please try again.", Severity.Error);
+        }
+        finally
+        {
+            _busy = false;
+        }
+    }
+
+    private void CancelAsync()
+        => MudDialog.Cancel();
+
+    private sealed class PayRunFormModel
+    {
+        public DateTime? RunFrom { get; set; }
+
+        public DateTime? RunTo { get; set; }
+
+        public string? Notes { get; set; }
+    }
+}

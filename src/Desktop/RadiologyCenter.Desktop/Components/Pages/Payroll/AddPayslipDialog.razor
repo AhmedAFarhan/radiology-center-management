@@ -1,0 +1,42 @@
+@inject ISnackbar Snackbar
+
+<MudDialog>
+    <DialogContent>
+        <MudAutocomplete T="StaffDto"
+                         @bind-Value="_selectedStaff"
+                         Label="Employee (search by name)"
+                         Variant="Variant.Outlined"
+                         Margin="Margin.Dense"
+                         MinCharacters="1"
+                         DebounceInterval="300"
+                         SearchFunc="StaffSearchFunc"
+                         ToStringFunc="@(s => s is null ? string.Empty : s.FullName)"
+                         Clearable="true" />
+    </DialogContent>
+    <DialogActions>
+        <MudButton Color="Color.Default" OnClick="CancelAsync">Cancel</MudButton>
+        <MudButton Color="Color.Primary" Variant="Variant.Filled" OnClick="SubmitAsync">Add</MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    [Parameter] public Func<string?, CancellationToken, Task<IEnumerable<StaffDto>>> StaffSearchFunc { get; set; } = default!;
+
+    [CascadingParameter] public IMudDialogInstance MudDialog { get; set; } = default!;
+
+    private StaffDto? _selectedStaff;
+
+    private void SubmitAsync()
+    {
+        if (_selectedStaff is null)
+        {
+            Snackbar.Add("Select an employee.", Severity.Warning);
+            return;
+        }
+
+        MudDialog.Close(DialogResult.Ok(_selectedStaff.Id));
+    }
+
+    private void CancelAsync()
+        => MudDialog.Cancel();
+}

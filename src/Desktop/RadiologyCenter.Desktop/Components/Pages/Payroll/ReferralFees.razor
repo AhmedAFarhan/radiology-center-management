@@ -1,0 +1,208 @@
+@page "/payroll/referral-fees"
+@attribute [Authorize]
+@inject PayrollService PayrollService
+@inject ResourceService ResourceService
+@inject ExaminationService ExaminationService
+@inject IDialogService DialogService
+@inject ISnackbar Snackbar
+@implements IDisposable
+
+<MudToolBar Dense="true" Class="mb-4">
+    <MudText Typo="Typo.h5">Referral Fees</MudText>
+    <MudText Typo="Typo.body2" Class="text-secondary ms-2">Fees paid to referring doctors</MudText>
+    <MudSpacer />
+    <MudTextField T="string"
+                  Value="_search"
+                  ValueChanged="OnSearchChanged"
+                  Placeholder="Search fees..."
+                  Variant="Variant.Outlined"
+                  Margin="Margin.Dense"
+                  Immediate="true"
+                  Adornment="Adornment.Start"
+                  AdornmentIcon="@Icons.Material.Filled.Search"
+                  Class="search-field" />
+    <MudIconButton Icon="@Icons.Material.Filled.Refresh" Color="Color.Default" aria-label="Refresh" OnClick="ReloadAsync" />
+    <MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Add" OnClick="OpenCreateDialogAsync">New Fee</MudButton>
+</MudToolBar>
+
+<MudTable T="ReferralFeeDto" @ref="_table" ServerData="LoadServerData" Dense="true" Hover="true" Striped="true" Elevation="1" RowsPerPage="10">
+    <HeaderContent>
+        <MudTh>Doctor</MudTh>
+        <MudTh>Examination Type</MudTh>
+        <MudTh Class="text-right"><MudTableSortLabel T="ReferralFeeDto" SortLabel="@("Amount")">Amount</MudTableSortLabel></MudTh>
+        <MudTh>Type</MudTh>
+        <MudTh>Status</MudTh>
+        <MudTh>Actions</MudTh>
+    </HeaderContent>
+    <RowTemplate>
+        <MudTd DataLabel="Doctor">
+            <MudText Class="font-weight-medium">@ResolveDoctor(context.ReferralDoctorId)</MudText>
+        </MudTd>
+        <MudTd DataLabel="Examination Type">@ResolveExamType(context.ExaminationTypeId)</MudTd>
+        <MudTd DataLabel="Amount" Class="text-right">@(context.IsPercentage ? $"{context.Amount:N2}%" : context.Amount.ToString("N2"))</MudTd>
+        <MudTd DataLabel="Type">
+            <MudChip T="string" Size="Size.Small" Color="@(context.IsPercentage ? Color.Warning : Color.Default)">@(context.IsPercentage ? "Percentage" : "Flat")</MudChip>
+        </MudTd>
+        <MudTd DataLabel="Status">
+            <MudChip T="string" Size="Size.Small" Color="@(context.IsActive ? Color.Success : Color.Default)">@(context.IsActive ? "Active" : "Inactive")</MudChip>
+        </MudTd>
+        <MudTd DataLabel="Actions">
+            <MudIconButton Icon="@Icons.Material.Filled.Edit" Size="Size.Small" Color="Color.Default" aria-label="Edit" OnClick="@(() => OpenEditDialogAsync(context))" />
+            <MudIconButton Icon="@(context.IsActive ? Icons.Material.Filled.Block : Icons.Material.Filled.CheckCircle)"
+                           Size="Size.Small"
+                           Color="@(context.IsActive ? Color.Default : Color.Success)"
+                           aria-label="Toggle status"
+                           OnClick="@(() => ToggleActiveAsync(context))" />
+            <MudIconButton Icon="@Icons.Material.Filled.Delete" Size="Size.Small" Color="Color.Error" aria-label="Delete" OnClick="@(() => DeleteFeeAsync(context))" />
+        </MudTd>
+    </RowTemplate>
+    <NoRecordsContent>
+        <MudText Class="pa-4">No referral fees found.</MudText>
+    </NoRecordsContent>
+    <PagerContent>
+        <MudTablePager PageSizeOptions="@(new[] { 10, 25, 50 })" />
+    </PagerContent>
+</MudTable>
+
+@code {
+    private MudTable<ReferralFeeDto>? _table;
+    private string? _search;
+    private CancellationTokenSource? _searchCts;
+    private IReadOnlyDictionary<string, string> _doctorNames = new Dictionary<string, string>();
+    private IReadOnlyDictionary<string, string> _examTypeNames = new Dictionary<string, string>();
+
+    private async Task<TableData<ReferralFeeDto>> LoadServerData(TableState state, CancellationToken ct)
+    {
+        try
+        {
+            var feesTask = PayrollService.GetReferralFeesPagedAsync(
+                _search,
+                state.SortLabel,
+                state.SortDirection == SortDirection.Descending,
+                state.Page + 1,
+                state.PageSize,
+                ct);
+            var doctorsTask = ResourceService.GetReferralDoctorsPagedAsync(null, null, false, 1, 100, ct);
+            var typesTask = ExaminationService.GetTypesPagedAsync(null, null, false, 1, 100, ct);
+
+            await Task.WhenAll(feesTask, doctorsTask, typesTask);
+
+            var fees = await feesTask;
+            _doctorNames = (await doctorsTask).Items.ToDictionary(d => d.Id, d => d.FullName);
+            _examTypeNames = (await typesTask).Items.ToDictionary(t => t.Id, t => $"{t.Code} - {t.Name}");
+
+            return new TableData<ReferralFeeDto> { Items = fees.Items, TotalItems = fees.TotalCount };
+        }
+        catch (ApiException ex)
+        {
+            Snackbar.Add(ex.Message, Severity.Error);
+            return new TableData<ReferralFeeDto> { Items = Array.Empty<ReferralFeeDto>(), TotalItems = 0 };
+        }
+        catch (Exception)
+        {
+            Snackbar.Add("Unable to reach the server.", Severity.Error);
+            return new TableData<ReferralFeeDto> { Items = Array.Empty<ReferralFeeDto>(), TotalItems = 0 };
+        }
+    }
+
+    private string ResolveDoctor(string doctorId)
+        => _doctorNames.TryGetValue(doctorId, out var name) ? name : doctorId;
+
+    private string ResolveExamType(string examTypeId)
+        => _examTypeNames.TryGetValue(examTypeId, out var name) ? name : examTypeId;
+
+    private async Task OnSearchChanged(string? value)
+    {
+        _search = value;
+
+        _searchCts?.Cancel();
+        var cts = _searchCts = new CancellationTokenSource();
+        try
+        {
+            await Task.Delay(400, cts.Token);
+        }
+        catch (TaskCanceledException)
+        {
+            return;
+        }
+
+        if (_table is not null)
+            await _table.ReloadServerData();
+    }
+
+    private Task ReloadAsync()
+        => _table is null ? Task.CompletedTask : _table.ReloadServerData();
+
+    private async Task OpenCreateDialogAsync()
+    {
+        var options = new DialogOptions { MaxWidth = MaxWidth.Medium, FullWidth = true };
+        var dialog = await DialogService.ShowAsync<ReferralFeeEditorDialog>("New Referral Fee", options);
+        await ReloadIfSavedAsync(dialog);
+    }
+
+    private async Task OpenEditDialogAsync(ReferralFeeDto fee)
+    {
+        var parameters = new DialogParameters { ["Fee"] = fee };
+        var options = new DialogOptions { MaxWidth = MaxWidth.Medium, FullWidth = true };
+        var dialog = await DialogService.ShowAsync<ReferralFeeEditorDialog>("Edit Referral Fee", parameters, options);
+        await ReloadIfSavedAsync(dialog);
+    }
+
+    private async Task ReloadIfSavedAsync(IDialogReference dialog)
+    {
+        var result = await dialog.Result;
+        if (result is { Canceled: false })
+            await ReloadAsync();
+    }
+
+    private async Task ToggleActiveAsync(ReferralFeeDto fee)
+    {
+        try
+        {
+            if (fee.IsActive)
+                await PayrollService.DeactivateReferralFeeAsync(fee.Id);
+            else
+                await PayrollService.ActivateReferralFeeAsync(fee.Id);
+
+            Snackbar.Add(fee.IsActive ? "Fee deactivated." : "Fee activated.", Severity.Success);
+            await ReloadAsync();
+        }
+        catch (ApiException ex)
+        {
+            Snackbar.Add(ex.Message, Severity.Error);
+        }
+        catch (Exception)
+        {
+            Snackbar.Add("Unable to reach the server.", Severity.Error);
+        }
+    }
+
+    private async Task DeleteFeeAsync(ReferralFeeDto fee)
+    {
+        var confirmed = await DialogService.ShowMessageBoxAsync(
+            "Delete Referral Fee",
+            "Are you sure you want to delete this fee? This cannot be undone.",
+            "Delete",
+            "Cancel");
+
+        if (confirmed != true)
+            return;
+
+        try
+        {
+            await PayrollService.DeleteReferralFeeAsync(fee.Id);
+            Snackbar.Add("Referral fee deleted.", Severity.Success);
+            await ReloadAsync();
+        }
+        catch (ApiException ex)
+        {
+            Snackbar.Add(ex.Message, Severity.Error);
+        }
+        catch (Exception)
+        {
+            Snackbar.Add("Unable to reach the server.", Severity.Error);
+        }
+    }
+
+    public void Dispose() => _searchCts?.Cancel();
+}

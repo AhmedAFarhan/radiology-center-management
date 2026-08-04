@@ -1,0 +1,223 @@
+@page "/payroll/allowances"
+@attribute [Authorize]
+@inject PayrollService PayrollService
+@inject ResourceService ResourceService
+@inject IDialogService DialogService
+@inject ISnackbar Snackbar
+@implements IDisposable
+
+<MudToolBar Dense="true" Class="mb-4">
+    <MudText Typo="Typo.h5">Allowances</MudText>
+    <MudText Typo="Typo.body2" Class="text-secondary ms-2">Employee-specific allowance assignments</MudText>
+    <MudSpacer />
+    <MudTextField T="string"
+                  Value="_search"
+                  ValueChanged="OnSearchChanged"
+                  Placeholder="Search allowances..."
+                  Variant="Variant.Outlined"
+                  Margin="Margin.Dense"
+                  Immediate="true"
+                  Adornment="Adornment.Start"
+                  AdornmentIcon="@Icons.Material.Filled.Search"
+                  Class="search-field" />
+    <MudIconButton Icon="@Icons.Material.Filled.Refresh" Color="Color.Default" aria-label="Refresh" OnClick="ReloadAsync" />
+    <MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Add" OnClick="OpenCreateDialogAsync">New Allowance</MudButton>
+</MudToolBar>
+
+<MudTable T="AllowanceAssignmentDto" @ref="_table" ServerData="LoadServerData" Dense="true" Hover="true" Striped="true" Elevation="1" RowsPerPage="10">
+    <HeaderContent>
+        <MudTh>Employee</MudTh>
+        <MudTh><MudTableSortLabel T="AllowanceAssignmentDto" SortLabel="@("Name")">Allowance</MudTableSortLabel></MudTh>
+        <MudTh Class="text-right"><MudTableSortLabel T="AllowanceAssignmentDto" SortLabel="@("Amount")">Amount</MudTableSortLabel></MudTh>
+        <MudTh><MudTableSortLabel T="AllowanceAssignmentDto" SortLabel="@("Frequency")">Frequency</MudTableSortLabel></MudTh>
+        <MudTh>Per Work Day</MudTh>
+        <MudTh><MudTableSortLabel T="AllowanceAssignmentDto" SortLabel="@("EffectiveDate")">Effective</MudTableSortLabel></MudTh>
+        <MudTh>End</MudTh>
+        <MudTh>Status</MudTh>
+        <MudTh>Actions</MudTh>
+    </HeaderContent>
+    <RowTemplate>
+        <MudTd DataLabel="Employee">
+            <MudText Class="font-weight-medium">@ResolveStaff(context.StaffId)</MudText>
+        </MudTd>
+        <MudTd DataLabel="Allowance">@context.Name</MudTd>
+        <MudTd DataLabel="Amount" Class="text-right">@context.Amount.ToString("N2")</MudTd>
+        <MudTd DataLabel="Frequency">@(string.IsNullOrWhiteSpace(context.Frequency) ? "-" : FormatFrequency(context.Frequency))</MudTd>
+        <MudTd DataLabel="Per Work Day">
+            @if (context.IsPerWorkDay)
+            {
+                <MudChip T="string" Size="Size.Small" Color="Color.Info">Per Work Day</MudChip>
+            }
+            else
+            {
+                <MudText Typo="Typo.body2" Class="text-secondary">-</MudText>
+            }
+        </MudTd>
+        <MudTd DataLabel="Effective">@context.EffectiveDate.ToString("yyyy-MM-dd")</MudTd>
+        <MudTd DataLabel="End">@(context.EndDate?.ToString("yyyy-MM-dd") ?? "-")</MudTd>
+        <MudTd DataLabel="Status">
+            <MudChip T="string" Size="Size.Small" Color="@(context.IsActive ? Color.Success : Color.Default)">@(context.IsActive ? "Active" : "Inactive")</MudChip>
+        </MudTd>
+        <MudTd DataLabel="Actions">
+            <MudIconButton Icon="@Icons.Material.Filled.Edit" Size="Size.Small" Color="Color.Default" aria-label="Edit" OnClick="@(() => OpenEditDialogAsync(context))" />
+            <MudIconButton Icon="@(context.IsActive ? Icons.Material.Filled.Block : Icons.Material.Filled.CheckCircle)"
+                           Size="Size.Small"
+                           Color="@(context.IsActive ? Color.Default : Color.Success)"
+                           aria-label="Toggle status"
+                           OnClick="@(() => ToggleActiveAsync(context))" />
+            <MudIconButton Icon="@Icons.Material.Filled.Delete" Size="Size.Small" Color="Color.Error" aria-label="Delete" OnClick="@(() => DeleteAllowanceAsync(context))" />
+        </MudTd>
+    </RowTemplate>
+    <NoRecordsContent>
+        <MudText Class="pa-4">No allowances found.</MudText>
+    </NoRecordsContent>
+    <PagerContent>
+        <MudTablePager PageSizeOptions="@(new[] { 10, 25, 50 })" />
+    </PagerContent>
+</MudTable>
+
+@code {
+    private MudTable<AllowanceAssignmentDto>? _table;
+    private string? _search;
+    private CancellationTokenSource? _searchCts;
+    private IReadOnlyDictionary<string, string> _staffNames = new Dictionary<string, string>();
+
+    private async Task<TableData<AllowanceAssignmentDto>> LoadServerData(TableState state, CancellationToken ct)
+    {
+        try
+        {
+            var allowancesTask = PayrollService.GetAllowancesPagedAsync(
+                _search,
+                state.SortLabel,
+                state.SortDirection == SortDirection.Descending,
+                state.Page + 1,
+                state.PageSize,
+                ct);
+            var staffTask = ResourceService.GetStaffsPagedAsync(null, null, false, 1, 100, ct);
+
+            await Task.WhenAll(allowancesTask, staffTask);
+
+            var allowances = await allowancesTask;
+            _staffNames = (await staffTask).Items.ToDictionary(s => s.Id, s => s.FullName);
+
+            return new TableData<AllowanceAssignmentDto> { Items = allowances.Items, TotalItems = allowances.TotalCount };
+        }
+        catch (ApiException ex)
+        {
+            Snackbar.Add(ex.Message, Severity.Error);
+            return new TableData<AllowanceAssignmentDto> { Items = Array.Empty<AllowanceAssignmentDto>(), TotalItems = 0 };
+        }
+        catch (Exception)
+        {
+            Snackbar.Add("Unable to reach the server.", Severity.Error);
+            return new TableData<AllowanceAssignmentDto> { Items = Array.Empty<AllowanceAssignmentDto>(), TotalItems = 0 };
+        }
+    }
+
+    private string ResolveStaff(string staffId)
+        => _staffNames.TryGetValue(staffId, out var name) ? name : staffId;
+
+    private async Task OnSearchChanged(string? value)
+    {
+        _search = value;
+
+        _searchCts?.Cancel();
+        var cts = _searchCts = new CancellationTokenSource();
+        try
+        {
+            await Task.Delay(400, cts.Token);
+        }
+        catch (TaskCanceledException)
+        {
+            return;
+        }
+
+        if (_table is not null)
+            await _table.ReloadServerData();
+    }
+
+    private Task ReloadAsync()
+        => _table is null ? Task.CompletedTask : _table.ReloadServerData();
+
+    private async Task OpenCreateDialogAsync()
+    {
+        var options = new DialogOptions { MaxWidth = MaxWidth.Medium, FullWidth = true };
+        var dialog = await DialogService.ShowAsync<AllowanceEditorDialog>("New Allowance", options);
+        await ReloadIfSavedAsync(dialog);
+    }
+
+    private async Task OpenEditDialogAsync(AllowanceAssignmentDto allowance)
+    {
+        var parameters = new DialogParameters { ["Allowance"] = allowance };
+        var options = new DialogOptions { MaxWidth = MaxWidth.Medium, FullWidth = true };
+        var dialog = await DialogService.ShowAsync<AllowanceEditorDialog>($"Edit {allowance.Name}", parameters, options);
+        await ReloadIfSavedAsync(dialog);
+    }
+
+    private async Task ReloadIfSavedAsync(IDialogReference dialog)
+    {
+        var result = await dialog.Result;
+        if (result is { Canceled: false })
+            await ReloadAsync();
+    }
+
+    private async Task ToggleActiveAsync(AllowanceAssignmentDto allowance)
+    {
+        try
+        {
+            if (allowance.IsActive)
+                await PayrollService.DeactivateAllowanceAsync(allowance.Id);
+            else
+                await PayrollService.ActivateAllowanceAsync(allowance.Id);
+
+            Snackbar.Add(allowance.IsActive ? "Allowance deactivated." : "Allowance activated.", Severity.Success);
+            await ReloadAsync();
+        }
+        catch (ApiException ex)
+        {
+            Snackbar.Add(ex.Message, Severity.Error);
+        }
+        catch (Exception)
+        {
+            Snackbar.Add("Unable to reach the server.", Severity.Error);
+        }
+    }
+
+    private async Task DeleteAllowanceAsync(AllowanceAssignmentDto allowance)
+    {
+        var confirmed = await DialogService.ShowMessageBoxAsync(
+            "Delete Allowance",
+            $"Are you sure you want to delete {allowance.Name}? This cannot be undone.",
+            "Delete",
+            "Cancel");
+
+        if (confirmed != true)
+            return;
+
+        try
+        {
+            await PayrollService.DeleteAllowanceAsync(allowance.Id);
+            Snackbar.Add("Allowance deleted.", Severity.Success);
+            await ReloadAsync();
+        }
+        catch (ApiException ex)
+        {
+            Snackbar.Add(ex.Message, Severity.Error);
+        }
+        catch (Exception)
+        {
+            Snackbar.Add("Unable to reach the server.", Severity.Error);
+        }
+    }
+
+    private static string FormatFrequency(string frequency) => frequency switch
+    {
+        "OneTime" => "One Time",
+        "Monthly" => "Monthly",
+        "Quarterly" => "Quarterly",
+        "Annual" => "Annual",
+        _ => frequency,
+    };
+
+    public void Dispose() => _searchCts?.Cancel();
+}
