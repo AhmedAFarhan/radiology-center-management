@@ -6,6 +6,7 @@ using RadiologyCenter.BuildingBlocks.Domain.Specifications;
 using RadiologyCenter.BuildingBlocks.Infrastructure.Repositories;
 using RadiologyCenter.BuildingBlocks.Infrastructure.Services;
 using RadiologyCenter.Examinations.Application.Abstractions;
+using RadiologyCenter.Examinations.Application.DTOs;
 using RadiologyCenter.Examinations.Domain.Entities;
 using RadiologyCenter.Examinations.Domain.Enumerations;
 using RadiologyCenter.Examinations.Infrastructure.Persistence;
@@ -54,4 +55,27 @@ public class ExaminationRepository : BaseRepository<Examination, Guid>, IExamina
                  && e.Status != ExaminationStatus.Completed
                  && e.Status != ExaminationStatus.Cancelled,
             ct);
+
+    public async Task<IReadOnlyList<ExamFinancialProjection>> GetFinancialProjectionAsync(DateTime? from, DateTime? to, CancellationToken ct = default)
+    {
+        var query = DbSet.Where(e => e.Status == ExaminationStatus.Completed);
+
+        if (from is not null)
+            query = query.Where(e => e.CompletedAt >= from);
+
+        if (to is not null)
+            query = query.Where(e => e.CompletedAt <= to);
+
+        return await query
+            .Select(e => new ExamFinancialProjection(
+                e.Id,
+                e.ExaminationTypeId,
+                e.CompletedAt,
+                e.Price,
+                e.Discount,
+                e.IsDiscountPercentage,
+                e.Paid,
+                e.Remaining))
+            .ToListAsync(ct);
+    }
 }

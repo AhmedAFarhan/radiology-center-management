@@ -37,6 +37,9 @@ public static class Permissions
     public static readonly Permission ReportsDelete  = Create(ReportsDeleteCode, "Delete Reports",  "Remove reports",                  "Reports");
     public static readonly Permission ReportsExport  = Create(ReportsExportCode, "Export Reports",  "Export reports to external formats", "Reports");
 
+    public const string AnalyticsReadCode = "analytics.read";
+    public static readonly Permission AnalyticsRead = Create(AnalyticsReadCode, "Read Analytics", "View analytics and business intelligence dashboards", "Analytics");
+
     public const string UsersCreateCode      = "users.create";
     public const string UsersReadCode        = "users.read";
     public const string UsersUpdateCode      = "users.update";
@@ -176,6 +179,7 @@ public static class Permissions
         PatientsCreate, PatientsRead, PatientsUpdate, PatientsDelete,
         AppointmentsCreate, AppointmentsRead, AppointmentsUpdate, AppointmentsDelete, AppointmentsConfirm,
         ReportsCreate, ReportsRead, ReportsUpdate, ReportsDelete, ReportsExport,
+        AnalyticsRead,
         UsersCreate, UsersRead, UsersUpdate, UsersDelete, UsersManageRoles,
         RolesCreate, RolesRead, RolesUpdate, RolesDelete, RolesManagePermissions,
         SettingsRead, SettingsUpdate,
