@@ -5,7 +5,7 @@
 @inject ISnackbar Snackbar
 @implements IDisposable
 
-<PageHeader Title="Suppliers"
+<PageHeader Icon="@Icons.Material.Filled.LocalShipping" Title="Suppliers"
             Subtitle="Manage vendors and their details"
             SearchValueChanged="OnSearchChanged"
             SearchPlaceholder="Search suppliers..."
@@ -133,7 +133,7 @@
 
     private async Task OpenCreateDialogAsync()
     {
-        var options = new DialogOptions { MaxWidth = MaxWidth.Medium, FullWidth = true };
+        var options = new DialogOptions { MaxWidth = MaxWidth.Medium, FullWidth = true, NoHeader = true };
         var dialog = await DialogService.ShowAsync<SupplierEditorDialog>("New Supplier", options);
         await ReloadIfSavedAsync(dialog);
     }
@@ -141,7 +141,7 @@
     private async Task OpenEditDialogAsync(SupplierDto supplier)
     {
         var parameters = new DialogParameters { ["Supplier"] = supplier };
-        var options = new DialogOptions { MaxWidth = MaxWidth.Medium, FullWidth = true };
+        var options = new DialogOptions { MaxWidth = MaxWidth.Medium, FullWidth = true, NoHeader = true };
         var dialog = await DialogService.ShowAsync<SupplierEditorDialog>("Edit Supplier", parameters, options);
         await ReloadIfSavedAsync(dialog);
     }

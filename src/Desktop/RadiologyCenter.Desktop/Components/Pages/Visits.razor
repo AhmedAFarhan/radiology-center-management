@@ -6,7 +6,7 @@
 @inject ISnackbar Snackbar
 @implements IDisposable
 
-<PageHeader Title="Visits"
+<PageHeader Icon="@Icons.Material.Filled.EventNote" Title="Visits"
             Subtitle="Patient examinations and their lifecycle"
             SearchValueChanged="OnSearchChanged"
             SearchPlaceholder="Search visits..."
@@ -177,7 +177,7 @@
 
     private async Task OpenCreateDialogAsync()
     {
-        var options = new DialogOptions { MaxWidth = MaxWidth.Medium, FullWidth = true };
+        var options = new DialogOptions { MaxWidth = MaxWidth.Medium, FullWidth = true, NoHeader = true };
         var dialog = await DialogService.ShowAsync<VisitEditorDialog>("New Visit", options);
         await ReloadIfSavedAsync(dialog);
     }
@@ -185,7 +185,7 @@
     private async Task OpenEditDialogAsync(ExaminationDto visit)
     {
         var parameters = new DialogParameters { ["Visit"] = visit };
-        var options = new DialogOptions { MaxWidth = MaxWidth.Medium, FullWidth = true };
+        var options = new DialogOptions { MaxWidth = MaxWidth.Medium, FullWidth = true, NoHeader = true };
         var dialog = await DialogService.ShowAsync<VisitEditorDialog>("Edit Visit", parameters, options);
         await ReloadIfSavedAsync(dialog);
     }
@@ -193,7 +193,7 @@
     private async Task OpenScheduleDialogAsync(ExaminationDto visit)
     {
         var parameters = new DialogParameters { ["Visit"] = visit };
-        var options = new DialogOptions { MaxWidth = MaxWidth.Small, FullWidth = true };
+        var options = new DialogOptions { MaxWidth = MaxWidth.Small, FullWidth = true, NoHeader = true };
         var dialog = await DialogService.ShowAsync<VisitScheduleDialog>("Schedule Visit", parameters, options);
         await ReloadIfSavedAsync(dialog);
     }
@@ -201,7 +201,7 @@
     private async Task OpenViewDialogAsync(ExaminationDto visit)
     {
         var parameters = new DialogParameters { ["Visit"] = visit };
-        var options = new DialogOptions { MaxWidth = MaxWidth.Medium, FullWidth = true };
+        var options = new DialogOptions { MaxWidth = MaxWidth.Medium, FullWidth = true, NoHeader = true };
         var dialog = await DialogService.ShowAsync<VisitViewDialog>("Visit Details", parameters, options);
         await ReloadIfSavedAsync(dialog);
     }
@@ -270,7 +270,7 @@
     private async Task CancelAsync(ExaminationDto visit)
     {
         var parameters = new DialogParameters { ["Visit"] = visit };
-        var options = new DialogOptions { MaxWidth = MaxWidth.Small, FullWidth = true };
+        var options = new DialogOptions { MaxWidth = MaxWidth.Small, FullWidth = true, NoHeader = true };
         var dialog = await DialogService.ShowAsync<CancelVisitDialog>("Cancel Visit", parameters, options);
         await ReloadIfSavedAsync(dialog);
     }

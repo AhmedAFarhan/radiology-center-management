@@ -6,7 +6,7 @@
 @inject ISnackbar Snackbar
 @implements IDisposable
 
-<PageHeader Title="Examination Fees"
+<PageHeader Icon="@Icons.Material.Filled.MedicalServices" Title="Examination Fees"
             Subtitle="Per-procedure fees for radiologists and technicians"
             SearchValueChanged="OnSearchChanged"
             SearchPlaceholder="Search fees..."
@@ -140,7 +140,7 @@
 
     private async Task OpenCreateDialogAsync()
     {
-        var options = new DialogOptions { MaxWidth = MaxWidth.Medium, FullWidth = true };
+        var options = new DialogOptions { MaxWidth = MaxWidth.Medium, FullWidth = true, NoHeader = true };
         var dialog = await DialogService.ShowAsync<ExaminationFeeEditorDialog>("New Examination Fee", options);
         await ReloadIfSavedAsync(dialog);
     }
@@ -148,7 +148,7 @@
     private async Task OpenEditDialogAsync(ExaminationFeeDto fee)
     {
         var parameters = new DialogParameters { ["Fee"] = fee };
-        var options = new DialogOptions { MaxWidth = MaxWidth.Medium, FullWidth = true };
+        var options = new DialogOptions { MaxWidth = MaxWidth.Medium, FullWidth = true, NoHeader = true };
         var dialog = await DialogService.ShowAsync<ExaminationFeeEditorDialog>("Edit Examination Fee", parameters, options);
         await ReloadIfSavedAsync(dialog);
     }

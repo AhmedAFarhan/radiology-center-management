@@ -3,6 +3,7 @@
 
 <MudDialog>
     <DialogContent>
+        <DialogHeader Icon="@Icons.Material.Filled.Inventory2" Title="@(_stock?.ItemName ?? "Item Stock")" />
         @if (_loadError is not null)
         {
             <ErrorState Title="Couldn't load stock" Message="@_loadError" Action="LoadStockAsync" />
@@ -13,7 +14,6 @@
         }
         else
         {
-            <MudText Typo="Typo.h6">@_stock.ItemName</MudText>
             <MudText Typo="Typo.body2" Class="text-secondary mb-3">
                 Stock on hand: <b>@_stock.StockOnHand</b>
             </MudText>

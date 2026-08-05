@@ -5,7 +5,7 @@
 @inject ISnackbar Snackbar
 @implements IDisposable
 
-<PageHeader Title="Salary Components"
+<PageHeader Icon="@Icons.Material.Filled.Category" Title="Salary Components"
             Subtitle="Define reusable earning and deduction templates"
             SearchValueChanged="OnSearchChanged"
             SearchPlaceholder="Search components..."
@@ -144,7 +144,7 @@
 
     private async Task OpenCreateDialogAsync()
     {
-        var options = new DialogOptions { MaxWidth = MaxWidth.Medium, FullWidth = true };
+        var options = new DialogOptions { MaxWidth = MaxWidth.Medium, FullWidth = true, NoHeader = true };
         var dialog = await DialogService.ShowAsync<SalaryComponentEditorDialog>("New Salary Component", options);
         await ReloadIfSavedAsync(dialog);
     }
@@ -152,7 +152,7 @@
     private async Task OpenEditDialogAsync(SalaryComponentDto component)
     {
         var parameters = new DialogParameters { ["Component"] = component };
-        var options = new DialogOptions { MaxWidth = MaxWidth.Medium, FullWidth = true };
+        var options = new DialogOptions { MaxWidth = MaxWidth.Medium, FullWidth = true, NoHeader = true };
         var dialog = await DialogService.ShowAsync<SalaryComponentEditorDialog>($"Edit {component.Name}", parameters, options);
         await ReloadIfSavedAsync(dialog);
     }

@@ -7,7 +7,7 @@
 @inject ISnackbar Snackbar
 @implements IDisposable
 
-<PageHeader Title="Referral Fees"
+<PageHeader Icon="@Icons.Material.Filled.LocalHospital" Title="Referral Fees"
             Subtitle="Fees paid to referring doctors"
             SearchValueChanged="OnSearchChanged"
             SearchPlaceholder="Search fees..."
@@ -145,7 +145,7 @@
 
     private async Task OpenCreateDialogAsync()
     {
-        var options = new DialogOptions { MaxWidth = MaxWidth.Medium, FullWidth = true };
+        var options = new DialogOptions { MaxWidth = MaxWidth.Medium, FullWidth = true, NoHeader = true };
         var dialog = await DialogService.ShowAsync<ReferralFeeEditorDialog>("New Referral Fee", options);
         await ReloadIfSavedAsync(dialog);
     }
@@ -153,7 +153,7 @@
     private async Task OpenEditDialogAsync(ReferralFeeDto fee)
     {
         var parameters = new DialogParameters { ["Fee"] = fee };
-        var options = new DialogOptions { MaxWidth = MaxWidth.Medium, FullWidth = true };
+        var options = new DialogOptions { MaxWidth = MaxWidth.Medium, FullWidth = true, NoHeader = true };
         var dialog = await DialogService.ShowAsync<ReferralFeeEditorDialog>("Edit Referral Fee", parameters, options);
         await ReloadIfSavedAsync(dialog);
     }

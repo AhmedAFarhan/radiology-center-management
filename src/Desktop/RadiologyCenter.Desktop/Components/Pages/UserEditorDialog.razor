@@ -3,6 +3,7 @@
 
 <MudDialog>
     <DialogContent>
+        <DialogHeader Icon="@Icons.Material.Filled.Person" Title="@(User is null ? "New User" : $"Edit {User.UserName}")" />
         <EditForm EditContext="_editContext">
             <DataAnnotationsValidator />
             <MudGrid Spacing="2">

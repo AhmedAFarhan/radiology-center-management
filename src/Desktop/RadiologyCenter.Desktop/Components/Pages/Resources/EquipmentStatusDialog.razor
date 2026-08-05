@@ -3,6 +3,7 @@
 
 <MudDialog>
     <DialogContent>
+        <DialogHeader Icon="@Icons.Material.Filled.Biotech" Title="@($"Set Status - {Equipment.Name}")" />
         <MudText Typo="Typo.body2" Class="mb-2 text-secondary">
             Current status: <MudChip T="string" Size="Size.Small" Color="@StatusColor(Equipment.Status)">@FormatStatus(Equipment.Status)</MudChip>
         </MudText>

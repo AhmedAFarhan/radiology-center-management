@@ -5,6 +5,7 @@
 
 <MudDialog>
     <DialogContent>
+        <DialogHeader Icon="@Icons.Material.Filled.ReceiptLong" Title="@(_payRun is null ? "Pay Run" : $"Pay Run {_payRun.RunFrom.ToString("yyyy-MM-dd")} \u2192 {_payRun.RunTo.ToString("yyyy-MM-dd")}")" />
         @if (_payRun is null)
         {
             <PageSkeleton Rows="6" />
@@ -247,7 +248,7 @@
     private async Task AddPayslipAsync()
     {
         var parameters = new DialogParameters { ["StaffSearchFunc"] = (Func<string, CancellationToken, Task<IEnumerable<StaffDto>>>)SearchStaffAsync };
-        var options = new DialogOptions { MaxWidth = MaxWidth.Small, FullWidth = true };
+        var options = new DialogOptions { MaxWidth = MaxWidth.Small, FullWidth = true, NoHeader = true };
         var dialog = await DialogService.ShowAsync<AddPayslipDialog>("Add Payslip", parameters, options);
         var result = await dialog.Result;
 

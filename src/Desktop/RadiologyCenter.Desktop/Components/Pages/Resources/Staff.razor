@@ -5,7 +5,7 @@
 @inject ISnackbar Snackbar
 @implements IDisposable
 
-<PageHeader Title="Staff"
+<PageHeader Icon="@Icons.Material.Filled.Badge" Title="Staff"
             Subtitle="Manage staff members"
             SearchValueChanged="OnSearchChanged"
             SearchPlaceholder="Search staff..."
@@ -131,7 +131,7 @@
 
     private async Task OpenCreateDialogAsync()
     {
-        var options = new DialogOptions { MaxWidth = MaxWidth.Medium, FullWidth = true };
+        var options = new DialogOptions { MaxWidth = MaxWidth.Medium, FullWidth = true, NoHeader = true };
         var dialog = await DialogService.ShowAsync<StaffEditorDialog>("New Staff", options);
         await ReloadIfSavedAsync(dialog);
     }
@@ -139,7 +139,7 @@
     private async Task OpenEditDialogAsync(StaffDto staff)
     {
         var parameters = new DialogParameters { ["Staff"] = staff };
-        var options = new DialogOptions { MaxWidth = MaxWidth.Medium, FullWidth = true };
+        var options = new DialogOptions { MaxWidth = MaxWidth.Medium, FullWidth = true, NoHeader = true };
         var dialog = await DialogService.ShowAsync<StaffEditorDialog>($"Edit {staff.FullName}", parameters, options);
         await ReloadIfSavedAsync(dialog);
     }

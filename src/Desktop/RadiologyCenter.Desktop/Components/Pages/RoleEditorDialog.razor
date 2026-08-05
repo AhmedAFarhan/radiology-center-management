@@ -3,6 +3,7 @@
 
 <MudDialog>
     <DialogContent>
+        <DialogHeader Icon="@Icons.Material.Filled.Security" Title="@(Role is null ? "New Role" : "Edit Role")" />
         <EditForm EditContext="_editContext">
             <DataAnnotationsValidator />
             <MudTextField @bind-Value="_model.Name"

@@ -5,7 +5,7 @@
 @inject ISnackbar Snackbar
 @implements IDisposable
 
-<PageHeader Title="Purchase Orders"
+<PageHeader Icon="@Icons.Material.Filled.ReceiptLong" Title="Purchase Orders"
             Subtitle="Create and fulfill replenishment orders"
             SearchValueChanged="OnSearchChanged"
             SearchPlaceholder="Search orders..."
@@ -131,7 +131,7 @@
 
     private async Task OpenCreateDialogAsync()
     {
-        var options = new DialogOptions { MaxWidth = MaxWidth.Medium, FullWidth = true };
+        var options = new DialogOptions { MaxWidth = MaxWidth.Medium, FullWidth = true, NoHeader = true };
         var dialog = await DialogService.ShowAsync<PurchaseOrderEditorDialog>("New Purchase Order", options);
         await ReloadIfSavedAsync(dialog);
     }
@@ -139,7 +139,7 @@
     private async Task OpenReceiveDialogAsync(PurchaseOrderDto po)
     {
         var parameters = new DialogParameters { ["PurchaseOrderId"] = po.Id };
-        var options = new DialogOptions { MaxWidth = MaxWidth.Medium, FullWidth = true };
+        var options = new DialogOptions { MaxWidth = MaxWidth.Medium, FullWidth = true, NoHeader = true };
         var dialog = await DialogService.ShowAsync<PurchaseOrderReceiveDialog>($"Receive {po.OrderNumber}", parameters, options);
         await ReloadIfSavedAsync(dialog);
     }
@@ -147,7 +147,7 @@
     private async Task OpenViewDialogAsync(PurchaseOrderDto po)
     {
         var parameters = new DialogParameters { ["PurchaseOrderId"] = po.Id };
-        var options = new DialogOptions { MaxWidth = MaxWidth.Medium, FullWidth = true };
+        var options = new DialogOptions { MaxWidth = MaxWidth.Medium, FullWidth = true, NoHeader = true };
         await DialogService.ShowAsync<PurchaseOrderViewDialog>($"Order {po.OrderNumber}", parameters, options);
     }
 

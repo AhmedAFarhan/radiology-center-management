@@ -5,7 +5,7 @@
 @inject ISnackbar Snackbar
 @implements IDisposable
 
-<PageHeader Title="Equipment"
+<PageHeader Icon="@Icons.Material.Filled.Biotech" Title="Equipment"
             Subtitle="Manage radiology equipment"
             SearchValueChanged="OnSearchChanged"
             SearchPlaceholder="Search equipment..."
@@ -132,7 +132,7 @@
 
     private async Task OpenCreateDialogAsync()
     {
-        var options = new DialogOptions { MaxWidth = MaxWidth.Medium, FullWidth = true };
+        var options = new DialogOptions { MaxWidth = MaxWidth.Medium, FullWidth = true, NoHeader = true };
         var dialog = await DialogService.ShowAsync<EquipmentEditorDialog>("New Equipment", options);
         await ReloadIfSavedAsync(dialog);
     }
@@ -140,7 +140,7 @@
     private async Task OpenEditDialogAsync(EquipmentDto equipment)
     {
         var parameters = new DialogParameters { ["Equipment"] = equipment };
-        var options = new DialogOptions { MaxWidth = MaxWidth.Medium, FullWidth = true };
+        var options = new DialogOptions { MaxWidth = MaxWidth.Medium, FullWidth = true, NoHeader = true };
         var dialog = await DialogService.ShowAsync<EquipmentEditorDialog>($"Edit {equipment.Name}", parameters, options);
         await ReloadIfSavedAsync(dialog);
     }
@@ -148,7 +148,7 @@
     private async Task OpenStatusDialogAsync(EquipmentDto equipment)
     {
         var parameters = new DialogParameters { ["Equipment"] = equipment };
-        var options = new DialogOptions { MaxWidth = MaxWidth.Small, FullWidth = true };
+        var options = new DialogOptions { MaxWidth = MaxWidth.Small, FullWidth = true, NoHeader = true };
         var dialog = await DialogService.ShowAsync<EquipmentStatusDialog>($"Set Status - {equipment.Name}", parameters, options);
         await ReloadIfSavedAsync(dialog);
     }

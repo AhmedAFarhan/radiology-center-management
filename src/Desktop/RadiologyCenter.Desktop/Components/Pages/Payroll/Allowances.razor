@@ -6,7 +6,7 @@
 @inject ISnackbar Snackbar
 @implements IDisposable
 
-<PageHeader Title="Allowances"
+<PageHeader Icon="@Icons.Material.Filled.AttachMoney" Title="Allowances"
             Subtitle="Employee-specific allowance assignments"
             SearchValueChanged="OnSearchChanged"
             SearchPlaceholder="Search allowances..."
@@ -151,7 +151,7 @@
 
     private async Task OpenCreateDialogAsync()
     {
-        var options = new DialogOptions { MaxWidth = MaxWidth.Medium, FullWidth = true };
+        var options = new DialogOptions { MaxWidth = MaxWidth.Medium, FullWidth = true, NoHeader = true };
         var dialog = await DialogService.ShowAsync<AllowanceEditorDialog>("New Allowance", options);
         await ReloadIfSavedAsync(dialog);
     }
@@ -159,7 +159,7 @@
     private async Task OpenEditDialogAsync(AllowanceAssignmentDto allowance)
     {
         var parameters = new DialogParameters { ["Allowance"] = allowance };
-        var options = new DialogOptions { MaxWidth = MaxWidth.Medium, FullWidth = true };
+        var options = new DialogOptions { MaxWidth = MaxWidth.Medium, FullWidth = true, NoHeader = true };
         var dialog = await DialogService.ShowAsync<AllowanceEditorDialog>($"Edit {allowance.Name}", parameters, options);
         await ReloadIfSavedAsync(dialog);
     }

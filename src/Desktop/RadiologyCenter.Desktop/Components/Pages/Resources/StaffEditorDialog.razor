@@ -4,6 +4,7 @@
 
 <MudDialog>
     <DialogContent>
+        <DialogHeader Icon="@Icons.Material.Filled.Badge" Title="@(Staff is null ? "New Staff" : $"Edit {Staff.FullName}")" />
         <EditForm EditContext="_editContext">
             <DataAnnotationsValidator />
             <MudGrid Spacing="2">

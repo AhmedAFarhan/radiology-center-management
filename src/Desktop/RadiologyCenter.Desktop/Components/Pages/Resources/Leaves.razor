@@ -5,7 +5,7 @@
 @inject ISnackbar Snackbar
 @implements IDisposable
 
-<PageHeader Title="Leave"
+<PageHeader Icon="@Icons.Material.Filled.BeachAccess" Title="Leave"
             Subtitle="Manage staff leave records"
             SearchValueChanged="OnSearchChanged"
             SearchPlaceholder="Search leave..."
@@ -132,7 +132,7 @@
 
     private async Task OpenCreateDialogAsync()
     {
-        var options = new DialogOptions { MaxWidth = MaxWidth.Medium, FullWidth = true };
+        var options = new DialogOptions { MaxWidth = MaxWidth.Medium, FullWidth = true, NoHeader = true };
         var dialog = await DialogService.ShowAsync<LeaveEditorDialog>("New Leave", options);
         await ReloadIfSavedAsync(dialog);
     }
@@ -140,7 +140,7 @@
     private async Task OpenEditDialogAsync(LeaveDto leave)
     {
         var parameters = new DialogParameters { ["Leave"] = leave };
-        var options = new DialogOptions { MaxWidth = MaxWidth.Medium, FullWidth = true };
+        var options = new DialogOptions { MaxWidth = MaxWidth.Medium, FullWidth = true, NoHeader = true };
         var dialog = await DialogService.ShowAsync<LeaveEditorDialog>("Edit Leave", parameters, options);
         await ReloadIfSavedAsync(dialog);
     }

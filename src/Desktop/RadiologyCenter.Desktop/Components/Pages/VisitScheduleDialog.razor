@@ -3,7 +3,7 @@
 
 <MudDialog>
     <DialogContent>
-        <MudText Typo="Typo.subtitle1" Class="mb-2">Schedule @Visit.ExaminationTypeName</MudText>
+        <DialogHeader Icon="@Icons.Material.Filled.EventNote" Title="@($"Schedule {Visit.ExaminationTypeName}")" />
         <MudDatePicker @bind-Date="_scheduledAt"
                        Label="Scheduled Date"
                        Variant="Variant.Outlined"

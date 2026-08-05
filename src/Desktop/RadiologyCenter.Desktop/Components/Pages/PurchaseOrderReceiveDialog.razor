@@ -3,6 +3,7 @@
 
 <MudDialog>
     <DialogContent>
+        <DialogHeader Icon="@Icons.Material.Filled.ReceiptLong" Title="@(_po is null ? "Receive Order" : $"Receive {_po.OrderNumber}")" />
         @if (_loading)
         {
             <PageSkeleton Rows="4" />
@@ -13,7 +14,6 @@
         }
         else if (_po is not null)
         {
-            <MudText Typo="Typo.h6">@_po.OrderNumber</MudText>
             <MudText Typo="Typo.body2" Class="text-secondary mb-3">@_po.SupplierName · @_po.Status</MudText>
 
             @foreach (var line in _receiveLines)

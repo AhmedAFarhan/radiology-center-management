@@ -1,4 +1,8 @@
 <MudToolBar Dense="true" Class="mb-4">
+    @if (!string.IsNullOrEmpty(Icon))
+    {
+        <MudIcon Icon="@Icon" Class="page-header-icon" />
+    }
     <MudText Typo="Typo.h5">@Title</MudText>
     @if (!string.IsNullOrWhiteSpace(Subtitle))
     {
@@ -26,6 +30,8 @@
 </MudToolBar>
 
 @code {
+    [Parameter] public string Icon { get; set; } = string.Empty;
+
     [Parameter] public string Title { get; set; } = string.Empty;
 
     [Parameter] public string Subtitle { get; set; } = string.Empty;

@@ -5,7 +5,7 @@
 @inject ISnackbar Snackbar
 @implements IDisposable
 
-<PageHeader Title="Roles"
+<PageHeader Icon="@Icons.Material.Filled.Security" Title="Roles"
             Subtitle="Manage roles and their permissions"
             SearchValueChanged="OnSearchChanged"
             SearchPlaceholder="Search roles..."
@@ -124,7 +124,7 @@
 
     private async Task OpenCreateDialogAsync()
     {
-        var options = new DialogOptions { MaxWidth = MaxWidth.Small, FullWidth = true };
+        var options = new DialogOptions { MaxWidth = MaxWidth.Small, FullWidth = true, NoHeader = true };
         var dialog = await DialogService.ShowAsync<RoleEditorDialog>("New Role", options);
         await ReloadIfSavedAsync(dialog);
     }
@@ -132,7 +132,7 @@
     private async Task OpenEditDialogAsync(RoleDto role)
     {
         var parameters = new DialogParameters { ["Role"] = role };
-        var options = new DialogOptions { MaxWidth = MaxWidth.Small, FullWidth = true };
+        var options = new DialogOptions { MaxWidth = MaxWidth.Small, FullWidth = true, NoHeader = true };
         var dialog = await DialogService.ShowAsync<RoleEditorDialog>($"Edit {role.Name}", parameters, options);
         await ReloadIfSavedAsync(dialog);
     }
@@ -140,7 +140,7 @@
     private async Task OpenPermissionsDialogAsync(RoleDto role)
     {
         var parameters = new DialogParameters { ["Role"] = role };
-        var options = new DialogOptions { MaxWidth = MaxWidth.Large, FullWidth = true };
+        var options = new DialogOptions { MaxWidth = MaxWidth.Large, FullWidth = true, NoHeader = true };
         var dialog = await DialogService.ShowAsync<RolePermissionsDialog>($"Permissions - {role.Name}", parameters, options);
         await ReloadIfSavedAsync(dialog);
     }

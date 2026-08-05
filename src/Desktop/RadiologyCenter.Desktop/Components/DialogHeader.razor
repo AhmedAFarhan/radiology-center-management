@@ -1,0 +1,13 @@
+<div class="dialog-header">
+    <MudIcon Icon="@Icon" Class="dialog-header-icon" />
+    <MudText Typo="Typo.h5" Class="dialog-header-title">@Title</MudText>
+    @ChildContent
+</div>
+
+@code {
+    [Parameter] public string Icon { get; set; } = string.Empty;
+
+    [Parameter] public string Title { get; set; } = string.Empty;
+
+    [Parameter] public RenderFragment? ChildContent { get; set; }
+}

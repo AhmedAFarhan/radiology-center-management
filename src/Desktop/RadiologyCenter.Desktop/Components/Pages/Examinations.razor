@@ -5,7 +5,7 @@
 @inject ISnackbar Snackbar
 @implements IDisposable
 
-<PageHeader Title="Examinations"
+<PageHeader Icon="@Icons.Material.Filled.MedicalServices" Title="Examinations"
             Subtitle="Manage examination types"
             SearchValueChanged="OnSearchChanged"
             SearchPlaceholder="Search types..."
@@ -151,7 +151,7 @@
 
     private async Task OpenCreateDialogAsync()
     {
-        var options = new DialogOptions { MaxWidth = MaxWidth.Medium, FullWidth = true };
+        var options = new DialogOptions { MaxWidth = MaxWidth.Medium, FullWidth = true, NoHeader = true };
         var dialog = await DialogService.ShowAsync<ExaminationTypeEditorDialog>("New Examination Type", options);
         await ReloadIfSavedAsync(dialog);
     }
@@ -159,7 +159,7 @@
     private async Task OpenEditDialogAsync(ExaminationTypeDto type)
     {
         var parameters = new DialogParameters { ["Type"] = type };
-        var options = new DialogOptions { MaxWidth = MaxWidth.Medium, FullWidth = true };
+        var options = new DialogOptions { MaxWidth = MaxWidth.Medium, FullWidth = true, NoHeader = true };
         var dialog = await DialogService.ShowAsync<ExaminationTypeEditorDialog>("Edit Examination Type", parameters, options);
         await ReloadIfSavedAsync(dialog);
     }

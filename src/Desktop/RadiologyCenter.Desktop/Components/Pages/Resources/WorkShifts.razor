@@ -5,7 +5,7 @@
 @inject ISnackbar Snackbar
 @implements IDisposable
 
-<PageHeader Title="Work Shifts"
+<PageHeader Icon="@Icons.Material.Filled.CalendarMonth" Title="Work Shifts"
             Subtitle="Schedule staff shifts and equipment"
             SearchValueChanged="OnSearchChanged"
             SearchPlaceholder="Search shifts..."
@@ -137,7 +137,7 @@
 
     private async Task OpenCreateDialogAsync()
     {
-        var options = new DialogOptions { MaxWidth = MaxWidth.Medium, FullWidth = true };
+        var options = new DialogOptions { MaxWidth = MaxWidth.Medium, FullWidth = true, NoHeader = true };
         var dialog = await DialogService.ShowAsync<WorkShiftEditorDialog>("New Work Shift", options);
         await ReloadIfSavedAsync(dialog);
     }
@@ -145,7 +145,7 @@
     private async Task OpenEditDialogAsync(WorkShiftDto shift)
     {
         var parameters = new DialogParameters { ["Shift"] = shift };
-        var options = new DialogOptions { MaxWidth = MaxWidth.Medium, FullWidth = true };
+        var options = new DialogOptions { MaxWidth = MaxWidth.Medium, FullWidth = true, NoHeader = true };
         var dialog = await DialogService.ShowAsync<WorkShiftEditorDialog>($"Edit Work Shift", parameters, options);
         await ReloadIfSavedAsync(dialog);
     }

@@ -4,6 +4,7 @@
 
 <MudDialog>
     <DialogContent>
+        <DialogHeader Icon="@Icons.Material.Filled.MedicalServices" Title="@(Fee is null ? "New Examination Fee" : "Edit Examination Fee")" />
         <EditForm EditContext="_editContext">
             <DataAnnotationsValidator />
             <MudGrid Spacing="2">

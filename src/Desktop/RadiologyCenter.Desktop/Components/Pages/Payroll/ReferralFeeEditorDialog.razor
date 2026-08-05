@@ -5,6 +5,7 @@
 
 <MudDialog>
     <DialogContent>
+        <DialogHeader Icon="@Icons.Material.Filled.LocalHospital" Title="@(Fee is null ? "New Referral Fee" : "Edit Referral Fee")" />
         <EditForm EditContext="_editContext">
             <DataAnnotationsValidator />
             <MudGrid Spacing="2">

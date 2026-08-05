@@ -203,6 +203,31 @@ h1:focus {
     background-color: var(--mud-palette-background, #f4f7fc);
 }
 
+.page-header-icon {
+    color: var(--mud-palette-primary);
+    font-size: 24px;
+    margin-right: 8px;
+}
+
+.dialog-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 20px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--mud-palette-lines-default, #e0e0e0);
+}
+
+.dialog-header-icon {
+    color: var(--mud-palette-primary);
+    font-size: 26px;
+}
+
+.dialog-header-title {
+    color: var(--mud-palette-text-primary);
+    font-weight: 600;
+}
+
 .search-field {
     width: 280px;
 }

@@ -6,7 +6,7 @@
 @inject ISnackbar Snackbar
 @implements IDisposable
 
-<PageHeader Title="Users"
+<PageHeader Icon="@Icons.Material.Filled.Person" Title="Users"
             Subtitle="Manage user accounts and roles"
             SearchValueChanged="OnSearchChanged"
             SearchPlaceholder="Search users..."
@@ -152,7 +152,7 @@
 
     private async Task OpenCreateDialogAsync()
     {
-        var options = new DialogOptions { MaxWidth = MaxWidth.Medium, FullWidth = true };
+        var options = new DialogOptions { MaxWidth = MaxWidth.Medium, FullWidth = true, NoHeader = true };
         var dialog = await DialogService.ShowAsync<UserEditorDialog>("New User", options);
         await ReloadIfSavedAsync(dialog);
     }
@@ -160,7 +160,7 @@
     private async Task OpenEditDialogAsync(UserDto user)
     {
         var parameters = new DialogParameters { ["User"] = user };
-        var options = new DialogOptions { MaxWidth = MaxWidth.Medium, FullWidth = true };
+        var options = new DialogOptions { MaxWidth = MaxWidth.Medium, FullWidth = true, NoHeader = true };
         var dialog = await DialogService.ShowAsync<UserEditorDialog>($"Edit {user.UserName}", parameters, options);
         await ReloadIfSavedAsync(dialog);
     }
@@ -168,7 +168,7 @@
     private async Task OpenRolesDialogAsync(UserDto user)
     {
         var parameters = new DialogParameters { ["User"] = user };
-        var options = new DialogOptions { MaxWidth = MaxWidth.Small, FullWidth = true };
+        var options = new DialogOptions { MaxWidth = MaxWidth.Small, FullWidth = true, NoHeader = true };
         var dialog = await DialogService.ShowAsync<UserRolesDialog>($"Roles - {user.UserName}", parameters, options);
         await ReloadIfSavedAsync(dialog);
     }
@@ -176,7 +176,7 @@
     private async Task OpenLockDialogAsync(UserDto user)
     {
         var parameters = new DialogParameters { ["User"] = user };
-        var options = new DialogOptions { MaxWidth = MaxWidth.Small, FullWidth = true };
+        var options = new DialogOptions { MaxWidth = MaxWidth.Small, FullWidth = true, NoHeader = true };
         var dialog = await DialogService.ShowAsync<UserLockDialog>($"Lock {user.UserName}", parameters, options);
         await ReloadIfSavedAsync(dialog);
     }

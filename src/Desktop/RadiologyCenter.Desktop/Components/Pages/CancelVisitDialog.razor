@@ -3,7 +3,7 @@
 
 <MudDialog>
     <DialogContent>
-        <MudText Typo="Typo.subtitle1" Class="mb-2">Cancel visit for @Visit.ExaminationTypeName</MudText>
+        <DialogHeader Icon="@Icons.Material.Filled.Cancel" Title="@($"Cancel Visit - {Visit.ExaminationTypeName}")" />
         <MudTextField @bind-Value="_reason"
                       Label="Cancellation reason (optional)"
                       Variant="Variant.Outlined"

@@ -5,7 +5,7 @@
 @inject ISnackbar Snackbar
 @implements IDisposable
 
-<PageHeader Title="Patients"
+<PageHeader Icon="@Icons.Material.Filled.People" Title="Patients"
             Subtitle="Manage patient records"
             SearchValueChanged="OnSearchChanged"
             SearchPlaceholder="Search patients..."
@@ -129,7 +129,7 @@
 
     private async Task OpenCreateDialogAsync()
     {
-        var options = new DialogOptions { MaxWidth = MaxWidth.Medium, FullWidth = true };
+        var options = new DialogOptions { MaxWidth = MaxWidth.Medium, FullWidth = true, NoHeader = true };
         var dialog = await DialogService.ShowAsync<PatientEditorDialog>("New Patient", options);
         await ReloadIfSavedAsync(dialog);
     }
@@ -137,7 +137,7 @@
     private async Task OpenEditDialogAsync(PatientDto patient)
     {
         var parameters = new DialogParameters { ["Patient"] = patient };
-        var options = new DialogOptions { MaxWidth = MaxWidth.Medium, FullWidth = true };
+        var options = new DialogOptions { MaxWidth = MaxWidth.Medium, FullWidth = true, NoHeader = true };
         var dialog = await DialogService.ShowAsync<PatientEditorDialog>("Edit Patient", parameters, options);
         await ReloadIfSavedAsync(dialog);
     }
