@@ -1,0 +1,288 @@
+@page "/radiologist"
+@attribute [Authorize]
+@inject ISnackbar Snackbar
+
+<PageHeader Icon="@Icons.Material.Filled.Biotech" Title="Reading Room"
+            Subtitle="Radiology reading worklist"
+            ShowSearch="false">
+    <MudChip T="string" Color="Color.Primary" Size="Size.Medium" Label="true" Variant="Variant.Outlined">
+        @RadiologySampleData.Studies.Count pending
+    </MudChip>
+</PageHeader>
+
+<div class="reading-room">
+    <!-- ══════════ Worklist pane ══════════ -->
+    <section class="reading-room-pane rr-worklist">
+        <div class="rr-pane-header">
+            <MudText Typo="Typo.subtitle1" Class="font-weight-medium">Reading Queue</MudText>
+            <MudTextField T="string"
+                          Value="@_filter"
+                          ValueChanged="OnFilterChanged"
+                          Placeholder="Filter..."
+                          Variant="Variant.Outlined"
+                          Margin="Margin.Dense"
+                          Immediate="true"
+                          Adornment="Adornment.Start"
+                          AdornmentIcon="@Icons.Material.Filled.Search"
+                          Class="rr-search" />
+        </div>
+        <div class="rr-worklist-items">
+            @foreach (var study in Studies)
+            {
+                var current = study;
+                <button type="button"
+                        class="rr-worklist-item @(IsSelected(current) ? "selected" : string.Empty)"
+                        @onclick="() => Select(current)">
+                    <div class="rr-item-top">
+                        <span class="rr-prio @PriorityClass(current.Priority)" title="@current.Priority"></span>
+                        <span class="rr-item-name">@current.PatientName</span>
+                        <span class="rr-item-time">@current.ScheduledLabel</span>
+                    </div>
+                    <div class="rr-item-exam">
+                        <MudIcon Icon="@Icons.Material.Filled.MedicalServices" Size="Size.Small" />
+                        <span>@current.ExamName</span>
+                    </div>
+                    <div class="rr-item-meta">
+                        <MudChip T="string" Size="Size.Small" Color="@StatusColor(current.Status)">@current.Status</MudChip>
+                        <MudChip T="string" Size="Size.Small" Color="@PriorityChipColor(current.Priority)">@current.Priority</MudChip>
+                    </div>
+                </button>
+            }
+            @if (!Studies.Any())
+            {
+                <EmptyState Icon="@Icons.Material.Filled.MedicalServices"
+                            Title="No studies match"
+                            Message="Try a different filter." />
+            }
+        </div>
+    </section>
+
+    <!-- ══════════ Image viewer pane ══════════ -->
+    <section class="reading-room-pane rr-viewer">
+        <div class="rr-pane-header">
+            <MudStack Row="true" AlignItems="AlignItems.Center" Spacing="1">
+                <MudIcon Icon="@Icons.Material.Filled.Monitor" Size="Size.Small" />
+                <MudText Typo="Typo.subtitle1" Class="font-weight-medium">Image Viewer</MudText>
+            </MudStack>
+            <span class="rr-modality">@Selected?.Modality</span>
+        </div>
+        <div class="rr-viewer-stage">
+            @if (Selected is null)
+            {
+                <EmptyState Icon="@Icons.Material.Filled.Biotech"
+                            Title="No study selected"
+                            Message="Select a study from the reading queue." />
+            }
+            else
+            {
+                <div class="rr-placeholder">
+                    <MudIcon Icon="@Icons.Material.Filled.Biotech" Size="Size.Large" Class="rr-placeholder-icon" />
+                    <MudText Typo="Typo.h6" Class="text-secondary">@Selected.ExamName</MudText>
+                    <MudText Typo="Typo.body2" Class="text-secondary">Image from equipment - coming soon</MudText>
+                </div>
+            }
+        </div>
+        <div class="rr-thumbnails">
+            <span class="rr-thumbs-label">Series</span>
+            @for (var i = 1; i <= 4; i++)
+            {
+                <div class="rr-thumb @(i == 1 ? "selected" : string.Empty)">
+                    <MudText Typo="Typo.caption" Class="text-secondary">S@i</MudText>
+                </div>
+            }
+        </div>
+    </section>
+
+    <!-- ══════════ Report pane ══════════ -->
+    <section class="reading-room-pane rr-report">
+        @if (Selected is null)
+        {
+            <div class="rr-report-empty">
+                <EmptyState Icon="@Icons.Material.Filled.Assignment"
+                            Title="No report"
+                            Message="Select a study to start reading." />
+            </div>
+        }
+        else
+        {
+            <div class="rr-pane-header">
+                <MudStack Row="true" AlignItems="AlignItems.Center" Spacing="1">
+                    <MudAvatar Size="Size.Small" Color="Color.Primary" Class="text-subtitle2">@Initials(Selected.PatientName)</MudAvatar>
+                    <div>
+                        <MudText Typo="Typo.subtitle1" Class="font-weight-medium">@Selected.PatientName</MudText>
+                        <MudText Typo="Typo.caption" Class="text-secondary">@Selected.PatientCode</MudText>
+                    </div>
+                </MudStack>
+                <MudChip T="string" Size="Size.Small" Color="@StatusColor(Selected.Status)">@Selected.Status</MudChip>
+            </div>
+
+            <div class="rr-patient-summary">
+                <MudStack Row="true" Spacing="2">
+                    <div class="rr-summary-cell"><span class="rr-summary-label">Age / Gender</span><span>@Selected.Age / @Selected.Gender</span></div>
+                    <div class="rr-summary-cell"><span class="rr-summary-label">Modality</span><span>@Selected.Modality - @Selected.BodyPart</span></div>
+                </MudStack>
+                <div class="rr-summary-block">
+                    <span class="rr-summary-label">Clinical Indication</span>
+                    <span class="rr-summary-value">@Selected.Indication</span>
+                </div>
+                <div class="rr-summary-block">
+                    <span class="rr-summary-label">Radiologist</span>
+                    <span class="rr-summary-value">@Selected.Radiologist</span>
+                </div>
+            </div>
+
+            <MudDivider />
+
+            <div class="rr-report-body">
+                <MudTextField T="string"
+                              Label="Findings"
+                              Value="@_findings"
+                              ValueChanged="OnFindingsChanged"
+                              Variant="Variant.Outlined"
+                              Margin="Margin.Dense"
+                              Lines="5"
+                              Disabled="@_signed"
+                              Immediate="true" />
+                <MudTextField T="string"
+                              Label="Impression / Conclusion"
+                              Value="@_impression"
+                              ValueChanged="OnImpressionChanged"
+                              Variant="Variant.Outlined"
+                              Margin="Margin.Dense"
+                              Lines="3"
+                              Disabled="@_signed"
+                              Immediate="true"
+                              Class="mt-2" />
+                <MudTextField T="string"
+                              Label="Recommendation"
+                              Value="@_recommendation"
+                              ValueChanged="OnRecommendationChanged"
+                              Variant="Variant.Outlined"
+                              Margin="Margin.Dense"
+                              Lines="2"
+                              Disabled="@_signed"
+                              Immediate="true"
+                              Class="mt-2" />
+            </div>
+
+            <div class="rr-report-actions">
+                <MudStack Row="true" Spacing="2">
+                    <MudButton Variant="Variant.Outlined" Color="Color.Default" StartIcon="@Icons.Material.Filled.Save" OnClick="SaveDraftAsync" Disabled="_signed">Draft</MudButton>
+                    <MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.CheckCircle" OnClick="SignCompleteAsync" Disabled="_signed">Sign</MudButton>
+                </MudStack>
+                <MudButton Variant="Variant.Text" Color="Color.Default" StartIcon="@Icons.Material.Filled.Description" OnClick="ExportWordAsync">Export Word</MudButton>
+            </div>
+        }
+    </section>
+</div>
+
+@code {
+    private string? _filter;
+    private string _findings = string.Empty;
+    private string _impression = string.Empty;
+    private string _recommendation = string.Empty;
+    private bool _signed;
+    private RadiologyStudy? _selected;
+    private bool _selectedSet;
+
+    private IEnumerable<RadiologyStudy> Studies
+    {
+        get
+        {
+            if (string.IsNullOrWhiteSpace(_filter))
+                return RadiologySampleData.Studies;
+
+            var f = _filter.Trim();
+            return RadiologySampleData.Studies.Where(s =>
+                s.PatientName.Contains(f, StringComparison.OrdinalIgnoreCase) ||
+                s.ExamName.Contains(f, StringComparison.OrdinalIgnoreCase) ||
+                s.Modality.Contains(f, StringComparison.OrdinalIgnoreCase) ||
+                s.Status.Contains(f, StringComparison.OrdinalIgnoreCase));
+        }
+    }
+
+    private RadiologyStudy? Selected => _selected;
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        if (firstRender && !_selectedSet)
+        {
+            _selectedSet = true;
+            var current = RadiologySampleData.Studies.FirstOrDefault(s => s.Status is "InProgress" or "Draft");
+            if (current is not null)
+                Select(current);
+            StateHasChanged();
+        }
+    }
+
+    private bool IsSelected(RadiologyStudy study) => Selected == study;
+
+    private void Select(RadiologyStudy study)
+    {
+        _selected = study;
+        _findings = study.Findings;
+        _impression = study.Impression;
+        _recommendation = study.Recommendation;
+        _signed = study.Status == "Completed";
+    }
+
+    private void OnFilterChanged(string? value)
+    {
+        _filter = value;
+        if (Studies.Any(s => s != _selected) && (Selected is null || !Studies.Contains(Selected)))
+        {
+            var first = Studies.FirstOrDefault();
+            if (first is not null)
+                Select(first);
+        }
+    }
+
+    private void OnFindingsChanged(string value) => _findings = value;
+    private void OnImpressionChanged(string value) => _impression = value;
+    private void OnRecommendationChanged(string value) => _recommendation = value;
+
+    private Color StatusColor(string status) => status switch
+    {
+        "Completed" => Color.Success,
+        "Draft" => Color.Info,
+        _ => Color.Secondary,
+    };
+
+    private Color PriorityChipColor(string priority) => priority switch
+    {
+        "Stat" => Color.Error,
+        "Urgent" => Color.Warning,
+        _ => Color.Default,
+    };
+
+    private static string PriorityClass(string priority) => priority switch
+    {
+        "Stat" => "stat",
+        "Urgent" => "urgent",
+        _ => "routine",
+    };
+
+    private void SaveDraftAsync()
+    {
+        Snackbar.Add("Draft saved.", Severity.Info);
+    }
+
+    private void SignCompleteAsync()
+    {
+        _signed = true;
+        Snackbar.Add("Report signed. Study marked as Completed.", Severity.Success);
+    }
+
+    private void ExportWordAsync()
+    {
+        Snackbar.Add("Word document export is coming soon.", Severity.Info);
+    }
+
+    private static string Initials(string name)
+    {
+        if (string.IsNullOrWhiteSpace(name))
+            return "?";
+        var parts = name.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+        return string.Concat(parts.Take(2).Select(p => p[0])).ToUpperInvariant();
+    }
+}
