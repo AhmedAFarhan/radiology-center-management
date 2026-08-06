@@ -1,0 +1,84 @@
+@page "/"
+@layout Layout.LandingLayout
+@using Microsoft.AspNetCore.Components.Authorization
+@inject NavigationManager Navigation
+@inject AuthenticationStateProvider AuthState
+@inject IDialogService DialogService
+
+<div class="landing-hero">
+    <div class="landing-content">
+        <div class="landing-left">
+            <div class="landing-brand">
+                <img src="images/healthcare-logo-64.png" alt="EGcare" class="landing-brand-logo" />
+                <span class="landing-brand-text">EGcare</span>
+            </div>
+
+            <div class="landing-copy">
+                <div class="landing-badge">Radiology Center Management</div>
+                <h1 class="landing-title">Your radiology practice,<br />brilliantly organized.</h1>
+                <p class="landing-subtitle">
+                    EGcare brings patients, examinations, inventory, payroll and reporting into one
+                    calm, fast workspace — so your team can focus on care, not paperwork.
+                </p>
+
+                <div class="landing-features">
+                    <div class="landing-feature">
+                        <MudIcon Icon="@Icons.Material.Filled.CheckCircle" Color="Color.Primary" Size="Size.Small" />
+                        <span>Examinations &amp; reading room</span>
+                    </div>
+                    <div class="landing-feature">
+                        <MudIcon Icon="@Icons.Material.Filled.CheckCircle" Color="Color.Primary" Size="Size.Small" />
+                        <span>Patients, visits &amp; scheduling</span>
+                    </div>
+                    <div class="landing-feature">
+                        <MudIcon Icon="@Icons.Material.Filled.CheckCircle" Color="Color.Primary" Size="Size.Small" />
+                        <span>Inventory, payroll &amp; analytics</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="landing-cta">
+                <MudButton Variant="Variant.Filled"
+                           Color="Color.Primary"
+                           Size="Size.Large"
+                           StartIcon="@Icons.Material.Filled.Login"
+                           Class="landing-login-btn"
+                           OnClick="OpenLogin">
+                    Sign in
+                </MudButton>
+                <MudText Typo="Typo.body2" Class="landing-hint">Secure access for your team</MudText>
+            </div>
+        </div>
+
+        <div class="landing-right">
+            <div class="landing-image-wrap">
+                <img src="images/landing-hero.png" alt="EGcare hero" class="landing-image" />
+            </div>
+        </div>
+    </div>
+
+    <div class="landing-footer">
+        <span>© @DateTime.Now.Year EGcare — Radiology Center Management System</span>
+    </div>
+</div>
+
+@code {
+    protected override async Task OnInitializedAsync()
+    {
+        var state = await AuthState.GetAuthenticationStateAsync();
+        if (state.User.Identity?.IsAuthenticated == true)
+            Navigation.NavigateTo("/dashboard");
+    }
+
+    private async Task OpenLogin()
+    {
+        var options = new DialogOptions
+        {
+            CloseOnEscapeKey = true,
+            MaxWidth = MaxWidth.Small,
+            FullWidth = true,
+            BackdropClick = true,
+        };
+        await DialogService.ShowAsync<LoginDialog>("Sign in", options);
+    }
+}

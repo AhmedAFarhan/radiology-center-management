@@ -1,19 +1,16 @@
-@page "/"
-@layout Layout.LoginLayout
 @using System.ComponentModel.DataAnnotations
 @inject AuthService AuthService
 @inject ISnackbar Snackbar
 @inject NavigationManager Navigation
-@inject AuthenticationStateProvider AuthState
 
-<MudCard Elevation="8" Class="login-card">
-    <MudCardContent>
+<MudDialog Class="login-dialog">
+    <DialogContent>
         <div class="text-center mb-4">
             <MudAvatar Class="mb-3" Color="Color.Primary" Variant="Variant.Filled">
                 <MudIcon Icon="@Icons.Material.Filled.MedicalServices" />
             </MudAvatar>
-            <MudText Typo="Typo.h5" Class="mb-1">Radiology Center</MudText>
-            <MudText Typo="Typo.body2" Class="text-secondary">Sign in to your account</MudText>
+            <MudText Typo="Typo.h5" Class="mb-1">Sign in to EGcare</MudText>
+            <MudText Typo="Typo.body2" Class="text-secondary">Enter your credentials to continue</MudText>
         </div>
 
         <EditForm Model="@_model" OnValidSubmit="@SubmitAsync">
@@ -47,19 +44,14 @@
                 }
             </MudButton>
         </EditForm>
-    </MudCardContent>
-</MudCard>
+    </DialogContent>
+</MudDialog>
 
 @code {
+    [CascadingParameter] public IMudDialogInstance MudDialog { get; set; } = default!;
+
     private readonly LoginModel _model = new();
     private bool _busy;
-
-    protected override async Task OnInitializedAsync()
-    {
-        var state = await AuthState.GetAuthenticationStateAsync();
-        if (state.User.Identity?.IsAuthenticated == true)
-            Navigation.NavigateTo("/dashboard");
-    }
 
     private async Task SubmitAsync()
     {
@@ -67,6 +59,8 @@
         try
         {
             await AuthService.SignInAsync(_model.UserName, _model.Password);
+            Snackbar.Add("Welcome back!", Severity.Success);
+            MudDialog.Close(DialogResult.Ok(true));
             Navigation.NavigateTo("/dashboard");
         }
         catch (ApiException ex)
