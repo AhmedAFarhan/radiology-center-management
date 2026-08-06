@@ -10,7 +10,7 @@
 
 @if (Loading)
 {
-    <PageSkeleton Rows="8" />
+    <AnalyticsSkeleton ShowHero="false" />
 }
 else if (Error)
 {
@@ -83,3 +83,5 @@ else
             .Select(r => new AnalyticsSlice(r.Name, r.ReferredExams))
             .ToList();
 }
+
+

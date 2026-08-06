@@ -1,0 +1,66 @@
+<MudGrid Spacing="3">
+    @for (var i = 0; i < 4; i++)
+    {
+        <MudItem xs="12" sm="6" lg="3">
+            <MudCard Elevation="0" Class="stat-card h-100">
+                <MudCardContent>
+                    <MudGrid>
+                        <MudItem xs="8">
+                            <MudSkeleton SkeletonType="SkeletonType.Text" Width="70%" Animation="Animation.Pulse" />
+                            <MudSkeleton SkeletonType="SkeletonType.Text" Width="90%" Animation="Animation.Pulse" Style="margin-top:8px" />
+                        </MudItem>
+                        <MudItem xs="4" Class="d-flex align-items-center justify-content-end">
+                            <MudSkeleton SkeletonType="SkeletonType.Circle" Width="40px" Height="40px" Animation="Animation.Pulse" />
+                        </MudItem>
+                    </MudGrid>
+                </MudCardContent>
+            </MudCard>
+        </MudItem>
+    }
+</MudGrid>
+
+<MudGrid Spacing="3" Class="mt-1">
+    <MudItem xs="12" lg="8">
+        <MudCard Elevation="0" Class="dashboard-card h-100">
+            <MudCardContent>
+                <MudSkeleton SkeletonType="SkeletonType.Rectangle" Height="300px" Animation="Animation.Pulse" Style="border-radius:8px" />
+            </MudCardContent>
+        </MudCard>
+    </MudItem>
+    <MudItem xs="12" lg="4">
+        <MudCard Elevation="0" Class="dashboard-card h-100">
+            <MudCardContent>
+                <MudSkeleton SkeletonType="SkeletonType.Rectangle" Height="300px" Animation="Animation.Pulse" Style="border-radius:8px" />
+            </MudCardContent>
+        </MudCard>
+    </MudItem>
+</MudGrid>
+
+<MudGrid Spacing="3" Class="mt-1">
+    <MudItem xs="12" lg="8">
+        <MudCard Elevation="0" Class="dashboard-card h-100">
+            <MudCardContent>
+                @for (var i = 0; i < 6; i++)
+                {
+                    <MudSkeleton SkeletonType="SkeletonType.Rectangle" Height="44px" Animation="Animation.Pulse" Style="border-radius:6px;margin-bottom:8px" />
+                }
+            </MudCardContent>
+        </MudCard>
+    </MudItem>
+    <MudItem xs="12" lg="4">
+        <MudCard Elevation="0" Class="dashboard-card h-100">
+            <MudCardContent>
+                @for (var i = 0; i < 5; i++)
+                {
+                    <div class="d-flex align-items-center" style="gap:10px;margin-bottom:14px">
+                        <MudSkeleton SkeletonType="SkeletonType.Circle" Width="36px" Height="36px" Animation="Animation.Pulse" />
+                        <div style="flex:1">
+                            <MudSkeleton SkeletonType="SkeletonType.Text" Width="60%" Animation="Animation.Pulse" />
+                            <MudSkeleton SkeletonType="SkeletonType.Text" Width="40%" Animation="Animation.Pulse" />
+                        </div>
+                    </div>
+                }
+            </MudCardContent>
+        </MudCard>
+    </MudItem>
+</MudGrid>

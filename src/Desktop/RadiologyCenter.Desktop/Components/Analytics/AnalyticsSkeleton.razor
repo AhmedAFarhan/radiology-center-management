@@ -1,0 +1,58 @@
+@if (ShowHero)
+{
+    <div class="mb-4">
+        <MudSkeleton SkeletonType="SkeletonType.Rectangle" Height="120px" Animation="Animation.Pulse" Style="border-radius:24px;background:linear-gradient(120deg,#4F46E5,#9333EA)" />
+    </div>
+}
+
+<MudGrid Spacing="3">
+    @for (var i = 0; i < 6; i++)
+    {
+        <MudItem xs="12" sm="6" lg="2">
+            <MudCard Elevation="0" Class="dashboard-card">
+                <MudCardContent>
+                    <MudSkeleton SkeletonType="SkeletonType.Text" Width="60%" Animation="Animation.Pulse" />
+                    <MudSkeleton SkeletonType="SkeletonType.Text" Width="90%" Animation="Animation.Pulse" Style="margin-top:8px" />
+                </MudCardContent>
+            </MudCard>
+        </MudItem>
+    }
+</MudGrid>
+
+<MudGrid Spacing="3" Class="mt-1">
+    <MudItem xs="12" lg="8">
+        <MudCard Elevation="0" Class="dashboard-card">
+            <MudCardContent>
+                <MudSkeleton SkeletonType="SkeletonType.Rectangle" Height="320px" Animation="Animation.Pulse" Style="border-radius:8px" />
+            </MudCardContent>
+        </MudCard>
+    </MudItem>
+    <MudItem xs="12" lg="4">
+        <MudCard Elevation="0" Class="dashboard-card">
+            <MudCardContent>
+                <MudSkeleton SkeletonType="SkeletonType.Rectangle" Height="320px" Animation="Animation.Pulse" Style="border-radius:8px" />
+            </MudCardContent>
+        </MudCard>
+    </MudItem>
+</MudGrid>
+
+<MudGrid Spacing="3" Class="mt-1">
+    <MudItem xs="12" lg="5">
+        <MudCard Elevation="0" Class="dashboard-card">
+            <MudCardContent>
+                <MudSkeleton SkeletonType="SkeletonType.Rectangle" Height="280px" Animation="Animation.Pulse" Style="border-radius:8px" />
+            </MudCardContent>
+        </MudCard>
+    </MudItem>
+    <MudItem xs="12" lg="7">
+        <MudCard Elevation="0" Class="dashboard-card">
+            <MudCardContent>
+                <MudSkeleton SkeletonType="SkeletonType.Rectangle" Height="280px" Animation="Animation.Pulse" Style="border-radius:8px" />
+            </MudCardContent>
+        </MudCard>
+    </MudItem>
+</MudGrid>
+
+@code {
+    [Parameter] public bool ShowHero { get; set; } = true;
+}

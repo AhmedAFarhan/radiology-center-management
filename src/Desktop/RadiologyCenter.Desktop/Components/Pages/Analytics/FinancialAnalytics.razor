@@ -10,7 +10,7 @@
 
 @if (Loading)
 {
-    <PageSkeleton Rows="8" />
+    <AnalyticsSkeleton ShowHero="false" />
 }
 else if (Error)
 {
@@ -106,3 +106,5 @@ else
             ? AnalyticsFormat.Percent(_data.TotalCollected / _data.TotalBilled)
             : "-";
 }
+
+

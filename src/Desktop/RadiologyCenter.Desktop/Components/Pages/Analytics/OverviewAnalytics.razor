@@ -10,7 +10,7 @@
 
 @if (Loading)
 {
-    <PageSkeleton Rows="8" />
+    <AnalyticsSkeleton />
 }
 else if (Error)
 {
@@ -151,3 +151,4 @@ else
 
     private sealed record WaterfallRow(string Label, decimal Value, int Percent, string Color);
 }
+

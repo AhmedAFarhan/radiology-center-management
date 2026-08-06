@@ -10,7 +10,7 @@
         }
         else if (_stock is null)
         {
-            <PageSkeleton Rows="4" />
+            <DialogSkeleton Rows="4" />
         }
         else
         {
@@ -167,3 +167,4 @@
     private void CancelAsync()
         => MudDialog.Cancel();
 }
+

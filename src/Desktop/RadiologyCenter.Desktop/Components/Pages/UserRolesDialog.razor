@@ -13,7 +13,7 @@
         }
         else if (_roles.Count == 0)
         {
-            <PageSkeleton Rows="4" />
+            <DialogSkeleton Rows="4" />
         }
         else
         {
@@ -112,3 +112,4 @@
     private void CancelAsync()
         => MudDialog.Cancel();
 }
+

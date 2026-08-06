@@ -1,0 +1,18 @@
+<MudStack Spacing="3">
+    <MudSkeleton SkeletonType="SkeletonType.Rectangle" Height="36px" Width="220px" Animation="Animation.Pulse" Style="border-radius:6px" />
+    @for (var i = 0; i < Rows; i++)
+    {
+        <div>
+            <MudSkeleton SkeletonType="SkeletonType.Text" Width="35%" Animation="Animation.Pulse" />
+            <MudSkeleton SkeletonType="SkeletonType.Rectangle" Height="42px" Animation="Animation.Pulse" Style="border-radius:8px;margin-top:4px" />
+        </div>
+    }
+    <MudStack Row="true" Spacing="2" Class="mt-3" AlignItems="AlignItems.Center">
+        <MudSkeleton SkeletonType="SkeletonType.Rectangle" Width="90px" Height="36px" Animation="Animation.Pulse" Style="border-radius:18px" />
+        <MudSkeleton SkeletonType="SkeletonType.Rectangle" Width="90px" Height="36px" Animation="Animation.Pulse" Style="border-radius:18px" />
+    </MudStack>
+</MudStack>
+
+@code {
+    [Parameter] public int Rows { get; set; } = 4;
+}

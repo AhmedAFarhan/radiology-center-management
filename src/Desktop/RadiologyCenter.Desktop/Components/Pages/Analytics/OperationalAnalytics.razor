@@ -10,7 +10,7 @@
 
 @if (Loading)
 {
-    <PageSkeleton Rows="8" />
+    <AnalyticsSkeleton ShowHero="false" />
 }
 else if (Error)
 {
@@ -86,3 +86,5 @@ else
             .Select(p => new AnalyticsSlice(p.Priority, p.Count))
             .ToList();
 }
+
+

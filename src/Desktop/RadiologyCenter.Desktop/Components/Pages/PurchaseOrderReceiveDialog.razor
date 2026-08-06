@@ -6,7 +6,7 @@
         <DialogHeader Icon="@Icons.Material.Filled.ReceiptLong" Title="@(_po is null ? "Receive Order" : $"Receive {_po.OrderNumber}")" />
         @if (_loading)
         {
-            <PageSkeleton Rows="4" />
+            <DialogSkeleton Rows="4" />
         }
         else if (_error is not null)
         {
@@ -183,3 +183,4 @@
         public DateTime? ExpiryDate { get; set; }
     }
 }
+

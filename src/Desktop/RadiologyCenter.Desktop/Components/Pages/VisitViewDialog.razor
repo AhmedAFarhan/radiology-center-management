@@ -7,7 +7,7 @@
         <DialogHeader Icon="@Icons.Material.Filled.EventNote" Title="Visit Details" />
         @if (_loading)
         {
-            <PageSkeleton Rows="4" />
+            <DialogSkeleton Rows="4" />
         }
         else if (_loadError is not null)
         {
@@ -220,3 +220,4 @@
     private void CloseAsync()
         => MudDialog.Cancel();
 }
+
