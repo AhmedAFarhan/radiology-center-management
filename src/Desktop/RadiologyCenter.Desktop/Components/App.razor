@@ -1,22 +1,48 @@
+@inject BackendStatusService Backend
+
 <MudThemeProvider Theme="@AppTheme.Default" />
 <MudPopoverProvider />
 <MudDialogProvider />
 <MudSnackbarProvider />
 
-<CascadingAuthenticationState>
-    <Router AppAssembly="typeof(MauiProgram).Assembly" NotFoundPage="typeof(Pages.NotFound)">
-        <Found Context="routeData">
-            <AuthorizeRouteView RouteData="routeData" DefaultLayout="typeof(Layout.MainLayout)">
-                <NotAuthorized>
-                    <RedirectToLogin />
-                </NotAuthorized>
-                <Authorizing>
-                    <div class="d-flex align-items-center justify-content-center" style="height: 100vh;">
-                        <MudSkeleton SkeletonType="SkeletonType.Rectangle" Width="320px" Height="180px" Animation="Animation.Pulse" Style="border-radius:12px" />
-                    </div>
-                </Authorizing>
-            </AuthorizeRouteView>
-            <FocusOnNavigate RouteData="routeData" Selector="h1" />
-        </Found>
-    </Router>
-</CascadingAuthenticationState>
+@if (Backend.IsReady)
+{
+    <CascadingAuthenticationState>
+        <Router AppAssembly="typeof(MauiProgram).Assembly" NotFoundPage="typeof(Pages.NotFound)">
+            <Found Context="routeData">
+                <AuthorizeRouteView RouteData="routeData" DefaultLayout="typeof(Layout.MainLayout)">
+                    <NotAuthorized>
+                        <RedirectToLogin />
+                    </NotAuthorized>
+                    <Authorizing>
+                        <div class="d-flex align-items-center justify-content-center" style="height: 100vh;">
+                            <MudSkeleton SkeletonType="SkeletonType.Rectangle" Width="320px" Height="180px" Animation="Animation.Pulse" Style="border-radius:12px" />
+                        </div>
+                    </Authorizing>
+                </AuthorizeRouteView>
+                <FocusOnNavigate RouteData="routeData" Selector="h1" />
+            </Found>
+        </Router>
+    </CascadingAuthenticationState>
+}
+else
+{
+    <BootSplash />
+}
+
+@code {
+    private Action? _onBackendChanged;
+
+    protected override void OnInitialized()
+    {
+        _onBackendChanged = () => InvokeAsync(StateHasChanged);
+        Backend.StateChanged += _onBackendChanged;
+        base.OnInitialized();
+    }
+
+    public void Dispose()
+    {
+        if (_onBackendChanged is not null)
+            Backend.StateChanged -= _onBackendChanged;
+    }
+}

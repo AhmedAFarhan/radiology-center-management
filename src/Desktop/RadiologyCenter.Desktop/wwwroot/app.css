@@ -656,3 +656,83 @@ h1:focus {
         text-align: left;
     }
 }
+
+/* Boot splash */
+.boot-splash {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: radial-gradient(120% 120% at 50% 0%, #3549a8 0%, #1b2350 100%);
+  z-index: 3000;
+  cursor: default;
+  user-select: none;
+}
+.boot-splash-center {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 24px;
+  max-width: 380px;
+}
+.boot-splash-logo {
+  width: 96px;
+  height: 96px;
+  border-radius: 24px;
+  background: linear-gradient(135deg, #5476FC, #7F9BFD);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 18px 40px rgba(0,0,0,0.35);
+  margin-bottom: 22px;
+}
+.boot-splash-title {
+  font-size: 28px;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+  color: #ffffff;
+}
+.boot-splash-subtitle {
+  margin-top: 8px;
+  font-size: 14px;
+  letter-spacing: 2.5px;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.6);
+}
+.boot-splash-progress {
+  width: 240px;
+  margin-top: 32px;
+}
+.boot-splash-caption {
+  margin-top: 14px;
+  font-size: 13px;
+  color: rgba(255,255,255,0.75);
+}
+.boot-splash-error {
+  display: flex;
+  align-items: center;
+  margin-top: 28px;
+  font-size: 14px;
+  color: #ffd7d7;
+  background: rgba(255,69,69,0.18);
+  padding: 10px 16px;
+  border-radius: 10px;
+}
+.boot-splash-error-detail {
+  margin-top: 10px;
+  max-width: 320px;
+  font-family: monospace;
+  font-size: 12px;
+  color: rgba(255,255,255,0.6);
+  word-break: break-word;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+}
+.boot-splash-center .mud-button {
+  margin-top: 20px;
+}

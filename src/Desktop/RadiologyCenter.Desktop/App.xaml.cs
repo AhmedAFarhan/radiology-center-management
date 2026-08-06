@@ -13,8 +13,29 @@ public partial class App : Application
     protected override Window CreateWindow(IActivationState? activationState)
     {
         var window = new Window(new MainPage()) { Title = "RadiologyCenter" };
+        CenterWindowOnLaunch(window);
         window.Destroying += (_, _) => _localhost.Stop();
         return window;
+    }
+
+    private void CenterWindowOnLaunch(Window window)
+    {
+#if WINDOWS
+        window.HandlerChanged += (_, _) =>
+        {
+            if (window.Handler?.PlatformView is not Microsoft.UI.Xaml.Window native)
+                return;
+
+            var hwnd = WinRT.Interop.WindowNative.GetWindowHandle(native);
+            var windowId = Microsoft.UI.Win32Interop.GetWindowIdFromWindow(hwnd);
+            var appWindow = Microsoft.UI.Windowing.AppWindow.GetFromWindowId(windowId);
+            var area = Microsoft.UI.Windowing.DisplayArea.GetFromWindowId(windowId, Microsoft.UI.Windowing.DisplayAreaFallback.Primary).WorkArea;
+
+            appWindow.Move(new Windows.Graphics.PointInt32(
+                area.X + (area.Width - appWindow.Size.Width) / 2,
+                area.Y + (area.Height - appWindow.Size.Height) / 2));
+        };
+#endif
     }
 
     protected override void OnStart()

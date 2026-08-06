@@ -9,21 +9,49 @@ public sealed class LocalhostService : IDisposable
     private const int StartupTimeoutMs = 10000;
     private const int HealthCheckIntervalMs = 500;
 
+    public static LocalhostService? Instance { get; private set; }
+
 #if WINDOWS
     private Process? _process;
 #endif
 
+    private Task? _startupTask;
+    private string? _startupError;
+
+    public bool IsReady => _startupTask is { IsCompletedSuccessfully: true };
+    public string? StartupError => _startupError;
+
     public LocalhostService()
     {
+        Instance = this;
 #if WINDOWS
         AppDomain.CurrentDomain.ProcessExit += (_, _) => Dispose();
 #endif
     }
 
-    public async Task StartAsync()
+    public Task StartAsync()
+    {
+        if (_startupTask is not null && !_startupTask.IsCanceled)
+            return _startupTask;
+
+        _startupError = null;
+        _startupTask = StartCoreAsync();
+        return _startupTask;
+    }
+
+    public async Task RetryAsync()
+    {
+        KillProcess();
+        _startupTask = null;
+        await StartAsync();
+    }
+
+    private async Task StartCoreAsync()
     {
 #if WINDOWS
-        EnsurePortIsFree();
+        try
+        {
+            EnsurePortIsFree();
         var (exePath, workDir, isDevelopment) = ResolveLocalhostPaths();
 
         var stderr = new StringWriter();
@@ -56,13 +84,19 @@ public sealed class LocalhostService : IDisposable
         _process.Start();
         _process.BeginErrorReadLine();
 
-        var started = await WaitForStartupAsync();
-        if (!started)
+            var started = await WaitForStartupAsync();
+            if (!started)
+            {
+                _process.Kill(entireProcessTree: true);
+                var error = stderr.ToString();
+                throw new InvalidOperationException(
+                    $"Localhost failed to start within {StartupTimeoutMs}ms.\nError output:\n{error}");
+            }
+        }
+        catch (Exception ex)
         {
-            _process.Kill(entireProcessTree: true);
-            var error = stderr.ToString();
-            throw new InvalidOperationException(
-                $"Localhost failed to start within {StartupTimeoutMs}ms.\nError output:\n{error}");
+            _startupError = ex.Message;
+            throw;
         }
 #endif
     }
