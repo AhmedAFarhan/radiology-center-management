@@ -3,6 +3,9 @@ using RadiologyCenter.BuildingBlocks.Domain.Results;
 using RadiologyCenter.Examinations.Application.DTOs;
 using RadiologyCenter.Examinations.Application.Queries.GetFinancialAnalytics;
 using RadiologyCenter.Examinations.Application.Queries.GetFinancialExams;
+using RadiologyCenter.Examinations.Application.Queries.GetMonthlyProfit;
+using RadiologyCenter.Examinations.Application.Queries.GetOperationalAnalytics;
+using RadiologyCenter.Examinations.Application.Queries.GetStaffMachineAnalytics;
 using RadiologyCenter.Localhost.Authorization;
 using RadiologyCenter.Localhost.Extensions;
 using Wolverine;
@@ -37,6 +40,39 @@ public class AnalyticsController : ControllerBase
         CancellationToken ct)
     {
         var result = await _bus.InvokeAsync<Result<IReadOnlyList<FinancialExamRowDto>>>(new GetFinancialExamsQuery(from, to), ct);
+        return result.ToActionResult();
+    }
+
+    [HasPermission(AnalyticsReadCode)]
+    [HttpGet("operational")]
+    public async Task<IActionResult> GetOperationalAsync(
+        [FromQuery] DateTime? from,
+        [FromQuery] DateTime? to,
+        CancellationToken ct)
+    {
+        var result = await _bus.InvokeAsync<Result<OperationalAnalyticsDto>>(new GetOperationalAnalyticsQuery(from, to), ct);
+        return result.ToActionResult();
+    }
+
+    [HasPermission(AnalyticsReadCode)]
+    [HttpGet("staff-machine")]
+    public async Task<IActionResult> GetStaffMachineAsync(
+        [FromQuery] DateTime? from,
+        [FromQuery] DateTime? to,
+        CancellationToken ct)
+    {
+        var result = await _bus.InvokeAsync<Result<StaffMachineAnalyticsDto>>(new GetStaffMachineAnalyticsQuery(from, to), ct);
+        return result.ToActionResult();
+    }
+
+    [HasPermission(AnalyticsReadCode)]
+    [HttpGet("profit")]
+    public async Task<IActionResult> GetProfitAsync(
+        [FromQuery] DateTime? from,
+        [FromQuery] DateTime? to,
+        CancellationToken ct)
+    {
+        var result = await _bus.InvokeAsync<Result<ProfitAnalyticsDto>>(new GetMonthlyProfitQuery(from, to), ct);
         return result.ToActionResult();
     }
 }

@@ -78,4 +78,26 @@ public class ExaminationRepository : BaseRepository<Examination, Guid>, IExamina
                 e.Remaining))
             .ToListAsync(ct);
     }
+
+    public async Task<IReadOnlyList<OperationalExamProjection>> GetOperationalProjectionAsync(DateTime? from, DateTime? to, CancellationToken ct = default)
+    {
+        var query = DbSet.AsQueryable();
+
+        if (from is not null)
+            query = query.Where(e => e.CreatedAt >= from);
+
+        if (to is not null)
+            query = query.Where(e => e.CreatedAt <= to);
+
+        return await query
+            .Select(e => new OperationalExamProjection(
+                e.ExaminationTypeId,
+                e.Status,
+                e.Priority,
+                e.ScheduledAt,
+                e.StartedAt,
+                e.CompletedAt,
+                e.CreatedAt))
+            .ToListAsync(ct);
+    }
 }

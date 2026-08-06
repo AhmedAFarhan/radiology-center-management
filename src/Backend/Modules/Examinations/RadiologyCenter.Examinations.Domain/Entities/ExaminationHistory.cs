@@ -105,6 +105,7 @@ public sealed class ExaminationHistory : Entity<Guid>
                 snapshot.Name,
                 snapshot.CategoryValue,
                 item.Quantity,
+                snapshot.UnitCost,
                 item.IsContrast,
                 item.IsRequired,
                 item.Notes));

@@ -10,4 +10,5 @@ public interface IExaminationRepository : IBaseRepository<Examination, Guid>
     Task<PagedResult<Examination>> GetPagedWithItemsAsync(QueryRequest request, CancellationToken ct = default);
     Task<bool> HasActiveExaminationsByTypeAsync(Guid examinationTypeId, CancellationToken ct = default);
     Task<IReadOnlyList<ExamFinancialProjection>> GetFinancialProjectionAsync(DateTime? from, DateTime? to, CancellationToken ct = default);
+    Task<IReadOnlyList<OperationalExamProjection>> GetOperationalProjectionAsync(DateTime? from, DateTime? to, CancellationToken ct = default);
 }

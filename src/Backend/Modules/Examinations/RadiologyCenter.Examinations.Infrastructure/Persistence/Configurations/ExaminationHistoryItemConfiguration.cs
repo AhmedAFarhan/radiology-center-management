@@ -17,6 +17,7 @@ public class ExaminationHistoryItemConfiguration : IEntityTypeConfiguration<Exam
         builder.Property(i => i.ItemName).IsRequired().HasMaxLength(200);
         builder.Property(i => i.ItemCategory).IsRequired();
         builder.Property(i => i.Quantity).IsRequired();
+        builder.Property(i => i.UnitCost).HasPrecision(18, 2).IsRequired();
         builder.Property(i => i.IsContrast).IsRequired();
         builder.Property(i => i.IsRequired).IsRequired();
         builder.Property(i => i.Notes).HasMaxLength(500);
