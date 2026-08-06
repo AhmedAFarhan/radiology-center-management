@@ -28,6 +28,8 @@ public sealed class BackendStatusService
         Error = null;
         StateChanged?.Invoke();
 
+        await Task.Delay(TimeSpan.FromSeconds(10));
+
         try
         {
             await (LocalhostService.Instance?.StartAsync() ?? Task.CompletedTask);
