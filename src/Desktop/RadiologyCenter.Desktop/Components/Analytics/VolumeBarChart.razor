@@ -1,0 +1,50 @@
+@using ApexCharts
+@using RadiologyCenter.Desktop.Models
+
+@if (Items.Count == 0)
+{
+    <div class="pa-6 text-center text-secondary">No volume data in this period.</div>
+}
+else
+{
+    <ApexChart TItem="MonthlyVolumeDto" Height="Height" Options="_options">
+        <ApexPointSeries TItem="MonthlyVolumeDto"
+                         Items="Items"
+                         Name="Total"
+                         SeriesType="SeriesType.Bar"
+                         XValue="@(m => m.Month)"
+                         YValue="@(m => m.Total)" />
+        <ApexPointSeries TItem="MonthlyVolumeDto"
+                         Items="Items"
+                         Name="Completed"
+                         SeriesType="SeriesType.Bar"
+                         XValue="@(m => m.Month)"
+                         YValue="@(m => m.Completed)" />
+    </ApexChart>
+}
+
+@code {
+    [Parameter] public IReadOnlyList<MonthlyVolumeDto> Items { get; set; } = Array.Empty<MonthlyVolumeDto>();
+
+    [Parameter] public string Height { get; set; } = "300px";
+
+    private static readonly ApexChartOptions<MonthlyVolumeDto> _options = new()
+    {
+        Chart = new ApexCharts.Chart
+        {
+            Toolbar = new Toolbar { Show = false },
+            Zoom = new Zoom { Enabled = false },
+            ForeColor = "#8B93A7",
+            FontFamily = "OpenSansRegular, sans-serif",
+        },
+        DataLabels = new DataLabels { Enabled = false },
+        PlotOptions = new PlotOptions
+        {
+            Bar = new PlotOptionsBar { BorderRadius = 5, ColumnWidth = "55%" }
+        },
+        Grid = new Grid { Show = true, BorderColor = "#EDEFF5" },
+        Legend = new Legend { Position = LegendPosition.Top },
+        Colors = new List<string> { "#5476FC", "#C3CDFD" },
+    };
+}
+

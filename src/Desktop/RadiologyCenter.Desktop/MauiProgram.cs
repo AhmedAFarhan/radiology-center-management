@@ -30,6 +30,8 @@ public static class MauiProgram
         builder.Services.AddScoped<AppAuthenticationStateProvider>();
         builder.Services.AddScoped<AuthenticationStateProvider>(sp => sp.GetRequiredService<AppAuthenticationStateProvider>());
         builder.Services.AddScoped<ApiClient>();
+        builder.Services.AddScoped<AnalyticsService>();
+        builder.Services.AddScoped<AnalyticsPeriodService>();
         builder.Services.AddScoped<AuthService>();
         builder.Services.AddScoped<DashboardService>();
         builder.Services.AddScoped<PatientService>();

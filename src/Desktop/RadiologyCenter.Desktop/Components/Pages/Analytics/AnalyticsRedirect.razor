@@ -1,0 +1,9 @@
+@page "/analytics"
+@inject NavigationManager Navigation
+
+@code {
+    protected override void OnInitialized()
+    {
+        Navigation.NavigateTo("/analytics/overview", forceLoad: true);
+    }
+}

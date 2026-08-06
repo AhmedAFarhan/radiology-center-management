@@ -1,0 +1,108 @@
+@page "/analytics/financial"
+@attribute [Authorize]
+@inherits AnalyticsPageBase
+@using RadiologyCenter.Desktop.Components.Analytics
+@using RadiologyCenter.Desktop.Models
+
+<PageHeader Icon="@Icons.Material.Filled.AccountBalanceWallet" Title="Financials" Subtitle="Revenue, billing and receivables" OnRefresh="() => ReloadAsync()" ShowSearch="false" />
+
+<PeriodSelector Class="mb-4" />
+
+@if (Loading)
+{
+    <PageSkeleton Rows="8" />
+}
+else if (Error)
+{
+    <ErrorState Title="Couldn't load financials" Message="Unable to reach the server. Check your connection and try again." Action="ReloadAsync" RetryLabel="Try again" />
+}
+else
+{
+    <MudGrid Spacing="3">
+        <MudItem xs="12" sm="6" lg="4">
+            <StatCard Label="Exams" Value="@AnalyticsFormat.Count(_data!.ExamCount)" Icon="@Icons.Material.Filled.MedicalServices" Color="Color.Primary" TrendText="Completed in period" TrendUp="true" />
+        </MudItem>
+        <MudItem xs="12" sm="6" lg="4">
+            <StatCard Label="Collected" Value="@AnalyticsFormat.Money(_data.TotalCollected)" Icon="@Icons.Material.Filled.Payments" Color="Color.Secondary" TrendText="Cash in" TrendUp="true" />
+        </MudItem>
+        <MudItem xs="12" sm="6" lg="4">
+            <StatCard Label="Billed" Value="@AnalyticsFormat.Money(_data.TotalBilled)" Icon="@Icons.Material.Filled.ReceiptLong" Color="Color.Info" TrendText="Gross invoices" TrendUp="true" />
+        </MudItem>
+        <MudItem xs="12" sm="6" lg="3">
+            <StatCard Label="Discounts" Value="@AnalyticsFormat.Money(_data.TotalDiscounts)" Icon="@Icons.Material.Filled.LocalOffer" Color="Color.Warning" TrendText="Given this period" TrendUp="false" />
+        </MudItem>
+        <MudItem xs="12" sm="6" lg="3">
+            <StatCard Label="Average per exam" Value="@AnalyticsFormat.Money(_data.AvgPerExam)" Icon="@Icons.Material.Filled.MonetizationOn" Color="Color.Primary" TrendText="Collected ÷ exams" TrendUp="true" />
+        </MudItem>
+        <MudItem xs="12" sm="6" lg="3">
+            <StatCard Label="Outstanding" Value="@AnalyticsFormat.Money(_data.Receivables)" Icon="@Icons.Material.Filled.Wallet" Color="Color.Error" TrendText="Still to collect" TrendUp="false" />
+        </MudItem>
+        <MudItem xs="12" sm="6" lg="3">
+            <StatCard Label="Collection rate" Value="@CollectionRate()" Icon="@Icons.Material.Filled.TrendingUp" Color="Color.Success" TrendText="Of total billed" TrendUp="true" />
+        </MudItem>
+    </MudGrid>
+
+    <MudGrid Spacing="3" Class="mt-1">
+        <MudItem xs="12" lg="8">
+            <ChartCard Title="Revenue trend" Subtitle="Collected vs billed by month">
+                <RevenueTrendChart Items="@_data!.RevenueByMonth" />
+            </ChartCard>
+        </MudItem>
+        <MudItem xs="12" lg="4">
+            <ChartCard Title="Revenue by modality" Subtitle="Collected contribution">
+                <ModalityRevenueChart Items="@_data!.RevenueByModality" Height="300px" />
+            </ChartCard>
+        </MudItem>
+        <MudItem xs="12" lg="5">
+            <ChartCard Title="Receivable aging" Subtitle="Outstanding balances by bucket">
+                <DonutChart Items="@BuildReceivableSlices()" Height="280px" />
+            </ChartCard>
+        </MudItem>
+        <MudItem xs="12" lg="7">
+            <ChartCard Title="Exam revenue detail" Subtitle="Billing per completed exam">
+                <MudTable Items="_exams!.Where(e => e.Billed > 0).OrderByDescending(e => e.CompletedAt).Take(12)" Dense="true" Hover="true" FixedHeader="true" Height="360" Elevation="0" Bordered="false">
+                    <HeaderContent>
+                        <MudTh>Exam</MudTh>
+                        <MudTh>Completed</MudTh>
+                        <MudTh Right="true">Billed</MudTh>
+                        <MudTh Right="true">Discount</MudTh>
+                        <MudTh Right="true">Paid</MudTh>
+                        <MudTh Right="true">Remaining</MudTh>
+                    </HeaderContent>
+                    <RowTemplate>
+                        <MudTd DataLabel="Exam">@context.ExaminationTypeName</MudTd>
+                        <MudTd DataLabel="Completed">@(context.CompletedAt?.ToString("dd MMM") ?? "-")</MudTd>
+                        <MudTd DataLabel="Billed" Right="true">@context.Billed.ToString("C")</MudTd>
+                        <MudTd DataLabel="Discount" Right="true">@context.Discount.ToString("C")</MudTd>
+                        <MudTd DataLabel="Paid" Right="true">@context.Paid.ToString("C")</MudTd>
+                        <MudTd DataLabel="Remaining" Right="true">@context.Remaining.ToString("C")</MudTd>
+                    </RowTemplate>
+                </MudTable>
+            </ChartCard>
+        </MudItem>
+    </MudGrid>
+}
+
+@code {
+    [Inject]
+    private AnalyticsService Api { get; set; } = null!;
+
+    private FinancialAnalyticsDto? _data;
+    private IReadOnlyList<FinancialExamRowDto>? _exams;
+
+    protected override async Task LoadAsync(DateTime from, DateTime to)
+    {
+        _data = await Api.GetFinancialAsync(from, to);
+        _exams = await Api.GetFinancialExamsAsync(from, to);
+    }
+
+    private IReadOnlyList<AnalyticsSlice> BuildReceivableSlices()
+        => (_data?.ReceivableAging ?? Array.Empty<ReceivableBucketDto>())
+            .Select(r => new AnalyticsSlice(r.Bucket, r.Amount))
+            .ToList();
+
+    private string CollectionRate()
+        => _data!.TotalBilled > 0
+            ? AnalyticsFormat.Percent(_data.TotalCollected / _data.TotalBilled)
+            : "-";
+}

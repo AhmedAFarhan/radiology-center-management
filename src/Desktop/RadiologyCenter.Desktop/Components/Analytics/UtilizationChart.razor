@@ -1,0 +1,50 @@
+@using ApexCharts
+@using RadiologyCenter.Desktop.Models
+
+@if (Items.Count == 0)
+{
+    <div class="pa-6 text-center text-secondary">No machine data in this period.</div>
+}
+else
+{
+    <ApexChart TItem="ModalityUtilizationDto" Height="Height" Options="_options">
+        <ApexPointSeries TItem="ModalityUtilizationDto"
+                         Items="Items"
+                         Name="Exams per machine"
+                         SeriesType="SeriesType.Bar"
+                         XValue="@(m => m.Modality)"
+                         YValue="@(m => m.ExamsPerMachine)" />
+        <ApexPointSeries TItem="ModalityUtilizationDto"
+                         Items="Items"
+                         Name="Active machines"
+                         SeriesType="SeriesType.Bar"
+                         XValue="@(m => m.Modality)"
+                         YValue="@(m => m.ActiveMachines)" />
+    </ApexChart>
+}
+
+@code {
+    [Parameter] public IReadOnlyList<ModalityUtilizationDto> Items { get; set; } = Array.Empty<ModalityUtilizationDto>();
+
+    [Parameter] public string Height { get; set; } = "300px";
+
+    private static readonly ApexChartOptions<ModalityUtilizationDto> _options = new()
+    {
+        Chart = new ApexCharts.Chart
+        {
+            Toolbar = new Toolbar { Show = false },
+            ForeColor = "#8B93A7",
+            FontFamily = "OpenSansRegular, sans-serif",
+        },
+        DataLabels = new DataLabels { Enabled = false },
+        PlotOptions = new PlotOptions
+        {
+            Bar = new PlotOptionsBar { BorderRadius = 6, ColumnWidth = "45%" }
+        },
+Grid = new Grid { Show = true, BorderColor = "#EDEFF5" },
+        Legend = new Legend { Position = LegendPosition.Top },
+        Colors = new List<string> { "#26C6DA", "#FF8A65" },
+    };
+}
+
+

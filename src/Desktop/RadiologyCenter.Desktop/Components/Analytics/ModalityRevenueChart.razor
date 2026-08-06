@@ -1,0 +1,41 @@
+@using ApexCharts
+@using RadiologyCenter.Desktop.Models
+
+@if (Items.Count == 0)
+{
+    <div class="pa-6 text-center text-secondary">No modality data in this period.</div>
+}
+else
+{
+    <ApexChart TItem="RevenueByModalityDto" Height="Height" Options="_options">
+        <ApexPointSeries TItem="RevenueByModalityDto"
+                         Items="Items"
+                         Name="Collected"
+                         SeriesType="SeriesType.Bar"
+                         XValue="@(m => m.Modality)"
+                         YValue="@(m => m.Collected)" />
+    </ApexChart>
+}
+
+@code {
+    [Parameter] public IReadOnlyList<RevenueByModalityDto> Items { get; set; } = Array.Empty<RevenueByModalityDto>();
+
+    [Parameter] public string Height { get; set; } = "300px";
+
+    private static readonly ApexChartOptions<RevenueByModalityDto> _options = new()
+    {
+        Chart = new ApexCharts.Chart
+        {
+            Toolbar = new Toolbar { Show = false },
+            ForeColor = "#8B93A7",
+            FontFamily = "OpenSansRegular, sans-serif",
+        },
+        DataLabels = new DataLabels { Enabled = false },
+        Grid = new Grid { Show = true, BorderColor = "#EDEFF5" },
+        Colors = new List<string> { "#7A5CFF" },
+        PlotOptions = new PlotOptions
+        {
+            Bar = new PlotOptionsBar { BorderRadius = 8, ColumnWidth = "45%" }
+        },
+    };
+}

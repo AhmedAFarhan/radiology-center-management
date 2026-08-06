@@ -1,0 +1,40 @@
+@using ApexCharts
+
+@if (Items.Count == 0)
+{
+    <div class="pa-6 text-center text-secondary">No data in this period.</div>
+}
+else
+{
+    <ApexChart TItem="AnalyticsSlice" Height="Height" Options="_options">
+        <ApexPointSeries TItem="AnalyticsSlice"
+                         Items="Items"
+                         Name="Value"
+                         SeriesType="SeriesType.Donut"
+                         XValue="@(s => s.Label)"
+                         YValue="@(s => s.Value)" />
+    </ApexChart>
+}
+
+@code {
+    [Parameter] public IReadOnlyList<AnalyticsSlice> Items { get; set; } = Array.Empty<AnalyticsSlice>();
+
+    [Parameter] public string Height { get; set; } = "300px";
+
+    private static readonly ApexChartOptions<AnalyticsSlice> _options = new()
+    {
+        Chart = new ApexCharts.Chart
+        {
+            Type = ApexCharts.ChartType.Donut,
+            ForeColor = "#8B93A7",
+            FontFamily = "OpenSansRegular, sans-serif",
+        },
+        DataLabels = new DataLabels { Enabled = false },
+        Legend = new Legend { Position = LegendPosition.Bottom },
+        Stroke = new Stroke { Colors = new List<string> { "#FFFFFF" }, Width = 3 },
+        Colors = new List<string>
+        {
+            "#5476FC", "#7A5CFF", "#FF8A65", "#26C6DA", "#66BB6A", "#FDD835", "#EC407A", "#8D6E63",
+        },
+    };
+}

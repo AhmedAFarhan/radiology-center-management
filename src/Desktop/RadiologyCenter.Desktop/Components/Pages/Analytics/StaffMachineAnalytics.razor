@@ -1,0 +1,85 @@
+@page "/analytics/staff"
+@attribute [Authorize]
+@inherits AnalyticsPageBase
+@using RadiologyCenter.Desktop.Components.Analytics
+@using RadiologyCenter.Desktop.Models
+
+<PageHeader Icon="@Icons.Material.Filled.Groups" Title="Staff &amp; Machines" Subtitle="Performance and machine utilization" OnRefresh="() => ReloadAsync()" ShowSearch="false" />
+
+<PeriodSelector Class="mb-4" />
+
+@if (Loading)
+{
+    <PageSkeleton Rows="8" />
+}
+else if (Error)
+{
+    <ErrorState Title="Couldn't load staffing" Message="Unable to reach the server. Check your connection and try again." Action="ReloadAsync" RetryLabel="Try again" />
+}
+else
+{
+    <MudGrid Spacing="3">
+        <MudItem xs="12" sm="6" lg="3">
+            <StatCard Label="Radiologists" Value="@AnalyticsFormat.Count(_data!.Radiologists.Count)" Icon="@Icons.Material.Filled.Biotech" Color="Color.Primary" TrendText="Performed exams" TrendUp="true" />
+        </MudItem>
+        <MudItem xs="12" sm="6" lg="3">
+            <StatCard Label="Technicians" Value="@AnalyticsFormat.Count(_data.Technicians.Count)" Icon="@Icons.Material.Filled.Handyman" Color="Color.Secondary" TrendText="Active in period" TrendUp="true" />
+        </MudItem>
+        <MudItem xs="12" sm="6" lg="3">
+            <StatCard Label="Referral doctors" Value="@AnalyticsFormat.Count(_data.ReferralDoctors.Count)" Icon="@Icons.Material.Filled.LocalHospital" Color="Color.Warning" TrendText="Referred cases" TrendUp="true" />
+        </MudItem>
+        <MudItem xs="12" sm="6" lg="3">
+            <StatCard Label="Modalities" Value="@AnalyticsFormat.Count(_data.ModalityUtilization.Count)" Icon="@Icons.Material.Filled.PrecisionManufacturing" Color="Color.Info" TrendText="With case activity" TrendUp="true" />
+        </MudItem>
+    </MudGrid>
+
+    <MudGrid Spacing="3" Class="mt-1">
+        <MudItem xs="12" lg="6">
+            <ChartCard Title="Top radiologists" Subtitle="Completed exams by case load">
+                <ListBarChart Items="@BuildRadiologistSlices()" SeriesName="Exams" />
+            </ChartCard>
+        </MudItem>
+        <MudItem xs="12" lg="6">
+            <ChartCard Title="Top technicians" Subtitle="Completed exams supported">
+                <ListBarChart Items="@BuildTechnicianSlices()" SeriesName="Exams" />
+            </ChartCard>
+        </MudItem>
+        <MudItem xs="12" lg="5">
+            <ChartCard Title="Referral performance" Subtitle="Cases referred to your center">
+                <ListBarChart Items="@BuildReferralSlices()" SeriesName="Referrals" />
+            </ChartCard>
+        </MudItem>
+        <MudItem xs="12" lg="7">
+            <ChartCard Title="Machine utilization" Subtitle="Exams per machine by modality">
+                <UtilizationChart Items="@_data!.ModalityUtilization" />
+            </ChartCard>
+        </MudItem>
+    </MudGrid>
+}
+
+@code {
+    [Inject]
+    private AnalyticsService Api { get; set; } = null!;
+
+    private StaffMachineAnalyticsDto? _data;
+
+    protected override async Task LoadAsync(DateTime from, DateTime to)
+    {
+        _data = await Api.GetStaffMachineAsync(from, to);
+    }
+
+    private IReadOnlyList<AnalyticsSlice> BuildRadiologistSlices()
+        => (_data?.Radiologists ?? Array.Empty<StaffPerformanceDto>())
+            .Select(s => new AnalyticsSlice(s.Name, s.CompletedExams))
+            .ToList();
+
+    private IReadOnlyList<AnalyticsSlice> BuildTechnicianSlices()
+        => (_data?.Technicians ?? Array.Empty<StaffPerformanceDto>())
+            .Select(s => new AnalyticsSlice(s.Name, s.CompletedExams))
+            .ToList();
+
+    private IReadOnlyList<AnalyticsSlice> BuildReferralSlices()
+        => (_data?.ReferralDoctors ?? Array.Empty<ReferralDoctorPerformanceDto>())
+            .Select(r => new AnalyticsSlice(r.Name, r.ReferredExams))
+            .ToList();
+}

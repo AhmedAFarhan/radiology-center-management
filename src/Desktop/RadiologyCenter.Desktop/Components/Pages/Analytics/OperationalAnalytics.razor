@@ -1,0 +1,88 @@
+@page "/analytics/operations"
+@attribute [Authorize]
+@inherits AnalyticsPageBase
+@using RadiologyCenter.Desktop.Components.Analytics
+@using RadiologyCenter.Desktop.Models
+
+<PageHeader Icon="@Icons.Material.Filled.Construction" Title="Operations" Subtitle="Workload, throughput and machine utilization" OnRefresh="() => ReloadAsync()" ShowSearch="false" />
+
+<PeriodSelector Class="mb-4" />
+
+@if (Loading)
+{
+    <PageSkeleton Rows="8" />
+}
+else if (Error)
+{
+    <ErrorState Title="Couldn't load operations" Message="Unable to reach the server. Check your connection and try again." Action="ReloadAsync" RetryLabel="Try again" />
+}
+else
+{
+    <MudGrid Spacing="3">
+        <MudItem xs="12" sm="6" lg="3">
+            <StatCard Label="Total exams" Value="@AnalyticsFormat.Count(_data!.TotalExams)" Icon="@Icons.Material.Filled.MedicalServices" Color="Color.Primary" TrendText="Registered" TrendUp="true" />
+        </MudItem>
+        <MudItem xs="12" sm="6" lg="3">
+            <StatCard Label="Completed" Value="@AnalyticsFormat.Count(_data.CompletedExams)" Icon="@Icons.Material.Filled.CheckCircle" Color="Color.Success" TrendText="Finished reading" TrendUp="true" />
+        </MudItem>
+        <MudItem xs="12" sm="6" lg="3">
+            <StatCard Label="Cancelled" Value="@AnalyticsFormat.Count(_data.CancelledExams)" Icon="@Icons.Material.Filled.Cancel" Color="Color.Error" TrendText="Did not complete" TrendUp="false" />
+        </MudItem>
+        <MudItem xs="12" sm="6" lg="3">
+            <StatCard Label="Completion rate" Value="@AnalyticsFormat.Percent(_data.CompletionRate)" Icon="@Icons.Material.Filled.PieChart" Color="Color.Info" TrendText="Completed ÷ terminal" TrendUp="true" />
+        </MudItem>
+        <MudItem xs="12" sm="6" lg="3">
+            <StatCard Label="Avg duration" Value="@FormatMinutes(_data.AvgDurationMinutes)" Icon="@Icons.Material.Filled.Timer" Color="Color.Warning" TrendText="Exam to completion" TrendUp="false" />
+        </MudItem>
+        <MudItem xs="12" sm="6" lg="3">
+            <StatCard Label="Avg time to start" Value="@FormatMinutes(_data.AvgTimeToStartMinutes)" Icon="@Icons.Material.Filled.Schedule" Color="Color.Secondary" TrendText="Scheduled to started" TrendUp="false" />
+        </MudItem>
+    </MudGrid>
+
+    <MudGrid Spacing="3" Class="mt-1">
+        <MudItem xs="12" lg="7">
+            <ChartCard Title="Volume by month" Subtitle="Total vs completed exams">
+                <VolumeBarChart Items="@_data!.VolumeByMonth" />
+            </ChartCard>
+        </MudItem>
+        <MudItem xs="12" lg="5">
+            <ChartCard Title="Status funnel" Subtitle="Exams in each state">
+                <ListBarChart Items="@BuildFunnel()" SeriesName="Count" />
+            </ChartCard>
+        </MudItem>
+        <MudItem xs="12" lg="6">
+            <ChartCard Title="Volume by modality" Subtitle="Total vs completed">
+                <ModalityVolumeChart Items="@_data!.VolumeByModality" />
+            </ChartCard>
+        </MudItem>
+        <MudItem xs="12" lg="6">
+            <ChartCard Title="Workload by priority" Subtitle="Distribution of exam priority">
+                <DonutChart Items="@BuildPriority()" Height="300px" />
+            </ChartCard>
+        </MudItem>
+    </MudGrid>
+}
+
+@code {
+    [Inject]
+    private AnalyticsService Api { get; set; } = null!;
+
+    private OperationalAnalyticsDto? _data;
+
+    protected override async Task LoadAsync(DateTime from, DateTime to)
+    {
+        _data = await Api.GetOperationalAsync(from, to);
+    }
+
+    private string FormatMinutes(double minutes) => minutes.ToString("0.#") + "m";
+
+    private IReadOnlyList<AnalyticsSlice> BuildFunnel()
+        => (_data?.Funnel ?? Array.Empty<StatusCountDto>())
+            .Select(s => new AnalyticsSlice(s.Status, s.Count))
+            .ToList();
+
+    private IReadOnlyList<AnalyticsSlice> BuildPriority()
+        => (_data?.VolumeByPriority ?? Array.Empty<PriorityVolumeDto>())
+            .Select(p => new AnalyticsSlice(p.Priority, p.Count))
+            .ToList();
+}

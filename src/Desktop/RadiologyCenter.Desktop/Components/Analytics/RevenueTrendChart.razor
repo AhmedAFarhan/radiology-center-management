@@ -1,0 +1,47 @@
+@using ApexCharts
+@using RadiologyCenter.Desktop.Models
+
+@if (Items.Count == 0)
+{
+    <div class="pa-6 text-center text-secondary">No revenue data in this period.</div>
+}
+else
+{
+    <ApexChart TItem="RevenuePointDto" Height="Height" Options="_options">
+        <ApexPointSeries TItem="RevenuePointDto"
+                         Items="Items"
+                         Name="Collected"
+                         SeriesType="SeriesType.Area"
+                         XValue="@(r => r.Month)"
+                         YValue="@(r => r.Collected)" />
+        <ApexPointSeries TItem="RevenuePointDto"
+                         Items="Items"
+                         Name="Billed"
+                         SeriesType="SeriesType.Area"
+                         XValue="@(r => r.Month)"
+                         YValue="@(r => r.Billed)" />
+    </ApexChart>
+}
+
+@code {
+    [Parameter] public IReadOnlyList<RevenuePointDto> Items { get; set; } = Array.Empty<RevenuePointDto>();
+
+    [Parameter] public string Height { get; set; } = "320px";
+
+    private static readonly ApexChartOptions<RevenuePointDto> _options = new()
+    {
+        Chart = new ApexCharts.Chart
+        {
+            Toolbar = new Toolbar { Show = false },
+            Zoom = new Zoom { Enabled = false },
+            ForeColor = "#8B93A7",
+            FontFamily = "OpenSansRegular, sans-serif",
+        },
+        DataLabels = new DataLabels { Enabled = false },
+        Stroke = new Stroke { Curve = Curve.Smooth, Width = 3 },
+        Grid = new Grid { Show = true, BorderColor = "#EDEFF5" },
+Legend = new Legend { Position = LegendPosition.Top },
+        Colors = new List<string> { "#5476FC", "#B4BFEA" },
+    };
+}
+
