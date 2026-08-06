@@ -137,7 +137,7 @@ else
 
         return new List<WaterfallRow>
         {
-            Build("Revenue", _profit.RevenueCollected, percent(_profit.RevenueCollected), "#5476FC"),
+            Build("Revenue", _profit.RevenueCollected, percent(_profit.RevenueCollected), "#4C58E0"),
             Build("Staff fees", -_profit.StaffCaseFees, percent(_profit.StaffCaseFees), "#FF8A65"),
             Build("Referral fees", -_profit.ReferralFees, percent(_profit.ReferralFees), "#FF8A65"),
             Build("Labor", -_profit.LaborCosts, percent(_profit.LaborCosts), "#FF8A65"),
@@ -151,4 +151,5 @@ else
 
     private sealed record WaterfallRow(string Label, decimal Value, int Percent, string Color);
 }
+
 

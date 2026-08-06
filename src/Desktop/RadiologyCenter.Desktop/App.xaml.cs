@@ -12,7 +12,7 @@ public partial class App : Application
 
     protected override Window CreateWindow(IActivationState? activationState)
     {
-        var window = new Window(new MainPage()) { Title = "RadiologyCenter" };
+        var window = new Window(new MainPage()) { Title = "EGcare" };
         CenterWindowOnLaunch(window);
         window.Destroying += (_, _) => _localhost.Stop();
         return window;
@@ -29,6 +29,11 @@ public partial class App : Application
             var hwnd = WinRT.Interop.WindowNative.GetWindowHandle(native);
             var windowId = Microsoft.UI.Win32Interop.GetWindowIdFromWindow(hwnd);
             var appWindow = Microsoft.UI.Windowing.AppWindow.GetFromWindowId(windowId);
+
+            var iconPath = Path.Combine(AppContext.BaseDirectory, "taskbar.ico");
+            if (File.Exists(iconPath))
+                appWindow.SetIcon(iconPath);
+
             var area = Microsoft.UI.Windowing.DisplayArea.GetFromWindowId(windowId, Microsoft.UI.Windowing.DisplayAreaFallback.Primary).WorkArea;
 
             appWindow.Move(new Windows.Graphics.PointInt32(

@@ -8,9 +8,9 @@ public static class AppTheme
     {
         PaletteLight = new PaletteLight
         {
-            Primary = "#5476FC",
-            PrimaryDarken = "#3A55D6",
-            PrimaryLighten = "#7F9BFD",
+            Primary = "#4C58E0",
+            PrimaryDarken = "#3A44B8",
+            PrimaryLighten = "#7A84EA",
             Secondary = "#9BB3FD",
             Tertiary = "#34A853",
             Info = "#2196F3",

@@ -59,7 +59,7 @@ h1:focus {
     align-items: center;
     justify-content: center;
     padding: 1.5rem;
-    background: linear-gradient(135deg, #5476fc 0%, #7f9bfd 55%, #9bb3fd 100%);
+    background: linear-gradient(135deg, #4C58E0 0%, #7A84EA 55%, #9BA4F0 100%);
 }
 
 .login-card {
@@ -664,7 +664,7 @@ h1:focus {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: #5476FC;
+  background: #4C58E0;
   z-index: 3000;
   cursor: default;
   user-select: none;
@@ -678,28 +678,74 @@ h1:focus {
   max-width: 380px;
 }
 .boot-splash-logo {
-  margin-bottom: 28px;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 30px;
   animation: boot-logo-in 0.9s cubic-bezier(0.22, 1, 0.36, 1) forwards;
 }
 .boot-splash-logo img {
   width: 120px;
   height: 120px;
   object-fit: contain;
+  position: relative;
+  z-index: 1;
+  animation: boot-logo-float 3.2s ease-in-out infinite;
 }
 @keyframes boot-logo-in {
   from { transform: scale(0.7) translateY(18px); opacity: 0; }
   to   { transform: scale(1) translateY(0); opacity: 1; }
 }
-.boot-splash-title {
-  font-size: 34px;
-  font-weight: 700;
-  letter-spacing: 4px;
-  color: #ffffff;
-  animation: boot-title-pulse 1.8s ease-in-out infinite;
+@keyframes boot-logo-float {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(-7px); }
 }
-@keyframes boot-title-pulse {
-  0%, 100% { opacity: 1; letter-spacing: 4px; }
-  50%      { opacity: 0.55; letter-spacing: 7px; }
+.boot-splash-halo {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  background: rgba(255,255,255,0.16);
+  z-index: 0;
+  animation: boot-halo-pulse 2.4s ease-out infinite;
+}
+.boot-splash-halo-1 { width: 150px; height: 150px; }
+.boot-splash-halo-2 { width: 150px; height: 150px; animation-delay: 1.2s; }
+@keyframes boot-halo-pulse {
+  0%   { transform: translate(-50%, -50%) scale(0.55); opacity: 0.85; }
+  70%  { transform: translate(-50%, -50%) scale(1.35); opacity: 0; }
+  100% { transform: translate(-50%, -50%) scale(1.35); opacity: 0; }
+}
+.boot-splash-title {
+  position: relative;
+  display: inline-flex;
+  font-size: 40px;
+  font-weight: 800;
+  letter-spacing: 6px;
+}
+.boot-splash-letter {
+  display: inline-block;
+  color: #ffffff;
+  background: linear-gradient(110deg, #ffffff 30%, #c7d3ff 45%, #ffffff 60%);
+  background-size: 220% auto;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation:
+    boot-letter-in 0.7s cubic-bezier(0.22, 1, 0.36, 1) forwards,
+    boot-letter-shimmer 2.6s linear infinite;
+  animation-delay: calc(var(--i) * 0.09s), calc(0.6s + var(--i) * 0.09s);
+  opacity: 0;
+}
+@keyframes boot-letter-in {
+  from { transform: translateY(26px) rotateX(60deg); opacity: 0; }
+  to   { transform: translateY(0) rotateX(0); opacity: 1; }
+}
+@keyframes boot-letter-shimmer {
+  0%   { background-position: 160% center; }
+  100% { background-position: -60% center; }
 }
 .boot-splash-hint {
   margin-top: 26px;
@@ -739,3 +785,4 @@ h1:focus {
 .boot-splash-center .mud-button {
   margin-top: 20px;
 }
+

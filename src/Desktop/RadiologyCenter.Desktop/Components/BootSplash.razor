@@ -3,10 +3,19 @@
 <div class="boot-splash" @onclick="() => { }" @oncontextmenu="() => { }">
     <div class="boot-splash-center">
         <div class="boot-splash-logo">
-            <img src="images/healthcare_logo_v2_64.png" alt="EGcare" />
+            <span class="boot-splash-halo boot-splash-halo-1"></span>
+            <span class="boot-splash-halo boot-splash-halo-2"></span>
+            <img src="images/healthcare_logo_v2_512.png" alt="EGcare" />
         </div>
 
-        <div class="boot-splash-title">EGcare</div>
+        <div class="boot-splash-title" aria-label="EGcare">
+            <span class="boot-splash-letter" style="--i:0">E</span>
+            <span class="boot-splash-letter" style="--i:1">G</span>
+            <span class="boot-splash-letter" style="--i:2">c</span>
+            <span class="boot-splash-letter" style="--i:3">a</span>
+            <span class="boot-splash-letter" style="--i:4">r</span>
+            <span class="boot-splash-letter" style="--i:5">e</span>
+        </div>
 
         @if (Backend.IsFailed)
         {
