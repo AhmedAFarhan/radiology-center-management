@@ -6,6 +6,17 @@
 @inject IDialogService DialogService
 
 <div class="landing-hero">
+    <div class="corner-circles corner-right">
+        <div class="corner-circle circle-outer"></div>
+        <div class="corner-circle circle-mid"></div>
+        <div class="corner-circle circle-inner">
+            <span class="plus-symbol">&#10010;</span>
+            <span class="plus-symbol">&#10010;</span>
+            <span class="plus-symbol">&#10010;</span>
+            <span class="plus-symbol">&#10010;</span>
+        </div>
+    </div>
+
     <div class="landing-content">
         <div class="landing-left">
             <div class="landing-brand">
@@ -51,8 +62,12 @@
         </div>
 
         <div class="landing-right">
-            <div class="landing-image-wrap">
-                <img src="images/landing-hero.png" alt="EGcare hero" class="landing-image" />
+            <div class="hero-image-wrapper">
+                <img src="images/landing-auth.jpg" alt="EGcare" class="hero-image" />
+                <span class="float-ring float-ring-1"><MudIcon Icon="@Icons.Material.Filled.Speed" /></span>
+                <span class="float-ring float-ring-2"><MudIcon Icon="@Icons.Material.Filled.MonitorHeart" /></span>
+                <span class="float-ring float-ring-3"><MudIcon Icon="@Icons.Material.Filled.Emergency" /></span>
+                <span class="float-ring float-ring-4"><MudIcon Icon="@Icons.Material.Filled.MedicalServices" /></span>
             </div>
         </div>
     </div>

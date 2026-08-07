@@ -73,13 +73,93 @@ h1:focus {
 
 .landing-layout {
     min-height: 100vh;
-    background: linear-gradient(135deg, #4C58E0 0%, #7A84EA 55%, #9BA4F0 100%);
+    background: #ffffff;
 }
 
 .landing-hero {
     min-height: 100vh;
     display: flex;
     flex-direction: column;
+    padding: 0 5vw;
+    position: relative;
+    overflow: hidden;
+}
+
+.corner-circles {
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    width: 0;
+    height: 0;
+    pointer-events: none;
+    z-index: 0;
+}
+
+.corner-circles.corner-right {
+    left: auto;
+    right: 0;
+}
+
+.corner-circle {
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    border-radius: 0 100% 0 0;
+}
+
+.corner-circles.corner-right .corner-circle {
+    left: auto;
+    right: 0;
+    border-radius: 100% 0 0 0;
+}
+
+.circle-inner {
+    width: 550px;
+    height: 450px;
+    background: #4C58E0;
+    overflow: hidden;
+}
+
+.plus-symbol {
+    position: absolute;
+    color: #ffffff;
+    font-size: 4rem;
+    font-weight: 700;
+    line-height: 1;
+    user-select: none;
+}
+
+.plus-symbol:nth-child(1) {
+    right: 55%;
+    bottom: 38%;
+}
+
+.plus-symbol:nth-child(2) {
+    right: 35%;
+    bottom: 20%;
+}
+
+.plus-symbol:nth-child(3) {
+    right: 58%;
+    bottom: 12%;
+}
+
+.plus-symbol:nth-child(4) {
+    right: 28%;
+    bottom: 48%;
+}
+
+.circle-mid {
+    width: 557px;
+    height: 465px;
+    background: #9BA4F0;
+}
+
+.circle-outer {
+    width: 565px;
+    height: 480px;
+    background: transparent;
+    border: 3px solid #7A84EA;
 }
 
 .landing-content {
@@ -88,7 +168,7 @@ h1:focus {
     grid-template-columns: 1.1fr 0.9fr;
     gap: 3rem;
     align-items: center;
-    padding: 3rem 5vw 2rem;
+    padding: 2.5rem 0;
 }
 
 .landing-left {
@@ -113,7 +193,7 @@ h1:focus {
 .landing-brand-text {
     font-size: 1.6rem;
     font-weight: 700;
-    color: #fff;
+    color: #1F2937;
     letter-spacing: -0.02em;
 }
 
@@ -125,30 +205,29 @@ h1:focus {
 
 .landing-badge {
     align-self: flex-start;
-    background: rgba(255, 255, 255, 0.16);
-    color: #fff;
+    background: #EAF1FF;
+    color: #3B82F6;
     font-size: 0.8rem;
     font-weight: 600;
     letter-spacing: 0.04em;
     text-transform: uppercase;
     padding: 0.35rem 0.9rem;
     border-radius: 999px;
-    backdrop-filter: blur(4px);
 }
 
 .landing-title {
-    color: #fff;
+    color: #111827;
     font-size: 2.9rem;
-    font-weight: 700;
+    font-weight: 800;
     line-height: 1.15;
     letter-spacing: -0.025em;
     margin: 0;
 }
 
 .landing-subtitle {
-    color: rgba(255, 255, 255, 0.88);
+    color: #4B5563;
     font-size: 1.05rem;
-    line-height: 1.6;
+    line-height: 2;
     margin: 0;
 }
 
@@ -162,7 +241,7 @@ h1:focus {
     display: flex;
     align-items: center;
     gap: 0.6rem;
-    color: rgba(255, 255, 255, 0.95);
+    color: #374151;
     font-size: 0.98rem;
 }
 
@@ -177,11 +256,11 @@ h1:focus {
     padding: 0.5rem 2.1rem;
     font-weight: 600;
     letter-spacing: 0.01em;
-    box-shadow: 0 10px 24px rgba(0, 0, 0, 0.22);
+    box-shadow: 0 10px 24px rgba(37, 99, 235, 0.25);
 }
 
 .landing-hint {
-    color: rgba(255, 255, 255, 0.75);
+    color: #6B7280;
     font-size: 0.85rem;
 }
 
@@ -190,30 +269,78 @@ h1:focus {
     justify-content: center;
 }
 
-.landing-image-wrap {
+.hero-image-wrapper {
     position: relative;
-    max-width: 520px;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
     width: 100%;
+    max-width: 620px;
+    height: 560px;
     animation: landing-float 5s ease-in-out infinite;
 }
 
-.landing-image-wrap::before {
-    content: "";
-    position: absolute;
-    inset: 18px;
-    border-radius: 42px;
-    background: rgba(255, 255, 255, 0.28);
-    filter: blur(28px);
-    z-index: 0;
+.hero-image {
+    width: 420px;
+    height: 420px;
+    object-fit: cover;
+    border-radius: 50%;
+    border: 12px solid #ffffff;
+    box-shadow: 0 25px 80px rgba(0, 0, 0, 0.15);
 }
 
-.landing-image {
-    position: relative;
-    width: 100%;
-    border-radius: 42px;
-    border: 1px solid rgba(255, 255, 255, 0.35);
-    box-shadow: 0 30px 60px rgba(0, 0, 0, 0.28);
-    display: block;
+.float-ring {
+    position: absolute;
+    border-radius: 50%;
+    animation: landing-float 5s ease-in-out infinite;
+    z-index: 2;
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.12);
+    color: #ffffff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.float-ring-1 {
+    width: 75px;
+    height: 75px;
+    background: #4C58E0;
+    top: 26px;
+    left: 28px;
+    animation-delay: 0s;
+}
+
+.float-ring-2 {
+    width: 75px;
+    height: 75px;
+    background: #B30000;
+    top: 96px;
+    right: -30px;
+    animation-delay: -1.5s;
+}
+
+.float-ring-3 {
+    width: 75px;
+    height: 75px;
+    background: #25345F;
+    bottom: 12px;
+    left: 52px;
+    animation-delay: -3s;
+}
+
+.float-ring-4 {
+    width: 75px;
+    height: 75px;
+    background: #FE881C;
+    top: -6px;
+    right: 86px;
+    animation-delay: -0.75s;
+}
+
+.float-ring .mud-icon-root {
+    width: 40px;
+    height: 40px;
+    font-size: 24px;
 }
 
 @keyframes landing-float {
@@ -224,14 +351,25 @@ h1:focus {
 .landing-footer {
     text-align: center;
     padding: 1rem 0 1.4rem;
-    color: rgba(255, 255, 255, 0.7);
+    color: #6B7280;
     font-size: 0.82rem;
+}
+
+@media (max-width: 1100px) {
+    .hero-image-wrapper {
+        height: 460px;
+    }
+
+    .hero-image {
+        width: 310px;
+        height: 310px;
+    }
 }
 
 @media (max-width: 900px) {
     .landing-content {
         grid-template-columns: 1fr;
-        gap: 2rem;
+        gap: 2.5rem;
         padding-top: 2.5rem;
     }
 
@@ -243,8 +381,15 @@ h1:focus {
         order: -1;
     }
 
-    .landing-image-wrap {
-        max-width: 380px;
+    .hero-image-wrapper {
+        height: 400px;
+        max-width: 400px;
+        margin: 0 auto;
+    }
+
+    .hero-image {
+        width: 280px;
+        height: 280px;
     }
 }
 
