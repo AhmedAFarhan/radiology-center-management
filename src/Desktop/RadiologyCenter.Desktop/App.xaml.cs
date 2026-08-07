@@ -41,20 +41,18 @@ public partial class App : Application
             var windowId = Microsoft.UI.Win32Interop.GetWindowIdFromWindow(hwnd);
             var appWindow = Microsoft.UI.Windowing.AppWindow.GetFromWindowId(windowId);
 
-            // Defer icon + centering until the window content is rendered. MAUI owns the
-            // AppWindow and may reset the icon if we call it too early (HandlerChanged fires
-            // before the native title bar binds).
+            // Center immediately so the window never flashes at the OS-default position.
+            var area = Microsoft.UI.Windowing.DisplayArea
+                .GetFromWindowId(windowId, Microsoft.UI.Windowing.DisplayAreaFallback.Primary).WorkArea;
+
+            appWindow.Move(new Windows.Graphics.PointInt32(
+                area.X + (area.Width - appWindow.Size.Width) / 2,
+                area.Y + (area.Height - appWindow.Size.Height) / 2));
+
+            // Defer only the icon until the native title bar binds. MAUI owns the
+            // AppWindow and may reset the icon if we set it too early.
             native.DispatcherQueue.TryEnqueue(Microsoft.UI.Dispatching.DispatcherQueuePriority.Low, () =>
-            {
-                SetWindowIcon(appWindow);
-
-                var area = Microsoft.UI.Windowing.DisplayArea
-                    .GetFromWindowId(windowId, Microsoft.UI.Windowing.DisplayAreaFallback.Primary).WorkArea;
-
-                appWindow.Move(new Windows.Graphics.PointInt32(
-                    area.X + (area.Width - appWindow.Size.Width) / 2,
-                    area.Y + (area.Height - appWindow.Size.Height) / 2));
-            });
+                SetWindowIcon(appWindow));
         };
 #endif
     }
