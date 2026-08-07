@@ -5,6 +5,12 @@
 @inject AuthenticationStateProvider AuthState
 @inject IDialogService DialogService
 
+@if (_checking)
+{
+    <MudSkeleton SkeletonType="SkeletonType.Rectangle" Width="100vw" Height="100vh" Animation="Animation.Pulse" />
+}
+else
+{
 <div class="landing-hero">
     <div class="corner-circles corner-right">
         <div class="corner-circle circle-outer"></div>
@@ -76,13 +82,22 @@
         <span>© @DateTime.Now.Year EGcare — Radiology Center Management System</span>
     </div>
 </div>
+}
 
 @code {
+    private bool _checking = true;
+
     protected override async Task OnInitializedAsync()
     {
+        _checking = true;
         var state = await AuthState.GetAuthenticationStateAsync();
         if (state.User.Identity?.IsAuthenticated == true)
-            Navigation.NavigateTo("/dashboard");
+        {
+            Navigation.NavigateTo("/dashboard", replace: true);
+            return;
+        }
+
+        _checking = false;
     }
 
     private async Task OpenLogin()
