@@ -1,48 +1,144 @@
-﻿<MudNavMenu>
-    <MudNavLink Href="/dashboard" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.Dashboard" Ripple="false">
-        Dashboard
-    </MudNavLink>
-    <MudNavLink Href="/patients" Icon="@Icons.Material.Filled.People" Ripple="false">
-        Patients
-    </MudNavLink>
-    <MudNavLink Href="/visits" Icon="@Icons.Material.Filled.EventNote" Ripple="false">
-        Visits
-    </MudNavLink>
-    <MudNavLink Href="/radiologist" Icon="@Icons.Material.Filled.Biotech" Ripple="false">
-        Reading Room
-    </MudNavLink>
-    <MudNavLink Href="/examinations" Icon="@Icons.Material.Filled.MedicalServices" Ripple="false">
-        Examination Types
-    </MudNavLink>
-    <MudNavGroup Title="Inventory" Icon="@Icons.Material.Filled.Warehouse" Ripple="false">
-        <MudNavLink Href="/inventory/items" Icon="@Icons.Material.Filled.Inventory2" Ripple="false">Inventory</MudNavLink>
-        <MudNavLink Href="/inventory/suppliers" Icon="@Icons.Material.Filled.LocalShipping" Ripple="false">Suppliers</MudNavLink>
-        <MudNavLink Href="/inventory/purchase-orders" Icon="@Icons.Material.Filled.ReceiptLong" Ripple="false">Purchase Orders</MudNavLink>
-        <MudNavLink Href="/inventory/stock-movements" Icon="@Icons.Material.Filled.SwapVert" Ripple="false">Stock Movements</MudNavLink>
-    </MudNavGroup>
-    <MudNavGroup Title="Payroll" Icon="@Icons.Material.Filled.Payments" Ripple="false">
-        <MudNavLink Href="/payroll/payruns" Icon="@Icons.Material.Filled.ReceiptLong" Ripple="false">Pay Runs</MudNavLink>
-        <MudNavLink Href="/payroll/salary-components" Icon="@Icons.Material.Filled.Category" Ripple="false">Salary Components</MudNavLink>
-        <MudNavLink Href="/payroll/salaries" Icon="@Icons.Material.Filled.Calculate" Ripple="false">Salaries</MudNavLink>
-        <MudNavLink Href="/payroll/allowances" Icon="@Icons.Material.Filled.AttachMoney" Ripple="false">Allowances</MudNavLink>
-        <MudNavLink Href="/payroll/examination-fees" Icon="@Icons.Material.Filled.MedicalServices" Ripple="false">Examination Fees</MudNavLink>
-        <MudNavLink Href="/payroll/referral-fees" Icon="@Icons.Material.Filled.LocalHospital" Ripple="false">Referral Fees</MudNavLink>
-    </MudNavGroup>
-    <MudNavGroup Title="Resources" Icon="@Icons.Material.Filled.PrecisionManufacturing" Ripple="false">
-        <MudNavLink Href="/resources/equipment" Icon="@Icons.Material.Filled.Biotech" Ripple="false">Equipment</MudNavLink>
-        <MudNavLink Href="/resources/staff" Icon="@Icons.Material.Filled.Badge" Ripple="false">Staff</MudNavLink>
-        <MudNavLink Href="/resources/work-shifts" Icon="@Icons.Material.Filled.CalendarMonth" Ripple="false">Work Shifts</MudNavLink>
-        <MudNavLink Href="/resources/leaves" Icon="@Icons.Material.Filled.BeachAccess" Ripple="false">Leave</MudNavLink>
-        <MudNavLink Href="/resources/referral-doctors" Icon="@Icons.Material.Filled.LocalHospital" Ripple="false">Referral Doctors</MudNavLink>
-    </MudNavGroup>
-    <MudNavGroup Title="Analytics" Icon="@Icons.Material.Filled.Insights" Ripple="false">
-        <MudNavLink Href="/analytics/overview" Icon="@Icons.Material.Filled.Speed" Ripple="false">Overview</MudNavLink>
-        <MudNavLink Href="/analytics/financial" Icon="@Icons.Material.Filled.AccountBalanceWallet" Ripple="false">Financials</MudNavLink>
-        <MudNavLink Href="/analytics/operations" Icon="@Icons.Material.Filled.Construction" Ripple="false">Operations</MudNavLink>
-        <MudNavLink Href="/analytics/staff" Icon="@Icons.Material.Filled.Groups" Ripple="false">Staff &amp; Machines</MudNavLink>
-    </MudNavGroup>
-    <MudNavGroup Title="Administration" Icon="@Icons.Material.Filled.AdminPanelSettings" Ripple="false">
-        <MudNavLink Href="/users" Icon="@Icons.Material.Filled.Person" Ripple="false">Users</MudNavLink>
-        <MudNavLink Href="/roles" Icon="@Icons.Material.Filled.Security" Ripple="false">Roles</MudNavLink>
-    </MudNavGroup>
-</MudNavMenu>
+﻿@inject NavigationManager Navigation
+
+<div class="app-nav-collapsed-side @(IsCollapsed ? "nav-visible" : "")">
+    <nav class="app-nav">
+        <MudNavMenu>
+            <MudNavLink Href="/dashboard" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.Dashboard" Ripple="false" />
+            <MudNavLink Href="/patients" Icon="@Icons.Material.Filled.People" Ripple="false" />
+            <MudNavLink Href="/visits" Icon="@Icons.Material.Filled.EventNote" Ripple="false" />
+            <MudNavLink Href="/radiologist" Icon="@Icons.Material.Filled.Biotech" Ripple="false" />
+            <MudNavLink Href="/examinations" Icon="@Icons.Material.Filled.MedicalServices" Ripple="false" />
+
+        <MudMenu Icon="@Icons.Material.Filled.Warehouse"
+                 IconSize="Size.Medium"
+                 Class="collapsed-nav-menu"
+                 AnchorOrigin="Origin.CenterRight"
+                 TransformOrigin="Origin.TopLeft"
+                 Dense="true"
+                 OffsetX="12"
+                 Direction="Direction.Left">
+            <MudMenuItem Icon="@Icons.Material.Filled.Inventory2" OnClick="@(() => Go("/inventory/items"))">Inventory</MudMenuItem>
+            <MudMenuItem Icon="@Icons.Material.Filled.LocalShipping" OnClick="@(() => Go("/inventory/suppliers"))">Suppliers</MudMenuItem>
+            <MudMenuItem Icon="@Icons.Material.Filled.ReceiptLong" OnClick="@(() => Go("/inventory/purchase-orders"))">Purchase Orders</MudMenuItem>
+            <MudMenuItem Icon="@Icons.Material.Filled.SwapVert" OnClick="@(() => Go("/inventory/stock-movements"))">Stock Movements</MudMenuItem>
+        </MudMenu>
+
+        <MudMenu Icon="@Icons.Material.Filled.Payments"
+                 IconSize="Size.Medium"
+                 Class="collapsed-nav-menu"
+                 AnchorOrigin="Origin.CenterRight"
+                 TransformOrigin="Origin.TopLeft"
+                 Dense="true"
+                 OffsetX="12"
+                 Direction="Direction.Left">
+            <MudMenuItem Icon="@Icons.Material.Filled.ReceiptLong" OnClick="@(() => Go("/payroll/payruns"))">Pay Runs</MudMenuItem>
+            <MudMenuItem Icon="@Icons.Material.Filled.Category" OnClick="@(() => Go("/payroll/salary-components"))">Salary Components</MudMenuItem>
+            <MudMenuItem Icon="@Icons.Material.Filled.Calculate" OnClick="@(() => Go("/payroll/salaries"))">Salaries</MudMenuItem>
+            <MudMenuItem Icon="@Icons.Material.Filled.AttachMoney" OnClick="@(() => Go("/payroll/allowances"))">Allowances</MudMenuItem>
+            <MudMenuItem Icon="@Icons.Material.Filled.MedicalServices" OnClick="@(() => Go("/payroll/examination-fees"))">Examination Fees</MudMenuItem>
+            <MudMenuItem Icon="@Icons.Material.Filled.LocalHospital" OnClick="@(() => Go("/payroll/referral-fees"))">Referral Fees</MudMenuItem>
+        </MudMenu>
+
+        <MudMenu Icon="@Icons.Material.Filled.PrecisionManufacturing"
+                 IconSize="Size.Medium"
+                 Class="collapsed-nav-menu"
+                 AnchorOrigin="Origin.CenterRight"
+                 TransformOrigin="Origin.TopLeft"
+                 Dense="true"
+                 OffsetX="12"
+                 Direction="Direction.Left">
+            <MudMenuItem Icon="@Icons.Material.Filled.Biotech" OnClick="@(() => Go("/resources/equipment"))">Equipment</MudMenuItem>
+            <MudMenuItem Icon="@Icons.Material.Filled.Badge" OnClick="@(() => Go("/resources/staff"))">Staff</MudMenuItem>
+            <MudMenuItem Icon="@Icons.Material.Filled.CalendarMonth" OnClick="@(() => Go("/resources/work-shifts"))">Work Shifts</MudMenuItem>
+            <MudMenuItem Icon="@Icons.Material.Filled.BeachAccess" OnClick="@(() => Go("/resources/leaves"))">Leave</MudMenuItem>
+            <MudMenuItem Icon="@Icons.Material.Filled.LocalHospital" OnClick="@(() => Go("/resources/referral-doctors"))">Referral Doctors</MudMenuItem>
+        </MudMenu>
+
+        <MudMenu Icon="@Icons.Material.Filled.Insights"
+                 IconSize="Size.Medium"
+                 Class="collapsed-nav-menu"
+                 AnchorOrigin="Origin.CenterRight"
+                 TransformOrigin="Origin.TopLeft"
+                 Dense="true"
+                 OffsetX="12"
+                 Direction="Direction.Left">
+            <MudMenuItem Icon="@Icons.Material.Filled.Speed" OnClick="@(() => Go("/analytics/overview"))">Overview</MudMenuItem>
+            <MudMenuItem Icon="@Icons.Material.Filled.AccountBalanceWallet" OnClick="@(() => Go("/analytics/financial"))">Financials</MudMenuItem>
+            <MudMenuItem Icon="@Icons.Material.Filled.Construction" OnClick="@(() => Go("/analytics/operations"))">Operations</MudMenuItem>
+            <MudMenuItem Icon="@Icons.Material.Filled.Groups" OnClick="@(() => Go("/analytics/staff"))">Staff &amp; Machines</MudMenuItem>
+        </MudMenu>
+
+        <MudMenu Icon="@Icons.Material.Filled.AdminPanelSettings"
+                 IconSize="Size.Medium"
+                 Class="collapsed-nav-menu"
+                 AnchorOrigin="Origin.CenterRight"
+                 TransformOrigin="Origin.TopLeft"
+                 Dense="true"
+                 OffsetX="12"
+                 Direction="Direction.Left">
+            <MudMenuItem Icon="@Icons.Material.Filled.Person" OnClick="@(() => Go("/users"))">Users</MudMenuItem>
+            <MudMenuItem Icon="@Icons.Material.Filled.Security" OnClick="@(() => Go("/roles"))">Roles</MudMenuItem>
+        </MudMenu>
+    </MudNavMenu>
+    </nav>
+</div>
+
+<div class="app-nav-expanded-side @(IsCollapsed ? "" : "nav-visible")">
+    <nav class="app-nav">
+        <MudNavMenu>
+            <MudNavLink Href="/dashboard" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.Dashboard" Ripple="false">
+                Dashboard
+            </MudNavLink>
+        <MudNavLink Href="/patients" Icon="@Icons.Material.Filled.People" Ripple="false">
+            Patients
+        </MudNavLink>
+        <MudNavLink Href="/visits" Icon="@Icons.Material.Filled.EventNote" Ripple="false">
+            Visits
+        </MudNavLink>
+        <MudNavLink Href="/radiologist" Icon="@Icons.Material.Filled.Biotech" Ripple="false">
+            Reading Room
+        </MudNavLink>
+        <MudNavLink Href="/examinations" Icon="@Icons.Material.Filled.MedicalServices" Ripple="false">
+            Examination Types
+        </MudNavLink>
+        <MudNavGroup Title="Inventory" Icon="@Icons.Material.Filled.Warehouse" Ripple="false">
+            <MudNavLink Href="/inventory/items" Icon="@Icons.Material.Filled.Inventory2" Ripple="false">Inventory</MudNavLink>
+            <MudNavLink Href="/inventory/suppliers" Icon="@Icons.Material.Filled.LocalShipping" Ripple="false">Suppliers</MudNavLink>
+            <MudNavLink Href="/inventory/purchase-orders" Icon="@Icons.Material.Filled.ReceiptLong" Ripple="false">Purchase Orders</MudNavLink>
+            <MudNavLink Href="/inventory/stock-movements" Icon="@Icons.Material.Filled.SwapVert" Ripple="false">Stock Movements</MudNavLink>
+        </MudNavGroup>
+        <MudNavGroup Title="Payroll" Icon="@Icons.Material.Filled.Payments" Ripple="false">
+            <MudNavLink Href="/payroll/payruns" Icon="@Icons.Material.Filled.ReceiptLong" Ripple="false">Pay Runs</MudNavLink>
+            <MudNavLink Href="/payroll/salary-components" Icon="@Icons.Material.Filled.Category" Ripple="false">Salary Components</MudNavLink>
+            <MudNavLink Href="/payroll/salaries" Icon="@Icons.Material.Filled.Calculate" Ripple="false">Salaries</MudNavLink>
+            <MudNavLink Href="/payroll/allowances" Icon="@Icons.Material.Filled.AttachMoney" Ripple="false">Allowances</MudNavLink>
+            <MudNavLink Href="/payroll/examination-fees" Icon="@Icons.Material.Filled.MedicalServices" Ripple="false">Examination Fees</MudNavLink>
+            <MudNavLink Href="/payroll/referral-fees" Icon="@Icons.Material.Filled.LocalHospital" Ripple="false">Referral Fees</MudNavLink>
+        </MudNavGroup>
+        <MudNavGroup Title="Resources" Icon="@Icons.Material.Filled.PrecisionManufacturing" Ripple="false">
+            <MudNavLink Href="/resources/equipment" Icon="@Icons.Material.Filled.Biotech" Ripple="false">Equipment</MudNavLink>
+            <MudNavLink Href="/resources/staff" Icon="@Icons.Material.Filled.Badge" Ripple="false">Staff</MudNavLink>
+            <MudNavLink Href="/resources/work-shifts" Icon="@Icons.Material.Filled.CalendarMonth" Ripple="false">Work Shifts</MudNavLink>
+            <MudNavLink Href="/resources/leaves" Icon="@Icons.Material.Filled.BeachAccess" Ripple="false">Leave</MudNavLink>
+            <MudNavLink Href="/resources/referral-doctors" Icon="@Icons.Material.Filled.LocalHospital" Ripple="false">Referral Doctors</MudNavLink>
+        </MudNavGroup>
+        <MudNavGroup Title="Analytics" Icon="@Icons.Material.Filled.Insights" Ripple="false">
+            <MudNavLink Href="/analytics/overview" Icon="@Icons.Material.Filled.Speed" Ripple="false">Overview</MudNavLink>
+            <MudNavLink Href="/analytics/financial" Icon="@Icons.Material.Filled.AccountBalanceWallet" Ripple="false">Financials</MudNavLink>
+            <MudNavLink Href="/analytics/operations" Icon="@Icons.Material.Filled.Construction" Ripple="false">Operations</MudNavLink>
+            <MudNavLink Href="/analytics/staff" Icon="@Icons.Material.Filled.Groups" Ripple="false">Staff &amp; Machines</MudNavLink>
+        </MudNavGroup>
+        <MudNavGroup Title="Administration" Icon="@Icons.Material.Filled.AdminPanelSettings" Ripple="false">
+            <MudNavLink Href="/users" Icon="@Icons.Material.Filled.Person" Ripple="false">Users</MudNavLink>
+            <MudNavLink Href="/roles" Icon="@Icons.Material.Filled.Security" Ripple="false">Roles</MudNavLink>
+        </MudNavGroup>
+    </MudNavMenu>
+    </nav>
+</div>
+
+@code {
+    [Parameter]
+    public bool IsCollapsed { get; set; }
+
+    private void Go(string href) => Navigation.NavigateTo(href);
+}
