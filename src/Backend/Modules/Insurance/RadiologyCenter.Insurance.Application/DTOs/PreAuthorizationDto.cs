@@ -10,4 +10,6 @@ public sealed record PreAuthorizationDto(
     DateTime RequestedAt,
     DateTime? DecidedAt,
     decimal? ApprovedAmount,
-    string? RejectionReason);
+    string? RejectionReason,
+    bool IsGovernment,
+    IReadOnlyList<PreAuthorizationDocumentDto>? Documents = null);

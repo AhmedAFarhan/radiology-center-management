@@ -6,4 +6,5 @@ public record CreateInsurancePolicyCommand(
     string PolicyNumber,
     decimal CoveragePercent,
     DateTime EffectiveFrom,
-    DateTime? EffectiveTo = null) : ICommand;
+    DateTime? EffectiveTo = null,
+    bool IsGovernment = false) : ICommand;

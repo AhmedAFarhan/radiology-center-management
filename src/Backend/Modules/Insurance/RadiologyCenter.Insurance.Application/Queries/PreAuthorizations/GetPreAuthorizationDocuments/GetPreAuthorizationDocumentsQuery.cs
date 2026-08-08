@@ -1,0 +1,3 @@
+namespace RadiologyCenter.Insurance.Application.Queries.PreAuthorizations.GetPreAuthorizationDocuments;
+
+public record GetPreAuthorizationDocumentsQuery(Guid PreAuthorizationId) : IQuery;

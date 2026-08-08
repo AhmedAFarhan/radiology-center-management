@@ -16,6 +16,7 @@ public sealed class InsurancePolicy : AuditableAggregateRoot<Guid>
     public DateTime EffectiveFrom { get; private set; }
     public DateTime? EffectiveTo { get; private set; }
     public PolicyStatus Status { get; private set; }
+    public bool IsGovernment { get; private set; }
 
     public IReadOnlyCollection<PolicyDocument> Documents => _documents.AsReadOnly();
 
@@ -43,7 +44,8 @@ public sealed class InsurancePolicy : AuditableAggregateRoot<Guid>
         string policyNumber,
         decimal coveragePercent,
         DateTime effectiveFrom,
-        DateTime? effectiveTo = null)
+        DateTime? effectiveTo = null,
+        bool isGovernment = false)
     {
         Guard.AgainstEmpty(companyId, nameof(companyId));
         Guard.AgainstEmpty(patientId, nameof(patientId));
@@ -59,6 +61,7 @@ public sealed class InsurancePolicy : AuditableAggregateRoot<Guid>
             CoveragePercent = coveragePercent,
             EffectiveFrom = effectiveFrom,
             EffectiveTo = effectiveTo,
+            IsGovernment = isGovernment,
             Status = PolicyStatus.Active
         };
     }

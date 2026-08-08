@@ -27,7 +27,8 @@ public static class CreatePreAuthorizationCommandHandler
             command.ExaminationId,
             command.PatientId,
             command.PolicyId,
-            command.EstimatedAmount);
+            command.EstimatedAmount,
+            policy.IsGovernment);
 
         await preAuthorizationRepository.AddAsync(preAuthorization, ct);
         await unitOfWork.SaveChangesAsync(ct);

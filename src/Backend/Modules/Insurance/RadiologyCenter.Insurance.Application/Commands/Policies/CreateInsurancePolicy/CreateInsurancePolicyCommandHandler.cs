@@ -24,7 +24,8 @@ public static class CreateInsurancePolicyCommandHandler
             command.PolicyNumber,
             command.CoveragePercent,
             command.EffectiveFrom,
-            command.EffectiveTo);
+            command.EffectiveTo,
+            command.IsGovernment);
 
         await policyRepository.AddAsync(policy, ct);
         await unitOfWork.SaveChangesAsync(ct);

@@ -7,6 +7,8 @@ namespace RadiologyCenter.Insurance.Domain.Entities;
 
 public sealed class PreAuthorization : AuditableAggregateRoot<Guid>
 {
+    private readonly List<PreAuthorizationDocument> _documents = [];
+
     public Guid ExaminationId { get; private set; }
     public Guid PatientId { get; private set; }
     public Guid PolicyId { get; private set; }
@@ -16,6 +18,9 @@ public sealed class PreAuthorization : AuditableAggregateRoot<Guid>
     public DateTime? DecidedAt { get; private set; }
     public decimal? ApprovedAmount { get; private set; }
     public string? RejectionReason { get; private set; }
+    public bool IsGovernment { get; private set; }
+
+    public IReadOnlyCollection<PreAuthorizationDocument> Documents => _documents.AsReadOnly();
 
     private PreAuthorization()
     {
@@ -26,7 +31,8 @@ public sealed class PreAuthorization : AuditableAggregateRoot<Guid>
         Guid examinationId,
         Guid patientId,
         Guid policyId,
-        decimal estimatedAmount)
+        decimal estimatedAmount,
+        bool isGovernment = false)
     {
         Guard.AgainstEmpty(examinationId, nameof(examinationId));
         Guard.AgainstEmpty(patientId, nameof(patientId));
@@ -41,8 +47,24 @@ public sealed class PreAuthorization : AuditableAggregateRoot<Guid>
             PolicyId = policyId,
             EstimatedAmount = estimatedAmount,
             Status = PreAuthorizationStatus.Requested,
-            RequestedAt = DateTime.UtcNow
+            RequestedAt = DateTime.UtcNow,
+            IsGovernment = isGovernment
         };
+    }
+
+    public PreAuthorizationDocument AddDocument(
+        DocumentType type,
+        string fileName,
+        string contentType,
+        string storedPath,
+        long sizeInBytes)
+    {
+        if (Status != PreAuthorizationStatus.Requested)
+            throw new DomainException($"Documents can only be attached while '{Id}' is requested.");
+
+        var document = PreAuthorizationDocument.Create(Id, type, fileName, contentType, storedPath, sizeInBytes);
+        _documents.Add(document);
+        return document;
     }
 
     public void Approve(decimal approvedAmount)
@@ -50,6 +72,9 @@ public sealed class PreAuthorization : AuditableAggregateRoot<Guid>
         EnsureRequested();
 
         Guard.Against(approvedAmount, a => a < 0, "Approved amount cannot be negative.");
+
+        if (IsGovernment && _documents.Count == 0)
+            throw new DomainException("A government pre-authorization cannot be approved without the official approval document.");
 
         Status = PreAuthorizationStatus.Approved;
         ApprovedAmount = approvedAmount;

@@ -8,4 +8,5 @@ public sealed record InsurancePolicyDto(
     decimal CoveragePercent,
     DateTime EffectiveFrom,
     DateTime? EffectiveTo,
-    string Status);
+    string Status,
+    bool IsGovernment);

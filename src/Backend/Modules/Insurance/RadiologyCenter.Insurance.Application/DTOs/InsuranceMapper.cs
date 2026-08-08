@@ -22,7 +22,8 @@ internal static class InsuranceMapper
             policy.CoveragePercent,
             policy.EffectiveFrom,
             policy.EffectiveTo,
-            policy.Status.Name);
+            policy.Status.Name,
+            policy.IsGovernment);
 
     public static PreAuthorizationDto ToDto(this PreAuthorization preAuthorization) =>
         new(
@@ -35,7 +36,9 @@ internal static class InsuranceMapper
             preAuthorization.RequestedAt,
             preAuthorization.DecidedAt,
             preAuthorization.ApprovedAmount,
-            preAuthorization.RejectionReason);
+            preAuthorization.RejectionReason,
+            preAuthorization.IsGovernment,
+            preAuthorization.Documents.Select(d => d.ToDto()).ToList());
 
     public static ClaimDto ToDto(this Claim claim) =>
         new(
@@ -75,6 +78,16 @@ internal static class InsuranceMapper
         new(
             document.Id,
             document.PolicyId,
+            document.Type.Name,
+            document.FileName,
+            document.ContentType,
+            document.SizeInBytes,
+            document.UploadedAt);
+
+    public static PreAuthorizationDocumentDto ToDto(this PreAuthorizationDocument document) =>
+        new(
+            document.Id,
+            document.PreAuthorizationId,
             document.Type.Name,
             document.FileName,
             document.ContentType,

@@ -23,6 +23,7 @@ public class InsurancePolicyConfiguration : IEntityTypeConfiguration<InsurancePo
         builder.Property(p => p.Status)
             .HasConversion(s => s.Value, v => PolicyStatus.FromValue<PolicyStatus>(v))
             .IsRequired();
+        builder.Property(p => p.IsGovernment).IsRequired();
 
         builder.HasIndex(p => p.PolicyNumber).IsUnique();
         builder.HasIndex(p => p.PatientId);

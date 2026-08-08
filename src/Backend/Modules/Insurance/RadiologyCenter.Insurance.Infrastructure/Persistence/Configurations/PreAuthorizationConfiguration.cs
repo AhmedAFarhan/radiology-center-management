@@ -25,8 +25,14 @@ public class PreAuthorizationConfiguration : IEntityTypeConfiguration<PreAuthori
         builder.Property(p => p.DecidedAt);
         builder.Property(p => p.ApprovedAmount).HasPrecision(18, 2);
         builder.Property(p => p.RejectionReason).HasMaxLength(1000);
+        builder.Property(p => p.IsGovernment).IsRequired();
 
         builder.HasIndex(p => p.ExaminationId).IsUnique();
         builder.HasIndex(p => p.PatientId);
+
+        builder.HasMany(p => p.Documents)
+               .WithOne()
+               .HasForeignKey(d => d.PreAuthorizationId)
+               .OnDelete(DeleteBehavior.Cascade);
     }
 }
