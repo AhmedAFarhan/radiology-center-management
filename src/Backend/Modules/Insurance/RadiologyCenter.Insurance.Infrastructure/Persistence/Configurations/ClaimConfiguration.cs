@@ -17,11 +17,10 @@ public class ClaimConfiguration : IEntityTypeConfiguration<Claim>
         builder.Property(c => c.ExaminationId).IsRequired();
         builder.Property(c => c.PatientId).IsRequired();
         builder.Property(c => c.PolicyId).IsRequired();
-        builder.Property(c => c.PreAuthorizationId);
+        builder.Property(c => c.PreAuthorizationId).IsRequired();
         builder.Property(c => c.BilledAmount).HasPrecision(18, 2).IsRequired();
         builder.Property(c => c.PayerShare).HasPrecision(18, 2).IsRequired();
         builder.Property(c => c.PatientShare).HasPrecision(18, 2).IsRequired();
-        builder.Property(c => c.CopayApplied).HasPrecision(18, 2).IsRequired();
         builder.Property(c => c.Status)
             .HasConversion(s => s.Value, v => ClaimStatus.FromValue<ClaimStatus>(v))
             .IsRequired();

@@ -20,8 +20,6 @@ internal static class InsuranceMapper
             policy.PatientId,
             policy.PolicyNumber,
             policy.CoveragePercent,
-            policy.Deductible,
-            policy.Copay,
             policy.EffectiveFrom,
             policy.EffectiveTo,
             policy.Status.Name);
@@ -49,7 +47,6 @@ internal static class InsuranceMapper
             claim.BilledAmount,
             claim.PayerShare,
             claim.PatientShare,
-            claim.CopayApplied,
             claim.Status.Name,
             claim.SubmittedAt,
             claim.ApprovedAt,

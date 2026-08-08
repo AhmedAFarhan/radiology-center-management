@@ -7,5 +7,4 @@ public sealed record ClaimSubmittedEvent(
     Guid ExaminationId,
     Guid PolicyId,
     decimal PayerShare,
-    decimal PatientShare,
-    decimal CopayApplied) : DomainEvent;
+    decimal PatientShare) : DomainEvent;

@@ -23,8 +23,6 @@ public static class CreateInsurancePolicyCommandHandler
             command.PatientId,
             command.PolicyNumber,
             command.CoveragePercent,
-            command.Deductible,
-            command.Copay,
             command.EffectiveFrom,
             command.EffectiveTo);
 

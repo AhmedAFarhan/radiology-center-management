@@ -10,8 +10,6 @@ public class CreateInsurancePolicyCommandValidator : AbstractValidator<CreateIns
         RuleFor(x => x.PatientId).NotEmpty();
         RuleFor(x => x.PolicyNumber).NotEmpty().MaximumLength(100);
         RuleFor(x => x.CoveragePercent).InclusiveBetween(0, 100);
-        RuleFor(x => x.Deductible).GreaterThanOrEqualTo(0);
-        RuleFor(x => x.Copay).GreaterThanOrEqualTo(0);
         RuleFor(x => x.EffectiveFrom).NotEmpty();
     }
 }

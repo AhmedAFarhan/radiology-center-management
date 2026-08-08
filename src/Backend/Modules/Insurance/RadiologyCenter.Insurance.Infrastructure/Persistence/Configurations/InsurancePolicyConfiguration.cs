@@ -18,8 +18,6 @@ public class InsurancePolicyConfiguration : IEntityTypeConfiguration<InsurancePo
         builder.Property(p => p.PatientId).IsRequired();
         builder.Property(p => p.PolicyNumber).IsRequired().HasMaxLength(100);
         builder.Property(p => p.CoveragePercent).HasPrecision(18, 2).IsRequired();
-        builder.Property(p => p.Deductible).HasPrecision(18, 2).IsRequired();
-        builder.Property(p => p.Copay).HasPrecision(18, 2).IsRequired();
         builder.Property(p => p.EffectiveFrom).IsRequired();
         builder.Property(p => p.EffectiveTo);
         builder.Property(p => p.Status)

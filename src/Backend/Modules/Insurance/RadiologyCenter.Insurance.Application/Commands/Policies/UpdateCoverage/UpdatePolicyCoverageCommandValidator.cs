@@ -8,7 +8,5 @@ public class UpdatePolicyCoverageCommandValidator : AbstractValidator<UpdatePoli
     {
         RuleFor(x => x.PolicyId).NotEmpty();
         RuleFor(x => x.CoveragePercent).InclusiveBetween(0, 100);
-        RuleFor(x => x.Deductible).GreaterThanOrEqualTo(0);
-        RuleFor(x => x.Copay).GreaterThanOrEqualTo(0);
     }
 }

@@ -4,5 +4,5 @@ public record CreateClaimCommand(
     Guid ExaminationId,
     Guid PatientId,
     Guid PolicyId,
-    decimal BilledAmount,
-    Guid? PreAuthorizationId = null) : ICommand;
+    Guid PreAuthorizationId,
+    decimal BilledAmount) : ICommand;

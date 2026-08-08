@@ -14,11 +14,10 @@ public sealed class Claim : AuditableAggregateRoot<Guid>
     public Guid ExaminationId { get; private set; }
     public Guid PatientId { get; private set; }
     public Guid PolicyId { get; private set; }
-    public Guid? PreAuthorizationId { get; private set; }
+    public Guid PreAuthorizationId { get; private set; }
     public decimal BilledAmount { get; private set; }
     public decimal PayerShare { get; private set; }
     public decimal PatientShare { get; private set; }
-    public decimal CopayApplied { get; private set; }
     public ClaimStatus Status { get; private set; }
     public DateTime? SubmittedAt { get; private set; }
     public DateTime? ApprovedAt { get; private set; }
@@ -38,19 +37,18 @@ public sealed class Claim : AuditableAggregateRoot<Guid>
         Guid examinationId,
         Guid patientId,
         Guid policyId,
+        Guid preAuthorizationId,
         decimal billedAmount,
         decimal payerShare,
-        decimal patientShare,
-        decimal copayApplied,
-        Guid? preAuthorizationId = null)
+        decimal patientShare)
     {
         Guard.AgainstEmpty(examinationId, nameof(examinationId));
         Guard.AgainstEmpty(patientId, nameof(patientId));
         Guard.AgainstEmpty(policyId, nameof(policyId));
+        Guard.AgainstEmpty(preAuthorizationId, nameof(preAuthorizationId));
         Guard.Against(billedAmount, a => a < 0, "Billed amount cannot be negative.");
         Guard.Against(payerShare, a => a < 0, "Payer share cannot be negative.");
         Guard.Against(patientShare, a => a < 0, "Patient share cannot be negative.");
-        Guard.Against(copayApplied, a => a < 0, "Copay cannot be negative.");
         Guard.Against(payerShare + patientShare > billedAmount, _ => true,
             "Payer and patient shares cannot exceed the billed amount.");
 
@@ -64,7 +62,6 @@ public sealed class Claim : AuditableAggregateRoot<Guid>
             BilledAmount = billedAmount,
             PayerShare = payerShare,
             PatientShare = patientShare,
-            CopayApplied = copayApplied,
             Status = ClaimStatus.Draft
         };
 
@@ -80,7 +77,7 @@ public sealed class Claim : AuditableAggregateRoot<Guid>
         Status = ClaimStatus.Submitted;
         SubmittedAt = DateTime.UtcNow;
 
-        RaiseDomainEvent(new ClaimSubmittedEvent(Id, ExaminationId, PolicyId, PayerShare, PatientShare, CopayApplied));
+        RaiseDomainEvent(new ClaimSubmittedEvent(Id, ExaminationId, PolicyId, PayerShare, PatientShare));
     }
 
     public void AdjudicateApproved(decimal approvedAmount)

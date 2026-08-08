@@ -15,11 +15,7 @@ public static class UpdatePolicyCoverageCommandHandler
         if (policy is null)
             return Result.Failure<InsurancePolicyDto>(Error.NotFound("Policy", command.PolicyId));
 
-        policy.UpdateCoverage(
-            command.CoveragePercent,
-            command.Deductible,
-            command.Copay,
-            command.EffectiveTo);
+        policy.UpdateCoverage(command.CoveragePercent, command.EffectiveTo);
 
         policyRepository.Update(policy);
         await unitOfWork.SaveChangesAsync(ct);
