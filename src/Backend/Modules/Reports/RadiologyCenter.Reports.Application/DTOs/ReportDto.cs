@@ -9,4 +9,7 @@ public record ReportDto(
     int CurrentVersionNumber,
     DateTime? FinalizedAt,
     string? CancelReason,
-    ReportVersionDto CurrentVersion);
+    ReportVersionDto CurrentVersion,
+    string? PatientName = null,
+    string? RadiologistName = null,
+    string? ExaminationTypeName = null);

@@ -28,6 +28,9 @@ using RadiologyCenter.ResourceManagement.Infrastructure.Persistence;
 using RadiologyCenter.Payroll.Application;
 using RadiologyCenter.Payroll.Infrastructure;
 using RadiologyCenter.Payroll.Infrastructure.Persistence;
+using RadiologyCenter.Reports.Application;
+using RadiologyCenter.Reports.Infrastructure;
+using RadiologyCenter.Reports.Infrastructure.Persistence;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -79,6 +82,8 @@ builder.Services.AddResourceManagementApplication();
 builder.Services.AddResourceManagementInfrastructure(builder.Configuration);
 builder.Services.AddPayrollApplication();
 builder.Services.AddPayrollInfrastructure(builder.Configuration);
+builder.Services.AddReportsApplication();
+builder.Services.AddReportsInfrastructure(builder.Configuration);
 builder.Services.AddScoped<IItemSnapshotResolver, ItemSnapshotResolver>();
 builder.Services.AddScoped<IExaminationFeeResolver, ExaminationFeeResolver>();
 builder.Services.AddScoped<RadiologyCenter.Payroll.Application.Abstractions.IPayrollStaffDirectory, PayrollStaffDirectory>();
@@ -88,6 +93,7 @@ builder.Services.AddScoped<RadiologyCenter.Payroll.Application.Abstractions.IExa
 builder.Services.AddScoped<RadiologyCenter.Payroll.Application.Abstractions.IStaffLeaveResolver, StaffLeaveDaysResolver>();
 builder.Services.AddScoped<RadiologyCenter.Examinations.Application.Abstractions.IAncillaryDirectory, AncillaryDirectory>();
 builder.Services.AddScoped<RadiologyCenter.Examinations.Application.Abstractions.IProfitSourceResolver, ProfitSourceResolver>();
+builder.Services.AddScoped<RadiologyCenter.Reports.Application.Abstractions.IReportDirectory, ReportDirectory>();
 
 var app = builder.Build();
 
@@ -116,6 +122,9 @@ using (var scope = app.Services.CreateScope())
 
     var payrollDb = scope.ServiceProvider.GetRequiredService<PayrollDbContext>();
     payrollDb.Database.Migrate();
+
+    var reportsDb = scope.ServiceProvider.GetRequiredService<ReportsDbContext>();
+    reportsDb.Database.Migrate();
 }
 
 app.UseMiddleware<ExceptionMiddleware>();

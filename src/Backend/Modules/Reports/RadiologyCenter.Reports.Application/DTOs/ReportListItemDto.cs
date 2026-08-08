@@ -8,4 +8,7 @@ public record ReportListItemDto(
     string Status,
     int CurrentVersionNumber,
     DateTime? FinalizedAt,
-    string? CancelReason);
+    string? CancelReason,
+    string? PatientName = null,
+    string? RadiologistName = null,
+    string? ExaminationTypeName = null);
