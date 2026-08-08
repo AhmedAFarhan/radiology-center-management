@@ -41,6 +41,7 @@
   </Folder>
   <Folder Name="/Backend/Modules/Reports/">
     <Project Path="Backend/Modules/Reports/RadiologyCenter.Reports.Domain/RadiologyCenter.Reports.Domain.csproj" />
+    <Project Path="Backend/Modules/Reports/RadiologyCenter.Reports.Application/RadiologyCenter.Reports.Application.csproj" />
   </Folder>
   <Folder Name="/Desktop/">
     <Project Path="Desktop/RadiologyCenter.Desktop/RadiologyCenter.Desktop.csproj" />
