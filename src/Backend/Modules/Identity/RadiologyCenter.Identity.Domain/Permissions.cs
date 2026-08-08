@@ -174,6 +174,42 @@ public static class Permissions
     public static readonly Permission PayrollPayRunsManage          = Create(PayrollPayRunsManageCode,          "Manage Pay Runs",         "Create pay runs and manage their payslips",       "Payroll");
     public static readonly Permission PayrollPayRunsRun             = Create(PayrollPayRunsRunCode,             "Run Pay Rolls",           "Compute, approve, reject and pay pay runs",       "Payroll");
 
+    public const string InsuranceCompaniesCreateCode  = "insurance.companies.create";
+    public const string InsuranceCompaniesReadCode    = "insurance.companies.read";
+    public const string InsuranceCompaniesUpdateCode  = "insurance.companies.update";
+    public const string InsuranceCompaniesDeleteCode  = "insurance.companies.delete";
+    public static readonly Permission InsuranceCompaniesCreate  = Create(InsuranceCompaniesCreateCode,  "Create Insurance Companies",  "Add new insurance companies",       "Insurance");
+    public static readonly Permission InsuranceCompaniesRead    = Create(InsuranceCompaniesReadCode,    "Read Insurance Companies",    "View insurance companies",          "Insurance");
+    public static readonly Permission InsuranceCompaniesUpdate  = Create(InsuranceCompaniesUpdateCode,  "Update Insurance Companies",  "Modify insurance company details",  "Insurance");
+    public static readonly Permission InsuranceCompaniesDelete  = Create(InsuranceCompaniesDeleteCode,  "Delete Insurance Companies",  "Remove insurance companies",        "Insurance");
+
+    public const string InsurancePoliciesCreateCode  = "insurance.policies.create";
+    public const string InsurancePoliciesReadCode    = "insurance.policies.read";
+    public const string InsurancePoliciesUpdateCode  = "insurance.policies.update";
+    public const string InsurancePoliciesDeleteCode  = "insurance.policies.delete";
+    public static readonly Permission InsurancePoliciesCreate  = Create(InsurancePoliciesCreateCode,  "Create Insurance Policies",  "Add new patient insurance policies",  "Insurance");
+    public static readonly Permission InsurancePoliciesRead    = Create(InsurancePoliciesReadCode,    "Read Insurance Policies",    "View patient insurance policies",     "Insurance");
+    public static readonly Permission InsurancePoliciesUpdate  = Create(InsurancePoliciesUpdateCode,  "Update Insurance Policies",  "Modify policies, coverage and status", "Insurance");
+    public static readonly Permission InsurancePoliciesDelete  = Create(InsurancePoliciesDeleteCode,  "Delete Insurance Policies",  "Remove insurance policies",           "Insurance");
+
+    public const string InsurancePreAuthorizationsCreateCode  = "insurance.preauthorizations.create";
+    public const string InsurancePreAuthorizationsReadCode    = "insurance.preauthorizations.read";
+    public const string InsurancePreAuthorizationsUpdateCode  = "insurance.preauthorizations.update";
+    public static readonly Permission InsurancePreAuthorizationsCreate  = Create(InsurancePreAuthorizationsCreateCode,  "Create Pre-authorizations",  "Request pre-authorization for examinations",  "Insurance");
+    public static readonly Permission InsurancePreAuthorizationsRead    = Create(InsurancePreAuthorizationsReadCode,    "Read Pre-authorizations",    "View pre-authorizations and documents",        "Insurance");
+    public static readonly Permission InsurancePreAuthorizationsUpdate  = Create(InsurancePreAuthorizationsUpdateCode,  "Update Pre-authorizations",  "Approve, deny or attach documents",            "Insurance");
+    public const string InsurancePreAuthorizationsAttachDocumentCode = "insurance.preauthorizations.attach-document";
+    public static readonly Permission InsurancePreAuthorizationsAttachDocument = Create(InsurancePreAuthorizationsAttachDocumentCode, "Attach Pre-authorization Documents", "Upload or remove official approval documents", "Insurance");
+
+    public const string InsuranceClaimsCreateCode  = "insurance.claims.create";
+    public const string InsuranceClaimsReadCode    = "insurance.claims.read";
+    public const string InsuranceClaimsUpdateCode  = "insurance.claims.update";
+    public const string InsuranceClaimsSettleCode  = "insurance.claims.settle";
+    public static readonly Permission InsuranceClaimsCreate  = Create(InsuranceClaimsCreateCode,  "Create Claims",     "Create claims for covered examinations",  "Insurance");
+    public static readonly Permission InsuranceClaimsRead    = Create(InsuranceClaimsReadCode,    "Read Claims",       "View claims and their lifecycle",         "Insurance");
+    public static readonly Permission InsuranceClaimsUpdate  = Create(InsuranceClaimsUpdateCode,  "Update Claims",     "Submit, resubmit and adjudicate claims",  "Insurance");
+    public static readonly Permission InsuranceClaimsSettle  = Create(InsuranceClaimsSettleCode,  "Settle Claims",     "Record insurance settlements",            "Insurance");
+
     private static readonly List<Permission> _all =
     [
         PatientsCreate, PatientsRead, PatientsUpdate, PatientsDelete,
@@ -193,7 +229,11 @@ public static class Permissions
         ShiftsCreate, ShiftsRead, ShiftsUpdate, ShiftsDelete,
         LeaveCreate, LeaveRead, LeaveUpdate, LeaveDelete,
         ReferralDoctorsCreate, ReferralDoctorsRead, ReferralDoctorsUpdate, ReferralDoctorsDelete,
-        PayrollRead, PayrollSalaryComponentsManage, PayrollSalaryManage, PayrollAllowancesManage, PayrollFeesManage, PayrollPayRunsManage, PayrollPayRunsRun
+        PayrollRead, PayrollSalaryComponentsManage, PayrollSalaryManage, PayrollAllowancesManage, PayrollFeesManage, PayrollPayRunsManage, PayrollPayRunsRun,
+        InsuranceCompaniesCreate, InsuranceCompaniesRead, InsuranceCompaniesUpdate, InsuranceCompaniesDelete,
+        InsurancePoliciesCreate, InsurancePoliciesRead, InsurancePoliciesUpdate, InsurancePoliciesDelete,
+        InsurancePreAuthorizationsCreate, InsurancePreAuthorizationsRead, InsurancePreAuthorizationsUpdate, InsurancePreAuthorizationsAttachDocument,
+        InsuranceClaimsCreate, InsuranceClaimsRead, InsuranceClaimsUpdate, InsuranceClaimsSettle
     ];
 
     public static IReadOnlyList<Permission> All => _all.AsReadOnly();

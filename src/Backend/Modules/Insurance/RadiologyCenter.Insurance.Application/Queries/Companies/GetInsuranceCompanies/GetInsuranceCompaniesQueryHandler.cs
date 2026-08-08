@@ -6,6 +6,7 @@ namespace RadiologyCenter.Insurance.Application.Queries.Companies.GetInsuranceCo
 public static class GetInsuranceCompaniesQueryHandler
 {
     public static async Task<Result<IReadOnlyList<InsuranceCompanyDto>>> HandleAsync(
+        GetInsuranceCompaniesQuery query,
         IInsuranceCompanyRepository companyRepository,
         CancellationToken ct)
     {

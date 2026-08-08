@@ -49,7 +49,7 @@ public sealed class Claim : AuditableAggregateRoot<Guid>
         Guard.Against(billedAmount, a => a < 0, "Billed amount cannot be negative.");
         Guard.Against(payerShare, a => a < 0, "Payer share cannot be negative.");
         Guard.Against(patientShare, a => a < 0, "Patient share cannot be negative.");
-        Guard.Against(payerShare + patientShare > billedAmount, _ => true,
+        Guard.Against(payerShare + patientShare, p => p > billedAmount,
             "Payer and patient shares cannot exceed the billed amount.");
 
         var claim = new Claim
@@ -84,7 +84,7 @@ public sealed class Claim : AuditableAggregateRoot<Guid>
     {
         EnsureSubmitted();
         Guard.Against(approvedAmount, a => a < 0, "Approved amount cannot be negative.");
-        Guard.Against(approvedAmount > PayerShare, _ => true,
+        Guard.Against(approvedAmount, a => a > PayerShare,
             "Approved amount cannot exceed the payer share.");
 
         Status = ClaimStatus.Approved;
@@ -125,7 +125,7 @@ public sealed class Claim : AuditableAggregateRoot<Guid>
 
         Guard.AgainstNull(method, nameof(method));
         Guard.Against(amount, a => a <= 0, "Settlement amount must be greater than zero.");
-        Guard.Against(amount > RemainingOwed, _ => true,
+        Guard.Against(amount, a => a > RemainingOwed,
             $"Settlement of {amount} exceeds the remaining {RemainingOwed} owed for claim '{Id}'.");
 
         var settlement = Settlement.Create(Id, method, amount, reference);
