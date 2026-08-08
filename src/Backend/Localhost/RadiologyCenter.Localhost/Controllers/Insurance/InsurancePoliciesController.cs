@@ -1,4 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
+using RadiologyCenter.BuildingBlocks.Application.Common;
+using RadiologyCenter.BuildingBlocks.Domain.Pagination;
 using RadiologyCenter.BuildingBlocks.Domain.Results;
 using RadiologyCenter.Insurance.Application.Commands.Policies.ChangePolicyStatus;
 using RadiologyCenter.Insurance.Application.Commands.Policies.CreateInsurancePolicy;
@@ -6,6 +8,7 @@ using RadiologyCenter.Insurance.Application.Commands.Policies.DeletePolicyDocume
 using RadiologyCenter.Insurance.Application.Commands.Policies.UploadPolicyDocument;
 using RadiologyCenter.Insurance.Application.Commands.Policies.UpdateCoverage;
 using RadiologyCenter.Insurance.Application.DTOs;
+using RadiologyCenter.Insurance.Application.Queries.Policies.GetInsurancePolicies;
 using RadiologyCenter.Insurance.Application.Queries.Policies.GetInsurancePolicyById;
 using RadiologyCenter.Insurance.Application.Queries.Policies.GetPoliciesByPatient;
 using RadiologyCenter.Insurance.Application.Queries.Policies.GetPolicyDocumentContent;
@@ -30,6 +33,14 @@ public class InsurancePoliciesController : ControllerBase
     public async Task<IActionResult> GetByIdAsync(Guid id, CancellationToken ct)
     {
         var result = await _bus.InvokeAsync<Result<InsurancePolicyDto>>(new GetInsurancePolicyByIdQuery(id), ct);
+        return result.ToActionResult();
+    }
+
+    [HasPermission(InsurancePoliciesReadCode)]
+    [HttpPost("all")]
+    public async Task<IActionResult> GetAllAsync([FromBody] QueryRequest request, CancellationToken ct)
+    {
+        var result = await _bus.InvokeAsync<Result<PagedResult<InsurancePolicyListItemDto>>>(new GetInsurancePoliciesQuery(request), ct);
         return result.ToActionResult();
     }
 

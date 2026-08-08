@@ -6,4 +6,5 @@ public interface IInsurancePolicyRepository : IBaseRepository<InsurancePolicy, G
 {
     Task<IReadOnlyList<InsurancePolicy>> GetActiveByPatientIdAsync(Guid patientId, CancellationToken ct = default);
     Task<bool> ExistsByPolicyNumberAsync(string policyNumber, CancellationToken ct = default);
+    Task<IReadOnlyList<InsurancePolicy>> GetByIdsAsync(IEnumerable<Guid> ids, CancellationToken ct = default);
 }

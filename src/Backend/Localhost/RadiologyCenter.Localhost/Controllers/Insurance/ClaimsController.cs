@@ -1,4 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
+using RadiologyCenter.BuildingBlocks.Application.Common;
+using RadiologyCenter.BuildingBlocks.Domain.Pagination;
 using RadiologyCenter.BuildingBlocks.Domain.Results;
 using RadiologyCenter.Insurance.Application.Commands.Claims.AdjudicateClaim;
 using RadiologyCenter.Insurance.Application.Commands.Claims.CreateClaim;
@@ -8,6 +10,7 @@ using RadiologyCenter.Insurance.Application.Commands.Claims.SubmitClaim;
 using RadiologyCenter.Insurance.Application.DTOs;
 using RadiologyCenter.Insurance.Application.Queries.Claims.GetClaimByExamination;
 using RadiologyCenter.Insurance.Application.Queries.Claims.GetClaimById;
+using RadiologyCenter.Insurance.Application.Queries.Claims.GetClaims;
 using RadiologyCenter.Localhost.Authorization;
 using RadiologyCenter.Localhost.Extensions;
 using Wolverine;
@@ -22,6 +25,14 @@ public class ClaimsController : ControllerBase
     private readonly IMessageBus _bus;
 
     public ClaimsController(IMessageBus bus) => _bus = bus;
+
+    [HasPermission(InsuranceClaimsReadCode)]
+    [HttpPost("all")]
+    public async Task<IActionResult> GetAllAsync([FromBody] QueryRequest request, CancellationToken ct)
+    {
+        var result = await _bus.InvokeAsync<Result<PagedResult<ClaimListItemDto>>>(new GetClaimsQuery(request), ct);
+        return result.ToActionResult();
+    }
 
     [HasPermission(InsuranceClaimsReadCode)]
     [HttpGet("{id:guid}")]

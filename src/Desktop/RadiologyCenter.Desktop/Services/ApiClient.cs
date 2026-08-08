@@ -56,6 +56,36 @@ public sealed class ApiClient
     public Task SendDeleteAsync(string path, CancellationToken ct = default)
         => SendCoreAsync<object>(() => new HttpRequestMessage(HttpMethod.Delete, path), ct);
 
+    public Task<T> PostFormAsync<T>(
+        string path,
+        IReadOnlyDictionary<string, string>? fields = null,
+        (string Name, string FileName, string ContentType, Stream Stream)? file = null,
+        CancellationToken ct = default)
+        => SendCoreAsync<T>(() =>
+        {
+            var content = new MultipartFormDataContent();
+            if (fields is not null)
+            {
+                foreach (var (name, value) in fields)
+                {
+                    if (!string.IsNullOrEmpty(value))
+                        content.Add(new StringContent(value!), name);
+                }
+            }
+
+            if (file is { } f)
+            {
+                var streamContent = new StreamContent(f.Stream);
+                streamContent.Headers.ContentType = new MediaTypeHeaderValue(f.ContentType);
+                content.Add(streamContent, "file", f.FileName);
+            }
+
+            return new HttpRequestMessage(HttpMethod.Post, path) { Content = content };
+        }, ct);
+
+    public Task<byte[]> GetBytesAsync(string path, CancellationToken ct = default)
+        => SendCoreRawAsync(() => new HttpRequestMessage(HttpMethod.Get, path), ct);
+
     private async Task<T> SendCoreAsync<T>(Func<HttpRequestMessage> requestFactory, CancellationToken ct)
     {
         var request = requestFactory();
@@ -81,6 +111,55 @@ public sealed class ApiClient
         }
 
         return await DeserializeAsync<T>(response, ct);
+    }
+
+    private async Task<byte[]> SendCoreRawAsync(Func<HttpRequestMessage> requestFactory, CancellationToken ct)
+    {
+        var request = requestFactory();
+        var tokens = _tokenStorage.GetTokens();
+        if (tokens is not null)
+            request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", tokens.AccessToken);
+
+        var response = await _http.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, ct);
+
+        if (response.StatusCode == HttpStatusCode.Unauthorized && tokens is not null)
+        {
+            var refreshed = await TryRefreshAsync(tokens, ct);
+            if (refreshed is null)
+            {
+                await _authState.SignOutAsync();
+            }
+            else
+            {
+                request = requestFactory();
+                request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", refreshed.AccessToken);
+                response = await _http.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, ct);
+            }
+        }
+
+        if (response.StatusCode == HttpStatusCode.Unauthorized)
+            throw new ApiException(401, "Your session has expired. Please sign in again.");
+
+        if (!response.IsSuccessStatusCode)
+        {
+            var content = await response.Content.ReadAsStringAsync(ct);
+            ApiError? error = null;
+            try
+            {
+                var envelope = JsonSerializer.Deserialize<ApiEnvelope>(content, JsonOptions);
+                error = envelope?.Error;
+                if (string.IsNullOrWhiteSpace(error?.Message))
+                    error = new ApiError { Message = envelope?.Message ?? "Request failed." };
+            }
+            catch
+            {
+                // non-JSON error body
+            }
+
+            throw new ApiException((int)response.StatusCode, error?.Message ?? $"Request failed ({(int)response.StatusCode}).", error);
+        }
+
+        return await response.Content.ReadAsByteArrayAsync(ct);
     }
 
     private async Task<TokenResult?> TryRefreshAsync(AuthTokens tokens, CancellationToken ct)

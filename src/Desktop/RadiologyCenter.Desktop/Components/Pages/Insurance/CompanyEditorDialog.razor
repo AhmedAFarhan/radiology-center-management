@@ -1,0 +1,153 @@
+@inject InsuranceService InsuranceService
+@inject ISnackbar Snackbar
+
+<MudDialog>
+    <DialogContent>
+        <DialogHeader Icon="@Icons.Material.Filled.Shield" Title="@(Company is null ? "New Insurance Company" : "Edit Insurance Company")" />
+        <EditForm EditContext="_editContext">
+            <DataAnnotationsValidator />
+            <MudGrid Spacing="2">
+                <MudItem xs="12" sm="8">
+                    <MudTextField @bind-Value="_model.Name"
+                                  Label="Name"
+                                  Variant="Variant.Outlined"
+                                  Margin="Margin.Dense"
+                                  Immediate="true"
+                                  For="@(() => _model.Name)" />
+                </MudItem>
+                <MudItem xs="12" sm="4">
+                    <MudTextField @bind-Value="_model.TaxId"
+                                  Label="Tax Number"
+                                  Variant="Variant.Outlined"
+                                  Margin="Margin.Dense"
+                                  Immediate="true"
+                                  For="@(() => _model.TaxId)" />
+                </MudItem>
+                <MudItem xs="12" sm="6">
+                    <MudTextField @bind-Value="_model.Phone"
+                                  Label="Phone"
+                                  Variant="Variant.Outlined"
+                                  Margin="Margin.Dense"
+                                  Immediate="true"
+                                  For="@(() => _model.Phone)" />
+                </MudItem>
+                <MudItem xs="12" sm="6">
+                    <MudTextField @bind-Value="_model.Email"
+                                  Label="Email"
+                                  Variant="Variant.Outlined"
+                                  Margin="Margin.Dense"
+                                  Immediate="true"
+                                  For="@(() => _model.Email)" />
+                </MudItem>
+                <MudItem xs="12">
+                    <MudTextField @bind-Value="_model.Address"
+                                  Label="Address"
+                                  Variant="Variant.Outlined"
+                                  Margin="Margin.Dense"
+                                  Immediate="true"
+                                  For="@(() => _model.Address)" />
+                </MudItem>
+            </MudGrid>
+        </EditForm>
+    </DialogContent>
+    <DialogActions>
+        <MudButton Color="Color.Default" OnClick="CancelAsync" Disabled="_busy">Cancel</MudButton>
+        <MudButton Color="Color.Primary" Variant="Variant.Filled" OnClick="SubmitAsync" Disabled="_busy">
+            @if (_busy)
+            {
+                <MudProgressCircular Size="Size.Small" Indeterminate="true" Class="mx-1" />
+            }
+            else
+            {
+                <text>@(IsEdit ? "Save Changes" : "Create Company")</text>
+            }
+        </MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    [Parameter] public InsuranceCompanyDto? Company { get; set; }
+
+    [CascadingParameter] public IMudDialogInstance MudDialog { get; set; } = default!;
+
+    private readonly CompanyFormModel _model = new();
+    private EditContext _editContext = default!;
+    private bool _busy;
+
+    private bool IsEdit => Company is not null;
+
+    protected override void OnInitialized()
+    {
+        _editContext = new EditContext(_model);
+
+        if (Company is null)
+            return;
+
+        _model.Name = Company.Name;
+        _model.TaxId = Company.TaxId;
+        _model.Phone = Company.Phone;
+        _model.Email = Company.Email;
+        _model.Address = Company.Address;
+    }
+
+    private async Task SubmitAsync()
+    {
+        if (!_editContext.Validate())
+            return;
+
+        _busy = true;
+        try
+        {
+            var input = new InsuranceCompanyInput
+            {
+                Name = _model.Name,
+                TaxId = _model.TaxId,
+                Phone = _model.Phone,
+                Email = _model.Email,
+                Address = _model.Address,
+            };
+
+            if (IsEdit)
+                await InsuranceService.UpdateCompanyAsync(Company!.Id, input);
+            else
+                await InsuranceService.CreateCompanyAsync(input);
+
+            Snackbar.Add(IsEdit ? "Company updated." : "Company created.", Severity.Success);
+            MudDialog.Close(DialogResult.Ok(true));
+        }
+        catch (ApiException ex)
+        {
+            Snackbar.Add(ex.Message, Severity.Error);
+        }
+        catch (Exception)
+        {
+            Snackbar.Add("Unable to reach the server. Please try again.", Severity.Error);
+        }
+        finally
+        {
+            _busy = false;
+        }
+    }
+
+    private void CancelAsync()
+        => MudDialog.Cancel();
+
+    private sealed class CompanyFormModel
+    {
+        [Required(ErrorMessage = "Name is required.")]
+        [MaxLength(200, ErrorMessage = "Name must be 200 characters or fewer.")]
+        public string Name { get; set; } = string.Empty;
+
+        [MaxLength(50, ErrorMessage = "Tax number must be 50 characters or fewer.")]
+        public string? TaxId { get; set; }
+
+        [MaxLength(30, ErrorMessage = "Phone must be 30 characters or fewer.")]
+        public string? Phone { get; set; }
+
+        [EmailAddress(ErrorMessage = "Enter a valid email address.")]
+        public string? Email { get; set; }
+
+        [MaxLength(300, ErrorMessage = "Address must be 300 characters or fewer.")]
+        public string? Address { get; set; }
+    }
+}

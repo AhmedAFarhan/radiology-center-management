@@ -1,0 +1,222 @@
+@inject InsuranceService InsuranceService
+@inject PatientService PatientService
+@inject ISnackbar Snackbar
+
+<MudDialog>
+    <DialogContent>
+        <DialogHeader Icon="@Icons.Material.Filled.Description" Title="New Insurance Policy" />
+        <EditForm EditContext="_editContext">
+            <DataAnnotationsValidator />
+            <MudGrid Spacing="2">
+                <MudItem xs="12" sm="6">
+                    <MudAutocomplete T="PatientDto"
+                                     @bind-Value="_selectedPatient"
+                                     Label="Patient (search by name or phone)"
+                                     Variant="Variant.Outlined"
+                                     Margin="Margin.Dense"
+                                     MinCharacters="1"
+                                     DebounceInterval="300"
+                                     SearchFunc="SearchPatientsAsync"
+                                     ToStringFunc="@(p => p is null ? string.Empty : p.FullName)"
+                                     Clearable="true"
+                                     For="@(() => _model.PatientId)" />
+                </MudItem>
+                <MudItem xs="12" sm="6">
+                    <MudAutocomplete T="InsuranceCompanyDto"
+                                     @bind-Value="_selectedCompany"
+                                     Label="Insurance Company"
+                                     Variant="Variant.Outlined"
+                                     Margin="Margin.Dense"
+                                     MinCharacters="1"
+                                     DebounceInterval="300"
+                                     SearchFunc="SearchCompaniesAsync"
+                                     ToStringFunc="@(c => c is null ? string.Empty : c.Name)"
+                                     Clearable="true"
+                                     For="@(() => _model.CompanyId)" />
+                </MudItem>
+                <MudItem xs="12" sm="6">
+                    <MudTextField @bind-Value="_model.PolicyNumber"
+                                  Label="Policy Number"
+                                  Variant="Variant.Outlined"
+                                  Margin="Margin.Dense"
+                                  Immediate="true"
+                                  For="@(() => _model.PolicyNumber)" />
+                </MudItem>
+                <MudItem xs="12" sm="6">
+                    <MudNumericField T="decimal"
+                                     @bind-Value="_model.CoveragePercent"
+                                     Label="Coverage %"
+                                     Variant="Variant.Outlined"
+                                     Margin="Margin.Dense"
+                                     Min="0"
+                                     Max="100"
+                                     For="@(() => _model.CoveragePercent)" />
+                </MudItem>
+                <MudItem xs="12" sm="6">
+                    <MudDatePicker @bind-Date="_model.EffectiveFrom"
+                                   Label="Effective From"
+                                   Variant="Variant.Outlined"
+                                   Margin="Margin.Dense"
+                                   For="@(() => _model.EffectiveFrom)" />
+                </MudItem>
+                <MudItem xs="12" sm="6">
+                    <MudDatePicker @bind-Date="_model.EffectiveTo"
+                                   Label="Effective To (optional)"
+                                   Variant="Variant.Outlined"
+                                   Margin="Margin.Dense"
+                                   Clearable="true" />
+                </MudItem>
+                <MudItem xs="12">
+                    <MudSwitch T="bool" @bind-Value="_model.IsGovernment" Color="Color.Primary">Government policy</MudSwitch>
+                </MudItem>
+            </MudGrid>
+        </EditForm>
+    </DialogContent>
+    <DialogActions>
+        <MudButton Color="Color.Default" OnClick="CancelAsync" Disabled="_busy">Cancel</MudButton>
+        <MudButton Color="Color.Primary" Variant="Variant.Filled" OnClick="SubmitAsync" Disabled="_busy">
+            @if (_busy)
+            {
+                <MudProgressCircular Size="Size.Small" Indeterminate="true" Class="mx-1" />
+            }
+            else
+            {
+                <text>Create Policy</text>
+            }
+        </MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    [CascadingParameter] public IMudDialogInstance MudDialog { get; set; } = default!;
+
+    private readonly PolicyFormModel _model = new();
+    private EditContext _editContext = default!;
+    private PatientDto? _selectedPatient;
+    private InsuranceCompanyDto? _selectedCompany;
+    private bool _busy;
+
+    protected override void OnInitialized()
+    {
+        _editContext = new EditContext(_model);
+        _model.EffectiveFrom = DateTime.Today;
+    }
+
+    private async Task<IEnumerable<PatientDto>> SearchPatientsAsync(string? value, CancellationToken ct)
+    {
+        if (string.IsNullOrWhiteSpace(value))
+            return Array.Empty<PatientDto>();
+
+        try
+        {
+            var page = await PatientService.GetPagedAsync(value, "LastName", false, 1, 20, ct);
+            return page.Items;
+        }
+        catch (ApiException ex)
+        {
+            Snackbar.Add(ex.Message, Severity.Error);
+            return Array.Empty<PatientDto>();
+        }
+        catch (Exception)
+        {
+            Snackbar.Add("Unable to search patients.", Severity.Error);
+            return Array.Empty<PatientDto>();
+        }
+    }
+
+    private async Task<IEnumerable<InsuranceCompanyDto>> SearchCompaniesAsync(string? value, CancellationToken ct)
+    {
+        try
+        {
+            var companies = await InsuranceService.GetCompaniesAsync(ct);
+            if (string.IsNullOrWhiteSpace(value))
+                return companies;
+
+            return companies.Where(c => c.Name.Contains(value, StringComparison.OrdinalIgnoreCase));
+        }
+        catch (ApiException ex)
+        {
+            Snackbar.Add(ex.Message, Severity.Error);
+            return Array.Empty<InsuranceCompanyDto>();
+        }
+        catch (Exception)
+        {
+            Snackbar.Add("Unable to search companies.", Severity.Error);
+            return Array.Empty<InsuranceCompanyDto>();
+        }
+    }
+
+    private async Task SubmitAsync()
+    {
+        _model.PatientId = _selectedPatient?.Id ?? string.Empty;
+        _model.CompanyId = _selectedCompany?.Id ?? string.Empty;
+
+        if (!_editContext.Validate())
+            return;
+
+        _busy = true;
+        try
+        {
+            var input = new InsurancePolicyInput
+            {
+                CompanyId = _model.CompanyId,
+                PatientId = _model.PatientId,
+                PolicyNumber = _model.PolicyNumber,
+                CoveragePercent = _model.CoveragePercent,
+                EffectiveFrom = _model.EffectiveFrom,
+                EffectiveTo = _model.EffectiveTo,
+                IsGovernment = _model.IsGovernment,
+            };
+
+            await InsuranceService.CreatePolicyAsync(input);
+            Snackbar.Add("Insurance policy created.", Severity.Success);
+            MudDialog.Close(DialogResult.Ok(true));
+        }
+        catch (ApiException ex)
+        {
+            Snackbar.Add(ex.Message, Severity.Error);
+        }
+        catch (Exception)
+        {
+            Snackbar.Add("Unable to reach the server. Please try again.", Severity.Error);
+        }
+        finally
+        {
+            _busy = false;
+        }
+    }
+
+    private void CancelAsync()
+        => MudDialog.Cancel();
+
+    private sealed class PolicyFormModel : IValidatableObject
+    {
+        public string PatientId { get; set; } = string.Empty;
+        public string CompanyId { get; set; } = string.Empty;
+
+        [Required(ErrorMessage = "Policy number is required.")]
+        [MaxLength(100, ErrorMessage = "Policy number must be 100 characters or fewer.")]
+        public string PolicyNumber { get; set; } = string.Empty;
+
+        [Range(0, 100, ErrorMessage = "Coverage must be between 0 and 100.")]
+        public decimal CoveragePercent { get; set; } = 100;
+
+        public DateTime EffectiveFrom { get; set; } = DateTime.Today;
+        public DateTime? EffectiveTo { get; set; }
+        public bool IsGovernment { get; set; }
+
+        public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
+        {
+            if (string.IsNullOrWhiteSpace(PatientId))
+                yield return new ValidationResult("Patient is required.", new[] { nameof(PatientId) });
+
+            if (string.IsNullOrWhiteSpace(CompanyId))
+                yield return new ValidationResult("Insurance company is required.", new[] { nameof(CompanyId) });
+
+            if (EffectiveTo is not null && EffectiveTo.Value.Date < EffectiveFrom.Date)
+                yield return new ValidationResult(
+                    "Effective To cannot be before Effective From.",
+                    new[] { nameof(EffectiveTo) });
+        }
+    }
+}

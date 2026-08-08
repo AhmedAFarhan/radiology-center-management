@@ -1,0 +1,323 @@
+@inject InsuranceService InsuranceService
+@inject IDialogService DialogService
+@inject ISnackbar Snackbar
+@implements IDisposable
+
+<MudDialog>
+    <DialogContent>
+        <DialogHeader Icon="@Icons.Material.Filled.Approval" Title="Pre-Authorization" />
+
+        @if (_loadError is not null)
+        {
+            <ErrorState Title="Couldn't load pre-authorization" Message="@_loadError" Action="LoadAsync" />
+        }
+        else if (_preAuth is null)
+        {
+            <MudProgressCircular Indeterminate="true" Class="d-flex mx-auto my-4" />
+        }
+        else
+        {
+            <MudGrid Spacing="2">
+                <MudItem xs="12" sm="6">
+                    <MudTextField Label="Patient" Variant="Variant.Outlined" Margin="Margin.Dense" ReadOnly="true" Value="@_patientName" />
+                </MudItem>
+                <MudItem xs="12" sm="6">
+                    <MudTextField Label="Examination" Variant="Variant.Outlined" Margin="Margin.Dense" ReadOnly="true" Value="@_examinationName" />
+                </MudItem>
+                <MudItem xs="12" sm="6">
+                    <MudTextField Label="Policy" Variant="Variant.Outlined" Margin="Margin.Dense" ReadOnly="true" Value="@_policyNumber" />
+                </MudItem>
+                <MudItem xs="12" sm="6">
+                    <MudTextField Label="Estimated Amount" Variant="Variant.Outlined" Margin="Margin.Dense" ReadOnly="true" Value="@_preAuth.EstimatedAmount.ToString("C")" />
+                </MudItem>
+                <MudItem xs="12" sm="6">
+                    <MudTextField Label="Status" Variant="Variant.Outlined" Margin="Margin.Dense" ReadOnly="true" Value="@_preAuth.Status" />
+                </MudItem>
+                <MudItem xs="12" sm="6">
+                    <MudTextField Label="Requested" Variant="Variant.Outlined" Margin="Margin.Dense" ReadOnly="true" Value="@_preAuth.RequestedAt.ToString("yyyy-MM-dd HH:mm")" />
+                </MudItem>
+                @if (_preAuth.Status == "Approved")
+                {
+                    <MudItem xs="12" sm="6">
+                        <MudTextField Label="Approved Amount" Variant="Variant.Outlined" Margin="Margin.Dense" ReadOnly="true" Value="@(_preAuth.ApprovedAmount?.ToString("C") ?? "-")" />
+                    </MudItem>
+                }
+                @if (_preAuth.Status == "Denied" && !string.IsNullOrWhiteSpace(_preAuth.RejectionReason))
+                {
+                    <MudItem xs="12">
+                        <MudTextField Label="Rejection Reason" Variant="Variant.Outlined" Margin="Margin.Dense" ReadOnly="true" Lines="3" Value="@_preAuth.RejectionReason" />
+                    </MudItem>
+                }
+            </MudGrid>
+
+            @if (_preAuth.Status == "Requested")
+            {
+                <MudDivider Class="my-2" />
+                <MudText Typo="Typo.subtitle2" Class="mb-1">Decision</MudText>
+                <MudGrid Spacing="2">
+                    <MudItem xs="12" sm="6">
+                        <MudNumericField T="decimal?"
+                                         @bind-Value="_approvedAmount"
+                                         Label="Approved Amount"
+                                         Variant="Variant.Outlined"
+                                         Margin="Margin.Dense"
+                                         Min="0" />
+                    </MudItem>
+                    <MudItem xs="12">
+                        <MudTextField @bind-Value="_rejectionReason"
+                                      Label="Rejection Reason (for deny)"
+                                      Variant="Variant.Outlined"
+                                      Margin="Margin.Dense"
+                                      Lines="2"
+                                      Immediate="true" />
+                    </MudItem>
+                    <MudItem xs="12" sm="6">
+                        <MudButton FullWidth="true" Color="Color.Success" Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Check" OnClick="ApproveAsync" Disabled="_busy">Approve</MudButton>
+                    </MudItem>
+                    <MudItem xs="12" sm="6">
+                        <MudButton FullWidth="true" Color="Color.Error" Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Close" OnClick="DenyAsync" Disabled="_busy">Deny</MudButton>
+                    </MudItem>
+                </MudGrid>
+            }
+
+            <MudDivider Class="my-2" />
+            <MudText Typo="Typo.subtitle2" Class="mb-1">Documents</MudText>
+
+            @if (_documents is null)
+            {
+                <MudProgressCircular Indeterminate="true" Size="Size.Small" Class="d-flex mx-auto my-2" />
+            }
+            else if (_documents.Count == 0)
+            {
+                <MudText Typo="Typo.body2" Class="text-secondary">No documents attached.</MudText>
+            }
+            else
+            {
+                <MudList Dense="true">
+                    @foreach (var document in _documents)
+                    {
+                        <MudListItem>
+                            <MudListItemIcon><MudIcon Icon="@Icons.Material.Filled.Approval" /></MudListItemIcon>
+                            <MudListItemText>
+                                @document.FileName
+                                <MudText Typo="Typo.caption" Class="text-secondary">@($"{document.Type} · {document.SizeInBytes / 1024m:0.#} KB · {document.UploadedAt:yyyy-MM-dd}")</MudText>
+                            </MudListItemText>
+                            <MudListItemSecondaryAction>
+                                <MudIconButton Icon="@Icons.Material.Filled.Download" Size="Size.Small" Color="Color.Default" aria-label="Download" OnClick="@(() => DownloadDocumentAsync(document))" />
+                                <MudIconButton Icon="@Icons.Material.Filled.Delete" Size="Size.Small" Color="Color.Error" aria-label="Delete" OnClick="@(() => DeleteDocumentAsync(document))" />
+                            </MudListItemSecondaryAction>
+                        </MudListItem>
+                    }
+                </MudList>
+            }
+
+            <MudFileUpload T="IBrowserFile"
+                           @bind-Files="_pendingFiles"
+                           OnFilesSelected="UploadSelectedFileAsync"
+                           Hidden="false"
+                           Variant="Variant.Outlined"
+                           Class="mt-2">
+                <ActivatorContent>
+                    <MudButton Variant="Variant.Outlined" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Upload" Disabled="_busy">
+                        @(_busy ? "Uploading..." : "Upload Document")
+                    </MudButton>
+                </ActivatorContent>
+            </MudFileUpload>
+            <MudText Typo="Typo.caption" Class="text-secondary mt-1">Attach imaging requests, referral notes, or proof of request.</MudText>
+        }
+    </DialogContent>
+    <DialogActions>
+        <MudButton Color="Color.Default" OnClick="CancelAsync">Close</MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    [Parameter] public PreAuthorizationListItemDto? PreAuthorization { get; set; }
+
+    [CascadingParameter] public IMudDialogInstance MudDialog { get; set; } = default!;
+
+    private PreAuthorizationDto? _preAuth;
+    private IReadOnlyList<PreAuthorizationDocumentDto>? _documents;
+    private IReadOnlyList<IBrowserFile>? _pendingFiles;
+    private decimal? _approvedAmount;
+    private string? _rejectionReason;
+    private string? _loadError;
+    private bool _busy;
+
+    private string Id => PreAuthorization?.Id ?? string.Empty;
+    private string _patientName => PreAuthorization?.PatientName ?? string.Empty;
+    private string _examinationName => PreAuthorization?.ExaminationTypeName ?? string.Empty;
+    private string _policyNumber => PreAuthorization?.PolicyNumber ?? string.Empty;
+
+    protected override async Task OnInitializedAsync()
+    {
+        _preAuth = PreAuthorization is null
+            ? null
+            : new PreAuthorizationDto(
+                PreAuthorization.Id,
+                PreAuthorization.ExaminationId,
+                PreAuthorization.PatientId,
+                PreAuthorization.PolicyId,
+                PreAuthorization.EstimatedAmount,
+                PreAuthorization.Status,
+                PreAuthorization.RequestedAt,
+                PreAuthorization.DecidedAt,
+                PreAuthorization.ApprovedAmount,
+                PreAuthorization.RejectionReason,
+                PreAuthorization.IsGovernment);
+        await LoadAsync();
+    }
+
+    private async Task LoadAsync()
+    {
+        _loadError = null;
+        try
+        {
+            _documents = await InsuranceService.GetPreAuthorizationDocumentsAsync(Id);
+            _loadError = null;
+        }
+        catch (ApiException ex)
+        {
+            _loadError = ex.Message;
+        }
+        catch (Exception)
+        {
+            _loadError = "Unable to reach the server.";
+        }
+    }
+
+    private async Task ApproveAsync()
+    {
+        _busy = true;
+        try
+        {
+            var input = new DecidePreAuthorizationInput
+            {
+                Decision = "Approve",
+                ApprovedAmount = _approvedAmount,
+            };
+
+            _preAuth = await InsuranceService.DecidePreAuthorizationAsync(Id, input);
+            Snackbar.Add("Pre-authorization approved.", Severity.Success);
+            await LoadAsync();
+        }
+        catch (ApiException ex)
+        {
+            Snackbar.Add(ex.Message, Severity.Error);
+        }
+        finally
+        {
+            _busy = false;
+        }
+    }
+
+    private async Task DenyAsync()
+    {
+        _busy = true;
+        try
+        {
+            var input = new DecidePreAuthorizationInput
+            {
+                Decision = "Deny",
+                RejectionReason = _rejectionReason,
+            };
+
+            _preAuth = await InsuranceService.DecidePreAuthorizationAsync(Id, input);
+            Snackbar.Add("Pre-authorization denied.", Severity.Success);
+            await LoadAsync();
+        }
+        catch (ApiException ex)
+        {
+            Snackbar.Add(ex.Message, Severity.Error);
+        }
+        finally
+        {
+            _busy = false;
+        }
+    }
+
+    private async Task UploadSelectedFileAsync()
+    {
+        var file = _pendingFiles?.FirstOrDefault();
+        if (file is null)
+            return;
+
+        _busy = true;
+        try
+        {
+            await using var stream = file.OpenReadStream(maxAllowedSize: 25 * 1024 * 1024);
+            await InsuranceService.UploadPreAuthorizationDocumentAsync(
+                Id,
+                "SupportingDocument",
+                file.Name,
+                file.ContentType,
+                stream);
+
+            Snackbar.Add("Document uploaded.", Severity.Success);
+            await LoadAsync();
+        }
+        catch (ApiException ex)
+        {
+            Snackbar.Add(ex.Message, Severity.Error);
+        }
+        catch (Exception)
+        {
+            Snackbar.Add("Unable to reach the server.", Severity.Error);
+        }
+        finally
+        {
+            _busy = false;
+            _pendingFiles = null;
+        }
+    }
+
+    private async Task DownloadDocumentAsync(PreAuthorizationDocumentDto document)
+    {
+        try
+        {
+            var content = await InsuranceService.DownloadPreAuthorizationDocumentAsync(Id, document.Id);
+            await FileSaveHelper.SaveAsync(content, document.FileName);
+            Snackbar.Add("Document downloaded.", Severity.Success);
+        }
+        catch (ApiException ex)
+        {
+            Snackbar.Add(ex.Message, Severity.Error);
+        }
+        catch (Exception)
+        {
+            Snackbar.Add("Unable to download the document.", Severity.Error);
+        }
+    }
+
+    private async Task DeleteDocumentAsync(PreAuthorizationDocumentDto document)
+    {
+        var confirmed = await DialogService.ShowMessageBoxAsync(
+            "Delete Document",
+            $"Delete {document.FileName}?",
+            "Delete",
+            "Cancel");
+
+        if (confirmed != true)
+            return;
+
+        try
+        {
+            await InsuranceService.DeletePreAuthorizationDocumentAsync(Id, document.Id);
+            Snackbar.Add("Document deleted.", Severity.Success);
+            await LoadAsync();
+        }
+        catch (ApiException ex)
+        {
+            Snackbar.Add(ex.Message, Severity.Error);
+        }
+        catch (Exception)
+        {
+            Snackbar.Add("Unable to reach the server.", Severity.Error);
+        }
+    }
+
+    private void CancelAsync()
+        => MudDialog.Close();
+
+    public void Dispose() => _pendingFiles = null;
+}

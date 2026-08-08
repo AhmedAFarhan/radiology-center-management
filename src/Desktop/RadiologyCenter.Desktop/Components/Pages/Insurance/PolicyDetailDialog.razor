@@ -1,0 +1,210 @@
+@inject InsuranceService InsuranceService
+@inject IDialogService DialogService
+@inject ISnackbar Snackbar
+
+<MudDialog>
+    <DialogContent>
+        <DialogHeader Icon="@Icons.Material.Filled.Description" Title="@(_policy?.PolicyNumber ?? "Policy Details")" />
+
+        @if (_loadError is not null)
+        {
+            <ErrorState Title="Couldn't load policy" Message="@_loadError" Action="LoadAsync" />
+        }
+        else if (_policy is null)
+        {
+            <MudProgressCircular Indeterminate="true" Class="d-flex mx-auto my-4" />
+        }
+        else
+        {
+            <MudGrid Spacing="2">
+                <MudItem xs="12" sm="6">
+                    <MudTextField Label="Patient" Variant="Variant.Outlined" Margin="Margin.Dense" ReadOnly="true" Value="@_patientName" />
+                </MudItem>
+                <MudItem xs="12" sm="6">
+                    <MudTextField Label="Insurance Company" Variant="Variant.Outlined" Margin="Margin.Dense" ReadOnly="true" Value="@_companyName" />
+                </MudItem>
+                <MudItem xs="12" sm="6">
+                    <MudTextField Label="Coverage %" Variant="Variant.Outlined" Margin="Margin.Dense" ReadOnly="true" Value="@($"{_policy.CoveragePercent:0}%")" />
+                </MudItem>
+                <MudItem xs="12" sm="6">
+                    <MudTextField Label="Status" Variant="Variant.Outlined" Margin="Margin.Dense" ReadOnly="true" Value="@_policy.Status" />
+                </MudItem>
+                <MudItem xs="12" sm="6">
+                    <MudTextField Label="Effective From" Variant="Variant.Outlined" Margin="Margin.Dense" ReadOnly="true" Value="@_policy.EffectiveFrom.ToString("yyyy-MM-dd")" />
+                </MudItem>
+                <MudItem xs="12" sm="6">
+                    <MudTextField Label="Effective To" Variant="Variant.Outlined" Margin="Margin.Dense" ReadOnly="true" Value="@(_policy.EffectiveTo?.ToString("yyyy-MM-dd") ?? "-")" />
+                </MudItem>
+            </MudGrid>
+
+            <MudDivider Class="my-2" />
+            <MudText Typo="Typo.subtitle2" Class="mb-1">Documents</MudText>
+
+            @if (_documents is null)
+            {
+                <MudProgressCircular Indeterminate="true" Size="Size.Small" Class="d-flex mx-auto my-2" />
+            }
+            else if (_documents.Count == 0)
+            {
+                <MudText Typo="Typo.body2" Class="text-secondary">No documents attached.</MudText>
+            }
+            else
+            {
+                @foreach (var document in _documents)
+                {
+                    <MudPaper Elevation="0" Outlined="true" Class="d-flex align-center pa-2 my-1">
+                        <MudIcon Icon="@Icons.Material.Filled.Description" Class="mx-2" />
+                        <div class="flex-grow-1">
+                            <MudText Typo="Typo.body2">@document.FileName</MudText>
+                            <MudText Typo="Typo.caption" Class="text-secondary">@FormatDocumentMeta(document)</MudText>
+                        </div>
+                        <MudIconButton Icon="@Icons.Material.Filled.Download" Size="Size.Small" Color="Color.Default" aria-label="Download" OnClick="@(() => DownloadDocumentAsync(document))" />
+                        <MudIconButton Icon="@Icons.Material.Filled.Delete" Size="Size.Small" Color="Color.Error" aria-label="Delete" OnClick="@(() => DeleteDocumentAsync(document))" />
+                    </MudPaper>
+                }
+            }
+
+            <MudButton HtmlTag="label" for="policy-doc-input"
+                       Variant="Variant.Outlined" Color="Color.Primary"
+                       StartIcon="@Icons.Material.Filled.Upload"
+                       Disabled="_busy"
+                       Class="mt-2">
+                @(_busy ? "Uploading..." : "Upload Document")
+            </MudButton>
+            <InputFile id="policy-doc-input" OnChange="OnFileSelectedAsync" style="display:none" />
+            <MudText Typo="Typo.caption" Class="text-secondary mt-1">Policy documents (policy card, coverage agreement, etc.).</MudText>
+        }
+    </DialogContent>
+    <DialogActions>
+        <MudButton Color="Color.Default" OnClick="CancelAsync">Close</MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    [Parameter] public string PolicyId { get; set; } = string.Empty;
+    [Parameter] public string? PatientName { get; set; }
+    [Parameter] public string? CompanyName { get; set; }
+
+    [CascadingParameter] public IMudDialogInstance MudDialog { get; set; } = default!;
+
+    private InsurancePolicyDto? _policy;
+    private IReadOnlyList<PolicyDocumentDto>? _documents;
+    private string _patientName = string.Empty;
+    private string _companyName = string.Empty;
+    private string? _loadError;
+    private bool _busy;
+
+    protected override async Task OnInitializedAsync()
+    {
+        _patientName = PatientName ?? string.Empty;
+        _companyName = CompanyName ?? string.Empty;
+        await LoadAsync();
+    }
+
+    private async Task LoadAsync()
+    {
+        _loadError = null;
+        try
+        {
+            _policy = await InsuranceService.GetPolicyByIdAsync(PolicyId);
+            _documents = await InsuranceService.GetPolicyDocumentsAsync(PolicyId);
+            _loadError = null;
+        }
+        catch (ApiException ex)
+        {
+            _loadError = ex.Message;
+        }
+        catch (Exception)
+        {
+            _loadError = "Unable to reach the server.";
+        }
+    }
+
+    private async Task OnFileSelectedAsync(InputFileChangeEventArgs e)
+    {
+        var file = e.File;
+        if (file is null)
+            return;
+
+        _busy = true;
+        try
+        {
+            await using var stream = file.OpenReadStream(maxAllowedSize: 25 * 1024 * 1024);
+            await InsuranceService.UploadPolicyDocumentAsync(
+                PolicyId,
+                "PolicyDocument",
+                file.Name,
+                file.ContentType,
+                stream);
+
+            Snackbar.Add("Document uploaded.", Severity.Success);
+            await LoadAsync();
+        }
+        catch (ApiException ex)
+        {
+            Snackbar.Add(ex.Message, Severity.Error);
+        }
+        catch (Exception)
+        {
+            Snackbar.Add("Unable to reach the server.", Severity.Error);
+        }
+        finally
+        {
+            _busy = false;
+        }
+    }
+
+    private async Task DownloadDocumentAsync(PolicyDocumentDto document)
+    {
+        try
+        {
+            var content = await InsuranceService.DownloadPolicyDocumentAsync(PolicyId, document.Id);
+            await FileSaveHelper.SaveAsync(content, document.FileName);
+            Snackbar.Add("Document downloaded.", Severity.Success);
+        }
+        catch (ApiException ex)
+        {
+            Snackbar.Add(ex.Message, Severity.Error);
+        }
+        catch (Exception)
+        {
+            Snackbar.Add("Unable to download the document.", Severity.Error);
+        }
+    }
+
+    private async Task DeleteDocumentAsync(PolicyDocumentDto document)
+    {
+        var confirmed = await DialogService.ShowMessageBoxAsync(
+            "Delete Document",
+            $"Delete {document.FileName}?",
+            "Delete",
+            "Cancel");
+
+        if (confirmed != true)
+            return;
+
+        try
+        {
+            await InsuranceService.DeletePolicyDocumentAsync(PolicyId, document.Id);
+            Snackbar.Add("Document deleted.", Severity.Success);
+            await LoadAsync();
+        }
+        catch (ApiException ex)
+        {
+            Snackbar.Add(ex.Message, Severity.Error);
+        }
+        catch (Exception)
+        {
+            Snackbar.Add("Unable to reach the server.", Severity.Error);
+        }
+    }
+
+    private static string FormatDocumentMeta(PolicyDocumentDto document)
+    {
+        var kb = document.SizeInBytes / 1024m;
+        return $"{document.Type} · {kb:0.#} KB · {document.UploadedAt:yyyy-MM-dd}";
+    }
+
+    private void CancelAsync()
+        => MudDialog.Close();
+}

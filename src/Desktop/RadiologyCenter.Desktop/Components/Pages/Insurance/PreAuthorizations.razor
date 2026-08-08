@@ -1,0 +1,164 @@
+@page "/insurance/preauthorizations"
+@attribute [Authorize]
+@inject InsuranceService InsuranceService
+@inject IDialogService DialogService
+@inject ISnackbar Snackbar
+@implements IDisposable
+
+<PageHeader Icon="@Icons.Material.Filled.Approval" Title="Pre-Authorizations"
+            Subtitle="Insurance approval for planned examinations"
+            SearchValueChanged="OnSearchChanged"
+            SearchPlaceholder="Search by patient, examination or policy..."
+            OnRefresh="ReloadAsync">
+    <MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Add" OnClick="OpenCreateDialogAsync">Request Authorization</MudButton>
+</PageHeader>
+
+<MudTable T="PreAuthorizationListItemDto" @ref="_table" ServerData="LoadServerData" Dense="true" Hover="true" Striped="true" Elevation="1" RowsPerPage="10">
+    <HeaderContent>
+        <MudTh><MudTableSortLabel T="PreAuthorizationListItemDto" SortLabel="@("PatientName")">Patient</MudTableSortLabel></MudTh>
+        <MudTh><MudTableSortLabel T="PreAuthorizationListItemDto" SortLabel="@("ExaminationTypeName")">Examination</MudTableSortLabel></MudTh>
+        <MudTh><MudTableSortLabel T="PreAuthorizationListItemDto" SortLabel="@("PolicyNumber")">Policy #</MudTableSortLabel></MudTh>
+        <MudTh><MudTableSortLabel T="PreAuthorizationListItemDto" SortLabel="@("EstimatedAmount")">Estimated</MudTableSortLabel></MudTh>
+        <MudTh><MudTableSortLabel T="PreAuthorizationListItemDto" SortLabel="@("RequestedAt")">Requested</MudTableSortLabel></MudTh>
+        <MudTh>Status</MudTh>
+        <MudTh>Actions</MudTh>
+    </HeaderContent>
+    <RowTemplate>
+        <MudTd DataLabel="Patient">
+            <MudText Class="font-weight-medium">@context.PatientName</MudText>
+        </MudTd>
+        <MudTd DataLabel="Examination">@context.ExaminationTypeName</MudTd>
+        <MudTd DataLabel="Policy #">
+            <MudText Class="mono-text">@context.PolicyNumber</MudText>
+        </MudTd>
+        <MudTd DataLabel="Estimated">@context.EstimatedAmount.ToString("C")</MudTd>
+        <MudTd DataLabel="Requested">@context.RequestedAt.ToString("yyyy-MM-dd")</MudTd>
+        <MudTd DataLabel="Status">
+            <MudChip T="string" Size="Size.Small" Color="@StatusColor(context.Status)">@FormatStatus(context.Status)</MudChip>
+        </MudTd>
+        <MudTd DataLabel="Actions">
+            <MudIconButton Icon="@Icons.Material.Filled.Visibility" Size="Size.Small" Color="Color.Default" aria-label="View" OnClick="@(() => OpenDetailDialogAsync(context))" />
+        </MudTd>
+    </RowTemplate>
+    <NoRecordsContent>
+        @if (_loadError is not null)
+        {
+            <ErrorState Icon="@(_offline ? Icons.Material.Filled.CloudOff : Icons.Material.Filled.ErrorOutline)"
+                        Title="Couldn't load data"
+                        Message="@_loadError"
+                        Action="ReloadAsync" />
+        }
+        else
+        {
+        <EmptyState Icon="@Icons.Material.Filled.Approval"
+                    Title="No pre-authorizations yet"
+                    Message="Request insurance approval before performing covered examinations."
+                    ActionLabel="Request your first authorization"
+                    Action="OpenCreateDialogAsync" />
+        }
+    </NoRecordsContent>
+    <PagerContent>
+        <MudTablePager PageSizeOptions="@(new[] { 10, 25, 50 })" />
+    </PagerContent>
+</MudTable>
+
+@code {
+    private MudTable<PreAuthorizationListItemDto>? _table;
+    private string? _search;
+    private CancellationTokenSource? _searchCts;
+    private string? _loadError;
+    private bool _offline;
+
+    private async Task<TableData<PreAuthorizationListItemDto>> LoadServerData(TableState state, CancellationToken ct)
+    {
+        try
+        {
+            var page = await InsuranceService.GetPreAuthorizationsPagedAsync(
+                _search,
+                state.SortLabel,
+                state.SortDirection == SortDirection.Descending,
+                state.Page + 1,
+                state.PageSize,
+                ct);
+
+            _loadError = null;
+            _offline = false;
+            return new TableData<PreAuthorizationListItemDto> { Items = page.Items, TotalItems = page.TotalCount };
+        }
+        catch (ApiException ex)
+        {
+            Snackbar.Add(ex.Message, Severity.Error);
+            _loadError = ex.Message;
+            _offline = false;
+            return new TableData<PreAuthorizationListItemDto> { Items = Array.Empty<PreAuthorizationListItemDto>(), TotalItems = 0 };
+        }
+        catch (Exception)
+        {
+            Snackbar.Add("Unable to reach the server.", Severity.Error);
+            _loadError = "Unable to reach the server.";
+            _offline = true;
+            return new TableData<PreAuthorizationListItemDto> { Items = Array.Empty<PreAuthorizationListItemDto>(), TotalItems = 0 };
+        }
+    }
+
+    private async Task OnSearchChanged(string? value)
+    {
+        _search = value;
+
+        _searchCts?.Cancel();
+        var cts = _searchCts = new CancellationTokenSource();
+        try
+        {
+            await Task.Delay(400, cts.Token);
+        }
+        catch (TaskCanceledException)
+        {
+            return;
+        }
+
+        if (_table is not null)
+            await _table.ReloadServerData();
+    }
+
+    private Task ReloadAsync()
+        => _table is null ? Task.CompletedTask : _table.ReloadServerData();
+
+    private async Task OpenCreateDialogAsync()
+    {
+        var options = new DialogOptions { MaxWidth = MaxWidth.Large, FullWidth = true, NoHeader = true };
+        var dialog = await DialogService.ShowAsync<PreAuthDialog>("Request Pre-Authorization", options);
+        await ReloadIfSavedAsync(dialog);
+    }
+
+    private async Task OpenDetailDialogAsync(PreAuthorizationListItemDto preAuth)
+    {
+        var parameters = new DialogParameters { ["PreAuthorization"] = preAuth };
+        var options = new DialogOptions { MaxWidth = MaxWidth.Large, FullWidth = true, NoHeader = true };
+        var dialog = await DialogService.ShowAsync<PreAuthDetailDialog>(preAuth.PatientName, parameters, options);
+        await ReloadIfSavedAsync(dialog);
+    }
+
+    private async Task ReloadIfSavedAsync(IDialogReference dialog)
+    {
+        var result = await dialog.Result;
+        if (result is { Canceled: false })
+            await ReloadAsync();
+    }
+
+    private static string FormatStatus(string status) => status switch
+    {
+        "Requested" => "Requested",
+        "Approved" => "Approved",
+        "Denied" => "Denied",
+        _ => status,
+    };
+
+    private static Color StatusColor(string status) => status switch
+    {
+        "Approved" => Color.Success,
+        "Denied" => Color.Error,
+        _ => Color.Warning,
+    };
+
+    public void Dispose() => _searchCts?.Cancel();
+}

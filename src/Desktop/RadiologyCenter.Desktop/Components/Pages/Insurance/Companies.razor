@@ -1,0 +1,177 @@
+@page "/insurance/companies"
+@attribute [Authorize]
+@inject InsuranceService InsuranceService
+@inject IDialogService DialogService
+@inject ISnackbar Snackbar
+@implements IDisposable
+
+<PageHeader Icon="@Icons.Material.Filled.Shield" Title="Insurance Companies"
+            Subtitle="Manage insurance providers and their details"
+            SearchValueChanged="OnSearchChanged"
+            SearchPlaceholder="Search companies..."
+            OnRefresh="ReloadAsync">
+    <MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Add" OnClick="OpenCreateDialogAsync">Add Company</MudButton>
+</PageHeader>
+
+<MudTable T="InsuranceCompanyDto" @ref="_table" Items="@_filtered" Dense="true" Hover="true" Striped="true" Elevation="1" RowsPerPage="10">
+    <HeaderContent>
+        <MudTh><MudTableSortLabel T="InsuranceCompanyDto" SortLabel="@("Name")">Name</MudTableSortLabel></MudTh>
+        <MudTh>Tax Number</MudTh>
+        <MudTh>Phone</MudTh>
+        <MudTh>Email</MudTh>
+        <MudTh>Address</MudTh>
+        <MudTh>Actions</MudTh>
+    </HeaderContent>
+    <RowTemplate>
+        <MudTd DataLabel="Name">
+            <MudText Class="font-weight-medium">@context.Name</MudText>
+        </MudTd>
+        <MudTd DataLabel="Tax Number">@(context.TaxId ?? "-")</MudTd>
+        <MudTd DataLabel="Phone">@(context.Phone ?? "-")</MudTd>
+        <MudTd DataLabel="Email">@(context.Email ?? "-")</MudTd>
+        <MudTd DataLabel="Address">@(context.Address ?? "-")</MudTd>
+        <MudTd DataLabel="Actions">
+            <MudIconButton Icon="@Icons.Material.Filled.Edit" Size="Size.Small" Color="Color.Default" aria-label="Edit" OnClick="@(() => OpenEditDialogAsync(context))" />
+            <MudIconButton Icon="@Icons.Material.Filled.Delete" Size="Size.Small" Color="Color.Error" aria-label="Delete" OnClick="@(() => DeleteCompanyAsync(context))" />
+        </MudTd>
+    </RowTemplate>
+    <NoRecordsContent>
+        @if (_loadError is not null)
+        {
+            <ErrorState Icon="@(_offline ? Icons.Material.Filled.CloudOff : Icons.Material.Filled.ErrorOutline)"
+                        Title="Couldn't load data"
+                        Message="@_loadError"
+                        Action="ReloadAsync" />
+        }
+        else
+        {
+        <EmptyState Icon="@Icons.Material.Filled.Shield"
+                    Title="No insurance companies yet"
+                    Message="Add insurance companies before creating patient policies."
+                    ActionLabel="Add your first company"
+                    Action="OpenCreateDialogAsync" />
+        }
+    </NoRecordsContent>
+    <PagerContent>
+        <MudTablePager PageSizeOptions="@(new[] { 10, 25, 50 })" />
+    </PagerContent>
+</MudTable>
+
+@code {
+    private MudTable<InsuranceCompanyDto>? _table;
+    private List<InsuranceCompanyDto> _companies = new();
+    private IEnumerable<InsuranceCompanyDto> _filtered => Filter(_companies);
+    private string? _search;
+    private CancellationTokenSource? _searchCts;
+    private string? _loadError;
+    private bool _offline;
+
+    protected override async Task OnInitializedAsync()
+        => await LoadAsync();
+
+    private IEnumerable<InsuranceCompanyDto> Filter(IEnumerable<InsuranceCompanyDto> companies)
+    {
+        if (string.IsNullOrWhiteSpace(_search))
+            return companies;
+
+        var term = _search.Trim();
+        return companies.Where(c =>
+            c.Name.Contains(term, StringComparison.OrdinalIgnoreCase)
+            || (c.Phone?.Contains(term, StringComparison.OrdinalIgnoreCase) ?? false)
+            || (c.Email?.Contains(term, StringComparison.OrdinalIgnoreCase) ?? false)
+            || (c.TaxId?.Contains(term, StringComparison.OrdinalIgnoreCase) ?? false));
+    }
+
+    private async Task LoadAsync()
+    {
+        try
+        {
+            _companies = (await InsuranceService.GetCompaniesAsync()).ToList();
+            _loadError = null;
+            _offline = false;
+        }
+        catch (ApiException ex)
+        {
+            Snackbar.Add(ex.Message, Severity.Error);
+            _loadError = ex.Message;
+            _offline = false;
+        }
+        catch (Exception)
+        {
+            _loadError = "Unable to reach the server.";
+            _offline = true;
+        }
+    }
+
+    private async Task OnSearchChanged(string? value)
+    {
+        _search = value;
+
+        _searchCts?.Cancel();
+        var cts = _searchCts = new CancellationTokenSource();
+        try
+        {
+            await Task.Delay(300, cts.Token);
+        }
+        catch (TaskCanceledException)
+        {
+            return;
+        }
+
+        await InvokeAsync(StateHasChanged);
+    }
+
+    private Task ReloadAsync()
+        => LoadAsync();
+
+    private async Task OpenCreateDialogAsync()
+    {
+        var options = new DialogOptions { MaxWidth = MaxWidth.Medium, FullWidth = true, NoHeader = true };
+        var dialog = await DialogService.ShowAsync<CompanyEditorDialog>("New Insurance Company", options);
+        await ReloadIfSavedAsync(dialog);
+    }
+
+    private async Task OpenEditDialogAsync(InsuranceCompanyDto company)
+    {
+        var parameters = new DialogParameters { ["Company"] = company };
+        var options = new DialogOptions { MaxWidth = MaxWidth.Medium, FullWidth = true, NoHeader = true };
+        var dialog = await DialogService.ShowAsync<CompanyEditorDialog>("Edit Insurance Company", parameters, options);
+        await ReloadIfSavedAsync(dialog);
+    }
+
+    private async Task ReloadIfSavedAsync(IDialogReference dialog)
+    {
+        var result = await dialog.Result;
+        if (result is { Canceled: false })
+            await LoadAsync();
+    }
+
+    private async Task DeleteCompanyAsync(InsuranceCompanyDto company)
+    {
+        var confirmed = await DialogService.ShowMessageBoxAsync(
+            "Delete Insurance Company",
+            $"Are you sure you want to delete {company.Name}? This cannot be undone.",
+            "Delete",
+            "Cancel");
+
+        if (confirmed != true)
+            return;
+
+        try
+        {
+            await InsuranceService.DeleteCompanyAsync(company.Id);
+            Snackbar.Add("Company deleted.", Severity.Success);
+            await LoadAsync();
+        }
+        catch (ApiException ex)
+        {
+            Snackbar.Add(ex.Message, Severity.Error);
+        }
+        catch (Exception)
+        {
+            Snackbar.Add("Unable to reach the server.", Severity.Error);
+        }
+    }
+
+    public void Dispose() => _searchCts?.Cancel();
+}

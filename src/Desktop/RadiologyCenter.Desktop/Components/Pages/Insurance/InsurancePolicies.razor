@@ -1,0 +1,186 @@
+@page "/insurance/policies"
+@attribute [Authorize]
+@inject InsuranceService InsuranceService
+@inject IDialogService DialogService
+@inject ISnackbar Snackbar
+@implements IDisposable
+
+<PageHeader Icon="@Icons.Material.Filled.Description" Title="Insurance Policies"
+            Subtitle="Patient coverage policies with companies"
+            SearchValueChanged="OnSearchChanged"
+            SearchPlaceholder="Search by patient, company or policy number..."
+            OnRefresh="ReloadAsync">
+    <MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Add" OnClick="OpenCreateDialogAsync">Add Policy</MudButton>
+</PageHeader>
+
+<MudTable T="InsurancePolicyListItemDto" @ref="_table" ServerData="LoadServerData" Dense="true" Hover="true" Striped="true" Elevation="1" RowsPerPage="10">
+    <HeaderContent>
+        <MudTh><MudTableSortLabel T="InsurancePolicyListItemDto" SortLabel="@("PolicyNumber")">Policy #</MudTableSortLabel></MudTh>
+        <MudTh><MudTableSortLabel T="InsurancePolicyListItemDto" SortLabel="@("PatientName")">Patient</MudTableSortLabel></MudTh>
+        <MudTh><MudTableSortLabel T="InsurancePolicyListItemDto" SortLabel="@("CompanyName")">Company</MudTableSortLabel></MudTh>
+        <MudTh><MudTableSortLabel T="InsurancePolicyListItemDto" SortLabel="@("CoveragePercent")">Coverage</MudTableSortLabel></MudTh>
+        <MudTh><MudTableSortLabel T="InsurancePolicyListItemDto" SortLabel="@("EffectiveFrom")">Effective</MudTableSortLabel></MudTh>
+        <MudTh>Status</MudTh>
+        <MudTh>Actions</MudTh>
+    </HeaderContent>
+    <RowTemplate>
+        <MudTd DataLabel="Policy #">
+            <MudText Class="font-weight-medium mono-text">@context.PolicyNumber</MudText>
+            @if (context.IsGovernment)
+            {
+                <MudChip T="string" Size="Size.Small" Color="Color.Info" Variant="Variant.Outlined">Government</MudChip>
+            }
+        </MudTd>
+        <MudTd DataLabel="Patient">@context.PatientName</MudTd>
+        <MudTd DataLabel="Company">@context.CompanyName</MudTd>
+        <MudTd DataLabel="Coverage">
+            <MudProgressLinear Color="@(context.CoveragePercent >= 75 ? Color.Success : context.CoveragePercent >= 40 ? Color.Warning : Color.Error)"
+                               Value="@((double)context.CoveragePercent)"
+                               Rounded="true"
+                               Size="Size.Small" />
+            <MudText Typo="Typo.caption" Class="text-secondary">@context.CoveragePercent.ToString("0")%</MudText>
+        </MudTd>
+        <MudTd DataLabel="Effective">
+            @context.EffectiveFrom.ToString("MMM yyyy")
+            @if (context.EffectiveTo is not null)
+            {
+                <MudText Typo="Typo.caption" Class="text-secondary">to @context.EffectiveTo.Value.ToString("MMM yyyy")</MudText>
+            }
+        </MudTd>
+        <MudTd DataLabel="Status">
+            <MudChip T="string" Size="Size.Small" Color="@(context.IsActive ? Color.Success : Color.Default)">@(context.IsActive ? "Active" : "Inactive")</MudChip>
+        </MudTd>
+        <MudTd DataLabel="Actions">
+            <MudIconButton Icon="@Icons.Material.Filled.Visibility" Size="Size.Small" Color="Color.Default" aria-label="View" OnClick="@(() => OpenDetailDialogAsync(context))" />
+            <MudIconButton Icon="@(context.IsActive ? Icons.Material.Filled.Block : Icons.Material.Filled.CheckCircle)"
+                           Size="Size.Small"
+                           Color="@(context.IsActive ? Color.Default : Color.Success)"
+                           aria-label="Toggle status"
+                           OnClick="@(() => ToggleActiveAsync(context))" />
+        </MudTd>
+    </RowTemplate>
+    <NoRecordsContent>
+        @if (_loadError is not null)
+        {
+            <ErrorState Icon="@(_offline ? Icons.Material.Filled.CloudOff : Icons.Material.Filled.ErrorOutline)"
+                        Title="Couldn't load data"
+                        Message="@_loadError"
+                        Action="ReloadAsync" />
+        }
+        else
+        {
+        <EmptyState Icon="@Icons.Material.Filled.Description"
+                    Title="No insurance policies yet"
+                    Message="Attach coverage to patients through an insurance company."
+                    ActionLabel="Add your first policy"
+                    Action="OpenCreateDialogAsync" />
+        }
+    </NoRecordsContent>
+    <PagerContent>
+        <MudTablePager PageSizeOptions="@(new[] { 10, 25, 50 })" />
+    </PagerContent>
+</MudTable>
+
+@code {
+    private MudTable<InsurancePolicyListItemDto>? _table;
+    private string? _search;
+    private CancellationTokenSource? _searchCts;
+    private string? _loadError;
+    private bool _offline;
+
+    private async Task<TableData<InsurancePolicyListItemDto>> LoadServerData(TableState state, CancellationToken ct)
+    {
+        try
+        {
+            var page = await InsuranceService.GetPoliciesPagedAsync(
+                _search,
+                state.SortLabel,
+                state.SortDirection == SortDirection.Descending,
+                state.Page + 1,
+                state.PageSize,
+                ct);
+
+            _loadError = null;
+            _offline = false;
+            return new TableData<InsurancePolicyListItemDto> { Items = page.Items, TotalItems = page.TotalCount };
+        }
+        catch (ApiException ex)
+        {
+            Snackbar.Add(ex.Message, Severity.Error);
+            _loadError = ex.Message;
+            _offline = false;
+            return new TableData<InsurancePolicyListItemDto> { Items = Array.Empty<InsurancePolicyListItemDto>(), TotalItems = 0 };
+        }
+        catch (Exception)
+        {
+            Snackbar.Add("Unable to reach the server.", Severity.Error);
+            _loadError = "Unable to reach the server.";
+            _offline = true;
+            return new TableData<InsurancePolicyListItemDto> { Items = Array.Empty<InsurancePolicyListItemDto>(), TotalItems = 0 };
+        }
+    }
+
+    private async Task OnSearchChanged(string? value)
+    {
+        _search = value;
+
+        _searchCts?.Cancel();
+        var cts = _searchCts = new CancellationTokenSource();
+        try
+        {
+            await Task.Delay(400, cts.Token);
+        }
+        catch (TaskCanceledException)
+        {
+            return;
+        }
+
+        if (_table is not null)
+            await _table.ReloadServerData();
+    }
+
+    private Task ReloadAsync()
+        => _table is null ? Task.CompletedTask : _table.ReloadServerData();
+
+    private async Task OpenCreateDialogAsync()
+    {
+        var options = new DialogOptions { MaxWidth = MaxWidth.Large, FullWidth = true, NoHeader = true };
+        var dialog = await DialogService.ShowAsync<PolicyEditorDialog>("New Insurance Policy", options);
+        await ReloadIfSavedAsync(dialog);
+    }
+
+    private async Task OpenDetailDialogAsync(InsurancePolicyListItemDto policy)
+    {
+        var parameters = new DialogParameters { ["PolicyId"] = policy.Id };
+        var options = new DialogOptions { MaxWidth = MaxWidth.Large, FullWidth = true, NoHeader = true };
+        var dialog = await DialogService.ShowAsync<PolicyDetailDialog>(policy.PolicyNumber, parameters, options);
+        await ReloadIfSavedAsync(dialog);
+    }
+
+    private async Task ReloadIfSavedAsync(IDialogReference dialog)
+    {
+        var result = await dialog.Result;
+        if (result is { Canceled: false })
+            await ReloadAsync();
+    }
+
+    private async Task ToggleActiveAsync(InsurancePolicyListItemDto policy)
+    {
+        try
+        {
+            await InsuranceService.ChangePolicyStatusAsync(policy.Id, policy.IsActive ? "Deactivate" : "Reactivate");
+            Snackbar.Add(policy.IsActive ? "Policy deactivated." : "Policy reactivated.", Severity.Success);
+            await ReloadAsync();
+        }
+        catch (ApiException ex)
+        {
+            Snackbar.Add(ex.Message, Severity.Error);
+        }
+        catch (Exception)
+        {
+            Snackbar.Add("Unable to reach the server.", Severity.Error);
+        }
+    }
+
+    public void Dispose() => _searchCts?.Cancel();
+}

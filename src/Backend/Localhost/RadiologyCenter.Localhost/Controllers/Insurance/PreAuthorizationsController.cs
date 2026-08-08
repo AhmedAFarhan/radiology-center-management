@@ -1,4 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
+using RadiologyCenter.BuildingBlocks.Application.Common;
+using RadiologyCenter.BuildingBlocks.Domain.Pagination;
 using RadiologyCenter.BuildingBlocks.Domain.Results;
 using RadiologyCenter.Insurance.Application.Commands.PreAuthorizations.CreatePreAuthorization;
 using RadiologyCenter.Insurance.Application.Commands.PreAuthorizations.DecidePreAuthorization;
@@ -8,6 +10,7 @@ using RadiologyCenter.Insurance.Application.DTOs;
 using RadiologyCenter.Insurance.Application.Queries.PreAuthorizations.GetPreAuthorizationByExamination;
 using RadiologyCenter.Insurance.Application.Queries.PreAuthorizations.GetPreAuthorizationDocumentContent;
 using RadiologyCenter.Insurance.Application.Queries.PreAuthorizations.GetPreAuthorizationDocuments;
+using RadiologyCenter.Insurance.Application.Queries.PreAuthorizations.GetPreAuthorizations;
 using RadiologyCenter.Localhost.Authorization;
 using RadiologyCenter.Localhost.Extensions;
 using Wolverine;
@@ -22,6 +25,14 @@ public class PreAuthorizationsController : ControllerBase
     private readonly IMessageBus _bus;
 
     public PreAuthorizationsController(IMessageBus bus) => _bus = bus;
+
+    [HasPermission(InsurancePreAuthorizationsReadCode)]
+    [HttpPost("all")]
+    public async Task<IActionResult> GetAllAsync([FromBody] QueryRequest request, CancellationToken ct)
+    {
+        var result = await _bus.InvokeAsync<Result<PagedResult<PreAuthorizationListItemDto>>>(new GetPreAuthorizationsQuery(request), ct);
+        return result.ToActionResult();
+    }
 
     [HasPermission(InsurancePreAuthorizationsReadCode)]
     [HttpGet("by-examination/{examinationId:guid}")]

@@ -1,0 +1,358 @@
+@inject InsuranceService InsuranceService
+@inject IDialogService DialogService
+@inject ISnackbar Snackbar
+
+<MudDialog>
+    <DialogContent>
+        <DialogHeader Icon="@Icons.Material.Filled.RequestQuote" Title="Claim Details" />
+
+        @if (_loadError is not null)
+        {
+            <ErrorState Title="Couldn't load claim" Message="@_loadError" Action="LoadAsync" />
+        }
+        else if (_claim is null)
+        {
+            <MudProgressCircular Indeterminate="true" Class="d-flex mx-auto my-4" />
+        }
+        else
+        {
+            <MudGrid Spacing="2">
+                <MudItem xs="12" sm="6">
+                    <MudTextField Label="Patient" Variant="Variant.Outlined" Margin="Margin.Dense" ReadOnly="true" Value="@_patientName" />
+                </MudItem>
+                <MudItem xs="12" sm="6">
+                    <MudTextField Label="Examination" Variant="Variant.Outlined" Margin="Margin.Dense" ReadOnly="true" Value="@_examinationName" />
+                </MudItem>
+                <MudItem xs="12" sm="6">
+                    <MudTextField Label="Policy" Variant="Variant.Outlined" Margin="Margin.Dense" ReadOnly="true" Value="@_policyNumber" />
+                </MudItem>
+                <MudItem xs="12" sm="6">
+                    <MudTextField Label="Status" Variant="Variant.Outlined" Margin="Margin.Dense" ReadOnly="true" Value="@_claim.Status" />
+                </MudItem>
+                <MudItem xs="12" sm="4">
+                    <MudTextField Label="Billed Amount" Variant="Variant.Outlined" Margin="Margin.Dense" ReadOnly="true" Value="@_claim.BilledAmount.ToString("C")" />
+                </MudItem>
+                <MudItem xs="12" sm="4">
+                    <MudTextField Label="Payer Share" Variant="Variant.Outlined" Margin="Margin.Dense" ReadOnly="true" Value="@_claim.PayerShare.ToString("C")" />
+                </MudItem>
+                <MudItem xs="12" sm="4">
+                    <MudTextField Label="Patient Share" Variant="Variant.Outlined" Margin="Margin.Dense" ReadOnly="true" Value="@_claim.PatientShare.ToString("C")" />
+                </MudItem>
+                @if (_claim.RemainingOwed > 0)
+                {
+                    <MudItem xs="12" sm="6">
+                        <MudTextField Label="Total Settled" Variant="Variant.Outlined" Margin="Margin.Dense" ReadOnly="true" Value="@_claim.TotalSettled.ToString("C")" />
+                    </MudItem>
+                    <MudItem xs="12" sm="6">
+                        <MudTextField Label="Remaining Owed" Variant="Variant.Outlined" Margin="Margin.Dense" ReadOnly="true" Value="@_claim.RemainingOwed.ToString("C")" />
+                    </MudItem>
+                }
+            </MudGrid>
+
+            @if (_claim.Status == "Draft")
+            {
+                <MudDivider Class="my-2" />
+                <MudButton FullWidth="true" Color="Color.Primary" Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Send" OnClick="SubmitAsync" Disabled="_busy">Submit Claim</MudButton>
+            }
+            else if (_claim.Status == "Submitted")
+            {
+                <MudDivider Class="my-2" />
+                <MudText Typo="Typo.subtitle2" Class="mb-1">Adjudication</MudText>
+                <MudGrid Spacing="2">
+                    <MudItem xs="12" sm="6">
+                        <MudNumericField T="decimal?"
+                                         @bind-Value="_approvedAmount"
+                                         Label="Approved Amount"
+                                         Variant="Variant.Outlined"
+                                         Margin="Margin.Dense"
+                                         Min="0" />
+                    </MudItem>
+                    <MudItem xs="12" sm="6">
+                        <MudTextField @bind-Value="_rejectionCode"
+                                      Label="Rejection Code (for reject)"
+                                      Variant="Variant.Outlined"
+                                      Margin="Margin.Dense"
+                                      Immediate="true" />
+                    </MudItem>
+                    <MudItem xs="12">
+                        <MudTextField @bind-Value="_rejectionReason"
+                                      Label="Rejection Reason (for reject)"
+                                      Variant="Variant.Outlined"
+                                      Margin="Margin.Dense"
+                                      Lines="2"
+                                      Immediate="true" />
+                    </MudItem>
+                    <MudItem xs="12" sm="6">
+                        <MudButton FullWidth="true" Color="Color.Success" Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Check" OnClick="ApproveAsync" Disabled="_busy">Approve</MudButton>
+                    </MudItem>
+                    <MudItem xs="12" sm="6">
+                        <MudButton FullWidth="true" Color="Color.Error" Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Close" OnClick="RejectAsync" Disabled="_busy">Reject</MudButton>
+                    </MudItem>
+                </MudGrid>
+            }
+            else if (_claim.Status == "Rejected")
+            {
+                <MudDivider Class="my-2" />
+                <MudButton FullWidth="true" Color="Color.Primary" Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Refresh" OnClick="ResubmitAsync" Disabled="_busy">Resubmit Claim</MudButton>
+            }
+            else if (_claim.Status is "Approved" or "Paid" && _claim.RemainingOwed > 0)
+            {
+                <MudDivider Class="my-2" />
+                <MudText Typo="Typo.subtitle2" Class="mb-1">Record Settlement</MudText>
+                <MudGrid Spacing="2">
+                    <MudItem xs="12" sm="4">
+                        <MudNumericField T="decimal"
+                                         @bind-Value="_settlementAmount"
+                                         Label="Amount"
+                                         Variant="Variant.Outlined"
+                                         Margin="Margin.Dense"
+                                         Min="0" />
+                    </MudItem>
+                    <MudItem xs="12" sm="4">
+                        <MudSelect T="string"
+                                   @bind-Value="_settlementMethod"
+                                   Label="Method"
+                                   Variant="Variant.Outlined"
+                                   Margin="Margin.Dense">
+                            @foreach (var method in SettlementMethods)
+                            {
+                                <MudSelectItem T="string" Value="@method">@method</MudSelectItem>
+                            }
+                        </MudSelect>
+                    </MudItem>
+                    <MudItem xs="12" sm="4">
+                        <MudTextField @bind-Value="_settlementReference"
+                                      Label="Reference (optional)"
+                                      Variant="Variant.Outlined"
+                                      Margin="Margin.Dense"
+                                      Immediate="true" />
+                    </MudItem>
+                    <MudItem xs="12">
+                        <MudButton FullWidth="true" Color="Color.Secondary" Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Payments" OnClick="RecordSettlementAsync" Disabled="_busy">Record Settlement</MudButton>
+                    </MudItem>
+                </MudGrid>
+            }
+
+            @if (_claim.Status == "Rejected" && _claim.Rejections.Count > 0)
+            {
+                <MudDivider Class="my-2" />
+                <MudText Typo="Typo.subtitle2" Class="mb-1">Rejections</MudText>
+                <MudList Dense="true">
+                    @foreach (var rejection in _claim.Rejections)
+                    {
+                        <MudListItem>
+                            <MudListItemIcon><MudIcon Icon="@Icons.Material.Filled.Warning" Color="@Color.Error" /></MudListItemIcon>
+                            <MudListItemText>
+                                @rejection.Code
+                                <MudText Typo="Typo.caption">@rejection.Reason</MudText>
+                                <MudText Typo="Typo.caption" Class="text-secondary">@rejection.RejectedAt.ToString("yyyy-MM-dd")</MudText>
+                            </MudListItemText>
+                        </MudListItem>
+                    }
+                </MudList>
+            }
+
+            @if (_claim.Settlements.Count > 0)
+            {
+                <MudDivider Class="my-2" />
+                <MudText Typo="Typo.subtitle2" Class="mb-1">Settlements</MudText>
+                <MudList Dense="true">
+                    @foreach (var settlement in _claim.Settlements)
+                    {
+                        <MudListItem>
+                            <MudListItemIcon><MudIcon Icon="@Icons.Material.Filled.Payments" /></MudListItemIcon>
+                            <MudListItemText>
+                                @settlement.Amount.ToString("C")
+                                <MudText Typo="Typo.caption" Class="text-secondary">@settlement.Method @(!string.IsNullOrWhiteSpace(settlement.Reference) ? $"· {settlement.Reference}" : "") · @settlement.SettledAt.ToString("yyyy-MM-dd")</MudText>
+                            </MudListItemText>
+                        </MudListItem>
+                    }
+                </MudList>
+            }
+
+            @if (_claim.Status == "Submitted" && _claim.Rejections.Count > 0)
+            {
+                <MudDivider Class="my-2" />
+                <MudText Typo="Typo.subtitle2" Class="mb-1">Prior Rejections</MudText>
+                <MudList Dense="true">
+                    @foreach (var rejection in _claim.Rejections)
+                    {
+                        <MudListItem>
+                            <MudListItemText>
+                                @rejection.Code
+                                <MudText Typo="Typo.caption">@rejection.Reason</MudText>
+                                <MudText Typo="Typo.caption" Class="text-secondary">@rejection.RejectedAt.ToString("yyyy-MM-dd")</MudText>
+                            </MudListItemText>
+                        </MudListItem>
+                    }
+                </MudList>
+            }
+        }
+    </DialogContent>
+    <DialogActions>
+        <MudButton Color="Color.Default" OnClick="CancelAsync">Close</MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    [Parameter] public string ClaimId { get; set; } = string.Empty;
+    [Parameter] public string? PatientName { get; set; }
+    [Parameter] public string? ExaminationName { get; set; }
+    [Parameter] public string? PolicyNumber { get; set; }
+
+    [CascadingParameter] public IMudDialogInstance MudDialog { get; set; } = default!;
+
+    private static readonly string[] SettlementMethods = { "Check", "Wire Transfer", "Electronic Funds Transfer", "Adjustment" };
+
+    private ClaimDto? _claim;
+    private string _patientName = string.Empty;
+    private string _examinationName = string.Empty;
+    private string _policyNumber = string.Empty;
+    private decimal? _approvedAmount;
+    private string? _rejectionCode;
+    private string? _rejectionReason;
+    private decimal _settlementAmount;
+    private string _settlementMethod = "Check";
+    private string? _settlementReference;
+    private string? _loadError;
+    private bool _busy;
+
+    protected override async Task OnInitializedAsync()
+    {
+        _patientName = PatientName ?? string.Empty;
+        _examinationName = ExaminationName ?? string.Empty;
+        _policyNumber = PolicyNumber ?? string.Empty;
+        await LoadAsync();
+    }
+
+    private async Task LoadAsync()
+    {
+        _loadError = null;
+        try
+        {
+            _claim = await InsuranceService.GetClaimByIdAsync(ClaimId);
+            _loadError = null;
+        }
+        catch (ApiException ex)
+        {
+            _loadError = ex.Message;
+        }
+        catch (Exception)
+        {
+            _loadError = "Unable to reach the server.";
+        }
+    }
+
+    private async Task SubmitAsync()
+    {
+        _busy = true;
+        try
+        {
+            _claim = await InsuranceService.SubmitClaimAsync(ClaimId);
+            Snackbar.Add("Claim submitted.", Severity.Success);
+        }
+        catch (ApiException ex)
+        {
+            Snackbar.Add(ex.Message, Severity.Error);
+        }
+        finally
+        {
+            _busy = false;
+        }
+    }
+
+    private async Task ApproveAsync()
+    {
+        _busy = true;
+        try
+        {
+            var input = new AdjudicateClaimInput
+            {
+                Decision = "Approve",
+                ApprovedAmount = _approvedAmount,
+            };
+
+            _claim = await InsuranceService.AdjudicateClaimAsync(ClaimId, input);
+            Snackbar.Add("Claim approved.", Severity.Success);
+        }
+        catch (ApiException ex)
+        {
+            Snackbar.Add(ex.Message, Severity.Error);
+        }
+        finally
+        {
+            _busy = false;
+        }
+    }
+
+    private async Task RejectAsync()
+    {
+        _busy = true;
+        try
+        {
+            var input = new AdjudicateClaimInput
+            {
+                Decision = "Reject",
+                RejectionCode = _rejectionCode,
+                RejectionReason = _rejectionReason,
+            };
+
+            _claim = await InsuranceService.AdjudicateClaimAsync(ClaimId, input);
+            Snackbar.Add("Claim rejected.", Severity.Success);
+        }
+        catch (ApiException ex)
+        {
+            Snackbar.Add(ex.Message, Severity.Error);
+        }
+        finally
+        {
+            _busy = false;
+        }
+    }
+
+    private async Task ResubmitAsync()
+    {
+        _busy = true;
+        try
+        {
+            _claim = await InsuranceService.ResubmitClaimAsync(ClaimId);
+            Snackbar.Add("Claim resubmitted.", Severity.Success);
+        }
+        catch (ApiException ex)
+        {
+            Snackbar.Add(ex.Message, Severity.Error);
+        }
+        finally
+        {
+            _busy = false;
+        }
+    }
+
+    private async Task RecordSettlementAsync()
+    {
+        _busy = true;
+        try
+        {
+            var input = new RecordSettlementInput
+            {
+                Method = _settlementMethod,
+                Amount = _settlementAmount,
+                Reference = _settlementReference,
+            };
+
+            _claim = await InsuranceService.RecordSettlementAsync(ClaimId, input);
+            Snackbar.Add("Settlement recorded.", Severity.Success);
+        }
+        catch (ApiException ex)
+        {
+            Snackbar.Add(ex.Message, Severity.Error);
+        }
+        finally
+        {
+            _busy = false;
+        }
+    }
+
+    private void CancelAsync()
+        => MudDialog.Close();
+}
