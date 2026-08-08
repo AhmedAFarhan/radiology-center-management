@@ -31,6 +31,9 @@ using RadiologyCenter.Payroll.Infrastructure.Persistence;
 using RadiologyCenter.Reports.Application;
 using RadiologyCenter.Reports.Infrastructure;
 using RadiologyCenter.Reports.Infrastructure.Persistence;
+using RadiologyCenter.Insurance.Application;
+using RadiologyCenter.Insurance.Infrastructure;
+using RadiologyCenter.Insurance.Infrastructure.Persistence;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -84,6 +87,8 @@ builder.Services.AddPayrollApplication();
 builder.Services.AddPayrollInfrastructure(builder.Configuration);
 builder.Services.AddReportsApplication();
 builder.Services.AddReportsInfrastructure(builder.Configuration);
+builder.Services.AddInsuranceApplication();
+builder.Services.AddInsuranceInfrastructure(builder.Configuration);
 builder.Services.AddScoped<IItemSnapshotResolver, ItemSnapshotResolver>();
 builder.Services.AddScoped<IExaminationFeeResolver, ExaminationFeeResolver>();
 builder.Services.AddScoped<RadiologyCenter.Payroll.Application.Abstractions.IPayrollStaffDirectory, PayrollStaffDirectory>();
@@ -125,6 +130,9 @@ using (var scope = app.Services.CreateScope())
 
     var reportsDb = scope.ServiceProvider.GetRequiredService<ReportsDbContext>();
     reportsDb.Database.Migrate();
+
+    var insuranceDb = scope.ServiceProvider.GetRequiredService<InsuranceDbContext>();
+    insuranceDb.Database.Migrate();
 }
 
 app.UseMiddleware<ExceptionMiddleware>();

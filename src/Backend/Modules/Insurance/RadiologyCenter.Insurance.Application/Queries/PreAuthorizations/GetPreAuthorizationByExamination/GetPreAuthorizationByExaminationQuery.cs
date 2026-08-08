@@ -1,0 +1,3 @@
+namespace RadiologyCenter.Insurance.Application.Queries.PreAuthorizations.GetPreAuthorizationByExamination;
+
+public record GetPreAuthorizationByExaminationQuery(Guid ExaminationId) : IQuery;
