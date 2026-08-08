@@ -6,3 +6,4 @@ global using System.Threading.Tasks;
 global using RadiologyCenter.BuildingBlocks.Application.Abstractions;
 global using RadiologyCenter.BuildingBlocks.Domain.Results;
 global using RadiologyCenter.Insurance.Domain.Entities;
+global using RadiologyCenter.Insurance.Domain.Enumerations;

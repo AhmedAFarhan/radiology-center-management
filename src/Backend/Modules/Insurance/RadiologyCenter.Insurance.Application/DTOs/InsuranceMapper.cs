@@ -70,4 +70,14 @@ internal static class InsuranceMapper
             rejection.Code.Name,
             rejection.Reason,
             rejection.RejectedAt);
+
+    public static PolicyDocumentDto ToDto(this PolicyDocument document) =>
+        new(
+            document.Id,
+            document.PolicyId,
+            document.Type.Name,
+            document.FileName,
+            document.ContentType,
+            document.SizeInBytes,
+            document.UploadedAt);
 }

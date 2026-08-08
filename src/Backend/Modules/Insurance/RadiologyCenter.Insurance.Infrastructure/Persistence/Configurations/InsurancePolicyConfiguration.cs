@@ -27,5 +27,10 @@ public class InsurancePolicyConfiguration : IEntityTypeConfiguration<InsurancePo
         builder.HasIndex(p => p.PolicyNumber).IsUnique();
         builder.HasIndex(p => p.PatientId);
         builder.HasIndex(p => p.CompanyId);
+
+        builder.HasMany(p => p.Documents)
+               .WithOne()
+               .HasForeignKey(d => d.PolicyId)
+               .OnDelete(DeleteBehavior.Cascade);
     }
 }

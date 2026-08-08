@@ -7,6 +7,8 @@ namespace RadiologyCenter.Insurance.Domain.Entities;
 
 public sealed class InsurancePolicy : AuditableAggregateRoot<Guid>
 {
+    private readonly List<PolicyDocument> _documents = [];
+
     public Guid CompanyId { get; private set; }
     public Guid PatientId { get; private set; }
     public string PolicyNumber { get; private set; }
@@ -15,10 +17,24 @@ public sealed class InsurancePolicy : AuditableAggregateRoot<Guid>
     public DateTime? EffectiveTo { get; private set; }
     public PolicyStatus Status { get; private set; }
 
+    public IReadOnlyCollection<PolicyDocument> Documents => _documents.AsReadOnly();
+
     private InsurancePolicy()
     {
         PolicyNumber = string.Empty;
         Status = null!;
+    }
+
+    public PolicyDocument AddDocument(
+        DocumentType type,
+        string fileName,
+        string contentType,
+        string storedPath,
+        long sizeInBytes)
+    {
+        var document = PolicyDocument.Create(Id, type, fileName, contentType, storedPath, sizeInBytes);
+        _documents.Add(document);
+        return document;
     }
 
     public static InsurancePolicy Create(

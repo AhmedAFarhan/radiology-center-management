@@ -12,6 +12,7 @@ public class InsuranceDbContext : AppDbContext
     public DbSet<Claim> Claims => Set<Claim>();
     public DbSet<ClaimRejection> ClaimRejections => Set<ClaimRejection>();
     public DbSet<Settlement> Settlements => Set<Settlement>();
+    public DbSet<PolicyDocument> PolicyDocuments => Set<PolicyDocument>();
 
     public InsuranceDbContext(DbContextOptions<InsuranceDbContext> options) : base(options) { }
 
