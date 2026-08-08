@@ -1,0 +1,70 @@
+@inject ReportService ReportService
+@inject ISnackbar Snackbar
+
+<MudDialog>
+    <DialogContent>
+        <DialogHeader Icon="@Icons.Material.Filled.EditNote" Title="Amend Report" />
+        <MudText Typo="Typo.body2" Class="text-secondary mb-2">
+            Amending opens a new draft (v@(@CurrentVersion + 1)) for re-reading. Enter a reason for the amendment.
+        </MudText>
+        <MudTextField @bind-Value="_reason"
+                      Label="Amendment reason"
+                      Variant="Variant.Outlined"
+                      Margin="Margin.Dense"
+                      Immediate="true"
+                      FullWidth="true"
+                      Required="true"
+                      MaxLength="500"
+                      Disabled="_busy" />
+    </DialogContent>
+    <DialogActions>
+        <MudButton Color="Color.Default" OnClick="CancelAsync" Disabled="_busy">Back</MudButton>
+        <MudButton Color="Color.Primary" Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.EditNote" OnClick="SubmitAsync" Disabled="_busy || string.IsNullOrWhiteSpace(_reason)">
+            @if (_busy)
+            {
+                <MudProgressCircular Size="Size.Small" Indeterminate="true" Class="mx-1" />
+            }
+            else
+            {
+                <text>Amend Report</text>
+            }
+        </MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    [Parameter] public string ReportId { get; set; } = string.Empty;
+
+    [Parameter] public int CurrentVersion { get; set; }
+
+    [CascadingParameter] public IMudDialogInstance MudDialog { get; set; } = default!;
+
+    private string? _reason;
+    private bool _busy;
+
+    private async Task SubmitAsync()
+    {
+        _busy = true;
+        try
+        {
+            var report = await ReportService.AmendAsync(ReportId, _reason!);
+            Snackbar.Add("Report reopened for amendment.", Severity.Success);
+            MudDialog.Close(DialogResult.Ok(report));
+        }
+        catch (ApiException ex)
+        {
+            Snackbar.Add(ex.Message, Severity.Error);
+        }
+        catch (Exception)
+        {
+            Snackbar.Add("Unable to reach the server.", Severity.Error);
+        }
+        finally
+        {
+            _busy = false;
+        }
+    }
+
+    private void CancelAsync()
+        => MudDialog.Cancel();
+}

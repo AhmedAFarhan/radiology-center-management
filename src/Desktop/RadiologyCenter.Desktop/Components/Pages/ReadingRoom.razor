@@ -1,12 +1,20 @@
 @page "/radiologist"
 @attribute [Authorize]
+@inject ExaminationService ExaminationService
+@inject PatientService PatientService
+@inject ReportService ReportService
+@inject IDialogService DialogService
 @inject ISnackbar Snackbar
 
 <PageHeader Icon="@Icons.Material.Filled.Biotech" Title="Reading Room"
             Subtitle="Radiology reading worklist"
-            ShowSearch="false">
+            ShowSearch="false"
+            OnRefresh="RefreshQueueAsync">
     <MudChip T="string" Color="Color.Primary" Size="Size.Medium" Label="true" Variant="Variant.Outlined">
-        @RadiologySampleData.Studies.Count pending
+        @PendingCount pending
+    </MudChip>
+    <MudChip T="string" Color="Color.Secondary" Size="Size.Medium" Label="true" Variant="Variant.Outlined">
+        @Queue.Count() imaged
     </MudChip>
 </PageHeader>
 
@@ -27,32 +35,47 @@
                           Class="rr-search" />
         </div>
         <div class="rr-worklist-items">
-            @foreach (var study in Studies)
+            @if (_loadingQueue)
             {
-                var current = study;
-                <button type="button"
-                        class="rr-worklist-item @(IsSelected(current) ? "selected" : string.Empty)"
-                        @onclick="() => Select(current)">
-                    <div class="rr-item-top">
-                        <span class="rr-prio @PriorityClass(current.Priority)" title="@current.Priority"></span>
-                        <span class="rr-item-name">@current.PatientName</span>
-                        <span class="rr-item-time">@current.ScheduledLabel</span>
-                    </div>
-                    <div class="rr-item-exam">
-                        <MudIcon Icon="@Icons.Material.Filled.MedicalServices" Size="Size.Small" />
-                        <span>@current.ExamName</span>
-                    </div>
-                    <div class="rr-item-meta">
-                        <MudChip T="string" Size="Size.Small" Color="@StatusColor(current.Status)">@current.Status</MudChip>
-                        <MudChip T="string" Size="Size.Small" Color="@PriorityChipColor(current.Priority)">@current.Priority</MudChip>
-                    </div>
-                </button>
+                <MudProgressCircular Size="Size.Large" Class="mx-auto d-block py-8" Indeterminate="true" />
             }
-            @if (!Studies.Any())
+            else if (_queueError is not null)
+            {
+                <ErrorState Icon="@Icons.Material.Filled.CloudOff"
+                            Title="Could not load the queue"
+                            Message="@_queueError"
+                            RetryLabel="Retry"
+                            Action="LoadQueueAsync" />
+            }
+            else if (!Queue.Any())
             {
                 <EmptyState Icon="@Icons.Material.Filled.MedicalServices"
-                            Title="No studies match"
-                            Message="Try a different filter." />
+                            Title="No imaged studies"
+                            Message="Examinations that have been completed will appear here." />
+            }
+            else
+            {
+                @foreach (var item in Queue)
+                {
+                    var current = item;
+                    <button type="button"
+                            class="rr-worklist-item @(IsSelected(current) ? "selected" : string.Empty)"
+                            @onclick="() => SelectExamAsync(current)">
+                        <div class="rr-item-top">
+                            <span class="rr-prio @PriorityClass(current.Priority)" title="@current.Priority"></span>
+                            <span class="rr-item-name">@current.PatientName</span>
+                            <span class="rr-item-time">@current.CompletedLabel</span>
+                        </div>
+                        <div class="rr-item-exam">
+                            <MudIcon Icon="@Icons.Material.Filled.MedicalServices" Size="Size.Small" />
+                            <span>@current.ExamName</span>
+                        </div>
+                        <div class="rr-item-meta">
+                            <MudChip T="string" Size="Size.Small" Color="@ReportStatusColor(current.ReportStatus)">@current.ReportStatus</MudChip>
+                            <MudChip T="string" Size="Size.Small" Color="@PriorityChipColor(current.Priority)">@current.Priority</MudChip>
+                        </div>
+                    </button>
+                }
             }
         </div>
     </section>
@@ -64,7 +87,7 @@
                 <MudIcon Icon="@Icons.Material.Filled.Monitor" Size="Size.Small" />
                 <MudText Typo="Typo.subtitle1" Class="font-weight-medium">Image Viewer</MudText>
             </MudStack>
-            <span class="rr-modality">@Selected?.Modality</span>
+            <span class="rr-modality">@(Selected?.ExamName ?? "-")</span>
         </div>
         <div class="rr-viewer-stage">
             @if (Selected is null)
@@ -77,18 +100,25 @@
             {
                 <div class="rr-placeholder">
                     <MudIcon Icon="@Icons.Material.Filled.Biotech" Size="Size.Large" Class="rr-placeholder-icon" />
-                    <MudText Typo="Typo.h6" Class="text-secondary">@Selected.ExamName</MudText>
-                    <MudText Typo="Typo.body2" Class="text-secondary">Image from equipment - coming soon</MudText>
+                    <MudText Typo="Typo.h6" Class="text-secondary">@Selected.PatientName</MudText>
+                    <MudText Typo="Typo.body2" Class="text-secondary">@Selected.ExamName - @Selected.PatientCode</MudText>
+                    <MudText Typo="Typo.body2" Class="text-secondary">@Selected.Priority priority</MudText>
+                    <MudText Typo="Typo.caption" Class="mt-2">Series @(_selectedSeries) / @SeriesCount - sample image</MudText>
+                    <MudText Typo="Typo.caption" Class="mt-2">Image loader from PACS / equipment - coming soon</MudText>
                 </div>
             }
         </div>
         <div class="rr-thumbnails">
             <span class="rr-thumbs-label">Series</span>
-            @for (var i = 1; i <= 4; i++)
+            @for (var i = 1; i <= SeriesCount; i++)
             {
-                <div class="rr-thumb @(i == 1 ? "selected" : string.Empty)">
-                    <MudText Typo="Typo.caption" Class="text-secondary">S@i</MudText>
-                </div>
+                var index = i;
+                <button type="button"
+                        class="rr-thumb @(index == _selectedSeries ? "selected" : string.Empty)"
+                        title="Series S@index"
+                        @onclick="() => _selectedSeries = index">
+                    <MudText Typo="Typo.caption">S@index</MudText>
+                </button>
             }
         </div>
     </section>
@@ -103,6 +133,30 @@
                             Message="Select a study to start reading." />
             </div>
         }
+        else if (_loadingReport)
+        {
+            <div class="rr-report-empty">
+                <MudProgressCircular Size="Size.Large" Indeterminate="true" />
+            </div>
+        }
+        else if (_reportError is not null)
+        {
+            <div class="rr-report-empty">
+                <ErrorState Icon="@Icons.Material.Filled.ErrorOutline"
+                            Title="Could not load the report"
+                            Message="@_reportError"
+                            RetryLabel="Retry"
+                            Action="ReloadSelectedAsync" />
+            </div>
+        }
+        else if (_report is null)
+        {
+            <div class="rr-report-empty">
+                <EmptyState Icon="@Icons.Material.Filled.Assignment"
+                            Title="No report"
+                            Message="A draft was not created for this study." />
+            </div>
+        }
         else
         {
             <div class="rr-pane-header">
@@ -110,145 +164,735 @@
                     <MudAvatar Size="Size.Small" Color="Color.Primary" Class="text-subtitle2">@Initials(Selected.PatientName)</MudAvatar>
                     <div>
                         <MudText Typo="Typo.subtitle1" Class="font-weight-medium">@Selected.PatientName</MudText>
-                        <MudText Typo="Typo.caption" Class="text-secondary">@Selected.PatientCode</MudText>
+                        <MudText Typo="Typo.caption" Class="text-secondary">@Selected.PatientCode • v@(_report.CurrentVersionNumber)</MudText>
                     </div>
                 </MudStack>
-                <MudChip T="string" Size="Size.Small" Color="@StatusColor(Selected.Status)">@Selected.Status</MudChip>
+                <MudChip T="string" Size="Size.Small" Color="@ReportStatusColor(_report.Status)">@_report.Status</MudChip>
             </div>
 
             <div class="rr-patient-summary">
-                <MudStack Row="true" Spacing="2">
-                    <div class="rr-summary-cell"><span class="rr-summary-label">Age / Gender</span><span>@Selected.Age / @Selected.Gender</span></div>
-                    <div class="rr-summary-cell"><span class="rr-summary-label">Modality</span><span>@Selected.Modality - @Selected.BodyPart</span></div>
-                </MudStack>
                 <div class="rr-summary-block">
                     <span class="rr-summary-label">Clinical Indication</span>
                     <span class="rr-summary-value">@Selected.Indication</span>
                 </div>
-                <div class="rr-summary-block">
-                    <span class="rr-summary-label">Radiologist</span>
-                    <span class="rr-summary-value">@Selected.Radiologist</span>
-                </div>
+                <MudStack Row="true" Spacing="2">
+                    <div class="rr-summary-cell"><span class="rr-summary-label">Exam</span><span>@Selected.ExamName- @Selected.Priority</span></div>
+                    <div class="rr-summary-cell"><span class="rr-summary-label">Status</span><span>@_report.Status</span></div>
+                </MudStack>
             </div>
 
             <MudDivider />
 
             <div class="rr-report-body">
-                <MudTextField T="string"
-                              Label="Findings"
-                              Value="@_findings"
-                              ValueChanged="OnFindingsChanged"
-                              Variant="Variant.Outlined"
-                              Margin="Margin.Dense"
-                              Lines="5"
-                              Disabled="@_signed"
-                              Immediate="true" />
-                <MudTextField T="string"
-                              Label="Impression / Conclusion"
-                              Value="@_impression"
-                              ValueChanged="OnImpressionChanged"
-                              Variant="Variant.Outlined"
-                              Margin="Margin.Dense"
-                              Lines="3"
-                              Disabled="@_signed"
-                              Immediate="true"
-                              Class="mt-2" />
-                <MudTextField T="string"
-                              Label="Recommendation"
-                              Value="@_recommendation"
-                              ValueChanged="OnRecommendationChanged"
-                              Variant="Variant.Outlined"
-                              Margin="Margin.Dense"
-                              Lines="2"
-                              Disabled="@_signed"
-                              Immediate="true"
-                              Class="mt-2" />
+                @if (!string.IsNullOrWhiteSpace(_report.CancelReason) && _report.Status == "Cancelled")
+                {
+                    <MudAlert Severity="Severity.Error" Variant="Variant.Outlined" Dense="true" Class="mb-3">
+                        Cancelled: @_report.CancelReason
+                    </MudAlert>
+                }
+
+                <div class="d-flex align-center mb-2">
+                    <MudText Typo="Typo.subtitle1" Class="font-weight-medium">Sections</MudText>
+                    <MudSpacer />
+                    @if (CanEdit)
+                    {
+                        <MudIconButton Icon="@Icons.Material.Filled.Newspaper"
+                                       Size="Size.Small"
+                                       OnClick="OpenTemplatePicker" />
+                    }
+                    <MudIconButton Icon="@Icons.Material.Filled.History"
+                                   Size="Size.Small"
+                                   OnClick="OpenVersionsAsync" />
+                </div>
+
+                @foreach (var section in _sections)
+                {
+                    var currentSection = section;
+                    <MudTextField T="string"
+                                  @bind-Value="currentSection.Body"
+                                  Label="@currentSection.Label"
+                                  Variant="Variant.Outlined"
+                                  Margin="Margin.Dense"
+                                  Lines="@(currentSection.Position == 3 ? 5 : 3)"
+                                  Disabled="@(!CanEdit || currentSection.Locked)"
+                                  Immediate="true"
+                                  Class="@(currentSection.Locked ? "mb-3" : "mb-3")" />
+                }
+
+                <MudDivider Class="my-3" />
+
+                <MudText Typo="Typo.subtitle1" Class="font-weight-medium mb-2">Findings</MudText>
+                @if (_findings.Any())
+                {
+                    @foreach (var finding in _findings)
+                    {
+                        var currentFinding = finding;
+                        <div class="d-flex align-center mb-2 pa-2" style="border:1px solid var(--mud-palette-lines-default,#e0e0e0);border-radius:8px;">
+                            <MudStack Spacing="0" Class="flex-grow-1">
+                                <MudText Typo="Typo.subtitle2">@currentFinding.Region</MudText>
+                                <MudText Typo="Typo.body2" Class="text-secondary">@currentFinding.Description</MudText>
+                            </MudStack>
+                            @if (CanEdit)
+                            {
+                                <MudSelect T="string"
+                                           Value="@currentFinding.Severity"
+                                           ValueChanged="@(s => OnSeverityChangedAsync(currentFinding, s))"
+                                           Margin="Margin.Dense"
+                                           Variant="Variant.Outlined"
+                                           Class="flex-shrink-0"
+                                           Style="min-width:120px;">
+                                    @foreach (var level in SeverityOptions)
+                                    {
+                                        <MudSelectItem T="string" Value="@level">@level</MudSelectItem>
+                                    }
+                                </MudSelect>
+                                <MudIconButton Icon="@Icons.Material.Filled.Delete"
+                                               Size="Size.Small"
+                                               Color="Color.Error"
+                                               OnClick="@(() => RemoveFindingAsync(currentFinding))"
+                                               Class="ms-1" />
+                            }
+                        </div>
+                    }
+                }
+                else
+                {
+                    <MudText Typo="Typo.body2" Class="text-secondary">No findings recorded.</MudText>
+                }
+
+                @if (CanEdit)
+                {
+                    <MudDivider Class="my-3" />
+                    <MudText Typo="Typo.subtitle1" Class="font-weight-medium mb-2">Add Finding</MudText>
+                    <MudTextField T="string"
+                                  @bind-Value="_newRegion"
+                                  Label="Region / anatomy"
+                                  Variant="Variant.Outlined"
+                                  Margin="Margin.Dense"
+                                  Immediate="true" />
+                    <MudTextField T="string"
+                                  @bind-Value="_newDescription"
+                                  Label="Description"
+                                  Variant="Variant.Outlined"
+                                  Margin="Margin.Dense"
+                                  Lines="2"
+                                  Immediate="true"
+                                  Class="mt-2" />
+                    <MudSelect T="string"
+                               @bind-Value="_newSeverity"
+                               Label="Severity"
+                               Variant="Variant.Outlined"
+                               Margin="Margin.Dense"
+                               Class="mt-2">
+                        @foreach (var level in SeverityOptions)
+                        {
+                            <MudSelectItem T="string" Value="@level">@level</MudSelectItem>
+                        }
+                    </MudSelect>
+                    <MudButton Variant="Variant.Filled"
+                               Color="Color.Primary"
+                               Size="Size.Small"
+                               StartIcon="@Icons.Material.Filled.Add"
+                               Class="mt-2"
+                               OnClick="AddFindingAsync"
+                               Disabled="@(string.IsNullOrWhiteSpace(_newRegion) || string.IsNullOrWhiteSpace(_newDescription))">Add Finding</MudButton>
+                }
             </div>
 
             <div class="rr-report-actions">
-                <MudStack Row="true" Spacing="2">
-                    <MudButton Variant="Variant.Outlined" Color="Color.Default" StartIcon="@Icons.Material.Filled.Save" OnClick="SaveDraftAsync" Disabled="_signed">Draft</MudButton>
-                    <MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.CheckCircle" OnClick="SignCompleteAsync" Disabled="_signed">Sign</MudButton>
-                </MudStack>
-                <MudButton Variant="Variant.Text" Color="Color.Default" StartIcon="@Icons.Material.Filled.Description" OnClick="ExportWordAsync">Export Word</MudButton>
+                @if (CanEdit)
+                {
+                    <MudStack Row="true" Spacing="2">
+                        <MudButton Variant="Variant.Outlined" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Save" OnClick="SaveAsync" Disabled="_busy">Save Draft</MudButton>
+                        <MudButton Variant="Variant.Text" Color="Color.Default" StartIcon="@Icons.Material.Filled.CancelPresentation" OnClick="OpenCancelAsync" Disabled="_busy">Cancel</MudButton>
+                    </MudStack>
+                    <MudButton Variant="Variant.Filled" Color="Color.Success" StartIcon="@Icons.Material.Filled.CheckCircle" OnClick="FinalizeAsync" Disabled="_busy">Sign Report</MudButton>
+                }
+                else if (_report.Status == "Finalized")
+                {
+                    <MudStack Row="true" Spacing="2">
+                        <MudButton Variant="Variant.Outlined" Color="Color.Primary" StartIcon="@Icons.Material.Filled.EditNote" OnClick="OpenAmendAsync" Disabled="_busy">Amend</MudButton>
+                        <MudChip T="string" Color="Color.Success" Size="Size.Medium" Variant="Variant.Filled" Label="true">Signed @(_report.FinalizedAt?.ToString("yyyy-MM-dd") ?? "-")</MudChip>
+                    </MudStack>
+                }
+                else if (_report.Status == "Cancelled")
+                {
+                    <MudChip T="string" Color="Color.Error" Size="Size.Medium" Variant="Variant.Outlined">Cancelled</MudChip>
+                }
             </div>
         }
     </section>
 </div>
 
 @code {
-    private string? _filter;
-    private string _findings = string.Empty;
-    private string _impression = string.Empty;
-    private string _recommendation = string.Empty;
-    private bool _signed;
-    private RadiologyStudy? _selected;
-    private bool _selectedSet;
+    private static readonly string[] SeverityOptions = { "None", "Mild", "Moderate", "Severe" };
 
-    private IEnumerable<RadiologyStudy> Studies
+    private readonly List<QueueExam> _queue = new();
+    private readonly Dictionary<string, PatientDto> _patientCache = new(StringComparer.OrdinalIgnoreCase);
+    private readonly Dictionary<string, string> _reportStatusByExam = new(StringComparer.OrdinalIgnoreCase);
+
+    private string? _filter;
+    private bool _loadingQueue;
+    private string? _queueError;
+    private bool _loaded;
+
+    private QueueExam? _selected;
+    private bool _loadingReport;
+    private string? _reportError;
+    private ReportDto? _report;
+
+    private int _selectedSeries = 1;
+
+    private readonly List<SectionEditor> _sections = new();
+    private readonly List<ReportFindingDto> _findings = new();
+
+    private string _newRegion = string.Empty;
+    private string _newDescription = string.Empty;
+    private string _newSeverity = "None";
+    private bool _busy;
+
+    private record CanonicalSection(string Type, string Label, int Position);
+
+    private static readonly CanonicalSection[] CanonicalTypes =
+    {
+        new("ClinicalIndication", "Clinical Indication", 1),
+        new("Technique", "Technique", 2),
+        new("Findings", "Findings", 3),
+        new("Impression", "Impression / Conclusion", 4),
+        new("Recommendation", "Recommendation", 5),
+    };
+
+    private IEnumerable<QueueExam> Queue
     {
         get
         {
             if (string.IsNullOrWhiteSpace(_filter))
-                return RadiologySampleData.Studies;
+                return _queue;
 
             var f = _filter.Trim();
-            return RadiologySampleData.Studies.Where(s =>
-                s.PatientName.Contains(f, StringComparison.OrdinalIgnoreCase) ||
-                s.ExamName.Contains(f, StringComparison.OrdinalIgnoreCase) ||
-                s.Modality.Contains(f, StringComparison.OrdinalIgnoreCase) ||
-                s.Status.Contains(f, StringComparison.OrdinalIgnoreCase));
+            return _queue.Where(q =>
+                q.PatientName.Contains(f, StringComparison.OrdinalIgnoreCase) ||
+                q.ExamName.Contains(f, StringComparison.OrdinalIgnoreCase) ||
+                q.PatientCode.Contains(f, StringComparison.OrdinalIgnoreCase) ||
+                q.Priority.Contains(f, StringComparison.OrdinalIgnoreCase) ||
+                q.ReportStatus.Contains(f, StringComparison.OrdinalIgnoreCase));
         }
     }
 
-    private RadiologyStudy? Selected => _selected;
+    private int PendingCount => _queue.Count(q => q.ReportStatus is "New" or "Draft");
+
+    private bool CanEdit => _report is { Status: "Draft" };
+
+    private QueueExam? Selected => _selected;
+
+    private static int SeriesCount => 4;
 
     protected override void OnAfterRender(bool firstRender)
     {
-        if (firstRender && !_selectedSet)
+        base.OnAfterRender(firstRender);
+        if (firstRender && !_loaded)
         {
-            _selectedSet = true;
-            var current = RadiologySampleData.Studies.FirstOrDefault(s => s.Status is "InProgress" or "Draft");
-            if (current is not null)
-                Select(current);
-            StateHasChanged();
+            _loaded = true;
+            _ = LoadQueueAsync();
         }
     }
 
-    private bool IsSelected(RadiologyStudy study) => Selected == study;
+    private bool IsSelected(QueueExam exam) => _selected?.Id == exam.Id;
 
-    private void Select(RadiologyStudy study)
+    private async Task LoadQueueAsync()
     {
-        _selected = study;
-        _findings = study.Findings;
-        _impression = study.Impression;
-        _recommendation = study.Recommendation;
-        _signed = study.Status == "Completed";
+        _loadingQueue = true;
+        _queueError = null;
+        try
+        {
+            var exams = await ExaminationService.GetPagedAsync(null, null, false, 1, 100);
+            var completed = exams.Items.Where(e => e.Status == "Completed").ToList();
+
+            IReadOnlyList<ReportListItemDto> reportItems = Array.Empty<ReportListItemDto>();
+            try
+            {
+                var reports = await ReportService.GetPagedAsync(null, null, false, 1, 100);
+                reportItems = reports.Items;
+            }
+            catch (Exception)
+            {
+                // report status badges are best-effort
+            }
+
+            _reportStatusByExam.Clear();
+            foreach (var report in reportItems)
+                _reportStatusByExam[report.ExaminationId] = report.Status;
+
+            _queue.Clear();
+            foreach (var exam in completed)
+            {
+                var patient = await GetPatientAsync(exam.PatientId);
+                _queue.Add(new QueueExam
+                {
+                    Id = exam.Id,
+                    PatientId = exam.PatientId,
+                    PatientName = patient?.FullName ?? $"Patient {exam.PatientId}",
+                    PatientCode = patient?.PatientCode ?? "-",
+                    ExamName = exam.ExaminationTypeName ?? "Examination",
+                    CompletedAt = exam.CompletedAt,
+                    Priority = exam.Priority,
+                    Indication = exam.ClinicalIndication,
+                    AssignedRadiologistId = exam.RadiologistId,
+                    ReportStatus = _reportStatusByExam.GetValueOrDefault(exam.Id, "New"),
+                });
+            }
+
+            _queue.Sort((a, b) => (b.CompletedAt ?? DateTime.MinValue).CompareTo(a.CompletedAt ?? DateTime.MinValue));
+        }
+        catch (Exception)
+        {
+            _queueError = "Unable to reach the server.";
+        }
+        finally
+        {
+            _loadingQueue = false;
+        }
+    }
+
+    private async Task<PatientDto?> GetPatientAsync(string patientId)
+    {
+        if (_patientCache.TryGetValue(patientId, out var cached))
+            return cached;
+        try
+        {
+            var patient = await PatientService.GetByIdAsync(patientId);
+            _patientCache[patientId] = patient;
+            return patient;
+        }
+        catch
+        {
+            return null;
+        }
     }
 
     private void OnFilterChanged(string? value)
+        => _filter = value;
+
+    private async Task SelectExamAsync(QueueExam item)
     {
-        _filter = value;
-        if (Studies.Any(s => s != _selected) && (Selected is null || !Studies.Contains(Selected)))
+        _selected = item;
+        _selectedSeries = 1;
+        _loadingReport = true;
+        _reportError = null;
+        _report = null;
+        StateHasChanged();
+        try
         {
-            var first = Studies.FirstOrDefault();
-            if (first is not null)
-                Select(first);
+            await LoadReportForExamAsync(item);
+        }
+        catch (Exception)
+        {
+            _reportError = "Unable to load the report.";
+        }
+        finally
+        {
+            _loadingReport = false;
         }
     }
 
-    private void OnFindingsChanged(string value) => _findings = value;
-    private void OnImpressionChanged(string value) => _impression = value;
-    private void OnRecommendationChanged(string value) => _recommendation = value;
-
-    private Color StatusColor(string status) => status switch
+    private async Task ReloadSelectedAsync()
     {
-        "Completed" => Color.Success,
+        if (_selected is null)
+            return;
+        await SelectExamAsync(_selected);
+    }
+
+    private async Task RefreshQueueAsync()
+    {
+        await LoadQueueAsync();
+        if (_selected is not null)
+        {
+            await SelectExamAsync(_selected);
+        }
+    }
+
+    private async Task LoadReportForExamAsync(QueueExam item)
+    {
+        ReportDto report;
+        try
+        {
+            report = await ReportService.GetByExaminationAsync(item.Id);
+        }
+        catch (ApiException ex) when (ex.StatusCode == 404)
+        {
+            report = await CreateDraftAsync(item);
+        }
+
+        _report = report;
+        BuildEditor(report);
+    }
+
+    private async Task<ReportDto> CreateDraftAsync(QueueExam item)
+    {
+        var draft = await ReportService.CreateDraftAsync(new CreateReportDraftInput
+        {
+            ExaminationId = item.Id,
+            PatientId = item.PatientId,
+            RadiologistId = item.AssignedRadiologistId ?? string.Empty,
+        });
+
+        if (!string.IsNullOrWhiteSpace(item.Indication))
+        {
+            draft = await ReportService.UpsertSectionAsync(draft.Id, new UpsertReportSectionInput
+            {
+                SectionType = "ClinicalIndication",
+                Title = "Clinical Indication",
+                Body = item.Indication,
+                Position = 1,
+                IsLocked = false,
+            });
+        }
+
+        _reportStatusByExam[item.Id] = "Draft";
+        item.ReportStatus = "Draft";
+        return draft;
+    }
+
+    private void BuildEditor(ReportDto report)
+    {
+        _sections.Clear();
+        var byType = (report.CurrentVersion?.Sections ?? Array.Empty<ReportSectionDto>())
+            .GroupBy(s => s.SectionType)
+            .ToDictionary(g => g.Key, g => g.First(), StringComparer.OrdinalIgnoreCase);
+
+        foreach (var canonical in CanonicalTypes)
+        {
+            if (byType.TryGetValue(canonical.Type, out var section))
+            {
+                _sections.Add(new SectionEditor
+                {
+                    Type = section.SectionType,
+                    Label = section.Title ?? canonical.Label,
+                    Body = section.Body ?? string.Empty,
+                    Position = section.Position,
+                    Locked = section.IsLocked,
+                    Exists = true,
+                });
+            }
+            else
+            {
+                _sections.Add(new SectionEditor
+                {
+                    Type = canonical.Type,
+                    Label = canonical.Label,
+                    Body = string.Empty,
+                    Position = canonical.Position,
+                    Locked = false,
+                    Exists = false,
+                });
+            }
+        }
+
+        // Include any server-defined sections that are not canonical.
+        foreach (var section in (report.CurrentVersion?.Sections ?? Array.Empty<ReportSectionDto>())
+                     .Where(s => !CanonicalTypes.Any(c => c.Type.Equals(s.SectionType, StringComparison.OrdinalIgnoreCase)))
+                     .OrderBy(s => s.Position))
+        {
+            _sections.Add(new SectionEditor
+            {
+                Type = section.SectionType,
+                Label = section.Title ?? section.SectionType,
+                Body = section.Body ?? string.Empty,
+                Position = section.Position,
+                Locked = section.IsLocked,
+                Exists = true,
+            });
+        }
+
+        _sections.Sort((a, b) => a.Position.CompareTo(b.Position));
+
+        _findings.Clear();
+        _findings.AddRange(report.CurrentVersion?.Findings ?? Array.Empty<ReportFindingDto>());
+    }
+
+    private async Task SaveAsync()
+    {
+        if (!CanEdit || _report is null)
+            return;
+
+        _busy = true;
+        try
+        {
+            ReportDto? latest = null;
+            var touched = 0;
+            foreach (var section in _sections)
+            {
+                if (section.Locked)
+                    continue;
+
+                if (!section.Exists && string.IsNullOrWhiteSpace(section.Body))
+                    continue;
+
+                var input = new UpsertReportSectionInput
+                {
+                    SectionType = section.Type,
+                    Title = section.Label,
+                    Body = section.Body ?? string.Empty,
+                    Position = section.Position,
+                    IsLocked = false,
+                };
+                latest = await ReportService.UpsertSectionAsync(_report.Id, input);
+                touched++;
+            }
+
+            if (latest is not null)
+            {
+                _report = latest;
+                BuildEditor(latest);
+                Snackbar.Add("Draft saved.", Severity.Success);
+            }
+        }
+        catch (ApiException ex)
+        {
+            Snackbar.Add(ex.Message, Severity.Error);
+        }
+        catch (Exception)
+        {
+            Snackbar.Add("Unable to reach the server.", Severity.Error);
+        }
+        finally
+        {
+            _busy = false;
+        }
+    }
+
+    private async Task FinalizeAsync()
+    {
+        if (!CanEdit || _report is null)
+            return;
+
+        var confirmed = await DialogService.ShowMessageBoxAsync(
+            "Sign Report",
+            "Finalizing the report locks this version and marks the study as reported. Continue?",
+            yesText: "Sign & Finalize",
+            cancelText: "Back");
+
+        if (confirmed is not true)
+            return;
+
+        _busy = true;
+        try
+        {
+            _report = await ReportService.FinalizeAsync(_report.Id);
+            BuildEditor(_report);
+            if (_selected is not null)
+            {
+                _selected.ReportStatus = "Finalized";
+                _reportStatusByExam[_selected.Id] = "Finalized";
+            }
+            Snackbar.Add("Report signed.", Severity.Success);
+        }
+        catch (ApiException ex)
+        {
+            Snackbar.Add(ex.Message, Severity.Error);
+        }
+        catch (Exception)
+        {
+            Snackbar.Add("Unable to reach the server.", Severity.Error);
+        }
+        finally
+        {
+            _busy = false;
+        }
+    }
+
+    private async Task AddFindingAsync()
+    {
+        if (!CanEdit || _report is null)
+            return;
+
+        _busy = true;
+        try
+        {
+            await ReportService.AddFindingAsync(_report.Id, new AddReportFindingInput
+            {
+                Region = _newRegion.Trim(),
+                Description = _newDescription.Trim(),
+                Severity = _newSeverity,
+            });
+
+            _newRegion = string.Empty;
+            _newDescription = string.Empty;
+            _newSeverity = "None";
+            await ReloadReportAsync();
+            Snackbar.Add("Finding added.", Severity.Success);
+        }
+        catch (ApiException ex)
+        {
+            Snackbar.Add(ex.Message, Severity.Error);
+        }
+        catch (Exception)
+        {
+            Snackbar.Add("Unable to reach the server.", Severity.Error);
+        }
+        finally
+        {
+            _busy = false;
+        }
+    }
+
+    private async Task OnSeverityChangedAsync(ReportFindingDto finding, string severity)
+    {
+        if (_report is null)
+            return;
+
+        try
+        {
+            await ReportService.UpdateFindingAsync(_report.Id, finding.Id, new UpdateReportFindingInput
+            {
+                Description = finding.Description,
+                Severity = severity,
+            });
+            await ReloadReportAsync();
+            Snackbar.Add("Finding updated.", Severity.Success);
+        }
+        catch (ApiException ex)
+        {
+            Snackbar.Add(ex.Message, Severity.Error);
+        }
+        catch (Exception)
+        {
+            Snackbar.Add("Unable to reach the server.", Severity.Error);
+        }
+    }
+
+    private async Task RemoveFindingAsync(ReportFindingDto finding)
+    {
+        if (_report is null)
+            return;
+
+        var confirmed = await DialogService.ShowMessageBoxAsync(
+            "Remove finding",
+            $"Remove '{finding.Region}'?",
+            yesText: "Remove",
+            cancelText: "Keep");
+
+        if (confirmed is not true)
+            return;
+
+        try
+        {
+            await ReportService.RemoveFindingAsync(_report.Id, finding.Id);
+            await ReloadReportAsync();
+            Snackbar.Add("Finding removed.", Severity.Success);
+        }
+        catch (ApiException ex)
+        {
+            Snackbar.Add(ex.Message, Severity.Error);
+        }
+        catch (Exception)
+        {
+            Snackbar.Add("Unable to reach the server.", Severity.Error);
+        }
+    }
+
+    private async Task ReloadReportAsync()
+    {
+        if (_selected is null)
+            return;
+        var report = await ReportService.GetByExaminationAsync(_selected.Id);
+        _report = report;
+        BuildEditor(report);
+    }
+
+    private async Task OpenAmendAsync()
+    {
+        if (_report is null)
+            return;
+
+        var options = new DialogOptions { CloseButton = true, MaxWidth = MaxWidth.Small, FullWidth = true };
+        var parameters = new DialogParameters<AmendReportDialog>
+        {
+            { nameof(AmendReportDialog.ReportId), _report.Id },
+            { nameof(AmendReportDialog.CurrentVersion), _report.CurrentVersionNumber },
+        };
+
+        var dialog = await DialogService.ShowAsync<AmendReportDialog>("Amend Report", parameters, options);
+        var result = await dialog.Result;
+        if (result is { Canceled: false } && result.Data is ReportDto amended)
+        {
+            _report = amended;
+            BuildEditor(amended);
+            if (_selected is not null)
+                _selected.ReportStatus = "Draft";
+            Snackbar.Add("Report reopened for amendment.", Severity.Success);
+        }
+    }
+
+    private async Task OpenCancelAsync()
+    {
+        if (_report is null)
+            return;
+
+        var parameters = new DialogParameters<CancelReportDialog>
+        {
+            { nameof(CancelReportDialog.ReportId), _report.Id },
+        };
+
+        var dialog = await DialogService.ShowAsync<CancelReportDialog>("Cancel Report", parameters);
+        var result = await dialog.Result;
+        if (result is { Canceled: false, Data: true })
+        {
+            await ReloadReportAsync();
+            if (_selected is not null)
+                _selected.ReportStatus = "Cancelled";
+        }
+    }
+
+    private async Task OpenTemplatePicker()
+    {
+        if (_report is null)
+            return;
+
+        var dialog = await DialogService.ShowAsync<ReportTemplatePickerDialog>("Report Template");
+        var result = await dialog.Result;
+        if (result?.Canceled != false || result.Data is not string templateId || _report is null)
+            return;
+
+        try
+        {
+            _report = await ReportService.ApplyTemplateAsync(_report.Id, templateId);
+            BuildEditor(_report);
+            Snackbar.Add("Template applied.", Severity.Success);
+        }
+        catch (ApiException ex)
+        {
+            Snackbar.Add(ex.Message, Severity.Error);
+        }
+        catch (Exception)
+        {
+            Snackbar.Add("Unable to reach the server.", Severity.Error);
+        }
+    }
+
+    private async Task OpenVersionsAsync()
+    {
+        if (_report is null)
+            return;
+
+        var parameters = new DialogParameters<ReportVersionsDialog>
+        {
+            { nameof(ReportVersionsDialog.ReportId), _report.Id },
+        };
+
+        await DialogService.ShowAsync<ReportVersionsDialog>("Report History", parameters);
+    }
+
+    private static Color ReportStatusColor(string status) => status switch
+    {
         "Draft" => Color.Info,
+        "Finalized" => Color.Success,
+        "Cancelled" => Color.Error,
+        "New" => Color.Secondary,
         _ => Color.Secondary,
     };
 
-    private Color PriorityChipColor(string priority) => priority switch
+    private static Color PriorityChipColor(string priority) => priority switch
     {
         "Stat" => Color.Error,
         "Urgent" => Color.Warning,
@@ -262,27 +906,37 @@
         _ => "routine",
     };
 
-    private void SaveDraftAsync()
-    {
-        Snackbar.Add("Draft saved.", Severity.Info);
-    }
-
-    private void SignCompleteAsync()
-    {
-        _signed = true;
-        Snackbar.Add("Report signed. Study marked as Completed.", Severity.Success);
-    }
-
-    private void ExportWordAsync()
-    {
-        Snackbar.Add("Word document export is coming soon.", Severity.Info);
-    }
-
     private static string Initials(string name)
     {
         if (string.IsNullOrWhiteSpace(name))
             return "?";
         var parts = name.Split(' ', StringSplitOptions.RemoveEmptyEntries);
         return string.Concat(parts.Take(2).Select(p => p[0])).ToUpperInvariant();
+    }
+
+    private sealed class QueueExam
+    {
+        public string Id { get; init; } = string.Empty;
+        public string PatientId { get; init; } = string.Empty;
+        public string PatientName { get; init; } = string.Empty;
+        public string PatientCode { get; init; } = string.Empty;
+        public string ExamName { get; init; } = string.Empty;
+        public DateTime? CompletedAt { get; init; }
+        public string Priority { get; init; } = string.Empty;
+        public string Indication { get; init; } = string.Empty;
+        public string? AssignedRadiologistId { get; init; }
+        public string ReportStatus { get; set; } = "New";
+
+        public string CompletedLabel => CompletedAt?.ToString("yyyy-MM-dd") ?? string.Empty;
+    }
+
+    private sealed class SectionEditor
+    {
+        public string Type { get; set; } = string.Empty;
+        public string Label { get; set; } = string.Empty;
+        public string Body { get; set; } = string.Empty;
+        public int Position { get; set; }
+        public bool Locked { get; set; }
+        public bool Exists { get; set; }
     }
 }

@@ -1,0 +1,113 @@
+@inject ReportService ReportService
+@inject ISnackbar Snackbar
+
+<MudDialog>
+    <DialogContent>
+        <DialogHeader Icon="@Icons.Material.Filled.History" Title="Report History" />
+
+        <div style="max-height: 440px; overflow-y: auto;">
+            @if (_loading)
+            {
+                <MudProgressCircular Size="Size.Large" Class="mx-auto d-block py-6" Indeterminate="true" />
+            }
+            else if (_error is not null)
+            {
+                <ErrorState Title="Could not load history"
+                            Message="@_error"
+                            RetryLabel="Retry"
+                            Action="LoadAsync" />
+            }
+            else if (!_versions.Any())
+            {
+                <EmptyState Icon="@Icons.Material.Filled.History" Title="No versions" Message="No report versions were found." />
+            }
+            else
+            {
+                @foreach (var version in _versions.OrderByDescending(v => v.VersionNumber))
+                {
+                    <MudPaper Elevation="1" Class="pa-3 mb-3">
+                        <div class="mb-1">
+                            <MudChip T="string" Size="Size.Small" Color="@(version.VersionNumber == _versions.Count ? Color.Primary : Color.Default)">v@version.VersionNumber</MudChip>
+                            <MudText Typo="Typo.caption" Class="text-secondary ms-2 d-inline">@(version.CreatedAt.ToString("f"))</MudText>
+                        </div>
+                        @if (!string.IsNullOrWhiteSpace(version.AmendmentReason))
+                        {
+                            <MudText Typo="Typo.body2" Class="text-secondary mb-2">Amended: @version.AmendmentReason</MudText>
+                        }
+                        @foreach (var vsection in version.Sections.OrderBy(s => s.Position))
+                        {
+                            <div class="mb-1">
+                                <MudText Typo="Typo.subtitle2" Class="font-weight-medium">@vsection.Title</MudText>
+                                @if (string.IsNullOrWhiteSpace(vsection.Body))
+                                {
+                                    <MudText Typo="Typo.caption" Class="text-secondary">-</MudText>
+                                }
+                                else
+                                {
+                                    <MudText Typo="Typo.body2">@vsection.Body</MudText>
+                                }
+                            </div>
+                        }
+                        @if (version.Findings.Any())
+                        {
+                            <MudDivider Class="my-2" />
+                            <MudText Typo="Typo.subtitle2" Class="font-weight-medium mb-1">Findings</MudText>
+                            @foreach (var finding in version.Findings.OrderBy(f => f.Position))
+                            {
+                                <div class="mb-1">
+                                    <MudChip T="string" Size="Size.Small" Color="@SeverityColor(finding.Severity)" Variant="Variant.Outlined" Class="me-1">@finding.Severity</MudChip>
+                                    <MudText Typo="Typo.body2" Class="d-inline">@finding.Region - @finding.Description</MudText>
+                                </div>
+                            }
+                        }
+                    </MudPaper>
+                }
+            }
+        </div>
+    </DialogContent>
+    <DialogActions>
+        <MudButton Color="Color.Default" OnClick="CancelAsync">Close</MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    [Parameter] public string ReportId { get; set; } = string.Empty;
+
+    [CascadingParameter] public IMudDialogInstance MudDialog { get; set; } = default!;
+
+    private bool _loading;
+    private string? _error;
+    private IReadOnlyList<ReportVersionDto> _versions = Array.Empty<ReportVersionDto>();
+
+    protected override async Task OnInitializedAsync()
+        => await LoadAsync();
+
+    private async Task LoadAsync()
+    {
+        _loading = true;
+        _error = null;
+        try
+        {
+            _versions = await ReportService.GetVersionsAsync(ReportId);
+        }
+        catch (Exception ex)
+        {
+            _error = ex.Message;
+        }
+        finally
+        {
+            _loading = false;
+        }
+    }
+
+    private static Color SeverityColor(string severity) => severity switch
+    {
+        "Severe" => Color.Error,
+        "Moderate" => Color.Warning,
+        "Mild" => Color.Info,
+        _ => Color.Default,
+    };
+
+    private void CancelAsync()
+        => MudDialog.Cancel();
+}

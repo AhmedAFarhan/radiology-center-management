@@ -144,7 +144,8 @@ public sealed class RadiologyReport : AuditableAggregateRoot<Guid>
         _versions.Add(amendment);
 
         CurrentVersionNumber = nextNumber;
-        FinalizedAt = DateTime.UtcNow;
+        Status = ReportStatus.Draft;
+        FinalizedAt = null;
 
         RaiseDomainEvent(new ReportAmendedEvent(Id, nextNumber, reason));
     }

@@ -869,10 +869,18 @@ h1:focus {
     display: grid;
     place-items: center;
     flex: 0 0 64px;
+    cursor: pointer;
+    transition: border-color 0.15s ease, color 0.15s ease;
+}
+
+.rr-thumb:hover {
+    border-color: rgba(255, 255, 255, 0.4);
+    color: rgba(255, 255, 255, 0.8);
 }
 
 .rr-thumb.selected {
     border-color: var(--mud-palette-primary);
+    color: #ffffff;
 }
 
 .rr-report-empty {

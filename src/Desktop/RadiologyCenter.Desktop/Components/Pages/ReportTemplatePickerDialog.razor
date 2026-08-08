@@ -1,0 +1,124 @@
+@inject ReportService ReportService
+@inject ISnackbar Snackbar
+
+<MudDialog>
+    <DialogContent>
+        <DialogHeader Icon="@Icons.Material.Filled.Newspaper" Title="Apply Report Template" />
+        <MudText Typo="Typo.body2" Class="text-secondary mb-2">
+            Applies a saved template: it fills editable sections and locks template-defined content. Your typed sections are kept where they don't conflict.
+        </MudText>
+
+        <MudTextField T="string"
+                      @bind-Value="_search"
+                      Placeholder="Search templates..."
+                      Variant="Variant.Outlined"
+                      Margin="Margin.Dense"
+                      Immediate="true"
+                      Adornment="Adornment.Start"
+                      AdornmentIcon="@Icons.Material.Filled.Search"
+                      FullWidth="true" />
+
+        <div class="mt-2" style="max-height: 380px; overflow-y: auto;">
+            @if (_loading)
+            {
+                <MudProgressCircular Size="Size.Large" Class="mx-auto d-block py-6" Indeterminate="true" />
+            }
+            else if (FilteredTemplates is null || !string.IsNullOrEmpty(_error))
+            {
+                <ErrorState Title="Could not load templates"
+                            Message="Check your connection and try again."
+                            RetryLabel="Retry"
+                            Action="LoadAsync" />
+            }
+            else if (!FilteredTemplates.Any())
+            {
+                <EmptyState Icon="@Icons.Material.Filled.Newspaper"
+                            Title="No templates"
+                            Message="No report templates were found." />
+            }
+            else
+            {
+                <MudList T="ReportTemplateDto" Dense="true">
+                    @foreach (var template in FilteredTemplates)
+                    {
+                        var current = template;
+                        <MudListItem T="ReportTemplateDto" OnClick="@(() => PickAsync(current))"
+                                     Disabled="@_busy"
+                                     Icon="@Icons.Material.Filled.Newspaper">
+                            <div>
+                                <MudText Typo="Typo.subtitle1" Class="font-weight-medium d-inline">@template.Name</MudText>
+                                @if (template.Modality is not null)
+                                {
+                                    <MudChip T="string" Size="Size.Small" Variant="Variant.Outlined" Class="ms-2 align-middle">@template.Modality</MudChip>
+                                }
+                                @if (template.IsSystem)
+                                {
+                                    <MudChip T="string" Size="Size.Small" Color="Color.Info" Variant="Variant.Outlined" Class="ms-1 align-middle">System</MudChip>
+                                }
+                                <MudText Typo="Typo.caption" Class="text-secondary">@template.Sections.Count section(s) @(string.IsNullOrWhiteSpace(template.Description) ? string.Empty : $" - {template.Description}")</MudText>
+                            </div>
+                        </MudListItem>
+                    }
+                </MudList>
+            }
+        </div>
+    </DialogContent>
+    <DialogActions>
+        <MudButton Color="Color.Default" OnClick="CancelAsync" Disabled="_busy">Close</MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    [CascadingParameter] public IMudDialogInstance MudDialog { get; set; } = default!;
+
+    private string? _search;
+    private bool _loading;
+    private bool _busy;
+    private IReadOnlyList<ReportTemplateDto> _templates = Array.Empty<ReportTemplateDto>();
+
+    private string? _error;
+
+    private IEnumerable<ReportTemplateDto> FilteredTemplates =>
+        _templates.Where(t =>
+            string.IsNullOrWhiteSpace(_search) ||
+            t.Name.Contains(_search, StringComparison.OrdinalIgnoreCase) ||
+            (t.Modality?.Contains(_search, StringComparison.OrdinalIgnoreCase) ?? false));
+
+    protected override async Task OnInitializedAsync()
+        => await LoadAsync();
+
+    private async Task LoadAsync()
+    {
+        _loading = true;
+        _error = null;
+        try
+        {
+            var result = await ReportService.GetTemplatesPagedAsync(null, true, 1, 100);
+            _templates = result.Items;
+        }
+        catch (Exception)
+        {
+            _error = "Failed to load templates.";
+        }
+        finally
+        {
+            _loading = false;
+        }
+    }
+
+    private async Task PickAsync(ReportTemplateDto template)
+    {
+        _busy = true;
+        try
+        {
+            MudDialog.Close(DialogResult.Ok(template.Id));
+        }
+        finally
+        {
+            _busy = false;
+        }
+    }
+
+    private void CancelAsync()
+        => MudDialog.Cancel();
+}

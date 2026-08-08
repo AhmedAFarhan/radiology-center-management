@@ -1,0 +1,66 @@
+@inject ReportService ReportService
+@inject ISnackbar Snackbar
+
+<MudDialog>
+    <DialogContent>
+        <DialogHeader Icon="@Icons.Material.Filled.CancelPresentation" Title="Cancel Report" />
+        <MudText Typo="Typo.body2" Class="text-muted-text mb-2">
+            The report will be cancelled and cannot be edited or finalized.
+        </MudText>
+        <MudTextField @bind-Value="_reason"
+                      Label="Cancellation reason (optional)"
+                      Variant="Variant.Outlined"
+                      Margin="Margin.Dense"
+                      Immediate="true"
+                      FullWidth="true"
+                      Disabled="_busy" />
+    </DialogContent>
+    <DialogActions>
+        <MudButton Color="Color.Default" OnClick="CancelAsync" Disabled="_busy">Back</MudButton>
+        <MudButton Color="Color.Error" Variant="Variant.Filled" OnClick="SubmitAsync" Disabled="_busy">
+            @if (_busy)
+            {
+                <MudProgressCircular Size="Size.Small" Indeterminate="true" Class="mx-1" />
+            }
+            else
+            {
+                <text>Cancel Report</text>
+            }
+        </MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    [Parameter] public string ReportId { get; set; } = string.Empty;
+
+    [CascadingParameter] public IMudDialogInstance MudDialog { get; set; } = default!;
+
+    private string? _reason;
+    private bool _busy;
+
+    private async Task SubmitAsync()
+    {
+        _busy = true;
+        try
+        {
+            await ReportService.CancelAsync(ReportId, _reason);
+            Snackbar.Add("Report cancelled.", Severity.Success);
+            MudDialog.Close(DialogResult.Ok(true));
+        }
+        catch (ApiException ex)
+        {
+            Snackbar.Add(ex.Message, Severity.Error);
+        }
+        catch (Exception)
+        {
+            Snackbar.Add("Unable to reach the server.", Severity.Error);
+        }
+        finally
+        {
+            _busy = false;
+        }
+    }
+
+    private void CancelAsync()
+        => MudDialog.Cancel();
+}
