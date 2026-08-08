@@ -28,7 +28,7 @@ public sealed class BackendStatusService
         Error = null;
         StateChanged?.Invoke();
 
-        await Task.Delay(TimeSpan.FromSeconds(10));
+        await Task.Delay(TimeSpan.FromSeconds(1));
 
         try
         {
