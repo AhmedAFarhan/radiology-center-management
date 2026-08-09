@@ -137,55 +137,49 @@
             {
                 <MudDivider Class="my-2" />
                 <MudText Typo="Typo.subtitle2" Class="mb-1">Rejections</MudText>
-                <MudList Dense="true">
-                    @foreach (var rejection in _claim.Rejections)
-                    {
-                        <MudListItem>
-                            <MudListItemIcon><MudIcon Icon="@Icons.Material.Filled.Warning" Color="@Color.Error" /></MudListItemIcon>
-                            <MudListItemText>
-                                @rejection.Code
-                                <MudText Typo="Typo.caption">@rejection.Reason</MudText>
-                                <MudText Typo="Typo.caption" Class="text-secondary">@rejection.RejectedAt.ToString("yyyy-MM-dd")</MudText>
-                            </MudListItemText>
-                        </MudListItem>
-                    }
-                </MudList>
+                @foreach (var rejection in _claim.Rejections)
+                {
+                    <MudPaper Elevation="0" Outlined="true" Class="d-flex align-center pa-2 my-1">
+                        <MudIcon Icon="@Icons.Material.Filled.Warning" Color="Color.Error" Class="mx-2" />
+                        <div>
+                            <MudText Typo="Typo.body2">@rejection.Code</MudText>
+                            <MudText Typo="Typo.caption">@rejection.Reason</MudText>
+                            <MudText Typo="Typo.caption" Class="text-secondary">@rejection.RejectedAt.ToString("yyyy-MM-dd")</MudText>
+                        </div>
+                    </MudPaper>
+                }
             }
 
             @if (_claim.Settlements.Count > 0)
             {
                 <MudDivider Class="my-2" />
                 <MudText Typo="Typo.subtitle2" Class="mb-1">Settlements</MudText>
-                <MudList Dense="true">
-                    @foreach (var settlement in _claim.Settlements)
-                    {
-                        <MudListItem>
-                            <MudListItemIcon><MudIcon Icon="@Icons.Material.Filled.Payments" /></MudListItemIcon>
-                            <MudListItemText>
-                                @settlement.Amount.ToString("C")
-                                <MudText Typo="Typo.caption" Class="text-secondary">@settlement.Method @(!string.IsNullOrWhiteSpace(settlement.Reference) ? $"· {settlement.Reference}" : "") · @settlement.SettledAt.ToString("yyyy-MM-dd")</MudText>
-                            </MudListItemText>
-                        </MudListItem>
-                    }
-                </MudList>
+                @foreach (var settlement in _claim.Settlements)
+                {
+                    <MudPaper Elevation="0" Outlined="true" Class="d-flex align-center pa-2 my-1">
+                        <MudIcon Icon="@Icons.Material.Filled.Payments" Class="mx-2" />
+                        <div>
+                            <MudText Typo="Typo.body2">@settlement.Amount.ToString("C")</MudText>
+                            <MudText Typo="Typo.caption" Class="text-secondary">@settlement.Method @(!string.IsNullOrWhiteSpace(settlement.Reference) ? $"· {settlement.Reference}" : "") · @settlement.SettledAt.ToString("yyyy-MM-dd")</MudText>
+                        </div>
+                    </MudPaper>
+                }
             }
 
             @if (_claim.Status == "Submitted" && _claim.Rejections.Count > 0)
             {
                 <MudDivider Class="my-2" />
                 <MudText Typo="Typo.subtitle2" Class="mb-1">Prior Rejections</MudText>
-                <MudList Dense="true">
-                    @foreach (var rejection in _claim.Rejections)
-                    {
-                        <MudListItem>
-                            <MudListItemText>
-                                @rejection.Code
-                                <MudText Typo="Typo.caption">@rejection.Reason</MudText>
-                                <MudText Typo="Typo.caption" Class="text-secondary">@rejection.RejectedAt.ToString("yyyy-MM-dd")</MudText>
-                            </MudListItemText>
-                        </MudListItem>
-                    }
-                </MudList>
+                @foreach (var rejection in _claim.Rejections)
+                {
+                    <MudPaper Elevation="0" Outlined="true" Class="d-flex align-center pa-2 my-1">
+                        <div>
+                            <MudText Typo="Typo.body2">@rejection.Code</MudText>
+                            <MudText Typo="Typo.caption">@rejection.Reason</MudText>
+                            <MudText Typo="Typo.caption" Class="text-secondary">@rejection.RejectedAt.ToString("yyyy-MM-dd")</MudText>
+                        </div>
+                    </MudPaper>
+                }
             }
         }
     </DialogContent>

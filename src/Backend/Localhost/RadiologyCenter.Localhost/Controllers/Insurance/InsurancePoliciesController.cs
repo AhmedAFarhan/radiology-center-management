@@ -99,13 +99,13 @@ public class InsurancePoliciesController : ControllerBase
     [HasPermission(InsurancePoliciesReadCode)]
     [HttpPost("{id:guid}/documents")]
     [Consumes("multipart/form-data")]
-    public async Task<IActionResult> UploadDocumentAsync(Guid id, [FromForm] IFormFile file, [FromForm] string type, CancellationToken ct)
+    public async Task<IActionResult> UploadDocumentAsync(Guid id, [FromForm] UploadPolicyDocumentForm form, CancellationToken ct)
     {
-        if (file is null)
+        if (form.File is null)
             return BadRequest(new { Type = "File", Message = "A file is required." });
 
-        await using var content = file.OpenReadStream();
-        var command = new UploadPolicyDocumentCommand(id, type, file.FileName, file.ContentType, file.Length, content);
+        await using var content = form.File.OpenReadStream();
+        var command = new UploadPolicyDocumentCommand(id, form.Type, form.File.FileName, form.File.ContentType, form.File.Length, content);
         var result = await _bus.InvokeAsync<Result<PolicyDocumentDto>>(command, ct);
         return result.ToActionResult();
     }
@@ -117,4 +117,11 @@ public class InsurancePoliciesController : ControllerBase
         var result = await _bus.InvokeAsync<Result>(new DeletePolicyDocumentCommand(id, documentId), ct);
         return result.ToActionResult();
     }
+}
+
+public sealed class UploadPolicyDocumentForm
+{
+    public IFormFile File { get; set; } = null!;
+
+    public string Type { get; set; } = string.Empty;
 }

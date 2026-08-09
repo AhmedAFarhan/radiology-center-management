@@ -2,8 +2,10 @@
 @attribute [Authorize]
 @inject ExaminationService ExaminationService
 @inject PatientService PatientService
+@inject InsuranceService InsuranceService
 @inject IDialogService DialogService
 @inject ISnackbar Snackbar
+@inject NavigationManager Navigation
 @implements IDisposable
 
 <PageHeader Icon="@Icons.Material.Filled.EventNote" Title="Visits"
@@ -48,6 +50,10 @@
         </MudTd>
         <MudTd DataLabel="Actions">
             <MudIconButton Icon="@Icons.Material.Filled.Visibility" Size="Size.Small" Color="Color.Default" aria-label="View" OnClick="@(() => OpenViewDialogAsync(context))" />
+            @if (HasInsurance(context))
+            {
+                <MudIconButton Icon="@Icons.Material.Filled.Approval" Size="Size.Small" Color="Color.Info" aria-label="Insurance" OnClick="@(() => OpenInsuranceAsync(context))" />
+            }
             @if (context.Status is "Requested" or "Scheduled")
             {
                 <MudIconButton Icon="@Icons.Material.Filled.Edit" Size="Size.Small" Color="Color.Default" aria-label="Edit" OnClick="@(() => OpenEditDialogAsync(context))" />
@@ -103,6 +109,31 @@
     private string? _loadError;
     private bool _offline;
     private readonly Dictionary<string, string> _patientNames = new();
+    private readonly Dictionary<string, bool> _insuranceCache = new();
+
+    private async Task PrimeInsuranceCacheAsync(IReadOnlyList<string> patientIds)
+    {
+        foreach (var id in patientIds)
+        {
+            if (_insuranceCache.ContainsKey(id))
+                continue;
+            try
+            {
+                var policies = await InsuranceService.GetPoliciesByPatientAsync(id);
+                _insuranceCache[id] = policies.Count > 0;
+            }
+            catch
+            {
+                _insuranceCache[id] = false;
+            }
+        }
+    }
+
+    private bool HasInsurance(ExaminationDto visit)
+        => _insuranceCache.TryGetValue(visit.PatientId, out var insured) && insured;
+
+    private void OpenInsuranceAsync(ExaminationDto visit)
+        => Navigation.NavigateTo("/insurance/preauthorizations");
 
     protected override async Task OnInitializedAsync()
     {
@@ -132,6 +163,8 @@
                 state.Page + 1,
                 state.PageSize,
                 ct);
+
+            await PrimeInsuranceCacheAsync(page.Items.Select(i => i.PatientId).Distinct().ToList());
 
             _loadError = null;
             _offline = false;

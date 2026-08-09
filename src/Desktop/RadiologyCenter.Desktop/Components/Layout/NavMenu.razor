@@ -39,6 +39,20 @@
             <MudMenuItem Icon="@Icons.Material.Filled.LocalHospital" OnClick="@(() => Go("/payroll/referral-fees"))">Referral Fees</MudMenuItem>
         </MudMenu>
 
+        <MudMenu Icon="@Icons.Material.Filled.Approval"
+                 IconSize="Size.Medium"
+                 Class="collapsed-nav-menu"
+                 AnchorOrigin="Origin.CenterRight"
+                 TransformOrigin="Origin.TopLeft"
+                 Dense="true"
+                 OffsetX="12"
+                 Direction="Direction.Left">
+            <MudMenuItem Icon="@Icons.Material.Filled.Shield" OnClick="@(() => Go("/insurance/companies"))">Companies</MudMenuItem>
+            <MudMenuItem Icon="@Icons.Material.Filled.Description" OnClick="@(() => Go("/insurance/policies"))">Policies</MudMenuItem>
+            <MudMenuItem Icon="@Icons.Material.Filled.Approval" OnClick="@(() => Go("/insurance/preauthorizations"))">Pre-Authorizations</MudMenuItem>
+            <MudMenuItem Icon="@Icons.Material.Filled.RequestQuote" OnClick="@(() => Go("/insurance/claims"))">Claims</MudMenuItem>
+        </MudMenu>
+
         <MudMenu Icon="@Icons.Material.Filled.PrecisionManufacturing"
                  IconSize="Size.Medium"
                  Class="collapsed-nav-menu"
@@ -114,6 +128,12 @@
             <MudNavLink Href="/payroll/allowances" Icon="@Icons.Material.Filled.AttachMoney" Ripple="false">Allowances</MudNavLink>
             <MudNavLink Href="/payroll/examination-fees" Icon="@Icons.Material.Filled.MedicalServices" Ripple="false">Examination Fees</MudNavLink>
             <MudNavLink Href="/payroll/referral-fees" Icon="@Icons.Material.Filled.LocalHospital" Ripple="false">Referral Fees</MudNavLink>
+        </MudNavGroup>
+        <MudNavGroup Title="Insurance" Icon="@Icons.Material.Filled.Approval" Ripple="false">
+            <MudNavLink Href="/insurance/companies" Icon="@Icons.Material.Filled.Shield" Ripple="false">Companies</MudNavLink>
+            <MudNavLink Href="/insurance/policies" Icon="@Icons.Material.Filled.Description" Ripple="false">Policies</MudNavLink>
+            <MudNavLink Href="/insurance/preauthorizations" Icon="@Icons.Material.Filled.Approval" Ripple="false">Pre-Authorizations</MudNavLink>
+            <MudNavLink Href="/insurance/claims" Icon="@Icons.Material.Filled.RequestQuote" Ripple="false">Claims</MudNavLink>
         </MudNavGroup>
         <MudNavGroup Title="Resources" Icon="@Icons.Material.Filled.PrecisionManufacturing" Ripple="false">
             <MudNavLink Href="/resources/equipment" Icon="@Icons.Material.Filled.Biotech" Ripple="false">Equipment</MudNavLink>

@@ -42,6 +42,23 @@ else
         </MudItem>
     </MudGrid>
 
+    @if (_insuranceStats is not null)
+    {
+        <MudDivider Class="my-3" />
+        <MudText Typo="Typo.h6" Class="mb-1">Insurance</MudText>
+        <MudGrid Spacing="3">
+            <MudItem xs="12" sm="6" lg="4">
+                <StatCard Label="Outstanding from insurers" Value="@AnalyticsFormat.Money(_insuranceStats.OutstandingAmount)" Icon="@Icons.Material.Filled.RequestQuote" Color="Color.Error" TrendText="@($"{_insuranceStats.ApprovedClaims} approved claims")" TrendUp="false" />
+            </MudItem>
+            <MudItem xs="12" sm="6" lg="4">
+                <StatCard Label="Claims in flight" Value="@_insuranceStats.SubmittedClaims.ToString()" Icon="@Icons.Material.Filled.Send" Color="Color.Warning" TrendText="@($"{_insuranceStats.DraftClaims} draft")" TrendUp="true" />
+            </MudItem>
+            <MudItem xs="12" sm="6" lg="4">
+                <StatCard Label="Pending authorizations" Value="@_insuranceStats.PendingPreAuthorizations.ToString()" Icon="@Icons.Material.Filled.Approval" Color="Color.Info" TrendText="@($"{_insuranceStats.ApprovedPreAuthorizations} approved")" TrendUp="true" />
+            </MudItem>
+        </MudGrid>
+    }
+
     <MudGrid Spacing="3" Class="mt-1">
         <MudItem xs="12" lg="8">
             <ChartCard Title="Revenue trend" Subtitle="Collected vs billed by month">
@@ -87,13 +104,26 @@ else
     [Inject]
     private AnalyticsService Api { get; set; } = null!;
 
+    [Inject]
+    private InsuranceService Insurance { get; set; } = null!;
+
     private FinancialAnalyticsDto? _data;
     private IReadOnlyList<FinancialExamRowDto>? _exams;
+    private InsuranceStatsDto? _insuranceStats;
 
     protected override async Task LoadAsync(DateTime from, DateTime to)
     {
         _data = await Api.GetFinancialAsync(from, to);
         _exams = await Api.GetFinancialExamsAsync(from, to);
+
+        try
+        {
+            _insuranceStats = await Insurance.GetStatsAsync();
+        }
+        catch
+        {
+            _insuranceStats = null;
+        }
     }
 
     private IReadOnlyList<AnalyticsSlice> BuildReceivableSlices()

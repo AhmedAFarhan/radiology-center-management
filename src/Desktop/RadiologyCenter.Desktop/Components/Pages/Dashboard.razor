@@ -1,6 +1,7 @@
 @page "/dashboard"
 @attribute [Authorize]
 @inject DashboardService DashboardService
+@inject InsuranceService InsuranceService
 
 <MudText Typo="Typo.h4">Dashboard</MudText>
 <MudText Typo="Typo.body1" Class="text-secondary mb-4">Live overview of your radiology center.</MudText>
@@ -36,6 +37,25 @@ else
                 <Trend><Sparkline Values="@DashboardSampleData.SparklineSteady" /></Trend>
             </StatCard>
         </MudItem>
+        @if (_insuranceStats is not null)
+        {
+            <MudDivider Class="my-3" />
+            <MudItem xs="12">
+                <MudText Typo="Typo.h6" Class="mb-1">Insurance</MudText>
+            </MudItem>
+            <MudItem xs="12" sm="6" lg="3">
+                <StatCard Label="Outstanding Claims" Value="@_insuranceStats.OutstandingAmount.ToString("C")" Icon="@Icons.Material.Filled.RequestQuote" Color="Color.Primary" TrendText="@($"{_insuranceStats.SubmittedClaims} submitted")" TrendUp="true" />
+            </MudItem>
+            <MudItem xs="12" sm="6" lg="3">
+                <StatCard Label="Pending Authorizations" Value="@_insuranceStats.PendingPreAuthorizations.ToString()" Icon="@Icons.Material.Filled.Approval" Color="Color.Warning" TrendText="@($"{_insuranceStats.ApprovedPreAuthorizations} approved")" TrendUp="true" />
+            </MudItem>
+            <MudItem xs="12" sm="6" lg="3">
+                <StatCard Label="Active Policies" Value="@_insuranceStats.ActivePolicies.ToString()" Icon="@Icons.Material.Filled.Description" Color="Color.Info" TrendText="@($"{_insuranceStats.TotalPolicies} total")" TrendUp="true" />
+            </MudItem>
+            <MudItem xs="12" sm="6" lg="3">
+                <StatCard Label="Insurance Companies" Value="@_insuranceStats.TotalCompanies.ToString()" Icon="@Icons.Material.Filled.Shield" Color="Color.Secondary" TrendText="@($"{_insuranceStats.DraftClaims} draft claims")" TrendUp="true" />
+            </MudItem>
+        }
     </MudGrid>
 
     <MudGrid Spacing="3" Class="mt-1">
@@ -56,12 +76,13 @@ else
 
 @code {
     private DashboardData? _data;
+    private InsuranceStatsDto? _insuranceStats;
     private bool _loading = true;
     private bool _error;
 
     protected override async Task OnInitializedAsync()
     {
-        await LoadAsync();
+        await Task.WhenAll(LoadAsync(), LoadInsuranceAsync());
     }
 
     private async Task LoadAsync()
@@ -79,6 +100,18 @@ else
         finally
         {
             _loading = false;
+        }
+    }
+
+    private async Task LoadInsuranceAsync()
+    {
+        try
+        {
+            _insuranceStats = await InsuranceService.GetStatsAsync();
+        }
+        catch
+        {
+            _insuranceStats = null;
         }
     }
 }

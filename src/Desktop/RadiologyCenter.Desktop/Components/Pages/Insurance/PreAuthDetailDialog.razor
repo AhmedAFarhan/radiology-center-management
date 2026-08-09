@@ -1,7 +1,6 @@
 @inject InsuranceService InsuranceService
 @inject IDialogService DialogService
 @inject ISnackbar Snackbar
-@implements IDisposable
 
 <MudDialog>
     <DialogContent>
@@ -93,36 +92,28 @@
             }
             else
             {
-                <MudList Dense="true">
-                    @foreach (var document in _documents)
-                    {
-                        <MudListItem>
-                            <MudListItemIcon><MudIcon Icon="@Icons.Material.Filled.Approval" /></MudListItemIcon>
-                            <MudListItemText>
-                                @document.FileName
-                                <MudText Typo="Typo.caption" Class="text-secondary">@($"{document.Type} · {document.SizeInBytes / 1024m:0.#} KB · {document.UploadedAt:yyyy-MM-dd}")</MudText>
-                            </MudListItemText>
-                            <MudListItemSecondaryAction>
-                                <MudIconButton Icon="@Icons.Material.Filled.Download" Size="Size.Small" Color="Color.Default" aria-label="Download" OnClick="@(() => DownloadDocumentAsync(document))" />
-                                <MudIconButton Icon="@Icons.Material.Filled.Delete" Size="Size.Small" Color="Color.Error" aria-label="Delete" OnClick="@(() => DeleteDocumentAsync(document))" />
-                            </MudListItemSecondaryAction>
-                        </MudListItem>
-                    }
-                </MudList>
+                @foreach (var document in _documents)
+                {
+                    <MudPaper Elevation="0" Outlined="true" Class="d-flex align-center pa-2 my-1">
+                        <MudIcon Icon="@Icons.Material.Filled.Approval" Class="mx-2" />
+                        <div class="flex-grow-1">
+                            <MudText Typo="Typo.body2">@document.FileName</MudText>
+                            <MudText Typo="Typo.caption" Class="text-secondary">@($"{document.Type} · {document.SizeInBytes / 1024m:0.#} KB · {document.UploadedAt:yyyy-MM-dd}")</MudText>
+                        </div>
+                        <MudIconButton Icon="@Icons.Material.Filled.Download" Size="Size.Small" Color="Color.Default" aria-label="Download" OnClick="@(() => DownloadDocumentAsync(document))" />
+                        <MudIconButton Icon="@Icons.Material.Filled.Delete" Size="Size.Small" Color="Color.Error" aria-label="Delete" OnClick="@(() => DeleteDocumentAsync(document))" />
+                    </MudPaper>
+                }
             }
 
-            <MudFileUpload T="IBrowserFile"
-                           @bind-Files="_pendingFiles"
-                           OnFilesSelected="UploadSelectedFileAsync"
-                           Hidden="false"
-                           Variant="Variant.Outlined"
-                           Class="mt-2">
-                <ActivatorContent>
-                    <MudButton Variant="Variant.Outlined" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Upload" Disabled="_busy">
-                        @(_busy ? "Uploading..." : "Upload Document")
-                    </MudButton>
-                </ActivatorContent>
-            </MudFileUpload>
+            <MudButton HtmlTag="label" for="preauth-doc-input"
+                       Variant="Variant.Outlined" Color="Color.Primary"
+                       StartIcon="@Icons.Material.Filled.Upload"
+                       Disabled="_busy"
+                       Class="mt-2">
+                @(_busy ? "Uploading..." : "Upload Document")
+            </MudButton>
+            <InputFile id="preauth-doc-input" OnChange="OnFileSelectedAsync" style="display:none" />
             <MudText Typo="Typo.caption" Class="text-secondary mt-1">Attach imaging requests, referral notes, or proof of request.</MudText>
         }
     </DialogContent>
@@ -138,7 +129,6 @@
 
     private PreAuthorizationDto? _preAuth;
     private IReadOnlyList<PreAuthorizationDocumentDto>? _documents;
-    private IReadOnlyList<IBrowserFile>? _pendingFiles;
     private decimal? _approvedAmount;
     private string? _rejectionReason;
     private string? _loadError;
@@ -236,9 +226,9 @@
         }
     }
 
-    private async Task UploadSelectedFileAsync()
+    private async Task OnFileSelectedAsync(InputFileChangeEventArgs e)
     {
-        var file = _pendingFiles?.FirstOrDefault();
+        var file = e.File;
         if (file is null)
             return;
 
@@ -267,7 +257,6 @@
         finally
         {
             _busy = false;
-            _pendingFiles = null;
         }
     }
 
@@ -318,6 +307,4 @@
 
     private void CancelAsync()
         => MudDialog.Close();
-
-    public void Dispose() => _pendingFiles = null;
 }
