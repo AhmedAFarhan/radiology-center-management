@@ -34,6 +34,9 @@ using RadiologyCenter.Reports.Infrastructure.Persistence;
 using RadiologyCenter.Insurance.Application;
 using RadiologyCenter.Insurance.Infrastructure;
 using RadiologyCenter.Insurance.Infrastructure.Persistence;
+using RadiologyCenter.Cash.Application;
+using RadiologyCenter.Cash.Infrastructure;
+using RadiologyCenter.Cash.Infrastructure.Persistence;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -89,6 +92,8 @@ builder.Services.AddReportsApplication();
 builder.Services.AddReportsInfrastructure(builder.Configuration);
 builder.Services.AddInsuranceApplication();
 builder.Services.AddInsuranceInfrastructure(builder.Configuration);
+builder.Services.AddCashApplication();
+builder.Services.AddCashInfrastructure(builder.Configuration);
 builder.Services.AddScoped<IItemSnapshotResolver, ItemSnapshotResolver>();
 builder.Services.AddScoped<IExaminationFeeResolver, ExaminationFeeResolver>();
 builder.Services.AddScoped<RadiologyCenter.Payroll.Application.Abstractions.IPayrollStaffDirectory, PayrollStaffDirectory>();
@@ -100,6 +105,7 @@ builder.Services.AddScoped<RadiologyCenter.Examinations.Application.Abstractions
 builder.Services.AddScoped<RadiologyCenter.Examinations.Application.Abstractions.IProfitSourceResolver, ProfitSourceResolver>();
 builder.Services.AddScoped<RadiologyCenter.Reports.Application.Abstractions.IReportDirectory, ReportDirectory>();
 builder.Services.AddScoped<RadiologyCenter.Insurance.Application.Abstractions.IInsuranceDirectory, InsuranceDirectory>();
+builder.Services.AddScoped<RadiologyCenter.Cash.Application.Abstractions.ICashDirectory, CashDirectory>();
 
 var app = builder.Build();
 
@@ -134,6 +140,9 @@ using (var scope = app.Services.CreateScope())
 
     var insuranceDb = scope.ServiceProvider.GetRequiredService<InsuranceDbContext>();
     insuranceDb.Database.Migrate();
+
+    var cashDb = scope.ServiceProvider.GetRequiredService<CashDbContext>();
+    cashDb.Database.Migrate();
 }
 
 app.UseMiddleware<ExceptionMiddleware>();

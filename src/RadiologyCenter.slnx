@@ -49,6 +49,11 @@
     <Project Path="Backend/Modules/Insurance/RadiologyCenter.Insurance.Application/RadiologyCenter.Insurance.Application.csproj" />
     <Project Path="Backend/Modules/Insurance/RadiologyCenter.Insurance.Infrastructure/RadiologyCenter.Insurance.Infrastructure.csproj" />
   </Folder>
+  <Folder Name="/Backend/Modules/Cash/">
+    <Project Path="Backend/Modules/Cash/RadiologyCenter.Cash.Domain/RadiologyCenter.Cash.Domain.csproj" />
+    <Project Path="Backend/Modules/Cash/RadiologyCenter.Cash.Application/RadiologyCenter.Cash.Application.csproj" />
+    <Project Path="Backend/Modules/Cash/RadiologyCenter.Cash.Infrastructure/RadiologyCenter.Cash.Infrastructure.csproj" />
+  </Folder>
   <Folder Name="/Desktop/">
     <Project Path="Desktop/RadiologyCenter.Desktop/RadiologyCenter.Desktop.csproj" />
   </Folder>

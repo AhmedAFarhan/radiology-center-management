@@ -210,6 +210,19 @@ public static class Permissions
     public static readonly Permission InsuranceClaimsUpdate  = Create(InsuranceClaimsUpdateCode,  "Update Claims",     "Submit, resubmit and adjudicate claims",  "Insurance");
     public static readonly Permission InsuranceClaimsSettle  = Create(InsuranceClaimsSettleCode,  "Settle Claims",     "Record insurance settlements",            "Insurance");
 
+    public const string CashSessionsOpenCode    = "cash.sessions.open";
+    public const string CashSessionsReadCode    = "cash.sessions.read";
+    public const string CashSessionsCloseCode   = "cash.sessions.close";
+    public const string CashEntriesAddCode      = "cash.entries.add";
+    public const string CashHandoversReadCode   = "cash.handovers.read";
+    public const string CashHandoversApproveCode = "cash.handovers.approve";
+    public static readonly Permission CashSessionsOpen    = Create(CashSessionsOpenCode,    "Open Cash Sessions",     "Open a new cash session and record the opening float", "Cash");
+    public static readonly Permission CashSessionsRead    = Create(CashSessionsReadCode,    "Read Cash Sessions",     "View cash sessions and their entries",                 "Cash");
+    public static readonly Permission CashSessionsClose   = Create(CashSessionsCloseCode,   "Close Cash Sessions",    "Close a cash session and reconcile a counted handover","Cash");
+    public static readonly Permission CashEntriesAdd      = Create(CashEntriesAddCode,      "Add Cash Entries",       "Record cash movements in a cash session",              "Cash");
+    public static readonly Permission CashHandoversRead   = Create(CashHandoversReadCode,   "Read Cash Handovers",    "View cash handovers and reconciliation details",       "Cash");
+    public static readonly Permission CashHandoversApprove = Create(CashHandoversApproveCode, "Approve Cash Handovers", "Approve completed cash handovers",                   "Cash");
+
     private static readonly List<Permission> _all =
     [
         PatientsCreate, PatientsRead, PatientsUpdate, PatientsDelete,
@@ -233,7 +246,8 @@ public static class Permissions
         InsuranceCompaniesCreate, InsuranceCompaniesRead, InsuranceCompaniesUpdate, InsuranceCompaniesDelete,
         InsurancePoliciesCreate, InsurancePoliciesRead, InsurancePoliciesUpdate, InsurancePoliciesDelete,
         InsurancePreAuthorizationsCreate, InsurancePreAuthorizationsRead, InsurancePreAuthorizationsUpdate, InsurancePreAuthorizationsAttachDocument,
-        InsuranceClaimsCreate, InsuranceClaimsRead, InsuranceClaimsUpdate, InsuranceClaimsSettle
+        InsuranceClaimsCreate, InsuranceClaimsRead, InsuranceClaimsUpdate, InsuranceClaimsSettle,
+        CashSessionsOpen, CashSessionsRead, CashSessionsClose, CashEntriesAdd, CashHandoversRead, CashHandoversApprove
     ];
 
     public static IReadOnlyList<Permission> All => _all.AsReadOnly();
