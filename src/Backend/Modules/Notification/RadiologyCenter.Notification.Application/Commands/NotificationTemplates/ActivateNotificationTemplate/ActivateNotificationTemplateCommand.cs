@@ -1,0 +1,3 @@
+namespace RadiologyCenter.Notification.Application.Commands.NotificationTemplates.ActivateNotificationTemplate;
+
+public record ActivateNotificationTemplateCommand(Guid Id) : ICommand;

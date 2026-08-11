@@ -54,6 +54,11 @@
     <Project Path="Backend/Modules/Cash/RadiologyCenter.Cash.Application/RadiologyCenter.Cash.Application.csproj" />
     <Project Path="Backend/Modules/Cash/RadiologyCenter.Cash.Infrastructure/RadiologyCenter.Cash.Infrastructure.csproj" />
   </Folder>
+  <Folder Name="/Backend/Modules/Notification/">
+    <Project Path="Backend/Modules/Notification/RadiologyCenter.Notification.Domain/RadiologyCenter.Notification.Domain.csproj" />
+    <Project Path="Backend/Modules/Notification/RadiologyCenter.Notification.Application/RadiologyCenter.Notification.Application.csproj" />
+    <Project Path="Backend/Modules/Notification/RadiologyCenter.Notification.Infrastructure/RadiologyCenter.Notification.Infrastructure.csproj" />
+  </Folder>
   <Folder Name="/Desktop/">
     <Project Path="Desktop/RadiologyCenter.Desktop/RadiologyCenter.Desktop.csproj" />
   </Folder>

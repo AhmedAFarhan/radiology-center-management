@@ -1,0 +1,5 @@
+using RadiologyCenter.Notification.Application.Commands.Notifications.SendNotification;
+
+namespace RadiologyCenter.Notification.Application.Queries.NotificationMessages.PreviewNotification;
+
+public record PreviewNotificationCommand(SendNotificationCommand Command) : IQuery;

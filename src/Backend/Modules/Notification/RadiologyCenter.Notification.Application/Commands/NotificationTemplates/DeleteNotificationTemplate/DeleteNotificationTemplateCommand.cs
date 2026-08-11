@@ -1,0 +1,3 @@
+namespace RadiologyCenter.Notification.Application.Commands.NotificationTemplates.DeleteNotificationTemplate;
+
+public record DeleteNotificationTemplateCommand(Guid Id) : ICommand;

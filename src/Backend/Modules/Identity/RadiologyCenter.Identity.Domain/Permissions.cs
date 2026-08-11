@@ -223,6 +223,13 @@ public static class Permissions
     public static readonly Permission CashHandoversRead   = Create(CashHandoversReadCode,   "Read Cash Handovers",    "View cash handovers and reconciliation details",       "Cash");
     public static readonly Permission CashHandoversApprove = Create(CashHandoversApproveCode, "Approve Cash Handovers", "Approve completed cash handovers",                   "Cash");
 
+    public const string NotificationTemplatesManageCode  = "notifications.templates.manage";
+    public const string NotificationMessagesReadCode     = "notifications.messages.read";
+    public const string NotificationMessagesSendCode     = "notifications.messages.send";
+    public static readonly Permission NotificationTemplatesManage = Create(NotificationTemplatesManageCode,  "Manage Notification Templates", "Create, update, activate, deactivate and delete notification templates", "Notifications");
+    public static readonly Permission NotificationMessagesRead    = Create(NotificationMessagesReadCode,     "Read Notification Messages",    "View the notification message ledger",                                   "Notifications");
+    public static readonly Permission NotificationMessagesSend    = Create(NotificationMessagesSendCode,     "Send Notifications",            "Send SMS, email and push notifications",                                 "Notifications");
+
     private static readonly List<Permission> _all =
     [
         PatientsCreate, PatientsRead, PatientsUpdate, PatientsDelete,
@@ -247,7 +254,8 @@ public static class Permissions
         InsurancePoliciesCreate, InsurancePoliciesRead, InsurancePoliciesUpdate, InsurancePoliciesDelete,
         InsurancePreAuthorizationsCreate, InsurancePreAuthorizationsRead, InsurancePreAuthorizationsUpdate, InsurancePreAuthorizationsAttachDocument,
         InsuranceClaimsCreate, InsuranceClaimsRead, InsuranceClaimsUpdate, InsuranceClaimsSettle,
-        CashSessionsOpen, CashSessionsRead, CashSessionsClose, CashEntriesAdd, CashHandoversRead, CashHandoversApprove
+        CashSessionsOpen, CashSessionsRead, CashSessionsClose, CashEntriesAdd, CashHandoversRead, CashHandoversApprove,
+        NotificationTemplatesManage, NotificationMessagesRead, NotificationMessagesSend
     ];
 
     public static IReadOnlyList<Permission> All => _all.AsReadOnly();

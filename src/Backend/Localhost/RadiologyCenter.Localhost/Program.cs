@@ -37,6 +37,9 @@ using RadiologyCenter.Insurance.Infrastructure.Persistence;
 using RadiologyCenter.Cash.Application;
 using RadiologyCenter.Cash.Infrastructure;
 using RadiologyCenter.Cash.Infrastructure.Persistence;
+using RadiologyCenter.Notification.Application;
+using RadiologyCenter.Notification.Infrastructure;
+using RadiologyCenter.Notification.Infrastructure.Persistence;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -94,6 +97,8 @@ builder.Services.AddInsuranceApplication();
 builder.Services.AddInsuranceInfrastructure(builder.Configuration);
 builder.Services.AddCashApplication();
 builder.Services.AddCashInfrastructure(builder.Configuration);
+builder.Services.AddNotificationApplication();
+builder.Services.AddNotificationInfrastructure(builder.Configuration);
 builder.Services.AddScoped<IItemSnapshotResolver, ItemSnapshotResolver>();
 builder.Services.AddScoped<IExaminationFeeResolver, ExaminationFeeResolver>();
 builder.Services.AddScoped<RadiologyCenter.Payroll.Application.Abstractions.IPayrollStaffDirectory, PayrollStaffDirectory>();
@@ -144,6 +149,9 @@ using (var scope = app.Services.CreateScope())
 
     var cashDb = scope.ServiceProvider.GetRequiredService<CashDbContext>();
     cashDb.Database.Migrate();
+
+    var notificationDb = scope.ServiceProvider.GetRequiredService<NotificationDbContext>();
+    notificationDb.Database.Migrate();
 }
 
 app.UseMiddleware<ExceptionMiddleware>();

@@ -39,6 +39,8 @@
     <ProjectReference Include="..\..\Modules\Insurance\RadiologyCenter.Insurance.Infrastructure\RadiologyCenter.Insurance.Infrastructure.csproj" />
     <ProjectReference Include="..\..\Modules\Cash\RadiologyCenter.Cash.Application\RadiologyCenter.Cash.Application.csproj" />
     <ProjectReference Include="..\..\Modules\Cash\RadiologyCenter.Cash.Infrastructure\RadiologyCenter.Cash.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\Modules\Notification\RadiologyCenter.Notification.Application\RadiologyCenter.Notification.Application.csproj" />
+    <ProjectReference Include="..\..\Modules\Notification\RadiologyCenter.Notification.Infrastructure\RadiologyCenter.Notification.Infrastructure.csproj" />
   </ItemGroup>
 
 </Project>

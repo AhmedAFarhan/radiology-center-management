@@ -1,0 +1,3 @@
+namespace RadiologyCenter.Notification.Application.Commands.NotificationTemplates.DeactivateNotificationTemplate;
+
+public record DeactivateNotificationTemplateCommand(Guid Id) : ICommand;
