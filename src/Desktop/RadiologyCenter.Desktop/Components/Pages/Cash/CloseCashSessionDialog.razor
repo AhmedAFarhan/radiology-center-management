@@ -1,0 +1,140 @@
+@inject CashService CashService
+@inject ISnackbar Snackbar
+
+<MudDialog>
+    <DialogContent>
+        <DialogHeader Icon="@Icons.Material.Filled.Lock" Title="Close Cash Session" />
+        <EditForm EditContext="_editContext">
+            <DataAnnotationsValidator />
+            <MudGrid Spacing="2">
+                <MudItem xs="12">
+                    <MudText Typo="Typo.body2" Class="text-secondary mb-1">
+                        Expected total (based on entries) is <b>@_expectedTotal.ToString("C")</b>. Enter the physically counted total to reconcile.
+                    </MudText>
+                    <MudNumericField @bind-Value="_model.CountedTotal"
+                                     Label="Counted Total"
+                                     Variant="Variant.Outlined"
+                                     Margin="Margin.Dense"
+                                     Immediate="true"
+                                     For="@(() => _model.CountedTotal)" />
+                </MudItem>
+                <MudItem xs="12">
+                    <MudDivider />
+                    <MudText Typo="Typo.caption" Class="text-secondary mt-2">
+                        Optionally hand over the cash to another user. A new cash session for that user is opened automatically.
+                    </MudText>
+                </MudItem>
+                <MudItem xs="12" sm="6">
+                    <MudTextField @bind-Value="_model.ReceivingUserId"
+                                  Label="Receiving User ID (optional)"
+                                  Variant="Variant.Outlined"
+                                  Margin="Margin.Dense"
+                                  Immediate="true"
+                                  For="@(() => _model.ReceivingUserId)" />
+                </MudItem>
+                <MudItem xs="12" sm="6">
+                    <MudNumericField @bind-Value="_model.ReceivingOpeningFloat"
+                                     Label="Receiving Opening Float (optional)"
+                                     Variant="Variant.Outlined"
+                                     Margin="Margin.Dense"
+                                     Immediate="true"
+                                     For="@(() => _model.ReceivingOpeningFloat)" />
+                </MudItem>
+                <MudItem xs="12">
+                    <MudTextField @bind-Value="_model.Notes"
+                                  Label="Notes"
+                                  Variant="Variant.Outlined"
+                                  Margin="Margin.Dense"
+                                  Immediate="true"
+                                  For="@(() => _model.Notes)" />
+                </MudItem>
+            </MudGrid>
+        </EditForm>
+    </DialogContent>
+    <DialogActions>
+        <MudButton Color="Color.Default" OnClick="CancelAsync" Disabled="_busy">Cancel</MudButton>
+        <MudButton Color="Color.Warning" Variant="Variant.Filled" OnClick="SubmitAsync" Disabled="_busy">
+            @if (_busy)
+            {
+                <MudProgressCircular Size="Size.Small" Indeterminate="true" Class="mx-1" />
+            }
+            else
+            {
+                <text>Close &amp; Hand Over</text>
+            }
+        </MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    [Parameter] public string SessionId { get; set; } = string.Empty;
+
+    [Parameter] public decimal ExpectedTotal { get; set; }
+
+    [CascadingParameter] public IMudDialogInstance MudDialog { get; set; } = default!;
+
+    private readonly CloseSessionFormModel _model = new();
+    private EditContext _editContext = default!;
+    private bool _busy;
+    private decimal _expectedTotal;
+
+    protected override void OnInitialized()
+    {
+        _editContext = new EditContext(_model);
+        _expectedTotal = ExpectedTotal;
+        _model.CountedTotal = ExpectedTotal;
+    }
+
+    private async Task SubmitAsync()
+    {
+        if (!_editContext.Validate())
+            return;
+
+        _busy = true;
+        try
+        {
+            var input = new CloseCashSessionInput
+            {
+                CashSessionId = SessionId,
+                CountedTotal = _model.CountedTotal,
+                ReceivingUserId = string.IsNullOrWhiteSpace(_model.ReceivingUserId) ? null : _model.ReceivingUserId.Trim(),
+                ReceivingOpeningFloat = _model.ReceivingOpeningFloat,
+                Notes = _model.Notes,
+            };
+
+            await CashService.CloseAsync(SessionId, input);
+            Snackbar.Add("Cash session closed and handover created.", Severity.Success);
+            MudDialog.Close(DialogResult.Ok(true));
+        }
+        catch (ApiException ex)
+        {
+            Snackbar.Add(ex.Message, Severity.Error);
+        }
+        catch (Exception)
+        {
+            Snackbar.Add("Unable to reach the server. Please try again.", Severity.Error);
+        }
+        finally
+        {
+            _busy = false;
+        }
+    }
+
+    private void CancelAsync()
+        => MudDialog.Cancel();
+
+    private sealed class CloseSessionFormModel
+    {
+        [Range(0, (double)decimal.MaxValue, ErrorMessage = "Counted total must be a valid amount.")]
+        public decimal CountedTotal { get; set; }
+
+        [MaxLength(100, ErrorMessage = "Receiving user ID must be 100 characters or fewer.")]
+        public string? ReceivingUserId { get; set; }
+
+        [Range(0, (double)decimal.MaxValue, ErrorMessage = "Receiving opening float must be a valid amount.")]
+        public decimal? ReceivingOpeningFloat { get; set; }
+
+        [MaxLength(1000, ErrorMessage = "Notes must be 1000 characters or fewer.")]
+        public string? Notes { get; set; }
+    }
+}

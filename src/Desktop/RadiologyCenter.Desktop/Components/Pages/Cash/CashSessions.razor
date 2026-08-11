@@ -1,0 +1,172 @@
+@page "/cash/sessions"
+@attribute [Authorize]
+@inject CashService CashService
+@inject IDialogService DialogService
+@inject ISnackbar Snackbar
+@implements IDisposable
+
+<PageHeader Icon="@Icons.Material.Filled.AccountBalanceWallet" Title="Cash Sessions"
+            Subtitle="Open cash sessions, record movements, close and hand over"
+            SearchValueChanged="OnSearchChanged"
+            SearchPlaceholder="Search sessions..."
+            OnRefresh="ReloadAsync">
+    <MudSelect T="string" Value="_status" ValueChanged="OnStatusChangedAsync" Label="Status"
+               Variant="Variant.Outlined" Margin="Margin.Dense" Dense="true" Class="status-filter ms-2">
+        <MudSelectItem Value="@(string.Empty)">All</MudSelectItem>
+        <MudSelectItem Value="@("Open")">Open</MudSelectItem>
+        <MudSelectItem Value="@("Closed")">Closed</MudSelectItem>
+    </MudSelect>
+    <MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Add" OnClick="OpenSessionAsync">Open Session</MudButton>
+</PageHeader>
+
+<MudTable T="CashSessionDto" @ref="_table" ServerData="LoadServerData" Dense="true" Hover="true" Striped="true" Elevation="1" RowsPerPage="10">
+    <HeaderContent>
+        <MudTh><MudTableSortLabel T="CashSessionDto" SortLabel="@("OpenedAt")">Opened At</MudTableSortLabel></MudTh>
+        <MudTh>User</MudTh>
+        <MudTh><MudTableSortLabel T="CashSessionDto" SortLabel="@("Status")">Status</MudTableSortLabel></MudTh>
+        <MudTh><MudTableSortLabel T="CashSessionDto" SortLabel="@("OpeningFloat")">Opening Float</MudTableSortLabel></MudTh>
+        <MudTh Class="text-right">Balance</MudTh>
+        <MudTh Class="text-center">Entries</MudTh>
+        <MudTh><MudTableSortLabel T="CashSessionDto" SortLabel="@("OpenedAt")">Closed At</MudTableSortLabel></MudTh>
+        <MudTh Class="text-center">Actions</MudTh>
+    </HeaderContent>
+    <RowTemplate>
+        <MudTd DataLabel="Opened At">@context.OpenedAt.ToLocalTime().ToString("g")</MudTd>
+        <MudTd DataLabel="User">@(string.IsNullOrWhiteSpace(context.UserName) ? ShortId(context.UserId) : context.UserName)</MudTd>
+        <MudTd DataLabel="Status">
+            <MudChip T="string" Size="Size.Small" Color="@StatusColor(context.Status)">@context.Status</MudChip>
+        </MudTd>
+        <MudTd DataLabel="Opening Float">@context.OpeningFloat.ToString("C")</MudTd>
+        <MudTd DataLabel="Balance" Class="text-right">
+            <MudText Class="font-weight-medium" Color="@(context.Balance < 0 ? Color.Error : Color.Default)">@context.Balance.ToString("C")</MudText>
+        </MudTd>
+        <MudTd DataLabel="Entries" Class="text-center">@context.EntryCount</MudTd>
+        <MudTd DataLabel="Closed At">@(context.ClosedAt?.ToLocalTime().ToString("g") ?? "-")</MudTd>
+        <MudTd DataLabel="Actions" Class="text-center">
+            <MudIconButton Icon="@Icons.Material.Filled.Visibility" Size="Size.Small" Color="Color.Default" aria-label="View" OnClick="@(() => OpenDetailAsync(context))" />
+        </MudTd>
+    </RowTemplate>
+    <NoRecordsContent>
+        @if (_loadError is not null)
+        {
+            <ErrorState Icon="@(_offline ? Icons.Material.Filled.CloudOff : Icons.Material.Filled.ErrorOutline)"
+                        Title="Couldn't load data"
+                        Message="@_loadError"
+                        Action="ReloadAsync" />
+        }
+        else
+        {
+            <EmptyState Icon="@Icons.Material.Filled.AccountBalanceWallet"
+                        Title="No cash sessions yet"
+                        Message="Open a cash session to start recording movements, then close it with a counted handover."
+                        ActionLabel="Open your first session"
+                        Action="OpenSessionAsync" />
+        }
+    </NoRecordsContent>
+    <PagerContent>
+        <MudTablePager PageSizeOptions="@(new[] { 10, 25, 50 })" />
+    </PagerContent>
+</MudTable>
+
+@code {
+    private MudTable<CashSessionDto>? _table;
+    private string? _search;
+    private string _status = string.Empty;
+    private CancellationTokenSource? _searchCts;
+    private string? _loadError;
+    private bool _offline;
+
+    private async Task<TableData<CashSessionDto>> LoadServerData(TableState state, CancellationToken ct)
+    {
+        try
+        {
+            var page = await CashService.GetSessionsPagedAsync(
+                _search,
+                state.SortLabel,
+                state.SortDirection == SortDirection.Descending,
+                state.Page + 1,
+                state.PageSize,
+                string.IsNullOrWhiteSpace(_status) ? null : _status,
+                ct);
+
+            _loadError = null;
+            _offline = false;
+            return new TableData<CashSessionDto> { Items = page.Items, TotalItems = page.TotalCount };
+        }
+        catch (ApiException ex)
+        {
+            Snackbar.Add(ex.Message, Severity.Error);
+            _loadError = ex.Message;
+            _offline = false;
+            return new TableData<CashSessionDto> { Items = Array.Empty<CashSessionDto>(), TotalItems = 0 };
+        }
+        catch (Exception)
+        {
+            Snackbar.Add("Unable to reach the server.", Severity.Error);
+            _loadError = "Unable to reach the server.";
+            _offline = true;
+            return new TableData<CashSessionDto> { Items = Array.Empty<CashSessionDto>(), TotalItems = 0 };
+        }
+    }
+
+    private async Task OnSearchChanged(string? value)
+        => await DebounceReloadAsync(value);
+
+    private async Task OnStatusChangedAsync(string value)
+    {
+        _status = value;
+        await ReloadAsync();
+    }
+
+    private async Task DebounceReloadAsync(string? value)
+    {
+        _search = value;
+
+        _searchCts?.Cancel();
+        var cts = _searchCts = new CancellationTokenSource();
+        try
+        {
+            await Task.Delay(400, cts.Token);
+        }
+        catch (TaskCanceledException)
+        {
+            return;
+        }
+
+        await ReloadAsync();
+    }
+
+    private Task ReloadAsync()
+        => _table is null ? Task.CompletedTask : _table.ReloadServerData();
+
+    private async Task OpenSessionAsync()
+    {
+        var options = new DialogOptions { MaxWidth = MaxWidth.Small, FullWidth = true, NoHeader = true };
+        var dialog = await DialogService.ShowAsync<OpenCashSessionDialog>("Open Cash Session", options);
+        var result = await dialog.Result;
+        if (result is { Canceled: false })
+            await ReloadAsync();
+    }
+
+    private async Task OpenDetailAsync(CashSessionDto session)
+    {
+        var parameters = new DialogParameters { ["SessionId"] = session.Id };
+        var options = new DialogOptions { MaxWidth = MaxWidth.Large, FullWidth = true, NoHeader = true };
+        var dialog = await DialogService.ShowAsync<CashSessionDetailDialog>("Cash Session", parameters, options);
+        var result = await dialog.Result;
+        if (result is { Canceled: false })
+            await ReloadAsync();
+    }
+
+    private static Color StatusColor(string status) => status switch
+    {
+        "Open" => Color.Success,
+        "Closed" => Color.Default,
+        _ => Color.Primary,
+    };
+
+    private static string ShortId(string id)
+        => id.Length > 8 ? id[..8] : id;
+
+    public void Dispose() => _searchCts?.Cancel();
+}

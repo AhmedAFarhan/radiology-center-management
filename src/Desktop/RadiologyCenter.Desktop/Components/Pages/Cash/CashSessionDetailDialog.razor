@@ -1,0 +1,279 @@
+@inject CashService CashService
+@inject IDialogService DialogService
+@inject ISnackbar Snackbar
+
+<MudDialog>
+    <DialogContent>
+        <DialogHeader Icon="@Icons.Material.Filled.AccountBalanceWallet" Title="@(Session is null ? "Cash Session" : $"Cash Session ({ShortId(Session.Id)})")" />
+        @if (Session is null)
+        {
+            <DialogSkeleton Rows="8" />
+        }
+        else
+        {
+            <MudGrid Spacing="2">
+                <MudItem xs="12">
+                    <MudPaper Elevation="0" Class="pa-4 rounded" Style="border:1px solid rgba(0,0,0,.12)">
+                        <MudGrid Spacing="2">
+                            <MudItem xs="12" sm="6" md="3">
+                                <MudText Typo="Typo.caption" Class="text-secondary">Status</MudText>
+                                <MudChip T="string" Size="Size.Small" Color="@StatusColor(Session.Status)">@Session.Status</MudChip>
+                            </MudItem>
+                            <MudItem xs="12" sm="6" md="3">
+                                <MudText Typo="Typo.caption" Class="text-secondary">User</MudText>
+                                <MudText Typo="Typo.body1" Class="font-weight-medium">@(string.IsNullOrWhiteSpace(Session.UserName) ? ShortId(Session.UserId) : Session.UserName)</MudText>
+                            </MudItem>
+                            <MudItem xs="12" sm="6" md="3">
+                                <MudText Typo="Typo.caption" Class="text-secondary">Opening Float</MudText>
+                                <MudText Typo="Typo.body1" Class="font-weight-medium">@Session.OpeningFloat.ToString("C")</MudText>
+                            </MudItem>
+                            <MudItem xs="12" sm="6" md="3">
+                                <MudText Typo="Typo.caption" Class="text-secondary">Balance</MudText>
+                                <MudText Typo="Typo.body1" Class="font-weight-medium" Color="@(Session.Balance < 0 ? Color.Error : Color.Default)">@Session.Balance.ToString("C")</MudText>
+                            </MudItem>
+                            <MudItem xs="12" sm="6">
+                                <MudText Typo="Typo.caption" Class="text-secondary">Opened At</MudText>
+                                <MudText Typo="Typo.body2">@Session.OpenedAt.ToLocalTime().ToString("g")</MudText>
+                            </MudItem>
+                            <MudItem xs="12" sm="6">
+                                <MudText Typo="Typo.caption" Class="text-secondary">Closed At</MudText>
+                                <MudText Typo="Typo.body2">@(Session.ClosedAt?.ToLocalTime().ToString("g") ?? "Not closed")</MudText>
+                            </MudItem>
+                        </MudGrid>
+                        @if (!string.IsNullOrWhiteSpace(Session.Notes))
+                        {
+                            <MudDivider Class="my-2" />
+                            <MudText Typo="Typo.body2" Class="text-secondary">@Session.Notes</MudText>
+                        }
+                    </MudPaper>
+                </MudItem>
+
+                @if (_handover is not null)
+                {
+                    <MudItem xs="12">
+                        <MudPaper Elevation="0" Class="pa-4 rounded" Style="border:1px solid rgba(0,0,0,.12)">
+                            <MudGrid Spacing="2" Class="mb-2">
+                                <MudItem xs="12" sm="8">
+                                    <MudText Typo="Typo.subtitle1" Class="font-weight-medium">Handover</MudText>
+                                </MudItem>
+                                <MudItem xs="12" sm="4" Class="d-flex justify-end">
+                                    @if (_handover.ApprovedAt is null)
+                                    {
+                                        <MudButton Variant="Variant.Filled" Color="Color.Success" Size="Size.Small" StartIcon="@Icons.Material.Filled.Check" OnClick="ApproveAsync" Disabled="_busy">Approve Handover</MudButton>
+                                    }
+                                </MudItem>
+                            </MudGrid>
+                            <MudGrid Spacing="2">
+                                <MudItem xs="12" sm="6" md="3">
+                                    <MudText Typo="Typo.caption" Class="text-secondary">Expected</MudText>
+                                    <MudText Typo="Typo.body1" Class="font-weight-medium">@_handover.ExpectedTotal.ToString("C")</MudText>
+                                </MudItem>
+                                <MudItem xs="12" sm="6" md="3">
+                                    <MudText Typo="Typo.caption" Class="text-secondary">Counted</MudText>
+                                    <MudText Typo="Typo.body1" Class="font-weight-medium">@_handover.CountedTotal.ToString("C")</MudText>
+                                </MudItem>
+                                <MudItem xs="12" sm="6" md="3">
+                                    <MudText Typo="Typo.caption" Class="text-secondary">Over / Short</MudText>
+                                    <MudText Typo="Typo.body1" Class="font-weight-medium" Color="@OverShortColor(_handover.OverShortAmount)">@(_handover.OverShortAmount >= 0 ? $"+{_handover.OverShortAmount:C}" : _handover.OverShortAmount.ToString("C"))</MudText>
+                                </MudItem>
+                                <MudItem xs="12" sm="6" md="3">
+                                    <MudText Typo="Typo.caption" Class="text-secondary">Approved</MudText>
+                                    <MudText Typo="Typo.body2">@(_handover.ApprovedAt?.ToLocalTime().ToString("g") ?? "Not approved")</MudText>
+                                </MudItem>
+                                <MudItem xs="12" sm="6">
+                                    <MudText Typo="Typo.caption" Class="text-secondary">Closed By</MudText>
+                                    <MudText Typo="Typo.body2">@(string.IsNullOrWhiteSpace(_handover.ClosedByName) ? ShortId(_handover.ClosedByUserId) : _handover.ClosedByName)</MudText>
+                                </MudItem>
+                                <MudItem xs="12" sm="6">
+                                    <MudText Typo="Typo.caption" Class="text-secondary">Receiving Session</MudText>
+                                    <MudText Typo="Typo.body2">@(_handover.ReceivingCashSessionId is null ? "-" : ShortId(_handover.ReceivingCashSessionId))</MudText>
+                                </MudItem>
+                            </MudGrid>
+                            @if (!string.IsNullOrWhiteSpace(_handover.Notes))
+                            {
+                                <MudDivider Class="my-2" />
+                                <MudText Typo="Typo.body2" Class="text-secondary">@_handover.Notes</MudText>
+                            }
+                        </MudPaper>
+                    </MudItem>
+                }
+
+                <MudItem xs="12">
+                    <MudGrid Spacing="2" Class="mb-2">
+                        <MudItem xs="12" sm="6">
+                            <MudText Typo="Typo.subtitle1" Class="font-weight-medium">Entries (@_entries.Count)</MudText>
+                        </MudItem>
+                        <MudItem xs="12" sm="6" Class="d-flex justify-end">
+                            @if (IsOpen)
+                            {
+                                <MudButton Variant="Variant.Filled" Color="Color.Primary" Size="Size.Small" StartIcon="@Icons.Material.Filled.SwapVert" OnClick="AddEntryAsync" Disabled="_busy">Add Entry</MudButton>
+                                <MudButton Variant="Variant.Filled" Color="Color.Warning" Size="Size.Small" Class="ms-2" StartIcon="@Icons.Material.Filled.Lock" OnClick="CloseAsync" Disabled="_busy">Close Session</MudButton>
+                            }
+                        </MudItem>
+                    </MudGrid>
+
+                    @if (_entries.Count == 0)
+                    {
+                        <MudText Typo="Typo.body2" Class="text-secondary pa-4">No entries recorded in this session yet.</MudText>
+                    }
+                    else
+                    {
+                        <MudTable T="CashEntryDto" Items="_entries" Dense="true" Hover="true" Elevation="0" Class="rounded" Style="border:1px solid rgba(0,0,0,.12)">
+                            <HeaderContent>
+                                <MudTh>Date</MudTh>
+                                <MudTh>Direction</MudTh>
+                                <MudTh>Reason</MudTh>
+                                <MudTh Class="text-right">Amount</MudTh>
+                                <MudTh>Reference</MudTh>
+                                <MudTh>Description</MudTh>
+                            </HeaderContent>
+                            <RowTemplate Context="entry">
+                                <MudTd DataLabel="Date">@entry.OccurredAt.ToLocalTime().ToString("g")</MudTd>
+                                <MudTd DataLabel="Direction">
+                                    <MudChip T="string" Size="Size.Small" Color="@DirectionColor(entry.Direction)">@entry.Direction</MudChip>
+                                </MudTd>
+                                <MudTd DataLabel="Reason">@entry.Reason</MudTd>
+                                <MudTd DataLabel="Amount" Class="text-right">
+                                    <MudText Class="font-weight-medium" Color="@(entry.Direction == "Out" ? Color.Error : Color.Success)">
+                                        @(entry.Direction == "Out" ? $"-{entry.Amount:C}" : $"+{entry.Amount:C}")
+                                    </MudText>
+                                </MudTd>
+                                <MudTd DataLabel="Reference">@(entry.ReferenceId ?? "-")</MudTd>
+                                <MudTd DataLabel="Description">@(entry.Description ?? "-")</MudTd>
+                            </RowTemplate>
+                            <NoRecordsContent>
+                                <MudText Typo="Typo.body2" Class="text-secondary pa-4">No entries to display.</MudText>
+                            </NoRecordsContent>
+                        </MudTable>
+                    }
+                </MudItem>
+            </MudGrid>
+        }
+    </DialogContent>
+    <DialogActions>
+        <MudButton Color="Color.Default" OnClick="CloseDialogAsync">Close</MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    [Parameter] public string SessionId { get; set; } = string.Empty;
+
+    [CascadingParameter] public IMudDialogInstance MudDialog { get; set; } = default!;
+
+    private CashSessionDto? Session { get; set; }
+    private List<CashEntryDto> _entries = new();
+    private CashHandoverDto? _handover;
+    private bool _busy;
+    private bool _loadFailed;
+
+    private bool IsOpen => Session?.Status == "Open";
+
+    protected override async Task OnInitializedAsync()
+        => await LoadAsync();
+
+    private async Task LoadAsync()
+    {
+        try
+        {
+            Session = await CashService.GetByIdAsync(SessionId);
+            _entries = (await CashService.GetEntriesAsync(SessionId)).ToList();
+            _handover = Session?.Status == "Closed"
+                ? await CashService.GetHandoverBySessionAsync(SessionId)
+                : null;
+            _loadFailed = false;
+        }
+        catch (ApiException ex)
+        {
+            Snackbar.Add(ex.Message, Severity.Error);
+            _loadFailed = true;
+        }
+        catch (Exception)
+        {
+            Snackbar.Add("Unable to reach the server.", Severity.Error);
+            _loadFailed = true;
+        }
+    }
+
+    private async Task AddEntryAsync()
+    {
+        var parameters = new DialogParameters { ["SessionId"] = SessionId };
+        var options = new DialogOptions { MaxWidth = MaxWidth.Medium, FullWidth = true, NoHeader = true };
+        var dialog = await DialogService.ShowAsync<AddCashEntryDialog>("Add Cash Entry", parameters, options);
+        var result = await dialog.Result;
+        if (result is { Canceled: false })
+            await LoadAsync();
+    }
+
+    private async Task CloseAsync()
+    {
+        var parameters = new DialogParameters
+        {
+            ["SessionId"] = SessionId,
+            ["ExpectedTotal"] = Session?.Balance ?? 0,
+        };
+        var options = new DialogOptions { MaxWidth = MaxWidth.Medium, FullWidth = true, NoHeader = true };
+        var dialog = await DialogService.ShowAsync<CloseCashSessionDialog>("Close Cash Session", parameters, options);
+        var result = await dialog.Result;
+        if (result is { Canceled: false })
+            await LoadAsync();
+    }
+
+    private async Task ApproveAsync()
+    {
+        var confirmed = await DialogService.ShowMessageBoxAsync(
+            "Approve Handover",
+            "Approve this cash handover? Once approved, the handover cannot be changed.",
+            "Approve",
+            "Cancel");
+
+        if (confirmed != true)
+            return;
+
+        _busy = true;
+        try
+        {
+            await CashService.ApproveHandoverAsync(SessionId);
+            Snackbar.Add("Handover approved.", Severity.Success);
+            await LoadAsync();
+        }
+        catch (ApiException ex)
+        {
+            Snackbar.Add(ex.Message, Severity.Error);
+        }
+        catch (Exception)
+        {
+            Snackbar.Add("Unable to reach the server.", Severity.Error);
+        }
+        finally
+        {
+            _busy = false;
+        }
+    }
+
+    private static Color StatusColor(string status) => status switch
+    {
+        "Open" => Color.Success,
+        "Closed" => Color.Default,
+        _ => Color.Primary,
+    };
+
+    private static Color DirectionColor(string direction) => direction switch
+    {
+        "In" => Color.Success,
+        "Out" => Color.Error,
+        _ => Color.Primary,
+    };
+
+    private static Color OverShortColor(decimal amount) => amount switch
+    {
+        > 0 => Color.Success,
+        < 0 => Color.Error,
+        _ => Color.Default,
+    };
+
+    private static string ShortId(string id)
+        => id.Length > 8 ? id[..8] : id;
+
+    private void CloseDialogAsync()
+        => MudDialog.Close(DialogResult.Ok(!_loadFailed));
+}
