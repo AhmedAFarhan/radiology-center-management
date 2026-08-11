@@ -106,6 +106,7 @@ builder.Services.AddScoped<RadiologyCenter.Examinations.Application.Abstractions
 builder.Services.AddScoped<RadiologyCenter.Reports.Application.Abstractions.IReportDirectory, ReportDirectory>();
 builder.Services.AddScoped<RadiologyCenter.Insurance.Application.Abstractions.IInsuranceDirectory, InsuranceDirectory>();
 builder.Services.AddScoped<RadiologyCenter.Cash.Application.Abstractions.ICashDirectory, CashDirectory>();
+builder.Services.AddScoped<IPaymentCashEntryRecorder, PaymentCashEntryRecorder>();
 
 var app = builder.Build();
 
