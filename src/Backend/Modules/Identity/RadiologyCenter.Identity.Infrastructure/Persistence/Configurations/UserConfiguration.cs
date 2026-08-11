@@ -25,6 +25,18 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
         });
         builder.Navigation(u => u.RefreshTokens).UsePropertyAccessMode(PropertyAccessMode.Field);
 
+        builder.OwnsMany(u => u.Sessions, s =>
+        {
+            s.WithOwner().HasForeignKey("UserId");
+            s.HasKey("UserId", nameof(UserSession.Id));
+            s.Property(x => x.Id).ValueGeneratedNever();
+            s.Property(x => x.RefreshToken).HasMaxLength(256).IsRequired();
+            s.HasIndex(nameof(UserSession.RefreshToken)).IsUnique();
+            s.Property(x => x.StartedAtUtc).IsRequired();
+            s.Property(x => x.LastActivityAtUtc).IsRequired();
+        });
+        builder.Navigation(u => u.Sessions).UsePropertyAccessMode(PropertyAccessMode.Field);
+
         builder.HasMany(u => u.AssignedRoles)
             .WithMany()
             .UsingEntity("AspNetUserRoles");

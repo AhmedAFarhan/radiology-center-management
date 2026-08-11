@@ -22,6 +22,9 @@ public sealed class User : IdentityUser<Guid>, IAggregateRoot
     private readonly List<RefreshToken> _refreshTokens = [];
     public IReadOnlyCollection<RefreshToken> RefreshTokens => _refreshTokens.AsReadOnly();
 
+    private readonly List<UserSession> _sessions = [];
+    public IReadOnlyCollection<UserSession> Sessions => _sessions.AsReadOnly();
+
     private readonly List<IDomainEvent> _domainEvents = [];
     public IReadOnlyCollection<IDomainEvent> DomainEvents => _domainEvents.AsReadOnly();
     public void ClearDomainEvents() => _domainEvents.Clear();
@@ -197,4 +200,26 @@ public sealed class User : IdentityUser<Guid>, IAggregateRoot
 
     public bool HasValidRefreshToken(string token) =>
         _refreshTokens.Any(rt => rt.Token == token && !rt.IsExpired && !rt.IsRevoked);
+
+    public UserSession StartSession(string refreshToken)
+    {
+        var session = new UserSession(refreshToken);
+        _sessions.Add(session);
+        return session;
+    }
+
+    public void RevokeSession(string refreshToken) =>
+        _sessions.FirstOrDefault(s => s.RefreshToken == refreshToken)?.Revoke();
+
+    public void RevokeAllSessions()
+    {
+        foreach (var session in _sessions)
+            session.Revoke();
+    }
+
+    public bool HasActiveSession(string refreshToken) =>
+        _sessions.Any(s => s.RefreshToken == refreshToken && s.IsActive);
+
+    public void RecordSessionActivity(string refreshToken) =>
+        _sessions.FirstOrDefault(s => s.RefreshToken == refreshToken)?.RecordActivity();
 }

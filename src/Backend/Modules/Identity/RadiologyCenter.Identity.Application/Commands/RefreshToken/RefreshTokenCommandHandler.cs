@@ -17,14 +17,17 @@ public static class RefreshTokenCommandHandler
         if (user is null)
             return Result.Failure<TokenResult>(Error.Unauthorized("Invalid refresh token."));
 
-        if (!user.HasValidRefreshToken(command.Token))
+        if (!user.HasValidRefreshToken(command.Token) || !user.HasActiveSession(command.Token))
             return Result.Failure<TokenResult>(Error.Unauthorized("Refresh token is expired or revoked."));
 
         user.RevokeRefreshToken(command.Token);
+        user.RevokeSession(command.Token);
 
         var tokenResult = tokenService.GenerateTokenResult(user);
 
         user.AddRefreshToken(tokenResult.RefreshToken, tokenResult.RefreshTokenExpiresAt);
+        user.StartSession(tokenResult.RefreshToken);
+        user.RecordSessionActivity(command.Token);
 
         await unitOfWork.SaveChangesAsync(ct);
 

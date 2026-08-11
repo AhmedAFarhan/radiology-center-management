@@ -40,7 +40,10 @@ public static class LoginCommandHandler
         var tokenResult = tokenService.GenerateTokenResult(user);
 
         user.RecordLogin();
+        user.RevokeAllRefreshTokens();
+        user.RevokeAllSessions();
         user.AddRefreshToken(tokenResult.RefreshToken, tokenResult.RefreshTokenExpiresAt);
+        user.StartSession(tokenResult.RefreshToken);
         await unitOfWork.SaveChangesAsync(ct);
 
         return Result.Success(tokenResult);
