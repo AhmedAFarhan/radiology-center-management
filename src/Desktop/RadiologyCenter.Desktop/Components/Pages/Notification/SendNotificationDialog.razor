@@ -1,0 +1,261 @@
+@inject NotificationService NotificationService
+@inject ISnackbar Snackbar
+
+<MudDialog>
+    <DialogContent>
+        <DialogHeader Icon="@Icons.Material.Filled.Send" Title="Send Notification" />
+        <MudAlert Severity="Severity.Info" Variant="Variant.Text" Class="mb-3">
+            Channels are currently configured with log-only providers, so messages are recorded but not actually delivered.
+        </MudAlert>
+        <EditForm EditContext="_editContext">
+            <DataAnnotationsValidator />
+            <MudGrid Spacing="2">
+                <MudItem xs="12" sm="6">
+                    <MudTextField @bind-Value="_model.Recipient"
+                                  Label="Recipient (phone / email / device token)"
+                                  Variant="Variant.Outlined"
+                                  Margin="Margin.Dense"
+                                  Immediate="true"
+                                  For="@(() => _model.Recipient)" />
+                </MudItem>
+                <MudItem xs="12" sm="6">
+                    <MudSelect T="string"
+                               Value="_model.Channel"
+                               ValueChanged="OnChannelChangedAsync"
+                               Label="Channel"
+                               Variant="Variant.Outlined"
+                               Margin="Margin.Dense"
+                               For="@(() => _model.Channel)">
+                        <MudSelectItem T="string" Value="@("Sms")">SMS</MudSelectItem>
+                        <MudSelectItem T="string" Value="@("Email")">Email</MudSelectItem>
+                        <MudSelectItem T="string" Value="@("Push")">Push</MudSelectItem>
+                    </MudSelect>
+                </MudItem>
+                <MudItem xs="12">
+                    <MudSelect T="string"
+                               Value="_model.TemplateCode"
+                               ValueChanged="OnTemplateCodeChangedAsync"
+                               Label="Template"
+                               Variant="Variant.Outlined"
+                               Margin="Margin.Dense"
+                               HelperText="Optionally pick a template; subject/body below are filled from it.">
+                        <MudSelectItem T="string" Value="@(string.Empty)">No template</MudSelectItem>
+                        @foreach (var template in _templates)
+                        {
+                            <MudSelectItem T="string" Value="@template.Code">@template.Code - @template.Name</MudSelectItem>
+                        }
+                    </MudSelect>
+                </MudItem>
+                <MudItem xs="12">
+                    <MudTextField @bind-Value="_model.Subject"
+                                  Label="Subject"
+                                  Variant="Variant.Outlined"
+                                  Margin="Margin.Dense"
+                                  Immediate="true" />
+                </MudItem>
+                <MudItem xs="12">
+                    <MudTextField @bind-Value="_model.Body"
+                                  Label="Body"
+                                  Variant="Variant.Outlined"
+                                  Margin="Margin.Dense"
+                                  Immediate="true"
+                                  Lines="4"
+                                  Multiline="true" />
+                </MudItem>
+                <MudItem xs="12">
+                    <MudTextField @bind-Value="_model.ReferenceId"
+                                  Label="Reference (optional)"
+                                  Variant="Variant.Outlined"
+                                  Margin="Margin.Dense"
+                                  Immediate="true" />
+                </MudItem>
+                <MudItem xs="12">
+                    <MudTextField @bind-Value="_model.Placeholders"
+                                  Label="Placeholders ({name}=Ahmed, {amount}=120)"
+                                  Variant="Variant.Outlined"
+                                  Margin="Margin.Dense"
+                                  Immediate="true" />
+                </MudItem>
+            </MudGrid>
+        </EditForm>
+
+        @if (_preview is not null)
+        {
+            <MudPaper Elevation="1" Class="mt-3 pa-3">
+                <MudText Typo="Typo.subtitle2" Color="Color.Primary" Class="mb-1">Preview</MudText>
+                <MudText Typo="Typo.caption" Class="mb-1">Subject: @(_preview.Subject)</MudText>
+                <MudText>@_preview.Body</MudText>
+            </MudPaper>
+        }
+    </DialogContent>
+    <DialogActions>
+        <MudButton Color="Color.Default" OnClick="CancelAsync" Disabled="_busy">Cancel</MudButton>
+        <MudButton Color="Color.Secondary" Variant="Variant.Outlined" OnClick="PreviewAsync" Disabled="_busy" StartIcon="@Icons.Material.Filled.Preview">
+            Preview
+        </MudButton>
+        <MudButton Color="Color.Primary" Variant="Variant.Filled" OnClick="SubmitAsync" Disabled="_busy" StartIcon="@Icons.Material.Filled.Send">
+            @if (_busy)
+            {
+                <MudProgressCircular Size="Size.Small" Indeterminate="true" Class="mx-1" />
+            }
+            else
+            {
+                <text>Send</text>
+            }
+        </MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    [CascadingParameter] public IMudDialogInstance MudDialog { get; set; } = default!;
+
+    private readonly SendNotificationFormModel _model = new();
+    private EditContext _editContext = default!;
+    private bool _busy;
+    private IReadOnlyList<NotificationTemplateDto> _templates = Array.Empty<NotificationTemplateDto>();
+    private NotificationPreviewDto? _preview;
+
+    protected override async Task OnInitializedAsync()
+    {
+        _editContext = new EditContext(_model);
+
+        try
+        {
+            var page = await NotificationService.GetTemplatesPagedAsync(null, "Name", false, 1, 100);
+            _templates = page.Items;
+        }
+        catch
+        {
+            // template picker is optional; leave empty
+        }
+    }
+
+    private Task OnChannelChangedAsync(string value)
+    {
+        _model.Channel = value;
+        return Task.CompletedTask;
+    }
+
+    private async Task OnTemplateCodeChangedAsync(string value)
+    {
+        _model.TemplateCode = value;
+        _preview = null;
+
+        if (string.IsNullOrWhiteSpace(value))
+            return;
+
+        var template = _templates.FirstOrDefault(t => t.Code == value);
+        if (template is null)
+            return;
+
+        _model.Subject = template.Subject;
+        _model.Body = template.Body;
+    }
+
+    private async Task PreviewAsync()
+    {
+        if (!_editContext.Validate())
+            return;
+
+        _busy = true;
+        try
+        {
+            _preview = await NotificationService.PreviewAsync(BuildInput());
+        }
+        catch (ApiException ex)
+        {
+            Snackbar.Add(ex.Message, Severity.Error);
+        }
+        catch (Exception)
+        {
+            Snackbar.Add("Unable to reach the server.", Severity.Error);
+        }
+        finally
+        {
+            _busy = false;
+        }
+    }
+
+    private async Task SubmitAsync()
+    {
+        if (!_editContext.Validate())
+            return;
+
+        _busy = true;
+        try
+        {
+            await NotificationService.SendAsync(BuildInput());
+            Snackbar.Add("Notification sent.", Severity.Success);
+            MudDialog.Close(DialogResult.Ok(true));
+        }
+        catch (ApiException ex)
+        {
+            Snackbar.Add(ex.Message, Severity.Error);
+        }
+        catch (Exception)
+        {
+            Snackbar.Add("Unable to reach the server. Please try again.", Severity.Error);
+        }
+        finally
+        {
+            _busy = false;
+        }
+    }
+
+    private void CancelAsync()
+        => MudDialog.Cancel();
+
+    private SendNotificationInput BuildInput()
+    {
+        var input = new SendNotificationInput
+        {
+            Recipient = _model.Recipient.Trim(),
+            Channel = _model.Channel,
+            TemplateCode = string.IsNullOrWhiteSpace(_model.TemplateCode) ? null : _model.TemplateCode.Trim(),
+            Subject = string.IsNullOrWhiteSpace(_model.Subject) ? null : _model.Subject.Trim(),
+            Body = string.IsNullOrWhiteSpace(_model.Body) ? null : _model.Body.Trim(),
+            ReferenceId = string.IsNullOrWhiteSpace(_model.ReferenceId) ? null : _model.ReferenceId.Trim(),
+        };
+
+        var placeholders = _model.PlaceholdersSplit();
+        if (placeholders.Count > 0)
+            input.Placeholders = placeholders;
+
+        return input;
+    }
+
+    private sealed class SendNotificationFormModel
+    {
+        [Required(ErrorMessage = "Recipient is required.")]
+        [MaxLength(500, ErrorMessage = "Recipient must be 500 characters or fewer.")]
+        public string Recipient { get; set; } = string.Empty;
+
+        [Required(ErrorMessage = "Channel is required.")]
+        public string Channel { get; set; } = "Sms";
+
+        public string? TemplateCode { get; set; }
+        public string? Subject { get; set; }
+        public string? Body { get; set; }
+        public string? ReferenceId { get; set; }
+        public string? Placeholders { get; set; }
+
+        public Dictionary<string, string> PlaceholdersSplit()
+        {
+            var result = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+
+            if (string.IsNullOrWhiteSpace(Placeholders))
+                return result;
+
+            foreach (var pair in Placeholders.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries))
+            {
+                var eq = pair.IndexOf('=');
+                if (eq <= 0)
+                    continue;
+
+                result[pair[..eq].Trim()] = pair[(eq + 1)..].Trim();
+            }
+
+            return result;
+        }
+    }
+}

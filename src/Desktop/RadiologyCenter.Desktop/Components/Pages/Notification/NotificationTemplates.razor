@@ -1,0 +1,205 @@
+@page "/notifications/templates"
+@attribute [Authorize]
+@inject NotificationService NotificationService
+@inject IDialogService DialogService
+@inject ISnackbar Snackbar
+@implements IDisposable
+
+<PageHeader Icon="@Icons.Material.Filled.Article" Title="Notification Templates"
+            Subtitle="Manage SMS, email and push message templates"
+            SearchValueChanged="OnSearchChanged"
+            SearchPlaceholder="Search templates..."
+            OnRefresh="ReloadAsync">
+    <MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Add" OnClick="OpenCreateDialogAsync">New Template</MudButton>
+</PageHeader>
+
+<MudTable T="NotificationTemplateDto" @ref="_table" ServerData="LoadServerData" Dense="true" Hover="true" Striped="true" Elevation="1" RowsPerPage="10">
+    <HeaderContent>
+        <MudTh><MudTableSortLabel T="NotificationTemplateDto" SortLabel="@("Code")">Code</MudTableSortLabel></MudTh>
+        <MudTh><MudTableSortLabel T="NotificationTemplateDto" SortLabel="@("Name")">Name</MudTableSortLabel></MudTh>
+        <MudTh>Subject</MudTh>
+        <MudTh>Body</MudTh>
+        <MudTh><MudTableSortLabel T="NotificationTemplateDto" SortLabel="@("IsActive")">Status</MudTableSortLabel></MudTh>
+        <MudTh>Actions</MudTh>
+    </HeaderContent>
+    <RowTemplate>
+        <MudTd DataLabel="Code">
+            <MudChip T="string" Size="Size.Small" Color="Color.Primary" Variant="Variant.Outlined">@context.Code</MudChip>
+        </MudTd>
+        <MudTd DataLabel="Name">
+            <MudText Class="font-weight-medium">@context.Name</MudText>
+        </MudTd>
+        <MudTd DataLabel="Subject">@(string.IsNullOrWhiteSpace(context.Subject) ? "-" : Truncate(context.Subject))</MudTd>
+        <MudTd DataLabel="Body">@Truncate(context.Body)</MudTd>
+        <MudTd DataLabel="Status">
+            <MudChip T="string" Size="Size.Small" Color="@(context.IsActive ? Color.Success : Color.Default)">@(context.IsActive ? "Active" : "Inactive")</MudChip>
+        </MudTd>
+        <MudTd DataLabel="Actions">
+            <MudIconButton Icon="@Icons.Material.Filled.Edit" Size="Size.Small" Color="Color.Default" aria-label="Edit" OnClick="@(() => OpenEditDialogAsync(context))" />
+            <MudIconButton Icon="@(context.IsActive ? Icons.Material.Filled.Block : Icons.Material.Filled.CheckCircle)"
+                           Size="Size.Small"
+                           Color="@(context.IsActive ? Color.Default : Color.Success)"
+                           aria-label="Toggle status"
+                           OnClick="@(() => ToggleActiveAsync(context))" />
+            <MudIconButton Icon="@Icons.Material.Filled.Delete" Size="Size.Small" Color="Color.Error" aria-label="Delete" OnClick="@(() => DeleteTemplateAsync(context))" />
+        </MudTd>
+    </RowTemplate>
+    <NoRecordsContent>
+        @if (_loadError is not null)
+        {
+            <ErrorState Icon="@(_offline ? Icons.Material.Filled.CloudOff : Icons.Material.Filled.ErrorOutline)"
+                        Title="Couldn't load data"
+                        Message="@_loadError"
+                        Action="ReloadAsync" />
+        }
+        else
+        {
+            <EmptyState Icon="@Icons.Material.Filled.Article"
+                        Title="No notification templates yet"
+                        Message="Create templates for SMS, email and push messages; they can include placeholders like {name}."
+                        ActionLabel="Create your first template"
+                        Action="OpenCreateDialogAsync" />
+        }
+    </NoRecordsContent>
+    <PagerContent>
+        <MudTablePager PageSizeOptions="@(new[] { 10, 25, 50 })" />
+    </PagerContent>
+</MudTable>
+
+@code {
+    private MudTable<NotificationTemplateDto>? _table;
+    private string? _search;
+    private CancellationTokenSource? _searchCts;
+    private string? _loadError;
+    private bool _offline;
+
+    private async Task<TableData<NotificationTemplateDto>> LoadServerData(TableState state, CancellationToken ct)
+    {
+        try
+        {
+            var page = await NotificationService.GetTemplatesPagedAsync(
+                _search,
+                state.SortLabel,
+                state.SortDirection == SortDirection.Descending,
+                state.Page + 1,
+                state.PageSize,
+                ct);
+
+            _loadError = null;
+            _offline = false;
+            return new TableData<NotificationTemplateDto> { Items = page.Items, TotalItems = page.TotalCount };
+        }
+        catch (ApiException ex)
+        {
+            Snackbar.Add(ex.Message, Severity.Error);
+            _loadError = ex.Message;
+            _offline = false;
+            return new TableData<NotificationTemplateDto> { Items = Array.Empty<NotificationTemplateDto>(), TotalItems = 0 };
+        }
+        catch (Exception)
+        {
+            Snackbar.Add("Unable to reach the server.", Severity.Error);
+            _loadError = "Unable to reach the server.";
+            _offline = true;
+            return new TableData<NotificationTemplateDto> { Items = Array.Empty<NotificationTemplateDto>(), TotalItems = 0 };
+        }
+    }
+
+    private async Task OnSearchChanged(string? value)
+    {
+        _search = value;
+
+        _searchCts?.Cancel();
+        var cts = _searchCts = new CancellationTokenSource();
+        try
+        {
+            await Task.Delay(400, cts.Token);
+        }
+        catch (TaskCanceledException)
+        {
+            return;
+        }
+
+        if (_table is not null)
+            await _table.ReloadServerData();
+    }
+
+    private Task ReloadAsync()
+        => _table is null ? Task.CompletedTask : _table.ReloadServerData();
+
+    private async Task OpenCreateDialogAsync()
+    {
+        var options = new DialogOptions { MaxWidth = MaxWidth.Medium, FullWidth = true, NoHeader = true };
+        var dialog = await DialogService.ShowAsync<NotificationTemplateEditorDialog>("New Notification Template", options);
+        await ReloadIfSavedAsync(dialog);
+    }
+
+    private async Task OpenEditDialogAsync(NotificationTemplateDto template)
+    {
+        var parameters = new DialogParameters { ["Template"] = template };
+        var options = new DialogOptions { MaxWidth = MaxWidth.Medium, FullWidth = true, NoHeader = true };
+        var dialog = await DialogService.ShowAsync<NotificationTemplateEditorDialog>($"Edit {template.Name}", parameters, options);
+        await ReloadIfSavedAsync(dialog);
+    }
+
+    private async Task ReloadIfSavedAsync(IDialogReference dialog)
+    {
+        var result = await dialog.Result;
+        if (result is { Canceled: false })
+            await ReloadAsync();
+    }
+
+    private async Task ToggleActiveAsync(NotificationTemplateDto template)
+    {
+        try
+        {
+            if (template.IsActive)
+                await NotificationService.DeactivateTemplateAsync(template.Id);
+            else
+                await NotificationService.ActivateTemplateAsync(template.Id);
+
+            Snackbar.Add(template.IsActive ? "Template deactivated." : "Template activated.", Severity.Success);
+            await ReloadAsync();
+        }
+        catch (ApiException ex)
+        {
+            Snackbar.Add(ex.Message, Severity.Error);
+        }
+        catch (Exception)
+        {
+            Snackbar.Add("Unable to reach the server.", Severity.Error);
+        }
+    }
+
+    private async Task DeleteTemplateAsync(NotificationTemplateDto template)
+    {
+        var confirmed = await DialogService.ShowMessageBoxAsync(
+            "Delete Template",
+            $"Are you sure you want to delete {template.Name}? This cannot be undone.",
+            "Delete",
+            "Cancel");
+
+        if (confirmed != true)
+            return;
+
+        try
+        {
+            await NotificationService.DeleteTemplateAsync(template.Id);
+            Snackbar.Add("Template deleted.", Severity.Success);
+            await ReloadAsync();
+        }
+        catch (ApiException ex)
+        {
+            Snackbar.Add(ex.Message, Severity.Error);
+        }
+        catch (Exception)
+        {
+            Snackbar.Add("Unable to reach the server.", Severity.Error);
+        }
+    }
+
+    private static string Truncate(string value)
+        => value.Length > 60 ? value[..60] + "…" : value;
+
+    public void Dispose() => _searchCts?.Cancel();
+}

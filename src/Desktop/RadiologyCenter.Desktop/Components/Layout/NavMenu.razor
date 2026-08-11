@@ -64,6 +64,18 @@
             <MudMenuItem Icon="@Icons.Material.Filled.AccountBalanceWallet" OnClick="@(() => Go("/cash/sessions"))">Cash Sessions</MudMenuItem>
         </MudMenu>
 
+        <MudMenu Icon="@Icons.Material.Filled.Notifications"
+                 IconSize="Size.Medium"
+                 Class="collapsed-nav-menu"
+                 AnchorOrigin="Origin.CenterRight"
+                 TransformOrigin="Origin.TopLeft"
+                 Dense="true"
+                 OffsetX="12"
+                 Direction="Direction.Left">
+            <MudMenuItem Icon="@Icons.Material.Filled.Article" OnClick="@(() => Go("/notifications/templates"))">Templates</MudMenuItem>
+            <MudMenuItem Icon="@Icons.Material.Filled.Notifications" OnClick="@(() => Go("/notifications/messages"))">Messages</MudMenuItem>
+        </MudMenu>
+
         <MudMenu Icon="@Icons.Material.Filled.PrecisionManufacturing"
                  IconSize="Size.Medium"
                  Class="collapsed-nav-menu"
@@ -148,6 +160,10 @@
         </MudNavGroup>
         <MudNavGroup Title="Cash" Icon="@Icons.Material.Filled.AccountBalanceWallet" Ripple="false">
             <MudNavLink Href="/cash/sessions" Icon="@Icons.Material.Filled.AccountBalanceWallet" Ripple="false">Cash Sessions</MudNavLink>
+        </MudNavGroup>
+        <MudNavGroup Title="Notifications" Icon="@Icons.Material.Filled.Notifications" Ripple="false">
+            <MudNavLink Href="/notifications/templates" Icon="@Icons.Material.Filled.Article" Ripple="false">Templates</MudNavLink>
+            <MudNavLink Href="/notifications/messages" Icon="@Icons.Material.Filled.Notifications" Ripple="false">Messages</MudNavLink>
         </MudNavGroup>
         <MudNavGroup Title="Resources" Icon="@Icons.Material.Filled.PrecisionManufacturing" Ripple="false">
             <MudNavLink Href="/resources/equipment" Icon="@Icons.Material.Filled.Biotech" Ripple="false">Equipment</MudNavLink>

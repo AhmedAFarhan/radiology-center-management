@@ -1,0 +1,199 @@
+@page "/notifications/messages"
+@attribute [Authorize]
+@inject NotificationService NotificationService
+@inject IDialogService DialogService
+@inject ISnackbar Snackbar
+@implements IDisposable
+
+<PageHeader Icon="@Icons.Material.Filled.Notifications" Title="Notification Messages"
+            Subtitle="View the message delivery ledger"
+            SearchValueChanged="OnSearchChanged"
+            SearchPlaceholder="Search recipient, reference..."
+            OnRefresh="ReloadAsync">
+    <MudSelect T="string" Value="_channel" ValueChanged="OnChannelChangedAsync" Label="Channel"
+               Variant="Variant.Outlined" Margin="Margin.Dense" Dense="true" Class="status-filter ms-2">
+        <MudSelectItem Value="@(string.Empty)">All</MudSelectItem>
+        <MudSelectItem Value="@("Sms")">SMS</MudSelectItem>
+        <MudSelectItem Value="@("Email")">Email</MudSelectItem>
+        <MudSelectItem Value="@("Push")">Push</MudSelectItem>
+    </MudSelect>
+    <MudSelect T="string" Value="_status" ValueChanged="OnStatusChangedAsync" Label="Status"
+               Variant="Variant.Outlined" Margin="Margin.Dense" Dense="true" Class="status-filter ms-2">
+        <MudSelectItem Value="@(string.Empty)">All</MudSelectItem>
+        <MudSelectItem Value="@("Pending")">Pending</MudSelectItem>
+        <MudSelectItem Value="@("Sent")">Sent</MudSelectItem>
+        <MudSelectItem Value="@("Failed")">Failed</MudSelectItem>
+    </MudSelect>
+    <MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Send" OnClick="OpenSendDialogAsync">Send Notification</MudButton>
+</PageHeader>
+
+<MudTable T="NotificationMessageDto" @ref="_table" ServerData="LoadServerData" Dense="true" Hover="true" Striped="true" Elevation="1" RowsPerPage="10">
+    <HeaderContent>
+        <MudTh><MudTableSortLabel T="NotificationMessageDto" SortLabel="@("CreatedAt")">Sent At</MudTableSortLabel></MudTh>
+        <MudTh>Channel</MudTh>
+        <MudTh>Recipient</MudTh>
+        <MudTh>Subject</MudTh>
+        <MudTh>Status</MudTh>
+        <MudTh><MudTableSortLabel T="NotificationMessageDto" SortLabel="@("Attempts")">Attempts</MudTableSortLabel></MudTh>
+        <MudTh>Reference</MudTh>
+        <MudTh>Actions</MudTh>
+    </HeaderContent>
+    <RowTemplate>
+        <MudTd DataLabel="Sent At">@context.CreatedAt.ToLocalTime().ToString("g")</MudTd>
+        <MudTd DataLabel="Channel">
+            <MudChip T="string" Size="Size.Small" Color="@ChannelColor(context.Channel)" Variant="Variant.Outlined">@context.Channel</MudChip>
+        </MudTd>
+        <MudTd DataLabel="Recipient">
+            <MudText Class="font-weight-medium">@context.Recipient</MudText>
+        </MudTd>
+        <MudTd DataLabel="Subject">@(string.IsNullOrWhiteSpace(context.Subject) ? "-" : Truncate(context.Subject))</MudTd>
+        <MudTd DataLabel="Status">
+            <MudChip T="string" Size="Size.Small" Color="@StatusColor(context.Status)">@context.Status</MudChip>
+        </MudTd>
+        <MudTd DataLabel="Attempts" Class="text-center">@context.Attempts</MudTd>
+        <MudTd DataLabel="Reference">@(string.IsNullOrWhiteSpace(context.ReferenceId) ? "-" : context.ReferenceId)</MudTd>
+        <MudTd DataLabel="Actions" Class="text-center">
+            <MudIconButton Icon="@Icons.Material.Filled.Visibility" Size="Size.Small" Color="Color.Default" aria-label="View" OnClick="@(() => OpenDetailAsync(context))" />
+        </MudTd>
+    </RowTemplate>
+    <NoRecordsContent>
+        @if (_loadError is not null)
+        {
+            <ErrorState Icon="@(_offline ? Icons.Material.Filled.CloudOff : Icons.Material.Filled.ErrorOutline)"
+                        Title="Couldn't load data"
+                        Message="@_loadError"
+                        Action="ReloadAsync" />
+        }
+        else
+        {
+            <EmptyState Icon="@Icons.Material.Filled.Notifications"
+                        Title="No notification messages yet"
+                        Message="Messages sent via the send endpoint appear here with their delivery status."
+                        ActionLabel="Send your first notification"
+                        Action="OpenSendDialogAsync" />
+        }
+    </NoRecordsContent>
+    <PagerContent>
+        <MudTablePager PageSizeOptions="@(new[] { 10, 25, 50 })" />
+    </PagerContent>
+</MudTable>
+
+@code {
+    private MudTable<NotificationMessageDto>? _table;
+    private string? _search;
+    private string _channel = string.Empty;
+    private string _status = string.Empty;
+    private CancellationTokenSource? _searchCts;
+    private string? _loadError;
+    private bool _offline;
+
+    private async Task<TableData<NotificationMessageDto>> LoadServerData(TableState state, CancellationToken ct)
+    {
+        try
+        {
+            var page = await NotificationService.GetMessagesPagedAsync(
+                _search,
+                state.SortLabel,
+                state.SortDirection == SortDirection.Descending,
+                state.Page + 1,
+                state.PageSize,
+                string.IsNullOrWhiteSpace(_channel) ? null : _channel,
+                string.IsNullOrWhiteSpace(_status) ? null : _status,
+                ct);
+
+            _loadError = null;
+            _offline = false;
+            return new TableData<NotificationMessageDto> { Items = page.Items, TotalItems = page.TotalCount };
+        }
+        catch (ApiException ex)
+        {
+            Snackbar.Add(ex.Message, Severity.Error);
+            _loadError = ex.Message;
+            _offline = false;
+            return new TableData<NotificationMessageDto> { Items = Array.Empty<NotificationMessageDto>(), TotalItems = 0 };
+        }
+        catch (Exception)
+        {
+            Snackbar.Add("Unable to reach the server.", Severity.Error);
+            _loadError = "Unable to reach the server.";
+            _offline = true;
+            return new TableData<NotificationMessageDto> { Items = Array.Empty<NotificationMessageDto>(), TotalItems = 0 };
+        }
+    }
+
+    private async Task OnSearchChanged(string? value)
+    {
+        _search = value;
+
+        _searchCts?.Cancel();
+        var cts = _searchCts = new CancellationTokenSource();
+        try
+        {
+            await Task.Delay(400, cts.Token);
+        }
+        catch (TaskCanceledException)
+        {
+            return;
+        }
+
+        if (_table is not null)
+            await _table.ReloadServerData();
+    }
+
+    private async Task OnChannelChangedAsync(string value)
+    {
+        _channel = value;
+        await ReloadAsync();
+    }
+
+    private async Task OnStatusChangedAsync(string value)
+    {
+        _status = value;
+        await ReloadAsync();
+    }
+
+    private Task ReloadAsync()
+        => _table is null ? Task.CompletedTask : _table.ReloadServerData();
+
+    private async Task OpenSendDialogAsync()
+    {
+        var options = new DialogOptions { MaxWidth = MaxWidth.Medium, FullWidth = true, NoHeader = true };
+        var dialog = await DialogService.ShowAsync<SendNotificationDialog>("Send Notification", options);
+        await ReloadIfSavedAsync(dialog);
+    }
+
+    private async Task OpenDetailAsync(NotificationMessageDto message)
+    {
+        var parameters = new DialogParameters { ["Message"] = message };
+        var options = new DialogOptions { MaxWidth = MaxWidth.Medium, FullWidth = true, NoHeader = true };
+        await DialogService.ShowAsync<NotificationMessageDetailDialog>("Notification Message", parameters, options);
+    }
+
+    private async Task ReloadIfSavedAsync(IDialogReference dialog)
+    {
+        var result = await dialog.Result;
+        if (result is { Canceled: false })
+            await ReloadAsync();
+    }
+
+    private static Color ChannelColor(string channel) => channel switch
+    {
+        "Sms" => Color.Info,
+        "Email" => Color.Warning,
+        "Push" => Color.Secondary,
+        _ => Color.Default,
+    };
+
+    private static Color StatusColor(string status) => status switch
+    {
+        "Sent" => Color.Success,
+        "Failed" => Color.Error,
+        "Pending" => Color.Warning,
+        _ => Color.Default,
+    };
+
+    private static string Truncate(string value)
+        => value.Length > 55 ? value[..55] + "…" : value;
+
+    public void Dispose() => _searchCts?.Cancel();
+}
