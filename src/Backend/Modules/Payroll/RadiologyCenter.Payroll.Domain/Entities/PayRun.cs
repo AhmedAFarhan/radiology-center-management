@@ -122,7 +122,7 @@ public sealed class PayRun : SoftDeletableAggregateRoot<Guid>
 
     public void Pay(string? by = null)
     {
-        EnsureStatus(PayRunStatus.Approved, PayRunStatus.Paid);
+        EnsureStatus(PayRunStatus.Approved);
         Status = PayRunStatus.Paid;
         ProcessedBy = by;
         ProcessedAt = DateTime.UtcNow;

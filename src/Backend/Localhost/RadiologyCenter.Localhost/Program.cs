@@ -106,6 +106,7 @@ builder.Services.AddScoped<RadiologyCenter.Payroll.Application.Abstractions.IExa
 builder.Services.AddScoped<RadiologyCenter.Payroll.Application.Abstractions.IReferralDoctorDirectory, ReferralDoctorDirectory>();
 builder.Services.AddScoped<RadiologyCenter.Payroll.Application.Abstractions.IExamFeeIncomeResolver, PayrollFeeIncomeResolver>();
 builder.Services.AddScoped<RadiologyCenter.Payroll.Application.Abstractions.IStaffLeaveResolver, StaffLeaveDaysResolver>();
+builder.Services.AddScoped<RadiologyCenter.Payroll.Application.Abstractions.IStaffWorkHoursResolver, StaffWorkHoursResolver>();
 builder.Services.AddScoped<RadiologyCenter.Examinations.Application.Abstractions.IAncillaryDirectory, AncillaryDirectory>();
 builder.Services.AddScoped<RadiologyCenter.Examinations.Application.Abstractions.IProfitSourceResolver, ProfitSourceResolver>();
 builder.Services.AddScoped<RadiologyCenter.Reports.Application.Abstractions.IReportDirectory, ReportDirectory>();

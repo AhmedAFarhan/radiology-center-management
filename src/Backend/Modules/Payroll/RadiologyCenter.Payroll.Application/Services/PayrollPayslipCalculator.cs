@@ -1,49 +1,56 @@
 using RadiologyCenter.BuildingBlocks.Domain.Specifications;
 using RadiologyCenter.Payroll.Application.Abstractions;
+using RadiologyCenter.Payroll.Domain.Common;
 using RadiologyCenter.Payroll.Domain.Enumerations;
 
 namespace RadiologyCenter.Payroll.Application.Services;
 
 public class PayrollPayslipCalculator : IPayslipCalculator
 {
-    private const int WorkingDaysPerMonth = 26;
-
     private readonly ISalaryRepository _salaryRepository;
     private readonly IAllowanceAssignmentRepository _allowanceAssignmentRepository;
     private readonly ISalaryComponentRepository _salaryComponentRepository;
     private readonly IExamFeeIncomeResolver _examFeeIncomeResolver;
     private readonly IStaffLeaveResolver _staffLeaveResolver;
+    private readonly IStaffWorkHoursResolver _staffWorkHoursResolver;
 
     public PayrollPayslipCalculator(
         ISalaryRepository salaryRepository,
         IAllowanceAssignmentRepository allowanceAssignmentRepository,
         ISalaryComponentRepository salaryComponentRepository,
         IExamFeeIncomeResolver examFeeIncomeResolver,
-        IStaffLeaveResolver staffLeaveResolver)
+        IStaffLeaveResolver staffLeaveResolver,
+        IStaffWorkHoursResolver staffWorkHoursResolver)
     {
         _salaryRepository = salaryRepository;
         _allowanceAssignmentRepository = allowanceAssignmentRepository;
         _salaryComponentRepository = salaryComponentRepository;
         _examFeeIncomeResolver = examFeeIncomeResolver;
         _staffLeaveResolver = staffLeaveResolver;
+        _staffWorkHoursResolver = staffWorkHoursResolver;
     }
 
     public async Task<PayrollPayslipDraft?> CalculateAsync(Guid staffId, DateTime from, DateTime to, CancellationToken ct)
     {
         var salary = await FindBaseSalaryAsync(staffId, to, ct);
-        var baseSalary = salary?.BaseSalary ?? 0m;
+
+        var runWorkingDays = PayrollCalendar.WorkingDaysBetween(from.Date, to.Date);
+        var baseSalary = await ComputeBaseSalaryAsync(salary, staffId, from, to, ct);
+
+        var unpaidLeaveDays = await _staffLeaveResolver.GetUnpaidLeaveDaysAsync(staffId, from, to, ct);
+        var unpaidLeaveDeduction = salary is not null
+            && salary.SalaryType != SalaryType.Hourly
+            && runWorkingDays > 0
+            && unpaidLeaveDays > 0
+            ? Math.Round(salary.BaseSalary / runWorkingDays * unpaidLeaveDays, 2)
+            : 0m;
 
         var allowances = await FindActiveAllowancesAsync(staffId, from, to, ct);
-        var components = await BuildComponentsAsync(allowances, ct);
+        var components = await BuildComponentsAsync(allowances, from, to, runWorkingDays, ct);
 
         var feeIncome = await _examFeeIncomeResolver.GetFeeIncomeAsync(staffId, from, to, ct);
         if (feeIncome > 0)
             components.Add(new PayrollPayslipComponent("Examination Fees", feeIncome, IsDeduction: false));
-
-        var unpaidLeaveDays = await _staffLeaveResolver.GetUnpaidLeaveDaysAsync(staffId, from, to, ct);
-        var unpaidLeaveDeduction = salary is not null && unpaidLeaveDays > 0
-            ? Math.Round(salary.BaseSalary / WorkingDaysPerMonth * unpaidLeaveDays, 2)
-            : 0m;
 
         return new PayrollPayslipDraft(
             staffId,
@@ -52,6 +59,25 @@ public class PayrollPayslipCalculator : IPayslipCalculator
             unpaidLeaveDays,
             unpaidLeaveDeduction,
             components);
+    }
+
+    private async Task<decimal> ComputeBaseSalaryAsync(
+        Salary? salary,
+        Guid staffId,
+        DateTime from,
+        DateTime to,
+        CancellationToken ct)
+    {
+        if (salary is null)
+            return 0m;
+
+        if (salary.SalaryType == SalaryType.Hourly)
+        {
+            var workedHours = await _staffWorkHoursResolver.GetWorkedHoursAsync(staffId, from, to, ct);
+            return Math.Round(salary.BaseSalary * workedHours, 2);
+        }
+
+        return salary.BaseSalary;
     }
 
     private async Task<Salary?> FindBaseSalaryAsync(Guid staffId, DateTime to, CancellationToken ct)
@@ -82,6 +108,9 @@ public class PayrollPayslipCalculator : IPayslipCalculator
 
     private async Task<List<PayrollPayslipComponent>> BuildComponentsAsync(
         IReadOnlyList<AllowanceAssignment> allowances,
+        DateTime from,
+        DateTime to,
+        int runWorkingDays,
         CancellationToken ct)
     {
         var componentIds = allowances
@@ -103,15 +132,45 @@ public class PayrollPayslipCalculator : IPayslipCalculator
 
         foreach (var allowance in allowances.OrderBy(a => a.EffectiveDate))
         {
-            var isDeduction = allowance.SalaryComponentId.HasValue
-                && lookup.TryGetValue(allowance.SalaryComponentId!.Value, out var component)
-                && component.Kind == ComponentKind.Deduction;
+            var component = allowance.SalaryComponentId.HasValue
+                ? lookup.GetValueOrDefault(allowance.SalaryComponentId.Value)
+                : null;
 
-            var amount = allowance.IsPerWorkDay ? allowance.Amount * WorkingDaysPerMonth : allowance.Amount;
+            if (!IsDueInRun(allowance, component, from, to))
+                continue;
+
+            var isDeduction = allowance.SalaryComponentId.HasValue
+                && lookup.TryGetValue(allowance.SalaryComponentId!.Value, out var lookupComponent)
+                && lookupComponent.Kind == ComponentKind.Deduction;
+
+            var amount = allowance.IsPerWorkDay ? allowance.Amount * runWorkingDays : allowance.Amount;
 
             result.Add(new PayrollPayslipComponent(allowance.Name, amount, isDeduction));
         }
 
         return result;
+    }
+
+    private static bool IsDueInRun(AllowanceAssignment allowance, SalaryComponent? component, DateTime from, DateTime to)
+    {
+        var frequency = allowance.Frequency ?? component?.Frequency ?? Frequency.Monthly;
+        if (frequency == Frequency.Monthly)
+            return true;
+
+        var effective = allowance.EffectiveDate.Date;
+        var fromDate = from.Date;
+        var toDate = to.Date;
+
+        if (frequency == Frequency.OneTime)
+            return effective >= fromDate && effective <= toDate;
+
+        if (frequency == Frequency.Quarterly)
+        {
+            var quarterStart = new DateTime(toDate.Year, ((toDate.Month - 1) / 3) * 3 + 1, 1);
+            return quarterStart >= fromDate && quarterStart <= toDate && quarterStart >= effective;
+        }
+
+        var yearStart = new DateTime(toDate.Year, 1, 1);
+        return yearStart >= fromDate && yearStart <= toDate && yearStart >= effective;
     }
 }

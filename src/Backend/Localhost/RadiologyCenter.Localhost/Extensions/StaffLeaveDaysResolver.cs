@@ -1,5 +1,6 @@
 using RadiologyCenter.BuildingBlocks.Domain.Specifications;
 using RadiologyCenter.Payroll.Application.Abstractions;
+using RadiologyCenter.Payroll.Domain.Common;
 using RadiologyCenter.ResourceManagement.Application.Abstractions;
 using RadiologyCenter.ResourceManagement.Domain.Entities;
 using RadiologyCenter.ResourceManagement.Domain.Enumerations;
@@ -21,16 +22,16 @@ public class StaffLeaveDaysResolver : IStaffLeaveResolver
 
         var leaves = await _leaveRepository.FindAsync(spec, ct);
 
-        int days = 0;
+        var leaveDays = new HashSet<DateTime>();
         foreach (var leave in leaves)
         {
             var overlapStart = leave.StartDate.Date > from.Date ? leave.StartDate.Date : from.Date;
             var overlapEnd = leave.EndDate.Date < to.Date ? leave.EndDate.Date : to.Date;
 
-            if (overlapStart <= overlapEnd)
-                days += (overlapEnd - overlapStart).Days + 1;
+            for (var day = overlapStart; day <= overlapEnd; day = day.AddDays(1))
+                leaveDays.Add(day);
         }
 
-        return days;
+        return leaveDays.Count(PayrollCalendar.IsWorkingDay);
     }
 }

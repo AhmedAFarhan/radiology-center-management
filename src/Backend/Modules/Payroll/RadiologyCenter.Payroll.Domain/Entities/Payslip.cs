@@ -17,7 +17,7 @@ public sealed class Payslip : Entity<Guid>
 
     public decimal TotalEarnings => _components.Where(c => !c.IsDeduction).Sum(c => c.Amount);
     public decimal TotalDeductions => _components.Where(c => c.IsDeduction).Sum(c => c.Amount) + UnpaidLeaveDeduction;
-    public decimal NetSalary => GrossSalary + TotalEarnings - TotalDeductions;
+    public decimal NetSalary => Math.Max(0m, GrossSalary + TotalEarnings - TotalDeductions);
     public IReadOnlyCollection<PayslipComponent> Components => _components.AsReadOnly();
 
     private Payslip() { }
