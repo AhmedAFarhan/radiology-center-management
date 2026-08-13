@@ -12,19 +12,33 @@ public static class RecordExaminationPaymentCommandHandler
         IExaminationsUnitOfWork unitOfWork,
         CancellationToken ct)
     {
-        var examination = await examinationRepository.GetByIdAsync(command.ExaminationId, ct);
+        await using var transaction = await unitOfWork.BeginTransactionAsync(ct);
+
+        var examination = await examinationRepository.GetByIdForUpdateAsync(command.ExaminationId, ct);
         if (examination is null)
             return Result.Failure(Error.NotFound("Examination", command.ExaminationId));
 
         if (examination.Status == ExaminationStatus.Cancelled)
             return Result.Failure(Error.Conflict("Cannot record a payment for a cancelled examination."));
 
-        var cashResult = await cashEntryRecorder.RecordAsync(examination.Id, command.Amount, command.Description, ct);
+        if (command.Amount > examination.Remaining)
+            return Result.Failure(
+                Error.Validation(
+                    "PaymentExceedsRemaining",
+                    $"Payment of '{command.Amount}' exceeds the remaining balance of '{examination.Remaining}'."));
+
+        examination.RecordPayment(command.Amount);
+
+        var cashResult = await cashEntryRecorder.RecordAsync(
+            examination.Id,
+            command.Amount,
+            command.Description,
+            transaction,
+            ct);
         if (cashResult.IsFailure)
             return cashResult;
 
-        examination.RecordPayment(command.Amount);
-        await unitOfWork.SaveChangesAsync(ct);
+        await transaction.CommitAsync(ct);
 
         return Result.Success();
     }

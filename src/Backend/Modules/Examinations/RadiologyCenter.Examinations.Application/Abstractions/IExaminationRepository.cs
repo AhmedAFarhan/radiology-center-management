@@ -7,6 +7,7 @@ namespace RadiologyCenter.Examinations.Application.Abstractions;
 public interface IExaminationRepository : IBaseRepository<Examination, Guid>
 {
     Task<Examination?> GetWithItemsAsync(Guid id, CancellationToken ct = default);
+    Task<Examination?> GetByIdForUpdateAsync(Guid id, CancellationToken ct = default);
     Task<PagedResult<Examination>> GetPagedWithItemsAsync(QueryRequest request, CancellationToken ct = default);
     Task<bool> HasActiveExaminationsByTypeAsync(Guid examinationTypeId, CancellationToken ct = default);
     Task<IReadOnlyList<ExamFinancialProjection>> GetFinancialProjectionAsync(DateTime? from, DateTime? to, CancellationToken ct = default);

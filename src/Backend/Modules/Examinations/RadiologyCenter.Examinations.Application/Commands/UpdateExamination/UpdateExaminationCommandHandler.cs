@@ -25,6 +25,9 @@ public static class UpdateExaminationCommandHandler
             command.ReferralDoctorId,
             command.Notes);
 
+        if (command.Paid.HasValue && examination.Paid > 0 && command.Paid.Value != examination.Paid)
+            return Result.Failure(Error.Conflict("Paid amount cannot be modified once a payment has been recorded."));
+
         if (command.Discount.HasValue || command.IsDiscountPercentage.HasValue || command.Paid.HasValue)
         {
             examination.SetBilling(

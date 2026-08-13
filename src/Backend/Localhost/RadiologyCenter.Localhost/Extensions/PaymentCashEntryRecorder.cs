@@ -1,54 +1,102 @@
+using Microsoft.EntityFrameworkCore;
+using RadiologyCenter.BuildingBlocks.Application.Abstractions;
 using RadiologyCenter.BuildingBlocks.Domain.Results;
-using RadiologyCenter.Cash.Application.Commands.Sessions.AddCashEntry;
-using RadiologyCenter.Cash.Application.Commands.Sessions.Common;
-using RadiologyCenter.Cash.Application.Commands.Sessions.OpenCashSession;
-using RadiologyCenter.Cash.Application.DTOs;
-using RadiologyCenter.Cash.Application.Queries.Sessions.GetMyOpenCashSession;
+using RadiologyCenter.BuildingBlocks.Infrastructure.Persistence.Interceptors;
+using RadiologyCenter.Cash.Domain.Entities;
+using RadiologyCenter.Cash.Domain.Enumerations;
+using RadiologyCenter.Cash.Infrastructure.Persistence;
 using RadiologyCenter.Examinations.Application.Abstractions;
-using Wolverine;
 
 namespace RadiologyCenter.Localhost.Extensions;
 
 public class PaymentCashEntryRecorder : IPaymentCashEntryRecorder
 {
-    private readonly IMessageBus _bus;
+    private readonly ICurrentUser _currentUser;
+    private readonly IClock _clock;
+    private readonly AuditSoftDeleteInterceptor _auditInterceptor;
 
-    public PaymentCashEntryRecorder(IMessageBus bus)
+    public PaymentCashEntryRecorder(ICurrentUser currentUser, IClock clock, AuditSoftDeleteInterceptor auditInterceptor)
     {
-        _bus = bus;
+        _currentUser = currentUser;
+        _clock = clock;
+        _auditInterceptor = auditInterceptor;
     }
 
-    public async Task<Result> RecordAsync(Guid examinationId, decimal amount, string? description, CancellationToken ct)
-    {
-        var sessionResult = await _bus.InvokeAsync<Result<CashSessionDto?>>(new GetMyOpenCashSessionQuery(), ct);
-        if (sessionResult.IsFailure)
-            return Result.Failure(sessionResult.Error!);
-
-        Guid sessionId;
-        if (sessionResult.Value is null)
-        {
-            var openResult = await _bus.InvokeAsync<Result<CashSessionDto>>(new OpenCashSessionCommand(0), ct);
-            if (openResult.IsFailure)
-                return Result.Failure(openResult.Error!);
-
-            sessionId = openResult.Value.Id;
-        }
-        else
-        {
-            sessionId = sessionResult.Value.Id;
-        }
-
-        var entryCommand = new AddCashEntryCommand(
-            sessionId,
-            CashDirectionInput.In,
-            CashReasonInput.Payment,
+    public async Task<Result> RecordAsync(
+        Guid examinationId,
+        decimal amount,
+        string? description,
+        IUnitOfWorkTransaction transaction,
+        CancellationToken ct) =>
+        await RecordEntryAsync(
+            examinationId,
             amount,
+            description,
+            CashEntryDirection.In,
+            CashEntryReason.Payment,
+            transaction,
+            ct);
+
+    public async Task<Result> RecordRefundAsync(
+        Guid examinationId,
+        decimal amount,
+        string? description,
+        IUnitOfWorkTransaction transaction,
+        CancellationToken ct) =>
+        await RecordEntryAsync(
+            examinationId,
+            amount,
+            description,
+            CashEntryDirection.Out,
+            CashEntryReason.Refund,
+            transaction,
+            ct);
+
+    private async Task<Result> RecordEntryAsync(
+        Guid examinationId,
+        decimal amount,
+        string? description,
+        CashEntryDirection direction,
+        CashEntryReason reason,
+        IUnitOfWorkTransaction transaction,
+        CancellationToken ct)
+    {
+        if (!Guid.TryParse(_currentUser.Id, out var userId))
+            return Result.Failure(Error.Unauthorized());
+
+        if (transaction.DbTransaction is null)
+            return Result.Failure(Error.Failure("No active database transaction is available for the cash entry."));
+
+        var dbTransaction = transaction.DbTransaction;
+
+        var options = new DbContextOptionsBuilder<CashDbContext>()
+            .UseSqlServer(dbTransaction.Connection!)
+            .AddInterceptors(_auditInterceptor)
+            .Options;
+
+        await using var cashContext = new CashDbContext(options);
+        await cashContext.Database.UseTransactionAsync(dbTransaction, ct);
+
+        var session = await cashContext.CashSessions
+            .FirstOrDefaultAsync(s => s.UserId == userId && s.Status == CashSessionStatus.Open, ct);
+
+        if (session is null)
+        {
+            session = CashSession.Open(userId, 0, _clock.UtcNow);
+            await cashContext.CashSessions.AddAsync(session, ct);
+        }
+
+        var entry = CashEntry.Create(
+            session.Id,
+            direction,
+            reason,
+            amount,
+            _clock.UtcNow,
             description,
             examinationId.ToString());
 
-        var entryResult = await _bus.InvokeAsync<Result<CashEntryDto>>(entryCommand, ct);
-        if (entryResult.IsFailure)
-            return Result.Failure(entryResult.Error!);
+        await cashContext.CashEntries.AddAsync(entry, ct);
+        await cashContext.SaveChangesAsync(ct);
 
         return Result.Success();
     }

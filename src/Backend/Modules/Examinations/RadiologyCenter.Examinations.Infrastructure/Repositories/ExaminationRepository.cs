@@ -25,6 +25,11 @@ public class ExaminationRepository : BaseRepository<Examination, Guid>, IExamina
             .Include(e => e.Items)
             .FirstOrDefaultAsync(e => e.Id == id, ct);
 
+    public async Task<Examination?> GetByIdForUpdateAsync(Guid id, CancellationToken ct = default) =>
+        await DbSet
+            .FromSqlInterpolated($"SELECT * FROM [Examinations].[Examinations] WITH (UPDLOCK, ROWLOCK) WHERE [Id] = {id}")
+            .SingleOrDefaultAsync(ct);
+
     public async Task<PagedResult<Examination>> GetPagedWithItemsAsync(QueryRequest request, CancellationToken ct = default)
     {
         var spec = new DynamicSpecification<Examination>(FilterExpressionBuilder.Build<Examination>(request.Filters));

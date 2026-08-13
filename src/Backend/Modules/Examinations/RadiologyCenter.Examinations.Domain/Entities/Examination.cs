@@ -191,7 +191,13 @@ public sealed class Examination : AuditableAggregateRoot<Guid>
         if (isDiscountPercentage)
             Guard.Against(discount, d => d > 100, "Percentage discount cannot exceed 100.");
         if (paid.HasValue)
+        {
             Guard.Against(paid.Value, p => p < 0, "Paid amount cannot be negative.");
+            Guard.Against(
+                paid.Value,
+                p => Paid > 0 && p != Paid,
+                "Paid amount cannot be modified once a payment has been recorded.");
+        }
 
         Discount = discount;
         IsDiscountPercentage = isDiscountPercentage;
@@ -203,8 +209,18 @@ public sealed class Examination : AuditableAggregateRoot<Guid>
     public void RecordPayment(decimal amount)
     {
         Guard.Against(amount, a => a < 0, "Payment cannot be negative.");
+        Guard.Against(amount, a => a > Remaining, "Payment cannot exceed the remaining balance.");
 
         Paid += amount;
+        RecalculateRemaining();
+    }
+
+    public void Refund(decimal amount)
+    {
+        Guard.Against(amount, a => a < 0, "Refund cannot be negative.");
+        Guard.Against(amount, a => a > Paid, "Refund cannot exceed the amount paid.");
+
+        Paid -= amount;
         RecalculateRemaining();
     }
 
