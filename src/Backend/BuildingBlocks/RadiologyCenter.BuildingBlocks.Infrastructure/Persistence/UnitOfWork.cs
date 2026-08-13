@@ -1,7 +1,9 @@
 using System.Data.Common;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
 using RadiologyCenter.BuildingBlocks.Application.Abstractions;
 using RadiologyCenter.BuildingBlocks.Domain.Entities;
+using RadiologyCenter.BuildingBlocks.Domain.Exceptions;
 
 namespace RadiologyCenter.BuildingBlocks.Infrastructure.Persistence;
 
@@ -19,9 +21,16 @@ public class UnitOfWork<TContext> : IUnitOfWork, IUnitOfWork<TContext>
 
     public async Task<int> SaveChangesAsync(CancellationToken ct = default)
     {
-        var result = await _context.SaveChangesAsync(ct);
-        await DispatchDomainEventsAsync(ct);
-        return result;
+        try
+        {
+            var result = await _context.SaveChangesAsync(ct);
+            await DispatchDomainEventsAsync(ct);
+            return result;
+        }
+        catch (DbUpdateConcurrencyException ex)
+        {
+            throw new ConcurrencyException("The record was modified by another user. Please refresh and try again.", ex);
+        }
     }
 
     public async Task<IUnitOfWorkTransaction> BeginTransactionAsync(CancellationToken ct = default)

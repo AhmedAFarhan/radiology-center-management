@@ -46,6 +46,12 @@ public class ExceptionMiddleware
             await WriteResponse(context, HttpStatusCode.Conflict,
                 ApiResponse.Fail(ex.Message, ApiError.FromException(ex, "Conflict")));
         }
+        catch (ConcurrencyException ex)
+        {
+            _logger.LogWarning(ex, "Concurrency conflict");
+            await WriteResponse(context, HttpStatusCode.Conflict,
+                ApiResponse.Fail(ex.Message, ApiError.FromException(ex, "Conflict")));
+        }
         catch (DomainException ex)
         {
             _logger.LogWarning(ex, "Domain exception");

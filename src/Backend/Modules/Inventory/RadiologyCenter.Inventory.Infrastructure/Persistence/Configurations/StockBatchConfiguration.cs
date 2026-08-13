@@ -8,7 +8,7 @@ public class StockBatchConfiguration : IEntityTypeConfiguration<StockBatch>
 {
     public void Configure(EntityTypeBuilder<StockBatch> builder)
     {
-        builder.ToTable("StockBatches");
+        builder.ToTable("StockBatches", t => t.HasCheckConstraint("CK_StockBatches_QuantityRemaining_NonNegative", "[QuantityRemaining] >= 0"));
 
         builder.HasKey(b => b.Id);
 
@@ -16,6 +16,7 @@ public class StockBatchConfiguration : IEntityTypeConfiguration<StockBatch>
         builder.Property(b => b.ExpiryDate);
         builder.Property(b => b.QuantityReceived).IsRequired();
         builder.Property(b => b.QuantityRemaining).IsRequired();
+        builder.Property(b => b.RowVersion).IsRowVersion();
 
         builder.HasIndex(b => b.ItemId);
         builder.HasIndex(b => new { b.ItemId, b.QuantityRemaining });

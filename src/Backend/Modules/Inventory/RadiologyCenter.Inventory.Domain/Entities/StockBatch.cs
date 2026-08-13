@@ -11,6 +11,7 @@ public sealed class StockBatch : AuditableEntity<Guid>
     public int QuantityReceived { get; private set; }
     public int QuantityRemaining { get; private set; }
     public Guid? SupplierId { get; private set; }
+    public byte[] RowVersion { get; private set; } = Array.Empty<byte>();
 
     private StockBatch()
     {

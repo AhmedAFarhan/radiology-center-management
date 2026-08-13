@@ -16,6 +16,12 @@ public class StockBatchRepository : BaseRepository<StockBatch, Guid>, IStockBatc
             .OrderBy(b => b.ExpiryDate ?? DateTime.MaxValue)
             .ToListAsync(ct);
 
+    public async Task<IReadOnlyList<StockBatch>> GetAvailableForItemForUpdateAsync(Guid itemId, CancellationToken ct = default) =>
+        await DbSet
+            .FromSqlInterpolated($"SELECT * FROM [Inventory].[StockBatches] WITH (UPDLOCK, ROWLOCK) WHERE [ItemId] = {itemId} AND [QuantityRemaining] > 0")
+            .OrderBy(b => b.ExpiryDate ?? DateTime.MaxValue)
+            .ToListAsync(ct);
+
     public async Task<IReadOnlyList<StockBatch>> GetForItemAsync(Guid itemId, CancellationToken ct = default) =>
         await DbSet.AsNoTracking()
             .Where(b => b.ItemId == itemId)

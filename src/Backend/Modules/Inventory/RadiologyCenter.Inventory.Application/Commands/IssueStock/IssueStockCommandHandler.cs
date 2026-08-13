@@ -17,14 +17,14 @@ public static class IssueStockCommandHandler
         if (item is null)
             return Result.Failure(Error.NotFound("Item", command.ItemId));
 
-        var batches = await stockBatchRepository.GetAvailableForItemAsync(command.ItemId, ct);
+        await using var transaction = await unitOfWork.BeginTransactionAsync(ct);
+
+        var batches = await stockBatchRepository.GetAvailableForItemForUpdateAsync(command.ItemId, ct);
         var available = batches.Sum(b => b.QuantityRemaining);
         if (available < command.Quantity)
             return Result.Failure(Error.Validation(
                 "InsufficientStock",
                 $"Only {available} units available for item '{item.Name}'."));
-
-        await using var transaction = await unitOfWork.BeginTransactionAsync(ct);
 
         var remaining = command.Quantity;
         foreach (var batch in batches)
