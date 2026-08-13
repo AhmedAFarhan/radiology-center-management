@@ -4,5 +4,5 @@ public record TokenResult(
     string AccessToken,
     string RefreshToken,
     DateTime ExpiresAt,
-    DateTime RefreshTokenExpiresAt
-);
+    DateTime RefreshTokenExpiresAt,
+    bool MustChangePassword = false);

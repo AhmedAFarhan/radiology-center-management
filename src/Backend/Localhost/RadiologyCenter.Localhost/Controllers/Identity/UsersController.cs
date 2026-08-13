@@ -9,6 +9,7 @@ using RadiologyCenter.Identity.Application.Commands.CreateUser;
 using RadiologyCenter.Identity.Application.Commands.DeactivateUser;
 using RadiologyCenter.Identity.Application.Commands.LockUser;
 using RadiologyCenter.Identity.Application.Commands.RemoveRoleFromUser;
+using RadiologyCenter.Identity.Application.Commands.ResetPassword;
 using RadiologyCenter.Identity.Application.Commands.UnlockUser;
 using RadiologyCenter.Identity.Application.Commands.UpdateUserProfile;
 using RadiologyCenter.Identity.Application.Commands.UpdateUserRoles;
@@ -90,6 +91,14 @@ public class UsersController : ControllerBase
     public async Task<IActionResult> UnlockAsync(Guid id, CancellationToken ct)
     {
         var result = await _bus.InvokeAsync<Result>(new UnlockUserCommand(id), ct);
+        return result.ToActionResult();
+    }
+
+    [HasPermission(UsersUpdateCode)]
+    [HttpPost("{id:guid}/reset-password")]
+    public async Task<IActionResult> ResetPasswordAsync(Guid id, [FromBody] ResetPasswordCommand command, CancellationToken ct)
+    {
+        var result = await _bus.InvokeAsync<Result>(command with { UserId = id }, ct);
         return result.ToActionResult();
     }
 

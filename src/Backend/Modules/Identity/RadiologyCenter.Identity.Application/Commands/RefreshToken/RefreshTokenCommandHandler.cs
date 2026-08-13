@@ -17,6 +17,12 @@ public static class RefreshTokenCommandHandler
         if (user is null)
             return Result.Failure<TokenResult>(Error.Unauthorized("Invalid refresh token."));
 
+        if (!user.IsActive)
+            return Result.Failure<TokenResult>(Error.Unauthorized("Account is deactivated."));
+
+        if (user.IsLockedOut)
+            return Result.Failure<TokenResult>(Error.LockedOut("Account is locked due to too many failed login attempts."));
+
         if (!user.HasValidRefreshToken(command.Token) || !user.HasActiveSession(command.Token))
             return Result.Failure<TokenResult>(Error.Unauthorized("Refresh token is expired or revoked."));
 

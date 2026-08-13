@@ -184,7 +184,8 @@ public sealed class ApiClient
                 envelope.Data.RefreshToken,
                 envelope.Data.ExpiresAt,
                 envelope.Data.RefreshTokenExpiresAt,
-                tokens.Username));
+                tokens.Username,
+                envelope.Data.MustChangePassword));
 
             return envelope.Data;
         }

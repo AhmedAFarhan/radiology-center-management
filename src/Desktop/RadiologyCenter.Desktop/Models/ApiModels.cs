@@ -26,7 +26,8 @@ public sealed record TokenResult(
     string AccessToken,
     string RefreshToken,
     DateTime ExpiresAt,
-    DateTime RefreshTokenExpiresAt);
+    DateTime RefreshTokenExpiresAt,
+    bool MustChangePassword = false);
 
 public sealed record PagedResult<T>(
     IReadOnlyList<T> Items,

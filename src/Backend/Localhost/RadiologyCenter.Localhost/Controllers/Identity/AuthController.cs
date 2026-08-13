@@ -4,6 +4,7 @@ using RadiologyCenter.BuildingBlocks.Domain.Results;
 using RadiologyCenter.Identity.Application.Commands.Login;
 using RadiologyCenter.Identity.Application.Commands.Logout;
 using RadiologyCenter.Identity.Application.Commands.RefreshToken;
+using RadiologyCenter.Identity.Application.Commands.ChangePassword;
 using RadiologyCenter.Identity.Application.DTOs;
 using RadiologyCenter.Localhost.Extensions;
 using Wolverine;
@@ -39,6 +40,14 @@ public class AuthController : ControllerBase
     public async Task<IActionResult> LogoutAsync([FromBody] LogoutCommand command, CancellationToken ct)
     {
         var result = await _bus.InvokeAsync<Result>(command, ct);
+        return result.ToActionResult();
+    }
+
+    [Authorize]
+    [HttpPost("change-password")]
+    public async Task<IActionResult> ChangePasswordAsync([FromBody] ChangePasswordCommand command, CancellationToken ct)
+    {
+        var result = await _bus.InvokeAsync<Result<TokenResult>>(command, ct);
         return result.ToActionResult();
     }
 }

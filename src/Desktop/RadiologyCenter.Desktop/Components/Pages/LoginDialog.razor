@@ -1,5 +1,6 @@
 @using System.ComponentModel.DataAnnotations
 @inject AuthService AuthService
+@inject IDialogService DialogService
 @inject ISnackbar Snackbar
 @inject NavigationManager Navigation
 
@@ -58,7 +59,23 @@
         _busy = true;
         try
         {
-            await AuthService.SignInAsync(_model.UserName, _model.Password);
+            var mustChangePassword = await AuthService.SignInAsync(_model.UserName, _model.Password);
+            if (mustChangePassword)
+            {
+                Snackbar.Add("You must set a new password before continuing.", Severity.Warning);
+                MudDialog.Close(DialogResult.Ok(true));
+                var options = new DialogOptions
+                {
+                    CloseOnEscapeKey = false,
+                    BackdropClick = false,
+                    MaxWidth = MaxWidth.Small,
+                    FullWidth = true,
+                };
+                await DialogService.ShowAsync<ChangePasswordDialog>("Change Password", new DialogParameters { ["Forced"] = true }, options);
+                Navigation.NavigateTo("/dashboard");
+                return;
+            }
+
             Snackbar.Add("Welcome back!", Severity.Success);
             MudDialog.Close(DialogResult.Ok(true));
             Navigation.NavigateTo("/dashboard");

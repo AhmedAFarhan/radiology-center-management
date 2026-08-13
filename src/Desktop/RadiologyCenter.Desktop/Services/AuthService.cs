@@ -15,7 +15,7 @@ public sealed class AuthService
         _tokenStorage = tokenStorage;
     }
 
-    public async Task SignInAsync(string userName, string password, CancellationToken ct = default)
+    public async Task<bool> SignInAsync(string userName, string password, CancellationToken ct = default)
     {
         var tokens = await _api.PostAsync<TokenResult>("api/auth/login", new { userName, password }, ct);
 
@@ -24,7 +24,27 @@ public sealed class AuthService
             tokens.RefreshToken,
             tokens.ExpiresAt,
             tokens.RefreshTokenExpiresAt,
-            userName));
+            userName,
+            tokens.MustChangePassword));
+
+        return tokens.MustChangePassword;
+    }
+
+    public async Task ChangePasswordAsync(string currentPassword, string newPassword, CancellationToken ct = default)
+    {
+        var tokens = await _api.PostAsync<TokenResult>(
+            "api/auth/change-password",
+            new { currentPassword, newPassword },
+            ct);
+
+        var current = _tokenStorage.GetTokens();
+        await _authState.SignInAsync(new AuthTokens(
+            tokens.AccessToken,
+            tokens.RefreshToken,
+            tokens.ExpiresAt,
+            tokens.RefreshTokenExpiresAt,
+            current?.Username ?? string.Empty,
+            tokens.MustChangePassword));
     }
 
     public async Task SignOutAsync(CancellationToken ct = default)

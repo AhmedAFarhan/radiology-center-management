@@ -42,6 +42,7 @@
         <MudTd DataLabel="Actions">
             <MudIconButton Icon="@Icons.Material.Filled.Edit" Size="Size.Small" Color="Color.Default" aria-label="Edit profile" OnClick="@(() => OpenEditDialogAsync(context))" />
             <MudIconButton Icon="@Icons.Material.Filled.Groups" Size="Size.Small" Color="Color.Info" aria-label="Manage roles" OnClick="@(() => OpenRolesDialogAsync(context))" />
+            <MudIconButton Icon="@Icons.Material.Filled.Key" Size="Size.Small" Color="Color.Default" aria-label="Reset password" OnClick="@(() => OpenResetPasswordDialogAsync(context))" Disabled="@IsCurrentUser(context)" />
             @if (context.IsLocked)
             {
                 <MudIconButton Icon="@Icons.Material.Filled.LockOpen" Size="Size.Small" Color="Color.Warning" aria-label="Unlock" OnClick="@(() => UnlockAsync(context))" />
@@ -178,6 +179,14 @@
         var parameters = new DialogParameters { ["User"] = user };
         var options = new DialogOptions { MaxWidth = MaxWidth.Small, FullWidth = true, NoHeader = true };
         var dialog = await DialogService.ShowAsync<UserLockDialog>($"Lock {user.UserName}", parameters, options);
+        await ReloadIfSavedAsync(dialog);
+    }
+
+    private async Task OpenResetPasswordDialogAsync(UserDto user)
+    {
+        var parameters = new DialogParameters { ["User"] = user };
+        var options = new DialogOptions { MaxWidth = MaxWidth.Small, FullWidth = true, NoHeader = true };
+        var dialog = await DialogService.ShowAsync<ResetPasswordDialog>($"Reset Password - {user.UserName}", parameters, options);
         await ReloadIfSavedAsync(dialog);
     }
 

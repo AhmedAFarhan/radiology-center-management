@@ -16,6 +16,7 @@ public static class CreateUserCommandHandler
     {
         var user = User.Create(command.UserName, command.Email, command.FirstName, command.LastName, command.PhoneNumber);
         user.SetPasswordHash(passwordHasher.HashPassword(user, command.Password));
+        user.RequirePasswordChange();
 
         var roles = await roleRepository.GetByIdsAsync(command.RoleIds, ct);
         var missingRoleId = command.RoleIds.Distinct().FirstOrDefault(id => roles.All(r => r.Id != id));

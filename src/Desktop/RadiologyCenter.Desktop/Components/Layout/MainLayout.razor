@@ -1,6 +1,8 @@
 ﻿@inherits LayoutComponentBase
+@using RadiologyCenter.Desktop.Components.Pages
 @inject NavigationManager Navigation
 @inject AuthService AuthService
+@inject IDialogService DialogService
 @inject ISnackbar Snackbar
 
 <div class="app-shell">
@@ -26,6 +28,7 @@
             <MudIconButton Icon="@Icons.Material.Filled.Notifications" Color="Color.Inherit" aria-label="Notifications" OnClick="OnNotifications" />
             <MudAvatar Size="Size.Small" Color="Color.Primary" Class="mx-2 app-bar-avatar">@GetInitial()</MudAvatar>
             <MudText Typo="Typo.body2" Class="me-2 app-bar-user">@_userName</MudText>
+            <MudIconButton Icon="@Icons.Material.Filled.Key" Color="Color.Inherit" aria-label="Change password" OnClick="@OnChangePassword" />
             <MudIconButton Icon="@Icons.Material.Filled.Logout" Color="Color.Inherit" aria-label="Sign out" OnClick="@OnLogout" />
         </header>
 
@@ -62,6 +65,12 @@
         await AuthService.SignOutAsync();
         Snackbar.Add("You have been signed out.", Severity.Info);
         Navigation.NavigateTo("/");
+    }
+
+    private async Task OnChangePassword()
+    {
+        var options = new DialogOptions { MaxWidth = MaxWidth.Small, FullWidth = true, NoHeader = true };
+        await DialogService.ShowAsync<ChangePasswordDialog>("Change Password", options);
     }
 
     private void OnNotifications()

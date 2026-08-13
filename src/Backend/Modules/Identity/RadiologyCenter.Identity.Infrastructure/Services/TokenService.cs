@@ -26,7 +26,8 @@ public class TokenService : ITokenService
             GenerateAccessToken(user, expiresAt),
             GenerateRefreshToken(),
             expiresAt,
-            DateTime.UtcNow.AddDays(_options.RefreshTokenExpirationDays));
+            DateTime.UtcNow.AddDays(_options.RefreshTokenExpirationDays),
+            user.MustChangePassword);
     }
 
     private string GenerateAccessToken(User user, DateTime expiresAt)

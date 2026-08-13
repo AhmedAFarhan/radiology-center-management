@@ -48,6 +48,9 @@ public sealed class IdentityService
     public Task UnlockUserAsync(string id, CancellationToken ct = default)
         => _api.SendAsync($"api/users/{id}/unlock", ct: ct);
 
+    public Task ResetPasswordAsync(string id, string newPassword, CancellationToken ct = default)
+        => _api.SendAsync($"api/users/{id}/reset-password", new { newPassword }, ct);
+
     public Task UpdateUserRolesAsync(string id, List<string> roleIds, CancellationToken ct = default)
         => _api.PutAsync<object>($"api/users/{id}/roles", new UpdateUserRolesInput { RoleIds = roleIds }, ct);
 
