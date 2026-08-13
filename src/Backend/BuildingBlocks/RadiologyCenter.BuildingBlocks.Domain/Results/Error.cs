@@ -16,6 +16,9 @@ public sealed record Error(string Code, string Message)
     public static Error Unauthorized(string message = "Unauthorized.") =>
         new("Unauthorized", message);
 
+    public static Error Forbidden(string message = "Forbidden.") =>
+        new("Forbidden", message);
+
     public static Error LockedOut(string message = "Account is locked out.") =>
         new("LockedOut", message);
 

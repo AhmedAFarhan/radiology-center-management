@@ -1,3 +1,4 @@
+using RadiologyCenter.BuildingBlocks.Application.Abstractions;
 using RadiologyCenter.Cash.Application.Abstractions;
 using RadiologyCenter.Cash.Application.Commands.Sessions.Common;
 using RadiologyCenter.Cash.Application.DTOs;
@@ -9,14 +10,20 @@ public static class AddCashEntryCommandHandler
 {
     public static async Task<Result<CashEntryDto>> HandleAsync(
         AddCashEntryCommand command,
+        ICurrentUser currentUser,
         ICashSessionRepository sessionRepository,
         ICashEntryRepository entryRepository,
         ICashUnitOfWork unitOfWork,
         CancellationToken ct)
     {
+        if (!Guid.TryParse(currentUser.Id, out var userId))
+            return Result.Failure<CashEntryDto>(Error.Unauthorized());
+
         var session = await sessionRepository.GetByIdAsync(command.CashSessionId, ct);
         if (session is null)
             return Result.Failure<CashEntryDto>(Error.NotFound("CashSession", command.CashSessionId));
+        if (session.UserId != userId)
+            return Result.Failure<CashEntryDto>(Error.Forbidden("You can only add entries to your own cash session."));
         if (session.Status != CashSessionStatus.Open)
             return Result.Failure<CashEntryDto>(Error.Conflict("Cannot add entries to a closed session."));
 

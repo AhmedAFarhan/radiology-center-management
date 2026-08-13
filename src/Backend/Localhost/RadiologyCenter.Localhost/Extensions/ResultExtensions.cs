@@ -14,6 +14,7 @@ public static class ResultExtensions
             {
                 "NotFound" => new NotFoundObjectResult(ApiResponse.FromResult(result)),
                 "Unauthorized" => new UnauthorizedObjectResult(ApiResponse.FromResult(result)),
+                "Forbidden" => new ObjectResult(ApiResponse.FromResult(result)) { StatusCode = StatusCodes.Status403Forbidden },
                 "Conflict" => new ConflictObjectResult(ApiResponse.FromResult(result)),
                 "LockedOut" => new ObjectResult(ApiResponse.FromResult(result)) { StatusCode = StatusCodes.Status423Locked },
                 _ => new BadRequestObjectResult(ApiResponse.FromResult(result))
@@ -26,6 +27,7 @@ public static class ResultExtensions
             {
                 "NotFound" => new NotFoundObjectResult(ApiResponse.FromResult(result)),
                 "Unauthorized" => new UnauthorizedObjectResult(ApiResponse.FromResult(result)),
+                "Forbidden" => new ObjectResult(ApiResponse.FromResult(result)) { StatusCode = StatusCodes.Status403Forbidden },
                 "Conflict" => new ConflictObjectResult(ApiResponse.FromResult(result)),
                 "LockedOut" => new ObjectResult(ApiResponse.FromResult(result)) { StatusCode = StatusCodes.Status423Locked },
                 _ => new BadRequestObjectResult(ApiResponse.FromResult(result))

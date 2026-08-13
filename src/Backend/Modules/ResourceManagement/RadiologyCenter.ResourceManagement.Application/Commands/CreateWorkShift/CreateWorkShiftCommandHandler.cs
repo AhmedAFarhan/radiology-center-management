@@ -1,5 +1,6 @@
 using Mapster;
 using RadiologyCenter.ResourceManagement.Application.Abstractions;
+using RadiologyCenter.ResourceManagement.Application.Commands.Common;
 using RadiologyCenter.ResourceManagement.Application.DTOs;
 
 namespace RadiologyCenter.ResourceManagement.Application.Commands.CreateWorkShift;
@@ -24,6 +25,20 @@ public static class CreateWorkShiftCommandHandler
             if (equipment is null)
                 return Result.Failure<WorkShiftDto>(Error.NotFound("Equipment", equipmentId));
         }
+
+        var (isConflict, resource) = await WorkShiftOverlapChecker.FindConflictAsync(
+            workShiftRepository,
+            command.StaffId,
+            command.EquipmentId,
+            command.Date,
+            command.StartTime,
+            command.EndTime,
+            excludingId: null,
+            ct);
+
+        if (isConflict)
+            return Result.Failure<WorkShiftDto>(Error.Conflict(
+                $"The {resource} is already booked on {command.Date:yyyy-MM-dd} during {command.StartTime:hh\\:mm}-{command.EndTime:hh\\:mm}."));
 
         var workShift = WorkShift.Create(
             command.StaffId,

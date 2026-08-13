@@ -1,4 +1,5 @@
 using RadiologyCenter.ResourceManagement.Application.Abstractions;
+using RadiologyCenter.ResourceManagement.Application.Commands.Common;
 
 namespace RadiologyCenter.ResourceManagement.Application.Commands.UpdateWorkShift;
 
@@ -26,6 +27,20 @@ public static class UpdateWorkShiftCommandHandler
             if (equipment is null)
                 return Result.Failure(Error.NotFound("Equipment", equipmentId));
         }
+
+        var (isConflict, resource) = await WorkShiftOverlapChecker.FindConflictAsync(
+            workShiftRepository,
+            command.StaffId,
+            command.EquipmentId,
+            command.Date,
+            command.StartTime,
+            command.EndTime,
+            excludingId: command.WorkShiftId,
+            ct);
+
+        if (isConflict)
+            return Result.Failure(Error.Conflict(
+                $"The {resource} is already booked on {command.Date:yyyy-MM-dd} during {command.StartTime:hh\\:mm}-{command.EndTime:hh\\:mm}."));
 
         workShift.Update(
             command.StaffId,

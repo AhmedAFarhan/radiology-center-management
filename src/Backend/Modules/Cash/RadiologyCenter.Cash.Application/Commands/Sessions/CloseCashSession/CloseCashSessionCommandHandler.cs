@@ -23,6 +23,8 @@ public static class CloseCashSessionCommandHandler
         var session = await sessionRepository.GetByIdAsync(command.CashSessionId, ct);
         if (session is null)
             return Result.Failure<CashHandoverDto>(Error.NotFound("CashSession", command.CashSessionId));
+        if (session.UserId != closingUserId)
+            return Result.Failure<CashHandoverDto>(Error.Forbidden("You can only close your own cash session."));
         if (session.Status != CashSessionStatus.Open)
             return Result.Failure<CashHandoverDto>(Error.Conflict("Cannot close a session that is not open."));
 
