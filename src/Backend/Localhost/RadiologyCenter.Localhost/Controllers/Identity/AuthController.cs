@@ -18,6 +18,7 @@ public class AuthController : ControllerBase
 
     public AuthController(IMessageBus bus) => _bus = bus;
 
+    [AllowAnonymous]
     [HttpPost("login")]
     public async Task<IActionResult> LoginAsync([FromBody] LoginCommand command, CancellationToken ct)
     {
@@ -25,6 +26,7 @@ public class AuthController : ControllerBase
         return result.ToActionResult();
     }
 
+    [AllowAnonymous]
     [HttpPost("refresh")]
     public async Task<IActionResult> RefreshAsync([FromBody] RefreshTokenCommand command, CancellationToken ct)
     {
