@@ -22,6 +22,7 @@ public sealed class Claim : AuditableAggregateRoot<Guid>
     public DateTime? SubmittedAt { get; private set; }
     public DateTime? ApprovedAt { get; private set; }
     public DateTime? PaidAt { get; private set; }
+    public byte[] RowVersion { get; private set; } = Array.Empty<byte>();
 
     public IReadOnlyCollection<ClaimRejection> Rejections => _rejections.AsReadOnly();
     public IReadOnlyCollection<Settlement> Settlements => _settlements.AsReadOnly();

@@ -12,16 +12,23 @@ public static class RecordClaimSettlementCommandHandler
         IInsuranceUnitOfWork unitOfWork,
         CancellationToken ct)
     {
-        var claim = await claimRepository.GetByIdAsync(command.ClaimId, ct);
+        await using var transaction = await unitOfWork.BeginTransactionAsync(ct);
+
+        var claim = await claimRepository.GetByIdForUpdateAsync(command.ClaimId, ct);
         if (claim is null)
             return Result.Failure<ClaimDto>(Error.NotFound("Claim", command.ClaimId));
+
+        if (command.Amount > claim.RemainingOwed)
+            return Result.Failure<ClaimDto>(Error.Validation(
+                "SettlementExceedsRemaining",
+                $"Settlement of {command.Amount} exceeds the remaining {claim.RemainingOwed} owed for claim '{claim.Id}'."));
 
         var method = SettlementMethod.FromName<SettlementMethod>(command.Method);
 
         claim.RecordSettlement(method, command.Amount, command.Reference);
 
         claimRepository.Update(claim);
-        await unitOfWork.SaveChangesAsync(ct);
+        await transaction.CommitAsync(ct);
 
         return Result.Success(claim.ToDto());
     }

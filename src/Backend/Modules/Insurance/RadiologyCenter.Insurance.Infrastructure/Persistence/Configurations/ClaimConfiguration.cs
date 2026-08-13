@@ -27,6 +27,7 @@ public class ClaimConfiguration : IEntityTypeConfiguration<Claim>
         builder.Property(c => c.SubmittedAt);
         builder.Property(c => c.ApprovedAt);
         builder.Property(c => c.PaidAt);
+        builder.Property(c => c.RowVersion).IsRowVersion();
 
         builder.HasIndex(c => c.ExaminationId).IsUnique();
         builder.HasIndex(c => c.PatientId);
