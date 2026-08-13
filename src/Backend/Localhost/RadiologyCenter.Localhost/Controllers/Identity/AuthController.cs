@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using RadiologyCenter.BuildingBlocks.Domain.Results;
 using RadiologyCenter.Identity.Application.Commands.Login;
@@ -31,6 +32,7 @@ public class AuthController : ControllerBase
         return result.ToActionResult();
     }
 
+    [Authorize]
     [HttpPost("logout")]
     public async Task<IActionResult> LogoutAsync([FromBody] LogoutCommand command, CancellationToken ct)
     {

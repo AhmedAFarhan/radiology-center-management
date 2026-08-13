@@ -7,16 +7,23 @@ public static class LogoutCommandHandler
 {
     public static async Task<Result> HandleAsync(
         LogoutCommand command,
+        ICurrentUser currentUser,
         IUserRepository userRepository,
         IIdentityUnitOfWork unitOfWork,
         CancellationToken ct)
     {
-        var user = await userRepository.GetByIdAsync(command.UserId, ct);
+        if (!Guid.TryParse(currentUser.Id, out var userId))
+            return Result.Failure(Error.Unauthorized());
+
+        var user = await userRepository.GetByIdAsync(userId, ct);
         if (user is null)
-            return Result.Failure(Error.NotFound("User", command.UserId));
+            return Result.Failure(Error.Unauthorized());
 
         if (command.RefreshToken is not null)
         {
+            if (!user.HasValidRefreshToken(command.RefreshToken) || !user.HasActiveSession(command.RefreshToken))
+                return Result.Failure(Error.Unauthorized("Refresh token is expired or revoked."));
+
             user.RevokeRefreshToken(command.RefreshToken);
             user.RevokeSession(command.RefreshToken);
         }

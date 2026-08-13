@@ -1,5 +1,3 @@
-using System.Text;
-using System.Text.Json;
 using RadiologyCenter.Desktop.Models;
 
 namespace RadiologyCenter.Desktop.Services;
@@ -36,7 +34,7 @@ public sealed class AuthService
         {
             try
             {
-                await _api.SendAsync("api/auth/logout", new { userId = JwtClaims.GetSubject(tokens.AccessToken), refreshToken = tokens.RefreshToken }, ct);
+                await _api.SendAsync("api/auth/logout", new { refreshToken = tokens.RefreshToken }, ct);
             }
             catch
             {
@@ -45,40 +43,5 @@ public sealed class AuthService
         }
 
         await _authState.SignOutAsync();
-    }
-}
-
-internal static class JwtClaims
-{
-    public static Guid? GetSubject(string accessToken)
-    {
-        try
-        {
-            var parts = accessToken.Split('.');
-            if (parts.Length < 2)
-                return null;
-
-            var payload = parts[1]
-                .Replace('-', '+')
-                .Replace('_', '/');
-            switch (payload.Length % 4)
-            {
-                case 2: payload += "=="; break;
-                case 3: payload += "="; break;
-            }
-
-            using var document = JsonDocument.Parse(Encoding.UTF8.GetString(Convert.FromBase64String(payload)));
-            if (document.RootElement.TryGetProperty("sub", out var sub) &&
-                Guid.TryParse(sub.GetString(), out var userId))
-            {
-                return userId;
-            }
-        }
-        catch
-        {
-            // ignore malformed tokens
-        }
-
-        return null;
     }
 }
