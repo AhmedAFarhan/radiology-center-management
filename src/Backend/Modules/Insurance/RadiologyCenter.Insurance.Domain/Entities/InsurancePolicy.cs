@@ -90,5 +90,7 @@ public sealed class InsurancePolicy : AuditableAggregateRoot<Guid>
 
     public void MarkExpired() => Status = PolicyStatus.Expired;
 
-    public bool IsActive => Status == PolicyStatus.Active && (!EffectiveTo.HasValue || EffectiveTo.Value >= DateTime.UtcNow);
+    public bool IsActive => Status == PolicyStatus.Active
+        && EffectiveFrom <= DateTime.UtcNow
+        && (!EffectiveTo.HasValue || EffectiveTo.Value >= DateTime.UtcNow);
 }

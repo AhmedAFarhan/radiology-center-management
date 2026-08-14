@@ -22,4 +22,7 @@ public class ExaminationHistoryRepository : BaseRepository<ExaminationHistory, G
 
         return await query.ToListAsync(ct);
     }
+
+    public async Task<ExaminationHistory?> GetByExaminationIdAsync(Guid examinationId, CancellationToken ct = default)
+        => await DbSet.FirstOrDefaultAsync(h => h.ExaminationId == examinationId, ct);
 }

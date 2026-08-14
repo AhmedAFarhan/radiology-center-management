@@ -23,8 +23,12 @@ public class UnitOfWork<TContext> : IUnitOfWork, IUnitOfWork<TContext>
     {
         try
         {
-            var result = await _context.SaveChangesAsync(ct);
             await DispatchDomainEventsAsync(ct);
+            var result = await _context.SaveChangesAsync(ct);
+
+            if (_context.Database.CurrentTransaction is null)
+                await _eventDispatcher.FlushAsync(ct);
+
             return result;
         }
         catch (DbUpdateConcurrencyException ex)
@@ -36,7 +40,7 @@ public class UnitOfWork<TContext> : IUnitOfWork, IUnitOfWork<TContext>
     public async Task<IUnitOfWorkTransaction> BeginTransactionAsync(CancellationToken ct = default)
     {
         var transaction = await _context.Database.BeginTransactionAsync(ct);
-        return new DbUnitOfWorkTransaction(transaction, this);
+        return new DbUnitOfWorkTransaction(transaction, this, _eventDispatcher);
     }
 
     private async Task DispatchDomainEventsAsync(CancellationToken ct)
@@ -49,7 +53,7 @@ public class UnitOfWork<TContext> : IUnitOfWork, IUnitOfWork<TContext>
 
         foreach (var entity in entries)
         {
-            await _eventDispatcher.DispatchAsync(entity, ct);
+            await _eventDispatcher.DispatchAsync(entity, _context, ct);
         }
     }
 }
@@ -58,11 +62,16 @@ internal sealed class DbUnitOfWorkTransaction : IUnitOfWorkTransaction
 {
     private readonly IDbContextTransaction _transaction;
     private readonly IUnitOfWork _unitOfWork;
+    private readonly IDomainEventDispatcher _eventDispatcher;
 
-    public DbUnitOfWorkTransaction(IDbContextTransaction transaction, IUnitOfWork unitOfWork)
+    public DbUnitOfWorkTransaction(
+        IDbContextTransaction transaction,
+        IUnitOfWork unitOfWork,
+        IDomainEventDispatcher eventDispatcher)
     {
         _transaction = transaction;
         _unitOfWork = unitOfWork;
+        _eventDispatcher = eventDispatcher;
     }
 
     public DbTransaction? DbTransaction => _transaction.GetDbTransaction();
@@ -72,6 +81,7 @@ internal sealed class DbUnitOfWorkTransaction : IUnitOfWorkTransaction
         try
         {
             await _unitOfWork.SaveChangesAsync(ct);
+            await _eventDispatcher.FlushAsync(ct);
             await _transaction.CommitAsync(ct);
         }
         catch

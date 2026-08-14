@@ -17,6 +17,7 @@ public class InsurancePolicyRepository : BaseRepository<InsurancePolicy, Guid>, 
         return await DbSet
             .Where(p => p.PatientId == patientId
                 && p.Status == PolicyStatus.Active
+                && p.EffectiveFrom <= now
                 && (!p.EffectiveTo.HasValue || p.EffectiveTo.Value >= now))
             .ToListAsync(ct);
     }

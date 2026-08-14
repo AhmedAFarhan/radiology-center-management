@@ -19,6 +19,8 @@ public static class CreateClaimCommandHandler
             return Result.Failure<ClaimDto>(Error.NotFound("Policy", command.PolicyId));
         if (!policy.IsActive)
             return Result.Failure<ClaimDto>(Error.Conflict("Policy is not active."));
+        if (policy.PatientId != command.PatientId)
+            return Result.Failure<ClaimDto>(Error.Conflict("The policy does not belong to the claim's patient."));
 
         if (await claimRepository.GetByExaminationIdAsync(command.ExaminationId, ct) is not null)
             return Result.Failure<ClaimDto>(Error.Conflict("A claim already exists for this examination."));
@@ -27,8 +29,19 @@ public static class CreateClaimCommandHandler
             return Result.Failure<ClaimDto>(Error.NotFound("PreAuthorization", command.PreAuthorizationId));
         if (preAuth.ExaminationId != command.ExaminationId)
             return Result.Failure<ClaimDto>(Error.Conflict("Pre-authorization does not match the examination."));
+        if (preAuth.PatientId != command.PatientId)
+            return Result.Failure<ClaimDto>(Error.Conflict("Pre-authorization does not match the claim's patient."));
+        if (preAuth.PolicyId != command.PolicyId)
+            return Result.Failure<ClaimDto>(Error.Conflict("Pre-authorization does not match the claim's policy."));
         if (preAuth.Status != PreAuthorizationStatus.Approved)
             return Result.Failure<ClaimDto>(Error.Conflict("Pre-authorization must be approved before creating a claim."));
+        if (preAuth.ApprovedAmount is not { } approvedAmount)
+            return Result.Failure<ClaimDto>(Error.Conflict("Pre-authorization has no approved amount."));
+        if (command.BilledAmount > approvedAmount)
+            return Result.Failure<ClaimDto>(
+                Error.Validation(
+                    "BilledAmountExceedsApproved",
+                    $"Billed amount '{command.BilledAmount}' exceeds the pre-authorization approved amount of '{approvedAmount}'."));
 
         var split = CoverageCalculationService.Split(policy, command.BilledAmount);
 

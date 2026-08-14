@@ -16,7 +16,7 @@ public static class CreateReportTemplateCommandHandler
             return Result.Failure<ReportTemplateDto>(Error.Conflict($"A template named '{command.Name}' already exists."));
 
         var modality = Modality.FromName<Modality>(command.Modality);
-        var template = ReportTemplate.Create(command.Name, modality, command.BodyPart, command.Description, command.IsSystem);
+        var template = ReportTemplate.Create(command.Name, modality, command.BodyPart, command.Description);
 
         if (command.Sections is not null)
         {

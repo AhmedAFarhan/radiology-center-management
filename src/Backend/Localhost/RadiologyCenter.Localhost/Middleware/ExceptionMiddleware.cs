@@ -62,7 +62,7 @@ public class ExceptionMiddleware
         {
             _logger.LogError(ex, "Unhandled exception");
             await WriteResponse(context, HttpStatusCode.InternalServerError,
-                ApiResponse.Fail("An unexpected error occurred.", ApiError.FromException(ex, "InternalError")));
+                ApiResponse.Fail("An unexpected error occurred.", new ApiError { Code = "InternalError", Message = "An unexpected error occurred." }));
         }
     }
 

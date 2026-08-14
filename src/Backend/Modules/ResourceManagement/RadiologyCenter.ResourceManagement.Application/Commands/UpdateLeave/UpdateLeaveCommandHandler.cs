@@ -20,6 +20,9 @@ public static class UpdateLeaveCommandHandler
         if (staff is null)
             return Result.Failure(Error.NotFound("Staff", command.StaffId));
 
+        if (await leaveRepository.HasOverlapAsync(command.StaffId, command.StartDate, command.EndDate, command.LeaveId, ct))
+            return Result.Failure(Error.Conflict("The staff member already has leave overlapping the requested period."));
+
         var leaveType = LeaveType.FromName<LeaveType>(command.LeaveType);
 
         leave.Update(

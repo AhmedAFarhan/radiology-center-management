@@ -44,7 +44,7 @@ public class NotificationSender : INotificationSender
         catch (Exception ex)
         {
             _logger.LogError(ex, "Failed to send notification via {Channel} to {Recipient}.", channel.Name, recipient);
-            return Result.Failure(Error.Failure($"Failed to send notification: {ex.Message}"));
+            return Result.Failure(Error.Failure("Failed to send notification."));
         }
     }
 }

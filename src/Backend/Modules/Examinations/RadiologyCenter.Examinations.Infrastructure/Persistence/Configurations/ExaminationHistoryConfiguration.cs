@@ -13,6 +13,7 @@ public class ExaminationHistoryConfiguration : IEntityTypeConfiguration<Examinat
 
         builder.HasKey(h => h.Id);
 
+        builder.Property(h => h.ExaminationId);
         builder.Property(h => h.ExaminationTypeId).IsRequired();
         builder.Property(h => h.TypeCode).IsRequired().HasMaxLength(20);
         builder.Property(h => h.TypeName).IsRequired().HasMaxLength(200);
@@ -44,6 +45,9 @@ public class ExaminationHistoryConfiguration : IEntityTypeConfiguration<Examinat
 
         builder.HasIndex(h => h.ExaminationTypeId);
         builder.HasIndex(h => h.CompletedAt);
+        builder.HasIndex(h => h.ExaminationId)
+            .IsUnique()
+            .HasFilter("[ExaminationId] IS NOT NULL");
 
         builder.HasMany(h => h.Items)
             .WithOne()

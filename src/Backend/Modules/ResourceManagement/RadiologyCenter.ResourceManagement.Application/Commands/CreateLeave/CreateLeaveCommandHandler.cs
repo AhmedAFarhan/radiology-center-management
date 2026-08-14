@@ -18,6 +18,9 @@ public static class CreateLeaveCommandHandler
         if (staff is null)
             return Result.Failure<LeaveDto>(Error.NotFound("Staff", command.StaffId));
 
+        if (await leaveRepository.HasOverlapAsync(command.StaffId, command.StartDate, command.EndDate, ct: ct))
+            return Result.Failure<LeaveDto>(Error.Conflict("The staff member already has leave overlapping the requested period."));
+
         var leaveType = LeaveType.FromName<LeaveType>(command.LeaveType);
 
         var leave = Leave.Create(

@@ -29,6 +29,8 @@ public static class ApproveCashHandoverCommandHandler
             return Result.Failure<CashHandoverDto>(Error.NotFound("CashHandover", command.CashSessionId));
         if (handover.ApprovedAt is not null)
             return Result.Failure<CashHandoverDto>(Error.Conflict("This handover is already approved."));
+        if (handover.ClosedByUserId == approvingUserId)
+            return Result.Failure<CashHandoverDto>(Error.Conflict("A handover cannot be approved by the same user who closed the session."));
 
         handover.Approve(approvingUserId, DateTime.UtcNow);
         handoverRepository.Update(handover);

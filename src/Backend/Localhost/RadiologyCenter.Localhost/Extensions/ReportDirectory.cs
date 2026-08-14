@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using RadiologyCenter.Examinations.Domain.Enumerations;
 using RadiologyCenter.Examinations.Infrastructure.Persistence;
 using RadiologyCenter.Patients.Infrastructure.Persistence;
 using RadiologyCenter.Reports.Application.Abstractions;
@@ -74,4 +75,8 @@ public class ReportDirectory : IReportDirectory
             .GroupBy(p => p.Id)
             .ToDictionary(g => g.Key, g => typeNames.GetValueOrDefault(g.First().ExaminationTypeId) ?? string.Empty);
     }
+
+    public async Task<bool> IsExaminationCompletedAsync(Guid examinationId, CancellationToken ct = default)
+        => await _examinationsDb.Examinations
+            .AnyAsync(e => e.Id == examinationId && e.Status == ExaminationStatus.Completed, ct);
 }

@@ -35,7 +35,7 @@ public sealed class Salary : SoftDeletableAggregateRoot<Guid>
             BaseSalary = baseSalary,
             SalaryType = salaryType,
             EffectiveDate = effectiveDate,
-            IsActive = true
+            IsActive = effectiveDate <= DateTime.UtcNow
         };
 
         return salary;

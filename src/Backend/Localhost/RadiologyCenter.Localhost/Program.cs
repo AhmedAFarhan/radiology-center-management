@@ -74,7 +74,7 @@ builder.Services.AddSwaggerGen(options =>
     });
 });
 
-builder.Host.ConfigureWolverine();
+builder.Host.ConfigureWolverine(builder.Configuration.GetConnectionString("DefaultConnection"));
 
 builder.Services.AddApplication();
 builder.Services.AddMapster();

@@ -37,9 +37,9 @@ public class ExaminationTypesController : ControllerBase
 
     [HasPermission(ExaminationsReadCode)]
     [HttpPost("all")]
-    public async Task<IActionResult> GetAllAsync([FromBody] QueryRequest request, CancellationToken ct)
+    public async Task<IActionResult> GetAllAsync([FromBody] QueryRequest request, CancellationToken ct, [FromQuery] bool? isActive = null)
     {
-        var result = await _bus.InvokeAsync<Result<PagedResult<ExaminationTypeDto>>>(new GetExaminationTypesQuery(request), ct);
+        var result = await _bus.InvokeAsync<Result<PagedResult<ExaminationTypeDto>>>(new GetExaminationTypesQuery(request, isActive), ct);
         return result.ToActionResult();
     }
 

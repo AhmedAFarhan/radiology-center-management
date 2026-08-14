@@ -20,14 +20,17 @@ public static class CreateSalaryCommandHandler
 
         var salaryType = SalaryType.FromName<SalaryType>(command.SalaryType);
 
-        var previousSalaries = await FindActiveSalariesAsync(salaryRepository, command.StaffId, ct);
-        foreach (var previous in previousSalaries)
-        {
-            previous.Deactivate();
-            salaryRepository.Update(previous);
-        }
-
         var salary = Salary.Create(command.StaffId, command.BaseSalary, salaryType, command.EffectiveDate);
+
+        if (salary.IsActive)
+        {
+            var previousSalaries = await FindActiveSalariesAsync(salaryRepository, command.StaffId, ct);
+            foreach (var previous in previousSalaries)
+            {
+                previous.Deactivate();
+                salaryRepository.Update(previous);
+            }
+        }
 
         await salaryRepository.AddAsync(salary, ct);
         await unitOfWork.SaveChangesAsync(ct);

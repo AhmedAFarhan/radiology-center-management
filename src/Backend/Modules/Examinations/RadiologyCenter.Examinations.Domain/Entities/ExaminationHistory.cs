@@ -9,6 +9,7 @@ public sealed class ExaminationHistory : Entity<Guid>
 {
     private readonly List<ExaminationHistoryItem> _items = [];
 
+    public Guid? ExaminationId { get; private set; }
     public Guid ExaminationTypeId { get; private set; }
     public string TypeCode { get; private set; }
     public string TypeName { get; private set; }
@@ -66,6 +67,7 @@ public sealed class ExaminationHistory : Entity<Guid>
         var history = new ExaminationHistory
         {
             Id = Guid.NewGuid(),
+            ExaminationId = examination.Id,
             ExaminationTypeId = examination.ExaminationTypeId,
             TypeCode = type.Code,
             TypeName = type.Name,
@@ -112,5 +114,14 @@ public sealed class ExaminationHistory : Entity<Guid>
         }
 
         return history;
+    }
+
+    public void UpdatePaymentSnapshot(decimal paid, decimal remaining)
+    {
+        Guard.Against(paid, p => p < 0, "Paid amount cannot be negative.");
+        Guard.Against(remaining, r => r < 0, "Remaining amount cannot be negative.");
+
+        Paid = paid;
+        Remaining = remaining;
     }
 }

@@ -8,6 +8,7 @@ public static class RecordExaminationPaymentCommandHandler
     public static async Task<Result> HandleAsync(
         RecordExaminationPaymentCommand command,
         IExaminationRepository examinationRepository,
+        IExaminationHistoryRepository historyRepository,
         IPaymentCashEntryRecorder cashEntryRecorder,
         IExaminationsUnitOfWork unitOfWork,
         CancellationToken ct)
@@ -28,6 +29,13 @@ public static class RecordExaminationPaymentCommandHandler
                     $"Payment of '{command.Amount}' exceeds the remaining balance of '{examination.Remaining}'."));
 
         examination.RecordPayment(command.Amount);
+
+        if (examination.Status == ExaminationStatus.Completed)
+        {
+            var history = await historyRepository.GetByExaminationIdAsync(examination.Id, ct);
+            if (history is not null)
+                history.UpdatePaymentSnapshot(examination.Paid, examination.Remaining);
+        }
 
         var cashResult = await cashEntryRecorder.RecordAsync(
             examination.Id,
