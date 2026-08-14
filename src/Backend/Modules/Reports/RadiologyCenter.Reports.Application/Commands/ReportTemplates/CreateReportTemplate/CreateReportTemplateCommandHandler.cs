@@ -1,3 +1,4 @@
+using RadiologyCenter.Catalog.Domain.Enumerations;
 using RadiologyCenter.Reports.Application.Abstractions;
 using RadiologyCenter.Reports.Application.DTOs;
 using RadiologyCenter.Reports.Domain.Enumerations;

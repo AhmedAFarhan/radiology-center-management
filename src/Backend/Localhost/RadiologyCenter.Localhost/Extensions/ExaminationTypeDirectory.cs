@@ -1,4 +1,4 @@
-using RadiologyCenter.Examinations.Application.Abstractions;
+using RadiologyCenter.Catalog.Application.Abstractions;
 using RadiologyCenter.Payroll.Application.Abstractions;
 
 namespace RadiologyCenter.Localhost.Extensions;

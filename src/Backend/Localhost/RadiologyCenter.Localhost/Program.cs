@@ -13,6 +13,9 @@ using RadiologyCenter.Examinations.Application.Abstractions;
 using RadiologyCenter.Localhost.Extensions;
 using RadiologyCenter.Localhost.Filters;
 using RadiologyCenter.Localhost.Middleware;
+using RadiologyCenter.Catalog.Application;
+using RadiologyCenter.Catalog.Infrastructure;
+using RadiologyCenter.Catalog.Infrastructure.Persistence;
 using RadiologyCenter.Patients.Application;
 using RadiologyCenter.Patients.Infrastructure;
 using RadiologyCenter.Patients.Infrastructure.Persistence;
@@ -88,6 +91,8 @@ builder.Services.AddInventoryApplication();
 builder.Services.AddInventoryInfrastructure(builder.Configuration);
 builder.Services.AddExaminationsApplication();
 builder.Services.AddExaminationsInfrastructure(builder.Configuration);
+builder.Services.AddCatalogApplication();
+builder.Services.AddCatalogInfrastructure(builder.Configuration);
 builder.Services.AddResourceManagementApplication();
 builder.Services.AddResourceManagementInfrastructure(builder.Configuration);
 builder.Services.AddPayrollApplication();
@@ -109,6 +114,8 @@ builder.Services.AddScoped<RadiologyCenter.Payroll.Application.Abstractions.IExa
 builder.Services.AddScoped<RadiologyCenter.Payroll.Application.Abstractions.IStaffLeaveResolver, StaffLeaveDaysResolver>();
 builder.Services.AddScoped<RadiologyCenter.Payroll.Application.Abstractions.IStaffWorkHoursResolver, StaffWorkHoursResolver>();
 builder.Services.AddScoped<RadiologyCenter.Examinations.Application.Abstractions.IAncillaryDirectory, AncillaryDirectory>();
+builder.Services.AddScoped<RadiologyCenter.Examinations.Application.Abstractions.IExaminationTypeDirectory, ExaminationTypeInfoDirectory>();
+builder.Services.AddScoped<RadiologyCenter.Catalog.Application.Abstractions.IExaminationTypeUsageChecker, ExaminationTypeUsageChecker>();
 builder.Services.AddScoped<RadiologyCenter.Examinations.Application.Abstractions.IProfitSourceResolver, ProfitSourceResolver>();
 builder.Services.AddScoped<RadiologyCenter.Reports.Application.Abstractions.IReportDirectory, ReportDirectory>();
 builder.Services.AddScoped<RadiologyCenter.Insurance.Application.Abstractions.IInsuranceDirectory, InsuranceDirectory>();
@@ -125,6 +132,7 @@ using (var scope = app.Services.CreateScope())
         typeof(IdentityDbContext),
         typeof(PatientsDbContext),
         typeof(InventoryDbContext),
+        typeof(CatalogDbContext),
         typeof(ExaminationsDbContext),
         typeof(ResourceManagementDbContext),
         typeof(PayrollDbContext),

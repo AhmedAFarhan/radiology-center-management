@@ -1,6 +1,7 @@
 using RadiologyCenter.BuildingBlocks.Domain.Common;
 using RadiologyCenter.BuildingBlocks.Domain.Exceptions;
 using RadiologyCenter.BuildingBlocks.Domain.SoftDeletable;
+using RadiologyCenter.Catalog.Domain.Enumerations;
 using RadiologyCenter.Reports.Domain.Enumerations;
 
 namespace RadiologyCenter.Reports.Domain.Entities;

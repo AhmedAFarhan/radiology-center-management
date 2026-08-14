@@ -15,16 +15,16 @@ public class UserRepository : BaseRepository<User, Guid>, IUserRepository
     }
 
     public override async Task<User?> GetByIdAsync(Guid id, CancellationToken ct = default) =>
-        await DbSet.Include(u => u.AssignedRoles).ThenInclude(r => r.Permissions).FirstOrDefaultAsync(u => u.Id == id, ct);
+        await DbSet.AsSplitQuery().Include(u => u.AssignedRoles).ThenInclude(r => r.Permissions).FirstOrDefaultAsync(u => u.Id == id, ct);
 
     public async Task<User?> GetByEmailAsync(string email, CancellationToken ct = default) =>
-        await DbSet.Include(u => u.AssignedRoles).ThenInclude(r => r.Permissions).FirstOrDefaultAsync(u => u.Email == email, ct);
+        await DbSet.AsSplitQuery().Include(u => u.AssignedRoles).ThenInclude(r => r.Permissions).FirstOrDefaultAsync(u => u.Email == email, ct);
 
     public async Task<User?> GetByUserNameAsync(string userName, CancellationToken ct = default) =>
-        await DbSet.Include(u => u.AssignedRoles).ThenInclude(r => r.Permissions).FirstOrDefaultAsync(u => u.UserName == userName, ct);
+        await DbSet.AsSplitQuery().Include(u => u.AssignedRoles).ThenInclude(r => r.Permissions).FirstOrDefaultAsync(u => u.UserName == userName, ct);
 
     public override async Task<IReadOnlyList<User>> GetAllAsync(CancellationToken ct = default) =>
-        await DbSet.Include(u => u.AssignedRoles).ThenInclude(r => r.Permissions).ToListAsync(ct);
+        await DbSet.AsSplitQuery().Include(u => u.AssignedRoles).ThenInclude(r => r.Permissions).ToListAsync(ct);
 
     public async Task<bool> ExistsByEmailAsync(string email, CancellationToken ct = default) =>
         await DbSet.AsNoTracking().AnyAsync(u => u.Email == email, ct);
@@ -33,7 +33,7 @@ public class UserRepository : BaseRepository<User, Guid>, IUserRepository
         await DbSet.AsNoTracking().AnyAsync(u => u.UserName == userName, ct);
 
     public async Task<User?> GetByRefreshTokenAsync(string refreshToken, CancellationToken ct = default) =>
-        await DbSet.Include(u => u.AssignedRoles).ThenInclude(r => r.Permissions)
+        await DbSet.AsSplitQuery().Include(u => u.AssignedRoles).ThenInclude(r => r.Permissions)
             .FirstOrDefaultAsync(u => u.RefreshTokens.Any(rt => rt.Token == refreshToken), ct);
 
     public Task UpdateAsync(User user, CancellationToken ct = default)

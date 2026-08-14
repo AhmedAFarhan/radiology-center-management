@@ -1,5 +1,7 @@
 using RadiologyCenter.BuildingBlocks.Domain.Common;
 using RadiologyCenter.BuildingBlocks.Domain.Entities;
+using RadiologyCenter.Catalog.Domain.Enumerations;
+using RadiologyCenter.Catalog.Domain.ValueObjects;
 using RadiologyCenter.Examinations.Domain.Enumerations;
 using RadiologyCenter.Examinations.Domain.ValueObjects;
 

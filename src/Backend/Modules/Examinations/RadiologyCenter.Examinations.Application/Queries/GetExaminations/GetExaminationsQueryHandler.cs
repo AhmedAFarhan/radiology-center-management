@@ -10,13 +10,13 @@ public static class GetExaminationsQueryHandler
     public static async Task<Result<PagedResult<ExaminationDto>>> HandleAsync(
         GetExaminationsQuery query,
         IExaminationRepository examinationRepository,
-        IExaminationTypeRepository examinationTypeRepository,
+        IExaminationTypeDirectory examinationTypeDirectory,
         CancellationToken ct)
     {
         var paged = await examinationRepository.GetPagedWithItemsAsync(query.Request, ct);
 
         var typeIds = paged.Items.Select(e => e.ExaminationTypeId).Distinct().ToList();
-        var types = await examinationTypeRepository.GetWithItemsByIdsAsync(typeIds, ct);
+        var types = await examinationTypeDirectory.GetWithItemsByIdsAsync(typeIds, ct);
         var typeLookup = types.ToDictionary(t => t.Id);
 
         var dtos = paged.Items

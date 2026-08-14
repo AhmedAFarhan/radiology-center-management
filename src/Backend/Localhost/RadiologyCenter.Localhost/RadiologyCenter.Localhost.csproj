@@ -29,6 +29,8 @@
     <ProjectReference Include="..\..\Modules\Inventory\RadiologyCenter.Inventory.Infrastructure\RadiologyCenter.Inventory.Infrastructure.csproj" />
     <ProjectReference Include="..\..\Modules\Examinations\RadiologyCenter.Examinations.Application\RadiologyCenter.Examinations.Application.csproj" />
     <ProjectReference Include="..\..\Modules\Examinations\RadiologyCenter.Examinations.Infrastructure\RadiologyCenter.Examinations.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\Modules\Catalog\RadiologyCenter.Catalog.Application\RadiologyCenter.Catalog.Application.csproj" />
+    <ProjectReference Include="..\..\Modules\Catalog\RadiologyCenter.Catalog.Infrastructure\RadiologyCenter.Catalog.Infrastructure.csproj" />
     <ProjectReference Include="..\..\Modules\ResourceManagement\RadiologyCenter.ResourceManagement.Application\RadiologyCenter.ResourceManagement.Application.csproj" />
     <ProjectReference Include="..\..\Modules\ResourceManagement\RadiologyCenter.ResourceManagement.Infrastructure\RadiologyCenter.ResourceManagement.Infrastructure.csproj" />
     <ProjectReference Include="..\..\Modules\Payroll\RadiologyCenter.Payroll.Application\RadiologyCenter.Payroll.Application.csproj" />

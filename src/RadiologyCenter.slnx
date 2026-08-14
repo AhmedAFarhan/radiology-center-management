@@ -24,6 +24,11 @@
     <Project Path="Backend/Modules/Patients/RadiologyCenter.Patients.Domain/RadiologyCenter.Patients.Domain.csproj" />
     <Project Path="Backend/Modules/Patients/RadiologyCenter.Patients.Infrastructure/RadiologyCenter.Patients.Infrastructure.csproj" />
   </Folder>
+  <Folder Name="/Backend/Modules/Catalog/">
+    <Project Path="Backend/Modules/Catalog/RadiologyCenter.Catalog.Domain/RadiologyCenter.Catalog.Domain.csproj" />
+    <Project Path="Backend/Modules/Catalog/RadiologyCenter.Catalog.Application/RadiologyCenter.Catalog.Application.csproj" />
+    <Project Path="Backend/Modules/Catalog/RadiologyCenter.Catalog.Infrastructure/RadiologyCenter.Catalog.Infrastructure.csproj" />
+  </Folder>
   <Folder Name="/Backend/Modules/Examinations/">
     <Project Path="Backend/Modules/Examinations/RadiologyCenter.Examinations.Domain/RadiologyCenter.Examinations.Domain.csproj" />
     <Project Path="Backend/Modules/Examinations/RadiologyCenter.Examinations.Application/RadiologyCenter.Examinations.Application.csproj" />

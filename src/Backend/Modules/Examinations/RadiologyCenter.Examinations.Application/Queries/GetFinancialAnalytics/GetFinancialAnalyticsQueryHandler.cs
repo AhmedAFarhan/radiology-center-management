@@ -13,15 +13,15 @@ public static class GetFinancialAnalyticsQueryHandler
     public static async Task<Result<FinancialAnalyticsDto>> HandleAsync(
         GetFinancialAnalyticsQuery query,
         IExaminationRepository examinationRepository,
-        IExaminationTypeRepository examinationTypeRepository,
+        IExaminationTypeDirectory examinationTypeDirectory,
         CancellationToken ct)
     {
         var projections = await examinationRepository.GetFinancialProjectionAsync(query.From, query.To, ct);
 
         var typeIds = projections.Select(p => p.ExaminationTypeId).Distinct().ToList();
-        var types = await examinationTypeRepository.GetWithItemsByIdsAsync(typeIds, ct);
+        var types = await examinationTypeDirectory.GetWithItemsByIdsAsync(typeIds, ct);
         var typeLookup = types
-            .ToDictionary(t => t.Id, t => (Name: t.Name, Modality: t.Modality.ToString()));
+            .ToDictionary(t => t.Id, t => (Name: t.Name, Modality: t.Modality));
 
         var examCount = projections.Count;
         var totalCollected = projections.Sum(p => p.Paid);

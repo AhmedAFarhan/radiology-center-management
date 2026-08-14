@@ -9,12 +9,12 @@ public static class CreateExaminationCommandHandler
 {
     public static async Task<Result<ExaminationDto>> HandleAsync(
         CreateExaminationCommand command,
-        IExaminationTypeRepository examinationTypeRepository,
+        IExaminationTypeDirectory examinationTypeDirectory,
         IExaminationRepository examinationRepository,
         IExaminationsUnitOfWork unitOfWork,
         CancellationToken ct)
     {
-        var examinationType = await examinationTypeRepository.GetWithItemsAsync(command.ExaminationTypeId, ct);
+        var examinationType = await examinationTypeDirectory.GetWithItemsAsync(command.ExaminationTypeId, ct);
         if (examinationType is null)
             return Result.Failure<ExaminationDto>(Error.NotFound("ExaminationType", command.ExaminationTypeId));
 

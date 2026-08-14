@@ -316,109 +316,6 @@ namespace RadiologyCenter.Examinations.Infrastructure.Persistence.Migrations
                     b.ToTable("ExaminationItems", "Examinations");
                 });
 
-            modelBuilder.Entity("RadiologyCenter.Examinations.Domain.Entities.ExaminationType", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("BodyPart")
-                        .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)");
-
-                    b.Property<string>("Code")
-                        .IsRequired()
-                        .HasMaxLength(20)
-                        .HasColumnType("nvarchar(20)");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("CreatedBy")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime?>("DeletedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("DeletedBy")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
-                    b.Property<DateTime?>("LastModifiedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("LastModifiedBy")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("Modality")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)");
-
-                    b.Property<decimal>("Price")
-                        .HasPrecision(18, 2)
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<bool>("RequiresConsent")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("RequiresPreparation")
-                        .HasColumnType("bit");
-
-                    b.Property<int>("StandardDurationMinutes")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("Code")
-                        .IsUnique()
-                        .HasFilter("[IsDeleted] = 0");
-
-                    b.ToTable("ExaminationTypes", "Examinations");
-                });
-
-            modelBuilder.Entity("RadiologyCenter.Examinations.Domain.Entities.ExaminationTypeItem", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid>("ExaminationTypeId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<bool>("IsContrast")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("IsRequired")
-                        .HasColumnType("bit");
-
-                    b.Property<Guid>("ItemId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("Notes")
-                        .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)");
-
-                    b.Property<int>("Quantity")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ExaminationTypeId");
-
-                    b.HasIndex("ItemId");
-
-                    b.ToTable("ExaminationTypeItems", "Examinations");
-                });
-
             modelBuilder.Entity("RadiologyCenter.Examinations.Domain.Entities.ExaminationHistoryItem", b =>
                 {
                     b.HasOne("RadiologyCenter.Examinations.Domain.Entities.ExaminationHistory", null)
@@ -437,26 +334,12 @@ namespace RadiologyCenter.Examinations.Infrastructure.Persistence.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("RadiologyCenter.Examinations.Domain.Entities.ExaminationTypeItem", b =>
-                {
-                    b.HasOne("RadiologyCenter.Examinations.Domain.Entities.ExaminationType", null)
-                        .WithMany("Items")
-                        .HasForeignKey("ExaminationTypeId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
             modelBuilder.Entity("RadiologyCenter.Examinations.Domain.Entities.Examination", b =>
                 {
                     b.Navigation("Items");
                 });
 
             modelBuilder.Entity("RadiologyCenter.Examinations.Domain.Entities.ExaminationHistory", b =>
-                {
-                    b.Navigation("Items");
-                });
-
-            modelBuilder.Entity("RadiologyCenter.Examinations.Domain.Entities.ExaminationType", b =>
                 {
                     b.Navigation("Items");
                 });

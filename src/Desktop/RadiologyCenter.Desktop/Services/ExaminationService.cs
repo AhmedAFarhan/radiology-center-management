@@ -24,26 +24,26 @@ public sealed class ExaminationService
             searchTerm,
         };
 
-        return _api.PostAsync<PagedResult<ExaminationTypeDto>>("api/examinations/types/all", query, ct);
+        return _api.PostAsync<PagedResult<ExaminationTypeDto>>("api/catalog/examination-types/all", query, ct);
     }
 
     public Task<ExaminationTypeDto> GetTypeByIdAsync(string id, CancellationToken ct = default)
-        => _api.GetAsync<ExaminationTypeDto>($"api/examinations/types/{id}", ct);
+        => _api.GetAsync<ExaminationTypeDto>($"api/catalog/examination-types/{id}", ct);
 
     public Task<ExaminationTypeDto> CreateTypeAsync(ExaminationTypeInput input, CancellationToken ct = default)
-        => _api.PostAsync<ExaminationTypeDto>("api/examinations/types", input, ct);
+        => _api.PostAsync<ExaminationTypeDto>("api/catalog/examination-types", input, ct);
 
     public Task UpdateTypeAsync(string id, ExaminationTypeInput input, CancellationToken ct = default)
-        => _api.PutAsync<object>($"api/examinations/types/{id}", input, ct);
+        => _api.PutAsync<object>($"api/catalog/examination-types/{id}", input, ct);
 
     public Task ActivateTypeAsync(string id, CancellationToken ct = default)
-        => _api.SendAsync($"api/examinations/types/{id}/activate", ct: ct);
+        => _api.SendAsync($"api/catalog/examination-types/{id}/activate", ct: ct);
 
     public Task DeactivateTypeAsync(string id, CancellationToken ct = default)
-        => _api.SendAsync($"api/examinations/types/{id}/deactivate", ct: ct);
+        => _api.SendAsync($"api/catalog/examination-types/{id}/deactivate", ct: ct);
 
     public Task DeleteTypeAsync(string id, CancellationToken ct = default)
-        => _api.SendDeleteAsync($"api/examinations/types/{id}", ct);
+        => _api.SendDeleteAsync($"api/catalog/examination-types/{id}", ct);
 
     public Task<PagedResult<ExaminationDto>> GetPagedAsync(
         string? searchTerm,

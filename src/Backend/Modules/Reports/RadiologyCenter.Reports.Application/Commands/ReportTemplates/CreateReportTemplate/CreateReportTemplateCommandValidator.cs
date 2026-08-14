@@ -1,5 +1,6 @@
 using FluentValidation;
 using RadiologyCenter.BuildingBlocks.Application.Validation;
+using RadiologyCenter.Catalog.Domain.Enumerations;
 using RadiologyCenter.Reports.Domain.Enumerations;
 
 namespace RadiologyCenter.Reports.Application.Commands.ReportTemplates.CreateReportTemplate;

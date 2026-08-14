@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using RadiologyCenter.Catalog.Infrastructure.Persistence;
 using RadiologyCenter.Examinations.Infrastructure.Persistence;
 using RadiologyCenter.Insurance.Application.Abstractions;
 using RadiologyCenter.Patients.Infrastructure.Persistence;
@@ -9,13 +10,16 @@ public class InsuranceDirectory : IInsuranceDirectory
 {
     private readonly PatientsDbContext _patientsDb;
     private readonly ExaminationsDbContext _examinationsDb;
+    private readonly CatalogDbContext _catalogDb;
 
     public InsuranceDirectory(
         PatientsDbContext patientsDb,
-        ExaminationsDbContext examinationsDb)
+        ExaminationsDbContext examinationsDb,
+        CatalogDbContext catalogDb)
     {
         _patientsDb = patientsDb;
         _examinationsDb = examinationsDb;
+        _catalogDb = catalogDb;
     }
 
     public async Task<IReadOnlyDictionary<Guid, string>> ResolvePatientNamesAsync(IEnumerable<Guid> ids, CancellationToken ct = default)
@@ -45,7 +49,7 @@ public class InsuranceDirectory : IInsuranceDirectory
             .ToListAsync(ct);
 
         var typeIds = pairs.Select(p => p.ExaminationTypeId).Distinct().ToList();
-        var typeNames = await _examinationsDb.ExaminationTypes
+        var typeNames = await _catalogDb.ExaminationTypes
             .Where(t => typeIds.Contains(t.Id))
             .Select(t => new { t.Id, t.Name })
             .ToListAsync(ct)

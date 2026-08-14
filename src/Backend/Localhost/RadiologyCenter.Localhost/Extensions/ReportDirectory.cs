@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using RadiologyCenter.Catalog.Infrastructure.Persistence;
 using RadiologyCenter.Examinations.Domain.Enumerations;
 using RadiologyCenter.Examinations.Infrastructure.Persistence;
 using RadiologyCenter.Patients.Infrastructure.Persistence;
@@ -12,15 +13,18 @@ public class ReportDirectory : IReportDirectory
     private readonly PatientsDbContext _patientsDb;
     private readonly ResourceManagementDbContext _resourceManagementDb;
     private readonly ExaminationsDbContext _examinationsDb;
+    private readonly CatalogDbContext _catalogDb;
 
     public ReportDirectory(
         PatientsDbContext patientsDb,
         ResourceManagementDbContext resourceManagementDb,
-        ExaminationsDbContext examinationsDb)
+        ExaminationsDbContext examinationsDb,
+        CatalogDbContext catalogDb)
     {
         _patientsDb = patientsDb;
         _resourceManagementDb = resourceManagementDb;
         _examinationsDb = examinationsDb;
+        _catalogDb = catalogDb;
     }
 
     public async Task<IReadOnlyDictionary<Guid, string>> ResolvePatientNamesAsync(IEnumerable<Guid> ids, CancellationToken ct = default)
@@ -65,7 +69,7 @@ public class ReportDirectory : IReportDirectory
             .ToListAsync(ct);
 
         var typeIds = pairs.Select(p => p.ExaminationTypeId).Distinct().ToList();
-        var typeNames = await _examinationsDb.ExaminationTypes
+        var typeNames = await _catalogDb.ExaminationTypes
             .Where(t => typeIds.Contains(t.Id))
             .Select(t => new { t.Id, t.Name })
             .ToListAsync(ct)

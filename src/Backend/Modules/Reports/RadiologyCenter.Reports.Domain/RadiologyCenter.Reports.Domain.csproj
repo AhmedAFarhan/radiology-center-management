@@ -1,6 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <ItemGroup>
+    <ProjectReference Include="..\..\Catalog\RadiologyCenter.Catalog.Domain\RadiologyCenter.Catalog.Domain.csproj" />
     <ProjectReference Include="..\..\..\BuildingBlocks\RadiologyCenter.BuildingBlocks.Domain\RadiologyCenter.BuildingBlocks.Domain.csproj" />
   </ItemGroup>
 

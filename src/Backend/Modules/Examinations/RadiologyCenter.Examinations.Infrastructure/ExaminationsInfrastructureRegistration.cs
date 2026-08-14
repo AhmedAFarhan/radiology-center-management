@@ -19,7 +19,6 @@ public static class ExaminationsInfrastructureRegistration
                    .AddInterceptors(sp.GetRequiredService<AuditSoftDeleteInterceptor>()));
 
         services.AddScoped<IExaminationRepository, ExaminationRepository>();
-        services.AddScoped<IExaminationTypeRepository, ExaminationTypeRepository>();
         services.AddScoped<IExaminationHistoryRepository, ExaminationHistoryRepository>();
         services.AddScoped<IExaminationsUnitOfWork, ExaminationsUnitOfWork>();
 

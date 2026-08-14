@@ -1,7 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using RadiologyCenter.Catalog.Domain.Enumerations;
 using RadiologyCenter.Reports.Domain.Entities;
-using RadiologyCenter.Reports.Domain.Enumerations;
 
 namespace RadiologyCenter.Reports.Infrastructure.Persistence.Configurations;
 
