@@ -42,7 +42,7 @@ public class PayrollPayslipCalculator : IPayslipCalculator
             && salary.SalaryType != SalaryType.Hourly
             && runWorkingDays > 0
             && unpaidLeaveDays > 0
-            ? Math.Round(salary.BaseSalary / runWorkingDays * unpaidLeaveDays, 2)
+            ? Math.Round(salary.BaseSalary / runWorkingDays * unpaidLeaveDays, 2, MidpointRounding.AwayFromZero)
             : 0m;
 
         var allowances = await FindActiveAllowancesAsync(staffId, from, to, ct);
@@ -74,7 +74,7 @@ public class PayrollPayslipCalculator : IPayslipCalculator
         if (salary.SalaryType == SalaryType.Hourly)
         {
             var workedHours = await _staffWorkHoursResolver.GetWorkedHoursAsync(staffId, from, to, ct);
-            return Math.Round(salary.BaseSalary * workedHours, 2);
+            return Math.Round(salary.BaseSalary * workedHours, 2, MidpointRounding.AwayFromZero);
         }
 
         return salary.BaseSalary;

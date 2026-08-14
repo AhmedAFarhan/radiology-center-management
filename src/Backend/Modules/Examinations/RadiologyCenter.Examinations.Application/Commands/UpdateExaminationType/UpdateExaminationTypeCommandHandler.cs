@@ -16,7 +16,7 @@ public static class UpdateExaminationTypeCommandHandler
             return Result.Failure(Error.NotFound("ExaminationType", command.ExaminationTypeId));
 
         if (await examinationTypeRepository.ExistsByCodeAsync(command.Code, command.ExaminationTypeId, ct))
-            return Result.Failure(Error.Validation("ExaminationTypeCodeExists", $"An examination type with code '{command.Code}' already exists."));
+            return Result.Failure(Error.Conflict($"An examination type with code '{command.Code}' already exists."));
 
         var modality = Modality.FromName<Modality>(command.Modality);
 

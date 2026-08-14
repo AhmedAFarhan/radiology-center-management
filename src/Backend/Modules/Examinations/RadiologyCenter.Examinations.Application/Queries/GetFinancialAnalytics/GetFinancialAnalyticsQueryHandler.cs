@@ -1,10 +1,15 @@
 using RadiologyCenter.Examinations.Application.Abstractions;
 using RadiologyCenter.Examinations.Application.DTOs;
+using RadiologyCenter.Examinations.Domain.Common;
 
 namespace RadiologyCenter.Examinations.Application.Queries.GetFinancialAnalytics;
 
 public static class GetFinancialAnalyticsQueryHandler
 {
+    private const int CurrentBucketDays = 30;
+    private const int ThirtyDayBucketDays = 60;
+    private const int NinetyDayBucketDays = 90;
+
     public static async Task<Result<FinancialAnalyticsDto>> HandleAsync(
         GetFinancialAnalyticsQuery query,
         IExaminationRepository examinationRepository,
@@ -42,10 +47,10 @@ public static class GetFinancialAnalyticsQueryHandler
         var aging = new List<ReceivableBucketDto>();
         var receivableExams = projections.Where(p => p.Remaining > 0).ToList();
 
-        aging.Add(Bucket(receivableExams, "Current (0-30d)", e => e.CompletedAt is null || (now - e.CompletedAt!.Value.Date).Days <= 30));
-        aging.Add(Bucket(receivableExams, "31-60d", e => e.CompletedAt is not null && (now - e.CompletedAt.Value.Date).Days is > 30 and <= 60));
-        aging.Add(Bucket(receivableExams, "61-90d", e => e.CompletedAt is not null && (now - e.CompletedAt.Value.Date).Days is > 60 and <= 90));
-        aging.Add(Bucket(receivableExams, "90d+", e => e.CompletedAt is not null && (now - e.CompletedAt.Value.Date).Days > 90));
+        aging.Add(Bucket(receivableExams, "Current (0-30d)", e => e.CompletedAt is null || (now - e.CompletedAt!.Value.Date).Days <= CurrentBucketDays));
+        aging.Add(Bucket(receivableExams, "31-60d", e => e.CompletedAt is not null && (now - e.CompletedAt.Value.Date).Days is > CurrentBucketDays and <= ThirtyDayBucketDays));
+        aging.Add(Bucket(receivableExams, "61-90d", e => e.CompletedAt is not null && (now - e.CompletedAt.Value.Date).Days is > ThirtyDayBucketDays and <= NinetyDayBucketDays));
+        aging.Add(Bucket(receivableExams, "90d+", e => e.CompletedAt is not null && (now - e.CompletedAt.Value.Date).Days > NinetyDayBucketDays));
 
         return Result.Success(new FinancialAnalyticsDto(
             examCount,
@@ -60,9 +65,7 @@ public static class GetFinancialAnalyticsQueryHandler
     }
 
     private static decimal Billable(ExamFinancialProjection p) =>
-        p.IsDiscountPercentage
-            ? Math.Round(p.Price * (1m - p.Discount / 100m), 2)
-            : p.Price - p.Discount;
+        ExaminationPricing.BillableAmount(p.Price, p.Discount, p.IsDiscountPercentage);
 
     private static ReceivableBucketDto Bucket(
         IEnumerable<ExamFinancialProjection> source,

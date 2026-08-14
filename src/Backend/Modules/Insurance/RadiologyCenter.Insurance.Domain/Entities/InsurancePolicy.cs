@@ -7,6 +7,8 @@ namespace RadiologyCenter.Insurance.Domain.Entities;
 
 public sealed class InsurancePolicy : AuditableAggregateRoot<Guid>
 {
+    public const decimal PercentageCap = 100m;
+
     private readonly List<PolicyDocument> _documents = [];
 
     public Guid CompanyId { get; private set; }
@@ -50,7 +52,7 @@ public sealed class InsurancePolicy : AuditableAggregateRoot<Guid>
         Guard.AgainstEmpty(companyId, nameof(companyId));
         Guard.AgainstEmpty(patientId, nameof(patientId));
         Guard.AgainstNullOrWhiteSpace(policyNumber, nameof(policyNumber));
-        Guard.Against(coveragePercent, p => p < 0 || p > 100, "Coverage percent must be between 0 and 100.");
+        Guard.Against(coveragePercent, p => p < 0 || p > InsurancePolicy.PercentageCap, "Coverage percent must be between 0 and 100.");
 
         return new InsurancePolicy
         {
@@ -69,9 +71,9 @@ public sealed class InsurancePolicy : AuditableAggregateRoot<Guid>
     public void UpdateCoverage(decimal coveragePercent, DateTime? effectiveTo = null)
     {
         if (Status == PolicyStatus.Expired)
-            throw new DomainException("Cannot update an expired policy.");
+            throw new BusinessRuleViolationException("Cannot update an expired policy.");
 
-        Guard.Against(coveragePercent, p => p < 0 || p > 100, "Coverage percent must be between 0 and 100.");
+        Guard.Against(coveragePercent, p => p < 0 || p > InsurancePolicy.PercentageCap, "Coverage percent must be between 0 and 100.");
 
         CoveragePercent = coveragePercent;
         if (effectiveTo.HasValue)
@@ -83,7 +85,7 @@ public sealed class InsurancePolicy : AuditableAggregateRoot<Guid>
     public void Reactivate()
     {
         if (EffectiveTo.HasValue && EffectiveTo.Value <= DateTime.UtcNow)
-            throw new DomainException("Cannot reactivate an expired policy.");
+            throw new BusinessRuleViolationException("Cannot reactivate an expired policy.");
 
         Status = PolicyStatus.Active;
     }

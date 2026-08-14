@@ -123,7 +123,7 @@ public sealed class LocalhostService : IDisposable
             try
             {
                 using var httpClient = new HttpClient { Timeout = TimeSpan.FromSeconds(2) };
-                var response = await httpClient.GetAsync($"http://localhost:{Port}/swagger/v1/swagger.json");
+                var response = await httpClient.GetAsync($"http://localhost:{Port}/health");
                 if (response.IsSuccessStatusCode)
                     return true;
             }

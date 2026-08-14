@@ -73,7 +73,7 @@ public sealed class Claim : AuditableAggregateRoot<Guid>
     public void Submit()
     {
         if (Status != ClaimStatus.Draft && Status != ClaimStatus.Rejected)
-            throw new DomainException($"Claim '{Id}' cannot be submitted from status {Status.Name}.");
+            throw new BusinessRuleViolationException($"Claim '{Id}' cannot be submitted from status {Status.Name}.");
 
         Status = ClaimStatus.Submitted;
         SubmittedAt = DateTime.UtcNow;
@@ -110,7 +110,7 @@ public sealed class Claim : AuditableAggregateRoot<Guid>
     public void Resubmit()
     {
         if (Status != ClaimStatus.Rejected)
-            throw new DomainException($"Claim '{Id}' is not rejected and cannot be resubmitted.");
+            throw new BusinessRuleViolationException($"Claim '{Id}' is not rejected and cannot be resubmitted.");
 
         Status = ClaimStatus.Draft;
         SubmittedAt = null;
@@ -122,7 +122,7 @@ public sealed class Claim : AuditableAggregateRoot<Guid>
     public void RecordSettlement(SettlementMethod method, decimal amount, string? reference = null)
     {
         if (Status != ClaimStatus.Approved)
-            throw new DomainException($"Claim '{Id}' must be approved before settling payments.");
+            throw new BusinessRuleViolationException($"Claim '{Id}' must be approved before settling payments.");
 
         Guard.AgainstNull(method, nameof(method));
         Guard.Against(amount, a => a <= 0, "Settlement amount must be greater than zero.");
@@ -145,6 +145,6 @@ public sealed class Claim : AuditableAggregateRoot<Guid>
     private void EnsureSubmitted()
     {
         if (Status != ClaimStatus.Submitted)
-            throw new DomainException($"Claim '{Id}' is not submitted and cannot be adjudicated.");
+            throw new BusinessRuleViolationException($"Claim '{Id}' is not submitted and cannot be adjudicated.");
     }
 }

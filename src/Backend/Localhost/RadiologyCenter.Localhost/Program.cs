@@ -51,6 +51,7 @@ builder.Services.AddControllers(options =>
     options.JsonSerializerOptions.Converters.Add(new System.Text.Json.Serialization.JsonStringEnumConverter());
 });
 builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddHealthChecks();
 builder.Services.AddSwaggerGen(options =>
 {
     options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
@@ -118,51 +119,45 @@ var app = builder.Build();
 
 using (var scope = app.Services.CreateScope())
 {
-    var appDb = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-    appDb.Database.Migrate();
+    var dbContextTypes = new[]
+    {
+        typeof(AppDbContext),
+        typeof(IdentityDbContext),
+        typeof(PatientsDbContext),
+        typeof(InventoryDbContext),
+        typeof(ExaminationsDbContext),
+        typeof(ResourceManagementDbContext),
+        typeof(PayrollDbContext),
+        typeof(ReportsDbContext),
+        typeof(InsuranceDbContext),
+        typeof(CashDbContext),
+        typeof(NotificationDbContext)
+    };
+
+    foreach (var dbContextType in dbContextTypes)
+    {
+        var dbContext = (DbContext)scope.ServiceProvider.GetRequiredService(dbContextType);
+        dbContext.Database.Migrate();
+    }
 
     var identityDb = scope.ServiceProvider.GetRequiredService<IdentityDbContext>();
-    identityDb.Database.Migrate();
     await IdentityDbSeeder.SeedAsync(
         identityDb,
         scope.ServiceProvider.GetRequiredService<IPasswordHasher<User>>());
-
-    var patientsDb = scope.ServiceProvider.GetRequiredService<PatientsDbContext>();
-    patientsDb.Database.Migrate();
-
-    var inventoryDb = scope.ServiceProvider.GetRequiredService<InventoryDbContext>();
-    inventoryDb.Database.Migrate();
-
-    var examinationsDb = scope.ServiceProvider.GetRequiredService<ExaminationsDbContext>();
-    examinationsDb.Database.Migrate();
-
-    var resourceManagementDb = scope.ServiceProvider.GetRequiredService<ResourceManagementDbContext>();
-    resourceManagementDb.Database.Migrate();
-
-    var payrollDb = scope.ServiceProvider.GetRequiredService<PayrollDbContext>();
-    payrollDb.Database.Migrate();
-
-    var reportsDb = scope.ServiceProvider.GetRequiredService<ReportsDbContext>();
-    reportsDb.Database.Migrate();
-
-    var insuranceDb = scope.ServiceProvider.GetRequiredService<InsuranceDbContext>();
-    insuranceDb.Database.Migrate();
-
-    var cashDb = scope.ServiceProvider.GetRequiredService<CashDbContext>();
-    cashDb.Database.Migrate();
-
-    var notificationDb = scope.ServiceProvider.GetRequiredService<NotificationDbContext>();
-    notificationDb.Database.Migrate();
 }
 
 app.UseMiddleware<ExceptionMiddleware>();
 
-app.UseSwagger();
-app.UseSwaggerUI();
+if (app.Environment.IsDevelopment())
+{
+    app.UseSwagger();
+    app.UseSwaggerUI();
+}
 
 app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
+app.MapHealthChecks("/health").AllowAnonymous();
 
 app.Run();

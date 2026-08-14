@@ -51,11 +51,6 @@ public sealed class NotificationMessage : SoftDeletableAggregateRoot<Guid>
         };
     }
 
-    public void MarkQueued()
-    {
-        Status = NotificationStatus.Pending;
-    }
-
     public void MarkSent(DateTime sentAtUtc)
     {
         Attempts++;

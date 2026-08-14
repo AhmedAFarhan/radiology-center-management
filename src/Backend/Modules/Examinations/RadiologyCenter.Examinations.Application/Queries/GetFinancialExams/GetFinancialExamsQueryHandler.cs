@@ -1,5 +1,6 @@
 using RadiologyCenter.Examinations.Application.Abstractions;
 using RadiologyCenter.Examinations.Application.DTOs;
+using RadiologyCenter.Examinations.Domain.Common;
 
 namespace RadiologyCenter.Examinations.Application.Queries.GetFinancialExams;
 
@@ -23,9 +24,7 @@ public static class GetFinancialExamsQueryHandler
                 p.Id,
                 typeLookup.TryGetValue(p.ExaminationTypeId, out var name) ? name : string.Empty,
                 p.CompletedAt,
-                p.IsDiscountPercentage
-                    ? Math.Round(p.Price * (1m - p.Discount / 100m), 2)
-                    : p.Price - p.Discount,
+                ExaminationPricing.BillableAmount(p.Price, p.Discount, p.IsDiscountPercentage),
                 p.Discount,
                 p.Paid,
                 p.Remaining))

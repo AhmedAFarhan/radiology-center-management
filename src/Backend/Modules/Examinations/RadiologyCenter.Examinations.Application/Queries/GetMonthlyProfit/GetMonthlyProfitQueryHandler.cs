@@ -1,5 +1,6 @@
 using RadiologyCenter.Examinations.Application.Abstractions;
 using RadiologyCenter.Examinations.Application.DTOs;
+using RadiologyCenter.Examinations.Domain.Common;
 
 namespace RadiologyCenter.Examinations.Application.Queries.GetMonthlyProfit;
 
@@ -32,22 +33,20 @@ public static class GetMonthlyProfitQueryHandler
         return Result.Success(new ProfitAnalyticsDto(
             from,
             to.AddDays(-1),
-            Math.Round(collected, 2),
-            Math.Round(billed, 2),
-            Math.Round(discounts, 2),
-            Math.Round(staffCaseFees, 2),
-            Math.Round(referralFees, 2),
-            Math.Round(laborCost, 2),
+            Math.Round(collected, 2, MidpointRounding.AwayFromZero),
+            Math.Round(billed, 2, MidpointRounding.AwayFromZero),
+            Math.Round(discounts, 2, MidpointRounding.AwayFromZero),
+            Math.Round(staffCaseFees, 2, MidpointRounding.AwayFromZero),
+            Math.Round(referralFees, 2, MidpointRounding.AwayFromZero),
+            Math.Round(laborCost, 2, MidpointRounding.AwayFromZero),
             true,
-            Math.Round(materialCost, 2),
+            Math.Round(materialCost, 2, MidpointRounding.AwayFromZero),
             materialTracked,
-            Math.Round(totalCosts, 2),
-            Math.Round(netProfit, 2),
+            Math.Round(totalCosts, 2, MidpointRounding.AwayFromZero),
+            Math.Round(netProfit, 2, MidpointRounding.AwayFromZero),
             netMargin));
     }
 
     private static decimal Billable(Domain.Entities.ExaminationHistory h) =>
-        h.IsDiscountPercentage
-            ? Math.Round(h.Price * (1m - h.Discount / 100m), 2)
-            : h.Price - h.Discount;
+        ExaminationPricing.BillableAmount(h.Price, h.Discount, h.IsDiscountPercentage);
 }

@@ -79,7 +79,7 @@ public sealed class RadiologyReport : AuditableAggregateRoot<Guid>
         }
 
         if (section.IsLocked)
-            throw new DomainException($"Section '{sectionType.Name}' is locked and cannot be edited.");
+            throw new BusinessRuleViolationException($"Section '{sectionType.Name}' is locked and cannot be edited.");
 
         section.Update(body.Trim(), isLocked);
     }
@@ -174,12 +174,12 @@ public sealed class RadiologyReport : AuditableAggregateRoot<Guid>
     private void EnsureEditable()
     {
         if (Status != ReportStatus.Draft)
-            throw new DomainException("Report content can only be edited while it is a draft.");
+            throw new BusinessRuleViolationException("Report content can only be edited while it is a draft.");
     }
 
     private void EnsureStatus(params ReportStatus[] allowed)
     {
         if (!allowed.Contains(Status))
-            throw new DomainException($"Report '{Id}' cannot transition from status '{Status}'.");
+            throw new BusinessRuleViolationException($"Report '{Id}' cannot transition from status '{Status}'.");
     }
 }

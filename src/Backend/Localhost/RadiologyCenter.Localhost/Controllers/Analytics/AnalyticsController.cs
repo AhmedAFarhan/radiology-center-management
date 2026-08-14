@@ -28,7 +28,6 @@ public class AnalyticsController : ControllerBase
         [FromQuery] DateTime? to,
         CancellationToken ct)
     {
-        await Task.Delay(4000);
         var result = await _bus.InvokeAsync<Result<FinancialAnalyticsDto>>(new GetFinancialAnalyticsQuery(from, to), ct);
         return result.ToActionResult();
     }
@@ -40,7 +39,6 @@ public class AnalyticsController : ControllerBase
         [FromQuery] DateTime? to,
         CancellationToken ct)
     {
-        await Task.Delay(4000);
         var result = await _bus.InvokeAsync<Result<IReadOnlyList<FinancialExamRowDto>>>(new GetFinancialExamsQuery(from, to), ct);
         return result.ToActionResult();
     }
@@ -52,7 +50,6 @@ public class AnalyticsController : ControllerBase
         [FromQuery] DateTime? to,
         CancellationToken ct)
     {
-        await Task.Delay(4000);
         var result = await _bus.InvokeAsync<Result<OperationalAnalyticsDto>>(new GetOperationalAnalyticsQuery(from, to), ct);
         return result.ToActionResult();
     }
@@ -64,7 +61,6 @@ public class AnalyticsController : ControllerBase
         [FromQuery] DateTime? to,
         CancellationToken ct)
     {
-        await Task.Delay(4000);
         var result = await _bus.InvokeAsync<Result<StaffMachineAnalyticsDto>>(new GetStaffMachineAnalyticsQuery(from, to), ct);
         return result.ToActionResult();
     }
@@ -76,7 +72,6 @@ public class AnalyticsController : ControllerBase
         [FromQuery] DateTime? to,
         CancellationToken ct)
     {
-        await Task.Delay(4000);
         var result = await _bus.InvokeAsync<Result<ProfitAnalyticsDto>>(new GetMonthlyProfitQuery(from, to), ct);
         return result.ToActionResult();
     }

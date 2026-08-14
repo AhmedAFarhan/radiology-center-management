@@ -2,7 +2,6 @@ using Microsoft.EntityFrameworkCore;
 using RadiologyCenter.BuildingBlocks.Application.Abstractions;
 using RadiologyCenter.BuildingBlocks.Application.Common;
 using RadiologyCenter.BuildingBlocks.Application.Services;
-using RadiologyCenter.BuildingBlocks.Domain.Entities;
 using RadiologyCenter.BuildingBlocks.Domain.Pagination;
 using RadiologyCenter.BuildingBlocks.Domain.Specifications;
 using RadiologyCenter.BuildingBlocks.Infrastructure.Persistence;
@@ -11,7 +10,7 @@ using RadiologyCenter.BuildingBlocks.Infrastructure.Services;
 namespace RadiologyCenter.BuildingBlocks.Infrastructure.Repositories;
 
 public class BaseRepository<TEntity, TId> : IBaseRepository<TEntity, TId>
-    where TEntity : Entity<TId>
+    where TEntity : class
     where TId : notnull
 {
     protected readonly DbContext Context;
@@ -74,6 +73,8 @@ public class BaseRepository<TEntity, TId> : IBaseRepository<TEntity, TId>
                 spec.ApplyOrderBy(sortSelector);
         }
 
+        ApplyIncludes(spec);
+
         var query = ApplySpecification(spec);
         var totalCount = await query.CountAsync(ct);
 
@@ -83,6 +84,10 @@ public class BaseRepository<TEntity, TId> : IBaseRepository<TEntity, TId>
 
         return PagedResult<TEntity>.Create(items, totalCount, request.Pagination.PageNumber, request.Pagination.PageSize);
     }
+    protected virtual void ApplyIncludes(DynamicSpecification<TEntity> spec)
+    {
+    }
+
     protected IQueryable<TEntity> ApplySpecification(ISpecification<TEntity> spec) =>
         SpecificationEvaluator<TEntity>.GetQuery(DbSet.AsQueryable(), spec);
 }

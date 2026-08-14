@@ -1,6 +1,7 @@
 using RadiologyCenter.BuildingBlocks.Domain.Auditing;
 using RadiologyCenter.BuildingBlocks.Domain.Common;
 using RadiologyCenter.BuildingBlocks.Domain.Exceptions;
+using RadiologyCenter.Examinations.Domain.Common;
 using RadiologyCenter.Examinations.Domain.Enumerations;
 using RadiologyCenter.Examinations.Domain.Events;
 
@@ -62,7 +63,7 @@ public sealed class Examination : AuditableAggregateRoot<Guid>
         Guard.Against(price, p => p < 0, "Price cannot be negative.");
         Guard.Against(discount, d => d < 0, "Discount cannot be negative.");
         if (isDiscountPercentage)
-            Guard.Against(discount, d => d > 100, "Percentage discount cannot exceed 100.");
+            Guard.Against(discount, d => d > ExaminationPricing.PercentageCap, "Percentage discount cannot exceed 100.");
         Guard.Against(paid, p => p < 0, "Paid amount cannot be negative.");
 
         var examination = new Examination
@@ -189,7 +190,7 @@ public sealed class Examination : AuditableAggregateRoot<Guid>
     {
         Guard.Against(discount, d => d < 0, "Discount cannot be negative.");
         if (isDiscountPercentage)
-            Guard.Against(discount, d => d > 100, "Percentage discount cannot exceed 100.");
+            Guard.Against(discount, d => d > ExaminationPricing.PercentageCap, "Percentage discount cannot exceed 100.");
         if (paid.HasValue)
         {
             Guard.Against(paid.Value, p => p < 0, "Paid amount cannot be negative.");
@@ -226,7 +227,7 @@ public sealed class Examination : AuditableAggregateRoot<Guid>
 
     private void RecalculateRemaining()
     {
-        var discountValue = IsDiscountPercentage ? Price * Discount / 100m : Discount;
+        var discountValue = ExaminationPricing.DiscountValue(Price, Discount, IsDiscountPercentage);
         Remaining = Price - discountValue - Paid;
         if (Remaining < 0) Remaining = 0;
     }
@@ -240,12 +241,12 @@ public sealed class Examination : AuditableAggregateRoot<Guid>
     private void EnsureNotTerminal()
     {
         if (IsTerminal)
-            throw new DomainException($"Examination '{Id}' is '{Status}' and its items can no longer be modified.");
+            throw new BusinessRuleViolationException($"Examination '{Id}' is '{Status}' and its items can no longer be modified.");
     }
 
     private void EnsureStatus(params ExaminationStatus[] allowed)
     {
         if (!allowed.Contains(Status))
-            throw new DomainException($"Examination '{Id}' cannot transition from status '{Status}'.");
+            throw new BusinessRuleViolationException($"Examination '{Id}' cannot transition from status '{Status}'.");
     }
 }

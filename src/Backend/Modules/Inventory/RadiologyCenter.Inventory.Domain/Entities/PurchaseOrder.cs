@@ -75,7 +75,7 @@ public sealed class PurchaseOrder : SoftDeletableAggregateRoot<Guid>
     public void Cancel()
     {
         if (Status != PurchaseOrderStatus.Draft && Status != PurchaseOrderStatus.Ordered)
-            throw new DomainException($"Purchase order '{OrderNumber}' in status '{Status}' cannot be cancelled.");
+            throw new BusinessRuleViolationException($"Purchase order '{OrderNumber}' in status '{Status}' cannot be cancelled.");
 
         Status = PurchaseOrderStatus.Cancelled;
     }
@@ -83,7 +83,7 @@ public sealed class PurchaseOrder : SoftDeletableAggregateRoot<Guid>
     public void RecordReceipt(Guid itemId, int quantity)
     {
         if (Status != PurchaseOrderStatus.Ordered && Status != PurchaseOrderStatus.PartiallyReceived)
-            throw new DomainException($"Receipts can only be recorded against an ordered purchase order, not '{Status}'.");
+            throw new BusinessRuleViolationException($"Receipts can only be recorded against an ordered purchase order, not '{Status}'.");
 
         var line = _items.FirstOrDefault(i => i.ItemId == itemId)
             ?? throw new DomainException($"Item '{itemId}' is not on purchase order '{OrderNumber}'.");
@@ -104,6 +104,6 @@ public sealed class PurchaseOrder : SoftDeletableAggregateRoot<Guid>
     private void EnsureDraft()
     {
         if (Status != PurchaseOrderStatus.Draft)
-            throw new DomainException($"Purchase order '{OrderNumber}' is no longer a draft (status: '{Status}').");
+            throw new BusinessRuleViolationException($"Purchase order '{OrderNumber}' is no longer a draft (status: '{Status}').");
     }
 }

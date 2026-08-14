@@ -88,7 +88,7 @@ public sealed class ReportTemplate : SoftDeletableAggregateRoot<Guid>
             ?? throw new DomainException($"Section '{sectionId}' is not on template '{Name}'.");
 
         if (IsSystem)
-            throw new DomainException("System templates cannot be modified.");
+            throw new BusinessRuleViolationException("System templates cannot be modified.");
 
         _sections.Remove(section);
     }

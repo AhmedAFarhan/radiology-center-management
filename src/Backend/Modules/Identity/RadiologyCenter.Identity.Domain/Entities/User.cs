@@ -161,8 +161,6 @@ public sealed class User : IdentityUser<Guid>, IAggregateRoot
 
     public void IncrementAccessFailedCount() => AccessFailedCount++;
 
-    public void ResetAccessFailedCount() => AccessFailedCount = 0;
-
     public void Lock(DateTimeOffset lockoutEnd) => LockoutEnd = lockoutEnd;
 
     public void Unlock()

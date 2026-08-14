@@ -1,12 +1,11 @@
 using RadiologyCenter.BuildingBlocks.Application.Common;
-using RadiologyCenter.BuildingBlocks.Domain.Entities;
 using RadiologyCenter.BuildingBlocks.Domain.Pagination;
 using RadiologyCenter.BuildingBlocks.Domain.Specifications;
 
 namespace RadiologyCenter.BuildingBlocks.Application.Abstractions;
 
 public interface IBaseRepository<TEntity, in TId>
-    where TEntity : Entity<TId>
+    where TEntity : class
     where TId : notnull
 {
     Task<TEntity?> GetByIdAsync(TId id, CancellationToken ct = default);
