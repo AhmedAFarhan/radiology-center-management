@@ -28,17 +28,6 @@ public static class CreateExaminationTypeCommandHandler
             command.RequiresPreparation,
             command.RequiresConsent);
 
-        if (command.Items is not null)
-        {
-            foreach (var item in command.Items)
-                examinationType.AddItem(
-                    item.ItemId,
-                    item.Quantity,
-                    item.IsContrast,
-                    item.IsRequired,
-                    item.Notes);
-        }
-
         await examinationTypeRepository.AddAsync(examinationType, ct);
         await unitOfWork.SaveChangesAsync(ct);
 

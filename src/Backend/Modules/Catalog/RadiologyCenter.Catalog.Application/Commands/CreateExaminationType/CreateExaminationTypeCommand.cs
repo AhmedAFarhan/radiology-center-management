@@ -10,5 +10,4 @@ public record CreateExaminationTypeCommand(
     int StandardDurationMinutes = 0,
     decimal Price = 0,
     bool RequiresPreparation = false,
-    bool RequiresConsent = false,
-    IReadOnlyList<CreateExaminationTypeItem>? Items = null) : ICommand, IExaminationTypeFields<CreateExaminationTypeItem>;
+    bool RequiresConsent = false) : ICommand, IExaminationTypeFields;

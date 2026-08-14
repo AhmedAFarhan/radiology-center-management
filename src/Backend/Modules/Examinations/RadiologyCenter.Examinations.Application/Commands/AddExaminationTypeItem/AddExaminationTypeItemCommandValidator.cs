@@ -1,6 +1,6 @@
-﻿using FluentValidation;
+using FluentValidation;
 
-namespace RadiologyCenter.Catalog.Application.Commands.AddExaminationTypeItem;
+namespace RadiologyCenter.Examinations.Application.Commands.AddExaminationTypeItem;
 
 public class AddExaminationTypeItemCommandValidator : AbstractValidator<AddExaminationTypeItemCommand>
 {

@@ -1,5 +1,4 @@
 ﻿using RadiologyCenter.BuildingBlocks.Domain.Common;
-using RadiologyCenter.BuildingBlocks.Domain.Exceptions;
 using RadiologyCenter.BuildingBlocks.Domain.SoftDeletable;
 using RadiologyCenter.Catalog.Domain.Enumerations;
 using RadiologyCenter.Catalog.Domain.Events;
@@ -9,8 +8,6 @@ namespace RadiologyCenter.Catalog.Domain.Entities;
 
 public sealed class ExaminationType : SoftDeletableAggregateRoot<Guid>
 {
-    private readonly List<ExaminationTypeItem> _items = [];
-
     public string Code { get; private set; }
     public string Name { get; private set; }
     public Modality Modality { get; private set; }
@@ -20,9 +17,6 @@ public sealed class ExaminationType : SoftDeletableAggregateRoot<Guid>
     public bool RequiresPreparation { get; private set; }
     public bool RequiresConsent { get; private set; }
     public bool IsActive { get; private set; }
-
-    public bool RequiresContrast => _items.Any(i => i.IsContrast);
-    public IReadOnlyCollection<ExaminationTypeItem> Items => _items.AsReadOnly();
 
     private ExaminationType()
     {
@@ -94,27 +88,6 @@ public sealed class ExaminationType : SoftDeletableAggregateRoot<Guid>
         RequiresConsent = requiresConsent;
 
         RaiseDomainEvent(new ExaminationTypeUpdatedEvent(Id));
-    }
-
-    public ExaminationTypeItem AddItem(
-        Guid itemId,
-        int quantity,
-        bool isContrast = false,
-        bool isRequired = false,
-        string? notes = null)
-    {
-        Guard.Against(_items.Any(i => i.ItemId == itemId), isDuplicate => isDuplicate, $"Item '{itemId}' is already in the preferences for examination type '{Code}'.");
-
-        var item = ExaminationTypeItem.Create(Id, itemId, quantity, isContrast, isRequired, notes);
-        _items.Add(item);
-        return item;
-    }
-
-    public void RemoveItem(Guid examinationTypeItemId)
-    {
-        var item = _items.FirstOrDefault(i => i.Id == examinationTypeItemId)
-            ?? throw new DomainException($"Preference item '{examinationTypeItemId}' is not on examination type '{Code}'.");
-        _items.Remove(item);
     }
 
     public void Activate()

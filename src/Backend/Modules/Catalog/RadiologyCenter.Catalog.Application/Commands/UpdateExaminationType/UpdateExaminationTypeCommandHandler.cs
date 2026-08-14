@@ -11,7 +11,7 @@ public static class UpdateExaminationTypeCommandHandler
         ICatalogUnitOfWork unitOfWork,
         CancellationToken ct)
     {
-        var examinationType = await examinationTypeRepository.GetWithItemsAsync(command.ExaminationTypeId, ct);
+        var examinationType = await examinationTypeRepository.GetByIdAsync(command.ExaminationTypeId, ct);
         if (examinationType is null)
             return Result.Failure(Error.NotFound("ExaminationType", command.ExaminationTypeId));
 
@@ -30,28 +30,7 @@ public static class UpdateExaminationTypeCommandHandler
             command.RequiresPreparation,
             command.RequiresConsent);
 
-        if (command.Items is not null)
-            ReconcileItems(examinationType, command.Items);
-
         await unitOfWork.SaveChangesAsync(ct);
         return Result.Success();
-    }
-
-    private static void ReconcileItems(
-        ExaminationType examinationType,
-        IReadOnlyList<UpdateExaminationTypeItemRequest> requested)
-    {
-        foreach (var item in examinationType.Items.ToList())
-            examinationType.RemoveItem(item.Id);
-
-        foreach (var request in requested)
-        {
-            examinationType.AddItem(
-                request.ItemId,
-                request.Quantity,
-                request.IsContrast,
-                request.IsRequired,
-                request.Notes);
-        }
     }
 }

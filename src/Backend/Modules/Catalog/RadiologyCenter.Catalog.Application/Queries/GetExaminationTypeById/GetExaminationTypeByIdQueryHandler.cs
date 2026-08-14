@@ -11,7 +11,7 @@ public static class GetExaminationTypeByIdQueryHandler
         IExaminationTypeRepository examinationTypeRepository,
         CancellationToken ct)
     {
-        var examinationType = await examinationTypeRepository.GetWithItemsAsync(query.Id, ct);
+        var examinationType = await examinationTypeRepository.GetByIdAsync(query.Id, ct);
         if (examinationType is null)
             return Result.Failure<ExaminationTypeDto>(Error.NotFound("ExaminationType", query.Id));
 

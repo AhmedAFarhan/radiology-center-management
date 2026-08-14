@@ -1,7 +1,7 @@
-﻿using RadiologyCenter.BuildingBlocks.Domain.Common;
+using RadiologyCenter.BuildingBlocks.Domain.Common;
 using RadiologyCenter.BuildingBlocks.Domain.Entities;
 
-namespace RadiologyCenter.Catalog.Domain.Entities;
+namespace RadiologyCenter.Examinations.Domain.Entities;
 
 public sealed class ExaminationTypeItem : Entity<Guid>
 {

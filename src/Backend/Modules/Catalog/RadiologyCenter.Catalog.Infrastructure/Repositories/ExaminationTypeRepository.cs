@@ -15,21 +15,7 @@ public class ExaminationTypeRepository : BaseRepository<ExaminationType, Guid>, 
 {
     public ExaminationTypeRepository(CatalogDbContext context) : base(context) { }
 
-    public async Task<ExaminationType?> GetWithItemsAsync(Guid id, CancellationToken ct = default) =>
-        await DbSet
-            .Include(t => t.Items)
-            .FirstOrDefaultAsync(t => t.Id == id, ct);
-
-    public async Task<IReadOnlyList<ExaminationType>> GetWithItemsByIdsAsync(IEnumerable<Guid> ids, CancellationToken ct = default)
-    {
-        var idList = ids.Distinct().ToList();
-        return await DbSet
-            .Include(t => t.Items)
-            .Where(t => idList.Contains(t.Id))
-            .ToListAsync(ct);
-    }
-
-    public async Task<PagedResult<ExaminationType>> GetPagedWithItemsAsync(QueryRequest request, CancellationToken ct = default)
+    public async Task<PagedResult<ExaminationType>> GetPagedAsync(QueryRequest request, CancellationToken ct = default)
     {
         var spec = new DynamicSpecification<ExaminationType>(FilterExpressionBuilder.Build<ExaminationType>(request.Filters));
 
@@ -44,11 +30,11 @@ public class ExaminationTypeRepository : BaseRepository<ExaminationType, Guid>, 
                 spec.ApplyOrderBy(sortSelector);
         }
 
-        var query = ApplySpecification(spec).Include(t => t.Items);
+        var query = ApplySpecification(spec);
         var totalCount = await query.CountAsync(ct);
 
         spec.ApplyPaging((request.Pagination.PageNumber - 1) * request.Pagination.PageSize, request.Pagination.PageSize);
-        var items = await ApplySpecification(spec).Include(t => t.Items).ToListAsync(ct);
+        var items = await ApplySpecification(spec).ToListAsync(ct);
 
         return PagedResult<ExaminationType>.Create(items, totalCount, request.Pagination.PageNumber, request.Pagination.PageSize);
     }

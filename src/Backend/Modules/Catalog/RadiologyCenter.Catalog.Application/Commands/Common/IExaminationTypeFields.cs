@@ -1,6 +1,6 @@
 ﻿namespace RadiologyCenter.Catalog.Application.Commands.Common;
 
-public interface IExaminationTypeFields<TItem> where TItem : IExaminationTypeItemFields
+public interface IExaminationTypeFields
 {
     string Code { get; }
     string Name { get; }
@@ -10,5 +10,4 @@ public interface IExaminationTypeFields<TItem> where TItem : IExaminationTypeIte
     decimal Price { get; }
     bool RequiresPreparation { get; }
     bool RequiresConsent { get; }
-    IReadOnlyList<TItem>? Items { get; }
 }

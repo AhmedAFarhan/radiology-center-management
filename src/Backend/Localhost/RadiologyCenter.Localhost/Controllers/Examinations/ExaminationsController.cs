@@ -3,18 +3,21 @@ using RadiologyCenter.BuildingBlocks.Application.Common;
 using RadiologyCenter.BuildingBlocks.Domain.Pagination;
 using RadiologyCenter.BuildingBlocks.Domain.Results;
 using RadiologyCenter.Examinations.Application.Commands.AddExaminationItem;
+using RadiologyCenter.Examinations.Application.Commands.AddExaminationTypeItem;
 using RadiologyCenter.Examinations.Application.Commands.CancelExamination;
 using RadiologyCenter.Examinations.Application.Commands.CheckInExamination;
 using RadiologyCenter.Examinations.Application.Commands.CompleteExamination;
 using RadiologyCenter.Examinations.Application.Commands.CreateExamination;
 using RadiologyCenter.Examinations.Application.Commands.RecordExaminationPayment;
 using RadiologyCenter.Examinations.Application.Commands.RemoveExaminationItem;
+using RadiologyCenter.Examinations.Application.Commands.RemoveExaminationTypeItem;
 using RadiologyCenter.Examinations.Application.Commands.ScheduleExamination;
 using RadiologyCenter.Examinations.Application.Commands.StartExamination;
 using RadiologyCenter.Examinations.Application.Commands.UpdateExamination;
 using RadiologyCenter.Examinations.Application.DTOs;
 using RadiologyCenter.Examinations.Application.Queries.GetExaminationById;
 using RadiologyCenter.Examinations.Application.Queries.GetExaminations;
+using RadiologyCenter.Examinations.Application.Queries.GetExaminationTypeItems;
 using RadiologyCenter.Localhost.Authorization;
 using RadiologyCenter.Localhost.Extensions;
 using Wolverine;
@@ -123,6 +126,30 @@ public class ExaminationsController : ControllerBase
     public async Task<IActionResult> RemoveItemAsync(Guid examinationId, Guid examinationItemId, CancellationToken ct)
     {
         var result = await _bus.InvokeAsync<Result>(new RemoveExaminationItemCommand(examinationId, examinationItemId), ct);
+        return result.ToActionResult();
+    }
+
+    [HasPermission(ExaminationsReadCode)]
+    [HttpGet("examination-types/{examinationTypeId:guid}/items")]
+    public async Task<IActionResult> GetExaminationTypeItemsAsync(Guid examinationTypeId, CancellationToken ct)
+    {
+        var result = await _bus.InvokeAsync<Result<IReadOnlyList<ExaminationTypeItemDto>>>(new GetExaminationTypeItemsQuery(examinationTypeId), ct);
+        return result.ToActionResult();
+    }
+
+    [HasPermission(ExaminationsTypesManageCode)]
+    [HttpPost("examination-types/{examinationTypeId:guid}/items")]
+    public async Task<IActionResult> AddExaminationTypeItemAsync(Guid examinationTypeId, [FromBody] AddExaminationTypeItemCommand command, CancellationToken ct)
+    {
+        var result = await _bus.InvokeAsync<Result<ExaminationTypeItemDto>>(command with { ExaminationTypeId = examinationTypeId }, ct);
+        return result.ToActionResult();
+    }
+
+    [HasPermission(ExaminationsTypesManageCode)]
+    [HttpDelete("examination-types/{examinationTypeId:guid}/items/{examinationTypeItemId:guid}")]
+    public async Task<IActionResult> RemoveExaminationTypeItemAsync(Guid examinationTypeId, Guid examinationTypeItemId, CancellationToken ct)
+    {
+        var result = await _bus.InvokeAsync<Result>(new RemoveExaminationTypeItemCommand(examinationTypeId, examinationTypeItemId), ct);
         return result.ToActionResult();
     }
 }

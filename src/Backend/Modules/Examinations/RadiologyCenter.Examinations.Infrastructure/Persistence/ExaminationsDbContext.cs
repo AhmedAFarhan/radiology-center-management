@@ -10,6 +10,7 @@ public class ExaminationsDbContext : AppDbContext
     public DbSet<ExaminationItem> ExaminationItems => Set<ExaminationItem>();
     public DbSet<ExaminationHistory> ExaminationHistories => Set<ExaminationHistory>();
     public DbSet<ExaminationHistoryItem> ExaminationHistoryItems => Set<ExaminationHistoryItem>();
+    public DbSet<ExaminationTypeItem> ExaminationTypeItems => Set<ExaminationTypeItem>();
 
     public ExaminationsDbContext(DbContextOptions<ExaminationsDbContext> options) : base(options) { }
 

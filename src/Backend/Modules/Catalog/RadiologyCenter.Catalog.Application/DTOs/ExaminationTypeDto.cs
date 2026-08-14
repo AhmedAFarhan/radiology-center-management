@@ -10,7 +10,5 @@ public record ExaminationTypeDto(
     decimal Price,
     bool RequiresPreparation,
     bool RequiresConsent,
-    bool RequiresContrast,
     bool IsActive,
-    IReadOnlyList<ExaminationTypeItemDto> Items,
     DateTime CreatedAt);

@@ -7,7 +7,6 @@ namespace RadiologyCenter.Catalog.Infrastructure.Persistence;
 public class CatalogDbContext : AppDbContext
 {
     public DbSet<ExaminationType> ExaminationTypes => Set<ExaminationType>();
-    public DbSet<ExaminationTypeItem> ExaminationTypeItems => Set<ExaminationTypeItem>();
 
     public CatalogDbContext(DbContextOptions<CatalogDbContext> options) : base(options) { }
 

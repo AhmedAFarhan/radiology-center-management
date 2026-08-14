@@ -20,6 +20,7 @@ public static class ExaminationsInfrastructureRegistration
 
         services.AddScoped<IExaminationRepository, ExaminationRepository>();
         services.AddScoped<IExaminationHistoryRepository, ExaminationHistoryRepository>();
+        services.AddScoped<IExaminationTypeItemRepository, ExaminationTypeItemRepository>();
         services.AddScoped<IExaminationsUnitOfWork, ExaminationsUnitOfWork>();
 
         return services;

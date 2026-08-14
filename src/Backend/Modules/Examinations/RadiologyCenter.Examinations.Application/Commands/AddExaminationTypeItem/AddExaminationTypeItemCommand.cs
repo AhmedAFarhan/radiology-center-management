@@ -1,4 +1,4 @@
-﻿namespace RadiologyCenter.Catalog.Application.Commands.AddExaminationTypeItem;
+namespace RadiologyCenter.Examinations.Application.Commands.AddExaminationTypeItem;
 
 public record AddExaminationTypeItemCommand(
     Guid ExaminationTypeId,

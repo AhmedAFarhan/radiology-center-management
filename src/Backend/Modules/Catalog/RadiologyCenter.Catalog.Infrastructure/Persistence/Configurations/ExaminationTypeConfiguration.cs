@@ -25,14 +25,5 @@ public class ExaminationTypeConfiguration : IEntityTypeConfiguration<Examination
         builder.Property(t => t.RequiresPreparation).IsRequired();
         builder.Property(t => t.RequiresConsent).IsRequired();
         builder.Property(t => t.IsActive).IsRequired();
-
-        builder.Ignore(t => t.RequiresContrast);
-
-        builder.HasMany(t => t.Items)
-            .WithOne()
-            .HasForeignKey(i => i.ExaminationTypeId)
-            .OnDelete(DeleteBehavior.Cascade);
-
-        builder.Navigation(t => t.Items).UsePropertyAccessMode(PropertyAccessMode.Field);
     }
 }

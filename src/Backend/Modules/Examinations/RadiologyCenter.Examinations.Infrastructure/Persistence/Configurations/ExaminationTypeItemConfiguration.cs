@@ -1,14 +1,14 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using RadiologyCenter.Catalog.Domain.Entities;
+using RadiologyCenter.Examinations.Domain.Entities;
 
-namespace RadiologyCenter.Catalog.Infrastructure.Persistence.Configurations;
+namespace RadiologyCenter.Examinations.Infrastructure.Persistence.Configurations;
 
 public class ExaminationTypeItemConfiguration : IEntityTypeConfiguration<ExaminationTypeItem>
 {
     public void Configure(EntityTypeBuilder<ExaminationTypeItem> builder)
     {
-        builder.ToTable("CatalogExaminationTypeItems");
+        builder.ToTable("ExaminationTypeItems");
 
         builder.HasKey(i => i.Id);
 

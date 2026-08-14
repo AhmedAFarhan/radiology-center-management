@@ -1,4 +1,4 @@
-﻿namespace RadiologyCenter.Catalog.Application.DTOs;
+namespace RadiologyCenter.Examinations.Application.DTOs;
 
 public record ExaminationTypeItemDto(
     Guid Id,

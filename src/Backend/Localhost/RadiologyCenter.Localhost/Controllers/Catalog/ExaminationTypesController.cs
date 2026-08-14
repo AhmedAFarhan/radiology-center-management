@@ -3,11 +3,9 @@ using RadiologyCenter.BuildingBlocks.Application.Common;
 using RadiologyCenter.BuildingBlocks.Domain.Pagination;
 using RadiologyCenter.BuildingBlocks.Domain.Results;
 using RadiologyCenter.Catalog.Application.Commands.ActivateExaminationType;
-using RadiologyCenter.Catalog.Application.Commands.AddExaminationTypeItem;
 using RadiologyCenter.Catalog.Application.Commands.CreateExaminationType;
 using RadiologyCenter.Catalog.Application.Commands.DeactivateExaminationType;
 using RadiologyCenter.Catalog.Application.Commands.DeleteExaminationType;
-using RadiologyCenter.Catalog.Application.Commands.RemoveExaminationTypeItem;
 using RadiologyCenter.Catalog.Application.Commands.UpdateExaminationType;
 using RadiologyCenter.Catalog.Application.DTOs;
 using RadiologyCenter.Catalog.Application.Queries.GetExaminationTypeById;
@@ -80,22 +78,6 @@ public class ExaminationTypesController : ControllerBase
     public async Task<IActionResult> DeleteAsync(Guid id, CancellationToken ct)
     {
         var result = await _bus.InvokeAsync<Result>(new DeleteExaminationTypeCommand(id), ct);
-        return result.ToActionResult();
-    }
-
-    [HasPermission(ExaminationsTypesManageCode)]
-    [HttpPost("{id:guid}/items")]
-    public async Task<IActionResult> AddItemAsync(Guid id, [FromBody] AddExaminationTypeItemCommand command, CancellationToken ct)
-    {
-        var result = await _bus.InvokeAsync<Result<ExaminationTypeItemDto>>(command with { ExaminationTypeId = id }, ct);
-        return result.ToActionResult();
-    }
-
-    [HasPermission(ExaminationsTypesManageCode)]
-    [HttpDelete("{id:guid}/items/{examinationTypeItemId:guid}")]
-    public async Task<IActionResult> RemoveItemAsync(Guid id, Guid examinationTypeItemId, CancellationToken ct)
-    {
-        var result = await _bus.InvokeAsync<Result>(new RemoveExaminationTypeItemCommand(id, examinationTypeItemId), ct);
         return result.ToActionResult();
     }
 }

@@ -15,7 +15,7 @@ public static class GetExaminationTypesQueryHandler
         CancellationToken ct)
     {
         var request = WithIsActiveFilter(query.Request, query.IsActive);
-        var paged = await examinationTypeRepository.GetPagedWithItemsAsync(request, ct);
+        var paged = await examinationTypeRepository.GetPagedAsync(request, ct);
         var dtos = paged.Items.Select(t => t.Adapt<ExaminationTypeDto>()).ToList();
 
         return Result.Success(new PagedResult<ExaminationTypeDto>(

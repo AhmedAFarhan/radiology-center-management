@@ -1,6 +1,6 @@
-﻿using FluentValidation;
+using FluentValidation;
 
-namespace RadiologyCenter.Catalog.Application.Commands.RemoveExaminationTypeItem;
+namespace RadiologyCenter.Examinations.Application.Commands.RemoveExaminationTypeItem;
 
 public class RemoveExaminationTypeItemCommandValidator : AbstractValidator<RemoveExaminationTypeItemCommand>
 {
