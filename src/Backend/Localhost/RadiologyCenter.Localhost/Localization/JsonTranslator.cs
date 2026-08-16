@@ -57,10 +57,10 @@ public sealed class JsonTranslator : ITranslator
         return message;
     }
 
-    public string TranslateCode(string code, string? fallbackMessage = null)
+    public string TranslateCode(string? code, string? fallbackMessage = null)
     {
         if (string.IsNullOrEmpty(code))
-            return fallbackMessage ?? code;
+            return fallbackMessage ?? code ?? string.Empty;
 
         var messages = ResolveCulture();
         if (messages is not null && messages.Codes.TryGetValue(code, out var localized))
@@ -164,6 +164,29 @@ public sealed class JsonTranslator : ITranslator
             }
         }
 
+        // Derive templates from the English code values so that English-shaped fallback
+        // messages (e.g. NotFound "{entity} with key '{key}' not found.") can still be
+        // localized even though many entity-specific codes are not JSON localization keys.
+        if (result.TryGetValue(FallbackCulture, out var english))
+        {
+            foreach (var cultureName in result.Keys.ToArray())
+            {
+                var culture = result[cultureName];
+                var templates = new List<TemplateEntry>(culture.Templates);
+                foreach (var kvp in english.Codes)
+                {
+                    if (!culture.Codes.TryGetValue(kvp.Key, out var localized))
+                        continue;
+
+                    if (TryBuildTemplateRegex(kvp.Value, out var pattern, out var argCount))
+                        templates.Add(new TemplateEntry(pattern, argCount, localized));
+                }
+
+                templates.Sort((a, b) => b.Pattern.Length.CompareTo(a.Pattern.Length));
+                result[cultureName] = culture with { Templates = templates };
+            }
+        }
+
         return result;
     }
 
@@ -216,8 +239,10 @@ public sealed class JsonTranslator : ITranslator
             {
                 foreach (var property in codesElement.EnumerateObject())
                 {
-                    if (property.Value.ValueKind == JsonValueKind.String)
-                        codes[property.Name] = property.Value.GetString() ?? property.Name;
+                    if (property.Value.ValueKind != JsonValueKind.String)
+                        continue;
+
+                    codes[property.Name] = property.Value.GetString() ?? property.Name;
                 }
             }
 

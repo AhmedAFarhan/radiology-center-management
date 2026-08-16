@@ -1,3 +1,5 @@
+using RadiologyCenter.BuildingBlocks.Domain.Localization;
+
 namespace RadiologyCenter.BuildingBlocks.Domain.Exceptions;
 
 public class NotFoundException : DomainException
@@ -6,7 +8,7 @@ public class NotFoundException : DomainException
     public object Key { get; }
 
     public NotFoundException(string entityName, object key)
-        : base($"{entityName} with key '{key}' was not found.")
+        : base(MessageCodes.Shared.KeyWasNotFound, $"{entityName} with key '{key}' was not found.")
     {
         EntityName = entityName;
         Key = key;

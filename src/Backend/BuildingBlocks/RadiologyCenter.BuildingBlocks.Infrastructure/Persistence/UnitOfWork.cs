@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore.Storage;
 using RadiologyCenter.BuildingBlocks.Application.Abstractions;
 using RadiologyCenter.BuildingBlocks.Domain.Entities;
 using RadiologyCenter.BuildingBlocks.Domain.Exceptions;
+using RadiologyCenter.BuildingBlocks.Domain.Localization;
 
 namespace RadiologyCenter.BuildingBlocks.Infrastructure.Persistence;
 
@@ -33,7 +34,10 @@ public class UnitOfWork<TContext> : IUnitOfWork, IUnitOfWork<TContext>
         }
         catch (DbUpdateConcurrencyException ex)
         {
-            throw new ConcurrencyException("The record was modified by another user. Please refresh and try again.", ex);
+            throw new ConcurrencyException(
+                MessageCodes.Shared.ConcurrencyConflict,
+                "The record was modified by another user. Please refresh and try again.",
+                ex);
         }
     }
 

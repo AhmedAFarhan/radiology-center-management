@@ -1,86 +1,86 @@
 ﻿{
-    "codes":  {
-                  "Insurance.PreAuthorizationNotApproved":  "يجب اعتماد التفويض المسبق قبل إنشاء المطالبة.",
-                  "Insurance.DenialReasonRequired":  "سبب الرفض مطلوب عند الرفض.",
-                  "Insurance.PreAuthorizationAlreadyExists":  "يوجد بالفعل تفويض مسبق لهذا الفحص.",
-                  "Insurance.PreAuthorizationPatientMismatch":  "التفويض المسبق لا يطابق مريض المطالبة.",
-                  "Insurance.PreAuthorizationExaminationMismatch":  "التفويض المسبق لا يطابق الفحص.",
-                  "Insurance.UnsupportedDecision":  "قرار غير مدعوم.",
-                  "Insurance.ApprovedAmountRequired":  "المبلغ المعتمد مطلوب عند الاعتماد.",
-                  "Insurance.PolicyPatientMismatch":  "البوليصة لا تنتمي إلى مريض المطالبة.",
-                  "Insurance.RejectionReasonRequired":  "سبب الرفض مطلوب عند الرفض.",
-                  "Insurance.UnsupportedPolicyAction":  "إجراء بوليصة غير مدعوم.",
-                  "Insurance.PolicyNotActive":  "البوليصة غير نشطة.",
-                  "Insurance.PreAuthorizationNoApprovedAmount":  "التفويض المسبق ليس له مبلغ معتمد.",
-                  "Insurance.PreAuthorizationPolicyMismatch":  "التفويض المسبق لا يطابق بوليصة المطالبة.",
-                  "Insurance.RejectionCodeRequired":  "رمز الرفض مطلوب عند الرفض.",
-                  "Insurance.ClaimAlreadyExists":  "توجد بالفعل مطالبة لهذا الفحص.",
-                  "Insurance.BilledAmountNegative":  "لا يمكن أن يكون المبلغ المفوتر سالباً.",
-                  "Insurance.PayerShareNegative":  "لا يمكن أن تكون حصة الدافع سالبة.",
-                  "Insurance.PatientShareNegative":  "لا يمكن أن تكون حصة المريض سالبة.",
-                  "Insurance.SharesExceedBilled":  "لا يمكن أن تتجاوز حصتا الدافع والمريض المبلغ المفوتر.",
-                  "Insurance.ClaimSubmitInvalidStatus":  "لا يمكن تقديم المطالبة \u0027{0}\u0027 من الحالة {1}.",
-                  "Insurance.ClaimNotSubmittedAdjudication":  "المطالبة \u0027{0}\u0027 غير مقدمة ولا يمكن البت فيها.",
-                  "Insurance.ApprovedAmountNegative":  "لا يمكن أن يكون المبلغ المعتمد سالباً.",
-                  "Insurance.ApprovedAmountExceedsPayerShare":  "لا يمكن أن يتجاوز المبلغ المعتمد حصة الدافع.",
-                  "Insurance.ClaimNotRejectedResubmit":  "المطالبة \u0027{0}\u0027 غير مرفوضة ولا يمكن إعادة تقديمها.",
-                  "Insurance.ClaimNotApprovedSettlement":  "يجب اعتماد المطالبة \u0027{0}\u0027 قبل تسوية المدفوعات.",
-                  "Insurance.SettlementAmountPositive":  "يجب أن يكون مبلغ التسوية أكبر من صفر.",
-                  "Insurance.SettlementExceedsOwed":  "تسوية {0} تتجاوز المبلغ المتبقي {1} المستحق للمطالبة \u0027{2}\u0027.",
-                  "Insurance.SettlementExceedsRemaining":  "تسوية {0} تتجاوز المبلغ المتبقي {1} المستحق للمطالبة \u0027{2}\u0027.",
-                  "Insurance.CoveragePercentRange":  "يجب أن تكون نسبة التغطية بين 0 و 100.",
-                  "Insurance.UpdateExpiredPolicy":  "لا يمكن تحديث بوليصة منتهية.",
-                  "Insurance.ReactivateExpiredPolicy":  "لا يمكن إعادة تفعيل بوليصة منتهية.",
-                  "Insurance.DocumentSizePositive":  "يجب أن يكون حجم المستند أكبر من صفر.",
-                  "Insurance.EstimatedAmountNegative":  "لا يمكن أن يكون المبلغ التقديري سالباً.",
-                  "Insurance.DocumentsRequestedOnly":  "يمكن إرفاق المستندات فقط بينما \u0027{0}\u0027 مطلوب.",
-                  "Insurance.GovernmentDocRequired":  "لا يمكن اعتماد تفويض حكومي مسبق بدون مستند الموافقة الرسمي.",
-                  "Insurance.PreAuthorizationAlreadyDecided":  "التفويض المسبق \u0027{0}\u0027 هو بالفعل {1}.",
-                  "Insurance.BilledAmountExceedsApproved":  "المبلغ المحتسب \u0027{0}\u0027 يتجاوز المبلغ المعتمد للتفويض المسبق \u0027{1}\u0027.",
-                  "Insurance.InvalidDocumentType":  "\u0027{0}\u0027 ليس نوع مستند صالح.",
-                  "Insurance.CompanyNameExists":  "توجد بالفعل شركة تأمين باسم \u0027{0}\u0027.",
-                  "Insurance.PolicyNumberExists":  "توجد بالفعل بوليصة برقم \u0027{0}\u0027."
-              },
-    "enums":  {
-                  "ClaimRejectionCode":  {
-                                             "MissingInformation":  "معلومات ناقصة",
-                                             "PreAuthorizationNotApproved":  "التفويض المسبق غير معتمد",
-                                             "PolicyNotActive":  "البوليصة غير نشطة",
-                                             "CoverageExcluded":  "التغطية مستثناة",
-                                             "LimitExceeded":  "تجاوز الحد",
-                                             "DuplicateClaim":  "مطالبة مكررة",
-                                             "Other":  "أخرى"
-                                         },
-                  "ClaimStatus":  {
-                                      "Draft":  "مسودة",
-                                      "Submitted":  "مقدمة",
-                                      "Adjudicated":  "تم البت",
-                                      "Approved":  "معتمدة",
-                                      "Rejected":  "مرفوضة",
-                                      "Paid":  "مدفوعة"
-                                  },
-                  "DocumentType":  {
-                                       "InsuranceCard":  "بطاقة تأمين",
-                                       "NationalId":  "بطاقة وطنية",
-                                       "GovernmentApproval":  "موافقة حكومية",
-                                       "Other":  "أخرى"
-                                   },
-                  "PolicyStatus":  {
-                                       "Active":  "نشطة",
-                                       "Inactive":  "غير نشطة",
-                                       "Expired":  "منتهية"
-                                   },
-                  "PreAuthorizationStatus":  {
-                                                 "Requested":  "مطلوب",
-                                                 "Approved":  "معتمد",
-                                                 "Denied":  "مرفوض",
-                                                 "Expired":  "منتهي"
-                                             },
-                  "SettlementMethod":  {
-                                           "Cash":  "نقدي",
-                                           "BankTransfer":  "تحويل بنكي",
-                                           "Cheque":  "شيك",
-                                           "Electronic":  "إلكتروني"
-                                       }
-              }
+  "codes": {
+    "Insurance.PreAuthorizationNotApproved": "يجب اعتماد التفويض المسبق قبل إنشاء المطالبة.",
+    "Insurance.DenialReasonRequired": "سبب الرفض مطلوب عند الرفض.",
+    "Insurance.PreAuthorizationAlreadyExists": "يوجد بالفعل تفويض مسبق لهذا الفحص.",
+    "Insurance.PreAuthorizationPatientMismatch": "التفويض المسبق لا يطابق مريض المطالبة.",
+    "Insurance.PreAuthorizationExaminationMismatch": "التفويض المسبق لا يطابق الفحص.",
+    "Insurance.UnsupportedDecision": "قرار غير مدعوم.",
+    "Insurance.ApprovedAmountRequired": "المبلغ المعتمد مطلوب عند الاعتماد.",
+    "Insurance.PolicyPatientMismatch": "البوليصة لا تنتمي إلى مريض المطالبة.",
+    "Insurance.RejectionReasonRequired": "سبب الرفض مطلوب عند الرفض.",
+    "Insurance.UnsupportedPolicyAction": "إجراء بوليصة غير مدعوم.",
+    "Insurance.PolicyNotActive": "البوليصة غير نشطة.",
+    "Insurance.PreAuthorizationNoApprovedAmount": "التفويض المسبق ليس له مبلغ معتمد.",
+    "Insurance.PreAuthorizationPolicyMismatch": "التفويض المسبق لا يطابق بوليصة المطالبة.",
+    "Insurance.RejectionCodeRequired": "رمز الرفض مطلوب عند الرفض.",
+    "Insurance.ClaimAlreadyExists": "توجد بالفعل مطالبة لهذا الفحص.",
+    "Insurance.BilledAmountNegative": "لا يمكن أن يكون المبلغ المفوتر سالباً.",
+    "Insurance.PayerShareNegative": "لا يمكن أن تكون حصة الدافع سالبة.",
+    "Insurance.PatientShareNegative": "لا يمكن أن تكون حصة المريض سالبة.",
+    "Insurance.SharesExceedBilled": "لا يمكن أن تتجاوز حصتا الدافع والمريض المبلغ المفوتر.",
+    "Insurance.ClaimSubmitInvalidStatus": "لا يمكن تقديم المطالبة \u0027{0}\u0027 من الحالة {1}.",
+    "Insurance.ClaimNotSubmittedAdjudication": "المطالبة \u0027{0}\u0027 غير مقدمة ولا يمكن البت فيها.",
+    "Insurance.ApprovedAmountNegative": "لا يمكن أن يكون المبلغ المعتمد سالباً.",
+    "Insurance.ApprovedAmountExceedsPayerShare": "لا يمكن أن يتجاوز المبلغ المعتمد حصة الدافع.",
+    "Insurance.ClaimNotRejectedResubmit": "المطالبة \u0027{0}\u0027 غير مرفوضة ولا يمكن إعادة تقديمها.",
+    "Insurance.ClaimNotApprovedSettlement": "يجب اعتماد المطالبة \u0027{0}\u0027 قبل تسوية المدفوعات.",
+    "Insurance.SettlementAmountPositive": "يجب أن يكون مبلغ التسوية أكبر من صفر.",
+    "Insurance.SettlementExceedsOwed": "تسوية {0} تتجاوز المبلغ المتبقي {1} المستحق للمطالبة \u0027{2}\u0027.",
+    "Insurance.SettlementExceedsRemaining": "تسوية {0} تتجاوز المبلغ المتبقي {1} المستحق للمطالبة \u0027{2}\u0027.",
+    "Insurance.CoveragePercentRange": "يجب أن تكون نسبة التغطية بين 0 و 100.",
+    "Insurance.UpdateExpiredPolicy": "لا يمكن تحديث بوليصة منتهية.",
+    "Insurance.ReactivateExpiredPolicy": "لا يمكن إعادة تفعيل بوليصة منتهية.",
+    "Insurance.DocumentSizePositive": "يجب أن يكون حجم المستند أكبر من صفر.",
+    "Insurance.EstimatedAmountNegative": "لا يمكن أن يكون المبلغ التقديري سالباً.",
+    "Insurance.DocumentsRequestedOnly": "يمكن إرفاق المستندات فقط بينما \u0027{0}\u0027 مطلوب.",
+    "Insurance.GovernmentDocRequired": "لا يمكن اعتماد تفويض حكومي مسبق بدون مستند الموافقة الرسمي.",
+    "Insurance.PreAuthorizationAlreadyDecided": "التفويض المسبق \u0027{0}\u0027 هو بالفعل {1}.",
+    "Insurance.BilledAmountExceedsApproved": "المبلغ المحتسب \u0027{0}\u0027 يتجاوز المبلغ المعتمد للتفويض المسبق \u0027{1}\u0027.",
+    "Insurance.InvalidDocumentType": "\u0027{0}\u0027 ليس نوع مستند صالح.",
+    "Insurance.CompanyNameExists": "توجد بالفعل شركة تأمين باسم \u0027{0}\u0027.",
+    "Insurance.PolicyNumberExists": "توجد بالفعل بوليصة برقم \u0027{0}\u0027."
+  },
+  "enums": {
+    "ClaimRejectionCode": {
+      "MissingInformation": "معلومات ناقصة",
+      "PreAuthorizationNotApproved": "التفويض المسبق غير معتمد",
+      "PolicyNotActive": "البوليصة غير نشطة",
+      "CoverageExcluded": "التغطية مستثناة",
+      "LimitExceeded": "تجاوز الحد",
+      "DuplicateClaim": "مطالبة مكررة",
+      "Other": "أخرى"
+    },
+    "ClaimStatus": {
+      "Draft": "مسودة",
+      "Submitted": "مقدمة",
+      "Adjudicated": "تم البت",
+      "Approved": "معتمدة",
+      "Rejected": "مرفوضة",
+      "Paid": "مدفوعة"
+    },
+    "DocumentType": {
+      "InsuranceCard": "بطاقة تأمين",
+      "NationalId": "بطاقة وطنية",
+      "GovernmentApproval": "موافقة حكومية",
+      "Other": "أخرى"
+    },
+    "PolicyStatus": {
+      "Active": "نشطة",
+      "Inactive": "غير نشطة",
+      "Expired": "منتهية"
+    },
+    "PreAuthorizationStatus": {
+      "Requested": "مطلوب",
+      "Approved": "معتمد",
+      "Denied": "مرفوض",
+      "Expired": "منتهي"
+    },
+    "SettlementMethod": {
+      "Cash": "نقدي",
+      "BankTransfer": "تحويل بنكي",
+      "Cheque": "شيك",
+      "Electronic": "إلكتروني"
+    }
+  }
 }

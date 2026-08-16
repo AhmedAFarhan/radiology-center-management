@@ -1,5 +1,6 @@
 using System.Reflection;
 using RadiologyCenter.BuildingBlocks.Domain.Exceptions;
+using RadiologyCenter.BuildingBlocks.Domain.Localization;
 
 namespace RadiologyCenter.BuildingBlocks.Domain.Common;
 
@@ -33,14 +34,14 @@ public abstract class Enumeration : IComparable
     public static T FromValue<T>(int value) where T : Enumeration
     {
         var item = GetAll<T>().FirstOrDefault(e => e.Value == value)
-            ?? throw new DomainException($"'{value}' is not a valid value for {typeof(T).Name}.");
+            ?? throw new DomainException(MessageCodes.Shared.InvalidValue, $"'{value}' is not a valid value for {typeof(T).Name}.");
         return item;
     }
 
     public static T FromName<T>(string name) where T : Enumeration
     {
         var item = GetAll<T>().FirstOrDefault(e => e.Name.Equals(name, StringComparison.OrdinalIgnoreCase))
-            ?? throw new DomainException($"'{name}' is not a valid name for {typeof(T).Name}.");
+            ?? throw new DomainException(MessageCodes.Shared.InvalidName, $"'{name}' is not a valid name for {typeof(T).Name}.");
         return item;
     }
 

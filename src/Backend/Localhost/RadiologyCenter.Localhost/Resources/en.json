@@ -501,32 +501,27 @@
       "group": "Notifications"
     }
   },
-  "messages": {
-    "Unauthorized.": "Unauthorized.",
-    "Forbidden.": "Forbidden.",
-    "Account is locked out.": "Account is locked out.",
-    "{0} with key \u0027{1}\u0027 not found.": "{0} with key \u0027{1}\u0027 not found.",
-    "{0} with key \u0027{1}\u0027 was not found.": "{0} with key \u0027{1}\u0027 was not found.",
-    "The record was modified by another user. Please refresh and try again.": "The record was modified by another user. Please refresh and try again.",
-    "An unexpected error occurred.": "An unexpected error occurred.",
-    "No active database transaction is available for the cash entry.": "No active database transaction is available for the cash entry.",
-    "Full name must contain at least a first name and a last name.": "Full name must contain at least a first name and a last name.",
-    "Phone number must be a valid Egyptian number (e.g. 01012345678).": "Phone number must be a valid Egyptian number (e.g. 01012345678).",
-    "\u0027{0}\u0027 is not a valid value for {1}.": "\u0027{0}\u0027 is not a valid value for {1}.",
-    "\u0027{0}\u0027 is not a valid name for {1}.": "\u0027{0}\u0027 is not a valid name for {1}.",
-    "{0} cannot be null.": "{0} cannot be null.",
-    "{0} cannot be null or whitespace.": "{0} cannot be null or whitespace.",
-    "{0} must be greater than zero.": "{0} must be greater than zero.",
-    "{0} cannot be the default value.": "{0} cannot be the default value.",
-    "{0} cannot be empty.": "{0} cannot be empty.",
-    "{0} must be one of: {1}.": "{0} must be one of: {1}.",
-    "Password must be at least {0} characters long and contain both letters and digits.": "Password must be at least {0} characters long and contain both letters and digits."
-  },
   "codes": {
     "Shared.IdRequired": "Id is required.",
     "Shared.PasswordPolicy": "Password must be at least 8 characters long and contain both letters and digits.",
     "Shared.FullNameTwoParts": "Full name must contain at least a first name and a last name.",
     "Shared.InvalidPhoneNumber": "Phone number must be a valid Egyptian number (e.g. 01012345678).",
-    "Shared.InvalidEnumValue": "Value must be one of the allowed options."
+    "Shared.InvalidEnumValue": "Value must be one of the allowed options.",
+    "Shared.KeyNotFound": "{0} with key \u0027{1}\u0027 not found.",
+    "Shared.KeyWasNotFound": "{0} with key \u0027{1}\u0027 was not found.",
+    "Shared.Unauthorized": "Unauthorized.",
+    "Shared.Forbidden": "Forbidden.",
+    "Shared.LockedOut": "Account is locked out.",
+    "Shared.ConcurrencyConflict": "The record was modified by another user. Please refresh and try again.",
+    "Shared.UnexpectedError": "An unexpected error occurred.",
+    "Shared.ValidationFailed": "Validation failed.",
+    "Shared.InvalidValue": "\u0027{0}\u0027 is not a valid value for {1}.",
+    "Shared.InvalidName": "\u0027{0}\u0027 is not a valid name for {1}.",
+    "Shared.CannotBeNull": "{0} cannot be null.",
+    "Shared.CannotBeNullOrWhitespace": "{0} cannot be null or whitespace.",
+    "Shared.MustBeGreaterThanZero": "{0} must be greater than zero.",
+    "Shared.CannotBeDefaultValue": "{0} cannot be the default value.",
+    "Shared.CannotBeEmpty": "{0} cannot be empty.",
+    "Shared.MustBeOneOf": "{0} must be one of: {1}."
   }
 }

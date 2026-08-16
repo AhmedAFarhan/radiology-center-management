@@ -1,39 +1,39 @@
 ﻿{
-    "codes":  {
-                  "Report.ReportContentDraftOnly":  "لا يمكن تعديل محتوى التقرير إلا أثناء كونه مسودة.",
-                  "Report.ExaminationNotCompleted":  "لا يمكن إنشاء مسودة تقرير إلا لفحص مكتمل.",
-                  "Report.FindingsRequired":  "لا يمكن إنهاء التقرير بدون نتائج.",
-                  "Report.ImpressionRequired":  "لا يمكن إنهاء التقرير بدون انطباع.",
-                  "Report.SystemTemplateCannotDelete":  "لا يمكن حذف القوالب النظامية.",
-                  "Report.SystemTemplateReadOnly":  "لا يمكن تعديل القوالب النظامية.",
-                  "Report.SectionLocked":  "القسم \u0027{0}\u0027 مقفل ولا يمكن تعديله.",
-                  "Report.InvalidStatusTransition":  "لا يمكن للتقرير \u0027{0}\u0027 الانتقال من الحالة \u0027{1}\u0027.",
-                  "Report.DuplicateTemplateSection":  "القسم \u0027{0}\u0027 موجود بالفعل على القالب \u0027{1}\u0027.",
-                  "Report.DuplicateVersionSection":  "القسم \u0027{0}\u0027 موجود بالفعل على الإصدار \u0027{1}\u0027.",
-                  "Report.SectionNotOnTemplate":  "القسم \u0027{0}\u0027 ليس على القالب \u0027{1}\u0027.",
-                  "Report.FindingNotOnVersion":  "النتيجة \u0027{0}\u0027 ليست على الإصدار \u0027{1}\u0027.",
-                  "Report.ReportAlreadyExists":  "يوجد بالفعل تقرير للفحص \u0027{0}\u0027.",
-                  "Report.TemplateNameExists":  "يوجد بالفعل قالب باسم \u0027{0}\u0027."
-              },
-    "enums":  {
-                  "FindingSeverity":  {
-                                          "None":  "لا شيء",
-                                          "Mild":  "خفيف",
-                                          "Moderate":  "متوسط",
-                                          "Severe":  "شديد",
-                                          "Critical":  "حرج"
-                                      },
-                  "ReportSectionType":  {
-                                            "ClinicalIndication":  "السبب السريري",
-                                            "Technique":  "التقنية",
-                                            "Findings":  "النتائج",
-                                            "Impression":  "الانطباع",
-                                            "Recommendation":  "التوصيات"
-                                        },
-                  "ReportStatus":  {
-                                       "Draft":  "مسودة",
-                                       "Finalized":  "نهائي",
-                                       "Cancelled":  "ملغي"
-                                   }
-              }
+  "codes": {
+    "Report.ReportContentDraftOnly": "لا يمكن تعديل محتوى التقرير إلا أثناء كونه مسودة.",
+    "Report.ExaminationNotCompleted": "لا يمكن إنشاء مسودة تقرير إلا لفحص مكتمل.",
+    "Report.FindingsRequired": "لا يمكن إنهاء التقرير بدون نتائج.",
+    "Report.ImpressionRequired": "لا يمكن إنهاء التقرير بدون انطباع.",
+    "Report.SystemTemplateCannotDelete": "لا يمكن حذف القوالب النظامية.",
+    "Report.SystemTemplateReadOnly": "لا يمكن تعديل القوالب النظامية.",
+    "Report.SectionLocked": "القسم \u0027{0}\u0027 مقفل ولا يمكن تعديله.",
+    "Report.InvalidStatusTransition": "لا يمكن للتقرير \u0027{0}\u0027 الانتقال من الحالة \u0027{1}\u0027.",
+    "Report.DuplicateTemplateSection": "القسم \u0027{0}\u0027 موجود بالفعل على القالب \u0027{1}\u0027.",
+    "Report.DuplicateVersionSection": "القسم \u0027{0}\u0027 موجود بالفعل على الإصدار \u0027{1}\u0027.",
+    "Report.SectionNotOnTemplate": "القسم \u0027{0}\u0027 ليس على القالب \u0027{1}\u0027.",
+    "Report.FindingNotOnVersion": "النتيجة \u0027{0}\u0027 ليست على الإصدار \u0027{1}\u0027.",
+    "Report.ReportAlreadyExists": "يوجد بالفعل تقرير للفحص \u0027{0}\u0027.",
+    "Report.TemplateNameExists": "يوجد بالفعل قالب باسم \u0027{0}\u0027."
+  },
+  "enums": {
+    "FindingSeverity": {
+      "None": "لا شيء",
+      "Mild": "خفيف",
+      "Moderate": "متوسط",
+      "Severe": "شديد",
+      "Critical": "حرج"
+    },
+    "ReportSectionType": {
+      "ClinicalIndication": "السبب السريري",
+      "Technique": "التقنية",
+      "Findings": "النتائج",
+      "Impression": "الانطباع",
+      "Recommendation": "التوصيات"
+    },
+    "ReportStatus": {
+      "Draft": "مسودة",
+      "Finalized": "نهائي",
+      "Cancelled": "ملغي"
+    }
+  }
 }

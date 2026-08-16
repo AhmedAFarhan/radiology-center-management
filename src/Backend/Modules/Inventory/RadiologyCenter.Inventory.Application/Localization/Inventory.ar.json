@@ -1,57 +1,57 @@
 ﻿{
-    "codes":  {
-                  "Inventory.PurchaseOrderItemsRequired":  "يجب أن يحتوي أمر الشراء على عنصر واحد على الأقل.",
-                  "Inventory.PurchaseOrderDuplicateItems":  "لا يمكن أن يظهر العنصر أكثر من مرة في أمر الشراء.",
-                  "Inventory.ReceiveItemsRequired":  "يجب استلام عنصر واحد على الأقل.",
-                  "Inventory.ReceiveDuplicateItems":  "لا يمكن استلام العنصر أكثر من مرة في نفس الطلب.",
-                  "Inventory.ExpiryDatePast":  "لا يمكن أن يكون تاريخ الانتهاء في الماضي.",
-                  "Inventory.ReorderLevelNegative":  "لا يمكن أن يكون مستوى إعادة الطلب سالباً.",
-                  "Inventory.ReorderQuantityNegative":  "لا يمكن أن تكون كمية إعادة الطلب سالبة.",
-                  "Inventory.DuplicateItem":  "الصنف \u0027{0}\u0027 موجود بالفعل على أمر الشراء \u0027{1}\u0027.",
-                  "Inventory.ItemNotOnPurchaseOrder":  "الصنف \u0027{0}\u0027 ليس على أمر الشراء \u0027{1}\u0027.",
-                  "Inventory.PurchaseOrderCannotCancel":  "لا يمكن إلغاء أمر الشراء \u0027{0}\u0027 في الحالة \u0027{1}\u0027.",
-                  "Inventory.ReceiptsOrderedOnly":  "يمكن تسجيل الاستلامات فقط لأمر شراء مطلوب، وليس \u0027{0}\u0027.",
-                  "Inventory.PurchaseOrderNotDraft":  "أمر الشراء \u0027{0}\u0027 لم يعد مسودة (الحالة: \u0027{1}\u0027).",
-                  "Inventory.UnitCostNegative":  "لا يمكن أن تكون تكلفة الوحدة سالبة.",
-                  "Inventory.ReceiptExceedsRemaining":  "تتجاوز كمية الاستلام المتبقي {0} للصنف.",
-                  "Inventory.BatchExpiryDatePast":  "لا يمكن أن يكون تاريخ انتهاء الدفعة في الماضي.",
-                  "Inventory.InsufficientBatchStock":  "لا يمكن صرف {0} من الدفعة \u0027{1}\u0027؛ المتبقي {2} فقط.",
-                  "Inventory.MovementQuantityZero":  "لا يمكن أن تكون كمية الحركة صفراً.",
-                  "Inventory.InsufficientStock":  "تتوفر {0} وحدات فقط للصنف \u0027{1}\u0027."
-              },
-    "enums":  {
-                  "ItemCategory":  {
-                                       "ContrastMedia":  "مادة تباين",
-                                       "Drug":  "دواء",
-                                       "MedicalSupply":  "مستلزمات طبية",
-                                       "Consumable":  "مستهلكات",
-                                       "Other":  "أخرى"
-                                   },
-                  "PurchaseOrderStatus":  {
-                                              "Draft":  "مسودة",
-                                              "Ordered":  "مطلوب",
-                                              "PartiallyReceived":  "استلام جزئي",
-                                              "Received":  "مستلم",
-                                              "Cancelled":  "ملغي"
-                                          },
-                  "StockMovementType":  {
-                                            "Receive":  "استلام",
-                                            "Issue":  "صرف",
-                                            "Adjustment":  "تسوية",
-                                            "ReturnToSupplier":  "إرجاع للمورد",
-                                            "Disposal":  "إتلاف"
-                                        },
-                  "UnitType":  {
-                                   "Piece":  "قطعة",
-                                   "Box":  "علبة",
-                                   "Bottle":  "زجاجة",
-                                   "Vial":  "قارورة",
-                                   "Ampoule":  "أمبولة",
-                                   "Pack":  "عبوة",
-                                   "Tube":  "أنبوب",
-                                   "Roll":  "لفة",
-                                   "Sheet":  "ورقة",
-                                   "Kit":  "طقم"
-                               }
-              }
+  "codes": {
+    "Inventory.PurchaseOrderItemsRequired": "يجب أن يحتوي أمر الشراء على عنصر واحد على الأقل.",
+    "Inventory.PurchaseOrderDuplicateItems": "لا يمكن أن يظهر العنصر أكثر من مرة في أمر الشراء.",
+    "Inventory.ReceiveItemsRequired": "يجب استلام عنصر واحد على الأقل.",
+    "Inventory.ReceiveDuplicateItems": "لا يمكن استلام العنصر أكثر من مرة في نفس الطلب.",
+    "Inventory.ExpiryDatePast": "لا يمكن أن يكون تاريخ الانتهاء في الماضي.",
+    "Inventory.ReorderLevelNegative": "لا يمكن أن يكون مستوى إعادة الطلب سالباً.",
+    "Inventory.ReorderQuantityNegative": "لا يمكن أن تكون كمية إعادة الطلب سالبة.",
+    "Inventory.DuplicateItem": "الصنف \u0027{0}\u0027 موجود بالفعل على أمر الشراء \u0027{1}\u0027.",
+    "Inventory.ItemNotOnPurchaseOrder": "الصنف \u0027{0}\u0027 ليس على أمر الشراء \u0027{1}\u0027.",
+    "Inventory.PurchaseOrderCannotCancel": "لا يمكن إلغاء أمر الشراء \u0027{0}\u0027 في الحالة \u0027{1}\u0027.",
+    "Inventory.ReceiptsOrderedOnly": "يمكن تسجيل الاستلامات فقط لأمر شراء مطلوب، وليس \u0027{0}\u0027.",
+    "Inventory.PurchaseOrderNotDraft": "أمر الشراء \u0027{0}\u0027 لم يعد مسودة (الحالة: \u0027{1}\u0027).",
+    "Inventory.UnitCostNegative": "لا يمكن أن تكون تكلفة الوحدة سالبة.",
+    "Inventory.ReceiptExceedsRemaining": "تتجاوز كمية الاستلام المتبقي {0} للصنف.",
+    "Inventory.BatchExpiryDatePast": "لا يمكن أن يكون تاريخ انتهاء الدفعة في الماضي.",
+    "Inventory.InsufficientBatchStock": "لا يمكن صرف {0} من الدفعة \u0027{1}\u0027؛ المتبقي {2} فقط.",
+    "Inventory.MovementQuantityZero": "لا يمكن أن تكون كمية الحركة صفراً.",
+    "Inventory.InsufficientStock": "تتوفر {0} وحدات فقط للصنف \u0027{1}\u0027."
+  },
+  "enums": {
+    "ItemCategory": {
+      "ContrastMedia": "مادة تباين",
+      "Drug": "دواء",
+      "MedicalSupply": "مستلزمات طبية",
+      "Consumable": "مستهلكات",
+      "Other": "أخرى"
+    },
+    "PurchaseOrderStatus": {
+      "Draft": "مسودة",
+      "Ordered": "مطلوب",
+      "PartiallyReceived": "استلام جزئي",
+      "Received": "مستلم",
+      "Cancelled": "ملغي"
+    },
+    "StockMovementType": {
+      "Receive": "استلام",
+      "Issue": "صرف",
+      "Adjustment": "تسوية",
+      "ReturnToSupplier": "إرجاع للمورد",
+      "Disposal": "إتلاف"
+    },
+    "UnitType": {
+      "Piece": "قطعة",
+      "Box": "علبة",
+      "Bottle": "زجاجة",
+      "Vial": "قارورة",
+      "Ampoule": "أمبولة",
+      "Pack": "عبوة",
+      "Tube": "أنبوب",
+      "Roll": "لفة",
+      "Sheet": "ورقة",
+      "Kit": "طقم"
+    }
+  }
 }

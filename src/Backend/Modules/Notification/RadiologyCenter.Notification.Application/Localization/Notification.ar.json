@@ -1,22 +1,22 @@
 ﻿{
-    "codes":  {
-                  "Notification.TemplateCodeOrBodyRequired":  "يجب توفير رمز القالب أو الموضوع/النص.",
-                  "Notification.SendFailed":  "فشل إرسال الإشعار.",
-                  "Notification.DeliveryFailed":  "فشل تسليم الإشعار.",
-                  "Notification.InvalidChannel":  "القناة \u0027{0}\u0027 غير مدعومة.",
-                  "Notification.InactiveTemplate":  "القالب \u0027{0}\u0027 غير نشط.",
-                  "Notification.TemplateCodeExists":  "يوجد بالفعل قالب بالكود \u0027{0}\u0027."
-              },
-    "enums":  {
-                  "NotificationChannel":  {
-                                              "Sms":  "رسالة نصية",
-                                              "Email":  "بريد إلكتروني",
-                                              "Push":  "إشعار فوري"
-                                          },
-                  "NotificationStatus":  {
-                                             "Pending":  "قيد الانتظار",
-                                             "Sent":  "مرسل",
-                                             "Failed":  "فشل"
-                                         }
-              }
+  "codes": {
+    "Notification.TemplateCodeOrBodyRequired": "يجب توفير رمز القالب أو الموضوع/النص.",
+    "Notification.SendFailed": "فشل إرسال الإشعار.",
+    "Notification.DeliveryFailed": "فشل تسليم الإشعار.",
+    "Notification.InvalidChannel": "القناة \u0027{0}\u0027 غير مدعومة.",
+    "Notification.InactiveTemplate": "القالب \u0027{0}\u0027 غير نشط.",
+    "Notification.TemplateCodeExists": "يوجد بالفعل قالب بالكود \u0027{0}\u0027."
+  },
+  "enums": {
+    "NotificationChannel": {
+      "Sms": "رسالة نصية",
+      "Email": "بريد إلكتروني",
+      "Push": "إشعار فوري"
+    },
+    "NotificationStatus": {
+      "Pending": "قيد الانتظار",
+      "Sent": "مرسل",
+      "Failed": "فشل"
+    }
+  }
 }

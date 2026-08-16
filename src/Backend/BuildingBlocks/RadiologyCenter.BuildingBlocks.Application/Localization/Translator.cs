@@ -17,7 +17,7 @@ public static class Translator
 
     public static string Localize(string message) => Current.TranslateMessage(message);
 
-    public static string LocalizeCode(string code, string? fallbackMessage = null) =>
+    public static string LocalizeCode(string? code, string? fallbackMessage = null) =>
         Current.TranslateCode(code, fallbackMessage);
 
     public static string LocalizeEnum(string typeName, string name) => Current.TranslateEnum(typeName, name);
@@ -34,7 +34,7 @@ public sealed class NullTranslator : ITranslator
 
     public string TranslateMessage(string message) => message;
 
-    public string TranslateCode(string code, string? fallbackMessage = null) => fallbackMessage ?? code;
+    public string TranslateCode(string? code, string? fallbackMessage = null) => fallbackMessage ?? code ?? string.Empty;
 
     public string TranslateEnum(string typeName, string name) => name;
 }

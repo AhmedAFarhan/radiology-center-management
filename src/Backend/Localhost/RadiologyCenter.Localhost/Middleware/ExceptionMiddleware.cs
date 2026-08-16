@@ -2,6 +2,7 @@ using System.Net;
 using RadiologyCenter.BuildingBlocks.Application.Common;
 using RadiologyCenter.BuildingBlocks.Application.Localization;
 using RadiologyCenter.BuildingBlocks.Domain.Exceptions;
+using RadiologyCenter.BuildingBlocks.Domain.Localization;
 
 namespace RadiologyCenter.Localhost.Middleware;
 
@@ -25,14 +26,14 @@ public class ExceptionMiddleware
         catch (NotFoundException ex)
         {
             _logger.LogWarning(ex, "Resource not found");
-            var message = Translator.Localize(ex.Message);
+            var message = Translator.LocalizeCode(ex.Code, ex.Message);
             await WriteResponse(context, HttpStatusCode.NotFound,
                 ApiResponse.Fail(message, ApiError.FromException(ex, "NotFound", message)));
         }
         catch (ValidationException ex)
         {
             _logger.LogWarning(ex, "Validation failed");
-            var message = Translator.Localize(ex.Message);
+            var message = Translator.LocalizeCode(MessageCodes.Shared.ValidationFailed, ex.Message);
             var details = ex.Errors.ToDictionary(
                 kvp => kvp.Key,
                 kvp => (object)kvp.Value.Select(Translator.Localize).ToArray());
@@ -48,7 +49,7 @@ public class ExceptionMiddleware
                 e.ErrorCode,
                 ErrorMessage = Translator.LocalizeCode(e.ErrorCode, e.ErrorMessage),
             });
-            var message = Translator.Localize(ex.Message);
+            var message = Translator.LocalizeCode(MessageCodes.Shared.ValidationFailed, ex.Message);
             await WriteResponse(context, HttpStatusCode.BadRequest,
                 ApiResponse.Fail(message, new ApiError { Code = "Validation", Message = message, Details = details }));
         }
@@ -62,7 +63,7 @@ public class ExceptionMiddleware
         catch (ConcurrencyException ex)
         {
             _logger.LogWarning(ex, "Concurrency conflict");
-            var message = Translator.Localize(ex.Message);
+            var message = Translator.LocalizeCode(ex.Code, ex.Message);
             await WriteResponse(context, HttpStatusCode.Conflict,
                 ApiResponse.Fail(message, ApiError.FromException(ex, "Conflict", message)));
         }
@@ -76,7 +77,7 @@ public class ExceptionMiddleware
         catch (Exception ex)
         {
             _logger.LogError(ex, "Unhandled exception");
-            var message = Translator.Localize("An unexpected error occurred.");
+            var message = Translator.LocalizeCode(MessageCodes.Shared.UnexpectedError);
             await WriteResponse(context, HttpStatusCode.InternalServerError,
                 ApiResponse.Fail(message, new ApiError { Code = "InternalError", Message = message }));
         }
