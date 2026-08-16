@@ -1,4 +1,5 @@
 using Mapster;
+using RadiologyCenter.Inventory.Application.Localization;
 using RadiologyCenter.Inventory.Application.Abstractions;
 using RadiologyCenter.Inventory.Application.DTOs;
 
@@ -13,7 +14,7 @@ public static class GetItemByIdQueryHandler
     {
         var item = await itemRepository.GetByIdAsync(query.Id, ct);
         if (item is null)
-            return Result.Failure<ItemDto>(Error.NotFound("Item", query.Id));
+            return Result.Failure<ItemDto>(Error.NotFound(ErrorCodes.ItemNotFound, "Item", query.Id));
 
         return Result.Success(item.Adapt<ItemDto>());
     }

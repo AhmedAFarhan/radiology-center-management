@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Identity;
 using RadiologyCenter.BuildingBlocks.Application.Abstractions;
+using RadiologyCenter.Identity.Application.Localization;
 using RadiologyCenter.Identity.Application.Abstractions;
 using RadiologyCenter.Identity.Application.DTOs;
 
@@ -25,7 +26,7 @@ public static class ChangePasswordCommandHandler
 
         var verification = passwordHasher.VerifyHashedPassword(user, user.PasswordHash!, command.CurrentPassword);
         if (verification == PasswordVerificationResult.Failed)
-            return Result.Failure<TokenResult>(Error.Failure("Current password is incorrect."));
+            return Result.Failure<TokenResult>(Error.Conflict(ErrorCodes.CurrentPasswordIncorrect, "Current password is incorrect."));
 
         user.SetPasswordHash(passwordHasher.HashPassword(user, command.NewPassword));
         user.PasswordChanged();

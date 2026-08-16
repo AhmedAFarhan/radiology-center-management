@@ -1,4 +1,5 @@
 using Mapster;
+using RadiologyCenter.ResourceManagement.Application.Localization;
 using RadiologyCenter.ResourceManagement.Application.Abstractions;
 using RadiologyCenter.ResourceManagement.Application.DTOs;
 
@@ -13,7 +14,7 @@ public static class GetWorkShiftByIdQueryHandler
     {
         var workShift = await workShiftRepository.GetByIdAsync(query.Id, ct);
         if (workShift is null)
-            return Result.Failure<WorkShiftDto>(Error.NotFound("WorkShift", query.Id));
+            return Result.Failure<WorkShiftDto>(Error.NotFound(ErrorCodes.WorkShiftNotFound, "WorkShift", query.Id));
 
         return Result.Success(workShift.Adapt<WorkShiftDto>());
     }

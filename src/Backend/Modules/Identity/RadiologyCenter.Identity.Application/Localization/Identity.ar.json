@@ -1,0 +1,16 @@
+﻿{
+  "codes": {
+    "Identity.PasswordDifferent": "يجب أن تختلف كلمة المرور الجديدة عن كلمة المرور الحالية.",
+    "Identity.RoleNameExists": "اسم الدور موجود بالفعل.",
+    "Identity.AtLeastOneRole": "يجب تعيين دور واحد على الأقل.",
+    "Identity.RoleIdsNotEmpty": "يجب ألا تحتوي معرفات الأدوار على قيم فارغة.",
+    "Identity.EmailRegistered": "البريد الإلكتروني مسجل بالفعل.",
+    "Identity.UsernameTaken": "اسم المستخدم مستخدم بالفعل.",
+    "Identity.InvalidRefreshToken": "رمز تحديث غير صالح.",
+    "Identity.AccountDeactivated": "الحساب معطل.",
+    "Identity.CurrentPasswordIncorrect": "كلمة المرور الحالية غير صحيحة.",
+    "Identity.RefreshTokenExpired": "رمز التحديث منتهي الصلاحية أو تم إبطاله.",
+    "Identity.AccountLockedOut": "الحساب مقفل بسبب كثرة محاولات تسجيل الدخول الفاشلة.",
+    "Identity.InvalidCredentials": "اسم المستخدم أو كلمة المرور غير صحيحة."
+  }
+}

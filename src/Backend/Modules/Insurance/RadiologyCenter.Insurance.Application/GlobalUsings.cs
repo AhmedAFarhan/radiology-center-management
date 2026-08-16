@@ -4,6 +4,8 @@ global using System.Linq;
 global using System.Threading;
 global using System.Threading.Tasks;
 global using RadiologyCenter.BuildingBlocks.Application.Abstractions;
+global using RadiologyCenter.BuildingBlocks.Application.Localization;
 global using RadiologyCenter.BuildingBlocks.Domain.Results;
+global using ErrorCodes = RadiologyCenter.Insurance.Application.Localization.ErrorCodes;
 global using RadiologyCenter.Insurance.Domain.Entities;
 global using RadiologyCenter.Insurance.Domain.Enumerations;

@@ -1,4 +1,5 @@
 using RadiologyCenter.BuildingBlocks.Application.Abstractions;
+using RadiologyCenter.Cash.Application.Localization;
 using RadiologyCenter.Cash.Application.Abstractions;
 using RadiologyCenter.Cash.Application.Commands.Sessions.Common;
 using RadiologyCenter.Cash.Application.DTOs;
@@ -21,11 +22,11 @@ public static class AddCashEntryCommandHandler
 
         var session = await sessionRepository.GetByIdAsync(command.CashSessionId, ct);
         if (session is null)
-            return Result.Failure<CashEntryDto>(Error.NotFound("CashSession", command.CashSessionId));
+            return Result.Failure<CashEntryDto>(Error.NotFound(ErrorCodes.SessionNotFound, "CashSession", command.CashSessionId));
         if (session.UserId != userId)
-            return Result.Failure<CashEntryDto>(Error.Forbidden("You can only add entries to your own cash session."));
+            return Result.Failure<CashEntryDto>(Error.Forbidden(ErrorCodes.EntryNotOwnSession, "You can only add entries to your own cash session."));
         if (session.Status != CashSessionStatus.Open)
-            return Result.Failure<CashEntryDto>(Error.Conflict("Cannot add entries to a closed session."));
+            return Result.Failure<CashEntryDto>(Error.Conflict(ErrorCodes.AddEntryToClosedSession, "Cannot add entries to a closed session."));
 
         var direction = CashEntryDirection.FromName<CashEntryDirection>(command.Direction.ToString());
         var reason = CashEntryReason.FromName<CashEntryReason>(command.Reason.ToString());

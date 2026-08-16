@@ -1,3 +1,4 @@
+using RadiologyCenter.Examinations.Application.Localization;
 using RadiologyCenter.Examinations.Application.Abstractions;
 using RadiologyCenter.Examinations.Application.DTOs;
 
@@ -13,7 +14,7 @@ public static class GetExaminationByIdQueryHandler
     {
         var examination = await examinationRepository.GetWithItemsAsync(query.Id, ct);
         if (examination is null)
-            return Result.Failure<ExaminationDto>(Error.NotFound("Examination", query.Id));
+            return Result.Failure<ExaminationDto>(Error.NotFound(ErrorCodes.ExaminationNotFound, "Examination", query.Id));
 
         var type = await examinationTypeDirectory.GetByIdAsync(examination.ExaminationTypeId, ct);
 

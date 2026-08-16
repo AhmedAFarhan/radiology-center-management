@@ -1,6 +1,7 @@
 using RadiologyCenter.BuildingBlocks.Domain.Common;
 using RadiologyCenter.BuildingBlocks.Domain.SoftDeletable;
 using RadiologyCenter.Payroll.Domain.Enumerations;
+using RadiologyCenter.Payroll.Domain.Errors;
 
 namespace RadiologyCenter.Payroll.Domain.Entities;
 
@@ -33,9 +34,9 @@ public sealed class AllowanceAssignment : SoftDeletableAggregateRoot<Guid>
     {
         Guard.AgainstEmpty(staffId, nameof(staffId));
         Guard.AgainstNullOrWhiteSpace(name, nameof(name));
-        Guard.Against(amount, a => a < 0, "Allowance amount cannot be negative.");
+        Guard.Against(amount, a => a < 0, DomainErrors.AllowanceAmountNegative, "Allowance amount cannot be negative.");
         Guard.AgainstDefault(effectiveDate, nameof(effectiveDate));
-        Guard.Against(endDate, d => d.HasValue && d < effectiveDate, "End date cannot be before effective date.");
+        Guard.Against(endDate, d => d.HasValue && d < effectiveDate, DomainErrors.EndDateBeforeEffectiveDate, "End date cannot be before effective date.");
 
         var assignment = new AllowanceAssignment
         {
@@ -63,9 +64,9 @@ public sealed class AllowanceAssignment : SoftDeletableAggregateRoot<Guid>
         bool isPerWorkDay = false)
     {
         Guard.AgainstNullOrWhiteSpace(name, nameof(name));
-        Guard.Against(amount, a => a < 0, "Allowance amount cannot be negative.");
+        Guard.Against(amount, a => a < 0, DomainErrors.AllowanceAmountNegative, "Allowance amount cannot be negative.");
         Guard.AgainstDefault(effectiveDate, nameof(effectiveDate));
-        Guard.Against(endDate, d => d.HasValue && d < effectiveDate, "End date cannot be before effective date.");
+        Guard.Against(endDate, d => d.HasValue && d < effectiveDate, DomainErrors.EndDateBeforeEffectiveDate, "End date cannot be before effective date.");
 
         Name = name.Trim();
         Amount = amount;

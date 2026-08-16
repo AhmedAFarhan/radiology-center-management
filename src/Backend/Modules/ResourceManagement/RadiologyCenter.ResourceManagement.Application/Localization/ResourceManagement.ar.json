@@ -1,0 +1,43 @@
+﻿{
+    "codes":  {
+                  "WorkShift.EndTimeAfterStart":  "يجب أن يكون وقت الانتهاء بعد وقت البدء.",
+                  "Leave.EndDateOnOrAfterStart":  "يجب أن يكون تاريخ الانتهاء في نفس تاريخ البدء أو بعده.",
+                  "ResourceManagement.ReferralDoctorPhoneExists":  "يوجد بالفعل طبيب محيل بهذا الرقم.",
+                  "ResourceManagement.LeaveOverlap":  "الموظف لديه بالفعل إجازة تتداخل مع الفترة المطلوبة.",
+                  "Leave.EndDateBeforeStartDate":  "لا يمكن أن يكون تاريخ الانتهاء قبل تاريخ البدء.",
+                  "WorkShift.StartTimeBeforeEndTime":  "يجب أن يكون وقت البدء قبل وقت الانتهاء.",
+                  "ResourceManagement.ResourceAlreadyBooked":  "تم حجز {0} بالفعل في {1} خلال {2}-{3}."
+              },
+    "enums":  {
+                  "EquipmentModality":  {
+                                            "XRay":  "أشعة سينية",
+                                            "CT":  "أشعة مقطعية",
+                                            "MRI":  "رنين مغناطيسي",
+                                            "Ultrasound":  "موجات فوق صوتية",
+                                            "Mammography":  "ماموجرام",
+                                            "Fluoroscopy":  "تنظير فلوري",
+                                            "DEXA":  "ديكسا",
+                                            "Other":  "أخرى"
+                                        },
+                  "EquipmentStatus":  {
+                                          "Operational":  "تشغيلي",
+                                          "UnderMaintenance":  "قيد الصيانة",
+                                          "OutOfService":  "خارج الخدمة",
+                                          "Retired":  "متقاعد"
+                                      },
+                  "LeaveType":  {
+                                    "Annual":  "سنوية",
+                                    "Sick":  "مرضية",
+                                    "Unpaid":  "بدون أجر",
+                                    "Maternity":  "أمومة",
+                                    "Other":  "أخرى"
+                                },
+                  "StaffPosition":  {
+                                        "Technician":  "فني",
+                                        "Radiologist":  "أخصائي أشعة",
+                                        "Receptionist":  "استقبال",
+                                        "Nurse":  "ممرض",
+                                        "Other":  "أخرى"
+                                    }
+              }
+}

@@ -9,6 +9,7 @@ public class IdentityDbContext : AppDbContext
     public DbSet<User> Users => Set<User>();
     public DbSet<Role> Roles => Set<Role>();
     public DbSet<Permission> Permissions => Set<Permission>();
+    public DbSet<PermissionTranslation> PermissionTranslations => Set<PermissionTranslation>();
 
     public IdentityDbContext(DbContextOptions<IdentityDbContext> options) : base(options) { }
 

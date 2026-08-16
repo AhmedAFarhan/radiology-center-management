@@ -1,3 +1,4 @@
+using RadiologyCenter.Inventory.Application.Localization;
 using RadiologyCenter.Inventory.Application.Abstractions;
 using RadiologyCenter.Inventory.Domain.Enumerations;
 
@@ -13,7 +14,7 @@ public static class UpdateItemCommandHandler
     {
         var item = await itemRepository.GetByIdAsync(command.ItemId, ct);
         if (item is null)
-            return Result.Failure(Error.NotFound("Item", command.ItemId));
+            return Result.Failure(Error.NotFound(ErrorCodes.ItemNotFound, "Item", command.ItemId));
 
         var category = ItemCategory.FromName<ItemCategory>(command.Category);
         var unit = UnitType.FromName<UnitType>(command.Unit);

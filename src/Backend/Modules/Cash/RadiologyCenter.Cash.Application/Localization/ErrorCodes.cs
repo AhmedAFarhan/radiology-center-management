@@ -1,0 +1,23 @@
+namespace RadiologyCenter.Cash.Application.Localization;
+
+/// <summary>
+/// Strongly-typed semantic error codes used as localization keys and as the
+/// stable machine-readable identifier surfaced in API responses. Codes are
+/// resolved through the "codes" section of the module JSON resource files,
+/// falling back to the legacy message-text keys when absent.
+/// </summary>
+public static class ErrorCodes
+{
+    public const string SessionNotFound = "Cash.SessionNotFound";
+    public const string HandoverNotFound = "Cash.HandoverNotFound";
+    public const string EntryNotOwnSession = "Cash.EntryNotOwnSession";
+    public const string CloseNotOwnSession = "Cash.CloseNotOwnSession";
+    public const string AddEntryToClosedSession = "Cash.AddEntryToClosedSession";
+    public const string HandoverRequiresClosedSession = "Cash.HandoverRequiresClosedSession";
+    public const string HandoverAlreadyApproved = "Cash.HandoverAlreadyApproved";
+    public const string HandoverApprovedByCloser = "Cash.HandoverApprovedByCloser";
+    public const string CloseSessionNotOpen = "Cash.CloseSessionNotOpen";
+    public const string ReceiverAlreadyOpenSession = "Cash.ReceiverAlreadyOpenSession";
+    public const string SessionAlreadyOpen = "Cash.SessionAlreadyOpen";
+    public const string NoActiveTransaction = "Cash.NoActiveTransaction";
+}

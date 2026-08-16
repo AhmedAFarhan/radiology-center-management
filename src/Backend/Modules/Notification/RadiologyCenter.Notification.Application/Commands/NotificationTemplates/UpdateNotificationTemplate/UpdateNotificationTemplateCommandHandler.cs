@@ -1,4 +1,5 @@
 using RadiologyCenter.BuildingBlocks.Application.Abstractions;
+using RadiologyCenter.Notification.Application.Localization;
 using RadiologyCenter.Notification.Application.Abstractions;
 using RadiologyCenter.Notification.Application.DTOs;
 
@@ -14,10 +15,10 @@ public static class UpdateNotificationTemplateCommandHandler
     {
         var template = await repository.GetByIdAsync(command.Id, ct);
         if (template is null)
-            return Result.Failure<NotificationTemplateDto>(Error.NotFound("NotificationTemplate", command.Id));
+            return Result.Failure<NotificationTemplateDto>(Error.NotFound(ErrorCodes.TemplateNotFound, "NotificationTemplate", command.Id));
 
         if (await repository.ExistsByCodeAsync(command.Code, command.Id, ct))
-            return Result.Failure<NotificationTemplateDto>(Error.Conflict($"A template with code '{command.Code}' already exists."));
+            return Result.Failure<NotificationTemplateDto>(Error.Conflict(ErrorCodes.TemplateCodeExists, $"A template with code '{command.Code}' already exists."));
 
         template.Update(command.Name, command.Subject, command.Body);
         await unitOfWork.SaveChangesAsync(ct);

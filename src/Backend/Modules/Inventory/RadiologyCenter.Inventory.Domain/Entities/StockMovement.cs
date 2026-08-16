@@ -1,6 +1,7 @@
 using RadiologyCenter.BuildingBlocks.Domain.Auditing;
 using RadiologyCenter.BuildingBlocks.Domain.Common;
 using RadiologyCenter.Inventory.Domain.Enumerations;
+using RadiologyCenter.Inventory.Domain.Errors;
 
 namespace RadiologyCenter.Inventory.Domain.Entities;
 
@@ -30,7 +31,7 @@ public sealed class StockMovement : AuditableEntity<Guid>
     {
         Guard.AgainstEmpty(itemId, nameof(itemId));
         Guard.AgainstNull(movementType, nameof(movementType));
-        Guard.Against(quantity, q => q == 0, "Movement quantity cannot be zero.");
+        Guard.Against(quantity, q => q == 0, DomainErrors.MovementQuantityZero, "Movement quantity cannot be zero.");
 
         return new StockMovement
         {

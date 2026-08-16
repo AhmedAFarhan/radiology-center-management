@@ -2,6 +2,7 @@ using RadiologyCenter.BuildingBlocks.Domain.Auditing;
 using RadiologyCenter.BuildingBlocks.Domain.Common;
 using RadiologyCenter.BuildingBlocks.Domain.Exceptions;
 using RadiologyCenter.Insurance.Domain.Enumerations;
+using RadiologyCenter.Insurance.Domain.Errors;
 
 namespace RadiologyCenter.Insurance.Domain.Entities;
 
@@ -52,7 +53,7 @@ public sealed class InsurancePolicy : AuditableAggregateRoot<Guid>
         Guard.AgainstEmpty(companyId, nameof(companyId));
         Guard.AgainstEmpty(patientId, nameof(patientId));
         Guard.AgainstNullOrWhiteSpace(policyNumber, nameof(policyNumber));
-        Guard.Against(coveragePercent, p => p < 0 || p > InsurancePolicy.PercentageCap, "Coverage percent must be between 0 and 100.");
+        Guard.Against(coveragePercent, p => p < 0 || p > InsurancePolicy.PercentageCap, DomainErrors.CoveragePercentRange, "Coverage percent must be between 0 and 100.");
 
         return new InsurancePolicy
         {
@@ -71,9 +72,9 @@ public sealed class InsurancePolicy : AuditableAggregateRoot<Guid>
     public void UpdateCoverage(decimal coveragePercent, DateTime? effectiveTo = null)
     {
         if (Status == PolicyStatus.Expired)
-            throw new BusinessRuleViolationException("Cannot update an expired policy.");
+            throw new BusinessRuleViolationException(nameof(UpdateCoverage), DomainErrors.UpdateExpiredPolicy, "Cannot update an expired policy.");
 
-        Guard.Against(coveragePercent, p => p < 0 || p > InsurancePolicy.PercentageCap, "Coverage percent must be between 0 and 100.");
+        Guard.Against(coveragePercent, p => p < 0 || p > InsurancePolicy.PercentageCap, DomainErrors.CoveragePercentRange, "Coverage percent must be between 0 and 100.");
 
         CoveragePercent = coveragePercent;
         if (effectiveTo.HasValue)
@@ -85,7 +86,7 @@ public sealed class InsurancePolicy : AuditableAggregateRoot<Guid>
     public void Reactivate()
     {
         if (EffectiveTo.HasValue && EffectiveTo.Value <= DateTime.UtcNow)
-            throw new BusinessRuleViolationException("Cannot reactivate an expired policy.");
+            throw new BusinessRuleViolationException(nameof(Reactivate), DomainErrors.ReactivateExpiredPolicy, "Cannot reactivate an expired policy.");
 
         Status = PolicyStatus.Active;
     }

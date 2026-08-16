@@ -1,0 +1,57 @@
+﻿{
+    "codes":  {
+                  "Inventory.PurchaseOrderItemsRequired":  "A purchase order must contain at least one item.",
+                  "Inventory.PurchaseOrderDuplicateItems":  "An item can appear only once per purchase order.",
+                  "Inventory.ReceiveItemsRequired":  "At least one item must be received.",
+                  "Inventory.ReceiveDuplicateItems":  "An item can be received only once per request.",
+                  "Inventory.ExpiryDatePast":  "Expiry date cannot be in the past.",
+                  "Inventory.ReorderLevelNegative":  "Reorder level cannot be negative.",
+                  "Inventory.ReorderQuantityNegative":  "Reorder quantity cannot be negative.",
+                  "Inventory.DuplicateItem":  "Item \u0027{0}\u0027 is already on purchase order \u0027{1}\u0027.",
+                  "Inventory.ItemNotOnPurchaseOrder":  "Item \u0027{0}\u0027 is not on purchase order \u0027{1}\u0027.",
+                  "Inventory.PurchaseOrderCannotCancel":  "Purchase order \u0027{0}\u0027 in status \u0027{1}\u0027 cannot be cancelled.",
+                  "Inventory.ReceiptsOrderedOnly":  "Receipts can only be recorded against an ordered purchase order, not \u0027{0}\u0027.",
+                  "Inventory.PurchaseOrderNotDraft":  "Purchase order \u0027{0}\u0027 is no longer a draft (status: \u0027{1}\u0027).",
+                  "Inventory.UnitCostNegative":  "Unit cost cannot be negative.",
+                  "Inventory.ReceiptExceedsRemaining":  "Receipt quantity exceeds the remaining {0} for the item.",
+                  "Inventory.BatchExpiryDatePast":  "Batch expiry date cannot be in the past.",
+                  "Inventory.InsufficientBatchStock":  "Cannot issue {0} from batch \u0027{1}\u0027; only {2} remaining.",
+                  "Inventory.MovementQuantityZero":  "Movement quantity cannot be zero.",
+                  "Inventory.InsufficientStock":  "Only {0} units available for item \u0027{1}\u0027."
+              },
+    "enums":  {
+                  "ItemCategory":  {
+                                       "ContrastMedia":  "ContrastMedia",
+                                       "Drug":  "Drug",
+                                       "MedicalSupply":  "MedicalSupply",
+                                       "Consumable":  "Consumable",
+                                       "Other":  "Other"
+                                   },
+                  "PurchaseOrderStatus":  {
+                                              "Draft":  "Draft",
+                                              "Ordered":  "Ordered",
+                                              "PartiallyReceived":  "PartiallyReceived",
+                                              "Received":  "Received",
+                                              "Cancelled":  "Cancelled"
+                                          },
+                  "StockMovementType":  {
+                                            "Receive":  "Receive",
+                                            "Issue":  "Issue",
+                                            "Adjustment":  "Adjustment",
+                                            "ReturnToSupplier":  "ReturnToSupplier",
+                                            "Disposal":  "Disposal"
+                                        },
+                  "UnitType":  {
+                                   "Piece":  "Piece",
+                                   "Box":  "Box",
+                                   "Bottle":  "Bottle",
+                                   "Vial":  "Vial",
+                                   "Ampoule":  "Ampoule",
+                                   "Pack":  "Pack",
+                                   "Tube":  "Tube",
+                                   "Roll":  "Roll",
+                                   "Sheet":  "Sheet",
+                                   "Kit":  "Kit"
+                               }
+              }
+}

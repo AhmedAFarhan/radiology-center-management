@@ -1,4 +1,5 @@
 using Mapster;
+using RadiologyCenter.Payroll.Application.Localization;
 using RadiologyCenter.Payroll.Application.Abstractions;
 using RadiologyCenter.Payroll.Application.DTOs;
 
@@ -13,7 +14,7 @@ public static class CreatePayRunCommandHandler
         CancellationToken ct)
     {
         if (await payRunRepository.ExistsOverlappingAsync(command.RunFrom, command.RunTo, ct))
-            return Result.Failure<PayRunDto>(Error.Conflict($"A pay run overlapping '{command.RunFrom:yyyy-MM-dd}' to '{command.RunTo:yyyy-MM-dd}' already exists."));
+            return Result.Failure<PayRunDto>(Error.Conflict(ErrorCodes.PayRunOverlapExists, $"A pay run overlapping '{command.RunFrom:yyyy-MM-dd}' to '{command.RunTo:yyyy-MM-dd}' already exists."));
 
         var payRun = PayRun.Create(command.RunFrom, command.RunTo, command.Notes);
 

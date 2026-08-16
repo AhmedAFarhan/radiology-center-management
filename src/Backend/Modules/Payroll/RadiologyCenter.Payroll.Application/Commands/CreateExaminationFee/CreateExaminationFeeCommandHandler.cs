@@ -1,4 +1,5 @@
 using Mapster;
+using RadiologyCenter.Payroll.Application.Localization;
 using RadiologyCenter.BuildingBlocks.Domain.Specifications;
 using RadiologyCenter.Payroll.Application.Abstractions;
 using RadiologyCenter.Payroll.Application.DTOs;
@@ -16,7 +17,7 @@ public static class CreateExaminationFeeCommandHandler
         CancellationToken ct)
     {
         if (!await examinationTypeDirectory.ExistsAsync(command.ExaminationTypeId, ct))
-            return Result.Failure<ExaminationFeeDto>(Error.NotFound("ExaminationType", command.ExaminationTypeId));
+            return Result.Failure<ExaminationFeeDto>(Error.NotFound(ErrorCodes.ExaminationTypeNotFound, "ExaminationType", command.ExaminationTypeId));
 
         var role = ExamFeeRole.FromName<ExamFeeRole>(command.Role);
 

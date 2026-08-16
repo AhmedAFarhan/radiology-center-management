@@ -2,6 +2,7 @@ using RadiologyCenter.BuildingBlocks.Domain.Auditing;
 using RadiologyCenter.BuildingBlocks.Domain.Common;
 using RadiologyCenter.BuildingBlocks.Domain.Exceptions;
 using RadiologyCenter.Insurance.Domain.Enumerations;
+using RadiologyCenter.Insurance.Domain.Errors;
 using RadiologyCenter.Insurance.Domain.Events;
 
 namespace RadiologyCenter.Insurance.Domain.Entities;
@@ -47,11 +48,11 @@ public sealed class Claim : AuditableAggregateRoot<Guid>
         Guard.AgainstEmpty(patientId, nameof(patientId));
         Guard.AgainstEmpty(policyId, nameof(policyId));
         Guard.AgainstEmpty(preAuthorizationId, nameof(preAuthorizationId));
-        Guard.Against(billedAmount, a => a < 0, "Billed amount cannot be negative.");
-        Guard.Against(payerShare, a => a < 0, "Payer share cannot be negative.");
-        Guard.Against(patientShare, a => a < 0, "Patient share cannot be negative.");
+        Guard.Against(billedAmount, a => a < 0, DomainErrors.BilledAmountNegative, "Billed amount cannot be negative.");
+        Guard.Against(payerShare, a => a < 0, DomainErrors.PayerShareNegative, "Payer share cannot be negative.");
+        Guard.Against(patientShare, a => a < 0, DomainErrors.PatientShareNegative, "Patient share cannot be negative.");
         Guard.Against(payerShare + patientShare, p => p > billedAmount,
-            "Payer and patient shares cannot exceed the billed amount.");
+            DomainErrors.SharesExceedBilled, "Payer and patient shares cannot exceed the billed amount.");
 
         var claim = new Claim
         {
@@ -73,7 +74,7 @@ public sealed class Claim : AuditableAggregateRoot<Guid>
     public void Submit()
     {
         if (Status != ClaimStatus.Draft && Status != ClaimStatus.Rejected)
-            throw new BusinessRuleViolationException($"Claim '{Id}' cannot be submitted from status {Status.Name}.");
+            throw new BusinessRuleViolationException(nameof(Submit), DomainErrors.ClaimSubmitInvalidStatus, $"Claim '{Id}' cannot be submitted from status {Status.Name}.");
 
         Status = ClaimStatus.Submitted;
         SubmittedAt = DateTime.UtcNow;
@@ -84,9 +85,9 @@ public sealed class Claim : AuditableAggregateRoot<Guid>
     public void AdjudicateApproved(decimal approvedAmount)
     {
         EnsureSubmitted();
-        Guard.Against(approvedAmount, a => a < 0, "Approved amount cannot be negative.");
+        Guard.Against(approvedAmount, a => a < 0, DomainErrors.ApprovedAmountNegative, "Approved amount cannot be negative.");
         Guard.Against(approvedAmount, a => a > PayerShare,
-            "Approved amount cannot exceed the payer share.");
+            DomainErrors.ApprovedAmountExceedsPayerShare, "Approved amount cannot exceed the payer share.");
 
         Status = ClaimStatus.Approved;
         PayerShare = approvedAmount;
@@ -110,7 +111,7 @@ public sealed class Claim : AuditableAggregateRoot<Guid>
     public void Resubmit()
     {
         if (Status != ClaimStatus.Rejected)
-            throw new BusinessRuleViolationException($"Claim '{Id}' is not rejected and cannot be resubmitted.");
+            throw new BusinessRuleViolationException(nameof(Resubmit), DomainErrors.ClaimNotRejectedResubmit, $"Claim '{Id}' is not rejected and cannot be resubmitted.");
 
         Status = ClaimStatus.Draft;
         SubmittedAt = null;
@@ -122,12 +123,12 @@ public sealed class Claim : AuditableAggregateRoot<Guid>
     public void RecordSettlement(SettlementMethod method, decimal amount, string? reference = null)
     {
         if (Status != ClaimStatus.Approved)
-            throw new BusinessRuleViolationException($"Claim '{Id}' must be approved before settling payments.");
+            throw new BusinessRuleViolationException(nameof(RecordSettlement), DomainErrors.ClaimNotApprovedSettlement, $"Claim '{Id}' must be approved before settling payments.");
 
         Guard.AgainstNull(method, nameof(method));
-        Guard.Against(amount, a => a <= 0, "Settlement amount must be greater than zero.");
+        Guard.Against(amount, a => a <= 0, DomainErrors.SettlementAmountPositive, "Settlement amount must be greater than zero.");
         Guard.Against(amount, a => a > RemainingOwed,
-            $"Settlement of {amount} exceeds the remaining {RemainingOwed} owed for claim '{Id}'.");
+            DomainErrors.SettlementExceedsOwed, $"Settlement of {amount} exceeds the remaining {RemainingOwed} owed for claim '{Id}'.");
 
         var settlement = Settlement.Create(Id, method, amount, reference);
         _settlements.Add(settlement);
@@ -145,6 +146,6 @@ public sealed class Claim : AuditableAggregateRoot<Guid>
     private void EnsureSubmitted()
     {
         if (Status != ClaimStatus.Submitted)
-            throw new BusinessRuleViolationException($"Claim '{Id}' is not submitted and cannot be adjudicated.");
+            throw new BusinessRuleViolationException(nameof(EnsureSubmitted), DomainErrors.ClaimNotSubmittedAdjudication, $"Claim '{Id}' is not submitted and cannot be adjudicated.");
     }
 }

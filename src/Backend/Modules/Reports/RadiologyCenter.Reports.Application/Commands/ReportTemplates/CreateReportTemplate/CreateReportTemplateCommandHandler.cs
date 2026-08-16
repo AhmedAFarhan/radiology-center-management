@@ -1,6 +1,7 @@
 using RadiologyCenter.Catalog.Domain.Enumerations;
 using RadiologyCenter.Reports.Application.Abstractions;
 using RadiologyCenter.Reports.Application.DTOs;
+using RadiologyCenter.Reports.Application.Localization;
 using RadiologyCenter.Reports.Domain.Enumerations;
 
 namespace RadiologyCenter.Reports.Application.Commands.ReportTemplates.CreateReportTemplate;
@@ -14,7 +15,7 @@ public static class CreateReportTemplateCommandHandler
         CancellationToken ct)
     {
         if (await templateRepository.ExistsByNameAsync(command.Name, ct: ct))
-            return Result.Failure<ReportTemplateDto>(Error.Conflict($"A template named '{command.Name}' already exists."));
+            return Result.Failure<ReportTemplateDto>(Error.Conflict(ErrorCodes.TemplateNameExists, $"A template named '{command.Name}' already exists."));
 
         var modality = Modality.FromName<Modality>(command.Modality);
         var template = ReportTemplate.Create(command.Name, modality, command.BodyPart, command.Description);

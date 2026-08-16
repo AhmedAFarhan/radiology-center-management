@@ -1,4 +1,5 @@
 using FluentValidation;
+using RadiologyCenter.Examinations.Application.Localization;
 using RadiologyCenter.BuildingBlocks.Application.Validation;
 using RadiologyCenter.Examinations.Domain.Enumerations;
 
@@ -17,12 +18,12 @@ public class UpdateExaminationCommandValidator : AbstractValidator<UpdateExamina
         RuleFor(x => x.Discount).GreaterThanOrEqualTo(0).When(x => x.Discount.HasValue);
         RuleFor(x => x.Discount).LessThanOrEqualTo(100)
             .When(x => x.Discount.HasValue && x.IsDiscountPercentage == true)
-            .WithMessage("Percentage discount cannot exceed 100.");
+            .WithErrorCode(ErrorCodes.PercentageDiscountMax);
         RuleFor(x => x.Paid).GreaterThanOrEqualTo(0).When(x => x.Paid.HasValue);
 
         RuleFor(x => x.Items)
             .Must(items => items is null || items.Select(i => i.ItemId).Distinct().Count() == items.Count)
-            .WithMessage("An item can only be added once per examination.")
+            .WithErrorCode(ErrorCodes.DuplicateItem)
             .When(x => x.Items is not null);
 
         RuleForEach(x => x.Items).ChildRules(item =>

@@ -1,4 +1,5 @@
 using RadiologyCenter.BuildingBlocks.Application.Abstractions;
+using RadiologyCenter.Identity.Application.Localization;
 using RadiologyCenter.Identity.Application.Abstractions;
 
 namespace RadiologyCenter.Identity.Application.Commands.Logout;
@@ -22,7 +23,7 @@ public static class LogoutCommandHandler
         if (command.RefreshToken is not null)
         {
             if (!user.HasValidRefreshToken(command.RefreshToken) || !user.HasActiveSession(command.RefreshToken))
-                return Result.Failure(Error.Unauthorized("Refresh token is expired or revoked."));
+                return Result.Failure(Error.Unauthorized(ErrorCodes.RefreshTokenExpired, "Refresh token is expired or revoked."));
 
             user.RevokeRefreshToken(command.RefreshToken);
             user.RevokeSession(command.RefreshToken);

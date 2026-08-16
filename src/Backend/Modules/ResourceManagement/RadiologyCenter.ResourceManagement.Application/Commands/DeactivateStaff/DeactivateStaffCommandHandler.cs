@@ -1,3 +1,4 @@
+using RadiologyCenter.ResourceManagement.Application.Localization;
 using RadiologyCenter.ResourceManagement.Application.Abstractions;
 
 namespace RadiologyCenter.ResourceManagement.Application.Commands.DeactivateStaff;
@@ -12,7 +13,7 @@ public static class DeactivateStaffCommandHandler
     {
         var staff = await staffRepository.GetByIdAsync(command.StaffId, ct);
         if (staff is null)
-            return Result.Failure(Error.NotFound("Staff", command.StaffId));
+            return Result.Failure(Error.NotFound(ErrorCodes.StaffNotFound, "Staff", command.StaffId));
 
         staff.Deactivate();
         staffRepository.Update(staff);

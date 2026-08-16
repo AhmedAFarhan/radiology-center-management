@@ -3,6 +3,7 @@ using RadiologyCenter.BuildingBlocks.Domain.Exceptions;
 using RadiologyCenter.BuildingBlocks.Domain.SoftDeletable;
 using RadiologyCenter.Catalog.Domain.Enumerations;
 using RadiologyCenter.Reports.Domain.Enumerations;
+using RadiologyCenter.Reports.Domain.Errors;
 
 namespace RadiologyCenter.Reports.Domain.Entities;
 
@@ -76,7 +77,7 @@ public sealed class ReportTemplate : SoftDeletableAggregateRoot<Guid>
         Guard.AgainstNull(sectionType, nameof(sectionType));
         Guard.AgainstNullOrWhiteSpace(title, nameof(title));
         Guard.Against(_sections.Any(s => s.SectionType == sectionType),
-            duplicate => duplicate, $"Section '{sectionType.Name}' already exists on template '{Name}'.");
+            duplicate => duplicate, DomainErrors.DuplicateTemplateSection, $"Section '{sectionType.Name}' already exists on template '{Name}'.");
 
         var section = ReportTemplateSection.Create(Id, sectionType, title, body, position, isLocked);
         _sections.Add(section);
@@ -86,10 +87,10 @@ public sealed class ReportTemplate : SoftDeletableAggregateRoot<Guid>
     public void RemoveSection(Guid sectionId)
     {
         var section = _sections.FirstOrDefault(s => s.Id == sectionId)
-            ?? throw new DomainException($"Section '{sectionId}' is not on template '{Name}'.");
+            ?? throw new DomainException(DomainErrors.SectionNotOnTemplate, $"Section '{sectionId}' is not on template '{Name}'.");
 
         if (IsSystem)
-            throw new BusinessRuleViolationException("System templates cannot be modified.");
+            throw new BusinessRuleViolationException(nameof(RemoveSection), DomainErrors.SystemTemplateReadOnly, "System templates cannot be modified.");
 
         _sections.Remove(section);
     }

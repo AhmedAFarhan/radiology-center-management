@@ -1,3 +1,4 @@
+using RadiologyCenter.BuildingBlocks.Application.Localization;
 using RadiologyCenter.BuildingBlocks.Domain.Specifications;
 using RadiologyCenter.Inventory.Application.Abstractions;
 using RadiologyCenter.Inventory.Domain.Entities;
@@ -15,7 +16,7 @@ public static class PurchaseOrderMapper
             purchaseOrder.OrderNumber,
             purchaseOrder.SupplierId,
             supplierName,
-            purchaseOrder.Status.Name,
+            purchaseOrder.Status.LocalizedName(),
             purchaseOrder.ExpectedDeliveryAt,
             purchaseOrder.ReceivedAt,
             purchaseOrder.Notes,

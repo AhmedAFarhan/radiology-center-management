@@ -1,4 +1,5 @@
 using RadiologyCenter.BuildingBlocks.Application.Abstractions;
+using RadiologyCenter.Notification.Application.Localization;
 using RadiologyCenter.Notification.Application.Abstractions;
 using RadiologyCenter.Notification.Application.DTOs;
 
@@ -13,7 +14,7 @@ public static class CreateNotificationTemplateCommandHandler
         CancellationToken ct)
     {
         if (await repository.ExistsByCodeAsync(command.Code, ct: ct))
-            return Result.Failure<NotificationTemplateDto>(Error.Conflict($"A template with code '{command.Code}' already exists."));
+            return Result.Failure<NotificationTemplateDto>(Error.Conflict(ErrorCodes.TemplateCodeExists, $"A template with code '{command.Code}' already exists."));
 
         var template = new NotificationTemplate(command.Code, command.Name, command.Subject, command.Body);
 

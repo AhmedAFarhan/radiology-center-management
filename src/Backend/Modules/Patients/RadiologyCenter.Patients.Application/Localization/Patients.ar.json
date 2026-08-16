@@ -1,0 +1,26 @@
+﻿{
+  "codes": {
+    "Patient.NameRequired": "الاسم الكامل مطلوب.",
+    "Patient.DobOrAgeRequired": "يجب توفير تاريخ الميلاد أو العمر.",
+    "Patient.DateOfBirthFuture": "لا يمكن أن يكون تاريخ الميلاد في المستقبل.",
+    "Patient.AgeOutOfRange": "يجب أن يكون العمر بين 0 و 150.",
+    "Patient.BloodTypeInvalid": "فصيلة الدم غير صالحة."
+  },
+  "enums": {
+    "BloodType": {
+      "A+": "A+",
+      "A-": "A-",
+      "B+": "B+",
+      "B-": "B-",
+      "AB+": "AB+",
+      "AB-": "AB-",
+      "O+": "O+",
+      "O-": "O-"
+    },
+    "Gender": {
+      "Male": "ذكر",
+      "Female": "أنثى",
+      "Other": "أخرى"
+    }
+  }
+}

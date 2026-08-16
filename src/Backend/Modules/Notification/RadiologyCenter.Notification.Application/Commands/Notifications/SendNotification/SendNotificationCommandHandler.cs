@@ -1,4 +1,5 @@
 using System.Text;
+using RadiologyCenter.Notification.Application.Localization;
 using RadiologyCenter.Notification.Application.Abstractions;
 using RadiologyCenter.Notification.Domain.Enumerations;
 
@@ -16,7 +17,7 @@ public static class SendNotificationCommandHandler
     {
         var channel = NotificationChannel.GetAll<NotificationChannel>().FirstOrDefault(c => c.Name == command.Channel);
         if (channel is null)
-            return Result.Failure(Error.Validation("InvalidChannel", $"Channel '{command.Channel}' is not supported."));
+            return Result.Failure(Error.Validation(ErrorCodes.InvalidChannel, $"Channel '{command.Channel}' is not supported."));
 
         string subject;
         string body;
@@ -25,10 +26,10 @@ public static class SendNotificationCommandHandler
         {
             var template = await templateRepository.GetByCodeAsync(command.TemplateCode, ct);
             if (template is null)
-                return Result.Failure(Error.NotFound("NotificationTemplate", command.TemplateCode));
+                return Result.Failure(Error.NotFound(ErrorCodes.TemplateNotFound, "NotificationTemplate", command.TemplateCode));
 
             if (!template.IsActive)
-                return Result.Failure(Error.Validation("InactiveTemplate", $"Template '{command.TemplateCode}' is inactive."));
+                return Result.Failure(Error.Validation(ErrorCodes.InactiveTemplate, $"Template '{command.TemplateCode}' is inactive."));
 
             subject = string.IsNullOrWhiteSpace(command.Subject) ? template.Subject : command.Subject;
             body = string.IsNullOrWhiteSpace(command.Body) ? template.Body : command.Body;
@@ -63,7 +64,7 @@ public static class SendNotificationCommandHandler
 
         return sendResult.IsSuccess
             ? Result.Success()
-            : Result.Failure(Error.Failure(sendResult.Error?.Message ?? "Notification delivery failed."));
+            : Result.Failure(Error.Failure(ErrorCodes.DeliveryFailed, sendResult.Error?.Message ?? "Notification delivery failed."));
     }
 
     private static string ApplyPlaceholders(string text, Dictionary<string, string>? placeholders)

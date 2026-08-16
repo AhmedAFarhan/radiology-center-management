@@ -1,4 +1,5 @@
 using Mapster;
+using RadiologyCenter.Payroll.Application.Localization;
 using RadiologyCenter.Payroll.Application.Abstractions;
 using RadiologyCenter.Payroll.Application.DTOs;
 
@@ -13,7 +14,7 @@ public static class GetPayRunByIdQueryHandler
     {
         var payRun = await payRunRepository.GetWithPayslipsAsync(query.Id, ct);
         if (payRun is null)
-            return Result.Failure<PayRunDto>(Error.NotFound("PayRun", query.Id));
+            return Result.Failure<PayRunDto>(Error.NotFound(ErrorCodes.PayRunNotFound, "PayRun", query.Id));
 
         return Result.Success(payRun.Adapt<PayRunDto>());
     }

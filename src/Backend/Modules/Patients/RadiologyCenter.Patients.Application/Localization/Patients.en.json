@@ -1,0 +1,26 @@
+﻿{
+    "codes":  {
+                  "Patient.NameRequired":  "Full name is required.",
+                  "Patient.DobOrAgeRequired":  "Either date of birth or age must be provided.",
+                  "Patient.DateOfBirthFuture":  "Date of birth cannot be in the future.",
+                  "Patient.AgeOutOfRange":  "Age must be between 0 and 150.",
+                  "Patient.BloodTypeInvalid":  "Blood type is invalid."
+              },
+    "enums":  {
+                  "BloodType":  {
+                                    "A+":  "A+",
+                                    "A-":  "A-",
+                                    "B+":  "B+",
+                                    "B-":  "B-",
+                                    "AB+":  "AB+",
+                                    "AB-":  "AB-",
+                                    "O+":  "O+",
+                                    "O-":  "O-"
+                                },
+                  "Gender":  {
+                                 "Male":  "Male",
+                                 "Female":  "Female",
+                                 "Other":  "Other"
+                             }
+              }
+}

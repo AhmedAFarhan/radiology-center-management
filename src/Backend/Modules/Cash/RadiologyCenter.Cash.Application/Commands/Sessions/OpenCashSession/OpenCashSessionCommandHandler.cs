@@ -1,4 +1,5 @@
 using RadiologyCenter.BuildingBlocks.Application.Abstractions;
+using RadiologyCenter.Cash.Application.Localization;
 using RadiologyCenter.Cash.Application.Abstractions;
 using RadiologyCenter.Cash.Application.DTOs;
 using RadiologyCenter.Cash.Domain.Entities;
@@ -18,7 +19,7 @@ public static class OpenCashSessionCommandHandler
             return Result.Failure<CashSessionDto>(Error.Unauthorized());
 
         if (await sessionRepository.GetOpenSessionByUserAsync(userId, ct) is not null)
-            return Result.Failure<CashSessionDto>(Error.Conflict("A cash session is already open for this user."));
+            return Result.Failure<CashSessionDto>(Error.Conflict(ErrorCodes.SessionAlreadyOpen, "A cash session is already open for this user."));
 
         var session = CashSession.Open(
             userId,

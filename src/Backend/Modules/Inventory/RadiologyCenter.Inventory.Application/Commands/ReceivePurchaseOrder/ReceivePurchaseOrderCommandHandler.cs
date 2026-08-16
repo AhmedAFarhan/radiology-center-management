@@ -1,3 +1,4 @@
+using RadiologyCenter.Inventory.Application.Localization;
 using RadiologyCenter.BuildingBlocks.Domain.Exceptions;
 using RadiologyCenter.Inventory.Application.Abstractions;
 using RadiologyCenter.Inventory.Domain.Enumerations;
@@ -16,7 +17,7 @@ public static class ReceivePurchaseOrderCommandHandler
     {
         var purchaseOrder = await purchaseOrderRepository.GetWithItemsAsync(command.PurchaseOrderId, ct);
         if (purchaseOrder is null)
-            return Result.Failure(Error.NotFound("PurchaseOrder", command.PurchaseOrderId));
+            return Result.Failure(Error.NotFound(ErrorCodes.PurchaseOrderNotFound, "PurchaseOrder", command.PurchaseOrderId));
 
         try
         {
@@ -53,7 +54,7 @@ public static class ReceivePurchaseOrderCommandHandler
         }
         catch (DomainException exception)
         {
-            return Result.Failure(Error.Validation("InvalidReceipt", exception.Message));
+            return Result.Failure(Error.Validation(exception.Code ?? ErrorCodes.InvalidReceipt, exception.Message));
         }
     }
 }

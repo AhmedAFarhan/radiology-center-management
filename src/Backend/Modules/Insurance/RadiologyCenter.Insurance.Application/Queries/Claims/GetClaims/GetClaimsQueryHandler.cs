@@ -36,7 +36,7 @@ public static class GetClaimsQueryHandler
             c.BilledAmount,
             c.PayerShare,
             c.PatientShare,
-            c.Status.Name,
+            c.Status.LocalizedName(),
             c.SubmittedAt,
             c.ApprovedAt,
             c.PaidAt,

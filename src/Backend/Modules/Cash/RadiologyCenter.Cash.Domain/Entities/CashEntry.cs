@@ -1,6 +1,7 @@
 using RadiologyCenter.BuildingBlocks.Domain.Common;
 using RadiologyCenter.BuildingBlocks.Domain.SoftDeletable;
 using RadiologyCenter.Cash.Domain.Enumerations;
+using RadiologyCenter.Cash.Domain.Errors;
 
 namespace RadiologyCenter.Cash.Domain.Entities;
 
@@ -32,7 +33,7 @@ public sealed class CashEntry : SoftDeletableAggregateRoot<Guid>
         Guard.AgainstEmpty(cashSessionId, nameof(cashSessionId));
         Guard.AgainstNull(direction, nameof(direction));
         Guard.AgainstNull(reason, nameof(reason));
-        Guard.Against(amount, a => a <= 0, "Cash entry amount must be positive.");
+        Guard.Against(amount, a => a <= 0, DomainErrors.EntryAmountPositive, "Cash entry amount must be positive.");
         Guard.AgainstDefault(occurredAt, nameof(occurredAt));
 
         return new CashEntry

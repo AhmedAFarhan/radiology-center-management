@@ -1,5 +1,6 @@
 using RadiologyCenter.BuildingBlocks.Domain.Auditing;
 using RadiologyCenter.BuildingBlocks.Domain.Common;
+using RadiologyCenter.Inventory.Domain.Errors;
 
 namespace RadiologyCenter.Inventory.Domain.Entities;
 
@@ -28,7 +29,7 @@ public sealed class StockBatch : AuditableEntity<Guid>
         Guard.AgainstEmpty(itemId, nameof(itemId));
         Guard.AgainstNullOrWhiteSpace(lotNumber, nameof(lotNumber));
         Guard.AgainstNegativeOrZero(quantityReceived, nameof(quantityReceived));
-        Guard.Against(expiryDate, e => e.HasValue && e.Value.Date < DateTime.UtcNow.Date, "Batch expiry date cannot be in the past.");
+        Guard.Against(expiryDate, e => e.HasValue && e.Value.Date < DateTime.UtcNow.Date, DomainErrors.BatchExpiryDatePast, "Batch expiry date cannot be in the past.");
 
         return new StockBatch
         {
@@ -45,7 +46,7 @@ public sealed class StockBatch : AuditableEntity<Guid>
     public void Issue(int quantity)
     {
         Guard.AgainstNegativeOrZero(quantity, nameof(quantity));
-        Guard.Against(quantity, q => q > QuantityRemaining, $"Cannot issue {quantity} from batch '{LotNumber}'; only {QuantityRemaining} remaining.");
+        Guard.Against(quantity, q => q > QuantityRemaining, DomainErrors.InsufficientBatchStock, $"Cannot issue {quantity} from batch '{LotNumber}'; only {QuantityRemaining} remaining.");
 
         QuantityRemaining -= quantity;
     }

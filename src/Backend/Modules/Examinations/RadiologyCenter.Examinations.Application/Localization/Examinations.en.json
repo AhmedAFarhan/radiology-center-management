@@ -1,0 +1,43 @@
+﻿{
+  "codes": {
+    "Examination.ScheduledTimePast": "Scheduled time cannot be in the past.",
+    "Examination.PercentageDiscountMax": "Percentage discount cannot exceed 100.",
+    "Examination.DuplicateItem": "An item can only be added once per examination.",
+    "Examination.AuthenticationRequired": "An authenticated user is required to start an examination.",
+    "Examination.PaymentForCancelledExamination": "Cannot record a payment for a cancelled examination.",
+    "Examination.PaidAmountImmutable": "Paid amount cannot be modified once a payment has been recorded.",
+    "Examination.PriceNegative": "Price cannot be negative.",
+    "Examination.DiscountNegative": "Discount cannot be negative.",
+    "Examination.PaidAmountNegative": "Paid amount cannot be negative.",
+    "Examination.ScheduledTimeDefault": "Scheduled time cannot be the default value.",
+    "Examination.PaymentNegative": "Payment cannot be negative.",
+    "Examination.PaymentExceedsRemaining": "Payment of \u0027{0}\u0027 exceeds the remaining balance of \u0027{1}\u0027.",
+    "Examination.RefundNegative": "Refund cannot be negative.",
+    "Examination.RefundExceedsPaid": "Refund cannot exceed the amount paid.",
+    "Examination.RequiredItemCannotRemove": "Item \u0027{0}\u0027 is required for this examination and cannot be removed.",
+    "Examination.ItemNotOnExamination": "Item \u0027{0}\u0027 is not on examination \u0027{1}\u0027.",
+    "Examination.ItemsCannotBeModified": "Examination \u0027{0}\u0027 is \u0027{1}\u0027 and its items can no longer be modified.",
+    "Examination.InvalidStatusTransition": "Examination \u0027{0}\u0027 cannot transition from status \u0027{1}\u0027.",
+    "Examination.RadiologistFeeNegative": "Radiologist fee cannot be negative.",
+    "Examination.TechnicianFeeNegative": "Technician fee cannot be negative.",
+    "Examination.ReferralFeeNegative": "Referral fee cannot be negative.",
+    "Examination.RemainingAmountNegative": "Remaining amount cannot be negative.",
+    "Examination.UnitCostNegative": "Unit cost cannot be negative.",
+    "Examination.ItemAlreadyInPreferences": "Item \u0027{0}\u0027 is already in the preferences for examination type \u0027{1}\u0027."
+  },
+  "enums": {
+    "ExaminationPriority": {
+      "Routine": "Routine",
+      "Urgent": "Urgent",
+      "Stat": "Stat"
+    },
+    "ExaminationStatus": {
+      "Requested": "Requested",
+      "Scheduled": "Scheduled",
+      "CheckedIn": "CheckedIn",
+      "InProgress": "InProgress",
+      "Completed": "Completed",
+      "Cancelled": "Cancelled"
+    }
+  }
+}

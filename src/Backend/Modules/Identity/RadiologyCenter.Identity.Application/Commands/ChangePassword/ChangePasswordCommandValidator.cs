@@ -1,4 +1,5 @@
 using FluentValidation;
+using RadiologyCenter.Identity.Application.Localization;
 using RadiologyCenter.BuildingBlocks.Application.Validation;
 
 namespace RadiologyCenter.Identity.Application.Commands.ChangePassword;
@@ -11,6 +12,6 @@ public class ChangePasswordCommandValidator : AbstractValidator<ChangePasswordCo
         RuleFor(x => x.NewPassword).NotEmpty().StrongPassword();
         RuleFor(x => x.NewPassword)
             .NotEqual(x => x.CurrentPassword)
-            .WithMessage("New password must be different from the current password.");
+            .WithErrorCode(ErrorCodes.PasswordDifferent);
     }
 }

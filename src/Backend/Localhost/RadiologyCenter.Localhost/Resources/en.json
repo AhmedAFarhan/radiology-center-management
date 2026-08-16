@@ -1,0 +1,532 @@
+﻿{
+  "permissions": {
+    "patients.create": {
+      "name": "Create Patients",
+      "description": "Create new patient records",
+      "group": "Patients"
+    },
+    "patients.read": {
+      "name": "Read Patients",
+      "description": "View patient records",
+      "group": "Patients"
+    },
+    "patients.update": {
+      "name": "Update Patients",
+      "description": "Modify existing patient records",
+      "group": "Patients"
+    },
+    "patients.delete": {
+      "name": "Delete Patients",
+      "description": "Remove patient records",
+      "group": "Patients"
+    },
+    "appointments.create": {
+      "name": "Create Appointments",
+      "description": "Schedule new appointments",
+      "group": "Appointments"
+    },
+    "appointments.read": {
+      "name": "Read Appointments",
+      "description": "View appointment details",
+      "group": "Appointments"
+    },
+    "appointments.update": {
+      "name": "Update Appointments",
+      "description": "Modify existing appointments",
+      "group": "Appointments"
+    },
+    "appointments.delete": {
+      "name": "Delete Appointments",
+      "description": "Cancel or remove appointments",
+      "group": "Appointments"
+    },
+    "appointments.confirm": {
+      "name": "Confirm Appointments",
+      "description": "Confirm scheduled appointments",
+      "group": "Appointments"
+    },
+    "reports.create": {
+      "name": "Create Reports",
+      "description": "Generate new radiology reports",
+      "group": "Reports"
+    },
+    "reports.read": {
+      "name": "Read Reports",
+      "description": "View radiology reports",
+      "group": "Reports"
+    },
+    "reports.update": {
+      "name": "Update Reports",
+      "description": "Modify existing reports",
+      "group": "Reports"
+    },
+    "reports.delete": {
+      "name": "Delete Reports",
+      "description": "Remove reports",
+      "group": "Reports"
+    },
+    "reports.export": {
+      "name": "Export Reports",
+      "description": "Export reports to external formats",
+      "group": "Reports"
+    },
+    "analytics.read": {
+      "name": "Read Analytics",
+      "description": "View analytics and business intelligence dashboards",
+      "group": "Analytics"
+    },
+    "users.create": {
+      "name": "Create Users",
+      "description": "Create new user accounts",
+      "group": "Identity"
+    },
+    "users.read": {
+      "name": "Read Users",
+      "description": "View user accounts",
+      "group": "Identity"
+    },
+    "users.update": {
+      "name": "Update Users",
+      "description": "Modify user accounts",
+      "group": "Identity"
+    },
+    "users.delete": {
+      "name": "Delete Users",
+      "description": "Remove user accounts",
+      "group": "Identity"
+    },
+    "users.manage-roles": {
+      "name": "Manage User Roles",
+      "description": "Assign or remove roles from users",
+      "group": "Identity"
+    },
+    "roles.create": {
+      "name": "Create Roles",
+      "description": "Create new roles",
+      "group": "Identity"
+    },
+    "roles.read": {
+      "name": "Read Roles",
+      "description": "View roles",
+      "group": "Identity"
+    },
+    "roles.update": {
+      "name": "Update Roles",
+      "description": "Modify role details",
+      "group": "Identity"
+    },
+    "roles.delete": {
+      "name": "Delete Roles",
+      "description": "Remove roles",
+      "group": "Identity"
+    },
+    "roles.manage-permissions": {
+      "name": "Manage Role Permissions",
+      "description": "Assign or remove permissions from roles",
+      "group": "Identity"
+    },
+    "settings.read": {
+      "name": "Read Settings",
+      "description": "View system settings",
+      "group": "Settings"
+    },
+    "settings.update": {
+      "name": "Update Settings",
+      "description": "Modify system settings",
+      "group": "Settings"
+    },
+    "inventory.items.create": {
+      "name": "Create Inventory Items",
+      "description": "Add new inventory items",
+      "group": "Inventory"
+    },
+    "inventory.items.read": {
+      "name": "Read Inventory Items",
+      "description": "View inventory items",
+      "group": "Inventory"
+    },
+    "inventory.items.update": {
+      "name": "Update Inventory Items",
+      "description": "Modify inventory items",
+      "group": "Inventory"
+    },
+    "inventory.items.delete": {
+      "name": "Delete Inventory Items",
+      "description": "Remove inventory items",
+      "group": "Inventory"
+    },
+    "inventory.suppliers.create": {
+      "name": "Create Inventory Suppliers",
+      "description": "Add new suppliers",
+      "group": "Inventory"
+    },
+    "inventory.suppliers.read": {
+      "name": "Read Inventory Suppliers",
+      "description": "View suppliers",
+      "group": "Inventory"
+    },
+    "inventory.suppliers.update": {
+      "name": "Update Inventory Suppliers",
+      "description": "Modify suppliers",
+      "group": "Inventory"
+    },
+    "inventory.suppliers.delete": {
+      "name": "Delete Inventory Suppliers",
+      "description": "Remove suppliers",
+      "group": "Inventory"
+    },
+    "inventory.purchase-orders.create": {
+      "name": "Create Purchase Orders",
+      "description": "Create purchase orders",
+      "group": "Inventory"
+    },
+    "inventory.purchase-orders.read": {
+      "name": "Read Purchase Orders",
+      "description": "View purchase orders",
+      "group": "Inventory"
+    },
+    "inventory.purchase-orders.update": {
+      "name": "Update Purchase Orders",
+      "description": "Modify purchase orders",
+      "group": "Inventory"
+    },
+    "inventory.purchase-orders.delete": {
+      "name": "Delete Purchase Orders",
+      "description": "Remove purchase orders",
+      "group": "Inventory"
+    },
+    "inventory.stock.read": {
+      "name": "Read Stock",
+      "description": "View stock levels and movements",
+      "group": "Inventory"
+    },
+    "inventory.stock.issue": {
+      "name": "Issue Stock",
+      "description": "Issue stock to patients",
+      "group": "Inventory"
+    },
+    "examinations.types.manage": {
+      "name": "Manage Examination Types",
+      "description": "Create, update, delete and activate examination types",
+      "group": "Examinations"
+    },
+    "examinations.create": {
+      "name": "Create Examinations",
+      "description": "Create visits and add examinations",
+      "group": "Examinations"
+    },
+    "examinations.read": {
+      "name": "Read Examinations",
+      "description": "View visits and examinations",
+      "group": "Examinations"
+    },
+    "examinations.update": {
+      "name": "Update Examinations",
+      "description": "Modify examinations and their items",
+      "group": "Examinations"
+    },
+    "examinations.delete": {
+      "name": "Delete Examinations",
+      "description": "Remove examinations",
+      "group": "Examinations"
+    },
+    "examinations.perform": {
+      "name": "Perform Examinations",
+      "description": "Start and complete examinations",
+      "group": "Examinations"
+    },
+    "examinations.cancel": {
+      "name": "Cancel Examinations",
+      "description": "Cancel visits and examinations",
+      "group": "Examinations"
+    },
+    "resources.staff.create": {
+      "name": "Create Staff",
+      "description": "Add new staff members",
+      "group": "Resources"
+    },
+    "resources.staff.read": {
+      "name": "Read Staff",
+      "description": "View staff members",
+      "group": "Resources"
+    },
+    "resources.staff.update": {
+      "name": "Update Staff",
+      "description": "Modify staff members",
+      "group": "Resources"
+    },
+    "resources.staff.delete": {
+      "name": "Delete Staff",
+      "description": "Remove staff members",
+      "group": "Resources"
+    },
+    "resources.equipment.create": {
+      "name": "Create Equipment",
+      "description": "Add new equipment",
+      "group": "Resources"
+    },
+    "resources.equipment.read": {
+      "name": "Read Equipment",
+      "description": "View equipment",
+      "group": "Resources"
+    },
+    "resources.equipment.update": {
+      "name": "Update Equipment",
+      "description": "Modify equipment and its status",
+      "group": "Resources"
+    },
+    "resources.equipment.delete": {
+      "name": "Delete Equipment",
+      "description": "Remove equipment",
+      "group": "Resources"
+    },
+    "resources.shifts.create": {
+      "name": "Create Work Shifts",
+      "description": "Add new work shifts",
+      "group": "Resources"
+    },
+    "resources.shifts.read": {
+      "name": "Read Work Shifts",
+      "description": "View work shifts",
+      "group": "Resources"
+    },
+    "resources.shifts.update": {
+      "name": "Update Work Shifts",
+      "description": "Modify work shifts",
+      "group": "Resources"
+    },
+    "resources.shifts.delete": {
+      "name": "Delete Work Shifts",
+      "description": "Remove work shifts",
+      "group": "Resources"
+    },
+    "resources.leave.create": {
+      "name": "Create Leave",
+      "description": "Add new leave records",
+      "group": "Resources"
+    },
+    "resources.leave.read": {
+      "name": "Read Leave",
+      "description": "View leave records",
+      "group": "Resources"
+    },
+    "resources.leave.update": {
+      "name": "Update Leave",
+      "description": "Modify leave records",
+      "group": "Resources"
+    },
+    "resources.leave.delete": {
+      "name": "Delete Leave",
+      "description": "Remove leave records",
+      "group": "Resources"
+    },
+    "resources.referrals.create": {
+      "name": "Create Referral Doctors",
+      "description": "Add new referral doctors",
+      "group": "Resources"
+    },
+    "resources.referrals.read": {
+      "name": "Read Referral Doctors",
+      "description": "View referral doctors",
+      "group": "Resources"
+    },
+    "resources.referrals.update": {
+      "name": "Update Referral Doctors",
+      "description": "Modify referral doctors",
+      "group": "Resources"
+    },
+    "resources.referrals.delete": {
+      "name": "Delete Referral Doctors",
+      "description": "Remove referral doctors",
+      "group": "Resources"
+    },
+    "payroll.read": {
+      "name": "Read Payroll",
+      "description": "View payroll records",
+      "group": "Payroll"
+    },
+    "payroll.salary-components.manage": {
+      "name": "Manage Salary Components",
+      "description": "Create, update, activate and delete salary components",
+      "group": "Payroll"
+    },
+    "payroll.salary.manage": {
+      "name": "Manage Salaries",
+      "description": "Create, update, activate and delete staff salaries",
+      "group": "Payroll"
+    },
+    "payroll.allowances.manage": {
+      "name": "Manage Allowances",
+      "description": "Create, update, activate and delete allowance assignments",
+      "group": "Payroll"
+    },
+    "payroll.fees.manage": {
+      "name": "Manage Payroll Fees",
+      "description": "Create, update, activate and delete examination and referral fees",
+      "group": "Payroll"
+    },
+    "payroll.payruns.manage": {
+      "name": "Manage Pay Runs",
+      "description": "Create pay runs and manage their payslips",
+      "group": "Payroll"
+    },
+    "payroll.payruns.run": {
+      "name": "Run Pay Rolls",
+      "description": "Compute, approve, reject and pay pay runs",
+      "group": "Payroll"
+    },
+    "insurance.companies.create": {
+      "name": "Create Insurance Companies",
+      "description": "Add new insurance companies",
+      "group": "Insurance"
+    },
+    "insurance.companies.read": {
+      "name": "Read Insurance Companies",
+      "description": "View insurance companies",
+      "group": "Insurance"
+    },
+    "insurance.companies.update": {
+      "name": "Update Insurance Companies",
+      "description": "Modify insurance company details",
+      "group": "Insurance"
+    },
+    "insurance.companies.delete": {
+      "name": "Delete Insurance Companies",
+      "description": "Remove insurance companies",
+      "group": "Insurance"
+    },
+    "insurance.policies.create": {
+      "name": "Create Insurance Policies",
+      "description": "Add new patient insurance policies",
+      "group": "Insurance"
+    },
+    "insurance.policies.read": {
+      "name": "Read Insurance Policies",
+      "description": "View patient insurance policies",
+      "group": "Insurance"
+    },
+    "insurance.policies.update": {
+      "name": "Update Insurance Policies",
+      "description": "Modify policies, coverage and status",
+      "group": "Insurance"
+    },
+    "insurance.policies.delete": {
+      "name": "Delete Insurance Policies",
+      "description": "Remove insurance policies",
+      "group": "Insurance"
+    },
+    "insurance.preauthorizations.create": {
+      "name": "Create Pre-authorizations",
+      "description": "Request pre-authorization for examinations",
+      "group": "Insurance"
+    },
+    "insurance.preauthorizations.read": {
+      "name": "Read Pre-authorizations",
+      "description": "View pre-authorizations and documents",
+      "group": "Insurance"
+    },
+    "insurance.preauthorizations.update": {
+      "name": "Update Pre-authorizations",
+      "description": "Approve, deny or attach documents",
+      "group": "Insurance"
+    },
+    "insurance.preauthorizations.attach-document": {
+      "name": "Attach Pre-authorization Documents",
+      "description": "Upload or remove official approval documents",
+      "group": "Insurance"
+    },
+    "insurance.claims.create": {
+      "name": "Create Claims",
+      "description": "Create claims for covered examinations",
+      "group": "Insurance"
+    },
+    "insurance.claims.read": {
+      "name": "Read Claims",
+      "description": "View claims and their lifecycle",
+      "group": "Insurance"
+    },
+    "insurance.claims.update": {
+      "name": "Update Claims",
+      "description": "Submit, resubmit and adjudicate claims",
+      "group": "Insurance"
+    },
+    "insurance.claims.settle": {
+      "name": "Settle Claims",
+      "description": "Record insurance settlements",
+      "group": "Insurance"
+    },
+    "cash.sessions.open": {
+      "name": "Open Cash Sessions",
+      "description": "Open a new cash session and record the opening float",
+      "group": "Cash"
+    },
+    "cash.sessions.read": {
+      "name": "Read Cash Sessions",
+      "description": "View cash sessions and their entries",
+      "group": "Cash"
+    },
+    "cash.sessions.close": {
+      "name": "Close Cash Sessions",
+      "description": "Close a cash session and reconcile a counted handover",
+      "group": "Cash"
+    },
+    "cash.entries.add": {
+      "name": "Add Cash Entries",
+      "description": "Record cash movements in a cash session",
+      "group": "Cash"
+    },
+    "cash.handovers.read": {
+      "name": "Read Cash Handovers",
+      "description": "View cash handovers and reconciliation details",
+      "group": "Cash"
+    },
+    "cash.handovers.approve": {
+      "name": "Approve Cash Handovers",
+      "description": "Approve completed cash handovers",
+      "group": "Cash"
+    },
+    "notifications.templates.manage": {
+      "name": "Manage Notification Templates",
+      "description": "Create, update, activate, deactivate and delete notification templates",
+      "group": "Notifications"
+    },
+    "notifications.messages.read": {
+      "name": "Read Notification Messages",
+      "description": "View the notification message ledger",
+      "group": "Notifications"
+    },
+    "notifications.messages.send": {
+      "name": "Send Notifications",
+      "description": "Send SMS, email and push notifications",
+      "group": "Notifications"
+    }
+  },
+  "messages": {
+    "Unauthorized.": "Unauthorized.",
+    "Forbidden.": "Forbidden.",
+    "Account is locked out.": "Account is locked out.",
+    "{0} with key \u0027{1}\u0027 not found.": "{0} with key \u0027{1}\u0027 not found.",
+    "{0} with key \u0027{1}\u0027 was not found.": "{0} with key \u0027{1}\u0027 was not found.",
+    "The record was modified by another user. Please refresh and try again.": "The record was modified by another user. Please refresh and try again.",
+    "An unexpected error occurred.": "An unexpected error occurred.",
+    "No active database transaction is available for the cash entry.": "No active database transaction is available for the cash entry.",
+    "Full name must contain at least a first name and a last name.": "Full name must contain at least a first name and a last name.",
+    "Phone number must be a valid Egyptian number (e.g. 01012345678).": "Phone number must be a valid Egyptian number (e.g. 01012345678).",
+    "\u0027{0}\u0027 is not a valid value for {1}.": "\u0027{0}\u0027 is not a valid value for {1}.",
+    "\u0027{0}\u0027 is not a valid name for {1}.": "\u0027{0}\u0027 is not a valid name for {1}.",
+    "{0} cannot be null.": "{0} cannot be null.",
+    "{0} cannot be null or whitespace.": "{0} cannot be null or whitespace.",
+    "{0} must be greater than zero.": "{0} must be greater than zero.",
+    "{0} cannot be the default value.": "{0} cannot be the default value.",
+    "{0} cannot be empty.": "{0} cannot be empty.",
+    "{0} must be one of: {1}.": "{0} must be one of: {1}.",
+    "Password must be at least {0} characters long and contain both letters and digits.": "Password must be at least {0} characters long and contain both letters and digits."
+  },
+  "codes": {
+    "Shared.IdRequired": "Id is required.",
+    "Shared.PasswordPolicy": "Password must be at least 8 characters long and contain both letters and digits.",
+    "Shared.FullNameTwoParts": "Full name must contain at least a first name and a last name.",
+    "Shared.InvalidPhoneNumber": "Phone number must be a valid Egyptian number (e.g. 01012345678).",
+    "Shared.InvalidEnumValue": "Value must be one of the allowed options."
+  }
+}

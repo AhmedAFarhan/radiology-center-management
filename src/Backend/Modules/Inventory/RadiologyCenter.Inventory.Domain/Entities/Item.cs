@@ -1,6 +1,7 @@
 using RadiologyCenter.BuildingBlocks.Domain.Common;
 using RadiologyCenter.BuildingBlocks.Domain.SoftDeletable;
 using RadiologyCenter.Inventory.Domain.Enumerations;
+using RadiologyCenter.Inventory.Domain.Errors;
 using RadiologyCenter.Inventory.Domain.Events;
 
 namespace RadiologyCenter.Inventory.Domain.Entities;
@@ -37,8 +38,8 @@ public sealed class Item : SoftDeletableAggregateRoot<Guid>
         Guard.AgainstNullOrWhiteSpace(name, nameof(name));
         Guard.AgainstNull(category, nameof(category));
         Guard.AgainstNull(unit, nameof(unit));
-        Guard.Against(reorderLevel, r => r < 0, "Reorder level cannot be negative.");
-        Guard.Against(reorderQuantity, r => r < 0, "Reorder quantity cannot be negative.");
+        Guard.Against(reorderLevel, r => r < 0, DomainErrors.ReorderLevelNegative, "Reorder level cannot be negative.");
+        Guard.Against(reorderQuantity, r => r < 0, DomainErrors.ReorderQuantityNegative, "Reorder quantity cannot be negative.");
 
         var item = new Item
         {
@@ -71,8 +72,8 @@ public sealed class Item : SoftDeletableAggregateRoot<Guid>
         Guard.AgainstNullOrWhiteSpace(name, nameof(name));
         Guard.AgainstNull(category, nameof(category));
         Guard.AgainstNull(unit, nameof(unit));
-        Guard.Against(reorderLevel, r => r < 0, "Reorder level cannot be negative.");
-        Guard.Against(reorderQuantity, r => r < 0, "Reorder quantity cannot be negative.");
+        Guard.Against(reorderLevel, r => r < 0, DomainErrors.ReorderLevelNegative, "Reorder level cannot be negative.");
+        Guard.Against(reorderQuantity, r => r < 0, DomainErrors.ReorderQuantityNegative, "Reorder quantity cannot be negative.");
 
         Name = name.Trim();
         Brand = brand?.Trim();

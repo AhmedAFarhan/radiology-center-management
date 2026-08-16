@@ -1,4 +1,5 @@
 using Mapster;
+using RadiologyCenter.ResourceManagement.Application.Localization;
 using RadiologyCenter.ResourceManagement.Application.Abstractions;
 using RadiologyCenter.ResourceManagement.Application.DTOs;
 
@@ -13,7 +14,7 @@ public static class GetStaffByIdQueryHandler
     {
         var staff = await staffRepository.GetByIdAsync(query.Id, ct);
         if (staff is null)
-            return Result.Failure<StaffDto>(Error.NotFound("Staff", query.Id));
+            return Result.Failure<StaffDto>(Error.NotFound(ErrorCodes.StaffNotFound, "Staff", query.Id));
 
         return Result.Success(staff.Adapt<StaffDto>());
     }

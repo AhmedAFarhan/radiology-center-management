@@ -1,3 +1,4 @@
+using RadiologyCenter.BuildingBlocks.Application.Localization;
 using RadiologyCenter.Notification.Domain.Entities;
 
 namespace RadiologyCenter.Notification.Application.DTOs;
@@ -17,8 +18,8 @@ internal static class NotificationMapper
         new(
             message.Id,
             message.Recipient,
-            message.Channel.Name,
-            message.Status.Name,
+            message.Channel.LocalizedName(),
+            message.Status.LocalizedName(),
             message.Subject,
             message.Body,
             message.TemplateCode,

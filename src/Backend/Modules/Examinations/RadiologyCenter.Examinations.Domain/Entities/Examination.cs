@@ -3,6 +3,7 @@ using RadiologyCenter.BuildingBlocks.Domain.Common;
 using RadiologyCenter.BuildingBlocks.Domain.Exceptions;
 using RadiologyCenter.Examinations.Domain.Common;
 using RadiologyCenter.Examinations.Domain.Enumerations;
+using RadiologyCenter.Examinations.Domain.Errors;
 using RadiologyCenter.Examinations.Domain.Events;
 
 namespace RadiologyCenter.Examinations.Domain.Entities;
@@ -60,11 +61,11 @@ public sealed class Examination : AuditableAggregateRoot<Guid>
         Guard.AgainstEmpty(technicianId, nameof(technicianId));
         Guard.AgainstNullOrWhiteSpace(clinicalIndication, nameof(clinicalIndication));
         Guard.AgainstNull(priority, nameof(priority));
-        Guard.Against(price, p => p < 0, "Price cannot be negative.");
-        Guard.Against(discount, d => d < 0, "Discount cannot be negative.");
+        Guard.Against(price, p => p < 0, DomainErrors.PriceNegative, "Price cannot be negative.");
+        Guard.Against(discount, d => d < 0, DomainErrors.DiscountNegative, "Discount cannot be negative.");
         if (isDiscountPercentage)
-            Guard.Against(discount, d => d > ExaminationPricing.PercentageCap, "Percentage discount cannot exceed 100.");
-        Guard.Against(paid, p => p < 0, "Paid amount cannot be negative.");
+            Guard.Against(discount, d => d > ExaminationPricing.PercentageCap, DomainErrors.PercentageDiscountMax, "Percentage discount cannot exceed 100.");
+        Guard.Against(paid, p => p < 0, DomainErrors.PaidAmountNegative, "Paid amount cannot be negative.");
 
         var examination = new Examination
         {
@@ -98,7 +99,7 @@ public sealed class Examination : AuditableAggregateRoot<Guid>
         string? notes = null)
     {
         EnsureNotTerminal();
-        Guard.Against(_items.Any(i => i.ItemId == itemId), isDuplicate => isDuplicate, $"Item '{itemId}' is already on examination '{Id}'.");
+        Guard.Against(_items.Any(i => i.ItemId == itemId), isDuplicate => isDuplicate, DomainErrors.DuplicateItem, $"Item '{itemId}' is already on examination '{Id}'.");
 
         var item = ExaminationItem.Create(Id, itemId, quantity, isContrast, isRequired, notes);
         _items.Add(item);
@@ -109,7 +110,7 @@ public sealed class Examination : AuditableAggregateRoot<Guid>
     {
         EnsureNotTerminal();
         var item = GetItem(examinationItemId);
-        Guard.Against(item.IsRequired, isRequired => isRequired, $"Item '{item.ItemId}' is required for this examination and cannot be removed.");
+        Guard.Against(item.IsRequired, isRequired => isRequired, DomainErrors.RequiredItemCannotRemove, $"Item '{item.ItemId}' is required for this examination and cannot be removed.");
 
         _items.Remove(item);
     }
@@ -139,8 +140,8 @@ public sealed class Examination : AuditableAggregateRoot<Guid>
     public void Schedule(DateTime scheduledAt)
     {
         EnsureStatus(ExaminationStatus.Requested);
-        Guard.Against(scheduledAt, s => s == default, "Scheduled time cannot be the default value.");
-        Guard.Against(scheduledAt, s => s < DateTime.UtcNow.AddMinutes(-1), "Scheduled time cannot be in the past.");
+        Guard.Against(scheduledAt, s => s == default, DomainErrors.ScheduledTimeDefault, "Scheduled time cannot be the default value.");
+        Guard.Against(scheduledAt, s => s < DateTime.UtcNow.AddMinutes(-1), DomainErrors.ScheduledTimePast, "Scheduled time cannot be in the past.");
 
         ScheduledAt = scheduledAt;
         Status = ExaminationStatus.Scheduled;
@@ -188,15 +189,16 @@ public sealed class Examination : AuditableAggregateRoot<Guid>
 
     public void SetBilling(decimal discount, bool isDiscountPercentage, decimal? paid = null)
     {
-        Guard.Against(discount, d => d < 0, "Discount cannot be negative.");
+        Guard.Against(discount, d => d < 0, DomainErrors.DiscountNegative, "Discount cannot be negative.");
         if (isDiscountPercentage)
-            Guard.Against(discount, d => d > ExaminationPricing.PercentageCap, "Percentage discount cannot exceed 100.");
+            Guard.Against(discount, d => d > ExaminationPricing.PercentageCap, DomainErrors.PercentageDiscountMax, "Percentage discount cannot exceed 100.");
         if (paid.HasValue)
         {
-            Guard.Against(paid.Value, p => p < 0, "Paid amount cannot be negative.");
+            Guard.Against(paid.Value, p => p < 0, DomainErrors.PaidAmountNegative, "Paid amount cannot be negative.");
             Guard.Against(
                 paid.Value,
                 p => Paid > 0 && p != Paid,
+                DomainErrors.PaidAmountImmutable,
                 "Paid amount cannot be modified once a payment has been recorded.");
         }
 
@@ -209,8 +211,8 @@ public sealed class Examination : AuditableAggregateRoot<Guid>
 
     public void RecordPayment(decimal amount)
     {
-        Guard.Against(amount, a => a < 0, "Payment cannot be negative.");
-        Guard.Against(amount, a => a > Remaining, "Payment cannot exceed the remaining balance.");
+        Guard.Against(amount, a => a < 0, DomainErrors.PaymentNegative, "Payment cannot be negative.");
+        Guard.Against(amount, a => a > Remaining, DomainErrors.PaymentExceedsRemaining, $"Payment of '{amount}' exceeds the remaining balance of '{Remaining}'.");
 
         Paid += amount;
         RecalculateRemaining();
@@ -218,8 +220,8 @@ public sealed class Examination : AuditableAggregateRoot<Guid>
 
     public void Refund(decimal amount)
     {
-        Guard.Against(amount, a => a < 0, "Refund cannot be negative.");
-        Guard.Against(amount, a => a > Paid, "Refund cannot exceed the amount paid.");
+        Guard.Against(amount, a => a < 0, DomainErrors.RefundNegative, "Refund cannot be negative.");
+        Guard.Against(amount, a => a > Paid, DomainErrors.RefundExceedsPaid, "Refund cannot exceed the amount paid.");
 
         Paid -= amount;
         RecalculateRemaining();
@@ -235,18 +237,18 @@ public sealed class Examination : AuditableAggregateRoot<Guid>
     private ExaminationItem GetItem(Guid examinationItemId)
     {
         return _items.FirstOrDefault(i => i.Id == examinationItemId)
-            ?? throw new DomainException($"Item '{examinationItemId}' is not on examination '{Id}'.");
+            ?? throw new DomainException(DomainErrors.ItemNotOnExamination, $"Item '{examinationItemId}' is not on examination '{Id}'.");
     }
 
     private void EnsureNotTerminal()
     {
         if (IsTerminal)
-            throw new BusinessRuleViolationException($"Examination '{Id}' is '{Status}' and its items can no longer be modified.");
+            throw new BusinessRuleViolationException(nameof(EnsureNotTerminal), DomainErrors.ItemsCannotBeModified, $"Examination '{Id}' is '{Status}' and its items can no longer be modified.");
     }
 
     private void EnsureStatus(params ExaminationStatus[] allowed)
     {
         if (!allowed.Contains(Status))
-            throw new BusinessRuleViolationException($"Examination '{Id}' cannot transition from status '{Status}'.");
+            throw new BusinessRuleViolationException(nameof(EnsureStatus), DomainErrors.InvalidStatusTransition, $"Examination '{Id}' cannot transition from status '{Status}'.");
     }
 }

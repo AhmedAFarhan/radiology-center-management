@@ -1,5 +1,6 @@
 using Mapster;
 using RadiologyCenter.Reports.Application.Abstractions;
+using RadiologyCenter.Reports.Application.Localization;
 using RadiologyCenter.Reports.Application.DTOs;
 
 namespace RadiologyCenter.Reports.Application.Queries.GetReportVersions;
@@ -13,7 +14,7 @@ public static class GetReportVersionsQueryHandler
     {
         var report = await reportRepository.GetByIdWithVersionsAsync(query.ReportId, ct);
         if (report is null)
-            return Result.Failure<IReadOnlyList<ReportVersionDto>>(Error.NotFound("Report", query.ReportId));
+            return Result.Failure<IReadOnlyList<ReportVersionDto>>(Error.NotFound(ErrorCodes.ReportNotFound, "Report", query.ReportId));
 
         var versions = report.Versions
             .OrderBy(v => v.VersionNumber)

@@ -2,6 +2,7 @@
 using RadiologyCenter.BuildingBlocks.Domain.SoftDeletable;
 using RadiologyCenter.Catalog.Domain.Enumerations;
 using RadiologyCenter.Catalog.Domain.Events;
+using RadiologyCenter.Catalog.Domain.Errors;
 using RadiologyCenter.Catalog.Domain.ValueObjects;
 
 namespace RadiologyCenter.Catalog.Domain.Entities;
@@ -40,8 +41,8 @@ public sealed class ExaminationType : SoftDeletableAggregateRoot<Guid>
         Guard.AgainstNullOrWhiteSpace(name, nameof(name));
         Guard.AgainstNull(modality, nameof(modality));
         Guard.AgainstNullOrWhiteSpace(bodyPart, nameof(bodyPart));
-        Guard.Against(standardDurationMinutes, d => d < 0, "Standard duration cannot be negative.");
-        Guard.Against(price, p => p < 0, "Price cannot be negative.");
+        Guard.Against(standardDurationMinutes, d => d < 0, DomainErrors.StandardDurationNegative, "Standard duration cannot be negative.");
+        Guard.Against(price, p => p < 0, DomainErrors.PriceNegative, "Price cannot be negative.");
 
         var examinationType = new ExaminationType
         {
@@ -75,8 +76,8 @@ public sealed class ExaminationType : SoftDeletableAggregateRoot<Guid>
         Guard.AgainstNullOrWhiteSpace(name, nameof(name));
         Guard.AgainstNull(modality, nameof(modality));
         Guard.AgainstNullOrWhiteSpace(bodyPart, nameof(bodyPart));
-        Guard.Against(standardDurationMinutes, d => d < 0, "Standard duration cannot be negative.");
-        Guard.Against(price, p => p < 0, "Price cannot be negative.");
+        Guard.Against(standardDurationMinutes, d => d < 0, DomainErrors.StandardDurationNegative, "Standard duration cannot be negative.");
+        Guard.Against(price, p => p < 0, DomainErrors.PriceNegative, "Price cannot be negative.");
 
         Code = code.Trim();
         Name = name.Trim();

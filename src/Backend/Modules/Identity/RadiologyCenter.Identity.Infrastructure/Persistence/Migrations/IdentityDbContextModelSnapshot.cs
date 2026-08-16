@@ -872,6 +872,41 @@ namespace RadiologyCenter.Identity.Infrastructure.Persistence.Migrations
                         });
                 });
 
+            modelBuilder.Entity("RadiologyCenter.Identity.Domain.Entities.PermissionTranslation", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Description")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<string>("Group")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("Language")
+                        .IsRequired()
+                        .HasMaxLength(10)
+                        .HasColumnType("nvarchar(10)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<Guid>("PermissionId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("PermissionId", "Language")
+                        .IsUnique();
+
+                    b.ToTable("PermissionTranslations", "Identity");
+                });
+
             modelBuilder.Entity("RadiologyCenter.Identity.Domain.Entities.Role", b =>
                 {
                     b.Property<Guid>("Id")
@@ -1014,6 +1049,15 @@ namespace RadiologyCenter.Identity.Infrastructure.Persistence.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("RadiologyCenter.Identity.Domain.Entities.PermissionTranslation", b =>
+                {
+                    b.HasOne("RadiologyCenter.Identity.Domain.Entities.Permission", null)
+                        .WithMany("Translations")
+                        .HasForeignKey("PermissionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("RadiologyCenter.Identity.Domain.Entities.User", b =>
                 {
                     b.OwnsMany("RadiologyCenter.Identity.Domain.Entities.RefreshToken", "RefreshTokens", b1 =>
@@ -1093,6 +1137,11 @@ namespace RadiologyCenter.Identity.Infrastructure.Persistence.Migrations
                         .HasForeignKey("RoleId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("RadiologyCenter.Identity.Domain.Entities.Permission", b =>
+                {
+                    b.Navigation("Translations");
                 });
 #pragma warning restore 612, 618
         }

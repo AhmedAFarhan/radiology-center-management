@@ -19,6 +19,12 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Content Update="Resources\*.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\..\BuildingBlocks\RadiologyCenter.BuildingBlocks.Application\RadiologyCenter.BuildingBlocks.Application.csproj" />
     <ProjectReference Include="..\..\BuildingBlocks\RadiologyCenter.BuildingBlocks.Infrastructure\RadiologyCenter.BuildingBlocks.Infrastructure.csproj" />
     <ProjectReference Include="..\..\Modules\Identity\RadiologyCenter.Identity.Application\RadiologyCenter.Identity.Application.csproj" />

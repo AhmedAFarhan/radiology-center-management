@@ -1,4 +1,5 @@
 using RadiologyCenter.BuildingBlocks.Application.Abstractions;
+using RadiologyCenter.Identity.Application.Localization;
 using RadiologyCenter.Identity.Application.Abstractions;
 
 namespace RadiologyCenter.Identity.Application.Commands.UpdateUserRoles;
@@ -14,12 +15,12 @@ public static class UpdateUserRolesCommandHandler
     {
         var user = await userRepository.GetByIdAsync(command.UserId, ct);
         if (user is null)
-            return Result.Failure(Error.NotFound("User", command.UserId));
+            return Result.Failure(Error.NotFound(ErrorCodes.UserNotFound, "User", command.UserId));
 
         var roles = await roleRepository.GetByIdsAsync(command.RoleIds, ct);
         var missingRoleId = command.RoleIds.Distinct().FirstOrDefault(id => roles.All(r => r.Id != id));
         if (missingRoleId != Guid.Empty)
-            return Result.Failure(Error.NotFound("Role", missingRoleId));
+            return Result.Failure(Error.NotFound(ErrorCodes.RoleNotFound, "Role", missingRoleId));
 
         user.UpdateRoles(roles);
         await userRepository.UpdateAsync(user, ct);

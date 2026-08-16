@@ -1,4 +1,5 @@
 using Mapster;
+using RadiologyCenter.ResourceManagement.Application.Localization;
 using RadiologyCenter.ResourceManagement.Application.Abstractions;
 using RadiologyCenter.ResourceManagement.Application.DTOs;
 
@@ -13,7 +14,7 @@ public static class GetReferralDoctorByIdQueryHandler
     {
         var referralDoctor = await referralDoctorRepository.GetByIdAsync(query.Id, ct);
         if (referralDoctor is null)
-            return Result.Failure<ReferralDoctorDto>(Error.NotFound("ReferralDoctor", query.Id));
+            return Result.Failure<ReferralDoctorDto>(Error.NotFound(ErrorCodes.ReferralDoctorNotFound, "ReferralDoctor", query.Id));
 
         return Result.Success(referralDoctor.Adapt<ReferralDoctorDto>());
     }

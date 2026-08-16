@@ -1,4 +1,5 @@
 using RadiologyCenter.Insurance.Application.Abstractions;
+using RadiologyCenter.Insurance.Application.Localization;
 using RadiologyCenter.Insurance.Application.DTOs;
 
 namespace RadiologyCenter.Insurance.Application.Commands.PreAuthorizations.CreatePreAuthorization;
@@ -14,14 +15,14 @@ public static class CreatePreAuthorizationCommandHandler
         CancellationToken ct)
     {
         if (await policyRepository.GetByIdAsync(command.PolicyId, ct) is not { } policy)
-            return Result.Failure<PreAuthorizationDto>(Error.NotFound("Policy", command.PolicyId));
+            return Result.Failure<PreAuthorizationDto>(Error.NotFound(ErrorCodes.PolicyNotFound, "Policy", command.PolicyId));
         if (!policy.IsActive)
-            return Result.Failure<PreAuthorizationDto>(Error.Conflict("Policy is not active."));
+            return Result.Failure<PreAuthorizationDto>(Error.Conflict(ErrorCodes.PolicyNotActive, "Policy is not active."));
 
         if (await preAuthorizationRepository.GetByExaminationIdAsync(command.ExaminationId, ct) is not null)
-            return Result.Failure<PreAuthorizationDto>(Error.Conflict("A pre-authorization already exists for this examination."));
+            return Result.Failure<PreAuthorizationDto>(Error.Conflict(ErrorCodes.PreAuthorizationAlreadyExists, "A pre-authorization already exists for this examination."));
         if (await claimRepository.GetByExaminationIdAsync(command.ExaminationId, ct) is not null)
-            return Result.Failure<PreAuthorizationDto>(Error.Conflict("A claim already exists for this examination."));
+            return Result.Failure<PreAuthorizationDto>(Error.Conflict(ErrorCodes.ClaimAlreadyExists, "A claim already exists for this examination."));
 
         var preAuthorization = PreAuthorization.Create(
             command.ExaminationId,

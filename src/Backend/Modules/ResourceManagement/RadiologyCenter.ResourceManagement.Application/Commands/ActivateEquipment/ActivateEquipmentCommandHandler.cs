@@ -1,3 +1,4 @@
+using RadiologyCenter.ResourceManagement.Application.Localization;
 using RadiologyCenter.ResourceManagement.Application.Abstractions;
 
 namespace RadiologyCenter.ResourceManagement.Application.Commands.ActivateEquipment;
@@ -12,7 +13,7 @@ public static class ActivateEquipmentCommandHandler
     {
         var equipment = await equipmentRepository.GetByIdAsync(command.EquipmentId, ct);
         if (equipment is null)
-            return Result.Failure(Error.NotFound("Equipment", command.EquipmentId));
+            return Result.Failure(Error.NotFound(ErrorCodes.EquipmentNotFound, "Equipment", command.EquipmentId));
 
         equipment.Activate();
         equipmentRepository.Update(equipment);

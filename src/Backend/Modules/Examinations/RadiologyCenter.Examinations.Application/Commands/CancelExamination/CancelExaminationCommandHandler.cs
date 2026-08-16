@@ -1,3 +1,4 @@
+using RadiologyCenter.Examinations.Application.Localization;
 using RadiologyCenter.Examinations.Application.Abstractions;
 
 namespace RadiologyCenter.Examinations.Application.Commands.CancelExamination;
@@ -15,7 +16,7 @@ public static class CancelExaminationCommandHandler
 
         var examination = await examinationRepository.GetByIdForUpdateAsync(command.ExaminationId, ct);
         if (examination is null)
-            return Result.Failure(Error.NotFound("Examination", command.ExaminationId));
+            return Result.Failure(Error.NotFound(ErrorCodes.ExaminationNotFound, "Examination", command.ExaminationId));
 
         if (examination.Paid > 0)
         {

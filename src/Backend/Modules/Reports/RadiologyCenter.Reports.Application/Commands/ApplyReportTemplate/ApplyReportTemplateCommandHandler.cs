@@ -1,4 +1,5 @@
 using RadiologyCenter.Reports.Application.Abstractions;
+using RadiologyCenter.Reports.Application.Localization;
 using RadiologyCenter.Reports.Application.DTOs;
 
 namespace RadiologyCenter.Reports.Application.Commands.ApplyReportTemplate;
@@ -14,11 +15,11 @@ public static class ApplyReportTemplateCommandHandler
     {
         var report = await reportRepository.GetByIdWithVersionsAsync(command.ReportId, ct);
         if (report is null)
-            return Result.Failure<ReportDto>(Error.NotFound("Report", command.ReportId));
+            return Result.Failure<ReportDto>(Error.NotFound(ErrorCodes.ReportNotFound, "Report", command.ReportId));
 
         var template = await templateRepository.GetByIdWithSectionsAsync(command.TemplateId, ct);
         if (template is null)
-            return Result.Failure<ReportDto>(Error.NotFound("ReportTemplate", command.TemplateId));
+            return Result.Failure<ReportDto>(Error.NotFound(ErrorCodes.ReportTemplateNotFound, "ReportTemplate", command.TemplateId));
 
         foreach (var section in template.Sections.OrderBy(s => s.Position))
         {

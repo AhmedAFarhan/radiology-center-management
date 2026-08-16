@@ -54,4 +54,11 @@ public static class Guard
             throw new DomainException(message);
         return value;
     }
+
+    public static T Against<T>(T value, Func<T, bool> predicate, string code, string message)
+    {
+        if (predicate(value))
+            throw new DomainException(code, message);
+        return value;
+    }
 }

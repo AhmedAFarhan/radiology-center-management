@@ -1,3 +1,4 @@
+using RadiologyCenter.Examinations.Application.Localization;
 using RadiologyCenter.Examinations.Application.Abstractions;
 using RadiologyCenter.Examinations.Application.DTOs;
 using RadiologyCenter.Examinations.Domain.Entities;
@@ -16,7 +17,7 @@ public static class CreateExaminationCommandHandler
     {
         var examinationType = await examinationTypeDirectory.GetWithItemsAsync(command.ExaminationTypeId, ct);
         if (examinationType is null)
-            return Result.Failure<ExaminationDto>(Error.NotFound("ExaminationType", command.ExaminationTypeId));
+            return Result.Failure<ExaminationDto>(Error.NotFound(ErrorCodes.ExaminationTypeNotFound, "ExaminationType", command.ExaminationTypeId));
 
         var priority = ExaminationPriority.FromName<ExaminationPriority>(command.Priority);
 

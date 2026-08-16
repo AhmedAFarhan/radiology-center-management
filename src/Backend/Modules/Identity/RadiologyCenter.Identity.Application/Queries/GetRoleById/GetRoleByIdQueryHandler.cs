@@ -1,4 +1,5 @@
 using Mapster;
+using RadiologyCenter.Identity.Application.Localization;
 using RadiologyCenter.Identity.Application.Abstractions;
 using RadiologyCenter.Identity.Application.DTOs;
 
@@ -13,7 +14,7 @@ public static class GetRoleByIdQueryHandler
     {
         var role = await roleRepository.GetByIdAsync(query.Id, ct);
         if (role is null)
-            return Result.Failure<RoleDto>(Error.NotFound("Role", query.Id));
+            return Result.Failure<RoleDto>(Error.NotFound(ErrorCodes.RoleNotFound, "Role", query.Id));
 
         return Result.Success(role.Adapt<RoleDto>());
     }

@@ -1,4 +1,5 @@
 using FluentValidation;
+using RadiologyCenter.Examinations.Application.Localization;
 
 namespace RadiologyCenter.Examinations.Application.Commands.ScheduleExamination;
 
@@ -10,6 +11,6 @@ public class ScheduleExaminationCommandValidator : AbstractValidator<ScheduleExa
         RuleFor(x => x.ScheduledAt).NotEmpty();
         RuleFor(x => x.ScheduledAt)
             .Must(s => s >= DateTime.UtcNow.AddMinutes(-1))
-            .WithMessage("Scheduled time cannot be in the past.");
+            .WithErrorCode(ErrorCodes.ScheduledTimePast);
     }
 }

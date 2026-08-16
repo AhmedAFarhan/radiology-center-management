@@ -1,3 +1,4 @@
+using RadiologyCenter.ResourceManagement.Application.Localization;
 using RadiologyCenter.ResourceManagement.Application.Abstractions;
 using RadiologyCenter.ResourceManagement.Application.Commands.Common;
 
@@ -15,17 +16,17 @@ public static class UpdateWorkShiftCommandHandler
     {
         var workShift = await workShiftRepository.GetByIdAsync(command.WorkShiftId, ct);
         if (workShift is null)
-            return Result.Failure(Error.NotFound("WorkShift", command.WorkShiftId));
+            return Result.Failure(Error.NotFound(ErrorCodes.WorkShiftNotFound, "WorkShift", command.WorkShiftId));
 
         var staff = await staffRepository.GetByIdAsync(command.StaffId, ct);
         if (staff is null)
-            return Result.Failure(Error.NotFound("Staff", command.StaffId));
+            return Result.Failure(Error.NotFound(ErrorCodes.StaffNotFound, "Staff", command.StaffId));
 
         if (command.EquipmentId is { } equipmentId)
         {
             var equipment = await equipmentRepository.GetByIdAsync(equipmentId, ct);
             if (equipment is null)
-                return Result.Failure(Error.NotFound("Equipment", equipmentId));
+                return Result.Failure(Error.NotFound(ErrorCodes.EquipmentNotFound, "Equipment", equipmentId));
         }
 
         var (isConflict, resource) = await WorkShiftOverlapChecker.FindConflictAsync(
@@ -40,6 +41,7 @@ public static class UpdateWorkShiftCommandHandler
 
         if (isConflict)
             return Result.Failure(Error.Conflict(
+                ErrorCodes.ResourceAlreadyBooked,
                 $"The {resource} is already booked on {command.Date:yyyy-MM-dd} during {command.StartTime:hh\\:mm}-{command.EndTime:hh\\:mm}."));
 
         workShift.Update(

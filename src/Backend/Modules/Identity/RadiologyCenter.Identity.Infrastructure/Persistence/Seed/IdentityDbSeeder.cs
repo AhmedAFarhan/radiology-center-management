@@ -1,3 +1,4 @@
+using System.Text.Json;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using RadiologyCenter.Identity.Domain;
@@ -11,9 +12,16 @@ public static class IdentityDbSeeder
     public const string AdminUserName = "admin123";
     private const string AdminPassword = "admin123";
 
-    public static async Task SeedAsync(IdentityDbContext context, IPasswordHasher<User> passwordHasher, CancellationToken ct = default)
+    public static async Task SeedAsync(
+        IdentityDbContext context,
+        IPasswordHasher<User> passwordHasher,
+        string? resourcesPath = null,
+        CancellationToken ct = default)
     {
         var permissions = await SeedPermissionsAsync(context, ct);
+
+        if (!string.IsNullOrWhiteSpace(resourcesPath))
+            await SeedPermissionTranslationsAsync(context, permissions, resourcesPath, ct);
 
         var adminRole = await context.Roles
             .Include(r => r.Permissions)
@@ -60,5 +68,91 @@ public static class IdentityDbSeeder
         }
 
         return await context.Permissions.ToListAsync(ct);
+    }
+
+    private static async Task SeedPermissionTranslationsAsync(
+        IdentityDbContext context,
+        IReadOnlyList<Permission> permissions,
+        string resourcesPath,
+        CancellationToken ct)
+    {
+        if (!Directory.Exists(resourcesPath))
+            return;
+
+        var permissionsByCode = permissions.ToDictionary(p => p.Code, StringComparer.OrdinalIgnoreCase);
+        var existingTranslations = await context.PermissionTranslations.ToListAsync(ct);
+
+        foreach (var file in Directory.GetFiles(resourcesPath, "*.json"))
+        {
+            var language = Path.GetFileNameWithoutExtension(file);
+            if (string.IsNullOrWhiteSpace(language))
+                continue;
+
+            foreach (var (code, values) in ReadPermissionEntries(file))
+            {
+                if (!permissionsByCode.TryGetValue(code, out var permission))
+                    continue;
+
+                var name = values.GetValueOrDefault("name");
+                if (string.IsNullOrWhiteSpace(name))
+                    continue;
+
+                var description = values.GetValueOrDefault("description");
+                var group = values.GetValueOrDefault("group");
+
+                var existing = existingTranslations.FirstOrDefault(t =>
+                    t.PermissionId == permission.Id &&
+                    t.Language.Equals(language, StringComparison.OrdinalIgnoreCase));
+
+                if (existing is null)
+                {
+                    var translation = PermissionTranslation.Create(permission.Id, language, name, description, group);
+                    context.PermissionTranslations.Add(translation);
+                    existingTranslations.Add(translation);
+                }
+                else
+                {
+                    existing.Update(name, description, group);
+                }
+            }
+        }
+
+        await context.SaveChangesAsync(ct);
+    }
+
+    private static IEnumerable<KeyValuePair<string, IReadOnlyDictionary<string, string>>> ReadPermissionEntries(string file)
+    {
+        var result = new List<KeyValuePair<string, IReadOnlyDictionary<string, string>>>();
+
+        try
+        {
+            using var stream = File.OpenRead(file);
+            using var document = JsonDocument.Parse(stream);
+
+            if (!document.RootElement.TryGetProperty("permissions", out var permissionsElement))
+                return result;
+
+            foreach (var property in permissionsElement.EnumerateObject())
+            {
+                var values = new Dictionary<string, string>(StringComparer.Ordinal);
+
+                foreach (var field in new[] { "name", "description", "group" })
+                {
+                    if (property.Value.TryGetProperty(field, out var fieldElement) &&
+                        fieldElement.ValueKind == JsonValueKind.String)
+                    {
+                        values[field] = fieldElement.GetString() ?? string.Empty;
+                    }
+                }
+
+                result.Add(new KeyValuePair<string, IReadOnlyDictionary<string, string>>(property.Name, values));
+            }
+        }
+        catch (JsonException)
+        {
+            // Ignore malformed resource files.
+        }
+
+        return result;
     }
 }

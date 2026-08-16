@@ -1,4 +1,5 @@
 using RadiologyCenter.BuildingBlocks.Application.Abstractions;
+using RadiologyCenter.Notification.Application.Localization;
 using RadiologyCenter.Notification.Application.Abstractions;
 using RadiologyCenter.Notification.Application.DTOs;
 
@@ -14,7 +15,7 @@ public static class ActivateNotificationTemplateCommandHandler
     {
         var template = await repository.GetByIdAsync(command.Id, ct);
         if (template is null)
-            return Result.Failure<NotificationTemplateDto>(Error.NotFound("NotificationTemplate", command.Id));
+            return Result.Failure<NotificationTemplateDto>(Error.NotFound(ErrorCodes.TemplateNotFound, "NotificationTemplate", command.Id));
 
         template.Activate();
         await unitOfWork.SaveChangesAsync(ct);

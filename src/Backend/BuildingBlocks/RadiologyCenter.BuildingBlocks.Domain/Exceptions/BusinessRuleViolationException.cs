@@ -13,4 +13,9 @@ public class BusinessRuleViolationException : DomainException
     {
         Rule = GetType().Name;
     }
+
+    public BusinessRuleViolationException(string rule, string code, string message) : base(code, message)
+    {
+        Rule = rule;
+    }
 }

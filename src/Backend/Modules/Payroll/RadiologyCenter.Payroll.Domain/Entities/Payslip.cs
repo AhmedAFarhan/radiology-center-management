@@ -1,6 +1,7 @@
 using RadiologyCenter.BuildingBlocks.Domain.Common;
 using RadiologyCenter.BuildingBlocks.Domain.Entities;
 using RadiologyCenter.BuildingBlocks.Domain.Exceptions;
+using RadiologyCenter.Payroll.Domain.Errors;
 
 namespace RadiologyCenter.Payroll.Domain.Entities;
 
@@ -32,9 +33,9 @@ public sealed class Payslip : Entity<Guid>
     {
         Guard.AgainstEmpty(payRunId, nameof(payRunId));
         Guard.AgainstEmpty(staffId, nameof(staffId));
-        Guard.Against(grossSalary, g => g < 0, "Gross salary cannot be negative.");
-        Guard.Against(unpaidLeaveDays, d => d < 0, "Unpaid leave days cannot be negative.");
-        Guard.Against(unpaidLeaveDeduction, d => d < 0, "Unpaid leave deduction cannot be negative.");
+        Guard.Against(grossSalary, g => g < 0, DomainErrors.GrossSalaryNegative, "Gross salary cannot be negative.");
+        Guard.Against(unpaidLeaveDays, d => d < 0, DomainErrors.UnpaidLeaveDaysNegative, "Unpaid leave days cannot be negative.");
+        Guard.Against(unpaidLeaveDeduction, d => d < 0, DomainErrors.UnpaidLeaveDeductionNegative, "Unpaid leave deduction cannot be negative.");
 
         return new Payslip
         {
@@ -59,7 +60,8 @@ public sealed class Payslip : Entity<Guid>
     {
         var component = _components.FirstOrDefault(c => c.Id == componentId)
             ?? throw new BusinessRuleViolationException(
-                "PayslipComponentNotFound",
+                nameof(RemoveComponent),
+                DomainErrors.PayslipComponentNotFound,
                 $"Payslip component '{componentId}' not found on payslip '{Id}'.");
         _components.Remove(component);
     }

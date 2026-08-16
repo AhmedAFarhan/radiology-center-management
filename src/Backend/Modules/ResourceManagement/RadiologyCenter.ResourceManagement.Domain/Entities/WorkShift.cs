@@ -1,5 +1,6 @@
 using RadiologyCenter.BuildingBlocks.Domain.Common;
 using RadiologyCenter.BuildingBlocks.Domain.SoftDeletable;
+using RadiologyCenter.ResourceManagement.Domain.Errors;
 
 namespace RadiologyCenter.ResourceManagement.Domain.Entities;
 
@@ -24,7 +25,7 @@ public sealed class WorkShift : SoftDeletableAggregateRoot<Guid>
     {
         Guard.AgainstEmpty(staffId, nameof(staffId));
         Guard.AgainstDefault(date, nameof(date));
-        Guard.Against(startTime, t => t >= endTime, "Start time must be before end time.");
+        Guard.Against(startTime, t => t >= endTime, DomainErrors.StartTimeBeforeEndTime, "Start time must be before end time.");
 
         var workShift = new WorkShift
         {
@@ -50,7 +51,7 @@ public sealed class WorkShift : SoftDeletableAggregateRoot<Guid>
     {
         Guard.AgainstEmpty(staffId, nameof(staffId));
         Guard.AgainstDefault(date, nameof(date));
-        Guard.Against(startTime, t => t >= endTime, "Start time must be before end time.");
+        Guard.Against(startTime, t => t >= endTime, DomainErrors.StartTimeBeforeEndTime, "Start time must be before end time.");
 
         StaffId = staffId;
         EquipmentId = equipmentId;

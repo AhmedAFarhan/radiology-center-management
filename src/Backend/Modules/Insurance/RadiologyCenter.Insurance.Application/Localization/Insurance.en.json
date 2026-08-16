@@ -1,0 +1,86 @@
+﻿{
+  "codes": {
+    "Insurance.PreAuthorizationNotApproved": "Pre-authorization must be approved before creating a claim.",
+    "Insurance.DenialReasonRequired": "Rejection reason is required when denying.",
+    "Insurance.PreAuthorizationAlreadyExists": "A pre-authorization already exists for this examination.",
+    "Insurance.PreAuthorizationPatientMismatch": "Pre-authorization does not match the claim\u0027s patient.",
+    "Insurance.PreAuthorizationExaminationMismatch": "Pre-authorization does not match the examination.",
+    "Insurance.UnsupportedDecision": "Unsupported decision.",
+    "Insurance.ApprovedAmountRequired": "Approved amount is required when approving.",
+    "Insurance.PolicyPatientMismatch": "The policy does not belong to the claim\u0027s patient.",
+    "Insurance.RejectionReasonRequired": "Rejection reason is required when rejecting.",
+    "Insurance.UnsupportedPolicyAction": "Unsupported policy action.",
+    "Insurance.PolicyNotActive": "Policy is not active.",
+    "Insurance.PreAuthorizationNoApprovedAmount": "Pre-authorization has no approved amount.",
+    "Insurance.PreAuthorizationPolicyMismatch": "Pre-authorization does not match the claim\u0027s policy.",
+    "Insurance.RejectionCodeRequired": "Rejection code is required when rejecting.",
+    "Insurance.ClaimAlreadyExists": "A claim already exists for this examination.",
+    "Insurance.BilledAmountNegative": "Billed amount cannot be negative.",
+    "Insurance.PayerShareNegative": "Payer share cannot be negative.",
+    "Insurance.PatientShareNegative": "Patient share cannot be negative.",
+    "Insurance.SharesExceedBilled": "Payer and patient shares cannot exceed the billed amount.",
+    "Insurance.ClaimSubmitInvalidStatus": "Claim \u0027{0}\u0027 cannot be submitted from status {1}.",
+    "Insurance.ClaimNotSubmittedAdjudication": "Claim \u0027{0}\u0027 is not submitted and cannot be adjudicated.",
+    "Insurance.ApprovedAmountNegative": "Approved amount cannot be negative.",
+    "Insurance.ApprovedAmountExceedsPayerShare": "Approved amount cannot exceed the payer share.",
+    "Insurance.ClaimNotRejectedResubmit": "Claim \u0027{0}\u0027 is not rejected and cannot be resubmitted.",
+    "Insurance.ClaimNotApprovedSettlement": "Claim \u0027{0}\u0027 must be approved before settling payments.",
+    "Insurance.SettlementAmountPositive": "Settlement amount must be greater than zero.",
+    "Insurance.SettlementExceedsOwed": "Settlement of {0} exceeds the remaining {1} owed for claim \u0027{2}\u0027.",
+    "Insurance.SettlementExceedsRemaining": "Settlement of {0} exceeds the remaining {1} owed for claim \u0027{2}\u0027.",
+    "Insurance.CoveragePercentRange": "Coverage percent must be between 0 and 100.",
+    "Insurance.UpdateExpiredPolicy": "Cannot update an expired policy.",
+    "Insurance.ReactivateExpiredPolicy": "Cannot reactivate an expired policy.",
+    "Insurance.DocumentSizePositive": "Document size must be greater than zero.",
+    "Insurance.EstimatedAmountNegative": "Estimated amount cannot be negative.",
+    "Insurance.DocumentsRequestedOnly": "Documents can only be attached while \u0027{0}\u0027 is requested.",
+    "Insurance.GovernmentDocRequired": "A government pre-authorization cannot be approved without the official approval document.",
+    "Insurance.PreAuthorizationAlreadyDecided": "Pre-authorization \u0027{0}\u0027 is already {1}.",
+    "Insurance.BilledAmountExceedsApproved": "Billed amount \u0027{0}\u0027 exceeds the pre-authorization approved amount of \u0027{1}\u0027.",
+    "Insurance.InvalidDocumentType": "\u0027{0}\u0027 is not a valid document type.",
+    "Insurance.CompanyNameExists": "An insurance company named \u0027{0}\u0027 already exists.",
+    "Insurance.PolicyNumberExists": "A policy with number \u0027{0}\u0027 already exists."
+  },
+  "enums": {
+    "ClaimRejectionCode": {
+      "MissingInformation": "MissingInformation",
+      "PreAuthorizationNotApproved": "PreAuthorizationNotApproved",
+      "PolicyNotActive": "PolicyNotActive",
+      "CoverageExcluded": "CoverageExcluded",
+      "LimitExceeded": "LimitExceeded",
+      "DuplicateClaim": "DuplicateClaim",
+      "Other": "Other"
+    },
+    "ClaimStatus": {
+      "Draft": "Draft",
+      "Submitted": "Submitted",
+      "Adjudicated": "Adjudicated",
+      "Approved": "Approved",
+      "Rejected": "Rejected",
+      "Paid": "Paid"
+    },
+    "DocumentType": {
+      "InsuranceCard": "InsuranceCard",
+      "NationalId": "NationalId",
+      "GovernmentApproval": "GovernmentApproval",
+      "Other": "Other"
+    },
+    "PolicyStatus": {
+      "Active": "Active",
+      "Inactive": "Inactive",
+      "Expired": "Expired"
+    },
+    "PreAuthorizationStatus": {
+      "Requested": "Requested",
+      "Approved": "Approved",
+      "Denied": "Denied",
+      "Expired": "Expired"
+    },
+    "SettlementMethod": {
+      "Cash": "Cash",
+      "BankTransfer": "BankTransfer",
+      "Cheque": "Cheque",
+      "Electronic": "Electronic"
+    }
+  }
+}

@@ -1,5 +1,6 @@
 using RadiologyCenter.BuildingBlocks.Domain.Common;
 using RadiologyCenter.BuildingBlocks.Domain.SoftDeletable;
+using RadiologyCenter.Cash.Domain.Errors;
 
 namespace RadiologyCenter.Cash.Domain.Entities;
 
@@ -27,8 +28,8 @@ public sealed class CashHandover : SoftDeletableAggregateRoot<Guid>
         string? notes = null)
     {
         Guard.AgainstEmpty(cashSessionId, nameof(cashSessionId));
-        Guard.Against(countedTotal, c => c < 0, "Counted total cannot be negative.");
-        Guard.Against(expectedTotal, e => e < 0, "Expected total cannot be negative.");
+        Guard.Against(countedTotal, c => c < 0, DomainErrors.CountedTotalNegative, "Counted total cannot be negative.");
+        Guard.Against(expectedTotal, e => e < 0, DomainErrors.ExpectedTotalNegative, "Expected total cannot be negative.");
         Guard.AgainstDefault(closedAt, nameof(closedAt));
         Guard.AgainstEmpty(closedByUserId, nameof(closedByUserId));
 

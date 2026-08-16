@@ -1,5 +1,6 @@
 using RadiologyCenter.BuildingBlocks.Domain.Entities;
 using RadiologyCenter.BuildingBlocks.Domain.Common;
+using RadiologyCenter.Inventory.Domain.Errors;
 
 namespace RadiologyCenter.Inventory.Domain.Entities;
 
@@ -22,7 +23,7 @@ public sealed class PurchaseOrderItem : Entity<Guid>
         Guard.AgainstEmpty(purchaseOrderId, nameof(purchaseOrderId));
         Guard.AgainstEmpty(itemId, nameof(itemId));
         Guard.AgainstNegativeOrZero(quantityOrdered, nameof(quantityOrdered));
-        Guard.Against(unitCost, c => c < 0, "Unit cost cannot be negative.");
+        Guard.Against(unitCost, c => c < 0, DomainErrors.UnitCostNegative, "Unit cost cannot be negative.");
 
         return new PurchaseOrderItem
         {
@@ -38,7 +39,7 @@ public sealed class PurchaseOrderItem : Entity<Guid>
     public void RecordReceipt(int quantity)
     {
         Guard.AgainstNegativeOrZero(quantity, nameof(quantity));
-        Guard.Against(quantity, q => q > QuantityOrdered - QuantityReceived, $"Receipt quantity exceeds the remaining {QuantityOrdered - QuantityReceived} for the item.");
+        Guard.Against(quantity, q => q > QuantityOrdered - QuantityReceived, DomainErrors.ReceiptExceedsRemaining, $"Receipt quantity exceeds the remaining {QuantityOrdered - QuantityReceived} for the item.");
 
         QuantityReceived += quantity;
     }

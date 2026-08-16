@@ -53,6 +53,19 @@ builder.Services.AddControllers(options =>
 {
     options.JsonSerializerOptions.Converters.Add(new System.Text.Json.Serialization.JsonStringEnumConverter());
 });
+
+builder.Services.AddLocalization();
+builder.Services.AddSingleton<Microsoft.Extensions.Localization.IStringLocalizerFactory, RadiologyCenter.Localhost.Localization.JsonStringLocalizerFactory>();
+builder.Services.AddSingleton<RadiologyCenter.BuildingBlocks.Application.Localization.ITranslator, RadiologyCenter.Localhost.Localization.JsonTranslator>();
+builder.Services.Configure<Microsoft.AspNetCore.Builder.RequestLocalizationOptions>(options =>
+{
+    var supportedCultures = new[] { new System.Globalization.CultureInfo("en"), new System.Globalization.CultureInfo("ar") };
+    options.DefaultRequestCulture = new Microsoft.AspNetCore.Localization.RequestCulture("en");
+    options.SupportedCultures = supportedCultures;
+    options.SupportedUICultures = supportedCultures;
+    options.ApplyCurrentCultureToResponseHeaders = true;
+});
+
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddHealthChecks();
 builder.Services.AddSwaggerGen(options =>
@@ -124,6 +137,9 @@ builder.Services.AddScoped<IPaymentCashEntryRecorder, PaymentCashEntryRecorder>(
 
 var app = builder.Build();
 
+RadiologyCenter.BuildingBlocks.Application.Localization.Translator.Current =
+    app.Services.GetRequiredService<RadiologyCenter.BuildingBlocks.Application.Localization.ITranslator>();
+
 using (var scope = app.Services.CreateScope())
 {
     var dbContextTypes = new[]
@@ -151,8 +167,11 @@ using (var scope = app.Services.CreateScope())
     var identityDb = scope.ServiceProvider.GetRequiredService<IdentityDbContext>();
     await IdentityDbSeeder.SeedAsync(
         identityDb,
-        scope.ServiceProvider.GetRequiredService<IPasswordHasher<User>>());
+        scope.ServiceProvider.GetRequiredService<IPasswordHasher<User>>(),
+        Path.Combine(app.Environment.ContentRootPath, "Resources"));
 }
+
+app.UseRequestLocalization();
 
 app.UseMiddleware<ExceptionMiddleware>();
 

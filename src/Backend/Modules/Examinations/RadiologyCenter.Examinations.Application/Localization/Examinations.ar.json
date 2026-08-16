@@ -1,0 +1,43 @@
+﻿{
+  "codes": {
+    "Examination.ScheduledTimePast": "لا يمكن أن يكون الموعد في الماضي.",
+    "Examination.PercentageDiscountMax": "لا يمكن أن يتجاوز الخصم النسبي 100.",
+    "Examination.DuplicateItem": "لا يمكن إضافة عنصر أكثر من مرة لكل فحص.",
+    "Examination.AuthenticationRequired": "مطلوب مستخدم مصادق عليه لبدء الفحص.",
+    "Examination.PaymentForCancelledExamination": "لا يمكن تسجيل دفعة لفحص ملغي.",
+    "Examination.PaidAmountImmutable": "لا يمكن تعديل المبلغ المدفوع بعد تسجيل الدفعة.",
+    "Examination.PriceNegative": "لا يمكن أن يكون السعر سالباً.",
+    "Examination.DiscountNegative": "لا يمكن أن يكون الخصم سالباً.",
+    "Examination.PaidAmountNegative": "لا يمكن أن يكون المبلغ المدفوع سالباً.",
+    "Examination.ScheduledTimeDefault": "لا يمكن أن يكون الموعد المحدد قيمة افتراضية.",
+    "Examination.PaymentNegative": "لا يمكن أن تكون الدفعة سالبة.",
+    "Examination.PaymentExceedsRemaining": "الدفعة \u0027{0}\u0027 تتجاوز الرصيد المتبقي \u0027{1}\u0027.",
+    "Examination.RefundNegative": "لا يمكن أن يكون الاسترداد سالباً.",
+    "Examination.RefundExceedsPaid": "لا يمكن أن يتجاوز الاسترداد المبلغ المدفوع.",
+    "Examination.RequiredItemCannotRemove": "الصنف \u0027{0}\u0027 مطلوب لهذا الفحص ولا يمكن إزالته.",
+    "Examination.ItemNotOnExamination": "الصنف \u0027{0}\u0027 ليس على الفحص \u0027{1}\u0027.",
+    "Examination.ItemsCannotBeModified": "الفحص \u0027{0}\u0027 هو \u0027{1}\u0027 ولم يعد من الممكن تعديل عناصره.",
+    "Examination.InvalidStatusTransition": "لا يمكن للفحص \u0027{0}\u0027 الانتقال من الحالة \u0027{1}\u0027.",
+    "Examination.RadiologistFeeNegative": "لا يمكن أن تكون رسوم أخصائي الأشعة سالبة.",
+    "Examination.TechnicianFeeNegative": "لا يمكن أن تكون رسوم الفني سالبة.",
+    "Examination.ReferralFeeNegative": "لا يمكن أن تكون رسوم الإحالة سالبة.",
+    "Examination.RemainingAmountNegative": "لا يمكن أن يكون المبلغ المتبقي سالباً.",
+    "Examination.UnitCostNegative": "لا يمكن أن تكون تكلفة الوحدة سالبة.",
+    "Examination.ItemAlreadyInPreferences": "الصنف \u0027{0}\u0027 موجود بالفعل في تفضيلات نوع الفحص \u0027{1}\u0027."
+  },
+  "enums": {
+    "ExaminationPriority": {
+      "Routine": "روتيني",
+      "Urgent": "عاجل",
+      "Stat": "فوري"
+    },
+    "ExaminationStatus": {
+      "Requested": "مطلوب",
+      "Scheduled": "مجدول",
+      "CheckedIn": "تم التسجيل",
+      "InProgress": "قيد التنفيذ",
+      "Completed": "مكتمل",
+      "Cancelled": "ملغي"
+    }
+  }
+}

@@ -1,4 +1,5 @@
 using Mapster;
+using RadiologyCenter.Payroll.Application.Localization;
 using RadiologyCenter.BuildingBlocks.Domain.Specifications;
 using RadiologyCenter.Payroll.Application.Abstractions;
 using RadiologyCenter.Payroll.Application.DTOs;
@@ -16,7 +17,7 @@ public static class CreateSalaryCommandHandler
         CancellationToken ct)
     {
         if (!await staffDirectory.ExistsAsync(command.StaffId, ct))
-            return Result.Failure<SalaryDto>(Error.NotFound("Staff", command.StaffId));
+            return Result.Failure<SalaryDto>(Error.NotFound(ErrorCodes.StaffNotFound, "Staff", command.StaffId));
 
         var salaryType = SalaryType.FromName<SalaryType>(command.SalaryType);
 

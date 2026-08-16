@@ -1,4 +1,5 @@
-﻿using RadiologyCenter.Catalog.Application.Abstractions;
+using RadiologyCenter.Catalog.Application.Localization;
+using RadiologyCenter.Catalog.Application.Abstractions;
 
 namespace RadiologyCenter.Catalog.Application.Commands.DeactivateExaminationType;
 
@@ -12,7 +13,7 @@ public static class DeactivateExaminationTypeCommandHandler
     {
         var examinationType = await examinationTypeRepository.GetByIdAsync(command.ExaminationTypeId, ct);
         if (examinationType is null)
-            return Result.Failure(Error.NotFound("ExaminationType", command.ExaminationTypeId));
+            return Result.Failure(Error.NotFound(ErrorCodes.ExaminationTypeNotFound, "ExaminationType", command.ExaminationTypeId));
 
         examinationType.Deactivate();
         await unitOfWork.SaveChangesAsync(ct);

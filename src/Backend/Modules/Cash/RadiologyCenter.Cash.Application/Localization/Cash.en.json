@@ -1,0 +1,23 @@
+{
+  "codes": {
+    "Cash.EntryNotOwnSession": "You can only add entries to your own cash session.",
+    "Cash.CloseNotOwnSession": "You can only close your own cash session.",
+    "Cash.AddEntryToClosedSession": "Cannot add entries to a closed session.",
+    "Cash.HandoverRequiresClosedSession": "Only closed sessions can have their handover approved.",
+    "Cash.HandoverAlreadyApproved": "This handover is already approved.",
+    "Cash.HandoverApprovedByCloser": "A handover cannot be approved by the same user who closed the session.",
+    "Cash.CloseSessionNotOpen": "Cannot close a session that is not open.",
+    "Cash.ReceiverAlreadyOpenSession": "The receiving user already has an open session.",
+    "Cash.SessionAlreadyOpen": "A cash session is already open for this user.",
+    "Cash.NoActiveTransaction": "No active database transaction is available for the cash entry.",
+    "Cash.OpeningFloatNegative": "Opening float cannot be negative.",
+    "Cash.CountedTotalNegative": "Counted total cannot be negative.",
+    "Cash.ExpectedTotalNegative": "Expected total cannot be negative.",
+    "Cash.EntryAmountPositive": "Cash entry amount must be positive."
+  },
+  "enums": {
+    "CashEntryDirection": { "In": "In", "Out": "Out" },
+    "CashEntryReason": { "Opening": "Opening", "Payment": "Payment", "Refund": "Refund", "Deposit": "Deposit", "Payout": "Payout", "Adjustment": "Adjustment" },
+    "CashSessionStatus": { "Open": "Open", "Closed": "Closed" }
+  }
+}

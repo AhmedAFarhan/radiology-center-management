@@ -1,4 +1,5 @@
 using RadiologyCenter.Insurance.Application.Abstractions;
+using RadiologyCenter.Insurance.Application.Localization;
 using RadiologyCenter.Insurance.Application.DTOs;
 
 namespace RadiologyCenter.Insurance.Application.Commands.Companies.CreateInsuranceCompany;
@@ -12,7 +13,7 @@ public static class CreateInsuranceCompanyCommandHandler
         CancellationToken ct)
     {
         if (await companyRepository.GetByNameAsync(command.Name, ct) is not null)
-            return Result.Failure<InsuranceCompanyDto>(Error.Conflict($"An insurance company named '{command.Name}' already exists."));
+            return Result.Failure<InsuranceCompanyDto>(Error.Conflict(ErrorCodes.CompanyNameExists, $"An insurance company named '{command.Name}' already exists."));
 
         var company = InsuranceCompany.Create(
             command.Name,

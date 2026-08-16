@@ -1,3 +1,4 @@
+using RadiologyCenter.Reports.Application.Localization;
 using RadiologyCenter.Reports.Application.Abstractions;
 
 namespace RadiologyCenter.Reports.Application.Commands.ReportTemplates.DeactivateReportTemplate;
@@ -12,7 +13,7 @@ public static class DeactivateReportTemplateCommandHandler
     {
         var template = await templateRepository.GetByIdAsync(command.TemplateId, ct);
         if (template is null)
-            return Result.Failure(Error.NotFound("ReportTemplate", command.TemplateId));
+            return Result.Failure(Error.NotFound(ErrorCodes.ReportTemplateNotFound, "ReportTemplate", command.TemplateId));
 
         template.Deactivate();
 

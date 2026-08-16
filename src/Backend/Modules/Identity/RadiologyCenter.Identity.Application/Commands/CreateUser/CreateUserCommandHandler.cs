@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Identity;
 using RadiologyCenter.BuildingBlocks.Application.Abstractions;
+using RadiologyCenter.Identity.Application.Localization;
 using RadiologyCenter.Identity.Application.Abstractions;
 
 namespace RadiologyCenter.Identity.Application.Commands.CreateUser;
@@ -21,7 +22,7 @@ public static class CreateUserCommandHandler
         var roles = await roleRepository.GetByIdsAsync(command.RoleIds, ct);
         var missingRoleId = command.RoleIds.Distinct().FirstOrDefault(id => roles.All(r => r.Id != id));
         if (missingRoleId != Guid.Empty)
-            return Result.Failure(Error.NotFound("Role", missingRoleId));
+            return Result.Failure(Error.NotFound(ErrorCodes.RoleNotFound, "Role", missingRoleId));
 
         user.UpdateRoles(roles);
 

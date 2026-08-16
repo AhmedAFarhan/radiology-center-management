@@ -1,3 +1,4 @@
+using RadiologyCenter.Inventory.Application.Localization;
 using RadiologyCenter.Inventory.Application.Abstractions;
 
 namespace RadiologyCenter.Inventory.Application.Commands.CancelPurchaseOrder;
@@ -12,7 +13,7 @@ public static class CancelPurchaseOrderCommandHandler
     {
         var purchaseOrder = await purchaseOrderRepository.GetWithItemsAsync(command.PurchaseOrderId, ct);
         if (purchaseOrder is null)
-            return Result.Failure(Error.NotFound("PurchaseOrder", command.PurchaseOrderId));
+            return Result.Failure(Error.NotFound(ErrorCodes.PurchaseOrderNotFound, "PurchaseOrder", command.PurchaseOrderId));
 
         purchaseOrder.Cancel();
         purchaseOrderRepository.Update(purchaseOrder);

@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using RadiologyCenter.BuildingBlocks.Application.Abstractions;
 using RadiologyCenter.BuildingBlocks.Domain.Results;
 using RadiologyCenter.BuildingBlocks.Infrastructure.Persistence.Interceptors;
+using RadiologyCenter.Cash.Application.Localization;
 using RadiologyCenter.Cash.Domain.Entities;
 using RadiologyCenter.Cash.Domain.Enumerations;
 using RadiologyCenter.Cash.Infrastructure.Persistence;
@@ -65,7 +66,7 @@ public class PaymentCashEntryRecorder : IPaymentCashEntryRecorder
             return Result.Failure(Error.Unauthorized());
 
         if (transaction.DbTransaction is null)
-            return Result.Failure(Error.Failure("No active database transaction is available for the cash entry."));
+            return Result.Failure(Error.Failure(ErrorCodes.NoActiveTransaction, "No active database transaction is available for the cash entry."));
 
         var dbTransaction = transaction.DbTransaction;
 

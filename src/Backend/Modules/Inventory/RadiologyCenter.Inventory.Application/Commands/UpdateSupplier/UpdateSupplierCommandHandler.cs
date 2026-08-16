@@ -1,3 +1,4 @@
+using RadiologyCenter.Inventory.Application.Localization;
 using RadiologyCenter.Inventory.Application.Abstractions;
 
 namespace RadiologyCenter.Inventory.Application.Commands.UpdateSupplier;
@@ -12,7 +13,7 @@ public static class UpdateSupplierCommandHandler
     {
         var supplier = await supplierRepository.GetByIdAsync(command.SupplierId, ct);
         if (supplier is null)
-            return Result.Failure(Error.NotFound("Supplier", command.SupplierId));
+            return Result.Failure(Error.NotFound(ErrorCodes.SupplierNotFound, "Supplier", command.SupplierId));
 
         supplier.Update(
             command.Name,

@@ -1,4 +1,5 @@
 using Mapster;
+using RadiologyCenter.Payroll.Application.Localization;
 using RadiologyCenter.Payroll.Application.Abstractions;
 using RadiologyCenter.Payroll.Application.DTOs;
 using RadiologyCenter.Payroll.Domain.Enumerations;
@@ -16,12 +17,12 @@ public static class CreateAllowanceAssignmentCommandHandler
         CancellationToken ct)
     {
         if (!await staffDirectory.ExistsAsync(command.StaffId, ct))
-            return Result.Failure<AllowanceAssignmentDto>(Error.NotFound("Staff", command.StaffId));
+            return Result.Failure<AllowanceAssignmentDto>(Error.NotFound(ErrorCodes.StaffNotFound, "Staff", command.StaffId));
 
         if (command.SalaryComponentId.HasValue &&
             await salaryComponentRepository.GetByIdAsync(command.SalaryComponentId.Value, ct) is null)
         {
-            return Result.Failure<AllowanceAssignmentDto>(Error.NotFound("SalaryComponent", command.SalaryComponentId.Value));
+            return Result.Failure<AllowanceAssignmentDto>(Error.NotFound(ErrorCodes.SalaryComponentNotFound, "SalaryComponent", command.SalaryComponentId.Value));
         }
 
         var frequency = string.IsNullOrWhiteSpace(command.Frequency)

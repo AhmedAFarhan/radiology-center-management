@@ -1,4 +1,5 @@
 using FluentValidation;
+using RadiologyCenter.Inventory.Application.Localization;
 
 namespace RadiologyCenter.Inventory.Application.Commands.CreatePurchaseOrder;
 
@@ -7,9 +8,9 @@ public class CreatePurchaseOrderCommandValidator : AbstractValidator<CreatePurch
     public CreatePurchaseOrderCommandValidator()
     {
         RuleFor(x => x.SupplierId).NotEmpty();
-        RuleFor(x => x.Items).NotEmpty().WithMessage("A purchase order must contain at least one item.");
+        RuleFor(x => x.Items).NotEmpty().WithErrorCode(ErrorCodes.PurchaseOrderItemsRequired);
         RuleFor(x => x.Items).Must(HaveNoDuplicateItems)
-            .WithMessage("An item can appear only once per purchase order.");
+            .WithErrorCode(ErrorCodes.PurchaseOrderDuplicateItems);
         RuleForEach(x => x.Items).ChildRules(line =>
         {
             line.RuleFor(i => i.ItemId).NotEmpty();

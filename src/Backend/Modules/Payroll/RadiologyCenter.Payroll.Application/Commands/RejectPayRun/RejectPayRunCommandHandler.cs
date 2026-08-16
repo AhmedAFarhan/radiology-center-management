@@ -1,3 +1,4 @@
+using RadiologyCenter.Payroll.Application.Localization;
 using RadiologyCenter.Payroll.Application.Abstractions;
 
 namespace RadiologyCenter.Payroll.Application.Commands.RejectPayRun;
@@ -13,7 +14,7 @@ public static class RejectPayRunCommandHandler
     {
         var payRun = await payRunRepository.GetByIdAsync(command.PayRunId, ct);
         if (payRun is null)
-            return Result.Failure(Error.NotFound("PayRun", command.PayRunId));
+            return Result.Failure(Error.NotFound(ErrorCodes.PayRunNotFound, "PayRun", command.PayRunId));
 
         payRun.Reject(currentUser.Name ?? currentUser.Id);
 

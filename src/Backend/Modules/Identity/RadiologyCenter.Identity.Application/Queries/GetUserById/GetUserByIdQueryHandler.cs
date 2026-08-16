@@ -1,4 +1,5 @@
 using Mapster;
+using RadiologyCenter.Identity.Application.Localization;
 using RadiologyCenter.Identity.Application.Abstractions;
 using RadiologyCenter.Identity.Application.DTOs;
 
@@ -13,7 +14,7 @@ public static class GetUserByIdQueryHandler
     {
         var user = await userRepository.GetByIdAsync(query.Id, ct);
         if (user is null)
-            return Result.Failure<UserDto>(Error.NotFound("User", query.Id));
+            return Result.Failure<UserDto>(Error.NotFound(ErrorCodes.UserNotFound, "User", query.Id));
 
         return Result.Success(user.Adapt<UserDto>());
     }

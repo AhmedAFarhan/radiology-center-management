@@ -1,5 +1,6 @@
 using RadiologyCenter.BuildingBlocks.Domain.Common;
 using RadiologyCenter.BuildingBlocks.Domain.SoftDeletable;
+using RadiologyCenter.Payroll.Domain.Errors;
 
 namespace RadiologyCenter.Payroll.Domain.Entities;
 
@@ -23,9 +24,9 @@ public sealed class ReferralFee : SoftDeletableAggregateRoot<Guid>
     {
         Guard.AgainstEmpty(referralDoctorId, nameof(referralDoctorId));
         Guard.AgainstEmpty(examinationTypeId, nameof(examinationTypeId));
-        Guard.Against(amount, a => a < 0, "Referral fee cannot be negative.");
+        Guard.Against(amount, a => a < 0, DomainErrors.ReferralFeeNegative, "Referral fee cannot be negative.");
         if (isPercentage)
-            Guard.Against(amount, a => a > 100, "Percentage fee cannot exceed 100.");
+            Guard.Against(amount, a => a > 100, DomainErrors.PercentageFeeMax, "Percentage fee cannot exceed 100.");
 
         var fee = new ReferralFee
         {
@@ -42,9 +43,9 @@ public sealed class ReferralFee : SoftDeletableAggregateRoot<Guid>
 
     public void Update(decimal amount, bool isPercentage = false)
     {
-        Guard.Against(amount, a => a < 0, "Referral fee cannot be negative.");
+        Guard.Against(amount, a => a < 0, DomainErrors.ReferralFeeNegative, "Referral fee cannot be negative.");
         if (isPercentage)
-            Guard.Against(amount, a => a > 100, "Percentage fee cannot exceed 100.");
+            Guard.Against(amount, a => a > 100, DomainErrors.PercentageFeeMax, "Percentage fee cannot exceed 100.");
 
         Amount = amount;
         IsPercentage = isPercentage;

@@ -1,5 +1,6 @@
 using Mapster;
 using RadiologyCenter.BuildingBlocks.Application.Abstractions;
+using RadiologyCenter.Patients.Application.Localization;
 using RadiologyCenter.Patients.Application.Abstractions;
 using RadiologyCenter.Patients.Application.DTOs;
 
@@ -14,7 +15,7 @@ public static class GetPatientByIdQueryHandler
     {
         var patient = await patientRepository.GetByIdAsync(query.Id, ct);
         if (patient is null)
-            return Result.Failure<PatientDto>(Error.NotFound("Patient", query.Id));
+            return Result.Failure<PatientDto>(Error.NotFound(ErrorCodes.PatientNotFound, "Patient", query.Id));
 
         return Result.Success(patient.Adapt<PatientDto>());
     }

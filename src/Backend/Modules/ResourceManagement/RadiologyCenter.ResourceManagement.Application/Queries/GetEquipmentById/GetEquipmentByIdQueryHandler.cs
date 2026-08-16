@@ -1,4 +1,5 @@
 using Mapster;
+using RadiologyCenter.ResourceManagement.Application.Localization;
 using RadiologyCenter.ResourceManagement.Application.Abstractions;
 using RadiologyCenter.ResourceManagement.Application.DTOs;
 
@@ -13,7 +14,7 @@ public static class GetEquipmentByIdQueryHandler
     {
         var equipment = await equipmentRepository.GetByIdAsync(query.Id, ct);
         if (equipment is null)
-            return Result.Failure<EquipmentDto>(Error.NotFound("Equipment", query.Id));
+            return Result.Failure<EquipmentDto>(Error.NotFound(ErrorCodes.EquipmentNotFound, "Equipment", query.Id));
 
         return Result.Success(equipment.Adapt<EquipmentDto>());
     }

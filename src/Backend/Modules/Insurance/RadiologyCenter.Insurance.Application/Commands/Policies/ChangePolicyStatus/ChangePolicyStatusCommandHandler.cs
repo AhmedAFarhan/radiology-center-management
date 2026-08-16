@@ -1,4 +1,5 @@
 using RadiologyCenter.Insurance.Application.Abstractions;
+using RadiologyCenter.Insurance.Application.Localization;
 using RadiologyCenter.Insurance.Application.DTOs;
 
 namespace RadiologyCenter.Insurance.Application.Commands.Policies.ChangePolicyStatus;
@@ -13,7 +14,7 @@ public static class ChangePolicyStatusCommandHandler
     {
         var policy = await policyRepository.GetByIdAsync(command.PolicyId, ct);
         if (policy is null)
-            return Result.Failure<InsurancePolicyDto>(Error.NotFound("Policy", command.PolicyId));
+            return Result.Failure<InsurancePolicyDto>(Error.NotFound(ErrorCodes.PolicyNotFound, "Policy", command.PolicyId));
 
         switch (command.Action)
         {
@@ -27,7 +28,7 @@ public static class ChangePolicyStatusCommandHandler
                 policy.MarkExpired();
                 break;
             default:
-                return Result.Failure<InsurancePolicyDto>(Error.Validation("PolicyAction", "Unsupported policy action."));
+                return Result.Failure<InsurancePolicyDto>(Error.Validation(ErrorCodes.UnsupportedPolicyAction, "Unsupported policy action."));
         }
 
         policyRepository.Update(policy);

@@ -1,6 +1,7 @@
 using RadiologyCenter.BuildingBlocks.Domain.Common;
 using RadiologyCenter.BuildingBlocks.Domain.SoftDeletable;
 using RadiologyCenter.ResourceManagement.Domain.Enumerations;
+using RadiologyCenter.ResourceManagement.Domain.Errors;
 
 namespace RadiologyCenter.ResourceManagement.Domain.Entities;
 
@@ -28,7 +29,7 @@ public sealed class Leave : SoftDeletableAggregateRoot<Guid>
         Guard.AgainstNull(leaveType, nameof(leaveType));
         Guard.AgainstDefault(startDate, nameof(startDate));
         Guard.AgainstDefault(endDate, nameof(endDate));
-        Guard.Against(endDate, d => d < startDate, "End date cannot be before start date.");
+        Guard.Against(endDate, d => d < startDate, DomainErrors.EndDateBeforeStartDate, "End date cannot be before start date.");
 
         var leave = new Leave
         {
@@ -54,7 +55,7 @@ public sealed class Leave : SoftDeletableAggregateRoot<Guid>
         Guard.AgainstNull(leaveType, nameof(leaveType));
         Guard.AgainstDefault(startDate, nameof(startDate));
         Guard.AgainstDefault(endDate, nameof(endDate));
-        Guard.Against(endDate, d => d < startDate, "End date cannot be before start date.");
+        Guard.Against(endDate, d => d < startDate, DomainErrors.EndDateBeforeStartDate, "End date cannot be before start date.");
 
         StaffId = staffId;
         LeaveType = leaveType;

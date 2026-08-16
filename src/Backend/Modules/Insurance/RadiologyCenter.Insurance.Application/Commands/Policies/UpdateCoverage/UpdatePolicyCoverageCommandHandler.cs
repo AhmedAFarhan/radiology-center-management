@@ -1,4 +1,5 @@
 using RadiologyCenter.Insurance.Application.Abstractions;
+using RadiologyCenter.Insurance.Application.Localization;
 using RadiologyCenter.Insurance.Application.DTOs;
 
 namespace RadiologyCenter.Insurance.Application.Commands.Policies.UpdateCoverage;
@@ -13,7 +14,7 @@ public static class UpdatePolicyCoverageCommandHandler
     {
         var policy = await policyRepository.GetByIdAsync(command.PolicyId, ct);
         if (policy is null)
-            return Result.Failure<InsurancePolicyDto>(Error.NotFound("Policy", command.PolicyId));
+            return Result.Failure<InsurancePolicyDto>(Error.NotFound(ErrorCodes.PolicyNotFound, "Policy", command.PolicyId));
 
         policy.UpdateCoverage(command.CoveragePercent, command.EffectiveTo);
 

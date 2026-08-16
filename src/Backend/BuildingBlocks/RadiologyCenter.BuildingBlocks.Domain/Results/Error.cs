@@ -1,27 +1,57 @@
 namespace RadiologyCenter.BuildingBlocks.Domain.Results;
 
-public sealed record Error(string Code, string Message)
+public enum ErrorKind
 {
-    public static readonly Error None = new(string.Empty, string.Empty);
+    None,
+    NotFound,
+    Validation,
+    Conflict,
+    Unauthorized,
+    Forbidden,
+    LockedOut,
+    Failure,
+}
+
+public sealed record Error(ErrorKind Kind, string Code, string Message)
+{
+    public static readonly Error None = new(ErrorKind.None, string.Empty, string.Empty);
 
     public static Error NotFound(string entity, object key) =>
-        new("NotFound", $"{entity} with key '{key}' not found.");
+        new(ErrorKind.NotFound, "NotFound", $"{entity} with key '{key}' not found.");
 
     public static Error Validation(string code, string message) =>
-        new(code, message);
+        new(ErrorKind.Validation, code, message);
 
     public static Error Conflict(string message) =>
-        new("Conflict", message);
+        new(ErrorKind.Conflict, "Conflict", message);
 
     public static Error Unauthorized(string message = "Unauthorized.") =>
-        new("Unauthorized", message);
+        new(ErrorKind.Unauthorized, "Unauthorized", message);
 
     public static Error Forbidden(string message = "Forbidden.") =>
-        new("Forbidden", message);
+        new(ErrorKind.Forbidden, "Forbidden", message);
 
     public static Error LockedOut(string message = "Account is locked out.") =>
-        new("LockedOut", message);
+        new(ErrorKind.LockedOut, "LockedOut", message);
 
     public static Error Failure(string message) =>
-        new("Failure", message);
+        new(ErrorKind.Failure, "Failure", message);
+
+    public static Error NotFound(string code, string entity, object key) =>
+        new(ErrorKind.NotFound, code, $"{entity} with key '{key}' not found.");
+
+    public static Error Conflict(string code, string message) =>
+        new(ErrorKind.Conflict, code, message);
+
+    public static Error Unauthorized(string code, string message) =>
+        new(ErrorKind.Unauthorized, code, message);
+
+    public static Error Forbidden(string code, string message) =>
+        new(ErrorKind.Forbidden, code, message);
+
+    public static Error LockedOut(string code, string message) =>
+        new(ErrorKind.LockedOut, code, message);
+
+    public static Error Failure(string code, string message) =>
+        new(ErrorKind.Failure, code, message);
 }

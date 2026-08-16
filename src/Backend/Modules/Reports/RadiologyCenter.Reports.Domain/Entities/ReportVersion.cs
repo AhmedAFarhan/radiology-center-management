@@ -2,6 +2,7 @@ using RadiologyCenter.BuildingBlocks.Domain.Common;
 using RadiologyCenter.BuildingBlocks.Domain.Entities;
 using RadiologyCenter.BuildingBlocks.Domain.Exceptions;
 using RadiologyCenter.Reports.Domain.Enumerations;
+using RadiologyCenter.Reports.Domain.Errors;
 
 namespace RadiologyCenter.Reports.Domain.Entities;
 
@@ -45,7 +46,7 @@ public sealed class ReportVersion : Entity<Guid>
         Guard.AgainstNull(sectionType, nameof(sectionType));
         Guard.AgainstNullOrWhiteSpace(title, nameof(title));
         var isDuplicate = _sections.Any(s => s.SectionType == sectionType);
-        Guard.Against(isDuplicate, duplicate => duplicate, $"Section '{sectionType.Name}' already exists on version '{Id}'.");
+        Guard.Against(isDuplicate, duplicate => duplicate, DomainErrors.DuplicateVersionSection, $"Section '{sectionType.Name}' already exists on version '{Id}'.");
 
         var section = ReportSection.Create(Id, sectionType, title, body, position, isLocked);
         _sections.Add(section);
@@ -84,6 +85,6 @@ public sealed class ReportVersion : Entity<Guid>
     private ReportFinding GetFinding(Guid findingId)
     {
         return _findings.FirstOrDefault(f => f.Id == findingId)
-            ?? throw new DomainException($"Finding '{findingId}' is not on version '{Id}'.");
+            ?? throw new DomainException(DomainErrors.FindingNotOnVersion, $"Finding '{findingId}' is not on version '{Id}'.");
     }
 }

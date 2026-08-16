@@ -1,3 +1,4 @@
+using RadiologyCenter.Inventory.Application.Localization;
 using RadiologyCenter.Inventory.Application.Abstractions;
 
 namespace RadiologyCenter.Inventory.Application.Commands.DeactivateItem;
@@ -12,7 +13,7 @@ public static class DeactivateItemCommandHandler
     {
         var item = await itemRepository.GetByIdAsync(command.ItemId, ct);
         if (item is null)
-            return Result.Failure(Error.NotFound("Item", command.ItemId));
+            return Result.Failure(Error.NotFound(ErrorCodes.ItemNotFound, "Item", command.ItemId));
 
         item.Deactivate();
         itemRepository.Update(item);

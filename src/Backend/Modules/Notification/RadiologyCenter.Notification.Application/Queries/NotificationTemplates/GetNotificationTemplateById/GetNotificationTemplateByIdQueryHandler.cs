@@ -1,3 +1,4 @@
+using RadiologyCenter.Notification.Application.Localization;
 using RadiologyCenter.Notification.Application.Abstractions;
 using RadiologyCenter.Notification.Application.DTOs;
 
@@ -12,7 +13,7 @@ public static class GetNotificationTemplateByIdQueryHandler
     {
         var template = await repository.GetByIdAsync(query.Id, ct);
         if (template is null)
-            return Result.Failure<NotificationTemplateDto>(Error.NotFound("NotificationTemplate", query.Id));
+            return Result.Failure<NotificationTemplateDto>(Error.NotFound(ErrorCodes.TemplateNotFound, "NotificationTemplate", query.Id));
 
         return Result.Success(template.ToDto());
     }

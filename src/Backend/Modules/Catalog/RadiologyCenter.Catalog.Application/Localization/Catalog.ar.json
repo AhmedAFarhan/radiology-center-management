@@ -1,0 +1,20 @@
+﻿{
+"codes": {
+    "Catalog.PriceNegative": "لا يمكن أن يكون السعر سالباً.",
+    "Catalog.StandardDurationNegative": "لا يمكن أن تكون المدة القياسية سالبة.",
+    "Catalog.ExaminationTypeCodeExists": "يوجد بالفعل نوع فحص بالكود \u0027{0}\u0027.",
+    "Catalog.ExaminationTypeInUse": "لا يمكن حذف نوع الفحص \u0027{0}\u0027 لأنه لا يزال مرتبطاً بفحوصات نشطة."
+  },
+    "enums":  {
+                  "Modality":  {
+                                   "XRay":  "أشعة سينية",
+                                   "CT":  "أشعة مقطعية",
+                                   "MRI":  "رنين مغناطيسي",
+                                   "Ultrasound":  "موجات فوق صوتية",
+                                   "Mammography":  "ماموجرام",
+                                   "Fluoroscopy":  "تنظير فلوري",
+                                   "DEXA":  "ديكسا",
+                                   "Other":  "أخرى"
+                               }
+              }
+}

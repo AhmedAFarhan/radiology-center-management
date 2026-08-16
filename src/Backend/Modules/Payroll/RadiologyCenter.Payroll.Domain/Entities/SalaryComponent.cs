@@ -1,6 +1,7 @@
 using RadiologyCenter.BuildingBlocks.Domain.Common;
 using RadiologyCenter.BuildingBlocks.Domain.SoftDeletable;
 using RadiologyCenter.Payroll.Domain.Enumerations;
+using RadiologyCenter.Payroll.Domain.Errors;
 
 namespace RadiologyCenter.Payroll.Domain.Entities;
 
@@ -30,7 +31,7 @@ public sealed class SalaryComponent : SoftDeletableAggregateRoot<Guid>
     {
         Guard.AgainstNullOrWhiteSpace(name, nameof(name));
         Guard.AgainstNull(kind, nameof(kind));
-        Guard.Against(defaultValue, d => d < 0, "Default value cannot be negative.");
+        Guard.Against(defaultValue, d => d < 0, DomainErrors.DefaultValueNegative, "Default value cannot be negative.");
 
         var component = new SalaryComponent
         {
@@ -51,7 +52,7 @@ public sealed class SalaryComponent : SoftDeletableAggregateRoot<Guid>
     {
         Guard.AgainstNullOrWhiteSpace(name, nameof(name));
         Guard.AgainstNull(kind, nameof(kind));
-        Guard.Against(defaultValue, d => d < 0, "Default value cannot be negative.");
+        Guard.Against(defaultValue, d => d < 0, DomainErrors.DefaultValueNegative, "Default value cannot be negative.");
 
         Name = name.Trim();
         Kind = kind;

@@ -1,4 +1,5 @@
 using FluentValidation;
+using RadiologyCenter.BuildingBlocks.Application.Localization;
 
 namespace RadiologyCenter.BuildingBlocks.Application.Validation;
 
@@ -20,5 +21,6 @@ public static class PasswordPolicyRule
 
     public static IRuleBuilderOptions<T, string?> StrongPassword<T>(this IRuleBuilder<T, string?> ruleBuilder) =>
         ruleBuilder.Must(IsStrongPassword)
-            .WithMessage($"Password must be at least {MinLength} characters long and contain both letters and digits.");
+            .WithMessage($"Password must be at least {MinLength} characters long and contain both letters and digits.")
+            .WithErrorCode(ErrorCodes.Shared.PasswordPolicy);
 }

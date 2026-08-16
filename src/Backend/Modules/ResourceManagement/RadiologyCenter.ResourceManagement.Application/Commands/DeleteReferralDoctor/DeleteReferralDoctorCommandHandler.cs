@@ -1,3 +1,4 @@
+using RadiologyCenter.ResourceManagement.Application.Localization;
 using RadiologyCenter.ResourceManagement.Application.Abstractions;
 
 namespace RadiologyCenter.ResourceManagement.Application.Commands.DeleteReferralDoctor;
@@ -12,7 +13,7 @@ public static class DeleteReferralDoctorCommandHandler
     {
         var referralDoctor = await referralDoctorRepository.GetByIdAsync(command.ReferralDoctorId, ct);
         if (referralDoctor is null)
-            return Result.Failure(Error.NotFound("ReferralDoctor", command.ReferralDoctorId));
+            return Result.Failure(Error.NotFound(ErrorCodes.ReferralDoctorNotFound, "ReferralDoctor", command.ReferralDoctorId));
 
         referralDoctorRepository.Remove(referralDoctor);
         await unitOfWork.SaveChangesAsync(ct);

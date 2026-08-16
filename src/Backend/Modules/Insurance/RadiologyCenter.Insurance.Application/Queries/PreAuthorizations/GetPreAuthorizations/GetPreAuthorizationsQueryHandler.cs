@@ -33,7 +33,7 @@ public static class GetPreAuthorizationsQueryHandler
             p.PolicyId,
             policyNumbers.GetValueOrDefault(p.PolicyId) ?? string.Empty,
             p.EstimatedAmount,
-            p.Status.Name,
+            p.Status.LocalizedName(),
             p.RequestedAt,
             p.DecidedAt,
             p.ApprovedAmount,

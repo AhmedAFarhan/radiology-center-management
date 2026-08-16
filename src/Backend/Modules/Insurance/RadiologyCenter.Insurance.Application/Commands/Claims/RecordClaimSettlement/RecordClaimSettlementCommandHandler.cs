@@ -1,4 +1,5 @@
 using RadiologyCenter.Insurance.Application.Abstractions;
+using RadiologyCenter.Insurance.Application.Localization;
 using RadiologyCenter.Insurance.Application.DTOs;
 using RadiologyCenter.Insurance.Domain.Enumerations;
 
@@ -16,11 +17,11 @@ public static class RecordClaimSettlementCommandHandler
 
         var claim = await claimRepository.GetByIdForUpdateAsync(command.ClaimId, ct);
         if (claim is null)
-            return Result.Failure<ClaimDto>(Error.NotFound("Claim", command.ClaimId));
+            return Result.Failure<ClaimDto>(Error.NotFound(ErrorCodes.ClaimNotFound, "Claim", command.ClaimId));
 
         if (command.Amount > claim.RemainingOwed)
             return Result.Failure<ClaimDto>(Error.Validation(
-                "SettlementExceedsRemaining",
+                ErrorCodes.SettlementExceedsRemaining,
                 $"Settlement of {command.Amount} exceeds the remaining {claim.RemainingOwed} owed for claim '{claim.Id}'."));
 
         var method = SettlementMethod.FromName<SettlementMethod>(command.Method);

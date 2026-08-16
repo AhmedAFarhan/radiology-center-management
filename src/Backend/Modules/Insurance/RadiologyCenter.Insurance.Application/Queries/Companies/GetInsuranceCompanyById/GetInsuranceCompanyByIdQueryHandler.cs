@@ -1,4 +1,5 @@
 using RadiologyCenter.Insurance.Application.Abstractions;
+using RadiologyCenter.Insurance.Application.Localization;
 using RadiologyCenter.Insurance.Application.DTOs;
 
 namespace RadiologyCenter.Insurance.Application.Queries.Companies.GetInsuranceCompanyById;
@@ -12,7 +13,7 @@ public static class GetInsuranceCompanyByIdQueryHandler
     {
         var company = await companyRepository.GetByIdAsync(query.CompanyId, ct);
         return company is null
-            ? Result.Failure<InsuranceCompanyDto>(Error.NotFound("Company", query.CompanyId))
+            ? Result.Failure<InsuranceCompanyDto>(Error.NotFound(ErrorCodes.CompanyNotFound, "Company", query.CompanyId))
             : Result.Success(company.ToDto());
     }
 }

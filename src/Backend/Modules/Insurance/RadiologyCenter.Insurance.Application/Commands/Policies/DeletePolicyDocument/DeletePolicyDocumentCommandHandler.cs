@@ -1,4 +1,5 @@
 using RadiologyCenter.Insurance.Application.Abstractions;
+using RadiologyCenter.Insurance.Application.Localization;
 
 namespace RadiologyCenter.Insurance.Application.Commands.Policies.DeletePolicyDocument;
 
@@ -13,7 +14,7 @@ public static class DeletePolicyDocumentCommandHandler
     {
         var document = await documentRepository.GetByIdAsync(command.DocumentId, ct);
         if (document is null || document.PolicyId != command.PolicyId)
-            return Result.Failure(Error.NotFound("PolicyDocument", command.DocumentId));
+            return Result.Failure(Error.NotFound(ErrorCodes.PolicyDocumentNotFound, "PolicyDocument", command.DocumentId));
 
         storage.Delete(document.StoredPath);
 

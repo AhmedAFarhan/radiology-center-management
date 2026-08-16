@@ -1,4 +1,5 @@
 using Mapster;
+using RadiologyCenter.BuildingBlocks.Application.Localization;
 using RadiologyCenter.Examinations.Domain.Entities;
 
 namespace RadiologyCenter.Examinations.Application.DTOs;
@@ -15,8 +16,8 @@ internal static class ExaminationMapper
             examination.RadiologistId,
             examination.TechnicianId,
             examination.ClinicalIndication,
-            examination.Priority.Name,
-            examination.Status.Name,
+            examination.Priority.LocalizedName(),
+            examination.Status.LocalizedName(),
             examination.ScheduledAt,
             examination.StartedAt,
             examination.CompletedAt,

@@ -1,4 +1,5 @@
 using FluentValidation;
+using RadiologyCenter.BuildingBlocks.Application.Localization;
 
 namespace RadiologyCenter.Cash.Application.Commands.Sessions.ApproveCashHandover;
 
@@ -6,6 +7,6 @@ public class ApproveCashHandoverCommandValidator : AbstractValidator<ApproveCash
 {
     public ApproveCashHandoverCommandValidator()
     {
-        RuleFor(x => x.CashSessionId).NotEmpty();
+        RuleFor(x => x.CashSessionId).NotEmpty().WithErrorCode(ErrorCodes.Shared.IdRequired);
     }
 }

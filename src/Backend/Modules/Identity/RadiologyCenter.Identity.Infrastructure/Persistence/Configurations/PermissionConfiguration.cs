@@ -18,6 +18,11 @@ public class PermissionConfiguration : IEntityTypeConfiguration<Permission>
 
         builder.HasIndex(p => p.Code).IsUnique();
 
+        builder.HasMany(p => p.Translations)
+            .WithOne()
+            .HasForeignKey(t => t.PermissionId)
+            .OnDelete(DeleteBehavior.Cascade);
+
         builder.HasData(Permissions.All);
     }
 }

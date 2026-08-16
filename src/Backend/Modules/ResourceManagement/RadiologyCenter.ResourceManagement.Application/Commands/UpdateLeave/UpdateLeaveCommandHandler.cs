@@ -1,3 +1,4 @@
+using RadiologyCenter.ResourceManagement.Application.Localization;
 using RadiologyCenter.ResourceManagement.Application.Abstractions;
 using RadiologyCenter.ResourceManagement.Domain.Enumerations;
 
@@ -14,14 +15,14 @@ public static class UpdateLeaveCommandHandler
     {
         var leave = await leaveRepository.GetByIdAsync(command.LeaveId, ct);
         if (leave is null)
-            return Result.Failure(Error.NotFound("Leave", command.LeaveId));
+            return Result.Failure(Error.NotFound(ErrorCodes.LeaveNotFound, "Leave", command.LeaveId));
 
         var staff = await staffRepository.GetByIdAsync(command.StaffId, ct);
         if (staff is null)
-            return Result.Failure(Error.NotFound("Staff", command.StaffId));
+            return Result.Failure(Error.NotFound(ErrorCodes.StaffNotFound, "Staff", command.StaffId));
 
         if (await leaveRepository.HasOverlapAsync(command.StaffId, command.StartDate, command.EndDate, command.LeaveId, ct))
-            return Result.Failure(Error.Conflict("The staff member already has leave overlapping the requested period."));
+            return Result.Failure(Error.Conflict(ErrorCodes.LeaveOverlap, "The staff member already has leave overlapping the requested period."));
 
         var leaveType = LeaveType.FromName<LeaveType>(command.LeaveType);
 

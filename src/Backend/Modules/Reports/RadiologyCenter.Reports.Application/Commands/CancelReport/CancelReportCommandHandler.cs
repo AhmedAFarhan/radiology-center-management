@@ -1,3 +1,4 @@
+using RadiologyCenter.Reports.Application.Localization;
 using RadiologyCenter.Reports.Application.Abstractions;
 
 namespace RadiologyCenter.Reports.Application.Commands.CancelReport;
@@ -12,7 +13,7 @@ public static class CancelReportCommandHandler
     {
         var report = await reportRepository.GetByIdWithVersionsAsync(command.ReportId, ct);
         if (report is null)
-            return Result.Failure(Error.NotFound("Report", command.ReportId));
+            return Result.Failure(Error.NotFound(ErrorCodes.ReportNotFound, "Report", command.ReportId));
 
         report.Cancel(command.Reason);
 

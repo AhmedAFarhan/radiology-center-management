@@ -1,5 +1,6 @@
 using System.Net;
 using RadiologyCenter.BuildingBlocks.Application.Common;
+using RadiologyCenter.BuildingBlocks.Application.Localization;
 using RadiologyCenter.BuildingBlocks.Domain.Exceptions;
 
 namespace RadiologyCenter.Localhost.Middleware;
@@ -24,45 +25,60 @@ public class ExceptionMiddleware
         catch (NotFoundException ex)
         {
             _logger.LogWarning(ex, "Resource not found");
+            var message = Translator.Localize(ex.Message);
             await WriteResponse(context, HttpStatusCode.NotFound,
-                ApiResponse.Fail(ex.Message, ApiError.FromException(ex, "NotFound")));
+                ApiResponse.Fail(message, ApiError.FromException(ex, "NotFound", message)));
         }
         catch (ValidationException ex)
         {
             _logger.LogWarning(ex, "Validation failed");
+            var message = Translator.Localize(ex.Message);
+            var details = ex.Errors.ToDictionary(
+                kvp => kvp.Key,
+                kvp => (object)kvp.Value.Select(Translator.Localize).ToArray());
             await WriteResponse(context, HttpStatusCode.BadRequest,
-                ApiResponse.Fail(ex.Message, new ApiError { Code = "Validation", Message = ex.Message, Details = ex.Errors }));
+                ApiResponse.Fail(message, new ApiError { Code = "Validation", Message = message, Details = details }));
         }
         catch (FluentValidation.ValidationException ex)
         {
             _logger.LogWarning(ex, "Fluent validation failed");
-            var details = ex.Errors.Select(e => new { e.PropertyName, e.ErrorMessage });
+            var details = ex.Errors.Select(e => new
+            {
+                e.PropertyName,
+                e.ErrorCode,
+                ErrorMessage = Translator.LocalizeCode(e.ErrorCode, e.ErrorMessage),
+            });
+            var message = Translator.Localize(ex.Message);
             await WriteResponse(context, HttpStatusCode.BadRequest,
-                ApiResponse.Fail(ex.Message, new ApiError { Code = "Validation", Message = ex.Message, Details = details }));
+                ApiResponse.Fail(message, new ApiError { Code = "Validation", Message = message, Details = details }));
         }
         catch (BusinessRuleViolationException ex)
         {
             _logger.LogWarning(ex, "Business rule violated");
+            var message = Translator.LocalizeCode(ex.Code, ex.Message);
             await WriteResponse(context, HttpStatusCode.Conflict,
-                ApiResponse.Fail(ex.Message, ApiError.FromException(ex, "Conflict")));
+                ApiResponse.Fail(message, ApiError.FromException(ex, ex.Code ?? "Conflict", message)));
         }
         catch (ConcurrencyException ex)
         {
             _logger.LogWarning(ex, "Concurrency conflict");
+            var message = Translator.Localize(ex.Message);
             await WriteResponse(context, HttpStatusCode.Conflict,
-                ApiResponse.Fail(ex.Message, ApiError.FromException(ex, "Conflict")));
+                ApiResponse.Fail(message, ApiError.FromException(ex, "Conflict", message)));
         }
         catch (DomainException ex)
         {
             _logger.LogWarning(ex, "Domain exception");
+            var message = Translator.LocalizeCode(ex.Code, ex.Message);
             await WriteResponse(context, HttpStatusCode.BadRequest,
-                ApiResponse.Fail(ex.Message, ApiError.FromException(ex, "DomainError")));
+                ApiResponse.Fail(message, ApiError.FromException(ex, ex.Code ?? "DomainError", message)));
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Unhandled exception");
+            var message = Translator.Localize("An unexpected error occurred.");
             await WriteResponse(context, HttpStatusCode.InternalServerError,
-                ApiResponse.Fail("An unexpected error occurred.", new ApiError { Code = "InternalError", Message = "An unexpected error occurred." }));
+                ApiResponse.Fail(message, new ApiError { Code = "InternalError", Message = message }));
         }
     }
 

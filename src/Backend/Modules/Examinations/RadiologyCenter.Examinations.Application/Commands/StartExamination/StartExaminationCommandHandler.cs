@@ -1,3 +1,4 @@
+using RadiologyCenter.Examinations.Application.Localization;
 using RadiologyCenter.Examinations.Application.Abstractions;
 
 namespace RadiologyCenter.Examinations.Application.Commands.StartExamination;
@@ -12,11 +13,11 @@ public static class StartExaminationCommandHandler
         CancellationToken ct)
     {
         if (!Guid.TryParse(currentUser.Id, out var performedByUserId))
-            return Result.Failure(Error.Unauthorized("An authenticated user is required to start an examination."));
+            return Result.Failure(Error.Unauthorized(ErrorCodes.AuthenticationRequired, "An authenticated user is required to start an examination."));
 
         var examination = await examinationRepository.GetByIdAsync(command.ExaminationId, ct);
         if (examination is null)
-            return Result.Failure(Error.NotFound("Examination", command.ExaminationId));
+            return Result.Failure(Error.NotFound(ErrorCodes.ExaminationNotFound, "Examination", command.ExaminationId));
 
         examination.Start(performedByUserId);
 

@@ -33,11 +33,20 @@ public class ApiResponse
         Error = error,
     };
 
-    public static ApiResponse FromResult<T>(Result<T> result, string? successMessage = null) =>
-        result.IsSuccess ? Ok(result.Value, successMessage) : Fail(result.Error!.Message, ApiError.FromError(result.Error));
+    public static ApiResponse FromResult<T>(Result<T> result, string? successMessage = null, bool localized = false) =>
+        result.IsSuccess ? Ok(result.Value, successMessage)
+            : localized
+                ? Fail(ResolveMessage(result.Error!), ApiError.FromError(result.Error!, localized: true))
+                : Fail(result.Error!.Message, ApiError.FromError(result.Error));
 
-    public static ApiResponse FromResult(Result result, string? successMessage = null) =>
-        result.IsSuccess ? Ok(null, successMessage) : Fail(result.Error!.Message, ApiError.FromError(result.Error));
+    public static ApiResponse FromResult(Result result, string? successMessage = null, bool localized = false) =>
+        result.IsSuccess ? Ok(null, successMessage)
+            : localized
+                ? Fail(ResolveMessage(result.Error!), ApiError.FromError(result.Error!, localized: true))
+                : Fail(result.Error!.Message, ApiError.FromError(result.Error));
+
+    private static string ResolveMessage(Error error) =>
+        RadiologyCenter.BuildingBlocks.Application.Localization.Translator.LocalizeCode(error.Code, error.Message);
 }
 
 public class ApiResponse<T>
@@ -81,15 +90,17 @@ public class ApiError
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public object? Details { get; init; }
 
-    public static ApiError FromError(Error error) => new()
+    public static ApiError FromError(Error error, bool localized = false) => new()
     {
         Code = error.Code,
-        Message = error.Message,
+        Message = localized
+            ? RadiologyCenter.BuildingBlocks.Application.Localization.Translator.LocalizeCode(error.Code, error.Message)
+            : error.Message,
     };
 
-    public static ApiError FromException(Exception ex, string? code = null) => new()
+    public static ApiError FromException(Exception ex, string? code = null, string? message = null) => new()
     {
         Code = code ?? "Error",
-        Message = ex.Message,
+        Message = message ?? ex.Message,
     };
 }

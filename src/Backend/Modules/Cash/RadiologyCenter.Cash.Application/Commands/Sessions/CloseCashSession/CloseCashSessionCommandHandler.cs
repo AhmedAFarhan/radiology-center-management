@@ -1,4 +1,5 @@
 using RadiologyCenter.BuildingBlocks.Application.Abstractions;
+using RadiologyCenter.Cash.Application.Localization;
 using RadiologyCenter.Cash.Application.Abstractions;
 using RadiologyCenter.Cash.Application.DTOs;
 using RadiologyCenter.Cash.Domain.Entities;
@@ -22,11 +23,11 @@ public static class CloseCashSessionCommandHandler
 
         var session = await sessionRepository.GetByIdAsync(command.CashSessionId, ct);
         if (session is null)
-            return Result.Failure<CashHandoverDto>(Error.NotFound("CashSession", command.CashSessionId));
+            return Result.Failure<CashHandoverDto>(Error.NotFound(ErrorCodes.SessionNotFound, "CashSession", command.CashSessionId));
         if (session.UserId != closingUserId)
-            return Result.Failure<CashHandoverDto>(Error.Forbidden("You can only close your own cash session."));
+            return Result.Failure<CashHandoverDto>(Error.Forbidden(ErrorCodes.CloseNotOwnSession, "You can only close your own cash session."));
         if (session.Status != CashSessionStatus.Open)
-            return Result.Failure<CashHandoverDto>(Error.Conflict("Cannot close a session that is not open."));
+            return Result.Failure<CashHandoverDto>(Error.Conflict(ErrorCodes.CloseSessionNotOpen, "Cannot close a session that is not open."));
 
         var expected = session.OpeningFloat;
         var movements = await entryRepository.GetSessionMovementsAsync(new[] { session.Id }, ct);
@@ -41,7 +42,7 @@ public static class CloseCashSessionCommandHandler
         if (command.ReceivingUserId is { } receivingUserId && receivingUserId != Guid.Empty)
         {
             if (await sessionRepository.GetOpenSessionByUserAsync(receivingUserId, ct) is not null)
-                return Result.Failure<CashHandoverDto>(Error.Conflict("The receiving user already has an open session."));
+                return Result.Failure<CashHandoverDto>(Error.Conflict(ErrorCodes.ReceiverAlreadyOpenSession, "The receiving user already has an open session."));
 
             var successor = CashSession.Open(
                 receivingUserId,

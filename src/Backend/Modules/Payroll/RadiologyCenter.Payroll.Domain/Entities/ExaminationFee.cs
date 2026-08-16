@@ -1,6 +1,7 @@
 using RadiologyCenter.BuildingBlocks.Domain.Common;
 using RadiologyCenter.BuildingBlocks.Domain.SoftDeletable;
 using RadiologyCenter.Payroll.Domain.Enumerations;
+using RadiologyCenter.Payroll.Domain.Errors;
 
 namespace RadiologyCenter.Payroll.Domain.Entities;
 
@@ -25,9 +26,9 @@ public sealed class ExaminationFee : SoftDeletableAggregateRoot<Guid>
     {
         Guard.AgainstEmpty(examinationTypeId, nameof(examinationTypeId));
         Guard.AgainstNull(role, nameof(role));
-        Guard.Against(amount, a => a < 0, "Examination fee cannot be negative.");
+        Guard.Against(amount, a => a < 0, DomainErrors.ExaminationFeeNegative, "Examination fee cannot be negative.");
         if (isPercentage)
-            Guard.Against(amount, a => a > 100, "Percentage fee cannot exceed 100.");
+            Guard.Against(amount, a => a > 100, DomainErrors.PercentageFeeMax, "Percentage fee cannot exceed 100.");
 
         var fee = new ExaminationFee
         {
@@ -45,9 +46,9 @@ public sealed class ExaminationFee : SoftDeletableAggregateRoot<Guid>
     public void Update(ExamFeeRole role, decimal amount, bool isPercentage = false)
     {
         Guard.AgainstNull(role, nameof(role));
-        Guard.Against(amount, a => a < 0, "Examination fee cannot be negative.");
+        Guard.Against(amount, a => a < 0, DomainErrors.ExaminationFeeNegative, "Examination fee cannot be negative.");
         if (isPercentage)
-            Guard.Against(amount, a => a > 100, "Percentage fee cannot exceed 100.");
+            Guard.Against(amount, a => a > 100, DomainErrors.PercentageFeeMax, "Percentage fee cannot exceed 100.");
 
         Role = role;
         Amount = amount;

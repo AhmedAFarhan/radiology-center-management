@@ -1,0 +1,532 @@
+﻿{
+    "permissions":  {
+                        "patients.create":  {
+                                                "name":  "إنشاء المرضى",
+                                                "description":  "إنشاء سجلات مرضى جديدة",
+                                                "group":  "المرضى"
+                                            },
+                        "patients.read":  {
+                                              "name":  "عرض المرضى",
+                                              "description":  "عرض سجلات المرضى",
+                                              "group":  "المرضى"
+                                          },
+                        "patients.update":  {
+                                                "name":  "تعديل المرضى",
+                                                "description":  "تعديل سجلات المرضى الحالية",
+                                                "group":  "المرضى"
+                                            },
+                        "patients.delete":  {
+                                                "name":  "حذف المرضى",
+                                                "description":  "إزالة سجلات المرضى",
+                                                "group":  "المرضى"
+                                            },
+                        "appointments.create":  {
+                                                    "name":  "إنشاء المواعيد",
+                                                    "description":  "جدولة مواعيد جديدة",
+                                                    "group":  "المواعيد"
+                                                },
+                        "appointments.read":  {
+                                                  "name":  "عرض المواعيد",
+                                                  "description":  "عرض تفاصيل المواعيد",
+                                                  "group":  "المواعيد"
+                                              },
+                        "appointments.update":  {
+                                                    "name":  "تعديل المواعيد",
+                                                    "description":  "تعديل المواعيد الحالية",
+                                                    "group":  "المواعيد"
+                                                },
+                        "appointments.delete":  {
+                                                    "name":  "حذف المواعيد",
+                                                    "description":  "إلغاء أو إزالة المواعيد",
+                                                    "group":  "المواعيد"
+                                                },
+                        "appointments.confirm":  {
+                                                     "name":  "تأكيد المواعيد",
+                                                     "description":  "تأكيد المواعيد المجدولة",
+                                                     "group":  "المواعيد"
+                                                 },
+                        "reports.create":  {
+                                               "name":  "إنشاء التقارير",
+                                               "description":  "إنشاء تقارير الأشعة الجديدة",
+                                               "group":  "التقارير"
+                                           },
+                        "reports.read":  {
+                                             "name":  "عرض التقارير",
+                                             "description":  "عرض تقارير الأشعة",
+                                             "group":  "التقارير"
+                                         },
+                        "reports.update":  {
+                                               "name":  "تعديل التقارير",
+                                               "description":  "تعديل التقارير الحالية",
+                                               "group":  "التقارير"
+                                           },
+                        "reports.delete":  {
+                                               "name":  "حذف التقارير",
+                                               "description":  "إزالة التقارير",
+                                               "group":  "التقارير"
+                                           },
+                        "reports.export":  {
+                                               "name":  "تصدير التقارير",
+                                               "description":  "تصدير التقارير إلى صيغ خارجية",
+                                               "group":  "التقارير"
+                                           },
+                        "analytics.read":  {
+                                               "name":  "عرض التحليلات",
+                                               "description":  "عرض لوحات التحليلات وذكاء الأعمال",
+                                               "group":  "التحليلات"
+                                           },
+                        "users.create":  {
+                                             "name":  "إنشاء المستخدمين",
+                                             "description":  "إنشاء حسابات مستخدمين جديدة",
+                                             "group":  "الهوية"
+                                         },
+                        "users.read":  {
+                                           "name":  "عرض المستخدمين",
+                                           "description":  "عرض حسابات المستخدمين",
+                                           "group":  "الهوية"
+                                       },
+                        "users.update":  {
+                                             "name":  "تعديل المستخدمين",
+                                             "description":  "تعديل حسابات المستخدمين",
+                                             "group":  "الهوية"
+                                         },
+                        "users.delete":  {
+                                             "name":  "حذف المستخدمين",
+                                             "description":  "إزالة حسابات المستخدمين",
+                                             "group":  "الهوية"
+                                         },
+                        "users.manage-roles":  {
+                                                   "name":  "إدارة أدوار المستخدمين",
+                                                   "description":  "تعيين أو إزالة الأدوار من المستخدمين",
+                                                   "group":  "الهوية"
+                                               },
+                        "roles.create":  {
+                                             "name":  "إنشاء الأدوار",
+                                             "description":  "إنشاء أدوار جديدة",
+                                             "group":  "الهوية"
+                                         },
+                        "roles.read":  {
+                                           "name":  "عرض الأدوار",
+                                           "description":  "عرض الأدوار",
+                                           "group":  "الهوية"
+                                       },
+                        "roles.update":  {
+                                             "name":  "تعديل الأدوار",
+                                             "description":  "تعديل تفاصيل الأدوار",
+                                             "group":  "الهوية"
+                                         },
+                        "roles.delete":  {
+                                             "name":  "حذف الأدوار",
+                                             "description":  "إزالة الأدوار",
+                                             "group":  "الهوية"
+                                         },
+                        "roles.manage-permissions":  {
+                                                         "name":  "إدارة صلاحيات الأدوار",
+                                                         "description":  "تعيين أو إزالة الصلاحيات من الأدوار",
+                                                         "group":  "الهوية"
+                                                     },
+                        "settings.read":  {
+                                              "name":  "عرض الإعدادات",
+                                              "description":  "عرض إعدادات النظام",
+                                              "group":  "الإعدادات"
+                                          },
+                        "settings.update":  {
+                                                "name":  "تعديل الإعدادات",
+                                                "description":  "تعديل إعدادات النظام",
+                                                "group":  "الإعدادات"
+                                            },
+                        "inventory.items.create":  {
+                                                       "name":  "إنشاء أصناف المخزون",
+                                                       "description":  "إضافة أصناف مخزون جديدة",
+                                                       "group":  "المخزون"
+                                                   },
+                        "inventory.items.read":  {
+                                                     "name":  "عرض أصناف المخزون",
+                                                     "description":  "عرض أصناف المخزون",
+                                                     "group":  "المخزون"
+                                                 },
+                        "inventory.items.update":  {
+                                                       "name":  "تعديل أصناف المخزون",
+                                                       "description":  "تعديل أصناف المخزون",
+                                                       "group":  "المخزون"
+                                                   },
+                        "inventory.items.delete":  {
+                                                       "name":  "حذف أصناف المخزون",
+                                                       "description":  "إزالة أصناف المخزون",
+                                                       "group":  "المخزون"
+                                                   },
+                        "inventory.suppliers.create":  {
+                                                           "name":  "إنشاء الموردين",
+                                                           "description":  "إضافة موردين جدد",
+                                                           "group":  "المخزون"
+                                                       },
+                        "inventory.suppliers.read":  {
+                                                         "name":  "عرض الموردين",
+                                                         "description":  "عرض الموردين",
+                                                         "group":  "المخزون"
+                                                     },
+                        "inventory.suppliers.update":  {
+                                                           "name":  "تعديل الموردين",
+                                                           "description":  "تعديل الموردين",
+                                                           "group":  "المخزون"
+                                                       },
+                        "inventory.suppliers.delete":  {
+                                                           "name":  "حذف الموردين",
+                                                           "description":  "إزالة الموردين",
+                                                           "group":  "المخزون"
+                                                       },
+                        "inventory.purchase-orders.create":  {
+                                                                 "name":  "إنشاء أوامر الشراء",
+                                                                 "description":  "إنشاء أوامر شراء",
+                                                                 "group":  "المخزون"
+                                                             },
+                        "inventory.purchase-orders.read":  {
+                                                               "name":  "عرض أوامر الشراء",
+                                                               "description":  "عرض أوامر الشراء",
+                                                               "group":  "المخزون"
+                                                           },
+                        "inventory.purchase-orders.update":  {
+                                                                 "name":  "تعديل أوامر الشراء",
+                                                                 "description":  "تعديل أوامر الشراء",
+                                                                 "group":  "المخزون"
+                                                             },
+                        "inventory.purchase-orders.delete":  {
+                                                                 "name":  "حذف أوامر الشراء",
+                                                                 "description":  "إزالة أوامر الشراء",
+                                                                 "group":  "المخزون"
+                                                             },
+                        "inventory.stock.read":  {
+                                                     "name":  "عرض المخزون",
+                                                     "description":  "عرض مستويات المخزون وحركاته",
+                                                     "group":  "المخزون"
+                                                 },
+                        "inventory.stock.issue":  {
+                                                      "name":  "صرف المخزون",
+                                                      "description":  "صرف المخزون للمرضى",
+                                                      "group":  "المخزون"
+                                                  },
+                        "examinations.types.manage":  {
+                                                          "name":  "إدارة أنواع الفحوصات",
+                                                          "description":  "إنشاء وتعديل وحذف وتفعيل أنواع الفحوصات",
+                                                          "group":  "الفحوصات"
+                                                      },
+                        "examinations.create":  {
+                                                    "name":  "إنشاء الفحوصات",
+                                                    "description":  "إنشاء الزيارات وإضافة الفحوصات",
+                                                    "group":  "الفحوصات"
+                                                },
+                        "examinations.read":  {
+                                                  "name":  "عرض الفحوصات",
+                                                  "description":  "عرض الزيارات والفحوصات",
+                                                  "group":  "الفحوصات"
+                                              },
+                        "examinations.update":  {
+                                                    "name":  "تعديل الفحوصات",
+                                                    "description":  "تعديل الفحوصات وعناصرها",
+                                                    "group":  "الفحوصات"
+                                                },
+                        "examinations.delete":  {
+                                                    "name":  "حذف الفحوصات",
+                                                    "description":  "إزالة الفحوصات",
+                                                    "group":  "الفحوصات"
+                                                },
+                        "examinations.perform":  {
+                                                     "name":  "تنفيذ الفحوصات",
+                                                     "description":  "بدء وإنهاء الفحوصات",
+                                                     "group":  "الفحوصات"
+                                                 },
+                        "examinations.cancel":  {
+                                                    "name":  "إلغاء الفحوصات",
+                                                    "description":  "إلغاء الزيارات والفحوصات",
+                                                    "group":  "الفحوصات"
+                                                },
+                        "resources.staff.create":  {
+                                                       "name":  "إنشاء الموظفين",
+                                                       "description":  "إضافة أعضاء فريق جدد",
+                                                       "group":  "الموارد"
+                                                   },
+                        "resources.staff.read":  {
+                                                     "name":  "عرض الموظفين",
+                                                     "description":  "عرض أعضاء الفريق",
+                                                     "group":  "الموارد"
+                                                 },
+                        "resources.staff.update":  {
+                                                       "name":  "تعديل الموظفين",
+                                                       "description":  "تعديل أعضاء الفريق",
+                                                       "group":  "الموارد"
+                                                   },
+                        "resources.staff.delete":  {
+                                                       "name":  "حذف الموظفين",
+                                                       "description":  "إزالة أعضاء الفريق",
+                                                       "group":  "الموارد"
+                                                   },
+                        "resources.equipment.create":  {
+                                                           "name":  "إنشاء الأجهزة",
+                                                           "description":  "إضافة أجهزة جديدة",
+                                                           "group":  "الموارد"
+                                                       },
+                        "resources.equipment.read":  {
+                                                         "name":  "عرض الأجهزة",
+                                                         "description":  "عرض الأجهزة",
+                                                         "group":  "الموارد"
+                                                     },
+                        "resources.equipment.update":  {
+                                                           "name":  "تعديل الأجهزة",
+                                                           "description":  "تعديل الأجهزة وحالتها",
+                                                           "group":  "الموارد"
+                                                       },
+                        "resources.equipment.delete":  {
+                                                           "name":  "حذف الأجهزة",
+                                                           "description":  "إزالة الأجهزة",
+                                                           "group":  "الموارد"
+                                                       },
+                        "resources.shifts.create":  {
+                                                        "name":  "إنشاء ورديات العمل",
+                                                        "description":  "إضافة ورديات عمل جديدة",
+                                                        "group":  "الموارد"
+                                                    },
+                        "resources.shifts.read":  {
+                                                      "name":  "عرض ورديات العمل",
+                                                      "description":  "عرض ورديات العمل",
+                                                      "group":  "الموارد"
+                                                  },
+                        "resources.shifts.update":  {
+                                                        "name":  "تعديل ورديات العمل",
+                                                        "description":  "تعديل ورديات العمل",
+                                                        "group":  "الموارد"
+                                                    },
+                        "resources.shifts.delete":  {
+                                                        "name":  "حذف ورديات العمل",
+                                                        "description":  "إزالة ورديات العمل",
+                                                        "group":  "الموارد"
+                                                    },
+                        "resources.leave.create":  {
+                                                       "name":  "إنشاء الإجازات",
+                                                       "description":  "إضافة سجلات إجازات جديدة",
+                                                       "group":  "الموارد"
+                                                   },
+                        "resources.leave.read":  {
+                                                     "name":  "عرض الإجازات",
+                                                     "description":  "عرض سجلات الإجازات",
+                                                     "group":  "الموارد"
+                                                 },
+                        "resources.leave.update":  {
+                                                       "name":  "تعديل الإجازات",
+                                                       "description":  "تعديل سجلات الإجازات",
+                                                       "group":  "الموارد"
+                                                   },
+                        "resources.leave.delete":  {
+                                                       "name":  "حذف الإجازات",
+                                                       "description":  "إزالة سجلات الإجازات",
+                                                       "group":  "الموارد"
+                                                   },
+                        "resources.referrals.create":  {
+                                                           "name":  "إنشاء الأطباء المحوّلين",
+                                                           "description":  "إضافة أطباء محوّلين جدد",
+                                                           "group":  "الموارد"
+                                                       },
+                        "resources.referrals.read":  {
+                                                         "name":  "عرض الأطباء المحوّلين",
+                                                         "description":  "عرض الأطباء المحوّلين",
+                                                         "group":  "الموارد"
+                                                     },
+                        "resources.referrals.update":  {
+                                                           "name":  "تعديل الأطباء المحوّلين",
+                                                           "description":  "تعديل الأطباء المحوّلين",
+                                                           "group":  "الموارد"
+                                                       },
+                        "resources.referrals.delete":  {
+                                                           "name":  "حذف الأطباء المحوّلين",
+                                                           "description":  "إزالة الأطباء المحوّلين",
+                                                           "group":  "الموارد"
+                                                       },
+                        "payroll.read":  {
+                                             "name":  "عرض كشف الرواتب",
+                                             "description":  "عرض سجلات الرواتب",
+                                             "group":  "الرواتب"
+                                         },
+                        "payroll.salary-components.manage":  {
+                                                                 "name":  "إدارة مكونات الراتب",
+                                                                 "description":  "إنشاء وتعديل وتفعيل وحذف مكونات الراتب",
+                                                                 "group":  "الرواتب"
+                                                             },
+                        "payroll.salary.manage":  {
+                                                      "name":  "إدارة الرواتب",
+                                                      "description":  "إنشاء وتعديل وتفعيل وحذف رواتب الموظفين",
+                                                      "group":  "الرواتب"
+                                                  },
+                        "payroll.allowances.manage":  {
+                                                          "name":  "إدارة البدلات",
+                                                          "description":  "إنشاء وتعديل وتفعيل وحذف بدلات الموظفين",
+                                                          "group":  "الرواتب"
+                                                      },
+                        "payroll.fees.manage":  {
+                                                    "name":  "إدارة رسوم الرواتب",
+                                                    "description":  "إنشاء وتعديل وتفعيل وحذف رسوم الفحوصات والإحالة",
+                                                    "group":  "الرواتب"
+                                                },
+                        "payroll.payruns.manage":  {
+                                                       "name":  "إدارة دفعات الرواتب",
+                                                       "description":  "إنشاء دفعات الرواتب وإدارة قسائمها",
+                                                       "group":  "الرواتب"
+                                                   },
+                        "payroll.payruns.run":  {
+                                                    "name":  "تنفيذ دفعات الرواتب",
+                                                    "description":  "احتساب واعتماد ورفض وصرف دفعات الرواتب",
+                                                    "group":  "الرواتب"
+                                                },
+                        "insurance.companies.create":  {
+                                                           "name":  "إنشاء شركات التأمين",
+                                                           "description":  "إضافة شركات تأمين جديدة",
+                                                           "group":  "التأمين"
+                                                       },
+                        "insurance.companies.read":  {
+                                                         "name":  "عرض شركات التأمين",
+                                                         "description":  "عرض شركات التأمين",
+                                                         "group":  "التأمين"
+                                                     },
+                        "insurance.companies.update":  {
+                                                           "name":  "تعديل شركات التأمين",
+                                                           "description":  "تعديل تفاصيل شركات التأمين",
+                                                           "group":  "التأمين"
+                                                       },
+                        "insurance.companies.delete":  {
+                                                           "name":  "حذف شركات التأمين",
+                                                           "description":  "إزالة شركات التأمين",
+                                                           "group":  "التأمين"
+                                                       },
+                        "insurance.policies.create":  {
+                                                          "name":  "إنشاء وثائق التأمين",
+                                                          "description":  "إضافة وثائق تأمين مرضى جديدة",
+                                                          "group":  "التأمين"
+                                                      },
+                        "insurance.policies.read":  {
+                                                        "name":  "عرض وثائق التأمين",
+                                                        "description":  "عرض وثائق تأمين المرضى",
+                                                        "group":  "التأمين"
+                                                    },
+                        "insurance.policies.update":  {
+                                                          "name":  "تعديل وثائق التأمين",
+                                                          "description":  "تعديل الوثائق والتغطية والحالة",
+                                                          "group":  "التأمين"
+                                                      },
+                        "insurance.policies.delete":  {
+                                                          "name":  "حذف وثائق التأمين",
+                                                          "description":  "إزالة وثائق التأمين",
+                                                          "group":  "التأمين"
+                                                      },
+                        "insurance.preauthorizations.create":  {
+                                                                   "name":  "إنشاء الموافقات المسبقة",
+                                                                   "description":  "طلب موافقة مسبقة للفحوصات",
+                                                                   "group":  "التأمين"
+                                                               },
+                        "insurance.preauthorizations.read":  {
+                                                                 "name":  "عرض الموافقات المسبقة",
+                                                                 "description":  "عرض الموافقات المسبقة والمستندات",
+                                                                 "group":  "التأمين"
+                                                             },
+                        "insurance.preauthorizations.update":  {
+                                                                   "name":  "تعديل الموافقات المسبقة",
+                                                                   "description":  "اعتماد أو رفض أو إرفاق المستندات",
+                                                                   "group":  "التأمين"
+                                                               },
+                        "insurance.preauthorizations.attach-document":  {
+                                                                            "name":  "إرفاق مستندات الموافقة المسبقة",
+                                                                            "description":  "رفع أو إزالة مستندات الموافقة الرسمية",
+                                                                            "group":  "التأمين"
+                                                                        },
+                        "insurance.claims.create":  {
+                                                        "name":  "إنشاء المطالبات",
+                                                        "description":  "إنشاء مطالبات للفحوصات المشمولة",
+                                                        "group":  "التأمين"
+                                                    },
+                        "insurance.claims.read":  {
+                                                      "name":  "عرض المطالبات",
+                                                      "description":  "عرض المطالبات ودورة حياتها",
+                                                      "group":  "التأمين"
+                                                  },
+                        "insurance.claims.update":  {
+                                                        "name":  "تعديل المطالبات",
+                                                        "description":  "إرسال وإعادة إرسال وبتّ المطالبات",
+                                                        "group":  "التأمين"
+                                                    },
+                        "insurance.claims.settle":  {
+                                                        "name":  "تسوية المطالبات",
+                                                        "description":  "تسجيل تسويات التأمين",
+                                                        "group":  "التأمين"
+                                                    },
+                        "cash.sessions.open":  {
+                                                   "name":  "فتح جلسات النقدية",
+                                                   "description":  "فتح جلسة نقدية جديدة وتسجيل رصيد الافتتاح",
+                                                   "group":  "النقدية"
+                                               },
+                        "cash.sessions.read":  {
+                                                   "name":  "عرض جلسات النقدية",
+                                                   "description":  "عرض الجلسات النقدية وحركاتها",
+                                                   "group":  "النقدية"
+                                               },
+                        "cash.sessions.close":  {
+                                                    "name":  "إغلاق جلسات النقدية",
+                                                    "description":  "إغلاق جلسة نقدية ومطابقة التوريدات المعدودة",
+                                                    "group":  "النقدية"
+                                                },
+                        "cash.entries.add":  {
+                                                 "name":  "إضافة الحركات النقدية",
+                                                 "description":  "تسجيل الحركات النقدية في الجلسة",
+                                                 "group":  "النقدية"
+                                             },
+                        "cash.handovers.read":  {
+                                                    "name":  "عرض التوريدات النقدية",
+                                                    "description":  "عرض التوريدات النقدية وتفاصيل المطابقة",
+                                                    "group":  "النقدية"
+                                                },
+                        "cash.handovers.approve":  {
+                                                       "name":  "اعتماد التوريدات النقدية",
+                                                       "description":  "اعتماد التوريدات النقدية المكتملة",
+                                                       "group":  "النقدية"
+                                                   },
+                        "notifications.templates.manage":  {
+                                                               "name":  "إدارة قوالب الإشعارات",
+                                                               "description":  "إنشاء وتعديل وتفعيل وتعطيل وحذف قوالب الإشعارات",
+                                                               "group":  "الإشعارات"
+                                                           },
+                        "notifications.messages.read":  {
+                                                            "name":  "عرض رسائل الإشعارات",
+                                                            "description":  "عرض سجل رسائل الإشعارات",
+                                                            "group":  "الإشعارات"
+                                                        },
+                        "notifications.messages.send":  {
+                                                            "name":  "إرسال الإشعارات",
+                                                            "description":  "إرسال إشعارات الرسائل النصية والبريد والإشعارات الفورية",
+                                                            "group":  "الإشعارات"
+                                                        }
+                    },
+    "messages":  {
+                     "Unauthorized.":  "غير مصرح.",
+                     "Forbidden.":  "ممنوع.",
+                     "Account is locked out.":  "الحساب مقفل.",
+                     "{0} with key \u0027{1}\u0027 not found.":  "لم يتم العثور على {0} بالمفتاح \u0027{1}\u0027.",
+                     "{0} with key \u0027{1}\u0027 was not found.":  "لم يتم العثور على {0} بالمفتاح \u0027{1}\u0027.",
+                     "The record was modified by another user. Please refresh and try again.":  "تم تعديل السجل بواسطة مستخدم آخر. يرجى التحديث والمحاولة مرة أخرى.",
+                     "An unexpected error occurred.":  "حدث خطأ غير متوقع.",
+                     "No active database transaction is available for the cash entry.":  "لا توجد معاملة قاعدة بيانات نشطة متاحة لإدخال النقدية.",
+                     "Full name must contain at least a first name and a last name.":  "يجب أن يحتوي الاسم الكامل على الاسم الأول واسم العائلة على الأقل.",
+                     "Phone number must be a valid Egyptian number (e.g. 01012345678).":  "يجب أن يكون رقم الهاتف رقماً مصرياً صحيحاً (مثال: 01012345678).",
+                     "\u0027{0}\u0027 is not a valid value for {1}.":  "\u0027{0}\u0027 ليس قيمة صالحة لـ {1}.",
+                     "\u0027{0}\u0027 is not a valid name for {1}.":  "\u0027{0}\u0027 ليس اسماً صالحاً لـ {1}.",
+                     "{0} cannot be null.":  "{0} لا يمكن أن يكون فارغاً (null).",
+                     "{0} cannot be null or whitespace.":  "{0} لا يمكن أن يكون فارغاً أو مسافات.",
+                     "{0} must be greater than zero.":  "يجب أن يكون {0} أكبر من صفر.",
+                     "{0} cannot be the default value.":  "{0} لا يمكن أن يكون القيمة الافتراضية.",
+                     "{0} cannot be empty.":  "{0} لا يمكن أن يكون فارغاً.",
+                     "{0} must be one of: {1}.":  "يجب أن يكون {0} واحداً من: {1}.",
+                     "Password must be at least {0} characters long and contain both letters and digits.":  "يجب أن تكون كلمة المرور بطول {0} أحرف على الأقل وتحتوي على حروف وأرقام."
+                 },
+    "codes":  {
+                  "Shared.IdRequired":  "المعرّف مطلوب.",
+                  "Shared.PasswordPolicy":  "يجب أن تكون كلمة المرور بطول 8 أحرف على الأقل وتحتوي على حروف وأرقام.",
+                  "Shared.FullNameTwoParts":  "يجب أن يحتوي الاسم الكامل على اسم أول واسم عائلة على الأقل.",
+                  "Shared.InvalidPhoneNumber":  "يجب أن يكون رقم الهاتف رقمًا مصريًا صالحًا (مثال: 01012345678).",
+                  "Shared.InvalidEnumValue":  "يجب أن تكون القيمة واحدة من الخيارات المسموح بها."
+              }
+}

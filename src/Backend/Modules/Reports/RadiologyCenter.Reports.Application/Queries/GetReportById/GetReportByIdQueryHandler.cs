@@ -1,4 +1,5 @@
 using RadiologyCenter.Reports.Application.Abstractions;
+using RadiologyCenter.Reports.Application.Localization;
 using RadiologyCenter.Reports.Application.DTOs;
 
 namespace RadiologyCenter.Reports.Application.Queries.GetReportById;
@@ -13,7 +14,7 @@ public static class GetReportByIdQueryHandler
     {
         var report = await reportRepository.GetByIdWithVersionsAsync(query.ReportId, ct);
         if (report is null)
-            return Result.Failure<ReportDto>(Error.NotFound("Report", query.ReportId));
+            return Result.Failure<ReportDto>(Error.NotFound(ErrorCodes.ReportNotFound, "Report", query.ReportId));
 
         var dto = report.ToDto();
         dto = await Decorate(dto, reportDirectory, ct);

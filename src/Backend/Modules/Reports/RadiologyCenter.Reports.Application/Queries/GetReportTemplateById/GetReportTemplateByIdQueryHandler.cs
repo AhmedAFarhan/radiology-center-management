@@ -1,4 +1,5 @@
 using RadiologyCenter.Reports.Application.Abstractions;
+using RadiologyCenter.Reports.Application.Localization;
 using RadiologyCenter.Reports.Application.DTOs;
 
 namespace RadiologyCenter.Reports.Application.Queries.GetReportTemplateById;
@@ -12,7 +13,7 @@ public static class GetReportTemplateByIdQueryHandler
     {
         var template = await templateRepository.GetByIdWithSectionsAsync(query.TemplateId, ct);
         if (template is null)
-            return Result.Failure<ReportTemplateDto>(Error.NotFound("ReportTemplate", query.TemplateId));
+            return Result.Failure<ReportTemplateDto>(Error.NotFound(ErrorCodes.ReportTemplateNotFound, "ReportTemplate", query.TemplateId));
 
         return Result.Success(template.ToDto());
     }

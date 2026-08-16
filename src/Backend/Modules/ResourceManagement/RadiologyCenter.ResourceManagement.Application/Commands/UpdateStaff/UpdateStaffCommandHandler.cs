@@ -1,3 +1,4 @@
+using RadiologyCenter.ResourceManagement.Application.Localization;
 using RadiologyCenter.ResourceManagement.Application.Abstractions;
 using RadiologyCenter.ResourceManagement.Domain.Enumerations;
 
@@ -13,7 +14,7 @@ public static class UpdateStaffCommandHandler
     {
         var staff = await staffRepository.GetByIdAsync(command.StaffId, ct);
         if (staff is null)
-            return Result.Failure(Error.NotFound("Staff", command.StaffId));
+            return Result.Failure(Error.NotFound(ErrorCodes.StaffNotFound, "Staff", command.StaffId));
 
         var position = StaffPosition.FromName<StaffPosition>(command.Position);
 

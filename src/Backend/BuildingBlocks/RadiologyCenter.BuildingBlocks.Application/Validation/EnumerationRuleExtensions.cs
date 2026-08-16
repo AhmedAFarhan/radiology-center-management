@@ -1,4 +1,5 @@
 using FluentValidation;
+using RadiologyCenter.BuildingBlocks.Application.Localization;
 using RadiologyCenter.BuildingBlocks.Domain.Common;
 
 namespace RadiologyCenter.BuildingBlocks.Application.Validation;
@@ -15,7 +16,8 @@ public static class EnumerationRuleExtensions
             .ToList();
 
         return ruleBuilder.Must(name => names.Any(n => n.Equals(name, StringComparison.OrdinalIgnoreCase)))
-            .WithMessage($"{label} must be one of: {string.Join(", ", names)}.");
+            .WithMessage($"{label} must be one of: {string.Join(", ", names)}.")
+            .WithErrorCode(ErrorCodes.Shared.InvalidEnumValue);
     }
 
     public static IRuleBuilderOptions<T, string?> IsEnumerationMemberOrEmpty<TEnum, T>(
@@ -29,6 +31,7 @@ public static class EnumerationRuleExtensions
 
         return ruleBuilder
             .Must(name => string.IsNullOrWhiteSpace(name) || names.Any(n => n.Equals(name, StringComparison.OrdinalIgnoreCase)))
-            .WithMessage($"{label} must be one of: {string.Join(", ", names)}.");
+            .WithMessage($"{label} must be one of: {string.Join(", ", names)}.")
+            .WithErrorCode(ErrorCodes.Shared.InvalidEnumValue);
     }
 }

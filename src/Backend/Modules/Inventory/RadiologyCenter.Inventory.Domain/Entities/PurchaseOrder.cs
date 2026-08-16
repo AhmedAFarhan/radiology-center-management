@@ -2,6 +2,7 @@ using RadiologyCenter.BuildingBlocks.Domain.Common;
 using RadiologyCenter.BuildingBlocks.Domain.Exceptions;
 using RadiologyCenter.BuildingBlocks.Domain.SoftDeletable;
 using RadiologyCenter.Inventory.Domain.Enumerations;
+using RadiologyCenter.Inventory.Domain.Errors;
 using RadiologyCenter.Inventory.Domain.Events;
 
 namespace RadiologyCenter.Inventory.Domain.Entities;
@@ -50,7 +51,7 @@ public sealed class PurchaseOrder : SoftDeletableAggregateRoot<Guid>
     public void AddItem(Guid itemId, int quantityOrdered, decimal unitCost)
     {
         EnsureDraft();
-        Guard.Against(_items.Any(i => i.ItemId == itemId), isDuplicate => isDuplicate, $"Item '{itemId}' is already on purchase order '{OrderNumber}'.");
+        Guard.Against(_items.Any(i => i.ItemId == itemId), isDuplicate => isDuplicate, DomainErrors.DuplicateItem, $"Item '{itemId}' is already on purchase order '{OrderNumber}'.");
 
         _items.Add(PurchaseOrderItem.Create(Id, itemId, quantityOrdered, unitCost));
     }
@@ -60,14 +61,14 @@ public sealed class PurchaseOrder : SoftDeletableAggregateRoot<Guid>
         EnsureDraft();
 
         var line = _items.FirstOrDefault(i => i.ItemId == itemId)
-            ?? throw new DomainException($"Item '{itemId}' is not on purchase order '{OrderNumber}'.");
+            ?? throw new DomainException(DomainErrors.ItemNotOnPurchaseOrder, $"Item '{itemId}' is not on purchase order '{OrderNumber}'.");
         _items.Remove(line);
     }
 
     public void Place()
     {
         EnsureDraft();
-        Guard.Against(_items.Count, c => c == 0, $"Cannot place purchase order '{OrderNumber}' without items.");
+        Guard.Against(_items.Count, c => c == 0, DomainErrors.PurchaseOrderItemsRequired, $"Cannot place purchase order '{OrderNumber}' without items.");
 
         Status = PurchaseOrderStatus.Ordered;
     }
@@ -75,7 +76,7 @@ public sealed class PurchaseOrder : SoftDeletableAggregateRoot<Guid>
     public void Cancel()
     {
         if (Status != PurchaseOrderStatus.Draft && Status != PurchaseOrderStatus.Ordered)
-            throw new BusinessRuleViolationException($"Purchase order '{OrderNumber}' in status '{Status}' cannot be cancelled.");
+            throw new BusinessRuleViolationException(nameof(Cancel), DomainErrors.PurchaseOrderCannotCancel, $"Purchase order '{OrderNumber}' in status '{Status}' cannot be cancelled.");
 
         Status = PurchaseOrderStatus.Cancelled;
     }
@@ -83,10 +84,10 @@ public sealed class PurchaseOrder : SoftDeletableAggregateRoot<Guid>
     public void RecordReceipt(Guid itemId, int quantity)
     {
         if (Status != PurchaseOrderStatus.Ordered && Status != PurchaseOrderStatus.PartiallyReceived)
-            throw new BusinessRuleViolationException($"Receipts can only be recorded against an ordered purchase order, not '{Status}'.");
+            throw new BusinessRuleViolationException(nameof(RecordReceipt), DomainErrors.ReceiptsOrderedOnly, $"Receipts can only be recorded against an ordered purchase order, not '{Status}'.");
 
         var line = _items.FirstOrDefault(i => i.ItemId == itemId)
-            ?? throw new DomainException($"Item '{itemId}' is not on purchase order '{OrderNumber}'.");
+            ?? throw new DomainException(DomainErrors.ItemNotOnPurchaseOrder, $"Item '{itemId}' is not on purchase order '{OrderNumber}'.");
         line.RecordReceipt(quantity);
 
         if (_items.All(i => i.QuantityReceived >= i.QuantityOrdered))
@@ -104,6 +105,6 @@ public sealed class PurchaseOrder : SoftDeletableAggregateRoot<Guid>
     private void EnsureDraft()
     {
         if (Status != PurchaseOrderStatus.Draft)
-            throw new BusinessRuleViolationException($"Purchase order '{OrderNumber}' is no longer a draft (status: '{Status}').");
+            throw new BusinessRuleViolationException(nameof(EnsureDraft), DomainErrors.PurchaseOrderNotDraft, $"Purchase order '{OrderNumber}' is no longer a draft (status: '{Status}').");
     }
 }

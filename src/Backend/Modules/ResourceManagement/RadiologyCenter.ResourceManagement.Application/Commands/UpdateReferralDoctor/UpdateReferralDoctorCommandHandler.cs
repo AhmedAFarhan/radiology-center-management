@@ -1,3 +1,4 @@
+using RadiologyCenter.ResourceManagement.Application.Localization;
 using RadiologyCenter.BuildingBlocks.Domain.Specifications;
 using RadiologyCenter.ResourceManagement.Application.Abstractions;
 
@@ -13,7 +14,7 @@ public static class UpdateReferralDoctorCommandHandler
     {
         var referralDoctor = await referralDoctorRepository.GetByIdAsync(command.ReferralDoctorId, ct);
         if (referralDoctor is null)
-            return Result.Failure(Error.NotFound("ReferralDoctor", command.ReferralDoctorId));
+            return Result.Failure(Error.NotFound(ErrorCodes.ReferralDoctorNotFound, "ReferralDoctor", command.ReferralDoctorId));
 
         var phone = command.Phone.Trim();
 
@@ -21,7 +22,7 @@ public static class UpdateReferralDoctorCommandHandler
             new DynamicSpecification<ReferralDoctor>(rd => rd.Phone == phone && rd.Id != command.ReferralDoctorId), ct);
         if (existing is not null)
             return Result.Failure(
-                Error.Conflict("A referral doctor with this phone number already exists."));
+                Error.Conflict(ErrorCodes.ReferralDoctorPhoneExists, "A referral doctor with this phone number already exists."));
 
         referralDoctor.Update(
             command.FullName,

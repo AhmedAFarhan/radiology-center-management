@@ -1,4 +1,5 @@
 using Mapster;
+using RadiologyCenter.BuildingBlocks.Application.Localization;
 using RadiologyCenter.Reports.Application.DTOs;
 using RadiologyCenter.Reports.Domain.Entities;
 
@@ -9,16 +10,16 @@ public static class ReportsMappingConfig
     public static void Configure()
     {
         TypeAdapterConfig<ReportSection, ReportSectionDto>.NewConfig()
-            .Map(d => d.SectionType, s => s.SectionType.Name);
+            .Map(d => d.SectionType, s => s.SectionType.LocalizedName());
 
         TypeAdapterConfig<ReportFinding, ReportFindingDto>.NewConfig()
-            .Map(d => d.Severity, s => s.Severity.Name);
+            .Map(d => d.Severity, s => s.Severity.LocalizedName());
 
         TypeAdapterConfig<ReportTemplateSection, ReportTemplateSectionDto>.NewConfig()
-            .Map(d => d.SectionType, s => s.SectionType.Name);
+            .Map(d => d.SectionType, s => s.SectionType.LocalizedName());
 
         TypeAdapterConfig<ReportTemplate, ReportTemplateDto>.NewConfig()
-            .Map(d => d.Modality, s => s.Modality.Name)
+            .Map(d => d.Modality, s => s.Modality.LocalizedName())
             .Map(d => d.Sections, s => s.Sections);
     }
 }

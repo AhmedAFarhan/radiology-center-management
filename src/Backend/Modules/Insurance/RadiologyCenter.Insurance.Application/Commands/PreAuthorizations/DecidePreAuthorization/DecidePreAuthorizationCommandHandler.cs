@@ -1,4 +1,5 @@
 using RadiologyCenter.Insurance.Application.Abstractions;
+using RadiologyCenter.Insurance.Application.Localization;
 using RadiologyCenter.Insurance.Application.DTOs;
 
 namespace RadiologyCenter.Insurance.Application.Commands.PreAuthorizations.DecidePreAuthorization;
@@ -13,22 +14,22 @@ public static class DecidePreAuthorizationCommandHandler
     {
         var preAuthorization = await preAuthorizationRepository.GetByIdAsync(command.PreAuthorizationId, ct);
         if (preAuthorization is null)
-            return Result.Failure<PreAuthorizationDto>(Error.NotFound("PreAuthorization", command.PreAuthorizationId));
+            return Result.Failure<PreAuthorizationDto>(Error.NotFound(ErrorCodes.PreAuthorizationNotFound, "PreAuthorization", command.PreAuthorizationId));
 
         switch (command.Decision)
         {
             case PreAuthorizationDecision.Approve:
                 if (command.ApprovedAmount is null)
-                    return Result.Failure<PreAuthorizationDto>(Error.Validation("ApprovedAmount", "Approved amount is required when approving."));
+                    return Result.Failure<PreAuthorizationDto>(Error.Validation(ErrorCodes.ApprovedAmountRequired, "Approved amount is required when approving."));
                 preAuthorization.Approve(command.ApprovedAmount.Value);
                 break;
             case PreAuthorizationDecision.Deny:
                 if (string.IsNullOrWhiteSpace(command.RejectionReason))
-                    return Result.Failure<PreAuthorizationDto>(Error.Validation("RejectionReason", "Rejection reason is required when denying."));
+                    return Result.Failure<PreAuthorizationDto>(Error.Validation(ErrorCodes.DenialReasonRequired, "Rejection reason is required when denying."));
                 preAuthorization.Deny(command.RejectionReason);
                 break;
             default:
-                return Result.Failure<PreAuthorizationDto>(Error.Validation("Decision", "Unsupported decision."));
+                return Result.Failure<PreAuthorizationDto>(Error.Validation(ErrorCodes.UnsupportedDecision, "Unsupported decision."));
         }
 
         preAuthorizationRepository.Update(preAuthorization);

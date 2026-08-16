@@ -1,6 +1,7 @@
 using RadiologyCenter.BuildingBlocks.Domain.Common;
 using RadiologyCenter.BuildingBlocks.Domain.SoftDeletable;
 using RadiologyCenter.Cash.Domain.Enumerations;
+using RadiologyCenter.Cash.Domain.Errors;
 
 namespace RadiologyCenter.Cash.Domain.Entities;
 
@@ -27,7 +28,7 @@ public sealed class CashSession : SoftDeletableAggregateRoot<Guid>
         string? notes = null)
     {
         Guard.AgainstEmpty(userId, nameof(userId));
-        Guard.Against(openingFloat, f => f < 0, "Opening float cannot be negative.");
+        Guard.Against(openingFloat, f => f < 0, DomainErrors.OpeningFloatNegative, "Opening float cannot be negative.");
         Guard.AgainstDefault(openedAt, nameof(openedAt));
 
         return new CashSession
@@ -44,7 +45,7 @@ public sealed class CashSession : SoftDeletableAggregateRoot<Guid>
 
     public void Close(DateTime closedAt)
     {
-        Guard.Against(Status, s => s != CashSessionStatus.Open, "Cannot close a session that is not open.");
+        Guard.Against(Status, s => s != CashSessionStatus.Open, DomainErrors.CloseSessionNotOpen, "Cannot close a session that is not open.");
         Status = CashSessionStatus.Closed;
         ClosedAt = closedAt;
     }

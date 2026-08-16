@@ -1,4 +1,5 @@
 using RadiologyCenter.Insurance.Application.Abstractions;
+using RadiologyCenter.Insurance.Application.Localization;
 
 namespace RadiologyCenter.Insurance.Application.Commands.PreAuthorizations.DeletePreAuthorizationDocument;
 
@@ -13,7 +14,7 @@ public static class DeletePreAuthorizationDocumentCommandHandler
     {
         var document = await documentRepository.GetByIdAsync(command.DocumentId, ct);
         if (document is null || document.PreAuthorizationId != command.PreAuthorizationId)
-            return Result.Failure(Error.NotFound("PreAuthorizationDocument", command.DocumentId));
+            return Result.Failure(Error.NotFound(ErrorCodes.PreAuthorizationDocumentNotFound, "PreAuthorizationDocument", command.DocumentId));
 
         storage.Delete(document.StoredPath);
 

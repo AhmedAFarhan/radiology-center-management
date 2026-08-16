@@ -1,3 +1,4 @@
+using RadiologyCenter.Examinations.Application.Localization;
 using RadiologyCenter.Examinations.Application.Abstractions;
 
 namespace RadiologyCenter.Examinations.Application.Commands.RemoveExaminationTypeItem;
@@ -12,7 +13,7 @@ public static class RemoveExaminationTypeItemCommandHandler
     {
         var item = await itemRepository.GetByIdAsync(command.ExaminationTypeItemId, ct);
         if (item is null || item.ExaminationTypeId != command.ExaminationTypeId)
-            return Result.Failure(Error.NotFound("ExaminationTypeItem", command.ExaminationTypeItemId));
+            return Result.Failure(Error.NotFound(ErrorCodes.ExaminationTypeItemNotFound, "ExaminationTypeItem", command.ExaminationTypeItemId));
 
         itemRepository.Remove(item);
         await unitOfWork.SaveChangesAsync(ct);

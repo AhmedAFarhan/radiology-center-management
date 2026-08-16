@@ -3,6 +3,7 @@ using RadiologyCenter.BuildingBlocks.Domain.Entities;
 using RadiologyCenter.Catalog.Domain.Enumerations;
 using RadiologyCenter.Catalog.Domain.ValueObjects;
 using RadiologyCenter.Examinations.Domain.Enumerations;
+using RadiologyCenter.Examinations.Domain.Errors;
 using RadiologyCenter.Examinations.Domain.ValueObjects;
 
 namespace RadiologyCenter.Examinations.Domain.Entities;
@@ -62,9 +63,9 @@ public sealed class ExaminationHistory : Entity<Guid>
         Guard.AgainstNull(examination, nameof(examination));
         Guard.AgainstNull(type, nameof(type));
         Guard.AgainstNull(itemSnapshots, nameof(itemSnapshots));
-        Guard.Against(radiologistFee, f => f.HasValue && f.Value < 0, "Radiologist fee cannot be negative.");
-        Guard.Against(technicianFee, f => f.HasValue && f.Value < 0, "Technician fee cannot be negative.");
-        Guard.Against(referralFee, f => f.HasValue && f.Value < 0, "Referral fee cannot be negative.");
+        Guard.Against(radiologistFee, f => f.HasValue && f.Value < 0, DomainErrors.RadiologistFeeNegative, "Radiologist fee cannot be negative.");
+        Guard.Against(technicianFee, f => f.HasValue && f.Value < 0, DomainErrors.TechnicianFeeNegative, "Technician fee cannot be negative.");
+        Guard.Against(referralFee, f => f.HasValue && f.Value < 0, DomainErrors.ReferralFeeNegative, "Referral fee cannot be negative.");
 
         var history = new ExaminationHistory
         {
@@ -120,8 +121,8 @@ public sealed class ExaminationHistory : Entity<Guid>
 
     public void UpdatePaymentSnapshot(decimal paid, decimal remaining)
     {
-        Guard.Against(paid, p => p < 0, "Paid amount cannot be negative.");
-        Guard.Against(remaining, r => r < 0, "Remaining amount cannot be negative.");
+        Guard.Against(paid, p => p < 0, DomainErrors.PaidAmountNegative, "Paid amount cannot be negative.");
+        Guard.Against(remaining, r => r < 0, DomainErrors.RemainingAmountNegative, "Remaining amount cannot be negative.");
 
         Paid = paid;
         Remaining = remaining;

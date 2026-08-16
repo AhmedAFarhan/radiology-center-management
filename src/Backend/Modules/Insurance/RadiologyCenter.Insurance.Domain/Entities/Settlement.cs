@@ -1,6 +1,7 @@
 using RadiologyCenter.BuildingBlocks.Domain.Common;
 using RadiologyCenter.BuildingBlocks.Domain.Entities;
 using RadiologyCenter.Insurance.Domain.Enumerations;
+using RadiologyCenter.Insurance.Domain.Errors;
 
 namespace RadiologyCenter.Insurance.Domain.Entities;
 
@@ -25,7 +26,7 @@ public sealed class Settlement : Entity<Guid>
     {
         Guard.AgainstEmpty(claimId, nameof(claimId));
         Guard.AgainstNull(method, nameof(method));
-        Guard.Against(amount, a => a <= 0, "Settlement amount must be greater than zero.");
+        Guard.Against(amount, a => a <= 0, DomainErrors.SettlementAmountPositive, "Settlement amount must be greater than zero.");
 
         return new Settlement
         {

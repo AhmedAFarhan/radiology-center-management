@@ -1,3 +1,4 @@
+using RadiologyCenter.Notification.Application.Localization;
 using RadiologyCenter.Notification.Application.Abstractions;
 using RadiologyCenter.Notification.Application.DTOs;
 
@@ -19,7 +20,7 @@ public static class PreviewNotificationQueryHandler
         {
             var template = await templateRepository.GetByCodeAsync(command.TemplateCode, ct);
             if (template is null)
-                return Result.Failure<NotificationMessageDto>(Error.NotFound("NotificationTemplate", command.TemplateCode));
+                return Result.Failure<NotificationMessageDto>(Error.NotFound(ErrorCodes.TemplateNotFound, "NotificationTemplate", command.TemplateCode));
 
             subject = string.IsNullOrWhiteSpace(command.Subject) ? template.Subject : command.Subject;
             body = string.IsNullOrWhiteSpace(command.Body) ? template.Body : command.Body;

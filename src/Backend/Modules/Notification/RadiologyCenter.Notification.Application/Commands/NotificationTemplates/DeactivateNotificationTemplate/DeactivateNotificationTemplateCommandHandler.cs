@@ -1,4 +1,5 @@
 using RadiologyCenter.BuildingBlocks.Application.Abstractions;
+using RadiologyCenter.Notification.Application.Localization;
 using RadiologyCenter.Notification.Application.Abstractions;
 
 namespace RadiologyCenter.Notification.Application.Commands.NotificationTemplates.DeactivateNotificationTemplate;
@@ -13,7 +14,7 @@ public static class DeactivateNotificationTemplateCommandHandler
     {
         var template = await repository.GetByIdAsync(command.Id, ct);
         if (template is null)
-            return Result.Failure(Error.NotFound("NotificationTemplate", command.Id));
+            return Result.Failure(Error.NotFound(ErrorCodes.TemplateNotFound, "NotificationTemplate", command.Id));
 
         template.Deactivate();
         await unitOfWork.SaveChangesAsync(ct);

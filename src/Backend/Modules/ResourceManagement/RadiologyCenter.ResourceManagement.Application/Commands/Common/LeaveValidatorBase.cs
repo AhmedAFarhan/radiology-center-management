@@ -1,4 +1,5 @@
 using FluentValidation;
+using RadiologyCenter.ResourceManagement.Application.Localization;
 using RadiologyCenter.BuildingBlocks.Application.Validation;
 using RadiologyCenter.ResourceManagement.Domain.Enumerations;
 
@@ -12,7 +13,7 @@ public abstract class LeaveValidatorBase<T> : AbstractValidator<T> where T : ILe
         RuleFor(x => x.LeaveType).NotEmpty().IsEnumerationMember<LeaveType, T>("Leave type");
         RuleFor(x => x.StartDate).NotEmpty();
         RuleFor(x => x.EndDate).NotEmpty();
-        RuleFor(x => x.EndDate).GreaterThanOrEqualTo(x => x.StartDate).WithMessage("End date must be on or after start date.");
+        RuleFor(x => x.EndDate).GreaterThanOrEqualTo(x => x.StartDate).WithErrorCode(ErrorCodes.LeaveEndOnOrAfterStart);
         RuleFor(x => x.Reason).MaximumLength(500).When(x => !string.IsNullOrWhiteSpace(x.Reason));
     }
 }

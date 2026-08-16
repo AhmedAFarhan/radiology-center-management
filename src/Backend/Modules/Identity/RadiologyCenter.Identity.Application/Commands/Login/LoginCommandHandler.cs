@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;
 using RadiologyCenter.BuildingBlocks.Application.Abstractions;
+using RadiologyCenter.Identity.Application.Localization;
 using RadiologyCenter.Identity.Application.Abstractions;
 using RadiologyCenter.Identity.Application.DTOs;
 using RadiologyCenter.Identity.Application.Settings;
@@ -20,10 +21,10 @@ public static class LoginCommandHandler
     {
         var user = await userRepository.GetByUserNameAsync(command.UserName, ct);
         if (user is null || !user.IsActive)
-            return Result.Failure<TokenResult>(Error.Unauthorized("Invalid username or password."));
+            return Result.Failure<TokenResult>(Error.Conflict(ErrorCodes.InvalidCredentials, "Invalid username or password."));
 
         if (user.IsLockedOut)
-            return Result.Failure<TokenResult>(Error.LockedOut("Account is locked due to too many failed login attempts."));
+            return Result.Failure<TokenResult>(Error.LockedOut(ErrorCodes.AccountLockedOut, "Account is locked due to too many failed login attempts."));
 
         var verification = passwordHasher.VerifyHashedPassword(user, user.PasswordHash!, command.Password);
         if (verification == PasswordVerificationResult.Failed)
@@ -34,7 +35,7 @@ public static class LoginCommandHandler
 
             await userRepository.UpdateAsync(user, ct);
             await unitOfWork.SaveChangesAsync(ct);
-            return Result.Failure<TokenResult>(Error.Unauthorized("Invalid username or password."));
+            return Result.Failure<TokenResult>(Error.Conflict(ErrorCodes.InvalidCredentials, "Invalid username or password."));
         }
 
         var tokenResult = tokenService.GenerateTokenResult(user);

@@ -1,4 +1,5 @@
 using Mapster;
+using RadiologyCenter.Inventory.Application.Localization;
 using RadiologyCenter.Inventory.Application.Abstractions;
 using RadiologyCenter.Inventory.Application.DTOs;
 
@@ -14,7 +15,7 @@ public static class GetItemStockQueryHandler
     {
         var item = await itemRepository.GetByIdAsync(query.ItemId, ct);
         if (item is null)
-            return Result.Failure<ItemStockDto>(Error.NotFound("Item", query.ItemId));
+            return Result.Failure<ItemStockDto>(Error.NotFound(ErrorCodes.ItemNotFound, "Item", query.ItemId));
 
         var batches = await stockBatchRepository.GetForItemAsync(query.ItemId, ct);
         var stockOnHand = batches.Sum(b => b.QuantityRemaining);

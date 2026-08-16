@@ -2,6 +2,7 @@ using RadiologyCenter.BuildingBlocks.Domain.Common;
 using RadiologyCenter.BuildingBlocks.Domain.Exceptions;
 using RadiologyCenter.BuildingBlocks.Domain.SoftDeletable;
 using RadiologyCenter.Payroll.Domain.Enumerations;
+using RadiologyCenter.Payroll.Domain.Errors;
 
 namespace RadiologyCenter.Payroll.Domain.Entities;
 
@@ -27,7 +28,7 @@ public sealed class PayRun : SoftDeletableAggregateRoot<Guid>
     {
         Guard.AgainstDefault(runFrom, nameof(runFrom));
         Guard.AgainstDefault(runTo, nameof(runTo));
-        Guard.Against(runTo, d => d < runFrom, "RunTo cannot be before RunFrom.");
+        Guard.Against(runTo, d => d < runFrom, DomainErrors.RunToBeforeRunFrom, "RunTo cannot be before RunFrom.");
 
         return new PayRun
         {
@@ -49,7 +50,8 @@ public sealed class PayRun : SoftDeletableAggregateRoot<Guid>
         EnsureEditable();
         if (_payslips.Any(p => p.StaffId == staffId))
             throw new BusinessRuleViolationException(
-                "DuplicatePayslip",
+                nameof(AddPayslip),
+                DomainErrors.DuplicatePayslip,
                 $"Staff '{staffId}' already has a payslip in pay run '{Id}'.");
 
         var payslip = Payslip.Create(Id, staffId, grossSalary, unpaidLeaveDays, unpaidLeaveDeduction, notes);
@@ -61,7 +63,7 @@ public sealed class PayRun : SoftDeletableAggregateRoot<Guid>
     {
         EnsureEditable();
         var payslip = _payslips.FirstOrDefault(p => p.StaffId == staffId)
-            ?? throw new DomainException($"Staff '{staffId}' has no payslip in pay run '{Id}'.");
+            ?? throw new DomainException(DomainErrors.PayslipNotFound, $"Staff '{staffId}' has no payslip in pay run '{Id}'.");
         _payslips.Remove(payslip);
     }
 
@@ -132,7 +134,8 @@ public sealed class PayRun : SoftDeletableAggregateRoot<Guid>
     {
         if (Status != PayRunStatus.Draft)
             throw new BusinessRuleViolationException(
-                "PayRunNotEditable",
+                nameof(EnsureEditable),
+                DomainErrors.PayRunNotEditable,
                 $"Pay run '{Id}' is {Status.Name} and cannot be modified.");
     }
 
@@ -140,7 +143,8 @@ public sealed class PayRun : SoftDeletableAggregateRoot<Guid>
     {
         if (!allowed.Contains(Status))
             throw new BusinessRuleViolationException(
-                "InvalidPayRunTransition",
+                nameof(EnsureStatus),
+                DomainErrors.InvalidPayRunTransition,
                 $"Pay run '{Id}' is {Status.Name} and cannot transition to this state.");
     }
 }

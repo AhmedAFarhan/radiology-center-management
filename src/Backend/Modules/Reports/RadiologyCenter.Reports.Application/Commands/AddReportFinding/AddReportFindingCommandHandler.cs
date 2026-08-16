@@ -1,5 +1,6 @@
 using Mapster;
 using RadiologyCenter.Reports.Application.Abstractions;
+using RadiologyCenter.Reports.Application.Localization;
 using RadiologyCenter.Reports.Application.DTOs;
 using RadiologyCenter.Reports.Domain.Enumerations;
 
@@ -15,7 +16,7 @@ public static class AddReportFindingCommandHandler
     {
         var report = await reportRepository.GetByIdWithVersionsAsync(command.ReportId, ct);
         if (report is null)
-            return Result.Failure<ReportFindingDto>(Error.NotFound("Report", command.ReportId));
+            return Result.Failure<ReportFindingDto>(Error.NotFound(ErrorCodes.ReportNotFound, "Report", command.ReportId));
 
         var severity = FindingSeverity.FromName<FindingSeverity>(command.Severity);
         var finding = report.AddFinding(command.Region, command.Description, severity, command.Position);

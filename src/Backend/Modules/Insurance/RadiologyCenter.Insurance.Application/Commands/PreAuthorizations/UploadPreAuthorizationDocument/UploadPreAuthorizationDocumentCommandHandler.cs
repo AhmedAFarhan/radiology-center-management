@@ -1,4 +1,5 @@
 using RadiologyCenter.Insurance.Application.Abstractions;
+using RadiologyCenter.Insurance.Application.Localization;
 using RadiologyCenter.Insurance.Application.DTOs;
 
 namespace RadiologyCenter.Insurance.Application.Commands.PreAuthorizations.UploadPreAuthorizationDocument;
@@ -14,11 +15,11 @@ public static class UploadPreAuthorizationDocumentCommandHandler
     {
         var preAuthorization = await preAuthorizationRepository.GetByIdAsync(command.PreAuthorizationId, ct);
         if (preAuthorization is null)
-            return Result.Failure<PreAuthorizationDocumentDto>(Error.NotFound("PreAuthorization", command.PreAuthorizationId));
+            return Result.Failure<PreAuthorizationDocumentDto>(Error.NotFound(ErrorCodes.PreAuthorizationNotFound, "PreAuthorization", command.PreAuthorizationId));
 
         var type = DocumentType.FromName<DocumentType>(command.Type);
         if (type is null)
-            return Result.Failure<PreAuthorizationDocumentDto>(Error.Validation("Type", $"'{command.Type}' is not a valid document type."));
+            return Result.Failure<PreAuthorizationDocumentDto>(Error.Validation(ErrorCodes.InvalidDocumentType, $"'{command.Type}' is not a valid document type."));
 
         var relativeDirectory = Path.Combine("preauthorizations", command.PreAuthorizationId.ToString());
         var storedPath = await storage.SaveAsync(relativeDirectory, command.FileName, command.Content, ct);

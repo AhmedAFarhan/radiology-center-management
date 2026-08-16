@@ -1,6 +1,7 @@
 using RadiologyCenter.BuildingBlocks.Application.Validation;
 using RadiologyCenter.Reports.Application.Abstractions;
 using RadiologyCenter.Reports.Application.DTOs;
+using RadiologyCenter.Reports.Application.Localization;
 using RadiologyCenter.Reports.Domain.Enumerations;
 
 namespace RadiologyCenter.Reports.Application.Commands.UpsertReportSection;
@@ -15,7 +16,7 @@ public static class UpsertReportSectionCommandHandler
     {
         var report = await reportRepository.GetByIdWithVersionsAsync(command.ReportId, ct);
         if (report is null)
-            return Result.Failure<ReportDto>(Error.NotFound("Report", command.ReportId));
+            return Result.Failure<ReportDto>(Error.NotFound(ErrorCodes.ReportNotFound, "Report", command.ReportId));
 
         var sectionType = ReportSectionType.FromName<ReportSectionType>(command.SectionType);
 

@@ -1,4 +1,5 @@
 using Mapster;
+using RadiologyCenter.Examinations.Application.Localization;
 using RadiologyCenter.Examinations.Application.Abstractions;
 using RadiologyCenter.Examinations.Application.DTOs;
 
@@ -15,10 +16,10 @@ public static class AddExaminationTypeItemCommandHandler
     {
         var type = await typeDirectory.GetByIdAsync(command.ExaminationTypeId, ct);
         if (type is null)
-            return Result.Failure<ExaminationTypeItemDto>(Error.NotFound("ExaminationType", command.ExaminationTypeId));
+            return Result.Failure<ExaminationTypeItemDto>(Error.NotFound(ErrorCodes.ExaminationTypeNotFound, "ExaminationType", command.ExaminationTypeId));
 
         if (await itemRepository.ExistsByItemAsync(command.ExaminationTypeId, command.ItemId, ct))
-            return Result.Failure<ExaminationTypeItemDto>(Error.Conflict($"Item '{command.ItemId}' is already in the preferences for examination type '{type.Code}'."));
+            return Result.Failure<ExaminationTypeItemDto>(Error.Conflict(ErrorCodes.ItemAlreadyInPreferences, $"Item '{command.ItemId}' is already in the preferences for examination type '{type.Code}'."));
 
         var item = ExaminationTypeItem.Create(
             command.ExaminationTypeId,

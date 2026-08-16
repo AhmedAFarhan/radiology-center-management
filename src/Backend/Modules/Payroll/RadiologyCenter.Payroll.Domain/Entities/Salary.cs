@@ -1,6 +1,7 @@
 using RadiologyCenter.BuildingBlocks.Domain.Common;
 using RadiologyCenter.BuildingBlocks.Domain.SoftDeletable;
 using RadiologyCenter.Payroll.Domain.Enumerations;
+using RadiologyCenter.Payroll.Domain.Errors;
 
 namespace RadiologyCenter.Payroll.Domain.Entities;
 
@@ -24,7 +25,7 @@ public sealed class Salary : SoftDeletableAggregateRoot<Guid>
         DateTime effectiveDate)
     {
         Guard.AgainstEmpty(staffId, nameof(staffId));
-        Guard.Against(baseSalary, s => s < 0, "Base salary cannot be negative.");
+        Guard.Against(baseSalary, s => s < 0, DomainErrors.BaseSalaryNegative, "Base salary cannot be negative.");
         Guard.AgainstNull(salaryType, nameof(salaryType));
         Guard.AgainstDefault(effectiveDate, nameof(effectiveDate));
 
@@ -43,7 +44,7 @@ public sealed class Salary : SoftDeletableAggregateRoot<Guid>
 
     public void Update(decimal baseSalary, SalaryType salaryType, DateTime effectiveDate)
     {
-        Guard.Against(baseSalary, s => s < 0, "Base salary cannot be negative.");
+        Guard.Against(baseSalary, s => s < 0, DomainErrors.BaseSalaryNegative, "Base salary cannot be negative.");
         Guard.AgainstNull(salaryType, nameof(salaryType));
         Guard.AgainstDefault(effectiveDate, nameof(effectiveDate));
 

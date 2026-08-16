@@ -1,4 +1,5 @@
 using FluentValidation;
+using RadiologyCenter.BuildingBlocks.Application.Localization;
 
 namespace RadiologyCenter.Cash.Application.Commands.Sessions.CloseCashSession;
 
@@ -6,7 +7,7 @@ public class CloseCashSessionCommandValidator : AbstractValidator<CloseCashSessi
 {
     public CloseCashSessionCommandValidator()
     {
-        RuleFor(x => x.CashSessionId).NotEmpty();
+        RuleFor(x => x.CashSessionId).NotEmpty().WithErrorCode(ErrorCodes.Shared.IdRequired);
         RuleFor(x => x.CountedTotal).GreaterThanOrEqualTo(0);
         RuleFor(x => x.ReceivingOpeningFloat).GreaterThanOrEqualTo(0).When(x => x.ReceivingOpeningFloat.HasValue);
         RuleFor(x => x.Notes).MaximumLength(1000);

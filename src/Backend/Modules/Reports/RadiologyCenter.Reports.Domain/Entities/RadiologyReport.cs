@@ -2,6 +2,7 @@ using RadiologyCenter.BuildingBlocks.Domain.Auditing;
 using RadiologyCenter.BuildingBlocks.Domain.Common;
 using RadiologyCenter.BuildingBlocks.Domain.Exceptions;
 using RadiologyCenter.Reports.Domain.Enumerations;
+using RadiologyCenter.Reports.Domain.Errors;
 using RadiologyCenter.Reports.Domain.Events;
 
 namespace RadiologyCenter.Reports.Domain.Entities;
@@ -79,7 +80,7 @@ public sealed class RadiologyReport : AuditableAggregateRoot<Guid>
         }
 
         if (section.IsLocked)
-            throw new BusinessRuleViolationException($"Section '{sectionType.Name}' is locked and cannot be edited.");
+            throw new BusinessRuleViolationException(nameof(UpsertSection), DomainErrors.SectionLocked, $"Section '{sectionType.Name}' is locked and cannot be edited.");
 
         section.Update(body.Trim(), isLocked);
     }
@@ -166,20 +167,20 @@ public sealed class RadiologyReport : AuditableAggregateRoot<Guid>
         var impression = GetSection(ReportSectionType.Impression);
 
         if (findings is null || string.IsNullOrWhiteSpace(findings.Body))
-            throw new DomainException("Report cannot be finalized without findings.");
+            throw new DomainException(DomainErrors.FindingsRequired, "Report cannot be finalized without findings.");
         if (impression is null || string.IsNullOrWhiteSpace(impression.Body))
-            throw new DomainException("Report cannot be finalized without an impression.");
+            throw new DomainException(DomainErrors.ImpressionRequired, "Report cannot be finalized without an impression.");
     }
 
     private void EnsureEditable()
     {
         if (Status != ReportStatus.Draft)
-            throw new BusinessRuleViolationException("Report content can only be edited while it is a draft.");
+            throw new BusinessRuleViolationException(nameof(EnsureEditable), DomainErrors.ReportContentDraftOnly, "Report content can only be edited while it is a draft.");
     }
 
     private void EnsureStatus(params ReportStatus[] allowed)
     {
         if (!allowed.Contains(Status))
-            throw new BusinessRuleViolationException($"Report '{Id}' cannot transition from status '{Status}'.");
+            throw new BusinessRuleViolationException(nameof(EnsureStatus), DomainErrors.InvalidStatusTransition, $"Report '{Id}' cannot transition from status '{Status}'.");
     }
 }

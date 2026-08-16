@@ -2,6 +2,7 @@ using RadiologyCenter.Catalog.Domain.Enumerations;
 using RadiologyCenter.Reports.Application.Abstractions;
 using RadiologyCenter.Reports.Application.Commands.ReportTemplates.CreateReportTemplate;
 using RadiologyCenter.Reports.Application.DTOs;
+using RadiologyCenter.Reports.Application.Localization;
 using RadiologyCenter.Reports.Domain.Enumerations;
 
 namespace RadiologyCenter.Reports.Application.Commands.ReportTemplates.UpdateReportTemplate;
@@ -16,13 +17,13 @@ public static class UpdateReportTemplateCommandHandler
     {
         var template = await templateRepository.GetByIdWithSectionsAsync(command.TemplateId, ct);
         if (template is null)
-            return Result.Failure<ReportTemplateDto>(Error.NotFound("ReportTemplate", command.TemplateId));
+            return Result.Failure<ReportTemplateDto>(Error.NotFound(ErrorCodes.ReportTemplateNotFound, "ReportTemplate", command.TemplateId));
 
         if (template.IsSystem)
-            return Result.Failure<ReportTemplateDto>(Error.Conflict("System templates cannot be modified."));
+            return Result.Failure<ReportTemplateDto>(Error.Conflict(ErrorCodes.SystemTemplateReadOnly, "System templates cannot be modified."));
 
         if (await templateRepository.ExistsByNameAsync(command.Name, template.Id, ct))
-            return Result.Failure<ReportTemplateDto>(Error.Conflict($"A template named '{command.Name}' already exists."));
+            return Result.Failure<ReportTemplateDto>(Error.Conflict(ErrorCodes.TemplateNameExists, $"A template named '{command.Name}' already exists."));
 
         var modality = Modality.FromName<Modality>(command.Modality);
         template.Update(command.Name, modality, command.BodyPart, command.Description);

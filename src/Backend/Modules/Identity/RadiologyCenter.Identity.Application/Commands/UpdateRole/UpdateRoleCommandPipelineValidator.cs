@@ -1,4 +1,5 @@
 using FluentValidation;
+using RadiologyCenter.Identity.Application.Localization;
 using RadiologyCenter.Identity.Application.Abstractions;
 
 namespace RadiologyCenter.Identity.Application.Commands.UpdateRole;
@@ -13,6 +14,6 @@ public class UpdateRoleCommandPipelineValidator : AbstractValidator<UpdateRoleCo
             if (existing is null) return true;
             if (existing.Name!.Equals(name, StringComparison.OrdinalIgnoreCase)) return true;
             return !await roleRepository.ExistsByNameAsync(name, ct);
-        }).WithMessage("Role name already exists.");
+        }).WithErrorCode(ErrorCodes.RoleNameExists);
     }
 }

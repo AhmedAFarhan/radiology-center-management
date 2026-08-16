@@ -1,4 +1,5 @@
 using RadiologyCenter.Insurance.Application.Abstractions;
+using RadiologyCenter.Insurance.Application.Localization;
 
 namespace RadiologyCenter.Insurance.Application.Queries.PreAuthorizations.GetPreAuthorizationDocumentContent;
 
@@ -12,7 +13,7 @@ public static class GetPreAuthorizationDocumentContentQueryHandler
     {
         var document = await documentRepository.GetByIdAsync(query.DocumentId, ct);
         if (document is null || document.PreAuthorizationId != query.PreAuthorizationId)
-            return Result.Failure<PreAuthorizationDocumentContentDto>(Error.NotFound("PreAuthorizationDocument", query.DocumentId));
+            return Result.Failure<PreAuthorizationDocumentContentDto>(Error.NotFound(ErrorCodes.PreAuthorizationDocumentNotFound, "PreAuthorizationDocument", query.DocumentId));
 
         var content = await ReadAllBytesAsync(storage, document.StoredPath, ct);
 

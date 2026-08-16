@@ -1,4 +1,5 @@
 using RadiologyCenter.Insurance.Application.Abstractions;
+using RadiologyCenter.Insurance.Application.Localization;
 using RadiologyCenter.Insurance.Application.DTOs;
 using RadiologyCenter.Insurance.Application.Services;
 using RadiologyCenter.Insurance.Domain.Enumerations;
@@ -16,31 +17,31 @@ public static class CreateClaimCommandHandler
         CancellationToken ct)
     {
         if (await policyRepository.GetByIdAsync(command.PolicyId, ct) is not { } policy)
-            return Result.Failure<ClaimDto>(Error.NotFound("Policy", command.PolicyId));
+            return Result.Failure<ClaimDto>(Error.NotFound(ErrorCodes.PolicyNotFound, "Policy", command.PolicyId));
         if (!policy.IsActive)
-            return Result.Failure<ClaimDto>(Error.Conflict("Policy is not active."));
+            return Result.Failure<ClaimDto>(Error.Conflict(ErrorCodes.PolicyNotActive, "Policy is not active."));
         if (policy.PatientId != command.PatientId)
-            return Result.Failure<ClaimDto>(Error.Conflict("The policy does not belong to the claim's patient."));
+            return Result.Failure<ClaimDto>(Error.Conflict(ErrorCodes.PolicyPatientMismatch, "The policy does not belong to the claim's patient."));
 
         if (await claimRepository.GetByExaminationIdAsync(command.ExaminationId, ct) is not null)
-            return Result.Failure<ClaimDto>(Error.Conflict("A claim already exists for this examination."));
+            return Result.Failure<ClaimDto>(Error.Conflict(ErrorCodes.ClaimAlreadyExists, "A claim already exists for this examination."));
 
         if (await preAuthorizationRepository.GetByIdAsync(command.PreAuthorizationId, ct) is not { } preAuth)
-            return Result.Failure<ClaimDto>(Error.NotFound("PreAuthorization", command.PreAuthorizationId));
+            return Result.Failure<ClaimDto>(Error.NotFound(ErrorCodes.PreAuthorizationNotFound, "PreAuthorization", command.PreAuthorizationId));
         if (preAuth.ExaminationId != command.ExaminationId)
-            return Result.Failure<ClaimDto>(Error.Conflict("Pre-authorization does not match the examination."));
+            return Result.Failure<ClaimDto>(Error.Conflict(ErrorCodes.PreAuthorizationExaminationMismatch, "Pre-authorization does not match the examination."));
         if (preAuth.PatientId != command.PatientId)
-            return Result.Failure<ClaimDto>(Error.Conflict("Pre-authorization does not match the claim's patient."));
+            return Result.Failure<ClaimDto>(Error.Conflict(ErrorCodes.PreAuthorizationPatientMismatch, "Pre-authorization does not match the claim's patient."));
         if (preAuth.PolicyId != command.PolicyId)
-            return Result.Failure<ClaimDto>(Error.Conflict("Pre-authorization does not match the claim's policy."));
+            return Result.Failure<ClaimDto>(Error.Conflict(ErrorCodes.PreAuthorizationPolicyMismatch, "Pre-authorization does not match the claim's policy."));
         if (preAuth.Status != PreAuthorizationStatus.Approved)
-            return Result.Failure<ClaimDto>(Error.Conflict("Pre-authorization must be approved before creating a claim."));
+            return Result.Failure<ClaimDto>(Error.Conflict(ErrorCodes.PreAuthorizationNotApproved, "Pre-authorization must be approved before creating a claim."));
         if (preAuth.ApprovedAmount is not { } approvedAmount)
-            return Result.Failure<ClaimDto>(Error.Conflict("Pre-authorization has no approved amount."));
+            return Result.Failure<ClaimDto>(Error.Conflict(ErrorCodes.PreAuthorizationNoApprovedAmount, "Pre-authorization has no approved amount."));
         if (command.BilledAmount > approvedAmount)
             return Result.Failure<ClaimDto>(
                 Error.Validation(
-                    "BilledAmountExceedsApproved",
+                    ErrorCodes.BilledAmountExceedsApproved,
                     $"Billed amount '{command.BilledAmount}' exceeds the pre-authorization approved amount of '{approvedAmount}'."));
 
         var split = CoverageCalculationService.Split(policy, command.BilledAmount);

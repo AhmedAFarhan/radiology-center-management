@@ -1,4 +1,5 @@
 using FluentValidation;
+using RadiologyCenter.BuildingBlocks.Application.Localization;
 
 namespace RadiologyCenter.Cash.Application.Commands.Sessions.OpenCashSession;
 

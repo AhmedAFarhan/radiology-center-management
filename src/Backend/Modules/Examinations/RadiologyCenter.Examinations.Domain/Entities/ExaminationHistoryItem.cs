@@ -1,5 +1,6 @@
 using RadiologyCenter.BuildingBlocks.Domain.Common;
 using RadiologyCenter.BuildingBlocks.Domain.Entities;
+using RadiologyCenter.Examinations.Domain.Errors;
 
 namespace RadiologyCenter.Examinations.Domain.Entities;
 
@@ -35,7 +36,7 @@ public sealed class ExaminationHistoryItem : Entity<Guid>
         Guard.AgainstEmpty(itemId, nameof(itemId));
         Guard.AgainstNullOrWhiteSpace(itemName, nameof(itemName));
         Guard.AgainstNegativeOrZero(quantity, nameof(quantity));
-        Guard.Against(unitCost, c => c < 0, "Unit cost cannot be negative.");
+        Guard.Against(unitCost, c => c < 0, DomainErrors.UnitCostNegative, "Unit cost cannot be negative.");
 
         return new ExaminationHistoryItem
         {

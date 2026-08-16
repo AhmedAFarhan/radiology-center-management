@@ -1,4 +1,5 @@
 using RadiologyCenter.Insurance.Application.Abstractions;
+using RadiologyCenter.Insurance.Application.Localization;
 
 namespace RadiologyCenter.Insurance.Application.Commands.Companies.DeleteInsuranceCompany;
 
@@ -12,7 +13,7 @@ public static class DeleteInsuranceCompanyCommandHandler
     {
         var company = await companyRepository.GetByIdAsync(command.Id, ct);
         if (company is null)
-            return Result.Failure(Error.NotFound("Company", command.Id));
+            return Result.Failure(Error.NotFound(ErrorCodes.CompanyNotFound, "Company", command.Id));
 
         company.Delete(by: null);
 

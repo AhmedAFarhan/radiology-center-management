@@ -1,4 +1,5 @@
 using Mapster;
+using RadiologyCenter.Examinations.Application.Localization;
 using RadiologyCenter.Examinations.Application.Abstractions;
 using RadiologyCenter.Examinations.Application.DTOs;
 
@@ -14,7 +15,7 @@ public static class AddExaminationItemCommandHandler
     {
         var examination = await examinationRepository.GetWithItemsAsync(command.ExaminationId, ct);
         if (examination is null)
-            return Result.Failure<ExaminationItemDto>(Error.NotFound("Examination", command.ExaminationId));
+            return Result.Failure<ExaminationItemDto>(Error.NotFound(ErrorCodes.ExaminationNotFound, "Examination", command.ExaminationId));
 
         var item = examination.AddItem(
             command.ItemId,

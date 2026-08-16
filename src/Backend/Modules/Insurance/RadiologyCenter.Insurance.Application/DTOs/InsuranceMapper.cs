@@ -1,3 +1,4 @@
+using RadiologyCenter.BuildingBlocks.Application.Localization;
 using RadiologyCenter.Insurance.Domain.Entities;
 
 namespace RadiologyCenter.Insurance.Application.DTOs;
@@ -22,7 +23,7 @@ internal static class InsuranceMapper
             policy.CoveragePercent,
             policy.EffectiveFrom,
             policy.EffectiveTo,
-            policy.Status.Name,
+            policy.Status.LocalizedName(),
             policy.IsGovernment);
 
     public static PreAuthorizationDto ToDto(this PreAuthorization preAuthorization) =>
@@ -32,7 +33,7 @@ internal static class InsuranceMapper
             preAuthorization.PatientId,
             preAuthorization.PolicyId,
             preAuthorization.EstimatedAmount,
-            preAuthorization.Status.Name,
+            preAuthorization.Status.LocalizedName(),
             preAuthorization.RequestedAt,
             preAuthorization.DecidedAt,
             preAuthorization.ApprovedAmount,
@@ -50,7 +51,7 @@ internal static class InsuranceMapper
             claim.BilledAmount,
             claim.PayerShare,
             claim.PatientShare,
-            claim.Status.Name,
+            claim.Status.LocalizedName(),
             claim.SubmittedAt,
             claim.ApprovedAt,
             claim.PaidAt,
@@ -63,14 +64,14 @@ internal static class InsuranceMapper
         new(
             settlement.Id,
             settlement.Amount,
-            settlement.Method.Name,
+            settlement.Method.LocalizedName(),
             settlement.SettledAt,
             settlement.Reference);
 
     public static ClaimRejectionDto ToDto(this ClaimRejection rejection) =>
         new(
             rejection.Id,
-            rejection.Code.Name,
+            rejection.Code.LocalizedName(),
             rejection.Reason,
             rejection.RejectedAt);
 
@@ -78,7 +79,7 @@ internal static class InsuranceMapper
         new(
             document.Id,
             document.PolicyId,
-            document.Type.Name,
+            document.Type.LocalizedName(),
             document.FileName,
             document.ContentType,
             document.SizeInBytes,
@@ -88,7 +89,7 @@ internal static class InsuranceMapper
         new(
             document.Id,
             document.PreAuthorizationId,
-            document.Type.Name,
+            document.Type.LocalizedName(),
             document.FileName,
             document.ContentType,
             document.SizeInBytes,

@@ -1,3 +1,4 @@
+using RadiologyCenter.Examinations.Application.Localization;
 using RadiologyCenter.Examinations.Application.Abstractions;
 using RadiologyCenter.Examinations.Domain.Enumerations;
 
@@ -17,15 +18,15 @@ public static class RecordExaminationPaymentCommandHandler
 
         var examination = await examinationRepository.GetByIdForUpdateAsync(command.ExaminationId, ct);
         if (examination is null)
-            return Result.Failure(Error.NotFound("Examination", command.ExaminationId));
+            return Result.Failure(Error.NotFound(ErrorCodes.ExaminationNotFound, "Examination", command.ExaminationId));
 
         if (examination.Status == ExaminationStatus.Cancelled)
-            return Result.Failure(Error.Conflict("Cannot record a payment for a cancelled examination."));
+            return Result.Failure(Error.Conflict(ErrorCodes.PaymentForCancelledExamination, "Cannot record a payment for a cancelled examination."));
 
         if (command.Amount > examination.Remaining)
             return Result.Failure(
                 Error.Validation(
-                    "PaymentExceedsRemaining",
+                    ErrorCodes.PaymentExceedsRemaining,
                     $"Payment of '{command.Amount}' exceeds the remaining balance of '{examination.Remaining}'."));
 
         examination.RecordPayment(command.Amount);

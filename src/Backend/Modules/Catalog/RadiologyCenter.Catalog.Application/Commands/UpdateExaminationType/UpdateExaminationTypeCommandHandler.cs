@@ -1,4 +1,5 @@
-﻿using RadiologyCenter.Catalog.Application.Abstractions;
+using RadiologyCenter.Catalog.Application.Localization;
+using RadiologyCenter.Catalog.Application.Abstractions;
 using RadiologyCenter.Catalog.Domain.Enumerations;
 
 namespace RadiologyCenter.Catalog.Application.Commands.UpdateExaminationType;
@@ -13,10 +14,10 @@ public static class UpdateExaminationTypeCommandHandler
     {
         var examinationType = await examinationTypeRepository.GetByIdAsync(command.ExaminationTypeId, ct);
         if (examinationType is null)
-            return Result.Failure(Error.NotFound("ExaminationType", command.ExaminationTypeId));
+            return Result.Failure(Error.NotFound(ErrorCodes.ExaminationTypeNotFound, "ExaminationType", command.ExaminationTypeId));
 
         if (await examinationTypeRepository.ExistsByCodeAsync(command.Code, command.ExaminationTypeId, ct))
-            return Result.Failure(Error.Conflict($"An examination type with code '{command.Code}' already exists."));
+            return Result.Failure(Error.Conflict(ErrorCodes.ExaminationTypeCodeExists, $"An examination type with code '{command.Code}' already exists."));
 
         var modality = Modality.FromName<Modality>(command.Modality);
 

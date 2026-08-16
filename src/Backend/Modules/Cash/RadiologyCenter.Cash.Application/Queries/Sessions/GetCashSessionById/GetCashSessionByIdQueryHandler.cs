@@ -1,3 +1,4 @@
+using RadiologyCenter.Cash.Application.Localization;
 using RadiologyCenter.Cash.Application.Abstractions;
 using RadiologyCenter.Cash.Application.DTOs;
 
@@ -14,7 +15,7 @@ public static class GetCashSessionByIdQueryHandler
     {
         var session = await sessionRepository.GetByIdAsync(query.Id, ct);
         if (session is null)
-            return Result.Failure<CashSessionDto>(Error.NotFound("CashSession", query.Id));
+            return Result.Failure<CashSessionDto>(Error.NotFound(ErrorCodes.SessionNotFound, "CashSession", query.Id));
 
         var movements = await entryRepository.GetSessionMovementsAsync(new[] { session.Id }, ct);
         movements.TryGetValue(session.Id, out var movement);

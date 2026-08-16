@@ -1,3 +1,4 @@
+using RadiologyCenter.BuildingBlocks.Application.Localization;
 using RadiologyCenter.Cash.Domain.Entities;
 
 namespace RadiologyCenter.Cash.Application.DTOs;
@@ -8,8 +9,8 @@ internal static class CashMapper
         new(
             entry.Id,
             entry.CashSessionId,
-            entry.Direction.Name,
-            entry.Reason.Name,
+            entry.Direction.LocalizedName(),
+            entry.Reason.LocalizedName(),
             entry.Amount,
             entry.Description,
             entry.ReferenceId,
@@ -36,7 +37,7 @@ internal static class CashMapper
             session.UserId,
             userName,
             session.WorkShiftId,
-            session.Status.Name,
+            session.Status.LocalizedName(),
             session.OpeningFloat,
             balance,
             session.OpenedAt,

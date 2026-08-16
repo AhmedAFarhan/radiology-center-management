@@ -1,3 +1,4 @@
+using RadiologyCenter.Examinations.Application.Localization;
 using RadiologyCenter.Examinations.Application.Abstractions;
 using RadiologyCenter.Examinations.Domain.Enumerations;
 
@@ -13,7 +14,7 @@ public static class UpdateExaminationCommandHandler
     {
         var examination = await examinationRepository.GetWithItemsAsync(command.ExaminationId, ct);
         if (examination is null)
-            return Result.Failure(Error.NotFound("Examination", command.ExaminationId));
+            return Result.Failure(Error.NotFound(ErrorCodes.ExaminationNotFound, "Examination", command.ExaminationId));
 
         var priority = ExaminationPriority.FromName<ExaminationPriority>(command.Priority);
 
@@ -26,7 +27,7 @@ public static class UpdateExaminationCommandHandler
             command.Notes);
 
         if (command.Paid.HasValue && examination.Paid > 0 && command.Paid.Value != examination.Paid)
-            return Result.Failure(Error.Conflict("Paid amount cannot be modified once a payment has been recorded."));
+            return Result.Failure(Error.Conflict(ErrorCodes.PaidAmountImmutable, "Paid amount cannot be modified once a payment has been recorded."));
 
         if (command.Discount.HasValue || command.IsDiscountPercentage.HasValue || command.Paid.HasValue)
         {

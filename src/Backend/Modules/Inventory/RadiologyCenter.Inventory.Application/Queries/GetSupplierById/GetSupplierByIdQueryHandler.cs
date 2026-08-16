@@ -1,4 +1,5 @@
 using Mapster;
+using RadiologyCenter.Inventory.Application.Localization;
 using RadiologyCenter.Inventory.Application.Abstractions;
 using RadiologyCenter.Inventory.Application.DTOs;
 
@@ -13,7 +14,7 @@ public static class GetSupplierByIdQueryHandler
     {
         var supplier = await supplierRepository.GetByIdAsync(query.Id, ct);
         if (supplier is null)
-            return Result.Failure<SupplierDto>(Error.NotFound("Supplier", query.Id));
+            return Result.Failure<SupplierDto>(Error.NotFound(ErrorCodes.SupplierNotFound, "Supplier", query.Id));
 
         return Result.Success(supplier.Adapt<SupplierDto>());
     }

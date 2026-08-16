@@ -1,4 +1,5 @@
 using Microsoft.Extensions.Logging;
+using RadiologyCenter.Notification.Application.Localization;
 using RadiologyCenter.BuildingBlocks.Domain.Results;
 using RadiologyCenter.Notification.Application.Abstractions;
 using RadiologyCenter.Notification.Domain.Enumerations;
@@ -38,13 +39,13 @@ public class NotificationSender : INotificationSender
                 _ when channel == NotificationChannel.Sms => await _smsProvider.SendAsync(recipient, body, ct),
                 _ when channel == NotificationChannel.Email => await _emailProvider.SendAsync(recipient, subject, body, ct),
                 _ when channel == NotificationChannel.Push => await _pushProvider.SendAsync(recipient, subject, body, ct),
-                _ => Result.Failure(Error.Validation("InvalidChannel", $"Channel '{channel}' is not supported."))
+                _ => Result.Failure(Error.Validation(ErrorCodes.InvalidChannel, $"Channel '{channel}' is not supported."))
             };
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Failed to send notification via {Channel} to {Recipient}.", channel.Name, recipient);
-            return Result.Failure(Error.Failure("Failed to send notification."));
+            return Result.Failure(Error.Failure(ErrorCodes.SendFailed, "Failed to send notification."));
         }
     }
 }

@@ -1,4 +1,5 @@
 using Mapster;
+using RadiologyCenter.BuildingBlocks.Application.Localization;
 using RadiologyCenter.Reports.Domain.Entities;
 
 namespace RadiologyCenter.Reports.Application.DTOs;
@@ -11,7 +12,7 @@ internal static class ReportMapper
             report.ExaminationId,
             report.PatientId,
             report.RadiologistId,
-            report.Status.Name,
+            report.Status.LocalizedName(),
             report.CurrentVersionNumber,
             report.FinalizedAt,
             report.CancelReason,
@@ -23,7 +24,7 @@ internal static class ReportMapper
             report.ExaminationId,
             report.PatientId,
             report.RadiologistId,
-            report.Status.Name,
+            report.Status.LocalizedName(),
             report.CurrentVersionNumber,
             report.FinalizedAt,
             report.CancelReason);

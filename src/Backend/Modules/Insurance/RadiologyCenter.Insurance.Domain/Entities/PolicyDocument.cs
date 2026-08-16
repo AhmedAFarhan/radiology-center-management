@@ -1,6 +1,7 @@
 using RadiologyCenter.BuildingBlocks.Domain.Common;
 using RadiologyCenter.BuildingBlocks.Domain.Entities;
 using RadiologyCenter.Insurance.Domain.Enumerations;
+using RadiologyCenter.Insurance.Domain.Errors;
 
 namespace RadiologyCenter.Insurance.Domain.Entities;
 
@@ -35,7 +36,7 @@ public sealed class PolicyDocument : Entity<Guid>
         Guard.AgainstNullOrWhiteSpace(fileName, nameof(fileName));
         Guard.AgainstNullOrWhiteSpace(contentType, nameof(contentType));
         Guard.AgainstNullOrWhiteSpace(storedPath, nameof(storedPath));
-        Guard.Against(sizeInBytes, s => s <= 0, "Document size must be greater than zero.");
+        Guard.Against(sizeInBytes, s => s <= 0, DomainErrors.DocumentSizePositive, "Document size must be greater than zero.");
 
         return new PolicyDocument
         {

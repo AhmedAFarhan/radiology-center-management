@@ -2,6 +2,7 @@ using RadiologyCenter.BuildingBlocks.Domain.Common;
 using RadiologyCenter.BuildingBlocks.Domain.Exceptions;
 using RadiologyCenter.BuildingBlocks.Domain.SoftDeletable;
 using RadiologyCenter.Patients.Domain.Enumerations;
+using RadiologyCenter.Patients.Domain.Errors;
 using RadiologyCenter.Patients.Domain.Events;
 
 namespace RadiologyCenter.Patients.Domain.Entities;
@@ -144,13 +145,13 @@ public sealed class Patient : SoftDeletableAggregateRoot<Guid>
     private static void ValidateBirthDetails(DateTime? dateOfBirth, int? age)
     {
         if (dateOfBirth is null && age is null)
-            throw new DomainException("Either date of birth or age must be provided.");
+            throw new DomainException(DomainErrors.DobOrAgeRequired, "Either date of birth or age must be provided.");
 
         if (dateOfBirth is not null)
-            Guard.Against(dateOfBirth.Value, d => d.Date > DateTime.UtcNow.Date, "Date of birth cannot be in the future.");
+            Guard.Against(dateOfBirth.Value, d => d.Date > DateTime.UtcNow.Date, DomainErrors.DateOfBirthFuture, "Date of birth cannot be in the future.");
 
         if (age is not null)
-            Guard.Against(age.Value, a => a is < 0 or > 150, "Age must be between 0 and 150.");
+            Guard.Against(age.Value, a => a is < 0 or > 150, DomainErrors.AgeOutOfRange, "Age must be between 0 and 150.");
     }
 
     private static int CalculateAge(DateTime dateOfBirth)

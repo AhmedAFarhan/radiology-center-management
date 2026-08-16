@@ -1,4 +1,5 @@
 using Mapster;
+using RadiologyCenter.Payroll.Application.Localization;
 using RadiologyCenter.BuildingBlocks.Domain.Specifications;
 using RadiologyCenter.Payroll.Application.Abstractions;
 using RadiologyCenter.Payroll.Application.DTOs;
@@ -16,10 +17,10 @@ public static class CreateReferralFeeCommandHandler
         CancellationToken ct)
     {
         if (!await referralDoctorDirectory.ExistsAsync(command.ReferralDoctorId, ct))
-            return Result.Failure<ReferralFeeDto>(Error.NotFound("ReferralDoctor", command.ReferralDoctorId));
+            return Result.Failure<ReferralFeeDto>(Error.NotFound(ErrorCodes.ReferralDoctorNotFound, "ReferralDoctor", command.ReferralDoctorId));
 
         if (!await examinationTypeDirectory.ExistsAsync(command.ExaminationTypeId, ct))
-            return Result.Failure<ReferralFeeDto>(Error.NotFound("ExaminationType", command.ExaminationTypeId));
+            return Result.Failure<ReferralFeeDto>(Error.NotFound(ErrorCodes.ExaminationTypeNotFound, "ExaminationType", command.ExaminationTypeId));
 
         var existing = await FindActiveAsync(referralFeeRepository, command.ReferralDoctorId, command.ExaminationTypeId, ct);
         foreach (var fee in existing)

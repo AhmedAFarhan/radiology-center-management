@@ -1,3 +1,4 @@
+using RadiologyCenter.Payroll.Application.Localization;
 using RadiologyCenter.Payroll.Application.Abstractions;
 using RadiologyCenter.Payroll.Domain.Enumerations;
 
@@ -16,10 +17,10 @@ public static class ComputePayRunCommandHandler
     {
         var payRun = await payRunRepository.GetWithPayslipsAsync(command.PayRunId, ct);
         if (payRun is null)
-            return Result.Failure(Error.NotFound("PayRun", command.PayRunId));
+            return Result.Failure(Error.NotFound(ErrorCodes.PayRunNotFound, "PayRun", command.PayRunId));
 
         if (payRun.Status != PayRunStatus.Draft)
-            return Result.Failure(Error.Conflict($"Pay run '{command.PayRunId}' is {payRun.Status.Name} and cannot be recomputed."));
+            return Result.Failure(Error.Conflict(ErrorCodes.PayRunCannotRecompute, $"Pay run '{command.PayRunId}' is {payRun.Status.Name} and cannot be recomputed."));
 
         var staffIds = await payrollStaffDirectory.GetActiveStaffIdsAsync(ct);
 

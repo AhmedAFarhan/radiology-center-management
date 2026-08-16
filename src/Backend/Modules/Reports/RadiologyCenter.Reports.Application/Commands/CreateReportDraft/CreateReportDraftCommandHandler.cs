@@ -1,4 +1,5 @@
 using RadiologyCenter.Reports.Application.Abstractions;
+using RadiologyCenter.Reports.Application.Localization;
 using RadiologyCenter.Reports.Application.DTOs;
 
 namespace RadiologyCenter.Reports.Application.Commands.CreateReportDraft;
@@ -13,10 +14,10 @@ public static class CreateReportDraftCommandHandler
         CancellationToken ct)
     {
         if (await reportRepository.HasReportByExaminationAsync(command.ExaminationId, ct))
-            return Result.Failure<ReportDto>(Error.Conflict($"A report already exists for examination '{command.ExaminationId}'."));
+            return Result.Failure<ReportDto>(Error.Conflict(ErrorCodes.ReportAlreadyExists, $"A report already exists for examination '{command.ExaminationId}'."));
 
         if (!await reportDirectory.IsExaminationCompletedAsync(command.ExaminationId, ct))
-            return Result.Failure<ReportDto>(Error.Validation("ExaminationNotCompleted", "A report draft can only be created for a completed examination."));
+            return Result.Failure<ReportDto>(Error.Validation(ErrorCodes.ExaminationNotCompleted, "A report draft can only be created for a completed examination."));
 
         var report = RadiologyReport.Create(command.ExaminationId, command.PatientId, command.RadiologistId);
 

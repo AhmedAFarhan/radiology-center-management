@@ -1,4 +1,5 @@
 using FluentValidation;
+using RadiologyCenter.Patients.Application.Localization;
 using RadiologyCenter.BuildingBlocks.Application.Validation;
 using RadiologyCenter.Patients.Domain.Enumerations;
 
@@ -8,19 +9,19 @@ public abstract class PatientValidatorBase<T> : AbstractValidator<T> where T : I
 {
     protected PatientValidatorBase()
     {
-        RuleFor(x => x.FullName).NotEmpty().MaximumLength(300);
+        RuleFor(x => x.FullName).NotEmpty().WithErrorCode(ErrorCodes.NameRequired).MaximumLength(300);
         RuleFor(x => x.FullName).ContainsAtLeastTwoNameParts();
         RuleFor(x => x.Gender).NotEmpty().IsEnumerationMember<Gender, T>("Gender");
         RuleFor(x => x.PhoneNumber).NotEmpty().IsEgyptianPhoneNumber().MaximumLength(30);
         RuleFor(x => x).Must(x => x.DateOfBirth is not null || x.Age is not null)
-            .WithMessage("Either date of birth or age must be provided.");
+            .WithErrorCode(ErrorCodes.DobOrAgeRequired);
         RuleFor(x => x.DateOfBirth).Must(d => d is null || d.Value.Date <= DateTime.UtcNow.Date)
-            .WithMessage("Date of birth cannot be in the future.");
+            .WithErrorCode(ErrorCodes.DateOfBirthFuture);
         RuleFor(x => x.Age).Must(a => a is null || a is >= 0 and <= 150)
-            .WithMessage("Age must be between 0 and 150.");
+            .WithErrorCode(ErrorCodes.AgeOutOfRange);
         RuleFor(x => x.Email).EmailAddress().When(x => !string.IsNullOrWhiteSpace(x.Email));
         RuleFor(x => x.BloodType).Must(IsValidBloodType)
-            .WithMessage("Blood type is invalid.")
+            .WithErrorCode(ErrorCodes.BloodTypeInvalid)
             .When(x => !string.IsNullOrWhiteSpace(x.BloodType));
     }
 

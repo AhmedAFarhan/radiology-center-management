@@ -1,4 +1,5 @@
 using RadiologyCenter.Insurance.Application.Abstractions;
+using RadiologyCenter.Insurance.Application.Localization;
 
 namespace RadiologyCenter.Insurance.Application.Queries.Policies.GetPolicyDocumentContent;
 
@@ -12,7 +13,7 @@ public static class GetPolicyDocumentContentQueryHandler
     {
         var document = await documentRepository.GetByIdAsync(query.DocumentId, ct);
         if (document is null || document.PolicyId != query.PolicyId)
-            return Result.Failure<PolicyDocumentContentDto>(Error.NotFound("PolicyDocument", query.DocumentId));
+            return Result.Failure<PolicyDocumentContentDto>(Error.NotFound(ErrorCodes.PolicyDocumentNotFound, "PolicyDocument", query.DocumentId));
 
         var content = await ReadAllBytesAsync(storage, document.StoredPath, ct);
 

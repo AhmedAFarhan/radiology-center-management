@@ -1,3 +1,4 @@
+using RadiologyCenter.Insurance.Application.Localization;
 using RadiologyCenter.Insurance.Application.Abstractions;
 using RadiologyCenter.Insurance.Application.DTOs;
 using RadiologyCenter.Insurance.Domain.Enumerations;
@@ -14,26 +15,26 @@ public static class AdjudicateClaimCommandHandler
     {
         var claim = await claimRepository.GetByIdAsync(command.ClaimId, ct);
         if (claim is null)
-            return Result.Failure<ClaimDto>(Error.NotFound("Claim", command.ClaimId));
+            return Result.Failure<ClaimDto>(Error.NotFound(ErrorCodes.ClaimNotFound, "Claim", command.ClaimId));
 
         switch (command.Decision)
         {
             case ClaimAdjudication.Approve:
                 if (command.ApprovedAmount is null)
-                    return Result.Failure<ClaimDto>(Error.Validation("ApprovedAmount", "Approved amount is required when approving."));
+                    return Result.Failure<ClaimDto>(Error.Validation(ErrorCodes.ApprovedAmountRequired, "Approved amount is required when approving."));
                 claim.AdjudicateApproved(command.ApprovedAmount.Value);
                 break;
             case ClaimAdjudication.Reject:
                 if (string.IsNullOrWhiteSpace(command.RejectionCode))
-                    return Result.Failure<ClaimDto>(Error.Validation("RejectionCode", "Rejection code is required when rejecting."));
+                    return Result.Failure<ClaimDto>(Error.Validation(ErrorCodes.RejectionCodeRequired, "Rejection code is required when rejecting."));
                 if (string.IsNullOrWhiteSpace(command.RejectionReason))
-                    return Result.Failure<ClaimDto>(Error.Validation("RejectionReason", "Rejection reason is required when rejecting."));
+                    return Result.Failure<ClaimDto>(Error.Validation(ErrorCodes.RejectionReasonRequired, "Rejection reason is required when rejecting."));
 
                 var code = ClaimRejectionCode.FromName<ClaimRejectionCode>(command.RejectionCode);
                 claim.AdjudicateRejected(code, command.RejectionReason);
                 break;
             default:
-                return Result.Failure<ClaimDto>(Error.Validation("Decision", "Unsupported decision."));
+                return Result.Failure<ClaimDto>(Error.Validation(ErrorCodes.UnsupportedDecision, "Unsupported decision."));
         }
 
         claimRepository.Update(claim);

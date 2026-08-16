@@ -1,4 +1,5 @@
 using RadiologyCenter.Reports.Application.Abstractions;
+using RadiologyCenter.Reports.Application.Localization;
 using RadiologyCenter.Reports.Application.DTOs;
 
 namespace RadiologyCenter.Reports.Application.Commands.ReportTemplates.RemoveTemplateSection;
@@ -13,7 +14,7 @@ public static class RemoveTemplateSectionCommandHandler
     {
         var template = await templateRepository.GetByIdWithSectionsAsync(command.TemplateId, ct);
         if (template is null)
-            return Result.Failure<ReportTemplateDto>(Error.NotFound("ReportTemplate", command.TemplateId));
+            return Result.Failure<ReportTemplateDto>(Error.NotFound(ErrorCodes.ReportTemplateNotFound, "ReportTemplate", command.TemplateId));
 
         template.RemoveSection(command.SectionId);
 

@@ -1,4 +1,5 @@
 using Mapster;
+using RadiologyCenter.ResourceManagement.Application.Localization;
 using RadiologyCenter.ResourceManagement.Application.Abstractions;
 using RadiologyCenter.ResourceManagement.Application.DTOs;
 using RadiologyCenter.ResourceManagement.Domain.Enumerations;
@@ -16,10 +17,10 @@ public static class CreateLeaveCommandHandler
     {
         var staff = await staffRepository.GetByIdAsync(command.StaffId, ct);
         if (staff is null)
-            return Result.Failure<LeaveDto>(Error.NotFound("Staff", command.StaffId));
+            return Result.Failure<LeaveDto>(Error.NotFound(ErrorCodes.StaffNotFound, "Staff", command.StaffId));
 
         if (await leaveRepository.HasOverlapAsync(command.StaffId, command.StartDate, command.EndDate, ct: ct))
-            return Result.Failure<LeaveDto>(Error.Conflict("The staff member already has leave overlapping the requested period."));
+            return Result.Failure<LeaveDto>(Error.Conflict(ErrorCodes.LeaveOverlap, "The staff member already has leave overlapping the requested period."));
 
         var leaveType = LeaveType.FromName<LeaveType>(command.LeaveType);
 

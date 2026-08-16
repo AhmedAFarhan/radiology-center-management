@@ -1,4 +1,5 @@
-﻿using Mapster;
+using Mapster;
+using RadiologyCenter.Catalog.Application.Localization;
 using RadiologyCenter.Catalog.Application.Abstractions;
 using RadiologyCenter.Catalog.Application.DTOs;
 
@@ -13,7 +14,7 @@ public static class GetExaminationTypeByIdQueryHandler
     {
         var examinationType = await examinationTypeRepository.GetByIdAsync(query.Id, ct);
         if (examinationType is null)
-            return Result.Failure<ExaminationTypeDto>(Error.NotFound("ExaminationType", query.Id));
+            return Result.Failure<ExaminationTypeDto>(Error.NotFound(ErrorCodes.ExaminationTypeNotFound, "ExaminationType", query.Id));
 
         return Result.Success(examinationType.Adapt<ExaminationTypeDto>());
     }

@@ -2,6 +2,7 @@ using RadiologyCenter.BuildingBlocks.Domain.Auditing;
 using RadiologyCenter.BuildingBlocks.Domain.Common;
 using RadiologyCenter.BuildingBlocks.Domain.Exceptions;
 using RadiologyCenter.Insurance.Domain.Enumerations;
+using RadiologyCenter.Insurance.Domain.Errors;
 
 namespace RadiologyCenter.Insurance.Domain.Entities;
 
@@ -37,7 +38,7 @@ public sealed class PreAuthorization : AuditableAggregateRoot<Guid>
         Guard.AgainstEmpty(examinationId, nameof(examinationId));
         Guard.AgainstEmpty(patientId, nameof(patientId));
         Guard.AgainstEmpty(policyId, nameof(policyId));
-        Guard.Against(estimatedAmount, a => a < 0, "Estimated amount cannot be negative.");
+        Guard.Against(estimatedAmount, a => a < 0, DomainErrors.EstimatedAmountNegative, "Estimated amount cannot be negative.");
 
         return new PreAuthorization
         {
@@ -60,7 +61,7 @@ public sealed class PreAuthorization : AuditableAggregateRoot<Guid>
         long sizeInBytes)
     {
         if (Status != PreAuthorizationStatus.Requested)
-            throw new BusinessRuleViolationException($"Documents can only be attached while '{Id}' is requested.");
+            throw new BusinessRuleViolationException(nameof(AddDocument), DomainErrors.DocumentsRequestedOnly, $"Documents can only be attached while '{Id}' is requested.");
 
         var document = PreAuthorizationDocument.Create(Id, type, fileName, contentType, storedPath, sizeInBytes);
         _documents.Add(document);
@@ -71,10 +72,10 @@ public sealed class PreAuthorization : AuditableAggregateRoot<Guid>
     {
         EnsureRequested();
 
-        Guard.Against(approvedAmount, a => a < 0, "Approved amount cannot be negative.");
+        Guard.Against(approvedAmount, a => a < 0, DomainErrors.ApprovedAmountNegative, "Approved amount cannot be negative.");
 
         if (IsGovernment && _documents.Count == 0)
-            throw new DomainException("A government pre-authorization cannot be approved without the official approval document.");
+            throw new DomainException(DomainErrors.GovernmentDocRequired, "A government pre-authorization cannot be approved without the official approval document.");
 
         Status = PreAuthorizationStatus.Approved;
         ApprovedAmount = approvedAmount;
@@ -96,6 +97,6 @@ public sealed class PreAuthorization : AuditableAggregateRoot<Guid>
     private void EnsureRequested()
     {
         if (Status != PreAuthorizationStatus.Requested)
-            throw new BusinessRuleViolationException($"Pre-authorization '{Id}' is already {Status.Name}.");
+            throw new BusinessRuleViolationException(nameof(EnsureRequested), DomainErrors.PreAuthorizationAlreadyDecided, $"Pre-authorization '{Id}' is already {Status.Name}.");
     }
 }

@@ -1,3 +1,4 @@
+using RadiologyCenter.Inventory.Application.Localization;
 using RadiologyCenter.Inventory.Application.Abstractions;
 
 namespace RadiologyCenter.Inventory.Application.Commands.ActivateItem;
@@ -12,7 +13,7 @@ public static class ActivateItemCommandHandler
     {
         var item = await itemRepository.GetByIdAsync(command.ItemId, ct);
         if (item is null)
-            return Result.Failure(Error.NotFound("Item", command.ItemId));
+            return Result.Failure(Error.NotFound(ErrorCodes.ItemNotFound, "Item", command.ItemId));
 
         item.Activate();
         itemRepository.Update(item);

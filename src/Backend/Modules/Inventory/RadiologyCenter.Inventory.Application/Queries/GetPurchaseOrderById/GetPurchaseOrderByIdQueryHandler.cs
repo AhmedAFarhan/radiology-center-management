@@ -1,3 +1,4 @@
+using RadiologyCenter.Inventory.Application.Localization;
 using RadiologyCenter.Inventory.Application.Abstractions;
 using RadiologyCenter.Inventory.Application.DTOs;
 
@@ -14,7 +15,7 @@ public static class GetPurchaseOrderByIdQueryHandler
     {
         var purchaseOrder = await purchaseOrderRepository.GetWithItemsAsync(query.Id, ct);
         if (purchaseOrder is null)
-            return Result.Failure<PurchaseOrderDto>(Error.NotFound("PurchaseOrder", query.Id));
+            return Result.Failure<PurchaseOrderDto>(Error.NotFound(ErrorCodes.PurchaseOrderNotFound, "PurchaseOrder", query.Id));
 
         var itemNames = await PurchaseOrderMapper.LoadItemNamesAsync(
             purchaseOrder.Items.Select(i => i.ItemId),

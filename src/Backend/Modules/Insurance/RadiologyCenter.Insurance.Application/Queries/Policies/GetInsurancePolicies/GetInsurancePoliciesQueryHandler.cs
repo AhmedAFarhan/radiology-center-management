@@ -31,7 +31,7 @@ public static class GetInsurancePoliciesQueryHandler
             p.CoveragePercent,
             p.EffectiveFrom,
             p.EffectiveTo,
-            p.Status.Name,
+            p.Status.LocalizedName(),
             p.IsGovernment,
             p.IsActive)).ToList();
 

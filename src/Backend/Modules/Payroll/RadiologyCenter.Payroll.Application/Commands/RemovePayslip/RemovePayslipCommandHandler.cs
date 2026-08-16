@@ -1,3 +1,4 @@
+using RadiologyCenter.Payroll.Application.Localization;
 using RadiologyCenter.Payroll.Application.Abstractions;
 
 namespace RadiologyCenter.Payroll.Application.Commands.RemovePayslip;
@@ -12,7 +13,7 @@ public static class RemovePayslipCommandHandler
     {
         var payRun = await payRunRepository.GetWithPayslipsAsync(command.PayRunId, ct);
         if (payRun is null)
-            return Result.Failure(Error.NotFound("PayRun", command.PayRunId));
+            return Result.Failure(Error.NotFound(ErrorCodes.PayRunNotFound, "PayRun", command.PayRunId));
 
         payRun.RemovePayslip(command.StaffId);
 
