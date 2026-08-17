@@ -5,16 +5,17 @@
 @inject ReportService ReportService
 @inject IDialogService DialogService
 @inject ISnackbar Snackbar
+@inject AppLocalizer T
 
-<PageHeader Icon="@Icons.Material.Filled.Biotech" Title="Reading Room"
-            Subtitle="Radiology reading worklist"
+<PageHeader Icon="@Icons.Material.Filled.Biotech" Title="@T.ReadingRoom.Title"
+            Subtitle="@T.ReadingRoom.Subtitle"
             ShowSearch="false"
             OnRefresh="RefreshQueueAsync">
     <MudChip T="string" Color="Color.Primary" Size="Size.Medium" Label="true" Variant="Variant.Outlined">
-        @PendingCount pending
+        @PendingCount @T.ReadingRoom.Pending
     </MudChip>
     <MudChip T="string" Color="Color.Secondary" Size="Size.Medium" Label="true" Variant="Variant.Outlined">
-        @Queue.Count() imaged
+        @Queue.Count() @T.ReadingRoom.Imaged
     </MudChip>
 </PageHeader>
 
@@ -22,11 +23,11 @@
     <!-- ══════════ Worklist pane ══════════ -->
     <section class="reading-room-pane rr-worklist">
         <div class="rr-pane-header">
-            <MudText Typo="Typo.subtitle1" Class="font-weight-medium">Reading Queue</MudText>
+            <MudText Typo="Typo.subtitle1" Class="font-weight-medium">@T.ReadingRoom.ReadingQueue</MudText>
             <MudTextField T="string"
                           Value="@_filter"
                           ValueChanged="OnFilterChanged"
-                          Placeholder="Filter..."
+                          Placeholder="@T.ReadingRoom.FilterPlaceholder"
                           Variant="Variant.Outlined"
                           Margin="Margin.Dense"
                           Immediate="true"
@@ -42,16 +43,16 @@
             else if (_queueError is not null)
             {
                 <ErrorState Icon="@Icons.Material.Filled.CloudOff"
-                            Title="Could not load the queue"
+                            Title="@T.ReadingRoom.QueueLoadErrorTitle"
                             Message="@_queueError"
-                            RetryLabel="Retry"
+                            RetryLabel="@T.Common.Retry"
                             Action="LoadQueueAsync" />
             }
             else if (!Queue.Any())
             {
                 <EmptyState Icon="@Icons.Material.Filled.MedicalServices"
-                            Title="No imaged studies"
-                            Message="Examinations that have been completed will appear here." />
+                            Title="@T.ReadingRoom.NoImagedStudies"
+                            Message="@T.ReadingRoom.NoImagedStudiesMessage" />
             }
             else
             {
@@ -85,7 +86,7 @@
         <div class="rr-pane-header">
             <MudStack Row="true" AlignItems="AlignItems.Center" Spacing="1">
                 <MudIcon Icon="@Icons.Material.Filled.Monitor" Size="Size.Small" />
-                <MudText Typo="Typo.subtitle1" Class="font-weight-medium">Image Viewer</MudText>
+                <MudText Typo="Typo.subtitle1" Class="font-weight-medium">@T.ReadingRoom.ImageViewer</MudText>
             </MudStack>
             <span class="rr-modality">@(Selected?.ExamName ?? "-")</span>
         </div>
@@ -93,8 +94,8 @@
             @if (Selected is null)
             {
                 <EmptyState Icon="@Icons.Material.Filled.Biotech"
-                            Title="No study selected"
-                            Message="Select a study from the reading queue." />
+                            Title="@T.ReadingRoom.NoStudySelected"
+                            Message="@T.ReadingRoom.SelectStudyMessage" />
             }
             else
             {
@@ -102,20 +103,20 @@
                     <MudIcon Icon="@Icons.Material.Filled.Biotech" Size="Size.Large" Class="rr-placeholder-icon" />
                     <MudText Typo="Typo.h6" Class="text-secondary">@Selected.PatientName</MudText>
                     <MudText Typo="Typo.body2" Class="text-secondary">@Selected.ExamName - @Selected.PatientCode</MudText>
-                    <MudText Typo="Typo.body2" Class="text-secondary">@Selected.Priority priority</MudText>
-                    <MudText Typo="Typo.caption" Class="mt-2">Series @(_selectedSeries) / @SeriesCount - sample image</MudText>
-                    <MudText Typo="Typo.caption" Class="mt-2">Image loader from PACS / equipment - coming soon</MudText>
+                    <MudText Typo="Typo.body2" Class="text-secondary">@Selected.Priority @T.ReadingRoom.Priority</MudText>
+                    <MudText Typo="Typo.caption" Class="mt-2">@(T.FormatValue(T.ReadingRoom.SeriesProgress, _selectedSeries, SeriesCount))</MudText>
+                    <MudText Typo="Typo.caption" Class="mt-2">@T.ReadingRoom.ComingSoon</MudText>
                 </div>
             }
         </div>
         <div class="rr-thumbnails">
-            <span class="rr-thumbs-label">Series</span>
+            <span class="rr-thumbs-label">@T.ReadingRoom.Series</span>
             @for (var i = 1; i <= SeriesCount; i++)
             {
                 var index = i;
                 <button type="button"
                         class="rr-thumb @(index == _selectedSeries ? "selected" : string.Empty)"
-                        title="Series S@index"
+                        title="@(T.FormatValue(T.ReadingRoom.SeriesThumbTitle, index))"
                         @onclick="() => _selectedSeries = index">
                     <MudText Typo="Typo.caption">S@index</MudText>
                 </button>
@@ -129,8 +130,8 @@
         {
             <div class="rr-report-empty">
                 <EmptyState Icon="@Icons.Material.Filled.Assignment"
-                            Title="No report"
-                            Message="Select a study to start reading." />
+                            Title="@T.ReadingRoom.NoReport"
+                            Message="@T.ReadingRoom.SelectStudyToRead" />
             </div>
         }
         else if (_loadingReport)
@@ -143,9 +144,9 @@
         {
             <div class="rr-report-empty">
                 <ErrorState Icon="@Icons.Material.Filled.ErrorOutline"
-                            Title="Could not load the report"
+                            Title="@T.ReadingRoom.ReportLoadErrorTitle"
                             Message="@_reportError"
-                            RetryLabel="Retry"
+                            RetryLabel="@T.Common.Retry"
                             Action="ReloadSelectedAsync" />
             </div>
         }
@@ -153,8 +154,8 @@
         {
             <div class="rr-report-empty">
                 <EmptyState Icon="@Icons.Material.Filled.Assignment"
-                            Title="No report"
-                            Message="A draft was not created for this study." />
+                            Title="@T.ReadingRoom.NoReport"
+                            Message="@T.ReadingRoom.NoDraftMessage" />
             </div>
         }
         else
@@ -172,12 +173,12 @@
 
             <div class="rr-patient-summary">
                 <div class="rr-summary-block">
-                    <span class="rr-summary-label">Clinical Indication</span>
+                    <span class="rr-summary-label">@T.ReadingRoom.ClinicalIndication</span>
                     <span class="rr-summary-value">@Selected.Indication</span>
                 </div>
                 <MudStack Row="true" Spacing="2">
-                    <div class="rr-summary-cell"><span class="rr-summary-label">Exam</span><span>@Selected.ExamName- @Selected.Priority</span></div>
-                    <div class="rr-summary-cell"><span class="rr-summary-label">Status</span><span>@_report.Status</span></div>
+                    <div class="rr-summary-cell"><span class="rr-summary-label">@T.ReadingRoom.Exam</span><span>@Selected.ExamName- @Selected.Priority</span></div>
+                    <div class="rr-summary-cell"><span class="rr-summary-label">@T.Common.Status</span><span>@_report.Status</span></div>
                 </MudStack>
             </div>
 
@@ -187,12 +188,12 @@
                 @if (!string.IsNullOrWhiteSpace(_report.CancelReason) && _report.Status == "Cancelled")
                 {
                     <MudAlert Severity="Severity.Error" Variant="Variant.Outlined" Dense="true" Class="mb-3">
-                        Cancelled: @_report.CancelReason
+                        @(T.FormatValue(T.ReadingRoom.CancelledWithReason, _report.CancelReason))
                     </MudAlert>
                 }
 
                 <div class="d-flex align-center mb-2">
-                    <MudText Typo="Typo.subtitle1" Class="font-weight-medium">Sections</MudText>
+                    <MudText Typo="Typo.subtitle1" Class="font-weight-medium">@T.ReadingRoom.Sections</MudText>
                     <MudSpacer />
                     @if (CanEdit)
                     {
@@ -221,7 +222,7 @@
 
                 <MudDivider Class="my-3" />
 
-                <MudText Typo="Typo.subtitle1" Class="font-weight-medium mb-2">Findings</MudText>
+                <MudText Typo="Typo.subtitle1" Class="font-weight-medium mb-2">@T.ReadingRoom.Findings</MudText>
                 @if (_findings.Any())
                 {
                     @foreach (var finding in _findings)
@@ -257,22 +258,22 @@
                 }
                 else
                 {
-                    <MudText Typo="Typo.body2" Class="text-secondary">No findings recorded.</MudText>
+                    <MudText Typo="Typo.body2" Class="text-secondary">@T.ReadingRoom.NoFindings</MudText>
                 }
 
                 @if (CanEdit)
                 {
                     <MudDivider Class="my-3" />
-                    <MudText Typo="Typo.subtitle1" Class="font-weight-medium mb-2">Add Finding</MudText>
+                    <MudText Typo="Typo.subtitle1" Class="font-weight-medium mb-2">@T.ReadingRoom.AddFinding</MudText>
                     <MudTextField T="string"
                                   @bind-Value="_newRegion"
-                                  Label="Region / anatomy"
+                                  Label="@T.ReadingRoom.RegionAnatomy"
                                   Variant="Variant.Outlined"
                                   Margin="Margin.Dense"
                                   Immediate="true" />
                     <MudTextField T="string"
                                   @bind-Value="_newDescription"
-                                  Label="Description"
+                                  Label="@T.ReadingRoom.Description"
                                   Variant="Variant.Outlined"
                                   Margin="Margin.Dense"
                                   Lines="2"
@@ -280,7 +281,7 @@
                                   Class="mt-2" />
                     <MudSelect T="string"
                                @bind-Value="_newSeverity"
-                               Label="Severity"
+                               Label="@T.ReadingRoom.Severity"
                                Variant="Variant.Outlined"
                                Margin="Margin.Dense"
                                Class="mt-2">
@@ -295,7 +296,7 @@
                                StartIcon="@Icons.Material.Filled.Add"
                                Class="mt-2"
                                OnClick="AddFindingAsync"
-                               Disabled="@(string.IsNullOrWhiteSpace(_newRegion) || string.IsNullOrWhiteSpace(_newDescription))">Add Finding</MudButton>
+                               Disabled="@(string.IsNullOrWhiteSpace(_newRegion) || string.IsNullOrWhiteSpace(_newDescription))">@T.ReadingRoom.AddFinding</MudButton>
                 }
             </div>
 
@@ -303,21 +304,21 @@
                 @if (CanEdit)
                 {
                     <MudStack Row="true" Spacing="2">
-                        <MudButton Variant="Variant.Outlined" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Save" OnClick="SaveAsync" Disabled="_busy">Save Draft</MudButton>
-                        <MudButton Variant="Variant.Text" Color="Color.Default" StartIcon="@Icons.Material.Filled.CancelPresentation" OnClick="OpenCancelAsync" Disabled="_busy">Cancel</MudButton>
+                        <MudButton Variant="Variant.Outlined" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Save" OnClick="SaveAsync" Disabled="_busy">@T.ReadingRoom.SaveDraft</MudButton>
+                        <MudButton Variant="Variant.Text" Color="Color.Default" StartIcon="@Icons.Material.Filled.CancelPresentation" OnClick="OpenCancelAsync" Disabled="_busy">@T.Common.Cancel</MudButton>
                     </MudStack>
-                    <MudButton Variant="Variant.Filled" Color="Color.Success" StartIcon="@Icons.Material.Filled.CheckCircle" OnClick="FinalizeAsync" Disabled="_busy">Sign Report</MudButton>
+                    <MudButton Variant="Variant.Filled" Color="Color.Success" StartIcon="@Icons.Material.Filled.CheckCircle" OnClick="FinalizeAsync" Disabled="_busy">@T.ReadingRoom.SignReport</MudButton>
                 }
                 else if (_report.Status == "Finalized")
                 {
                     <MudStack Row="true" Spacing="2">
-                        <MudButton Variant="Variant.Outlined" Color="Color.Primary" StartIcon="@Icons.Material.Filled.EditNote" OnClick="OpenAmendAsync" Disabled="_busy">Amend</MudButton>
-                        <MudChip T="string" Color="Color.Success" Size="Size.Medium" Variant="Variant.Filled" Label="true">Signed @(_report.FinalizedAt?.ToString("yyyy-MM-dd") ?? "-")</MudChip>
+                        <MudButton Variant="Variant.Outlined" Color="Color.Primary" StartIcon="@Icons.Material.Filled.EditNote" OnClick="OpenAmendAsync" Disabled="_busy">@T.ReadingRoom.Amend</MudButton>
+                        <MudChip T="string" Color="Color.Success" Size="Size.Medium" Variant="Variant.Filled" Label="true">@(T.FormatValue(T.ReadingRoom.SignedAt, _report.FinalizedAt?.ToString("yyyy-MM-dd") ?? "-"))</MudChip>
                     </MudStack>
                 }
                 else if (_report.Status == "Cancelled")
                 {
-                    <MudChip T="string" Color="Color.Error" Size="Size.Medium" Variant="Variant.Outlined">Cancelled</MudChip>
+                    <MudChip T="string" Color="Color.Error" Size="Size.Medium" Variant="Variant.Outlined">@T.ReadingRoom.Cancelled</MudChip>
                 }
             </div>
         }
@@ -446,7 +447,7 @@
         }
         catch (Exception)
         {
-            _queueError = "Unable to reach the server.";
+            _queueError = T.ReadingRoom.Unreachable;
         }
         finally
         {
@@ -487,7 +488,7 @@
         }
         catch (Exception)
         {
-            _reportError = "Unable to load the report.";
+            _reportError = T.ReadingRoom.ReportLoadError;
         }
         finally
         {
@@ -644,7 +645,7 @@
             {
                 _report = latest;
                 BuildEditor(latest);
-                Snackbar.Add("Draft saved.", Severity.Success);
+                Snackbar.Add(T.ReadingRoom.DraftSaved, Severity.Success);
             }
         }
         catch (ApiException ex)
@@ -653,7 +654,7 @@
         }
         catch (Exception)
         {
-            Snackbar.Add("Unable to reach the server.", Severity.Error);
+            Snackbar.Add(T.ReadingRoom.Unreachable, Severity.Error);
         }
         finally
         {
@@ -667,10 +668,10 @@
             return;
 
         var confirmed = await DialogService.ShowMessageBoxAsync(
-            "Sign Report",
-            "Finalizing the report locks this version and marks the study as reported. Continue?",
-            yesText: "Sign & Finalize",
-            cancelText: "Back");
+            T.ReadingRoom.SignReport,
+            T.ReadingRoom.FinalizeConfirm,
+            yesText: T.ReadingRoom.SignAndFinalize,
+            cancelText: T.ReadingRoom.Back);
 
         if (confirmed is not true)
             return;
@@ -685,7 +686,7 @@
                 _selected.ReportStatus = "Finalized";
                 _reportStatusByExam[_selected.Id] = "Finalized";
             }
-            Snackbar.Add("Report signed.", Severity.Success);
+            Snackbar.Add(T.ReadingRoom.ReportSigned, Severity.Success);
         }
         catch (ApiException ex)
         {
@@ -693,7 +694,7 @@
         }
         catch (Exception)
         {
-            Snackbar.Add("Unable to reach the server.", Severity.Error);
+            Snackbar.Add(T.ReadingRoom.Unreachable, Severity.Error);
         }
         finally
         {
@@ -720,7 +721,7 @@
             _newDescription = string.Empty;
             _newSeverity = "None";
             await ReloadReportAsync();
-            Snackbar.Add("Finding added.", Severity.Success);
+            Snackbar.Add(T.ReadingRoom.FindingAdded, Severity.Success);
         }
         catch (ApiException ex)
         {
@@ -728,7 +729,7 @@
         }
         catch (Exception)
         {
-            Snackbar.Add("Unable to reach the server.", Severity.Error);
+            Snackbar.Add(T.ReadingRoom.Unreachable, Severity.Error);
         }
         finally
         {
@@ -749,7 +750,7 @@
                 Severity = severity,
             });
             await ReloadReportAsync();
-            Snackbar.Add("Finding updated.", Severity.Success);
+            Snackbar.Add(T.ReadingRoom.FindingUpdated, Severity.Success);
         }
         catch (ApiException ex)
         {
@@ -757,7 +758,7 @@
         }
         catch (Exception)
         {
-            Snackbar.Add("Unable to reach the server.", Severity.Error);
+            Snackbar.Add(T.ReadingRoom.Unreachable, Severity.Error);
         }
     }
 
@@ -767,10 +768,10 @@
             return;
 
         var confirmed = await DialogService.ShowMessageBoxAsync(
-            "Remove finding",
-            $"Remove '{finding.Region}'?",
-            yesText: "Remove",
-            cancelText: "Keep");
+            T.ReadingRoom.RemoveFinding,
+            T.FormatValue(T.ReadingRoom.RemoveFindingConfirm, finding.Region),
+            yesText: T.ReadingRoom.Remove,
+            cancelText: T.ReadingRoom.Keep);
 
         if (confirmed is not true)
             return;
@@ -779,7 +780,7 @@
         {
             await ReportService.RemoveFindingAsync(_report.Id, finding.Id);
             await ReloadReportAsync();
-            Snackbar.Add("Finding removed.", Severity.Success);
+            Snackbar.Add(T.ReadingRoom.FindingRemoved, Severity.Success);
         }
         catch (ApiException ex)
         {
@@ -787,7 +788,7 @@
         }
         catch (Exception)
         {
-            Snackbar.Add("Unable to reach the server.", Severity.Error);
+            Snackbar.Add(T.ReadingRoom.Unreachable, Severity.Error);
         }
     }
 
@@ -812,7 +813,7 @@
             { nameof(AmendReportDialog.CurrentVersion), _report.CurrentVersionNumber },
         };
 
-        var dialog = await DialogService.ShowAsync<AmendReportDialog>("Amend Report", parameters, options);
+        var dialog = await DialogService.ShowAsync<AmendReportDialog>(T.AmendReport.Title, parameters, options);
         var result = await dialog.Result;
         if (result is { Canceled: false } && result.Data is ReportDto amended)
         {
@@ -820,7 +821,7 @@
             BuildEditor(amended);
             if (_selected is not null)
                 _selected.ReportStatus = "Draft";
-            Snackbar.Add("Report reopened for amendment.", Severity.Success);
+            Snackbar.Add(T.ReadingRoom.ReopenedForAmendment, Severity.Success);
         }
     }
 
@@ -834,7 +835,7 @@
             { nameof(CancelReportDialog.ReportId), _report.Id },
         };
 
-        var dialog = await DialogService.ShowAsync<CancelReportDialog>("Cancel Report", parameters);
+        var dialog = await DialogService.ShowAsync<CancelReportDialog>(T.CancelReport.Title, parameters);
         var result = await dialog.Result;
         if (result is { Canceled: false, Data: true })
         {
@@ -849,7 +850,7 @@
         if (_report is null)
             return;
 
-        var dialog = await DialogService.ShowAsync<ReportTemplatePickerDialog>("Report Template");
+        var dialog = await DialogService.ShowAsync<ReportTemplatePickerDialog>(T.ReportTemplate.Title);
         var result = await dialog.Result;
         if (result?.Canceled != false || result.Data is not string templateId || _report is null)
             return;
@@ -858,7 +859,7 @@
         {
             _report = await ReportService.ApplyTemplateAsync(_report.Id, templateId);
             BuildEditor(_report);
-            Snackbar.Add("Template applied.", Severity.Success);
+            Snackbar.Add(T.ReadingRoom.TemplateApplied, Severity.Success);
         }
         catch (ApiException ex)
         {
@@ -866,7 +867,7 @@
         }
         catch (Exception)
         {
-            Snackbar.Add("Unable to reach the server.", Severity.Error);
+            Snackbar.Add(T.ReadingRoom.Unreachable, Severity.Error);
         }
     }
 
@@ -880,7 +881,7 @@
             { nameof(ReportVersionsDialog.ReportId), _report.Id },
         };
 
-        await DialogService.ShowAsync<ReportVersionsDialog>("Report History", parameters);
+        await DialogService.ShowAsync<ReportVersionsDialog>(T.ReportVersions.Title, parameters);
     }
 
     private static Color ReportStatusColor(string status) => status switch

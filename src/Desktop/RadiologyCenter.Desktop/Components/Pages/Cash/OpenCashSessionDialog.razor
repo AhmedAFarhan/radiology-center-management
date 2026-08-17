@@ -1,16 +1,17 @@
 @inject CashService CashService
 @inject ISnackbar Snackbar
+@inject AppLocalizer T
 
 <MudDialog>
     <DialogContent>
-        <DialogHeader Icon="@Icons.Material.Filled.AccountBalanceWallet" Title="Open Cash Session" />
+        <DialogHeader Icon="@Icons.Material.Filled.AccountBalanceWallet" Title="@T.OpenCash.Title" />
         <EditForm EditContext="_editContext">
             <DataAnnotationsValidator />
             <MudGrid Spacing="2">
                 <MudItem xs="12">
-                    <MudText Typo="Typo.body2" Class="text-secondary mb-1">Opening float is the physical cash you start with in the session.</MudText>
+                    <MudText Typo="Typo.body2" Class="text-secondary mb-1">@T.OpenCash.OpeningFloatHint</MudText>
                     <MudNumericField @bind-Value="_model.OpeningFloat"
-                                     Label="Opening Float"
+                                     Label="@T.OpenCash.OpeningFloat"
                                      Variant="Variant.Outlined"
                                      Margin="Margin.Dense"
                                      Immediate="true"
@@ -18,7 +19,7 @@
                 </MudItem>
                 <MudItem xs="12">
                     <MudTextField @bind-Value="_model.Notes"
-                                  Label="Notes"
+                                  Label="@T.OpenCash.Notes"
                                   Variant="Variant.Outlined"
                                   Margin="Margin.Dense"
                                   Immediate="true"
@@ -28,7 +29,7 @@
         </EditForm>
     </DialogContent>
     <DialogActions>
-        <MudButton Color="Color.Default" OnClick="CancelAsync" Disabled="_busy">Cancel</MudButton>
+        <MudButton Color="Color.Default" OnClick="CancelAsync" Disabled="_busy">@T.Common.Cancel</MudButton>
         <MudButton Color="Color.Primary" Variant="Variant.Filled" OnClick="SubmitAsync" Disabled="_busy">
             @if (_busy)
             {
@@ -36,7 +37,7 @@
             }
             else
             {
-                <text>Open Session</text>
+                <text>@T.OpenCash.Submit</text>
             }
         </MudButton>
     </DialogActions>
@@ -67,7 +68,7 @@
             };
 
             await CashService.OpenAsync(input);
-            Snackbar.Add("Cash session opened.", Severity.Success);
+            Snackbar.Add(T.OpenCash.Opened, Severity.Success);
             MudDialog.Close(DialogResult.Ok(true));
         }
         catch (ApiException ex)
@@ -76,7 +77,7 @@
         }
         catch (Exception)
         {
-            Snackbar.Add("Unable to reach the server. Please try again.", Severity.Error);
+            Snackbar.Add(T.OpenCash.UnreachableRetry, Severity.Error);
         }
         finally
         {

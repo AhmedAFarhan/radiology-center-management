@@ -1,15 +1,16 @@
 @inject InventoryService InventoryService
 @inject ISnackbar Snackbar
+@inject AppLocalizer T
 
 <MudDialog>
     <DialogContent>
-        <DialogHeader Icon="@Icons.Material.Filled.LocalShipping" Title="@(Supplier is null ? "New Supplier" : "Edit Supplier")" />
+        <DialogHeader Icon="@Icons.Material.Filled.LocalShipping" Title="@(Supplier is null ? T.SupplierDialog.NewSupplier : T.SupplierDialog.EditSupplier)" />
         <EditForm EditContext="_editContext">
             <DataAnnotationsValidator />
             <MudGrid Spacing="2">
                 <MudItem xs="12" sm="8">
                     <MudTextField @bind-Value="_model.Name"
-                                  Label="Name"
+                                  Label="@T.Common.Name"
                                   Variant="Variant.Outlined"
                                   Margin="Margin.Dense"
                                   Immediate="true"
@@ -17,7 +18,7 @@
                 </MudItem>
                 <MudItem xs="12" sm="4">
                     <MudTextField @bind-Value="_model.Phone"
-                                  Label="Phone"
+                                  Label="@T.SupplierDialog.Phone"
                                   Variant="Variant.Outlined"
                                   Margin="Margin.Dense"
                                   Immediate="true"
@@ -25,7 +26,7 @@
                 </MudItem>
                 <MudItem xs="12" sm="6">
                     <MudTextField @bind-Value="_model.ContactPerson"
-                                  Label="Contact Person"
+                                  Label="@T.SupplierDialog.ContactPerson"
                                   Variant="Variant.Outlined"
                                   Margin="Margin.Dense"
                                   Immediate="true"
@@ -33,7 +34,7 @@
                 </MudItem>
                 <MudItem xs="12" sm="6">
                     <MudTextField @bind-Value="_model.Email"
-                                  Label="Email"
+                                  Label="@T.SupplierDialog.Email"
                                   Variant="Variant.Outlined"
                                   Margin="Margin.Dense"
                                   Immediate="true"
@@ -41,7 +42,7 @@
                 </MudItem>
                 <MudItem xs="12">
                     <MudTextField @bind-Value="_model.Address"
-                                  Label="Address"
+                                  Label="@T.SupplierDialog.Address"
                                   Variant="Variant.Outlined"
                                   Margin="Margin.Dense"
                                   Immediate="true"
@@ -49,7 +50,7 @@
                 </MudItem>
                 <MudItem xs="12" sm="6">
                     <MudTextField @bind-Value="_model.TaxNumber"
-                                  Label="Tax Number"
+                                  Label="@T.SupplierDialog.TaxNumber"
                                   Variant="Variant.Outlined"
                                   Margin="Margin.Dense"
                                   Immediate="true"
@@ -57,7 +58,7 @@
                 </MudItem>
                 <MudItem xs="12" sm="6">
                     <MudTextField @bind-Value="_model.PaymentTerms"
-                                  Label="Payment Terms"
+                                  Label="@T.SupplierDialog.PaymentTerms"
                                   Variant="Variant.Outlined"
                                   Margin="Margin.Dense"
                                   Immediate="true"
@@ -67,7 +68,7 @@
         </EditForm>
     </DialogContent>
     <DialogActions>
-        <MudButton Color="Color.Default" OnClick="CancelAsync" Disabled="_busy">Cancel</MudButton>
+        <MudButton Color="Color.Default" OnClick="CancelAsync" Disabled="_busy">@T.Common.Cancel</MudButton>
         <MudButton Color="Color.Primary" Variant="Variant.Filled" OnClick="SubmitAsync" Disabled="_busy">
             @if (_busy)
             {
@@ -75,7 +76,7 @@
             }
             else
             {
-                <text>@(IsEdit ? "Save Changes" : "Create Supplier")</text>
+                <text>@(IsEdit ? T.SupplierDialog.SaveChanges : T.SupplierDialog.CreateSupplier)</text>
             }
         </MudButton>
     </DialogActions>
@@ -132,7 +133,7 @@
             else
                 await InventoryService.CreateSupplierAsync(input);
 
-            Snackbar.Add(IsEdit ? "Supplier updated." : "Supplier created.", Severity.Success);
+            Snackbar.Add(IsEdit ? T.SupplierDialog.SupplierUpdated : T.SupplierDialog.SupplierCreated, Severity.Success);
             MudDialog.Close(DialogResult.Ok(true));
         }
         catch (ApiException ex)
@@ -141,7 +142,7 @@
         }
         catch (Exception)
         {
-            Snackbar.Add("Unable to reach the server. Please try again.", Severity.Error);
+            Snackbar.Add(T.SupplierDialog.Unreachable, Severity.Error);
         }
         finally
         {

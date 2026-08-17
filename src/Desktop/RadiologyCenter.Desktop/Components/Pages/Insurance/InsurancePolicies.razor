@@ -3,59 +3,60 @@
 @inject InsuranceService InsuranceService
 @inject IDialogService DialogService
 @inject ISnackbar Snackbar
+@inject AppLocalizer T
 @implements IDisposable
 
-<PageHeader Icon="@Icons.Material.Filled.Description" Title="Insurance Policies"
-            Subtitle="Patient coverage policies with companies"
+<PageHeader Icon="@Icons.Material.Filled.Description" Title="@T.Policy.Title"
+            Subtitle="@T.Policy.Subtitle"
             SearchValueChanged="OnSearchChanged"
-            SearchPlaceholder="Search by patient, company or policy number..."
+            SearchPlaceholder="@T.Policy.SearchPlaceholder"
             OnRefresh="ReloadAsync">
-    <MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Add" OnClick="OpenCreateDialogAsync">Add Policy</MudButton>
+    <MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Add" OnClick="OpenCreateDialogAsync">@T.Policy.AddPolicy</MudButton>
 </PageHeader>
 
 <MudTable T="InsurancePolicyListItemDto" @ref="_table" ServerData="LoadServerData" Dense="true" Hover="true" Striped="true" Elevation="1" RowsPerPage="10">
     <HeaderContent>
-        <MudTh><MudTableSortLabel T="InsurancePolicyListItemDto" SortLabel="@("PolicyNumber")">Policy #</MudTableSortLabel></MudTh>
-        <MudTh><MudTableSortLabel T="InsurancePolicyListItemDto" SortLabel="@("PatientName")">Patient</MudTableSortLabel></MudTh>
-        <MudTh><MudTableSortLabel T="InsurancePolicyListItemDto" SortLabel="@("CompanyName")">Company</MudTableSortLabel></MudTh>
-        <MudTh><MudTableSortLabel T="InsurancePolicyListItemDto" SortLabel="@("CoveragePercent")">Coverage</MudTableSortLabel></MudTh>
-        <MudTh><MudTableSortLabel T="InsurancePolicyListItemDto" SortLabel="@("EffectiveFrom")">Effective</MudTableSortLabel></MudTh>
-        <MudTh>Status</MudTh>
-        <MudTh>Actions</MudTh>
+        <MudTh><MudTableSortLabel T="InsurancePolicyListItemDto" SortLabel="@("PolicyNumber")">@T.Policy.Number</MudTableSortLabel></MudTh>
+        <MudTh><MudTableSortLabel T="InsurancePolicyListItemDto" SortLabel="@("PatientName")">@T.Policy.Patient</MudTableSortLabel></MudTh>
+        <MudTh><MudTableSortLabel T="InsurancePolicyListItemDto" SortLabel="@("CompanyName")">@T.Policy.Company</MudTableSortLabel></MudTh>
+        <MudTh><MudTableSortLabel T="InsurancePolicyListItemDto" SortLabel="@("CoveragePercent")">@T.Policy.Coverage</MudTableSortLabel></MudTh>
+        <MudTh><MudTableSortLabel T="InsurancePolicyListItemDto" SortLabel="@("EffectiveFrom")">@T.Policy.Effective</MudTableSortLabel></MudTh>
+        <MudTh>@T.Common.Status</MudTh>
+        <MudTh>@T.Common.Actions</MudTh>
     </HeaderContent>
     <RowTemplate>
-        <MudTd DataLabel="Policy #">
+        <MudTd DataLabel="@T.Policy.Number">
             <MudText Class="font-weight-medium mono-text">@context.PolicyNumber</MudText>
             @if (context.IsGovernment)
             {
-                <MudChip T="string" Size="Size.Small" Color="Color.Info" Variant="Variant.Outlined">Government</MudChip>
+                <MudChip T="string" Size="Size.Small" Color="Color.Info" Variant="Variant.Outlined">@T.Policy.Government</MudChip>
             }
         </MudTd>
-        <MudTd DataLabel="Patient">@context.PatientName</MudTd>
-        <MudTd DataLabel="Company">@context.CompanyName</MudTd>
-        <MudTd DataLabel="Coverage">
+        <MudTd DataLabel="@T.Policy.Patient">@context.PatientName</MudTd>
+        <MudTd DataLabel="@T.Policy.Company">@context.CompanyName</MudTd>
+        <MudTd DataLabel="@T.Policy.Coverage">
             <MudProgressLinear Color="@(context.CoveragePercent >= 75 ? Color.Success : context.CoveragePercent >= 40 ? Color.Warning : Color.Error)"
                                Value="@((double)context.CoveragePercent)"
                                Rounded="true"
                                Size="Size.Small" />
             <MudText Typo="Typo.caption" Class="text-secondary">@context.CoveragePercent.ToString("0")%</MudText>
         </MudTd>
-        <MudTd DataLabel="Effective">
+        <MudTd DataLabel="@T.Policy.Effective">
             @context.EffectiveFrom.ToString("MMM yyyy")
             @if (context.EffectiveTo is not null)
             {
-                <MudText Typo="Typo.caption" Class="text-secondary">to @context.EffectiveTo.Value.ToString("MMM yyyy")</MudText>
+                <MudText Typo="Typo.caption" Class="text-secondary">@(T.FormatValue(T.Policy.EffectiveTo, context.EffectiveTo.Value.ToString("MMM yyyy")))</MudText>
             }
         </MudTd>
-        <MudTd DataLabel="Status">
-            <MudChip T="string" Size="Size.Small" Color="@(context.IsActive ? Color.Success : Color.Default)">@(context.IsActive ? "Active" : "Inactive")</MudChip>
+        <MudTd DataLabel="@T.Common.Status">
+            <MudChip T="string" Size="Size.Small" Color="@(context.IsActive ? Color.Success : Color.Default)">@(context.IsActive ? T.Common.Active : T.Common.Inactive)</MudChip>
         </MudTd>
-        <MudTd DataLabel="Actions">
-            <MudIconButton Icon="@Icons.Material.Filled.Visibility" Size="Size.Small" Color="Color.Default" aria-label="View" OnClick="@(() => OpenDetailDialogAsync(context))" />
+        <MudTd DataLabel="@T.Common.Actions">
+            <MudIconButton Icon="@Icons.Material.Filled.Visibility" Size="Size.Small" Color="Color.Default" aria-label="@T.Policy.View" OnClick="@(() => OpenDetailDialogAsync(context))" />
             <MudIconButton Icon="@(context.IsActive ? Icons.Material.Filled.Block : Icons.Material.Filled.CheckCircle)"
                            Size="Size.Small"
                            Color="@(context.IsActive ? Color.Default : Color.Success)"
-                           aria-label="Toggle status"
+                           aria-label="@T.Policy.ToggleStatus"
                            OnClick="@(() => ToggleActiveAsync(context))" />
         </MudTd>
     </RowTemplate>
@@ -63,16 +64,16 @@
         @if (_loadError is not null)
         {
             <ErrorState Icon="@(_offline ? Icons.Material.Filled.CloudOff : Icons.Material.Filled.ErrorOutline)"
-                        Title="Couldn't load data"
+                        Title="@T.Policy.LoadErrorTitle"
                         Message="@_loadError"
                         Action="ReloadAsync" />
         }
         else
         {
         <EmptyState Icon="@Icons.Material.Filled.Description"
-                    Title="No insurance policies yet"
-                    Message="Attach coverage to patients through an insurance company."
-                    ActionLabel="Add your first policy"
+                    Title="@T.Policy.EmptyTitle"
+                    Message="@T.Policy.EmptyMessage"
+                    ActionLabel="@T.Policy.EmptyActionLabel"
                     Action="OpenCreateDialogAsync" />
         }
     </NoRecordsContent>
@@ -113,8 +114,8 @@
         }
         catch (Exception)
         {
-            Snackbar.Add("Unable to reach the server.", Severity.Error);
-            _loadError = "Unable to reach the server.";
+            Snackbar.Add(T.Policy.Unreachable, Severity.Error);
+            _loadError = T.Policy.Unreachable;
             _offline = true;
             return new TableData<InsurancePolicyListItemDto> { Items = Array.Empty<InsurancePolicyListItemDto>(), TotalItems = 0 };
         }
@@ -145,7 +146,7 @@
     private async Task OpenCreateDialogAsync()
     {
         var options = new DialogOptions { MaxWidth = MaxWidth.Large, FullWidth = true, NoHeader = true };
-        var dialog = await DialogService.ShowAsync<PolicyEditorDialog>("New Insurance Policy", options);
+        var dialog = await DialogService.ShowAsync<PolicyEditorDialog>(T.Policy.NewTitle, options);
         await ReloadIfSavedAsync(dialog);
     }
 
@@ -169,7 +170,7 @@
         try
         {
             await InsuranceService.ChangePolicyStatusAsync(policy.Id, policy.IsActive ? "Deactivate" : "Reactivate");
-            Snackbar.Add(policy.IsActive ? "Policy deactivated." : "Policy reactivated.", Severity.Success);
+            Snackbar.Add(policy.IsActive ? T.Policy.Deactivated : T.Policy.Reactivated, Severity.Success);
             await ReloadAsync();
         }
         catch (ApiException ex)
@@ -178,7 +179,7 @@
         }
         catch (Exception)
         {
-            Snackbar.Add("Unable to reach the server.", Severity.Error);
+            Snackbar.Add(T.Policy.Unreachable, Severity.Error);
         }
     }
 

@@ -1,27 +1,29 @@
+@inject AppLocalizer T
+
 <MudCard Elevation="0" Class="dashboard-card h-100">
     <MudCardHeader>
         <CardHeaderContent>
-            <MudText Typo="Typo.subtitle1" Class="font-weight-medium">Recent Examinations</MudText>
+            <MudText Typo="Typo.subtitle1" Class="font-weight-medium">@T.Dashboard.RecentExaminations</MudText>
         </CardHeaderContent>
     </MudCardHeader>
     <MudCardContent>
         <MudTable T="ExaminationDto" Items="Items" Dense="true" Hover="true" Striped="true" Elevation="0">
             <HeaderContent>
-                <MudTh>Type</MudTh>
-                <MudTh>Status</MudTh>
-                <MudTh>Priority</MudTh>
-                <MudTh>Referring Doctor</MudTh>
+                <MudTh>@T.Dashboard.ExamType</MudTh>
+                <MudTh>@T.Dashboard.ExamStatus</MudTh>
+                <MudTh>@T.Dashboard.ExamPriority</MudTh>
+                <MudTh>@T.Dashboard.ReferringDoctor</MudTh>
             </HeaderContent>
             <RowTemplate>
-                <MudTd DataLabel="Type">@context.ExaminationTypeName</MudTd>
-                <MudTd DataLabel="Status">
+                <MudTd DataLabel="@T.Dashboard.ExamType">@context.ExaminationTypeName</MudTd>
+                <MudTd DataLabel="@T.Dashboard.ExamStatus">
                     <MudChip T="string" Size="Size.Small" Color="@StatusColor(context.Status)">@context.Status</MudChip>
                 </MudTd>
-                <MudTd DataLabel="Priority">@context.Priority</MudTd>
-                <MudTd DataLabel="Referring Doctor">@(context.ReferralDoctorId ?? "-")</MudTd>
+                <MudTd DataLabel="@T.Dashboard.ExamPriority">@context.Priority</MudTd>
+                <MudTd DataLabel="@T.Dashboard.ReferringDoctor">@(context.ReferralDoctorId ?? "-")</MudTd>
             </RowTemplate>
             <NoRecordsContent>
-                <EmptyState Icon="@Icons.Material.Filled.EventNote" Title="No recent examinations" Message="Examinations will appear here." />
+                <EmptyState Icon="@Icons.Material.Filled.EventNote" Title="@T.Dashboard.NoRecentExams" Message="@T.Dashboard.ExamsWillAppear" />
             </NoRecordsContent>
         </MudTable>
     </MudCardContent>

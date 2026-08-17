@@ -1,12 +1,14 @@
+@inject AppLocalizer T
+
 <MudStack AlignItems="AlignItems.Center" Spacing="1" Class="pa-6">
     <MudIcon Icon="@Icon" Size="Size.Large" Color="@Color" />
-    <MudText Typo="Typo.subtitle1" Align="Align.Center" Class="font-weight-medium">@Title</MudText>
-    <MudText Typo="Typo.body2" Align="Align.Center" Class="text-secondary">@Message</MudText>
+    <MudText Typo="Typo.subtitle1" Align="Align.Center" Class="font-weight-medium">@_title</MudText>
+    <MudText Typo="Typo.body2" Align="Align.Center" Class="text-secondary">@_message</MudText>
     @if (Action.HasDelegate)
     {
         <MudButton Variant="Variant.Outlined" Color="@Color" OnClick="OnActionClick" Class="mt-2">
             <MudIcon Icon="@Icons.Material.Filled.Refresh" Size="Size.Small" Class="mr-2" />
-            @RetryLabel
+            @_retryLabel
         </MudButton>
     }
 </MudStack>
@@ -16,13 +18,24 @@
 
     [Parameter] public Color Color { get; set; } = Color.Error;
 
-    [Parameter] public string Title { get; set; } = "Something went wrong";
+    [Parameter] public string? Title { get; set; }
 
-    [Parameter] public string Message { get; set; } = string.Empty;
+    [Parameter] public string? Message { get; set; }
 
-    [Parameter] public string RetryLabel { get; set; } = "Retry";
+    [Parameter] public string? RetryLabel { get; set; }
 
     [Parameter] public EventCallback Action { get; set; }
+
+    private string _title = string.Empty;
+    private string _message = string.Empty;
+    private string _retryLabel = string.Empty;
+
+    protected override void OnParametersSet()
+    {
+        _title = Title ?? T.Common.ErrorTitle;
+        _message = Message ?? string.Empty;
+        _retryLabel = RetryLabel ?? T.Common.Retry;
+    }
 
     private Task OnActionClick()
         => Action.HasDelegate ? Action.InvokeAsync(null) : Task.CompletedTask;

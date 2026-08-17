@@ -1,12 +1,13 @@
 @inject InventoryService InventoryService
 @inject ISnackbar Snackbar
+@inject AppLocalizer T
 
 <MudDialog>
     <DialogContent>
-        <DialogHeader Icon="@Icons.Material.Filled.Inventory2" Title="@(_stock?.ItemName ?? "Item Stock")" />
+        <DialogHeader Icon="@Icons.Material.Filled.Inventory2" Title="@(_stock?.ItemName ?? T.ItemDialog.ItemStockTitle)" />
         @if (_loadError is not null)
         {
-            <ErrorState Title="Couldn't load stock" Message="@_loadError" Action="LoadStockAsync" />
+            <ErrorState Title="@T.ItemDialog.LoadStockErrorTitle" Message="@_loadError" Action="LoadStockAsync" />
         }
         else if (_stock is null)
         {
@@ -15,24 +16,24 @@
         else
         {
             <MudText Typo="Typo.body2" Class="text-secondary mb-3">
-                Stock on hand: <b>@_stock.StockOnHand</b>
+                @T.ItemDialog.StockOnHand <b>@_stock.StockOnHand</b>
             </MudText>
 
-            <MudText Typo="Typo.subtitle2" Class="mb-1">Batches</MudText>
+            <MudText Typo="Typo.subtitle2" Class="mb-1">@T.ItemDialog.Batches</MudText>
             <MudSimpleTable Dense="true">
                 <thead>
                     <tr>
-                        <th>Lot</th>
-                        <th>Expiry</th>
-                        <th>Remaining</th>
-                        <th>Status</th>
+                        <th>@T.ItemDialog.Lot</th>
+                        <th>@T.ItemDialog.Expiry</th>
+                        <th>@T.ItemDialog.Remaining</th>
+                        <th>@T.Common.Status</th>
                     </tr>
                 </thead>
                 <tbody>
                     @if (_stock.Batches.Count == 0)
                     {
                         <tr>
-                            <td colspan="4">No batches recorded.</td>
+                            <td colspan="4">@T.ItemDialog.NoBatches</td>
                         </tr>
                     }
                     else
@@ -44,7 +45,7 @@
                                 <td>@(batch.ExpiryDate?.ToString("dd MMM yyyy") ?? "-")</td>
                                 <td>@batch.QuantityRemaining</td>
                                 <td>
-                                    <MudChip T="string" Size="Size.Small" Color="@(batch.IsExpired ? Color.Error : Color.Success)">@(batch.IsExpired ? "Expired" : "OK")</MudChip>
+                                    <MudChip T="string" Size="Size.Small" Color="@(batch.IsExpired ? Color.Error : Color.Success)">@(batch.IsExpired ? T.ItemDialog.Expired : T.Common.Ok)</MudChip>
                                 </td>
                             </tr>
                         }
@@ -53,25 +54,25 @@
             </MudSimpleTable>
 
             <MudDivider Class="my-4" />
-            <MudText Typo="Typo.subtitle2" Class="mb-1">Issue Stock</MudText>
+            <MudText Typo="Typo.subtitle2" Class="mb-1">@T.ItemDialog.IssueStock</MudText>
             <MudGrid Spacing="2">
                 <MudItem xs="12" sm="4">
                     <MudNumericField T="int?" @bind-Value="_quantity"
-                                     Label="Quantity"
+                                     Label="@T.ItemDialog.Quantity"
                                      Variant="Variant.Outlined"
                                      Margin="Margin.Dense"
                                      Min="1" />
                 </MudItem>
                 <MudItem xs="12" sm="8">
                     <MudTextField @bind-Value="_reference"
-                                  Label="Reference"
+                                  Label="@T.ItemDialog.Reference"
                                   Variant="Variant.Outlined"
                                   Margin="Margin.Dense"
                                   Immediate="true" />
                 </MudItem>
                 <MudItem xs="12">
                     <MudTextField @bind-Value="_notes"
-                                  Label="Notes"
+                                  Label="@T.ItemDialog.Notes"
                                   Variant="Variant.Outlined"
                                   Margin="Margin.Dense"
                                   Immediate="true" />
@@ -80,7 +81,7 @@
         }
     </DialogContent>
     <DialogActions>
-        <MudButton Color="Color.Default" OnClick="CancelAsync" Disabled="_busy">Close</MudButton>
+        <MudButton Color="Color.Default" OnClick="CancelAsync" Disabled="_busy">@T.Common.Close</MudButton>
         <MudButton Color="Color.Warning" Variant="Variant.Filled" OnClick="IssueAsync" Disabled="_busy || _stock is null || _loadError is not null">
             @if (_busy)
             {
@@ -88,7 +89,7 @@
             }
             else
             {
-                <text>Issue Stock</text>
+                <text>@T.ItemDialog.IssueStock</text>
             }
         </MudButton>
     </DialogActions>
@@ -122,7 +123,7 @@
         }
         catch (Exception)
         {
-            _loadError = "Unable to reach the server.";
+            _loadError = T.Inventory.Unreachable;
         }
     }
 
@@ -130,7 +131,7 @@
     {
         if (_quantity is not { } qty || qty <= 0)
         {
-            Snackbar.Add("Enter a quantity greater than zero.", Severity.Warning);
+            Snackbar.Add(T.ItemDialog.IssueQuantityWarning, Severity.Warning);
             return;
         }
 
@@ -144,7 +145,7 @@
                 Notes = _notes,
             });
 
-            Snackbar.Add($"Issued {qty} unit(s).", Severity.Success);
+            Snackbar.Add(T.FormatValue(T.ItemDialog.IssuedUnits, qty), Severity.Success);
             _quantity = null;
             _reference = null;
             _notes = null;
@@ -156,7 +157,7 @@
         }
         catch (Exception)
         {
-            Snackbar.Add("Unable to reach the server.", Severity.Error);
+            Snackbar.Add(T.Inventory.Unreachable, Severity.Error);
         }
         finally
         {

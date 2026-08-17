@@ -2,10 +2,11 @@
 @inject ResourceService ResourceService
 @inject ISnackbar Snackbar
 @inject IDialogService DialogService
+@inject AppLocalizer T
 
 <MudDialog>
     <DialogContent>
-        <DialogHeader Icon="@Icons.Material.Filled.ReceiptLong" Title="@(_payRun is null ? "Pay Run" : $"Pay Run {_payRun.RunFrom.ToString("yyyy-MM-dd")} \u2192 {_payRun.RunTo.ToString("yyyy-MM-dd")}")" />
+        <DialogHeader Icon="@Icons.Material.Filled.ReceiptLong" Title="@(_payRun is null ? T.PayRunDialog.Title : T.FormatValue(T.PayRunDialog.DetailTitle, _payRun.RunFrom.ToString("yyyy-MM-dd"), _payRun.RunTo.ToString("yyyy-MM-dd")))" />
         @if (_payRun is null)
         {
             <DialogSkeleton Rows="6" />
@@ -17,23 +18,23 @@
                     <MudPaper Elevation="0" Class="pa-4 rounded" Style="border:1px solid rgba(0,0,0,.12)">
                         <MudGrid Spacing="2">
                             <MudItem xs="12" sm="6" md="3">
-                                <MudText Typo="Typo.caption" Class="text-secondary">Period</MudText>
+                                <MudText Typo="Typo.caption" Class="text-secondary">@T.PayRunDialog.Period</MudText>
                                 <MudText Typo="Typo.body1" Class="font-weight-medium">@_payRun.RunFrom.ToString("yyyy-MM-dd") → @_payRun.RunTo.ToString("yyyy-MM-dd")</MudText>
                             </MudItem>
                             <MudItem xs="12" sm="6" md="3">
-                                <MudText Typo="Typo.caption" Class="text-secondary">Status</MudText>
+                                <MudText Typo="Typo.caption" Class="text-secondary">@T.Common.Status</MudText>
                                 <MudChip T="string" Size="Size.Small" Color="@StatusColor(_payRun.Status)">@FormatStatus(_payRun.Status)</MudChip>
                             </MudItem>
                             <MudItem xs="12" sm="6" md="3">
-                                <MudText Typo="Typo.caption" Class="text-secondary">Processed</MudText>
-                                <MudText Typo="Typo.body2">@(_payRun.ProcessedAt?.ToString("g") ?? "Not processed")</MudText>
+                                <MudText Typo="Typo.caption" Class="text-secondary">@T.PayRunDialog.Processed</MudText>
+                                <MudText Typo="Typo.body2">@(_payRun.ProcessedAt?.ToString("g") ?? T.PayRunDialog.NotProcessed)</MudText>
                                 @if (!string.IsNullOrWhiteSpace(_payRun.ProcessedBy))
                                 {
-                                    <MudText Typo="Typo.caption" Class="text-secondary">by @_payRun.ProcessedBy</MudText>
+                                    <MudText Typo="Typo.caption" Class="text-secondary">@(T.FormatValue(T.PayRunDialog.By, _payRun.ProcessedBy))</MudText>
                                 }
                             </MudItem>
                             <MudItem xs="12" sm="6" md="3">
-                                <MudText Typo="Typo.caption" Class="text-secondary">Employees</MudText>
+                                <MudText Typo="Typo.caption" Class="text-secondary">@T.PayRunDialog.Employees</MudText>
                                 <MudText Typo="Typo.body1" Class="font-weight-medium">@_payRun.Payslips.Count</MudText>
                             </MudItem>
                         </MudGrid>
@@ -48,55 +49,55 @@
                 <MudItem xs="12">
                     <MudGrid Spacing="2" Class="mb-2">
                         <MudItem xs="12" sm="6">
-                            <MudText Typo="Typo.subtitle1" Class="font-weight-medium">Payslips</MudText>
+                            <MudText Typo="Typo.subtitle1" Class="font-weight-medium">@T.PayRunDialog.Payslips</MudText>
                         </MudItem>
                         <MudItem xs="12" sm="6" Class="d-flex justify-end">
                             @if (CanEditPayslips)
                             {
-                                <MudButton Variant="Variant.Filled" Color="Color.Primary" Size="Size.Small" StartIcon="@Icons.Material.Filled.PersonAdd" OnClick="AddPayslipAsync" Disabled="_busy">Add Payslip</MudButton>
+                                <MudButton Variant="Variant.Filled" Color="Color.Primary" Size="Size.Small" StartIcon="@Icons.Material.Filled.PersonAdd" OnClick="AddPayslipAsync" Disabled="_busy">@T.Payslip.AddTitle</MudButton>
                             }
                         </MudItem>
                     </MudGrid>
 
                     @if (_payRun.Payslips.Count == 0)
                     {
-                        <MudText Typo="Typo.body2" Class="text-secondary pa-4">No payslips yet. Add employees to this pay run.</MudText>
+                        <MudText Typo="Typo.body2" Class="text-secondary pa-4">@T.PayRunDialog.NoPayslips</MudText>
                     }
                     else
                     {
                         <MudTable T="PayslipDto" Items="_payRun.Payslips" Dense="true" Hover="true" Elevation="0" Class="rounded" Style="border:1px solid rgba(0,0,0,.12)">
                             <HeaderContent>
                                 <MudTh />
-                                <MudTh>Employee</MudTh>
-                                <MudTh Class="text-right">Gross</MudTh>
-                                <MudTh Class="text-right">Earnings</MudTh>
-                                <MudTh Class="text-right">Deductions</MudTh>
-                                <MudTh Class="text-right">Unpaid Days</MudTh>
-                                <MudTh Class="text-right">Net</MudTh>
+                                <MudTh>@T.PayRunDialog.Employee</MudTh>
+                                <MudTh Class="text-right">@T.PayRunDialog.Gross</MudTh>
+                                <MudTh Class="text-right">@T.PayRunDialog.Earnings</MudTh>
+                                <MudTh Class="text-right">@T.PayRunDialog.Deductions</MudTh>
+                                <MudTh Class="text-right">@T.PayRunDialog.UnpaidDays</MudTh>
+                                <MudTh Class="text-right">@T.PayRunDialog.Net</MudTh>
                                 @if (CanEditPayslips)
                                 {
-                                    <MudTh Class="text-center">Actions</MudTh>
+                                    <MudTh Class="text-center">@T.Common.Actions</MudTh>
                                 }
                             </HeaderContent>
                             <RowTemplate Context="ps">
                                 <MudTd>
                                     <MudIconButton Icon="@(IsExpanded(ps) ? Icons.Material.Filled.ExpandMore : Icons.Material.Filled.ChevronRight)"
                                                    Size="Size.Small"
-                                                   aria-label="Toggle breakdown"
+                                                   aria-label="@T.PayRunDialog.ToggleBreakdown"
                                                    OnClick="@(() => ToggleExpand(ps))" />
                                 </MudTd>
-                                <MudTd DataLabel="Employee">
+                                <MudTd DataLabel="@T.PayRunDialog.Employee">
                                     <MudText Class="font-weight-medium">@ResolveStaff(ps.StaffId)</MudText>
                                 </MudTd>
-                                <MudTd DataLabel="Gross" Class="text-right">@ps.GrossSalary.ToString("N2")</MudTd>
-                                <MudTd DataLabel="Earnings" Class="text-right" Style="color:var(--mud-palette-success)">@ps.TotalEarnings.ToString("N2")</MudTd>
-                                <MudTd DataLabel="Deductions" Class="text-right" Style="color:var(--mud-palette-error)">@ps.TotalDeductions.ToString("N2")</MudTd>
-                                <MudTd DataLabel="Unpaid Days" Class="text-right">@ps.UnpaidLeaveDays</MudTd>
-                                <MudTd DataLabel="Net" Class="text-right"><MudText Typo="Typo.body2" Class="font-weight-medium">@ps.NetSalary.ToString("N2")</MudText></MudTd>
+                                <MudTd DataLabel="@T.PayRunDialog.Gross" Class="text-right">@ps.GrossSalary.ToString("N2")</MudTd>
+                                <MudTd DataLabel="@T.PayRunDialog.Earnings" Class="text-right" Style="color:var(--mud-palette-success)">@ps.TotalEarnings.ToString("N2")</MudTd>
+                                <MudTd DataLabel="@T.PayRunDialog.Deductions" Class="text-right" Style="color:var(--mud-palette-error)">@ps.TotalDeductions.ToString("N2")</MudTd>
+                                <MudTd DataLabel="@T.PayRunDialog.UnpaidDays" Class="text-right">@ps.UnpaidLeaveDays</MudTd>
+                                <MudTd DataLabel="@T.PayRunDialog.Net" Class="text-right"><MudText Typo="Typo.body2" Class="font-weight-medium">@ps.NetSalary.ToString("N2")</MudText></MudTd>
                                 @if (CanEditPayslips)
                                 {
-                                    <MudTd DataLabel="Actions" Class="text-center">
-                                        <MudIconButton Icon="@Icons.Material.Filled.Delete" Size="Size.Small" Color="Color.Error" aria-label="Remove payslip" OnClick="@(() => RemovePayslipAsync(ps))" Disabled="_busy" />
+                                    <MudTd DataLabel="@T.Common.Actions" Class="text-center">
+                                        <MudIconButton Icon="@Icons.Material.Filled.Delete" Size="Size.Small" Color="Color.Error" aria-label="@T.PayRunDialog.RemovePayslip" OnClick="@(() => RemovePayslipAsync(ps))" Disabled="_busy" />
                                     </MudTd>
                                 }
                             </RowTemplate>
@@ -105,21 +106,21 @@
                                 {
                                     <MudTr>
                                         <td colspan="8">
-                                            <MudText Typo="Typo.caption" Class="text-secondary mb-1">Earnings / deductions breakdown</MudText>
+                                            <MudText Typo="Typo.caption" Class="text-secondary mb-1">@T.PayRunDialog.Breakdown</MudText>
                                     @if (context.Components.Count == 0)
                                     {
-                                        <MudText Typo="Typo.body2" Class="text-secondary pa-2">No components recorded.</MudText>
+                                        <MudText Typo="Typo.body2" Class="text-secondary pa-2">@T.PayRunDialog.NoComponents</MudText>
                                     }
                                     else
                                     {
                                         <MudTable T="PayslipComponentDto" Items="context.Components" Dense="true" Hover="true" Elevation="0">
                                             <HeaderContent>
-                                                <MudTh>Component</MudTh>
-                                                <MudTh Class="text-right">Amount</MudTh>
+                                                <MudTh>@T.PayRunDialog.Component</MudTh>
+                                                <MudTh Class="text-right">@T.PayRunDialog.Amount</MudTh>
                                             </HeaderContent>
                                             <RowTemplate Context="cmp">
                                                 <MudTd>
-                                                    <MudChip T="string" Size="Size.Small" Color="@(cmp.IsDeduction ? Color.Error : Color.Success)" Variant="Variant.Text">@(cmp.IsDeduction ? "Deduction" : "Earning")</MudChip>
+                                                    <MudChip T="string" Size="Size.Small" Color="@(cmp.IsDeduction ? Color.Error : Color.Success)" Variant="Variant.Text">@(cmp.IsDeduction ? T.PayRunDialog.Deduction : T.PayRunDialog.Earning)</MudChip>
                                                     <span class="ms-2">@cmp.Name</span>
                                                 </MudTd>
                                                 <MudTd Class="text-right" Style="@(cmp.IsDeduction ? "color:var(--mud-palette-error)" : "color:var(--mud-palette-success)")">
@@ -145,29 +146,29 @@
                     <MudGrid Spacing="2">
                         <MudItem xs="12">
                             <MudText Typo="Typo.caption" Class="text-secondary">
-                                Workflow: Draft → Compute → Approve → Pay. Use Reject to send a computed run back for review; Restart reopens a rejected run as a draft.
+                                @T.PayRunDialog.Workflow
                             </MudText>
                         </MudItem>
                         <MudItem xs="12" Class="d-flex flex-wrap gap-2">
                             @if (CanCompute)
                             {
-                                <MudButton Variant="Variant.Filled" Color="Color.Info" StartIcon="@Icons.Material.Filled.Calculate" OnClick="ComputeAsync" Disabled="_busy">Compute</MudButton>
+                                <MudButton Variant="Variant.Filled" Color="Color.Info" StartIcon="@Icons.Material.Filled.Calculate" OnClick="ComputeAsync" Disabled="_busy">@T.PayRunDialog.Compute</MudButton>
                             }
                             @if (CanApprove)
                             {
-                                <MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.CheckCircle" OnClick="ApproveAsync" Disabled="_busy">Approve</MudButton>
+                                <MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.CheckCircle" OnClick="ApproveAsync" Disabled="_busy">@T.PayRunDialog.Approve</MudButton>
                             }
                             @if (CanReject)
                             {
-                                <MudButton Variant="Variant.Outlined" Color="Color.Error" StartIcon="@Icons.Material.Filled.Cancel" OnClick="RejectAsync" Disabled="_busy">Reject</MudButton>
+                                <MudButton Variant="Variant.Outlined" Color="Color.Error" StartIcon="@Icons.Material.Filled.Cancel" OnClick="RejectAsync" Disabled="_busy">@T.PayRunDialog.Reject</MudButton>
                             }
                             @if (CanRestart)
                             {
-                                <MudButton Variant="Variant.Outlined" Color="Color.Warning" StartIcon="@Icons.Material.Filled.RestartAlt" OnClick="RestartAsync" Disabled="_busy">Restart</MudButton>
+                                <MudButton Variant="Variant.Outlined" Color="Color.Warning" StartIcon="@Icons.Material.Filled.RestartAlt" OnClick="RestartAsync" Disabled="_busy">@T.PayRunDialog.Restart</MudButton>
                             }
                             @if (CanPay)
                             {
-                                <MudButton Variant="Variant.Filled" Color="Color.Success" StartIcon="@Icons.Material.Filled.Payments" OnClick="PayAsync" Disabled="_busy">Pay</MudButton>
+                                <MudButton Variant="Variant.Filled" Color="Color.Success" StartIcon="@Icons.Material.Filled.Payments" OnClick="PayAsync" Disabled="_busy">@T.PayRunDialog.Pay</MudButton>
                             }
                         </MudItem>
                     </MudGrid>
@@ -176,7 +177,7 @@
         }
     </DialogContent>
     <DialogActions>
-        <MudButton Color="Color.Default" OnClick="CloseAsync" Disabled="_busy">Close</MudButton>
+        <MudButton Color="Color.Default" OnClick="CloseAsync" Disabled="_busy">@T.Common.Close</MudButton>
     </DialogActions>
 </MudDialog>
 
@@ -222,7 +223,7 @@
         }
         catch (Exception)
         {
-            Snackbar.Add("Unable to load pay run.", Severity.Error);
+            Snackbar.Add(T.PayRunDialog.LoadError, Severity.Error);
         }
     }
 
@@ -241,7 +242,7 @@
         }
         catch (Exception)
         {
-            Snackbar.Add("Unable to reload pay run.", Severity.Error);
+            Snackbar.Add(T.PayRunDialog.ReloadError, Severity.Error);
         }
     }
 
@@ -249,7 +250,7 @@
     {
         var parameters = new DialogParameters { ["StaffSearchFunc"] = (Func<string, CancellationToken, Task<IEnumerable<StaffDto>>>)SearchStaffAsync };
         var options = new DialogOptions { MaxWidth = MaxWidth.Small, FullWidth = true, NoHeader = true };
-        var dialog = await DialogService.ShowAsync<AddPayslipDialog>("Add Payslip", parameters, options);
+        var dialog = await DialogService.ShowAsync<AddPayslipDialog>(T.Payslip.AddTitle, parameters, options);
         var result = await dialog.Result;
 
         if (result is { Canceled: false } && result.Data is string staffId)
@@ -258,7 +259,7 @@
             {
                 _busy = true;
                 await PayrollService.AddPayslipAsync(PayRunId, staffId);
-                Snackbar.Add("Payslip added.", Severity.Success);
+                Snackbar.Add(T.PayRunDialog.PayslipAdded, Severity.Success);
                 await ReloadAsync();
             }
             catch (ApiException ex)
@@ -267,7 +268,7 @@
             }
             catch (Exception)
             {
-                Snackbar.Add("Unable to add payslip.", Severity.Error);
+                Snackbar.Add(T.PayRunDialog.AddError, Severity.Error);
             }
             finally
             {
@@ -295,10 +296,10 @@
     private async Task RemovePayslipAsync(PayslipDto payslip)
     {
         var confirmed = await DialogService.ShowMessageBoxAsync(
-            "Remove Payslip",
-            $"Are you sure you want to remove {ResolveStaff(payslip.StaffId)} from this pay run?",
-            "Remove",
-            "Cancel");
+            T.PayRunDialog.RemovePayslipTitle,
+            T.FormatValue(T.PayRunDialog.RemoveConfirm, ResolveStaff(payslip.StaffId)),
+            T.PayRunDialog.Remove,
+            T.Common.Cancel);
 
         if (confirmed != true)
             return;
@@ -307,7 +308,7 @@
         {
             _busy = true;
             await PayrollService.RemovePayslipAsync(PayRunId, payslip.StaffId);
-            Snackbar.Add("Payslip removed.", Severity.Success);
+            Snackbar.Add(T.PayRunDialog.PayslipRemoved, Severity.Success);
             await ReloadAsync();
         }
         catch (ApiException ex)
@@ -316,7 +317,7 @@
         }
         catch (Exception)
         {
-            Snackbar.Add("Unable to remove payslip.", Severity.Error);
+            Snackbar.Add(T.PayRunDialog.RemoveError, Severity.Error);
         }
         finally
         {
@@ -326,7 +327,7 @@
 
     private async Task RunLifecycleAsync(string verb, string confirmTitle, string confirmMessage, string confirmOk)
     {
-        var confirmed = await DialogService.ShowMessageBoxAsync(confirmTitle, confirmMessage, confirmOk, "Cancel");
+        var confirmed = await DialogService.ShowMessageBoxAsync(confirmTitle, confirmMessage, confirmOk, T.Common.Cancel);
         if (confirmed != true)
             return;
 
@@ -342,7 +343,7 @@
                 case "pay": await PayrollService.PayPayRunAsync(PayRunId); break;
             }
 
-            Snackbar.Add($"Pay run {verb}d.", Severity.Success);
+            Snackbar.Add(T.FormatValue(T.PayRunDialog.LifecycleDone, verb), Severity.Success);
             await ReloadAsync();
         }
         catch (ApiException ex)
@@ -351,7 +352,7 @@
         }
         catch (Exception)
         {
-            Snackbar.Add("Unable to reach the server.", Severity.Error);
+            Snackbar.Add(T.PayRunDialog.ServerError, Severity.Error);
         }
         finally
         {
@@ -359,11 +360,11 @@
         }
     }
 
-    private Task ComputeAsync() => RunLifecycleAsync("compute", "Compute Pay Run", "Generate payslips for all active staff in this period?", "Compute");
-    private Task ApproveAsync() => RunLifecycleAsync("approve", "Approve Pay Run", "Approve this pay run for payment?", "Approve");
-    private Task RejectAsync() => RunLifecycleAsync("reject", "Reject Pay Run", "Send this pay run back for review?", "Reject");
-    private Task RestartAsync() => RunLifecycleAsync("restart", "Restart Pay Run", "Reopen this pay run as a draft?", "Restart");
-    private Task PayAsync() => RunLifecycleAsync("pay", "Pay Pay Run", "Mark this pay run as paid? This cannot be undone.", "Pay");
+    private Task ComputeAsync() => RunLifecycleAsync("compute", T.PayRunDialog.ComputeTitle, T.PayRunDialog.ComputeConfirm, T.PayRunDialog.Compute);
+    private Task ApproveAsync() => RunLifecycleAsync("approve", T.PayRunDialog.ApproveTitle, T.PayRunDialog.ApproveConfirm, T.PayRunDialog.Approve);
+    private Task RejectAsync() => RunLifecycleAsync("reject", T.PayRunDialog.RejectTitle, T.PayRunDialog.RejectConfirm, T.PayRunDialog.Reject);
+    private Task RestartAsync() => RunLifecycleAsync("restart", T.PayRunDialog.RestartTitle, T.PayRunDialog.RestartConfirm, T.PayRunDialog.Restart);
+    private Task PayAsync() => RunLifecycleAsync("pay", T.PayRunDialog.PayTitle, T.PayRunDialog.PayConfirm, T.PayRunDialog.Pay);
 
     private void CloseAsync()
         => MudDialog.Close(DialogResult.Ok(true));

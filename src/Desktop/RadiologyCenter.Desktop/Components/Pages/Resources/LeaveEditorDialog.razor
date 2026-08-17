@@ -1,16 +1,17 @@
 @inject ResourceService ResourceService
 @inject ISnackbar Snackbar
+@inject AppLocalizer T
 
 <MudDialog>
     <DialogContent>
-        <DialogHeader Icon="@Icons.Material.Filled.BeachAccess" Title="@(Leave is null ? "New Leave" : "Edit Leave")" />
+        <DialogHeader Icon="@Icons.Material.Filled.BeachAccess" Title="@(Leave is null ? T.Leave.NewLeave : T.Leave.EditLeave)" />
         <EditForm EditContext="_editContext">
             <DataAnnotationsValidator />
             <MudGrid Spacing="2">
                 <MudItem xs="12">
                     <MudAutocomplete T="StaffDto"
                                      @bind-Value="_selectedStaff"
-                                     Label="Staff member (search by name)"
+                                     Label="@T.LeaveDialog.StaffSearch"
                                      Variant="Variant.Outlined"
                                      Margin="Margin.Dense"
                                      MinCharacters="1"
@@ -23,7 +24,7 @@
                 <MudItem xs="12" sm="6">
                     <MudSelect T="string"
                                @bind-Value="_model.LeaveType"
-                               Label="Leave Type"
+                               Label="@T.LeaveDialog.LeaveType"
                                Variant="Variant.Outlined"
                                Margin="Margin.Dense"
                                For="@(() => _model.LeaveType)">
@@ -35,21 +36,21 @@
                 </MudItem>
                 <MudItem xs="12" sm="6">
                     <MudDatePicker @bind-Date="_model.StartDate"
-                                   Label="Start Date"
+                                   Label="@T.Leave.StartDate"
                                    Variant="Variant.Outlined"
                                    Margin="Margin.Dense"
                                    Class="w-100" />
                 </MudItem>
                 <MudItem xs="12" sm="6">
                     <MudDatePicker @bind-Date="_model.EndDate"
-                                   Label="End Date"
+                                   Label="@T.Leave.EndDate"
                                    Variant="Variant.Outlined"
                                    Margin="Margin.Dense"
                                    Class="w-100" />
                 </MudItem>
                 <MudItem xs="12">
                     <MudTextField @bind-Value="_model.Reason"
-                                  Label="Reason"
+                                  Label="@T.Leave.Reason"
                                   Variant="Variant.Outlined"
                                   Margin="Margin.Dense"
                                   Lines="3"
@@ -59,7 +60,7 @@
         </EditForm>
     </DialogContent>
     <DialogActions>
-        <MudButton Color="Color.Default" OnClick="CancelAsync" Disabled="_busy">Cancel</MudButton>
+        <MudButton Color="Color.Default" OnClick="CancelAsync" Disabled="_busy">@T.Common.Cancel</MudButton>
         <MudButton Color="Color.Primary" Variant="Variant.Filled" OnClick="SubmitAsync" Disabled="_busy">
             @if (_busy)
             {
@@ -67,7 +68,7 @@
             }
             else
             {
-                <text>@(IsEdit ? "Save Changes" : "Create Leave")</text>
+                <text>@(IsEdit ? T.LeaveDialog.SaveChanges : T.LeaveDialog.CreateLeave)</text>
             }
         </MudButton>
     </DialogActions>
@@ -111,7 +112,7 @@
         }
         catch (Exception)
         {
-            Snackbar.Add("Unable to search staff.", Severity.Error);
+            Snackbar.Add(T.LeaveDialog.SearchStaffError, Severity.Error);
             return Array.Empty<StaffDto>();
         }
     }
@@ -149,19 +150,19 @@
 
         if (_selectedStaff is null)
         {
-            Snackbar.Add("Select a staff member.", Severity.Warning);
+            Snackbar.Add(T.LeaveDialog.SelectStaff, Severity.Warning);
             return;
         }
 
         if (_model.StartDate is null || _model.EndDate is null)
         {
-            Snackbar.Add("Select both start and end dates.", Severity.Warning);
+            Snackbar.Add(T.LeaveDialog.SelectDates, Severity.Warning);
             return;
         }
 
         if (_model.EndDate < _model.StartDate)
         {
-            Snackbar.Add("End date must be on or after start date.", Severity.Warning);
+            Snackbar.Add(T.LeaveDialog.EndAfterStart, Severity.Warning);
             return;
         }
 
@@ -182,7 +183,7 @@
             else
                 await ResourceService.CreateLeaveAsync(input);
 
-            Snackbar.Add(IsEdit ? "Leave record updated." : "Leave record created.", Severity.Success);
+            Snackbar.Add(IsEdit ? T.LeaveDialog.Updated : T.LeaveDialog.Created, Severity.Success);
             MudDialog.Close(DialogResult.Ok(true));
         }
         catch (ApiException ex)
@@ -191,7 +192,7 @@
         }
         catch (Exception)
         {
-            Snackbar.Add("Unable to reach the server. Please try again.", Severity.Error);
+            Snackbar.Add(T.LeaveDialog.Unreachable, Severity.Error);
         }
         finally
         {

@@ -1,9 +1,10 @@
-﻿@inherits LayoutComponentBase
+@inherits LayoutComponentBase
 @using RadiologyCenter.Desktop.Components.Pages
 @inject NavigationManager Navigation
 @inject AuthService AuthService
 @inject IDialogService DialogService
 @inject ISnackbar Snackbar
+@inject AppLocalizer T
 
 <div class="app-shell">
     <aside class="app-sidebar @(_drawerOpen ? "open" : "collapsed")">
@@ -16,20 +17,21 @@
 
     <div class="app-main-col">
         <header class="app-topbar">
-            <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" OnClick="@(() => _drawerOpen = !_drawerOpen)" aria-label="Toggle navigation" />
+            <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" OnClick="@(() => _drawerOpen = !_drawerOpen)" aria-label="@T.Layout.ToggleNav" />
             <MudTextField T="string"
-                          Placeholder="Search..."
+                          Placeholder="@T.Layout.SearchPlaceholder"
                           Variant="Variant.Outlined"
                           Margin="Margin.Dense"
                           Adornment="Adornment.Start"
                           AdornmentIcon="@Icons.Material.Filled.Search"
                           Class="header-search app-bar-search" />
             <MudSpacer />
-            <MudIconButton Icon="@Icons.Material.Filled.Notifications" Color="Color.Inherit" aria-label="Notifications" OnClick="OnNotifications" />
+            <MudIconButton Icon="@Icons.Material.Filled.Notifications" Color="Color.Inherit" aria-label="@T.Layout.Notifications" OnClick="OnNotifications" />
+            <LanguageSwitcher />
             <MudAvatar Size="Size.Small" Color="Color.Primary" Class="mx-2 app-bar-avatar">@GetInitial()</MudAvatar>
             <MudText Typo="Typo.body2" Class="me-2 app-bar-user">@_userName</MudText>
-            <MudIconButton Icon="@Icons.Material.Filled.Key" Color="Color.Inherit" aria-label="Change password" OnClick="@OnChangePassword" />
-            <MudIconButton Icon="@Icons.Material.Filled.Logout" Color="Color.Inherit" aria-label="Sign out" OnClick="@OnLogout" />
+            <MudIconButton Icon="@Icons.Material.Filled.Key" Color="Color.Inherit" aria-label="@T.Layout.ChangePassword" OnClick="@OnChangePassword" />
+            <MudIconButton Icon="@Icons.Material.Filled.Logout" Color="Color.Inherit" aria-label="@T.Layout.SignOut" OnClick="@OnLogout" />
         </header>
 
         <main class="app-main-content">
@@ -63,18 +65,18 @@
     private async Task OnLogout()
     {
         await AuthService.SignOutAsync();
-        Snackbar.Add("You have been signed out.", Severity.Info);
+        Snackbar.Add(T.Layout.SignedOut, Severity.Info);
         Navigation.NavigateTo("/");
     }
 
     private async Task OnChangePassword()
     {
         var options = new DialogOptions { MaxWidth = MaxWidth.Small, FullWidth = true, NoHeader = true };
-        await DialogService.ShowAsync<ChangePasswordDialog>("Change Password", options);
+        await DialogService.ShowAsync<ChangePasswordDialog>(T.ChangePassword.Title, options);
     }
 
     private void OnNotifications()
-        => Snackbar.Add("No new notifications.", Severity.Info);
+        => Snackbar.Add(T.Layout.NoNotifications, Severity.Info);
 
     private string GetInitial()
     {

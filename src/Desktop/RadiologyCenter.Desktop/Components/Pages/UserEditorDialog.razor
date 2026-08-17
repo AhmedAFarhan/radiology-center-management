@@ -1,9 +1,10 @@
 @inject IdentityService IdentityService
 @inject ISnackbar Snackbar
+@inject AppLocalizer T
 
 <MudDialog>
     <DialogContent>
-        <DialogHeader Icon="@Icons.Material.Filled.Person" Title="@(User is null ? "New User" : $"Edit {User.UserName}")" />
+        <DialogHeader Icon="@Icons.Material.Filled.Person" Title="@(User is null ? T.UserDialog.NewTitle : T.FormatValue(T.UserDialog.EditTitle, User.UserName))" />
         <EditForm EditContext="_editContext">
             <DataAnnotationsValidator />
             <MudGrid Spacing="2">
@@ -11,7 +12,7 @@
                 {
                     <MudItem xs="12" sm="6">
                         <MudTextField @bind-Value="_model.UserName"
-                                      Label="Username"
+                                      Label="@T.UserDialog.Username"
                                       Variant="Variant.Outlined"
                                       Margin="Margin.Dense"
                                       Immediate="true"
@@ -19,7 +20,7 @@
                     </MudItem>
                     <MudItem xs="12" sm="6">
                         <MudTextField @bind-Value="_model.Email"
-                                      Label="Email"
+                                      Label="@T.UserDialog.Email"
                                       Variant="Variant.Outlined"
                                       Margin="Margin.Dense"
                                       Immediate="true"
@@ -30,14 +31,14 @@
                 {
                     <MudItem xs="12" sm="6">
                         <MudTextField Value="@_model.UserName"
-                                      Label="Username"
+                                      Label="@T.UserDialog.Username"
                                       Variant="Variant.Outlined"
                                       Margin="Margin.Dense"
                                       ReadOnly="true" />
                     </MudItem>
                     <MudItem xs="12" sm="6">
                         <MudTextField Value="@_model.Email"
-                                      Label="Email"
+                                      Label="@T.UserDialog.Email"
                                       Variant="Variant.Outlined"
                                       Margin="Margin.Dense"
                                       ReadOnly="true" />
@@ -45,7 +46,7 @@
                 }
                 <MudItem xs="12" sm="6">
                     <MudTextField @bind-Value="_model.FirstName"
-                                  Label="First Name"
+                                  Label="@T.UserDialog.FirstName"
                                   Variant="Variant.Outlined"
                                   Margin="Margin.Dense"
                                   Immediate="true"
@@ -53,7 +54,7 @@
                 </MudItem>
                 <MudItem xs="12" sm="6">
                     <MudTextField @bind-Value="_model.LastName"
-                                  Label="Last Name"
+                                  Label="@T.UserDialog.LastName"
                                   Variant="Variant.Outlined"
                                   Margin="Margin.Dense"
                                   Immediate="true"
@@ -61,7 +62,7 @@
                 </MudItem>
                 <MudItem xs="12" sm="6">
                     <MudTextField @bind-Value="_model.PhoneNumber"
-                                  Label="Phone"
+                                  Label="@T.UserDialog.Phone"
                                   Variant="Variant.Outlined"
                                   Margin="Margin.Dense"
                                   Immediate="true" />
@@ -70,7 +71,7 @@
                 {
                     <MudItem xs="12" sm="6">
                         <MudTextField @bind-Value="_model.Password"
-                                      Label="Password"
+                                      Label="@T.UserDialog.Password"
                                       Variant="Variant.Outlined"
                                       Margin="Margin.Dense"
                                       InputType="InputType.Password"
@@ -80,7 +81,7 @@
                         <MudSelect T="string"
                                    SelectedValues="@_model.SelectedRoleIds"
                                    SelectedValuesChanged="@(vals => _model.SelectedRoleIds = vals)"
-                                   Label="Roles"
+                                   Label="@T.UserDialog.Roles"
                                    Variant="Variant.Outlined"
                                    Margin="Margin.Dense"
                                    MultiSelection="true">
@@ -95,7 +96,7 @@
         </EditForm>
     </DialogContent>
     <DialogActions>
-        <MudButton Color="Color.Default" OnClick="CancelAsync" Disabled="_busy">Cancel</MudButton>
+        <MudButton Color="Color.Default" OnClick="CancelAsync" Disabled="_busy">@T.Common.Cancel</MudButton>
         <MudButton Color="Color.Primary" Variant="Variant.Filled" OnClick="SubmitAsync" Disabled="_busy || (!IsEdit && _roles.Count == 0)">
             @if (_busy)
             {
@@ -103,7 +104,7 @@
             }
             else
             {
-                <text>@(IsEdit ? "Save Changes" : "Create User")</text>
+                <text>@(IsEdit ? T.UserDialog.SaveChanges : T.UserDialog.CreateUser)</text>
             }
         </MudButton>
     </DialogActions>
@@ -136,7 +137,7 @@
         }
         catch (Exception)
         {
-            Snackbar.Add("Unable to load roles.", Severity.Error);
+            Snackbar.Add(T.UserDialog.LoadRolesError, Severity.Error);
         }
 
         if (User is null)
@@ -166,19 +167,19 @@
                     LastName = _model.LastName,
                     PhoneNumber = _model.PhoneNumber,
                 });
-                Snackbar.Add("User profile updated.", Severity.Success);
+                Snackbar.Add(T.UserDialog.ProfileUpdated, Severity.Success);
             }
             else
             {
                 if (string.IsNullOrWhiteSpace(_model.Password))
                 {
-                    Snackbar.Add("Password is required.", Severity.Warning);
+                    Snackbar.Add(T.UserDialog.PasswordRequired, Severity.Warning);
                     return;
                 }
 
                 if (!_model.SelectedRoleIds.Any())
                 {
-                    Snackbar.Add("Select at least one role.", Severity.Warning);
+                    Snackbar.Add(T.UserDialog.SelectRole, Severity.Warning);
                     return;
                 }
 
@@ -192,7 +193,7 @@
                     Password = _model.Password,
                     RoleIds = _model.SelectedRoleIds.ToList(),
                 });
-                Snackbar.Add("User created.", Severity.Success);
+                Snackbar.Add(T.UserDialog.Created, Severity.Success);
             }
 
             MudDialog.Close(DialogResult.Ok(true));
@@ -203,7 +204,7 @@
         }
         catch (Exception)
         {
-            Snackbar.Add("Unable to reach the server. Please try again.", Severity.Error);
+            Snackbar.Add(T.UserDialog.UnreachableRetry, Severity.Error);
         }
         finally
         {

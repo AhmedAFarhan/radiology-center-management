@@ -3,52 +3,53 @@
 @inject InsuranceService InsuranceService
 @inject IDialogService DialogService
 @inject ISnackbar Snackbar
+@inject AppLocalizer T
 @implements IDisposable
 
-<PageHeader Icon="@Icons.Material.Filled.Shield" Title="Insurance Companies"
-            Subtitle="Manage insurance providers and their details"
+<PageHeader Icon="@Icons.Material.Filled.Shield" Title="@T.Insurance.CompaniesTitle"
+            Subtitle="@T.Insurance.CompaniesSubtitle"
             SearchValueChanged="OnSearchChanged"
-            SearchPlaceholder="Search companies..."
+            SearchPlaceholder="@T.Insurance.CompaniesSearchPlaceholder"
             OnRefresh="ReloadAsync">
-    <MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Add" OnClick="OpenCreateDialogAsync">Add Company</MudButton>
+    <MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Add" OnClick="OpenCreateDialogAsync">@T.Insurance.AddCompany</MudButton>
 </PageHeader>
 
 <MudTable T="InsuranceCompanyDto" @ref="_table" Items="@_filtered" Dense="true" Hover="true" Striped="true" Elevation="1" RowsPerPage="10">
     <HeaderContent>
-        <MudTh><MudTableSortLabel T="InsuranceCompanyDto" SortLabel="@("Name")">Name</MudTableSortLabel></MudTh>
-        <MudTh>Tax Number</MudTh>
-        <MudTh>Phone</MudTh>
-        <MudTh>Email</MudTh>
-        <MudTh>Address</MudTh>
-        <MudTh>Actions</MudTh>
+        <MudTh><MudTableSortLabel T="InsuranceCompanyDto" SortLabel="@("Name")">@T.Common.Name</MudTableSortLabel></MudTh>
+        <MudTh>@T.Insurance.TaxNumber</MudTh>
+        <MudTh>@T.Insurance.Phone</MudTh>
+        <MudTh>@T.Insurance.Email</MudTh>
+        <MudTh>@T.Insurance.Address</MudTh>
+        <MudTh>@T.Common.Actions</MudTh>
     </HeaderContent>
     <RowTemplate>
-        <MudTd DataLabel="Name">
+        <MudTd DataLabel="@T.Common.Name">
             <MudText Class="font-weight-medium">@context.Name</MudText>
         </MudTd>
-        <MudTd DataLabel="Tax Number">@(context.TaxId ?? "-")</MudTd>
-        <MudTd DataLabel="Phone">@(context.Phone ?? "-")</MudTd>
-        <MudTd DataLabel="Email">@(context.Email ?? "-")</MudTd>
-        <MudTd DataLabel="Address">@(context.Address ?? "-")</MudTd>
-        <MudTd DataLabel="Actions">
-            <MudIconButton Icon="@Icons.Material.Filled.Edit" Size="Size.Small" Color="Color.Default" aria-label="Edit" OnClick="@(() => OpenEditDialogAsync(context))" />
-            <MudIconButton Icon="@Icons.Material.Filled.Delete" Size="Size.Small" Color="Color.Error" aria-label="Delete" OnClick="@(() => DeleteCompanyAsync(context))" />
+        <MudTd DataLabel="@T.Insurance.TaxNumber">@(context.TaxId ?? "-")</MudTd>
+        <MudTd DataLabel="@T.Insurance.Phone">@(context.Phone ?? "-")</MudTd>
+        <MudTd DataLabel="@T.Insurance.Email">@(context.Email ?? "-")</MudTd>
+        <MudTd DataLabel="@T.Insurance.Address">@(context.Address ?? "-")</MudTd>
+        <MudTd DataLabel="@T.Common.Actions">
+            <MudIconButton Icon="@Icons.Material.Filled.Edit" Size="Size.Small" Color="Color.Default" aria-label="@T.Common.Edit" OnClick="@(() => OpenEditDialogAsync(context))" />
+            <MudIconButton Icon="@Icons.Material.Filled.Delete" Size="Size.Small" Color="Color.Error" aria-label="@T.Common.Delete" OnClick="@(() => DeleteCompanyAsync(context))" />
         </MudTd>
     </RowTemplate>
     <NoRecordsContent>
         @if (_loadError is not null)
         {
             <ErrorState Icon="@(_offline ? Icons.Material.Filled.CloudOff : Icons.Material.Filled.ErrorOutline)"
-                        Title="Couldn't load data"
+                        Title="@T.Insurance.LoadErrorTitle"
                         Message="@_loadError"
                         Action="ReloadAsync" />
         }
         else
         {
         <EmptyState Icon="@Icons.Material.Filled.Shield"
-                    Title="No insurance companies yet"
-                    Message="Add insurance companies before creating patient policies."
-                    ActionLabel="Add your first company"
+                    Title="@T.Insurance.EmptyTitle"
+                    Message="@T.Insurance.EmptyMessage"
+                    ActionLabel="@T.Insurance.EmptyActionLabel"
                     Action="OpenCreateDialogAsync" />
         }
     </NoRecordsContent>
@@ -98,7 +99,7 @@
         }
         catch (Exception)
         {
-            _loadError = "Unable to reach the server.";
+            _loadError = T.Insurance.Unreachable;
             _offline = true;
         }
     }
@@ -127,7 +128,7 @@
     private async Task OpenCreateDialogAsync()
     {
         var options = new DialogOptions { MaxWidth = MaxWidth.Medium, FullWidth = true, NoHeader = true };
-        var dialog = await DialogService.ShowAsync<CompanyEditorDialog>("New Insurance Company", options);
+        var dialog = await DialogService.ShowAsync<CompanyEditorDialog>(T.Insurance.NewCompanyTitle, options);
         await ReloadIfSavedAsync(dialog);
     }
 
@@ -135,7 +136,7 @@
     {
         var parameters = new DialogParameters { ["Company"] = company };
         var options = new DialogOptions { MaxWidth = MaxWidth.Medium, FullWidth = true, NoHeader = true };
-        var dialog = await DialogService.ShowAsync<CompanyEditorDialog>("Edit Insurance Company", parameters, options);
+        var dialog = await DialogService.ShowAsync<CompanyEditorDialog>(T.Insurance.EditCompanyTitle, parameters, options);
         await ReloadIfSavedAsync(dialog);
     }
 
@@ -149,10 +150,10 @@
     private async Task DeleteCompanyAsync(InsuranceCompanyDto company)
     {
         var confirmed = await DialogService.ShowMessageBoxAsync(
-            "Delete Insurance Company",
-            $"Are you sure you want to delete {company.Name}? This cannot be undone.",
-            "Delete",
-            "Cancel");
+            T.Insurance.DeleteCompanyTitle,
+            T.FormatValue(T.Insurance.DeleteCompanyConfirm, company.Name),
+            T.Common.Delete,
+            T.Common.Cancel);
 
         if (confirmed != true)
             return;
@@ -160,7 +161,7 @@
         try
         {
             await InsuranceService.DeleteCompanyAsync(company.Id);
-            Snackbar.Add("Company deleted.", Severity.Success);
+            Snackbar.Add(T.Insurance.CompanyDeleted, Severity.Success);
             await LoadAsync();
         }
         catch (ApiException ex)
@@ -169,7 +170,7 @@
         }
         catch (Exception)
         {
-            Snackbar.Add("Unable to reach the server.", Severity.Error);
+            Snackbar.Add(T.Insurance.Unreachable, Severity.Error);
         }
     }
 

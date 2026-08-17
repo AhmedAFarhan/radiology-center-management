@@ -3,65 +3,66 @@
 @inject InventoryService InventoryService
 @inject IDialogService DialogService
 @inject ISnackbar Snackbar
+@inject AppLocalizer T
 @implements IDisposable
 
-<PageHeader Icon="@Icons.Material.Filled.LocalShipping" Title="Suppliers"
-            Subtitle="Manage vendors and their details"
+<PageHeader Icon="@Icons.Material.Filled.LocalShipping" Title="@T.Suppliers.Title"
+            Subtitle="@T.Suppliers.Subtitle"
             SearchValueChanged="OnSearchChanged"
-            SearchPlaceholder="Search suppliers..."
+            SearchPlaceholder="@T.Suppliers.SearchPlaceholder"
             OnRefresh="ReloadAsync">
-    <MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Add" OnClick="OpenCreateDialogAsync">Add Supplier</MudButton>
+    <MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Add" OnClick="OpenCreateDialogAsync">@T.Suppliers.AddSupplier</MudButton>
 </PageHeader>
 
 <MudTable T="SupplierDto" @ref="_table" ServerData="LoadServerData" Dense="true" Hover="true" Striped="true" Elevation="1" RowsPerPage="10">
     <HeaderContent>
-        <MudTh><MudTableSortLabel T="SupplierDto" SortLabel="@("Name")">Name</MudTableSortLabel></MudTh>
-        <MudTh><MudTableSortLabel T="SupplierDto" SortLabel="@("ContactPerson")">Contact</MudTableSortLabel></MudTh>
-        <MudTh><MudTableSortLabel T="SupplierDto" SortLabel="@("Phone")">Phone</MudTableSortLabel></MudTh>
-        <MudTh><MudTableSortLabel T="SupplierDto" SortLabel="@("Email")">Email</MudTableSortLabel></MudTh>
-        <MudTh>Payment Terms</MudTh>
-        <MudTh>Status</MudTh>
-        <MudTh>Actions</MudTh>
+        <MudTh><MudTableSortLabel T="SupplierDto" SortLabel="@("Name")">@T.Common.Name</MudTableSortLabel></MudTh>
+        <MudTh><MudTableSortLabel T="SupplierDto" SortLabel="@("ContactPerson")">@T.Suppliers.Contact</MudTableSortLabel></MudTh>
+        <MudTh><MudTableSortLabel T="SupplierDto" SortLabel="@("Phone")">@T.Suppliers.Phone</MudTableSortLabel></MudTh>
+        <MudTh><MudTableSortLabel T="SupplierDto" SortLabel="@("Email")">@T.Suppliers.Email</MudTableSortLabel></MudTh>
+        <MudTh>@T.Suppliers.PaymentTerms</MudTh>
+        <MudTh>@T.Common.Status</MudTh>
+        <MudTh>@T.Common.Actions</MudTh>
     </HeaderContent>
     <RowTemplate>
-        <MudTd DataLabel="Name">
+        <MudTd DataLabel="@T.Common.Name">
             <MudText Class="font-weight-medium">@context.Name</MudText>
             @if (!string.IsNullOrWhiteSpace(context.TaxNumber))
             {
-                <MudText Typo="Typo.caption" Class="text-secondary">Tax: @context.TaxNumber</MudText>
+                <MudText Typo="Typo.caption" Class="text-secondary">@T.Suppliers.Tax: @context.TaxNumber</MudText>
             }
         </MudTd>
-        <MudTd DataLabel="Contact">@(context.ContactPerson ?? "-")</MudTd>
-        <MudTd DataLabel="Phone">@context.Phone</MudTd>
-        <MudTd DataLabel="Email">@(context.Email ?? "-")</MudTd>
-        <MudTd DataLabel="Payment Terms">@(context.PaymentTerms ?? "-")</MudTd>
-        <MudTd DataLabel="Status">
-            <MudChip T="string" Size="Size.Small" Color="@(context.IsActive ? Color.Success : Color.Default)">@(context.IsActive ? "Active" : "Inactive")</MudChip>
+        <MudTd DataLabel="@T.Suppliers.Contact">@(context.ContactPerson ?? "-")</MudTd>
+        <MudTd DataLabel="@T.Suppliers.Phone">@context.Phone</MudTd>
+        <MudTd DataLabel="@T.Suppliers.Email">@(context.Email ?? "-")</MudTd>
+        <MudTd DataLabel="@T.Suppliers.PaymentTerms">@(context.PaymentTerms ?? "-")</MudTd>
+        <MudTd DataLabel="@T.Common.Status">
+            <MudChip T="string" Size="Size.Small" Color="@(context.IsActive ? Color.Success : Color.Default)">@(context.IsActive ? T.Common.Active : T.Common.Inactive)</MudChip>
         </MudTd>
-        <MudTd DataLabel="Actions">
-            <MudIconButton Icon="@Icons.Material.Filled.Edit" Size="Size.Small" Color="Color.Default" aria-label="Edit" OnClick="@(() => OpenEditDialogAsync(context))" />
+        <MudTd DataLabel="@T.Common.Actions">
+            <MudIconButton Icon="@Icons.Material.Filled.Edit" Size="Size.Small" Color="Color.Default" aria-label="@T.Common.Edit" OnClick="@(() => OpenEditDialogAsync(context))" />
             <MudIconButton Icon="@(context.IsActive ? Icons.Material.Filled.Block : Icons.Material.Filled.CheckCircle)"
                            Size="Size.Small"
                            Color="@(context.IsActive ? Color.Default : Color.Success)"
-                           aria-label="Toggle status"
+                           aria-label="@T.Suppliers.ToggleStatus"
                            OnClick="@(() => ToggleActiveAsync(context))" />
-            <MudIconButton Icon="@Icons.Material.Filled.Delete" Size="Size.Small" Color="Color.Error" aria-label="Delete" OnClick="@(() => DeleteSupplierAsync(context))" />
+            <MudIconButton Icon="@Icons.Material.Filled.Delete" Size="Size.Small" Color="Color.Error" aria-label="@T.Common.Delete" OnClick="@(() => DeleteSupplierAsync(context))" />
         </MudTd>
     </RowTemplate>
     <NoRecordsContent>
         @if (_loadError is not null)
         {
             <ErrorState Icon="@(_offline ? Icons.Material.Filled.CloudOff : Icons.Material.Filled.ErrorOutline)"
-                        Title="Couldn't load data"
+                        Title="@T.Suppliers.LoadErrorTitle"
                         Message="@_loadError"
                         Action="ReloadAsync" />
         }
         else
         {
         <EmptyState Icon="@Icons.Material.Filled.LocalShipping"
-                    Title="No suppliers yet"
-                    Message="Add suppliers to create purchase orders for inventory."
-                    ActionLabel="Add your first supplier"
+                    Title="@T.Suppliers.NoSuppliersTitle"
+                    Message="@T.Suppliers.EmptyMessage"
+                    ActionLabel="@T.Suppliers.AddFirstSupplier"
                     Action="OpenCreateDialogAsync" />
         }
     </NoRecordsContent>
@@ -102,8 +103,8 @@
         }
         catch (Exception)
         {
-            Snackbar.Add("Unable to reach the server.", Severity.Error);
-            _loadError = "Unable to reach the server.";
+            Snackbar.Add(T.Suppliers.Unreachable, Severity.Error);
+            _loadError = T.Suppliers.Unreachable;
             _offline = true;
             return new TableData<SupplierDto> { Items = Array.Empty<SupplierDto>(), TotalItems = 0 };
         }
@@ -134,7 +135,7 @@
     private async Task OpenCreateDialogAsync()
     {
         var options = new DialogOptions { MaxWidth = MaxWidth.Medium, FullWidth = true, NoHeader = true };
-        var dialog = await DialogService.ShowAsync<SupplierEditorDialog>("New Supplier", options);
+        var dialog = await DialogService.ShowAsync<SupplierEditorDialog>(T.SupplierDialog.NewSupplier, options);
         await ReloadIfSavedAsync(dialog);
     }
 
@@ -142,7 +143,7 @@
     {
         var parameters = new DialogParameters { ["Supplier"] = supplier };
         var options = new DialogOptions { MaxWidth = MaxWidth.Medium, FullWidth = true, NoHeader = true };
-        var dialog = await DialogService.ShowAsync<SupplierEditorDialog>("Edit Supplier", parameters, options);
+        var dialog = await DialogService.ShowAsync<SupplierEditorDialog>(T.SupplierDialog.EditSupplier, parameters, options);
         await ReloadIfSavedAsync(dialog);
     }
 
@@ -162,7 +163,7 @@
             else
                 await InventoryService.ActivateSupplierAsync(supplier.Id);
 
-            Snackbar.Add(supplier.IsActive ? "Supplier deactivated." : "Supplier activated.", Severity.Success);
+            Snackbar.Add(supplier.IsActive ? T.Suppliers.SupplierDeactivated : T.Suppliers.SupplierActivated, Severity.Success);
             await ReloadAsync();
         }
         catch (ApiException ex)
@@ -171,17 +172,17 @@
         }
         catch (Exception)
         {
-            Snackbar.Add("Unable to reach the server.", Severity.Error);
+            Snackbar.Add(T.Suppliers.Unreachable, Severity.Error);
         }
     }
 
     private async Task DeleteSupplierAsync(SupplierDto supplier)
     {
         var confirmed = await DialogService.ShowMessageBoxAsync(
-            "Delete Supplier",
-            $"Are you sure you want to delete {supplier.Name}? This cannot be undone.",
-            "Delete",
-            "Cancel");
+            T.Suppliers.DeleteSupplierTitle,
+            T.FormatValue(T.Suppliers.DeleteConfirm, supplier.Name),
+            T.Common.Delete,
+            T.Common.Cancel);
 
         if (confirmed != true)
             return;
@@ -189,7 +190,7 @@
         try
         {
             await InventoryService.DeleteSupplierAsync(supplier.Id);
-            Snackbar.Add("Supplier deleted.", Severity.Success);
+            Snackbar.Add(T.Suppliers.SupplierDeleted, Severity.Success);
             await ReloadAsync();
         }
         catch (ApiException ex)
@@ -198,7 +199,7 @@
         }
         catch (Exception)
         {
-            Snackbar.Add("Unable to reach the server.", Severity.Error);
+            Snackbar.Add(T.Suppliers.Unreachable, Severity.Error);
         }
     }
 

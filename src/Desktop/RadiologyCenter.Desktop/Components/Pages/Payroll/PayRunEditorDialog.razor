@@ -1,29 +1,30 @@
 @inject PayrollService PayrollService
 @inject ISnackbar Snackbar
+@inject AppLocalizer T
 
 <MudDialog>
     <DialogContent>
-        <DialogHeader Icon="@Icons.Material.Filled.ReceiptLong" Title="New Pay Run" />
+        <DialogHeader Icon="@Icons.Material.Filled.ReceiptLong" Title="@T.PayRunDialog.CreateTitle" />
         <EditForm EditContext="_editContext">
             <DataAnnotationsValidator />
             <MudGrid Spacing="2">
                 <MudItem xs="12" sm="6">
                     <MudDatePicker @bind-Date="_model.RunFrom"
-                                   Label="Period From"
+                                   Label="@T.PayRunDialog.PeriodFrom"
                                    Variant="Variant.Outlined"
                                    Margin="Margin.Dense"
                                    Class="w-100" />
                 </MudItem>
                 <MudItem xs="12" sm="6">
                     <MudDatePicker @bind-Date="_model.RunTo"
-                                   Label="Period To"
+                                   Label="@T.PayRunDialog.PeriodTo"
                                    Variant="Variant.Outlined"
                                    Margin="Margin.Dense"
                                    Class="w-100" />
                 </MudItem>
                 <MudItem xs="12">
                     <MudTextField @bind-Value="_model.Notes"
-                                  Label="Notes"
+                                  Label="@T.PayRunDialog.Notes"
                                   Variant="Variant.Outlined"
                                   Margin="Margin.Dense"
                                   Lines="3"
@@ -33,7 +34,7 @@
         </EditForm>
     </DialogContent>
     <DialogActions>
-        <MudButton Color="Color.Default" OnClick="CancelAsync" Disabled="_busy">Cancel</MudButton>
+        <MudButton Color="Color.Default" OnClick="CancelAsync" Disabled="_busy">@T.Common.Cancel</MudButton>
         <MudButton Color="Color.Primary" Variant="Variant.Filled" OnClick="SubmitAsync" Disabled="_busy">
             @if (_busy)
             {
@@ -41,7 +42,7 @@
             }
             else
             {
-                <text>Create Pay Run</text>
+                <text>@T.PayRunDialog.Create</text>
             }
         </MudButton>
     </DialogActions>
@@ -68,13 +69,13 @@
 
         if (_model.RunFrom is null || _model.RunTo is null)
         {
-            Snackbar.Add("Select both period dates.", Severity.Warning);
+            Snackbar.Add(T.PayRunDialog.SelectBothDates, Severity.Warning);
             return;
         }
 
         if (_model.RunTo < _model.RunFrom)
         {
-            Snackbar.Add("Period To must be on or after Period From.", Severity.Warning);
+            Snackbar.Add(T.PayRunDialog.PeriodToAfterFrom, Severity.Warning);
             return;
         }
 
@@ -88,7 +89,7 @@
                 Notes = _model.Notes,
             });
 
-            Snackbar.Add("Pay run created.", Severity.Success);
+            Snackbar.Add(T.PayRunDialog.Created, Severity.Success);
             MudDialog.Close(DialogResult.Ok(true));
         }
         catch (ApiException ex)
@@ -97,7 +98,7 @@
         }
         catch (Exception)
         {
-            Snackbar.Add("Unable to reach the server. Please try again.", Severity.Error);
+            Snackbar.Add(T.PayRunDialog.Unreachable, Severity.Error);
         }
         finally
         {

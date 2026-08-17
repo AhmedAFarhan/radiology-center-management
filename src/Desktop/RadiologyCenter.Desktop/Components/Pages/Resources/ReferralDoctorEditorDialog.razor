@@ -1,15 +1,16 @@
 @inject ResourceService ResourceService
 @inject ISnackbar Snackbar
+@inject AppLocalizer T
 
 <MudDialog>
     <DialogContent>
-        <DialogHeader Icon="@Icons.Material.Filled.LocalHospital" Title="@(Doctor is null ? "New Referral Doctor" : $"Edit {Doctor.FullName}")" />
+        <DialogHeader Icon="@Icons.Material.Filled.LocalHospital" Title="@(Doctor is null ? T.ReferralDoctor.NewReferralDoctor : T.FormatValue(T.ReferralDoctor.Edit, Doctor.FullName))" />
         <EditForm EditContext="_editContext">
             <DataAnnotationsValidator />
             <MudGrid Spacing="2">
                 <MudItem xs="12">
                     <MudTextField @bind-Value="_model.FullName"
-                                  Label="Full Name"
+                                  Label="@T.ReferralDoctorDialog.FullName"
                                   Variant="Variant.Outlined"
                                   Margin="Margin.Dense"
                                   Immediate="true"
@@ -17,7 +18,7 @@
                 </MudItem>
                 <MudItem xs="12" sm="6">
                     <MudTextField @bind-Value="_model.Phone"
-                                  Label="Phone Number"
+                                  Label="@T.ReferralDoctorDialog.PhoneNumber"
                                   Variant="Variant.Outlined"
                                   Margin="Margin.Dense"
                                   Immediate="true"
@@ -25,7 +26,7 @@
                 </MudItem>
                 <MudItem xs="12" sm="6">
                     <MudTextField @bind-Value="_model.Email"
-                                  Label="Email"
+                                  Label="@T.ReferralDoctor.Email"
                                   Variant="Variant.Outlined"
                                   Margin="Margin.Dense"
                                   Immediate="true"
@@ -33,14 +34,14 @@
                 </MudItem>
                 <MudItem xs="12" sm="6">
                     <MudTextField @bind-Value="_model.Specialization"
-                                  Label="Specialization"
+                                  Label="@T.ReferralDoctor.Specialization"
                                   Variant="Variant.Outlined"
                                   Margin="Margin.Dense"
                                   Immediate="true" />
                 </MudItem>
                 <MudItem xs="12" sm="6">
                     <MudTextField @bind-Value="_model.Hospital"
-                                  Label="Hospital / Clinic"
+                                  Label="@T.ReferralDoctorDialog.HospitalClinic"
                                   Variant="Variant.Outlined"
                                   Margin="Margin.Dense"
                                   Immediate="true" />
@@ -49,7 +50,7 @@
         </EditForm>
     </DialogContent>
     <DialogActions>
-        <MudButton Color="Color.Default" OnClick="CancelAsync" Disabled="_busy">Cancel</MudButton>
+        <MudButton Color="Color.Default" OnClick="CancelAsync" Disabled="_busy">@T.Common.Cancel</MudButton>
         <MudButton Color="Color.Primary" Variant="Variant.Filled" OnClick="SubmitAsync" Disabled="_busy">
             @if (_busy)
             {
@@ -57,7 +58,7 @@
             }
             else
             {
-                <text>@(IsEdit ? "Save Changes" : "Create Doctor")</text>
+                <text>@(IsEdit ? T.ReferralDoctorDialog.SaveChanges : T.ReferralDoctorDialog.CreateDoctor)</text>
             }
         </MudButton>
     </DialogActions>
@@ -110,7 +111,7 @@
             else
                 await ResourceService.CreateReferralDoctorAsync(input);
 
-            Snackbar.Add(IsEdit ? "Referral doctor updated." : "Referral doctor created.", Severity.Success);
+            Snackbar.Add(IsEdit ? T.ReferralDoctorDialog.Updated : T.ReferralDoctorDialog.Created, Severity.Success);
             MudDialog.Close(DialogResult.Ok(true));
         }
         catch (ApiException ex)
@@ -119,7 +120,7 @@
         }
         catch (Exception)
         {
-            Snackbar.Add("Unable to reach the server. Please try again.", Severity.Error);
+            Snackbar.Add(T.ReferralDoctorDialog.Unreachable, Severity.Error);
         }
         finally
         {

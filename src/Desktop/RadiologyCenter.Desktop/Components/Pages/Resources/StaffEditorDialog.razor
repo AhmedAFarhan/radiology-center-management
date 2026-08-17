@@ -1,17 +1,18 @@
 @inject ResourceService ResourceService
 @inject IdentityService IdentityService
 @inject ISnackbar Snackbar
+@inject AppLocalizer T
 
 <MudDialog>
     <DialogContent>
-        <DialogHeader Icon="@Icons.Material.Filled.Badge" Title="@(Staff is null ? "New Staff" : $"Edit {Staff.FullName}")" />
+        <DialogHeader Icon="@Icons.Material.Filled.Badge" Title="@(Staff is null ? T.Staff.NewStaff : T.FormatValue(T.Staff.Edit, Staff.FullName))" />
         <EditForm EditContext="_editContext">
             <DataAnnotationsValidator />
             <MudGrid Spacing="2">
                 <MudItem xs="12">
                     <MudAutocomplete T="UserDto"
                                      @bind-Value="_selectedUser"
-                                     Label="User account (search by name or username)"
+                                     Label="@T.StaffDialog.UserSearch"
                                      Variant="Variant.Outlined"
                                      Margin="Margin.Dense"
                                      MinCharacters="1"
@@ -23,7 +24,7 @@
                 </MudItem>
                 <MudItem xs="12">
                     <MudTextField @bind-Value="_model.FullName"
-                                  Label="Full Name"
+                                  Label="@T.StaffDialog.FullName"
                                   Variant="Variant.Outlined"
                                   Margin="Margin.Dense"
                                   Immediate="true"
@@ -32,7 +33,7 @@
                 <MudItem xs="12" sm="6">
                     <MudSelect T="string"
                                @bind-Value="_model.Position"
-                               Label="Position"
+                               Label="@T.Staff.Position"
                                Variant="Variant.Outlined"
                                Margin="Margin.Dense"
                                For="@(() => _model.Position)">
@@ -44,14 +45,14 @@
                 </MudItem>
                 <MudItem xs="12" sm="6">
                     <MudDatePicker @bind-Date="_model.HireDate"
-                                   Label="Hire Date"
+                                   Label="@T.Staff.HireDate"
                                    Variant="Variant.Outlined"
                                    Margin="Margin.Dense"
                                    Class="w-100" />
                 </MudItem>
                 <MudItem xs="12" sm="6">
                     <MudTextField @bind-Value="_model.PhoneNumber"
-                                  Label="Phone Number"
+                                  Label="@T.StaffDialog.PhoneNumber"
                                   Variant="Variant.Outlined"
                                   Margin="Margin.Dense"
                                   Immediate="true"
@@ -59,21 +60,21 @@
                 </MudItem>
                 <MudItem xs="12" sm="6">
                     <MudTextField @bind-Value="_model.Department"
-                                  Label="Department"
+                                  Label="@T.Staff.Department"
                                   Variant="Variant.Outlined"
                                   Margin="Margin.Dense"
                                   Immediate="true" />
                 </MudItem>
                 <MudItem xs="12" sm="6">
                     <MudTextField @bind-Value="_model.Specialization"
-                                  Label="Specialization"
+                                  Label="@T.Staff.Specialization"
                                   Variant="Variant.Outlined"
                                   Margin="Margin.Dense"
                                   Immediate="true" />
                 </MudItem>
                 <MudItem xs="12" sm="6">
                     <MudTextField @bind-Value="_model.LicenseNumber"
-                                  Label="License Number"
+                                  Label="@T.StaffDialog.LicenseNumber"
                                   Variant="Variant.Outlined"
                                   Margin="Margin.Dense"
                                   Immediate="true" />
@@ -82,7 +83,7 @@
         </EditForm>
     </DialogContent>
     <DialogActions>
-        <MudButton Color="Color.Default" OnClick="CancelAsync" Disabled="_busy">Cancel</MudButton>
+        <MudButton Color="Color.Default" OnClick="CancelAsync" Disabled="_busy">@T.Common.Cancel</MudButton>
         <MudButton Color="Color.Primary" Variant="Variant.Filled" OnClick="SubmitAsync" Disabled="_busy">
             @if (_busy)
             {
@@ -90,7 +91,7 @@
             }
             else
             {
-                <text>@(IsEdit ? "Save Changes" : "Create Staff")</text>
+                <text>@(IsEdit ? T.StaffDialog.SaveChanges : T.StaffDialog.CreateStaff)</text>
             }
         </MudButton>
     </DialogActions>
@@ -134,7 +135,7 @@
         }
         catch (Exception)
         {
-            Snackbar.Add("Unable to search users.", Severity.Error);
+            Snackbar.Add(T.StaffDialog.SearchError, Severity.Error);
             return Array.Empty<UserDto>();
         }
     }
@@ -184,7 +185,7 @@
 
         if (_selectedUser is null)
         {
-            Snackbar.Add("Select a user account.", Severity.Warning);
+            Snackbar.Add(T.StaffDialog.SelectUser, Severity.Warning);
             return;
         }
 
@@ -208,7 +209,7 @@
             else
                 await ResourceService.CreateStaffAsync(input);
 
-            Snackbar.Add(IsEdit ? "Staff member updated." : "Staff member created.", Severity.Success);
+            Snackbar.Add(IsEdit ? T.StaffDialog.Updated : T.StaffDialog.Created, Severity.Success);
             MudDialog.Close(DialogResult.Ok(true));
         }
         catch (ApiException ex)
@@ -217,7 +218,7 @@
         }
         catch (Exception)
         {
-            Snackbar.Add("Unable to reach the server. Please try again.", Severity.Error);
+            Snackbar.Add(T.StaffDialog.Unreachable, Severity.Error);
         }
         finally
         {

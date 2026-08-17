@@ -1,0 +1,11 @@
+@inject AppLocalizer T
+
+<MudIconButton Icon="@Icons.Material.Filled.Translate"
+               Color="Color.Inherit"
+               Title="@(T.IsRTL ? "English" : "العربية")"
+               aria-label="Language"
+               OnClick="Toggle" />
+
+@code {
+    private void Toggle() => T.SetCulture(T.IsRTL ? AppLocalizer.DefaultCulture : AppLocalizer.ArabicCulture);
+}

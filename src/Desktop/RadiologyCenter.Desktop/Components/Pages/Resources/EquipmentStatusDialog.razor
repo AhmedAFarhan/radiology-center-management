@@ -1,15 +1,16 @@
 @inject ResourceService ResourceService
 @inject ISnackbar Snackbar
+@inject AppLocalizer T
 
 <MudDialog>
     <DialogContent>
-        <DialogHeader Icon="@Icons.Material.Filled.Biotech" Title="@($"Set Status - {Equipment.Name}")" />
+        <DialogHeader Icon="@Icons.Material.Filled.Biotech" Title="@(T.FormatValue(T.Equipment.SetStatusTitle, Equipment.Name))" />
         <MudText Typo="Typo.body2" Class="mb-2 text-secondary">
-            Current status: <MudChip T="string" Size="Size.Small" Color="@StatusColor(Equipment.Status)">@FormatStatus(Equipment.Status)</MudChip>
+            @(T.Equipment.CurrentStatus): <MudChip T="string" Size="Size.Small" Color="@StatusColor(Equipment.Status)">@FormatStatus(Equipment.Status)</MudChip>
         </MudText>
         <MudSelect T="string"
                    @bind-Value="_status"
-                   Label="Status"
+                   Label="@T.Common.Status"
                    Variant="Variant.Outlined"
                    Margin="Margin.Dense"
                    Class="w-100">
@@ -20,7 +21,7 @@
         </MudSelect>
     </DialogContent>
     <DialogActions>
-        <MudButton Color="Color.Default" OnClick="CancelAsync" Disabled="_busy">Cancel</MudButton>
+        <MudButton Color="Color.Default" OnClick="CancelAsync" Disabled="_busy">@T.Common.Cancel</MudButton>
         <MudButton Color="Color.Primary" Variant="Variant.Filled" OnClick="SubmitAsync" Disabled="_busy">
             @if (_busy)
             {
@@ -28,7 +29,7 @@
             }
             else
             {
-                <text>Save Status</text>
+                <text>@T.EquipmentDialog.SaveStatus</text>
             }
         </MudButton>
     </DialogActions>
@@ -57,7 +58,7 @@
     {
         if (string.IsNullOrWhiteSpace(_status))
         {
-            Snackbar.Add("Select a status.", Severity.Warning);
+            Snackbar.Add(T.EquipmentDialog.SelectStatus, Severity.Warning);
             return;
         }
 
@@ -65,7 +66,7 @@
         try
         {
             await ResourceService.SetEquipmentStatusAsync(Equipment.Id, _status);
-            Snackbar.Add("Equipment status updated.", Severity.Success);
+            Snackbar.Add(T.EquipmentDialog.StatusUpdated, Severity.Success);
             MudDialog.Close(DialogResult.Ok(true));
         }
         catch (ApiException ex)
@@ -74,7 +75,7 @@
         }
         catch (Exception)
         {
-            Snackbar.Add("Unable to reach the server. Please try again.", Severity.Error);
+            Snackbar.Add(T.EquipmentDialog.Unreachable, Severity.Error);
         }
         finally
         {

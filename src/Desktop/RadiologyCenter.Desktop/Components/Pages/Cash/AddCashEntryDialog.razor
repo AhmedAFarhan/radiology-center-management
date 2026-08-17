@@ -1,38 +1,39 @@
 @inject CashService CashService
 @inject ISnackbar Snackbar
+@inject AppLocalizer T
 
 <MudDialog>
     <DialogContent>
-        <DialogHeader Icon="@Icons.Material.Filled.SwapVert" Title="Add Cash Entry" />
+        <DialogHeader Icon="@Icons.Material.Filled.SwapVert" Title="@T.CashEntry.Title" />
         <EditForm EditContext="_editContext">
             <DataAnnotationsValidator />
             <MudGrid Spacing="2">
                 <MudItem xs="12" sm="6">
                     <MudSelect @bind-Value="_model.Direction"
-                               Label="Direction"
+                               Label="@T.CashEntry.Direction"
                                Variant="Variant.Outlined"
                                Margin="Margin.Dense"
                                For="@(() => _model.Direction)">
-                        <MudSelectItem Value="@("In")">In (money in)</MudSelectItem>
-                        <MudSelectItem Value="@("Out")">Out (money out)</MudSelectItem>
+                        <MudSelectItem Value="@("In")">@T.CashEntry.DirectionIn</MudSelectItem>
+                        <MudSelectItem Value="@("Out")">@T.CashEntry.DirectionOut</MudSelectItem>
                     </MudSelect>
                 </MudItem>
                 <MudItem xs="12" sm="6">
                     <MudSelect @bind-Value="_model.Reason"
-                               Label="Reason"
+                               Label="@T.CashEntry.Reason"
                                Variant="Variant.Outlined"
                                Margin="Margin.Dense"
                                For="@(() => _model.Reason)">
-                        <MudSelectItem Value="@("Payment")">Payment</MudSelectItem>
-                        <MudSelectItem Value="@("Refund")">Refund</MudSelectItem>
-                        <MudSelectItem Value="@("Deposit")">Deposit</MudSelectItem>
-                        <MudSelectItem Value="@("Payout")">Payout</MudSelectItem>
-                        <MudSelectItem Value="@("Adjustment")">Adjustment</MudSelectItem>
+                        <MudSelectItem Value="@("Payment")">@T.CashEntry.ReasonPayment</MudSelectItem>
+                        <MudSelectItem Value="@("Refund")">@T.CashEntry.ReasonRefund</MudSelectItem>
+                        <MudSelectItem Value="@("Deposit")">@T.CashEntry.ReasonDeposit</MudSelectItem>
+                        <MudSelectItem Value="@("Payout")">@T.CashEntry.ReasonPayout</MudSelectItem>
+                        <MudSelectItem Value="@("Adjustment")">@T.CashEntry.ReasonAdjustment</MudSelectItem>
                     </MudSelect>
                 </MudItem>
                 <MudItem xs="12" sm="6">
                     <MudNumericField @bind-Value="_model.Amount"
-                                     Label="Amount"
+                                     Label="@T.CashEntry.Amount"
                                      Variant="Variant.Outlined"
                                      Margin="Margin.Dense"
                                      Immediate="true"
@@ -40,7 +41,7 @@
                 </MudItem>
                 <MudItem xs="12" sm="6">
                     <MudTextField @bind-Value="_model.ReferenceId"
-                                  Label="Reference"
+                                  Label="@T.CashEntry.Reference"
                                   Variant="Variant.Outlined"
                                   Margin="Margin.Dense"
                                   Immediate="true"
@@ -48,7 +49,7 @@
                 </MudItem>
                 <MudItem xs="12">
                     <MudTextField @bind-Value="_model.Description"
-                                  Label="Description"
+                                  Label="@T.CashEntry.Description"
                                   Variant="Variant.Outlined"
                                   Margin="Margin.Dense"
                                   Immediate="true"
@@ -58,7 +59,7 @@
         </EditForm>
     </DialogContent>
     <DialogActions>
-        <MudButton Color="Color.Default" OnClick="CancelAsync" Disabled="_busy">Cancel</MudButton>
+        <MudButton Color="Color.Default" OnClick="CancelAsync" Disabled="_busy">@T.Common.Cancel</MudButton>
         <MudButton Color="Color.Primary" Variant="Variant.Filled" OnClick="SubmitAsync" Disabled="_busy">
             @if (_busy)
             {
@@ -66,7 +67,7 @@
             }
             else
             {
-                <text>Add Entry</text>
+                <text>@T.CashEntry.Submit</text>
             }
         </MudButton>
     </DialogActions>
@@ -106,7 +107,7 @@
             };
 
             await CashService.AddEntryAsync(SessionId, input);
-            Snackbar.Add("Cash entry added.", Severity.Success);
+            Snackbar.Add(T.CashEntry.Added, Severity.Success);
             MudDialog.Close(DialogResult.Ok(true));
         }
         catch (ApiException ex)
@@ -115,7 +116,7 @@
         }
         catch (Exception)
         {
-            Snackbar.Add("Unable to reach the server. Please try again.", Severity.Error);
+            Snackbar.Add(T.CashEntry.UnreachableRetry, Severity.Error);
         }
         finally
         {

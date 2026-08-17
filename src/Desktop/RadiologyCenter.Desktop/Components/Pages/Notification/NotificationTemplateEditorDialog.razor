@@ -1,25 +1,26 @@
 @inject NotificationService NotificationService
 @inject ISnackbar Snackbar
+@inject AppLocalizer T
 
 <MudDialog>
     <DialogContent>
-        <DialogHeader Icon="@Icons.Material.Filled.Article" Title="@(Template is null ? "New Notification Template" : $"Edit {Template.Name}")" />
+        <DialogHeader Icon="@Icons.Material.Filled.Article" Title="@(Template is null ? T.TemplateDialog.NewTitle : T.FormatValue(T.TemplateDialog.EditTitle, Template.Name))" />
         <EditForm EditContext="_editContext">
             <DataAnnotationsValidator />
             <MudGrid Spacing="2">
                 <MudItem xs="12" sm="5">
                     <MudTextField @bind-Value="_model.Code"
-                                  Label="Code"
+                                  Label="@T.TemplateDialog.Code"
                                   Variant="Variant.Outlined"
                                   Margin="Margin.Dense"
                                   Immediate="true"
                                   Disabled="_isEdit"
-                                  HelperText="Unique identifier used to send, e.g. REPORT_READY"
+                                  HelperText="@T.TemplateDialog.CodeHelper"
                                   For="@(() => _model.Code)" />
                 </MudItem>
                 <MudItem xs="12" sm="7">
                     <MudTextField @bind-Value="_model.Name"
-                                  Label="Name"
+                                  Label="@T.Common.Name"
                                   Variant="Variant.Outlined"
                                   Margin="Margin.Dense"
                                   Immediate="true"
@@ -27,29 +28,29 @@
                 </MudItem>
                 <MudItem xs="12">
                     <MudTextField @bind-Value="_model.Subject"
-                                  Label="Subject"
+                                  Label="@T.TemplateDialog.Subject"
                                   Variant="Variant.Outlined"
                                   Margin="Margin.Dense"
                                   Immediate="true"
-                                  HelperText="Used for emails and push titles. Leave empty for SMS."
+                                  HelperText="@T.TemplateDialog.SubjectHelper"
                                   For="@(() => _model.Subject)" />
                 </MudItem>
                 <MudItem xs="12">
                     <MudTextField @bind-Value="_model.Body"
-                                  Label="Body"
+                                  Label="@T.TemplateDialog.Body"
                                   Variant="Variant.Outlined"
                                   Margin="Margin.Dense"
                                   Immediate="true"
                                   Lines="5"
                                   Multiline="true"
-                                  HelperText="Supported placeholders: {name}, {code}, {amount} ..."
+                                  HelperText="@T.TemplateDialog.BodyHelper"
                                   For="@(() => _model.Body)" />
                 </MudItem>
             </MudGrid>
         </EditForm>
     </DialogContent>
     <DialogActions>
-        <MudButton Color="Color.Default" OnClick="CancelAsync" Disabled="_busy">Cancel</MudButton>
+        <MudButton Color="Color.Default" OnClick="CancelAsync" Disabled="_busy">@T.Common.Cancel</MudButton>
         <MudButton Color="Color.Primary" Variant="Variant.Filled" OnClick="SubmitAsync" Disabled="_busy">
             @if (_busy)
             {
@@ -57,7 +58,7 @@
             }
             else
             {
-                <text>@(_isEdit ? "Save Changes" : "Create Template")</text>
+                <text>@(_isEdit ? T.TemplateDialog.SaveChanges : T.TemplateDialog.CreateTemplate)</text>
             }
         </MudButton>
     </DialogActions>
@@ -108,7 +109,7 @@
             else
                 await NotificationService.CreateTemplateAsync(input);
 
-            Snackbar.Add(_isEdit ? "Template updated." : "Template created.", Severity.Success);
+            Snackbar.Add(_isEdit ? T.TemplateDialog.Updated : T.TemplateDialog.Created, Severity.Success);
             MudDialog.Close(DialogResult.Ok(true));
         }
         catch (ApiException ex)
@@ -117,7 +118,7 @@
         }
         catch (Exception)
         {
-            Snackbar.Add("Unable to reach the server. Please try again.", Severity.Error);
+            Snackbar.Add(T.TemplateDialog.Unreachable, Severity.Error);
         }
         finally
         {

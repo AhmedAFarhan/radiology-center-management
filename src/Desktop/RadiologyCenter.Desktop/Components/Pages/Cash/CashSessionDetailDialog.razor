@@ -1,10 +1,11 @@
 @inject CashService CashService
 @inject IDialogService DialogService
 @inject ISnackbar Snackbar
+@inject AppLocalizer T
 
 <MudDialog>
     <DialogContent>
-        <DialogHeader Icon="@Icons.Material.Filled.AccountBalanceWallet" Title="@(Session is null ? "Cash Session" : $"Cash Session ({ShortId(Session.Id)})")" />
+        <DialogHeader Icon="@Icons.Material.Filled.AccountBalanceWallet" Title="@(Session is null ? T.CashSession.Title : T.FormatValue(T.CashSession.TitleWithId, ShortId(Session.Id)))" />
         @if (Session is null)
         {
             <DialogSkeleton Rows="8" />
@@ -16,28 +17,28 @@
                     <MudPaper Elevation="0" Class="pa-4 rounded" Style="border:1px solid rgba(0,0,0,.12)">
                         <MudGrid Spacing="2">
                             <MudItem xs="12" sm="6" md="3">
-                                <MudText Typo="Typo.caption" Class="text-secondary">Status</MudText>
+                                <MudText Typo="Typo.caption" Class="text-secondary">@T.Common.Status</MudText>
                                 <MudChip T="string" Size="Size.Small" Color="@StatusColor(Session.Status)">@Session.Status</MudChip>
                             </MudItem>
                             <MudItem xs="12" sm="6" md="3">
-                                <MudText Typo="Typo.caption" Class="text-secondary">User</MudText>
+                                <MudText Typo="Typo.caption" Class="text-secondary">@T.CashSession.User</MudText>
                                 <MudText Typo="Typo.body1" Class="font-weight-medium">@(string.IsNullOrWhiteSpace(Session.UserName) ? ShortId(Session.UserId) : Session.UserName)</MudText>
                             </MudItem>
                             <MudItem xs="12" sm="6" md="3">
-                                <MudText Typo="Typo.caption" Class="text-secondary">Opening Float</MudText>
+                                <MudText Typo="Typo.caption" Class="text-secondary">@T.CashSession.OpeningFloat</MudText>
                                 <MudText Typo="Typo.body1" Class="font-weight-medium">@Session.OpeningFloat.ToString("C")</MudText>
                             </MudItem>
                             <MudItem xs="12" sm="6" md="3">
-                                <MudText Typo="Typo.caption" Class="text-secondary">Balance</MudText>
+                                <MudText Typo="Typo.caption" Class="text-secondary">@T.CashSession.Balance</MudText>
                                 <MudText Typo="Typo.body1" Class="font-weight-medium" Color="@(Session.Balance < 0 ? Color.Error : Color.Default)">@Session.Balance.ToString("C")</MudText>
                             </MudItem>
                             <MudItem xs="12" sm="6">
-                                <MudText Typo="Typo.caption" Class="text-secondary">Opened At</MudText>
+                                <MudText Typo="Typo.caption" Class="text-secondary">@T.CashSession.OpenedAt</MudText>
                                 <MudText Typo="Typo.body2">@Session.OpenedAt.ToLocalTime().ToString("g")</MudText>
                             </MudItem>
                             <MudItem xs="12" sm="6">
-                                <MudText Typo="Typo.caption" Class="text-secondary">Closed At</MudText>
-                                <MudText Typo="Typo.body2">@(Session.ClosedAt?.ToLocalTime().ToString("g") ?? "Not closed")</MudText>
+                                <MudText Typo="Typo.caption" Class="text-secondary">@T.CashSession.ClosedAt</MudText>
+                                <MudText Typo="Typo.body2">@(Session.ClosedAt?.ToLocalTime().ToString("g") ?? T.CashSession.NotClosed)</MudText>
                             </MudItem>
                         </MudGrid>
                         @if (!string.IsNullOrWhiteSpace(Session.Notes))
@@ -54,38 +55,38 @@
                         <MudPaper Elevation="0" Class="pa-4 rounded" Style="border:1px solid rgba(0,0,0,.12)">
                             <MudGrid Spacing="2" Class="mb-2">
                                 <MudItem xs="12" sm="8">
-                                    <MudText Typo="Typo.subtitle1" Class="font-weight-medium">Handover</MudText>
+                                    <MudText Typo="Typo.subtitle1" Class="font-weight-medium">@T.CashSession.Handover</MudText>
                                 </MudItem>
                                 <MudItem xs="12" sm="4" Class="d-flex justify-end">
                                     @if (_handover.ApprovedAt is null)
                                     {
-                                        <MudButton Variant="Variant.Filled" Color="Color.Success" Size="Size.Small" StartIcon="@Icons.Material.Filled.Check" OnClick="ApproveAsync" Disabled="_busy">Approve Handover</MudButton>
+                                        <MudButton Variant="Variant.Filled" Color="Color.Success" Size="Size.Small" StartIcon="@Icons.Material.Filled.Check" OnClick="ApproveAsync" Disabled="_busy">@T.CashSession.ApproveHandover</MudButton>
                                     }
                                 </MudItem>
                             </MudGrid>
                             <MudGrid Spacing="2">
                                 <MudItem xs="12" sm="6" md="3">
-                                    <MudText Typo="Typo.caption" Class="text-secondary">Expected</MudText>
+                                    <MudText Typo="Typo.caption" Class="text-secondary">@T.CashSession.Expected</MudText>
                                     <MudText Typo="Typo.body1" Class="font-weight-medium">@_handover.ExpectedTotal.ToString("C")</MudText>
                                 </MudItem>
                                 <MudItem xs="12" sm="6" md="3">
-                                    <MudText Typo="Typo.caption" Class="text-secondary">Counted</MudText>
+                                    <MudText Typo="Typo.caption" Class="text-secondary">@T.CashSession.Counted</MudText>
                                     <MudText Typo="Typo.body1" Class="font-weight-medium">@_handover.CountedTotal.ToString("C")</MudText>
                                 </MudItem>
                                 <MudItem xs="12" sm="6" md="3">
-                                    <MudText Typo="Typo.caption" Class="text-secondary">Over / Short</MudText>
+                                    <MudText Typo="Typo.caption" Class="text-secondary">@T.CashSession.OverShort</MudText>
                                     <MudText Typo="Typo.body1" Class="font-weight-medium" Color="@OverShortColor(_handover.OverShortAmount)">@(_handover.OverShortAmount >= 0 ? $"+{_handover.OverShortAmount:C}" : _handover.OverShortAmount.ToString("C"))</MudText>
                                 </MudItem>
                                 <MudItem xs="12" sm="6" md="3">
-                                    <MudText Typo="Typo.caption" Class="text-secondary">Approved</MudText>
-                                    <MudText Typo="Typo.body2">@(_handover.ApprovedAt?.ToLocalTime().ToString("g") ?? "Not approved")</MudText>
+                                    <MudText Typo="Typo.caption" Class="text-secondary">@T.CashSession.Approved</MudText>
+                                    <MudText Typo="Typo.body2">@(_handover.ApprovedAt?.ToLocalTime().ToString("g") ?? T.CashSession.NotApproved)</MudText>
                                 </MudItem>
                                 <MudItem xs="12" sm="6">
-                                    <MudText Typo="Typo.caption" Class="text-secondary">Closed By</MudText>
+                                    <MudText Typo="Typo.caption" Class="text-secondary">@T.CashSession.ClosedBy</MudText>
                                     <MudText Typo="Typo.body2">@(string.IsNullOrWhiteSpace(_handover.ClosedByName) ? ShortId(_handover.ClosedByUserId) : _handover.ClosedByName)</MudText>
                                 </MudItem>
                                 <MudItem xs="12" sm="6">
-                                    <MudText Typo="Typo.caption" Class="text-secondary">Receiving Session</MudText>
+                                    <MudText Typo="Typo.caption" Class="text-secondary">@T.CashSession.ReceivingSession</MudText>
                                     <MudText Typo="Typo.body2">@(_handover.ReceivingCashSessionId is null ? "-" : ShortId(_handover.ReceivingCashSessionId))</MudText>
                                 </MudItem>
                             </MudGrid>
@@ -101,48 +102,48 @@
                 <MudItem xs="12">
                     <MudGrid Spacing="2" Class="mb-2">
                         <MudItem xs="12" sm="6">
-                            <MudText Typo="Typo.subtitle1" Class="font-weight-medium">Entries (@_entries.Count)</MudText>
+                            <MudText Typo="Typo.subtitle1" Class="font-weight-medium">@(T.FormatValue(T.CashSession.EntriesCount, _entries.Count))</MudText>
                         </MudItem>
                         <MudItem xs="12" sm="6" Class="d-flex justify-end">
                             @if (IsOpen)
                             {
-                                <MudButton Variant="Variant.Filled" Color="Color.Primary" Size="Size.Small" StartIcon="@Icons.Material.Filled.SwapVert" OnClick="AddEntryAsync" Disabled="_busy">Add Entry</MudButton>
-                                <MudButton Variant="Variant.Filled" Color="Color.Warning" Size="Size.Small" Class="ms-2" StartIcon="@Icons.Material.Filled.Lock" OnClick="CloseAsync" Disabled="_busy">Close Session</MudButton>
+                                <MudButton Variant="Variant.Filled" Color="Color.Primary" Size="Size.Small" StartIcon="@Icons.Material.Filled.SwapVert" OnClick="AddEntryAsync" Disabled="_busy">@T.CashSession.AddEntry</MudButton>
+                                <MudButton Variant="Variant.Filled" Color="Color.Warning" Size="Size.Small" Class="ms-2" StartIcon="@Icons.Material.Filled.Lock" OnClick="CloseAsync" Disabled="_busy">@T.CashSession.CloseSession</MudButton>
                             }
                         </MudItem>
                     </MudGrid>
 
                     @if (_entries.Count == 0)
                     {
-                        <MudText Typo="Typo.body2" Class="text-secondary pa-4">No entries recorded in this session yet.</MudText>
+                        <MudText Typo="Typo.body2" Class="text-secondary pa-4">@T.CashSession.NoEntries</MudText>
                     }
                     else
                     {
                         <MudTable T="CashEntryDto" Items="_entries" Dense="true" Hover="true" Elevation="0" Class="rounded" Style="border:1px solid rgba(0,0,0,.12)">
                             <HeaderContent>
-                                <MudTh>Date</MudTh>
-                                <MudTh>Direction</MudTh>
-                                <MudTh>Reason</MudTh>
-                                <MudTh Class="text-right">Amount</MudTh>
-                                <MudTh>Reference</MudTh>
-                                <MudTh>Description</MudTh>
+                                <MudTh>@T.Common.Date</MudTh>
+                                <MudTh>@T.CashSession.Direction</MudTh>
+                                <MudTh>@T.CashSession.Reason</MudTh>
+                                <MudTh Class="text-right">@T.CashSession.Amount</MudTh>
+                                <MudTh>@T.CashSession.Reference</MudTh>
+                                <MudTh>@T.CashSession.Description</MudTh>
                             </HeaderContent>
                             <RowTemplate Context="entry">
-                                <MudTd DataLabel="Date">@entry.OccurredAt.ToLocalTime().ToString("g")</MudTd>
-                                <MudTd DataLabel="Direction">
+                                <MudTd DataLabel="@T.Common.Date">@entry.OccurredAt.ToLocalTime().ToString("g")</MudTd>
+                                <MudTd DataLabel="@T.CashSession.Direction">
                                     <MudChip T="string" Size="Size.Small" Color="@DirectionColor(entry.Direction)">@entry.Direction</MudChip>
                                 </MudTd>
-                                <MudTd DataLabel="Reason">@entry.Reason</MudTd>
-                                <MudTd DataLabel="Amount" Class="text-right">
+                                <MudTd DataLabel="@T.CashSession.Reason">@entry.Reason</MudTd>
+                                <MudTd DataLabel="@T.CashSession.Amount" Class="text-right">
                                     <MudText Class="font-weight-medium" Color="@(entry.Direction == "Out" ? Color.Error : Color.Success)">
                                         @(entry.Direction == "Out" ? $"-{entry.Amount:C}" : $"+{entry.Amount:C}")
                                     </MudText>
                                 </MudTd>
-                                <MudTd DataLabel="Reference">@(entry.ReferenceId ?? "-")</MudTd>
-                                <MudTd DataLabel="Description">@(entry.Description ?? "-")</MudTd>
+                                <MudTd DataLabel="@T.CashSession.Reference">@(entry.ReferenceId ?? "-")</MudTd>
+                                <MudTd DataLabel="@T.CashSession.Description">@(entry.Description ?? "-")</MudTd>
                             </RowTemplate>
                             <NoRecordsContent>
-                                <MudText Typo="Typo.body2" Class="text-secondary pa-4">No entries to display.</MudText>
+                                <MudText Typo="Typo.body2" Class="text-secondary pa-4">@T.CashSession.NoEntriesToDisplay</MudText>
                             </NoRecordsContent>
                         </MudTable>
                     }
@@ -151,7 +152,7 @@
         }
     </DialogContent>
     <DialogActions>
-        <MudButton Color="Color.Default" OnClick="CloseDialogAsync">Close</MudButton>
+        <MudButton Color="Color.Default" OnClick="CloseDialogAsync">@T.Common.Close</MudButton>
     </DialogActions>
 </MudDialog>
 
@@ -189,7 +190,7 @@
         }
         catch (Exception)
         {
-            Snackbar.Add("Unable to reach the server.", Severity.Error);
+            Snackbar.Add(T.CashSession.Unreachable, Severity.Error);
             _loadFailed = true;
         }
     }
@@ -198,7 +199,7 @@
     {
         var parameters = new DialogParameters { ["SessionId"] = SessionId };
         var options = new DialogOptions { MaxWidth = MaxWidth.Medium, FullWidth = true, NoHeader = true };
-        var dialog = await DialogService.ShowAsync<AddCashEntryDialog>("Add Cash Entry", parameters, options);
+        var dialog = await DialogService.ShowAsync<AddCashEntryDialog>(T.CashSession.AddCashEntryTitle, parameters, options);
         var result = await dialog.Result;
         if (result is { Canceled: false })
             await LoadAsync();
@@ -212,7 +213,7 @@
             ["ExpectedTotal"] = Session?.Balance ?? 0,
         };
         var options = new DialogOptions { MaxWidth = MaxWidth.Medium, FullWidth = true, NoHeader = true };
-        var dialog = await DialogService.ShowAsync<CloseCashSessionDialog>("Close Cash Session", parameters, options);
+        var dialog = await DialogService.ShowAsync<CloseCashSessionDialog>(T.CashSession.CloseCashSessionTitle, parameters, options);
         var result = await dialog.Result;
         if (result is { Canceled: false })
             await LoadAsync();
@@ -221,10 +222,10 @@
     private async Task ApproveAsync()
     {
         var confirmed = await DialogService.ShowMessageBoxAsync(
-            "Approve Handover",
-            "Approve this cash handover? Once approved, the handover cannot be changed.",
-            "Approve",
-            "Cancel");
+            T.CashSession.ApproveHandover,
+            T.CashSession.ApproveHandoverConfirm,
+            T.CashSession.Approve,
+            T.Common.Cancel);
 
         if (confirmed != true)
             return;
@@ -233,7 +234,7 @@
         try
         {
             await CashService.ApproveHandoverAsync(SessionId);
-            Snackbar.Add("Handover approved.", Severity.Success);
+            Snackbar.Add(T.CashSession.HandoverApproved, Severity.Success);
             await LoadAsync();
         }
         catch (ApiException ex)
@@ -242,7 +243,7 @@
         }
         catch (Exception)
         {
-            Snackbar.Add("Unable to reach the server.", Severity.Error);
+            Snackbar.Add(T.CashSession.Unreachable, Severity.Error);
         }
         finally
         {

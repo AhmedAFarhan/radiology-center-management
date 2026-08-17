@@ -1,18 +1,19 @@
 @inject NotificationService NotificationService
 @inject ISnackbar Snackbar
+@inject AppLocalizer T
 
 <MudDialog>
     <DialogContent>
-        <DialogHeader Icon="@Icons.Material.Filled.Send" Title="Send Notification" />
+        <DialogHeader Icon="@Icons.Material.Filled.Send" Title="@T.SendDialog.Title" />
         <MudAlert Severity="Severity.Info" Variant="Variant.Text" Class="mb-3">
-            Channels are currently configured with log-only providers, so messages are recorded but not actually delivered.
+            @T.SendDialog.LogOnlyAlert
         </MudAlert>
         <EditForm EditContext="_editContext">
             <DataAnnotationsValidator />
             <MudGrid Spacing="2">
                 <MudItem xs="12" sm="6">
                     <MudTextField @bind-Value="_model.Recipient"
-                                  Label="Recipient (phone / email / device token)"
+                                  Label="@T.SendDialog.RecipientLabel"
                                   Variant="Variant.Outlined"
                                   Margin="Margin.Dense"
                                   Immediate="true"
@@ -22,7 +23,7 @@
                     <MudSelect T="string"
                                Value="_model.Channel"
                                ValueChanged="OnChannelChangedAsync"
-                               Label="Channel"
+                               Label="@T.SendDialog.Channel"
                                Variant="Variant.Outlined"
                                Margin="Margin.Dense"
                                For="@(() => _model.Channel)">
@@ -35,11 +36,11 @@
                     <MudSelect T="string"
                                Value="_model.TemplateCode"
                                ValueChanged="OnTemplateCodeChangedAsync"
-                               Label="Template"
+                               Label="@T.SendDialog.Template"
                                Variant="Variant.Outlined"
                                Margin="Margin.Dense"
-                               HelperText="Optionally pick a template; subject/body below are filled from it.">
-                        <MudSelectItem T="string" Value="@(string.Empty)">No template</MudSelectItem>
+                               HelperText="@T.SendDialog.TemplateHelper">
+                        <MudSelectItem T="string" Value="@(string.Empty)">@T.SendDialog.NoTemplate</MudSelectItem>
                         @foreach (var template in _templates)
                         {
                             <MudSelectItem T="string" Value="@template.Code">@template.Code - @template.Name</MudSelectItem>
@@ -48,14 +49,14 @@
                 </MudItem>
                 <MudItem xs="12">
                     <MudTextField @bind-Value="_model.Subject"
-                                  Label="Subject"
+                                  Label="@T.SendDialog.Subject"
                                   Variant="Variant.Outlined"
                                   Margin="Margin.Dense"
                                   Immediate="true" />
                 </MudItem>
                 <MudItem xs="12">
                     <MudTextField @bind-Value="_model.Body"
-                                  Label="Body"
+                                  Label="@T.SendDialog.Body"
                                   Variant="Variant.Outlined"
                                   Margin="Margin.Dense"
                                   Immediate="true"
@@ -64,14 +65,14 @@
                 </MudItem>
                 <MudItem xs="12">
                     <MudTextField @bind-Value="_model.ReferenceId"
-                                  Label="Reference (optional)"
+                                  Label="@T.SendDialog.ReferenceOptional"
                                   Variant="Variant.Outlined"
                                   Margin="Margin.Dense"
                                   Immediate="true" />
                 </MudItem>
                 <MudItem xs="12">
                     <MudTextField @bind-Value="_model.Placeholders"
-                                  Label="Placeholders ({name}=Ahmed, {amount}=120)"
+                                  Label="@T.SendDialog.PlaceholdersLabel"
                                   Variant="Variant.Outlined"
                                   Margin="Margin.Dense"
                                   Immediate="true" />
@@ -82,16 +83,16 @@
         @if (_preview is not null)
         {
             <MudPaper Elevation="1" Class="mt-3 pa-3">
-                <MudText Typo="Typo.subtitle2" Color="Color.Primary" Class="mb-1">Preview</MudText>
-                <MudText Typo="Typo.caption" Class="mb-1">Subject: @(_preview.Subject)</MudText>
+                <MudText Typo="Typo.subtitle2" Color="Color.Primary" Class="mb-1">@T.SendDialog.Preview</MudText>
+                <MudText Typo="Typo.caption" Class="mb-1">@(T.FormatValue(T.SendDialog.PreviewSubject, _preview.Subject))</MudText>
                 <MudText>@_preview.Body</MudText>
             </MudPaper>
         }
     </DialogContent>
     <DialogActions>
-        <MudButton Color="Color.Default" OnClick="CancelAsync" Disabled="_busy">Cancel</MudButton>
+        <MudButton Color="Color.Default" OnClick="CancelAsync" Disabled="_busy">@T.Common.Cancel</MudButton>
         <MudButton Color="Color.Secondary" Variant="Variant.Outlined" OnClick="PreviewAsync" Disabled="_busy" StartIcon="@Icons.Material.Filled.Preview">
-            Preview
+            @T.SendDialog.Preview
         </MudButton>
         <MudButton Color="Color.Primary" Variant="Variant.Filled" OnClick="SubmitAsync" Disabled="_busy" StartIcon="@Icons.Material.Filled.Send">
             @if (_busy)
@@ -100,7 +101,7 @@
             }
             else
             {
-                <text>Send</text>
+                <text>@T.SendDialog.Send</text>
             }
         </MudButton>
     </DialogActions>
@@ -168,7 +169,7 @@
         }
         catch (Exception)
         {
-            Snackbar.Add("Unable to reach the server.", Severity.Error);
+            Snackbar.Add(T.SendDialog.Unreachable, Severity.Error);
         }
         finally
         {
@@ -185,7 +186,7 @@
         try
         {
             await NotificationService.SendAsync(BuildInput());
-            Snackbar.Add("Notification sent.", Severity.Success);
+            Snackbar.Add(T.SendDialog.Sent, Severity.Success);
             MudDialog.Close(DialogResult.Ok(true));
         }
         catch (ApiException ex)
@@ -194,7 +195,7 @@
         }
         catch (Exception)
         {
-            Snackbar.Add("Unable to reach the server. Please try again.", Severity.Error);
+            Snackbar.Add(T.SendDialog.UnreachableRetry, Severity.Error);
         }
         finally
         {

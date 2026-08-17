@@ -1,7 +1,9 @@
+@inject AppLocalizer T
+
 <MudCard Elevation="0" Class="dashboard-card h-100">
     <MudCardHeader>
         <CardHeaderContent>
-            <MudText Typo="Typo.subtitle1" Class="font-weight-medium">Doctor Availability</MudText>
+            <MudText Typo="Typo.subtitle1" Class="font-weight-medium">@T.Dashboard.DoctorAvailability</MudText>
         </CardHeaderContent>
     </MudCardHeader>
     <MudCardContent>
@@ -13,10 +15,10 @@
                         <MudAvatar Size="Size.Small" Color="Color.Secondary">@Initials(doctor.Name)</MudAvatar>
                         <MudStack Spacing="0" Class="flex-grow-1">
                             <MudText Typo="Typo.body2" Class="font-weight-medium">@doctor.Name</MudText>
-                            <MudText Typo="Typo.caption" Class="text-secondary">@doctor.Specialty · Next @doctor.NextSlot</MudText>
+                            <MudText Typo="Typo.caption" Class="text-secondary">@doctor.Specialty · @T.FormatValue(T.Dashboard.NextSlot, doctor.NextSlot)</MudText>
                         </MudStack>
                         <MudChip T="string" Size="Size.Small" Color="@(doctor.Available ? Color.Success : Color.Default)" Variant="@(doctor.Available ? Variant.Filled : Variant.Outlined)">
-                            @(doctor.Available ? "Available" : "Busy")
+                            @(doctor.Available ? T.Dashboard.Available : T.Dashboard.Busy)
                         </MudChip>
                     </MudStack>
                 </MudListItem>

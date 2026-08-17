@@ -2,10 +2,11 @@
 @inject PatientService PatientService
 @inject InventoryService InventoryService
 @inject ISnackbar Snackbar
+@inject AppLocalizer T
 
 <MudDialog>
     <DialogContent>
-        <DialogHeader Icon="@Icons.Material.Filled.EventNote" Title="@(Visit is null ? "New Visit" : "Edit Visit")" />
+        <DialogHeader Icon="@Icons.Material.Filled.EventNote" Title="@(Visit is null ? T.VisitDialog.NewTitle : T.VisitDialog.EditTitle)" />
         <EditForm EditContext="_editContext">
             <DataAnnotationsValidator />
             <MudGrid Spacing="2">
@@ -14,7 +15,7 @@
                     <MudItem xs="12" sm="6">
                         <MudAutocomplete T="PatientDto"
                                          @bind-Value="_selectedPatient"
-                                         Label="Patient (search by name or phone)"
+                                         Label="@T.VisitDialog.PatientSearch"
                                          Variant="Variant.Outlined"
                                          Margin="Margin.Dense"
                                          MinCharacters="1"
@@ -26,7 +27,7 @@
                     <MudItem xs="12" sm="6">
                         <MudAutocomplete T="ExaminationTypeDto"
                                          @bind-Value="_selectedType"
-                                         Label="Examination Type (search by code or name)"
+                                         Label="@T.VisitDialog.TypeSearch"
                                          Variant="Variant.Outlined"
                                          Margin="Margin.Dense"
                                          MinCharacters="1"
@@ -40,14 +41,14 @@
                 {
                     <MudItem xs="12" sm="6">
                         <MudTextField @bind-Value="_model.PatientName"
-                                      Label="Patient"
+                                      Label="@T.VisitDialog.Patient"
                                       Variant="Variant.Outlined"
                                       Margin="Margin.Dense"
                                       ReadOnly="true" />
                     </MudItem>
                     <MudItem xs="12" sm="6">
                         <MudTextField @bind-Value="_model.ExaminationTypeName"
-                                      Label="Examination Type"
+                                      Label="@T.VisitDialog.ExaminationType"
                                       Variant="Variant.Outlined"
                                       Margin="Margin.Dense"
                                       ReadOnly="true" />
@@ -55,7 +56,7 @@
                 }
                 <MudItem xs="12" sm="6">
                     <MudTextField @bind-Value="_model.RadiologistId"
-                                  Label="Radiologist ID"
+                                  Label="@T.VisitDialog.RadiologistId"
                                   Variant="Variant.Outlined"
                                   Margin="Margin.Dense"
                                   Immediate="true"
@@ -63,7 +64,7 @@
                 </MudItem>
                 <MudItem xs="12" sm="6">
                     <MudTextField @bind-Value="_model.TechnicianId"
-                                  Label="Technician ID"
+                                  Label="@T.VisitDialog.TechnicianId"
                                   Variant="Variant.Outlined"
                                   Margin="Margin.Dense"
                                   Immediate="true"
@@ -71,7 +72,7 @@
                 </MudItem>
                 <MudItem xs="12" sm="6">
                     <MudTextField @bind-Value="_model.ReferralDoctorId"
-                                  Label="Referral Doctor ID (optional)"
+                                  Label="@T.VisitDialog.ReferralDoctorId"
                                   Variant="Variant.Outlined"
                                   Margin="Margin.Dense"
                                   Immediate="true" />
@@ -79,7 +80,7 @@
                 <MudItem xs="12" sm="6">
                     <MudSelect T="string"
                                @bind-Value="_model.Priority"
-                               Label="Priority"
+                               Label="@T.VisitDialog.Priority"
                                Variant="Variant.Outlined"
                                Margin="Margin.Dense">
                         @foreach (var priority in Priorities)
@@ -90,7 +91,7 @@
                 </MudItem>
                 <MudItem xs="12">
                     <MudTextField @bind-Value="_model.ClinicalIndication"
-                                  Label="Clinical Indication"
+                                  Label="@T.VisitDialog.ClinicalIndication"
                                   Variant="Variant.Outlined"
                                   Margin="Margin.Dense"
                                   Lines="2"
@@ -100,25 +101,25 @@
 
                 <MudDivider Class="my-1" />
                 <MudItem xs="12">
-                    <MudText Typo="Typo.subtitle2" Class="mb-1">Billing</MudText>
+                    <MudText Typo="Typo.subtitle2" Class="mb-1">@T.VisitDialog.Billing</MudText>
                 </MudItem>
                 <MudItem xs="12" sm="6">
                     <MudNumericField T="decimal"
                                      @bind-Value="_model.Discount"
-                                     Label="Discount"
+                                     Label="@T.VisitDialog.Discount"
                                      Variant="Variant.Outlined"
                                      Margin="Margin.Dense"
                                      Min="0" />
                 </MudItem>
                 <MudItem xs="12" sm="6">
-                    <MudSwitch T="bool" @bind-Value="_model.IsDiscountPercentage" Color="Color.Primary">Discount is percentage</MudSwitch>
+                    <MudSwitch T="bool" @bind-Value="_model.IsDiscountPercentage" Color="Color.Primary">@T.VisitDialog.DiscountIsPercentage</MudSwitch>
                 </MudItem>
                 @if (!IsEdit)
                 {
                     <MudItem xs="12" sm="6">
                         <MudNumericField T="decimal"
                                          @bind-Value="_model.Paid"
-                                         Label="Amount Paid"
+                                         Label="@T.VisitDialog.AmountPaid"
                                          Variant="Variant.Outlined"
                                          Margin="Margin.Dense"
                                          Min="0" />
@@ -126,7 +127,7 @@
                 }
                 <MudItem xs="12">
                     <MudTextField @bind-Value="_model.Notes"
-                                  Label="Notes"
+                                  Label="@T.VisitDialog.Notes"
                                   Variant="Variant.Outlined"
                                   Margin="Margin.Dense"
                                   Lines="3"
@@ -136,7 +137,7 @@
         </EditForm>
     </DialogContent>
     <DialogActions>
-        <MudButton Color="Color.Default" OnClick="CancelAsync" Disabled="_busy">Cancel</MudButton>
+        <MudButton Color="Color.Default" OnClick="CancelAsync" Disabled="_busy">@T.Common.Cancel</MudButton>
         <MudButton Color="Color.Primary" Variant="Variant.Filled" OnClick="SubmitAsync" Disabled="_busy">
             @if (_busy)
             {
@@ -144,7 +145,7 @@
             }
             else
             {
-                <text>@(IsEdit ? "Save Changes" : "Create Visit")</text>
+                <text>@(IsEdit ? T.VisitDialog.SaveChanges : T.VisitDialog.CreateVisit)</text>
             }
         </MudButton>
     </DialogActions>
@@ -182,7 +183,7 @@
         }
         catch (Exception)
         {
-            Snackbar.Add("Unable to search patients.", Severity.Error);
+            Snackbar.Add(T.VisitDialog.SearchPatientsError, Severity.Error);
             return Array.Empty<PatientDto>();
         }
     }
@@ -204,7 +205,7 @@
         }
         catch (Exception)
         {
-            Snackbar.Add("Unable to search examination types.", Severity.Error);
+            Snackbar.Add(T.VisitDialog.SearchTypesError, Severity.Error);
             return Array.Empty<ExaminationTypeDto>();
         }
     }
@@ -215,7 +216,7 @@
 
         if (IsEdit)
         {
-            _model.PatientName = "Loading...";
+            _model.PatientName = T.Common.Loading;
             _model.ExaminationTypeName = Visit!.ExaminationTypeName;
             _model.RadiologistId = Visit.RadiologistId;
             _model.TechnicianId = Visit.TechnicianId;
@@ -235,13 +236,13 @@
 
         if (!IsEdit && _selectedPatient is null)
         {
-            Snackbar.Add("Select a patient.", Severity.Warning);
+            Snackbar.Add(T.VisitDialog.SelectPatient, Severity.Warning);
             return;
         }
 
         if (!IsEdit && _selectedType is null)
         {
-            Snackbar.Add("Select an examination type.", Severity.Warning);
+            Snackbar.Add(T.VisitDialog.SelectType, Severity.Warning);
             return;
         }
 
@@ -261,7 +262,7 @@
                     Discount = _model.Discount,
                     IsDiscountPercentage = _model.IsDiscountPercentage,
                 });
-                Snackbar.Add("Visit updated.", Severity.Success);
+                Snackbar.Add(T.VisitDialog.Updated, Severity.Success);
             }
             else
             {
@@ -279,7 +280,7 @@
                     Paid = _model.Paid,
                     Notes = _model.Notes,
                 });
-                Snackbar.Add("Visit created.", Severity.Success);
+                Snackbar.Add(T.VisitDialog.Created, Severity.Success);
             }
 
             MudDialog.Close(DialogResult.Ok(true));
@@ -290,7 +291,7 @@
         }
         catch (Exception)
         {
-            Snackbar.Add("Unable to reach the server. Please try again.", Severity.Error);
+            Snackbar.Add(T.VisitDialog.Unreachable, Severity.Error);
         }
         finally
         {

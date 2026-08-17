@@ -1,3 +1,5 @@
+@inject AppLocalizer T
+
 <MudToolBar Dense="true" Class="mb-4">
     @if (!string.IsNullOrEmpty(Icon))
     {
@@ -14,7 +16,7 @@
         <MudTextField T="string"
                       Value="@_search"
                       ValueChanged="OnLocalSearchChanged"
-                      Placeholder="@SearchPlaceholder"
+                      Placeholder="@_placeholder"
                       Variant="Variant.Outlined"
                       Margin="Margin.Dense"
                       Immediate="true"
@@ -24,7 +26,7 @@
     }
     @if (OnRefresh is not null)
     {
-        <MudIconButton Icon="@Icons.Material.Filled.Refresh" Color="Color.Default" aria-label="Refresh" OnClick="OnRefresh" />
+        <MudIconButton Icon="@Icons.Material.Filled.Refresh" Color="Color.Default" aria-label="@T.Common.Retry" OnClick="OnRefresh" />
     }
     @ChildContent
 </MudToolBar>
@@ -36,7 +38,7 @@
 
     [Parameter] public string Subtitle { get; set; } = string.Empty;
 
-    [Parameter] public string SearchPlaceholder { get; set; } = "Search...";
+    [Parameter] public string? SearchPlaceholder { get; set; }
 
     [Parameter] public EventCallback<string?> SearchValueChanged { get; set; }
 
@@ -47,6 +49,14 @@
     [Parameter] public RenderFragment? ChildContent { get; set; }
 
     private string? _search;
+    private string _placeholder = string.Empty;
+
+    protected override void OnParametersSet()
+    {
+        _placeholder = string.IsNullOrWhiteSpace(SearchPlaceholder)
+            ? T.Common.SearchPlaceholder
+            : SearchPlaceholder;
+    }
 
     private Task OnLocalSearchChanged(string value)
     {

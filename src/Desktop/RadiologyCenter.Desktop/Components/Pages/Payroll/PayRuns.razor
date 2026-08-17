@@ -3,14 +3,15 @@
 @inject PayrollService PayrollService
 @inject IDialogService DialogService
 @inject ISnackbar Snackbar
+@inject AppLocalizer T
 @implements IDisposable
 
-<PageHeader Icon="@Icons.Material.Filled.ReceiptLong" Title="Pay Runs"
-            Subtitle="Create and process payroll cycles"
+<PageHeader Icon="@Icons.Material.Filled.ReceiptLong" Title="@T.Payroll.PayRunsTitle"
+            Subtitle="@T.Payroll.Subtitle"
             SearchValueChanged="OnSearchChanged"
-            SearchPlaceholder="Search pay runs..."
+            SearchPlaceholder="@T.Payroll.SearchPlaceholder"
             OnRefresh="ReloadAsync">
-    <MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Add" OnClick="OpenCreateDialogAsync">New Pay Run</MudButton>
+    <MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Add" OnClick="OpenCreateDialogAsync">@T.Payroll.NewPayRun</MudButton>
 </PageHeader>
 
 @if (_statsLoaded)
@@ -19,37 +20,37 @@
         <MudItem xs="6" sm="4" md="2">
             <MudPaper Elevation="0" Class="pa-3 d-flex flex-column align-center rounded" Style="border:1px solid rgba(0,0,0,.12)">
                 <MudText Typo="Typo.h5" Align="Align.Center">@_stats.Total</MudText>
-                <MudText Typo="Typo.caption" Align="Align.Center" Class="text-secondary">On Page</MudText>
+                <MudText Typo="Typo.caption" Align="Align.Center" Class="text-secondary">@T.Payroll.OnPage</MudText>
             </MudPaper>
         </MudItem>
         <MudItem xs="6" sm="4" md="2">
             <MudPaper Elevation="0" Class="pa-3 d-flex flex-column align-center rounded" Style="border:1px solid rgba(0,0,0,.12)">
                 <MudText Typo="Typo.h5" Align="Align.Center" Class="text-secondary">@_stats.Draft</MudText>
-                <MudText Typo="Typo.caption" Align="Align.Center" Class="text-secondary">Draft</MudText>
+                <MudText Typo="Typo.caption" Align="Align.Center" Class="text-secondary">@T.Payroll.Draft</MudText>
             </MudPaper>
         </MudItem>
         <MudItem xs="6" sm="4" md="2">
             <MudPaper Elevation="0" Class="pa-3 d-flex flex-column align-center rounded" Style="border:1px solid rgba(0,0,0,.12)">
                 <MudText Typo="Typo.h5" Align="Align.Center" Class="text-info">@_stats.Computed</MudText>
-                <MudText Typo="Typo.caption" Align="Align.Center" Class="text-secondary">Computed</MudText>
+                <MudText Typo="Typo.caption" Align="Align.Center" Class="text-secondary">@T.Payroll.Computed</MudText>
             </MudPaper>
         </MudItem>
         <MudItem xs="6" sm="4" md="2">
             <MudPaper Elevation="0" Class="pa-3 d-flex flex-column align-center rounded" Style="border:1px solid rgba(0,0,0,.12)">
                 <MudText Typo="Typo.h5" Align="Align.Center" Class="text-primary">@_stats.Approved</MudText>
-                <MudText Typo="Typo.caption" Align="Align.Center" Class="text-secondary">Approved</MudText>
+                <MudText Typo="Typo.caption" Align="Align.Center" Class="text-secondary">@T.Payroll.Approved</MudText>
             </MudPaper>
         </MudItem>
         <MudItem xs="6" sm="4" md="2">
             <MudPaper Elevation="0" Class="pa-3 d-flex flex-column align-center rounded" Style="border:1px solid rgba(0,0,0,.12)">
                 <MudText Typo="Typo.h5" Align="Align.Center" Class="text-success">@_stats.Paid</MudText>
-                <MudText Typo="Typo.caption" Align="Align.Center" Class="text-secondary">Paid</MudText>
+                <MudText Typo="Typo.caption" Align="Align.Center" Class="text-secondary">@T.Payroll.Paid</MudText>
             </MudPaper>
         </MudItem>
         <MudItem xs="6" sm="4" md="2">
             <MudPaper Elevation="0" Class="pa-3 d-flex flex-column align-center rounded" Style="border:1px solid rgba(0,0,0,.12)">
                 <MudText Typo="Typo.h5" Align="Align.Center" Class="text-error">@_stats.Rejected</MudText>
-                <MudText Typo="Typo.caption" Align="Align.Center" Class="text-secondary">Rejected</MudText>
+                <MudText Typo="Typo.caption" Align="Align.Center" Class="text-secondary">@T.Payroll.Rejected</MudText>
             </MudPaper>
         </MudItem>
     </MudGrid>
@@ -57,44 +58,44 @@
 
 <MudTable T="PayRunDto" @ref="_table" ServerData="LoadServerData" Dense="true" Hover="true" Striped="true" Elevation="1" RowsPerPage="10">
     <HeaderContent>
-        <MudTh><MudTableSortLabel T="PayRunDto" SortLabel="@("RunFrom")">Period</MudTableSortLabel></MudTh>
-        <MudTh><MudTableSortLabel T="PayRunDto" SortLabel="@("Status")">Status</MudTableSortLabel></MudTh>
-        <MudTh>Employees</MudTh>
-        <MudTh>Net Pay</MudTh>
-        <MudTh><MudTableSortLabel T="PayRunDto" SortLabel="@("ProcessedAt")">Processed</MudTableSortLabel></MudTh>
-        <MudTh>Notes</MudTh>
-        <MudTh>Actions</MudTh>
+        <MudTh><MudTableSortLabel T="PayRunDto" SortLabel="@("RunFrom")">@T.Payroll.Period</MudTableSortLabel></MudTh>
+        <MudTh><MudTableSortLabel T="PayRunDto" SortLabel="@("Status")">@T.Common.Status</MudTableSortLabel></MudTh>
+        <MudTh>@T.Payroll.Employees</MudTh>
+        <MudTh>@T.Payroll.NetPay</MudTh>
+        <MudTh><MudTableSortLabel T="PayRunDto" SortLabel="@("ProcessedAt")">@T.Payroll.Processed</MudTableSortLabel></MudTh>
+        <MudTh>@T.Payroll.Notes</MudTh>
+        <MudTh>@T.Common.Actions</MudTh>
     </HeaderContent>
     <RowTemplate>
-        <MudTd DataLabel="Period">
+        <MudTd DataLabel="@T.Payroll.Period">
             <MudText Class="font-weight-medium">@context.RunFrom.ToString("yyyy-MM-dd") → @context.RunTo.ToString("yyyy-MM-dd")</MudText>
         </MudTd>
-        <MudTd DataLabel="Status">
+        <MudTd DataLabel="@T.Common.Status">
             <MudChip T="string" Size="Size.Small" Color="@StatusColor(context.Status)">@FormatStatus(context.Status)</MudChip>
         </MudTd>
-        <MudTd DataLabel="Employees">@context.Payslips.Count</MudTd>
-        <MudTd DataLabel="Net Pay">@context.Payslips.Sum(p => p.NetSalary).ToString("N2")</MudTd>
-        <MudTd DataLabel="Processed">@(context.ProcessedAt?.ToString("g") ?? "-")</MudTd>
-        <MudTd DataLabel="Notes">@(string.IsNullOrWhiteSpace(context.Notes) ? "-" : context.Notes)</MudTd>
-        <MudTd DataLabel="Actions">
-            <MudIconButton Icon="@Icons.Material.Filled.Visibility" Size="Size.Small" Color="Color.Default" aria-label="View" OnClick="@(() => OpenDetailDialogAsync(context))" />
-            <MudIconButton Icon="@Icons.Material.Filled.Delete" Size="Size.Small" Color="Color.Error" aria-label="Delete" OnClick="@(() => DeletePayRunAsync(context))" />
+        <MudTd DataLabel="@T.Payroll.Employees">@context.Payslips.Count</MudTd>
+        <MudTd DataLabel="@T.Payroll.NetPay">@context.Payslips.Sum(p => p.NetSalary).ToString("N2")</MudTd>
+        <MudTd DataLabel="@T.Payroll.Processed">@(context.ProcessedAt?.ToString("g") ?? "-")</MudTd>
+        <MudTd DataLabel="@T.Payroll.Notes">@(string.IsNullOrWhiteSpace(context.Notes) ? "-" : context.Notes)</MudTd>
+        <MudTd DataLabel="@T.Common.Actions">
+            <MudIconButton Icon="@Icons.Material.Filled.Visibility" Size="Size.Small" Color="Color.Default" aria-label="@T.Payroll.View" OnClick="@(() => OpenDetailDialogAsync(context))" />
+            <MudIconButton Icon="@Icons.Material.Filled.Delete" Size="Size.Small" Color="Color.Error" aria-label="@T.Common.Delete" OnClick="@(() => DeletePayRunAsync(context))" />
         </MudTd>
     </RowTemplate>
     <NoRecordsContent>
         @if (_loadError is not null)
         {
             <ErrorState Icon="@(_offline ? Icons.Material.Filled.CloudOff : Icons.Material.Filled.ErrorOutline)"
-                        Title="Couldn't load data"
+                        Title="@T.Payroll.LoadErrorTitle"
                         Message="@_loadError"
                         Action="ReloadAsync" />
         }
         else
         {
         <EmptyState Icon="@Icons.Material.Filled.ReceiptLong"
-                    Title="No pay runs yet"
-                    Message="Create a pay run to start a new payroll cycle."
-                    ActionLabel="Create your first pay run"
+                    Title="@T.Payroll.EmptyTitle"
+                    Message="@T.Payroll.EmptyMessage"
+                    ActionLabel="@T.Payroll.EmptyActionLabel"
                     Action="OpenCreateDialogAsync" />
         }
     </NoRecordsContent>
@@ -148,8 +149,8 @@
         }
         catch (Exception)
         {
-            Snackbar.Add("Unable to reach the server.", Severity.Error);
-            _loadError = "Unable to reach the server.";
+            Snackbar.Add(T.Payroll.Unreachable, Severity.Error);
+            _loadError = T.Payroll.Unreachable;
             _offline = true;
             return new TableData<PayRunDto> { Items = Array.Empty<PayRunDto>(), TotalItems = 0 };
         }
@@ -180,7 +181,7 @@
     private async Task OpenCreateDialogAsync()
     {
         var options = new DialogOptions { MaxWidth = MaxWidth.Medium, FullWidth = true, NoHeader = true };
-        var dialog = await DialogService.ShowAsync<PayRunEditorDialog>("New Pay Run", options);
+        var dialog = await DialogService.ShowAsync<PayRunEditorDialog>(T.Payroll.NewPayRun, options);
         await ReloadIfSavedAsync(dialog);
     }
 
@@ -188,7 +189,7 @@
     {
         var parameters = new DialogParameters { ["PayRunId"] = payRun.Id };
         var options = new DialogOptions { MaxWidth = MaxWidth.Large, FullWidth = true, NoHeader = true };
-        var dialog = await DialogService.ShowAsync<PayRunDetailDialog>($"Pay Run {payRun.RunFrom.ToString("yyyy-MM-dd")} → {payRun.RunTo.ToString("yyyy-MM-dd")}", parameters, options);
+        var dialog = await DialogService.ShowAsync<PayRunDetailDialog>(T.FormatValue(T.Payroll.PayRunDetailTitle, payRun.RunFrom.ToString("yyyy-MM-dd"), payRun.RunTo.ToString("yyyy-MM-dd")), parameters, options);
         await ReloadIfSavedAsync(dialog);
     }
 
@@ -202,10 +203,10 @@
     private async Task DeletePayRunAsync(PayRunDto payRun)
     {
         var confirmed = await DialogService.ShowMessageBoxAsync(
-            "Delete Pay Run",
-            $"Are you sure you want to delete the pay run for {payRun.RunFrom.ToString("yyyy-MM-dd")} → {payRun.RunTo.ToString("yyyy-MM-dd")}? This cannot be undone.",
-            "Delete",
-            "Cancel");
+            T.Payroll.DeleteTitle,
+            T.FormatValue(T.Payroll.DeleteConfirm, payRun.RunFrom.ToString("yyyy-MM-dd"), payRun.RunTo.ToString("yyyy-MM-dd")),
+            T.Common.Delete,
+            T.Common.Cancel);
 
         if (confirmed != true)
             return;
@@ -213,7 +214,7 @@
         try
         {
             await PayrollService.DeletePayRunAsync(payRun.Id);
-            Snackbar.Add("Pay run deleted.", Severity.Success);
+            Snackbar.Add(T.Payroll.Deleted, Severity.Success);
             await ReloadAsync();
         }
         catch (ApiException ex)
@@ -222,7 +223,7 @@
         }
         catch (Exception)
         {
-            Snackbar.Add("Unable to reach the server.", Severity.Error);
+            Snackbar.Add(T.Payroll.Unreachable, Severity.Error);
         }
     }
 

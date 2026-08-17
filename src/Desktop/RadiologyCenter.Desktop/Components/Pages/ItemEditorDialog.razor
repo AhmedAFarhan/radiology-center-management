@@ -1,15 +1,16 @@
 @inject InventoryService InventoryService
 @inject ISnackbar Snackbar
+@inject AppLocalizer T
 
 <MudDialog>
     <DialogContent>
-        <DialogHeader Icon="@Icons.Material.Filled.Inventory2" Title="@(Item is null ? "New Item" : "Edit Item")" />
+        <DialogHeader Icon="@Icons.Material.Filled.Inventory2" Title="@(Item is null ? T.ItemDialog.NewItem : T.ItemDialog.EditItem)" />
         <EditForm EditContext="_editContext">
             <DataAnnotationsValidator />
             <MudGrid Spacing="2">
                 <MudItem xs="12" sm="8">
                     <MudTextField @bind-Value="_model.Name"
-                                  Label="Name"
+                                  Label="@T.Common.Name"
                                   Variant="Variant.Outlined"
                                   Margin="Margin.Dense"
                                   Immediate="true"
@@ -17,7 +18,7 @@
                 </MudItem>
                 <MudItem xs="12" sm="4">
                     <MudTextField @bind-Value="_model.Brand"
-                                  Label="Brand"
+                                  Label="@T.ItemDialog.Brand"
                                   Variant="Variant.Outlined"
                                   Margin="Margin.Dense"
                                   Immediate="true" />
@@ -25,7 +26,7 @@
                 <MudItem xs="12" sm="6">
                     <MudSelect T="string"
                                @bind-Value="_model.Category"
-                               Label="Category"
+                               Label="@T.ItemDialog.Category"
                                Variant="Variant.Outlined"
                                Margin="Margin.Dense"
                                For="@(() => _model.Category)">
@@ -38,7 +39,7 @@
                 <MudItem xs="12" sm="6">
                     <MudSelect T="string"
                                @bind-Value="_model.Unit"
-                               Label="Unit"
+                               Label="@T.ItemDialog.Unit"
                                Variant="Variant.Outlined"
                                Margin="Margin.Dense"
                                For="@(() => _model.Unit)">
@@ -51,7 +52,7 @@
                 <MudItem xs="6">
                     <MudNumericField T="int"
                                      @bind-Value="_model.ReorderLevel"
-                                     Label="Reorder Level"
+                                     Label="@T.ItemDialog.ReorderLevel"
                                      Variant="Variant.Outlined"
                                      Margin="Margin.Dense"
                                      Min="0"
@@ -60,7 +61,7 @@
                 <MudItem xs="6">
                     <MudNumericField T="int"
                                      @bind-Value="_model.ReorderQuantity"
-                                     Label="Reorder Quantity"
+                                     Label="@T.ItemDialog.ReorderQuantity"
                                      Variant="Variant.Outlined"
                                      Margin="Margin.Dense"
                                      Min="0"
@@ -69,21 +70,21 @@
                 <MudItem xs="12" sm="6">
                     <MudSelect T="string"
                                @bind-Value="_model.LotTracked"
-                               Label="Lot Tracking"
+                               Label="@T.ItemDialog.LotTracking"
                                Variant="Variant.Outlined"
                                Margin="Margin.Dense">
-                        <MudSelectItem T="string" Value="@("No")">No</MudSelectItem>
-                        <MudSelectItem T="string" Value="@("Yes")">Yes</MudSelectItem>
+                        <MudSelectItem T="string" Value="@("No")">@T.Common.No</MudSelectItem>
+                        <MudSelectItem T="string" Value="@("Yes")">@T.Common.Yes</MudSelectItem>
                     </MudSelect>
                 </MudItem>
                 <MudItem xs="12" sm="6" Class="d-flex align-items-center">
                     <MudText Typo="Typo.body2" Class="text-secondary">
-                        Lots are tracked per batch for expiry and stock control.
+                        @T.ItemDialog.LotsHint
                     </MudText>
                 </MudItem>
                 <MudItem xs="12">
                     <MudTextField @bind-Value="_model.StorageInstructions"
-                                  Label="Storage Instructions"
+                                  Label="@T.ItemDialog.StorageInstructions"
                                   Variant="Variant.Outlined"
                                   Margin="Margin.Dense"
                                   Lines="3"
@@ -93,7 +94,7 @@
         </EditForm>
     </DialogContent>
     <DialogActions>
-        <MudButton Color="Color.Default" OnClick="CancelAsync" Disabled="_busy">Cancel</MudButton>
+        <MudButton Color="Color.Default" OnClick="CancelAsync" Disabled="_busy">@T.Common.Cancel</MudButton>
         <MudButton Color="Color.Primary" Variant="Variant.Filled" OnClick="SubmitAsync" Disabled="_busy">
             @if (_busy)
             {
@@ -101,7 +102,7 @@
             }
             else
             {
-                <text>@(IsEdit ? "Save Changes" : "Create Item")</text>
+                <text>@(IsEdit ? T.ItemDialog.SaveChanges : T.ItemDialog.CreateItem)</text>
             }
         </MudButton>
     </DialogActions>
@@ -171,7 +172,7 @@
             else
                 await InventoryService.CreateItemAsync(input);
 
-            Snackbar.Add(IsEdit ? "Item updated." : "Item created.", Severity.Success);
+            Snackbar.Add(IsEdit ? T.ItemDialog.ItemUpdated : T.ItemDialog.ItemCreated, Severity.Success);
             MudDialog.Close(DialogResult.Ok(true));
         }
         catch (ApiException ex)
@@ -180,7 +181,7 @@
         }
         catch (Exception)
         {
-            Snackbar.Add("Unable to reach the server. Please try again.", Severity.Error);
+            Snackbar.Add(T.ItemDialog.Unreachable, Severity.Error);
         }
         finally
         {

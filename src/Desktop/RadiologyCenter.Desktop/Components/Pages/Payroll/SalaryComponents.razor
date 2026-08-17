@@ -3,76 +3,77 @@
 @inject PayrollService PayrollService
 @inject IDialogService DialogService
 @inject ISnackbar Snackbar
+@inject AppLocalizer T
 @implements IDisposable
 
-<PageHeader Icon="@Icons.Material.Filled.Category" Title="Salary Components"
-            Subtitle="Define reusable earning and deduction templates"
+<PageHeader Icon="@Icons.Material.Filled.Category" Title="@T.SalaryComponent.Title"
+            Subtitle="@T.SalaryComponent.Subtitle"
             SearchValueChanged="OnSearchChanged"
-            SearchPlaceholder="Search components..."
+            SearchPlaceholder="@T.SalaryComponent.SearchPlaceholder"
             OnRefresh="ReloadAsync">
-    <MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Add" OnClick="OpenCreateDialogAsync">New Component</MudButton>
+    <MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Add" OnClick="OpenCreateDialogAsync">@T.SalaryComponent.NewComponent</MudButton>
 </PageHeader>
 
 <MudTable T="SalaryComponentDto" @ref="_table" ServerData="LoadServerData" Dense="true" Hover="true" Striped="true" Elevation="1" RowsPerPage="10">
     <HeaderContent>
-        <MudTh><MudTableSortLabel T="SalaryComponentDto" SortLabel="@("Name")">Name</MudTableSortLabel></MudTh>
-        <MudTh><MudTableSortLabel T="SalaryComponentDto" SortLabel="@("Kind")">Kind</MudTableSortLabel></MudTh>
-        <MudTh>Type</MudTh>
-        <MudTh><MudTableSortLabel T="SalaryComponentDto" SortLabel="@("Frequency")">Frequency</MudTableSortLabel></MudTh>
-        <MudTh Class="text-right"><MudTableSortLabel T="SalaryComponentDto" SortLabel="@("DefaultValue")">Default</MudTableSortLabel></MudTh>
-        <MudTh>Status</MudTh>
-        <MudTh>Actions</MudTh>
+        <MudTh><MudTableSortLabel T="SalaryComponentDto" SortLabel="@("Name")">@T.Common.Name</MudTableSortLabel></MudTh>
+        <MudTh><MudTableSortLabel T="SalaryComponentDto" SortLabel="@("Kind")">@T.SalaryComponent.Kind</MudTableSortLabel></MudTh>
+        <MudTh>@T.Common.Type</MudTh>
+        <MudTh><MudTableSortLabel T="SalaryComponentDto" SortLabel="@("Frequency")">@T.SalaryComponent.Frequency</MudTableSortLabel></MudTh>
+        <MudTh Class="text-right"><MudTableSortLabel T="SalaryComponentDto" SortLabel="@("DefaultValue")">@T.SalaryComponent.Default</MudTableSortLabel></MudTh>
+        <MudTh>@T.Common.Status</MudTh>
+        <MudTh>@T.Common.Actions</MudTh>
     </HeaderContent>
     <RowTemplate>
-        <MudTd DataLabel="Name">
+        <MudTd DataLabel="@T.Common.Name">
             <MudText Class="font-weight-medium">@context.Name</MudText>
         </MudTd>
-        <MudTd DataLabel="Kind">
+        <MudTd DataLabel="@T.SalaryComponent.Kind">
             <MudChip T="string" Size="Size.Small" Color="@(context.Kind == "Deduction" ? Color.Error : Color.Success)">@context.Kind</MudChip>
         </MudTd>
-        <MudTd DataLabel="Type">
+        <MudTd DataLabel="@T.Common.Type">
             @if (context.IsPerWorkDay)
             {
-                <MudChip T="string" Size="Size.Small" Color="Color.Info">Per Work Day</MudChip>
+                <MudChip T="string" Size="Size.Small" Color="Color.Info">@T.SalaryComponent.PerWorkDay</MudChip>
             }
             @if (context.IsPercentage)
             {
-                <MudChip T="string" Size="Size.Small" Color="Color.Warning">Percentage</MudChip>
+                <MudChip T="string" Size="Size.Small" Color="Color.Warning">@T.SalaryComponent.Percentage</MudChip>
             }
             @if (!context.IsPercentage && !context.IsPerWorkDay)
             {
-                <MudChip T="string" Size="Size.Small">Fixed</MudChip>
+                <MudChip T="string" Size="Size.Small">@T.SalaryComponent.Fixed</MudChip>
             }
         </MudTd>
-        <MudTd DataLabel="Frequency">@(string.IsNullOrWhiteSpace(context.Frequency) ? "-" : FormatFrequency(context.Frequency))</MudTd>
-        <MudTd DataLabel="Default" Class="text-right">@(context.IsPercentage ? $"{context.DefaultValue:N2}%" : context.DefaultValue.ToString("N2"))</MudTd>
-        <MudTd DataLabel="Status">
-            <MudChip T="string" Size="Size.Small" Color="@(context.IsActive ? Color.Success : Color.Default)">@(context.IsActive ? "Active" : "Inactive")</MudChip>
+        <MudTd DataLabel="@T.SalaryComponent.Frequency">@(string.IsNullOrWhiteSpace(context.Frequency) ? "-" : FormatFrequency(context.Frequency))</MudTd>
+        <MudTd DataLabel="@T.SalaryComponent.Default" Class="text-right">@(context.IsPercentage ? $"{context.DefaultValue:N2}%" : context.DefaultValue.ToString("N2"))</MudTd>
+        <MudTd DataLabel="@T.Common.Status">
+            <MudChip T="string" Size="Size.Small" Color="@(context.IsActive ? Color.Success : Color.Default)">@(context.IsActive ? T.Common.Active : T.Common.Inactive)</MudChip>
         </MudTd>
-        <MudTd DataLabel="Actions">
-            <MudIconButton Icon="@Icons.Material.Filled.Edit" Size="Size.Small" Color="Color.Default" aria-label="Edit" OnClick="@(() => OpenEditDialogAsync(context))" />
+        <MudTd DataLabel="@T.Common.Actions">
+            <MudIconButton Icon="@Icons.Material.Filled.Edit" Size="Size.Small" Color="Color.Default" aria-label="@T.Common.Edit" OnClick="@(() => OpenEditDialogAsync(context))" />
             <MudIconButton Icon="@(context.IsActive ? Icons.Material.Filled.Block : Icons.Material.Filled.CheckCircle)"
                            Size="Size.Small"
                            Color="@(context.IsActive ? Color.Default : Color.Success)"
-                           aria-label="Toggle status"
+                           aria-label="@T.SalaryComponent.ToggleStatus"
                            OnClick="@(() => ToggleActiveAsync(context))" />
-            <MudIconButton Icon="@Icons.Material.Filled.Delete" Size="Size.Small" Color="Color.Error" aria-label="Delete" OnClick="@(() => DeleteComponentAsync(context))" />
+            <MudIconButton Icon="@Icons.Material.Filled.Delete" Size="Size.Small" Color="Color.Error" aria-label="@T.Common.Delete" OnClick="@(() => DeleteComponentAsync(context))" />
         </MudTd>
     </RowTemplate>
     <NoRecordsContent>
         @if (_loadError is not null)
         {
             <ErrorState Icon="@(_offline ? Icons.Material.Filled.CloudOff : Icons.Material.Filled.ErrorOutline)"
-                        Title="Couldn't load data"
+                        Title="@T.SalaryComponent.LoadErrorTitle"
                         Message="@_loadError"
                         Action="ReloadAsync" />
         }
         else
         {
         <EmptyState Icon="@Icons.Material.Filled.Category"
-                    Title="No salary components yet"
-                    Message="Create components to reuse across pay runs."
-                    ActionLabel="Create your first component"
+                    Title="@T.SalaryComponent.EmptyTitle"
+                    Message="@T.SalaryComponent.EmptyMessage"
+                    ActionLabel="@T.SalaryComponent.EmptyActionLabel"
                     Action="OpenCreateDialogAsync" />
         }
     </NoRecordsContent>
@@ -113,8 +114,8 @@
         }
         catch (Exception)
         {
-            Snackbar.Add("Unable to reach the server.", Severity.Error);
-            _loadError = "Unable to reach the server.";
+            Snackbar.Add(T.SalaryComponent.Unreachable, Severity.Error);
+            _loadError = T.SalaryComponent.Unreachable;
             _offline = true;
             return new TableData<SalaryComponentDto> { Items = Array.Empty<SalaryComponentDto>(), TotalItems = 0 };
         }
@@ -145,7 +146,7 @@
     private async Task OpenCreateDialogAsync()
     {
         var options = new DialogOptions { MaxWidth = MaxWidth.Medium, FullWidth = true, NoHeader = true };
-        var dialog = await DialogService.ShowAsync<SalaryComponentEditorDialog>("New Salary Component", options);
+        var dialog = await DialogService.ShowAsync<SalaryComponentEditorDialog>(T.SalaryComponent.NewSalaryComponent, options);
         await ReloadIfSavedAsync(dialog);
     }
 
@@ -153,7 +154,7 @@
     {
         var parameters = new DialogParameters { ["Component"] = component };
         var options = new DialogOptions { MaxWidth = MaxWidth.Medium, FullWidth = true, NoHeader = true };
-        var dialog = await DialogService.ShowAsync<SalaryComponentEditorDialog>($"Edit {component.Name}", parameters, options);
+        var dialog = await DialogService.ShowAsync<SalaryComponentEditorDialog>(T.FormatValue(T.SalaryComponent.EditTitle, component.Name), parameters, options);
         await ReloadIfSavedAsync(dialog);
     }
 
@@ -173,7 +174,7 @@
             else
                 await PayrollService.ActivateSalaryComponentAsync(component.Id);
 
-            Snackbar.Add(component.IsActive ? "Component deactivated." : "Component activated.", Severity.Success);
+            Snackbar.Add(component.IsActive ? T.SalaryComponent.Deactivated : T.SalaryComponent.Activated, Severity.Success);
             await ReloadAsync();
         }
         catch (ApiException ex)
@@ -182,17 +183,17 @@
         }
         catch (Exception)
         {
-            Snackbar.Add("Unable to reach the server.", Severity.Error);
+            Snackbar.Add(T.SalaryComponent.Unreachable, Severity.Error);
         }
     }
 
     private async Task DeleteComponentAsync(SalaryComponentDto component)
     {
         var confirmed = await DialogService.ShowMessageBoxAsync(
-            "Delete Component",
-            $"Are you sure you want to delete {component.Name}? This cannot be undone.",
-            "Delete",
-            "Cancel");
+            T.SalaryComponent.DeleteTitle,
+            T.FormatValue(T.SalaryComponent.DeleteConfirm, component.Name),
+            T.Common.Delete,
+            T.Common.Cancel);
 
         if (confirmed != true)
             return;
@@ -200,7 +201,7 @@
         try
         {
             await PayrollService.DeleteSalaryComponentAsync(component.Id);
-            Snackbar.Add("Component deleted.", Severity.Success);
+            Snackbar.Add(T.SalaryComponent.Deleted, Severity.Success);
             await ReloadAsync();
         }
         catch (ApiException ex)
@@ -209,7 +210,7 @@
         }
         catch (Exception)
         {
-            Snackbar.Add("Unable to reach the server.", Severity.Error);
+            Snackbar.Add(T.SalaryComponent.Unreachable, Severity.Error);
         }
     }
 

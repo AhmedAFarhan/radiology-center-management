@@ -1,18 +1,19 @@
 @inject ExaminationService ExaminationService
 @inject ISnackbar Snackbar
+@inject AppLocalizer T
 
 <MudDialog>
     <DialogContent>
-        <DialogHeader Icon="@Icons.Material.Filled.Cancel" Title="@($"Cancel Visit - {Visit.ExaminationTypeName}")" />
+        <DialogHeader Icon="@Icons.Material.Filled.Cancel" Title="@(T.FormatValue(T.Visits.CancelVisitTitle, Visit.ExaminationTypeName))" />
         <MudTextField @bind-Value="_reason"
-                      Label="Cancellation reason (optional)"
+                      Label="@T.Visits.CancellationReasonOptional"
                       Variant="Variant.Outlined"
                       Margin="Margin.Dense"
                       Immediate="true"
                       FullWidth="true" />
     </DialogContent>
     <DialogActions>
-        <MudButton Color="Color.Default" OnClick="CancelAsync" Disabled="_busy">Back</MudButton>
+        <MudButton Color="Color.Default" OnClick="CancelAsync" Disabled="_busy">@T.Visits.Back</MudButton>
         <MudButton Color="Color.Error" Variant="Variant.Filled" OnClick="SubmitAsync" Disabled="_busy">
             @if (_busy)
             {
@@ -20,7 +21,7 @@
             }
             else
             {
-                <text>Cancel Visit</text>
+                <text>@T.Visits.CancelVisit</text>
             }
         </MudButton>
     </DialogActions>
@@ -40,7 +41,7 @@
         try
         {
             await ExaminationService.CancelAsync(Visit.Id, _reason);
-            Snackbar.Add("Visit cancelled.", Severity.Success);
+            Snackbar.Add(T.Visits.Cancelled, Severity.Success);
             MudDialog.Close(DialogResult.Ok(true));
         }
         catch (ApiException ex)
@@ -49,7 +50,7 @@
         }
         catch (Exception)
         {
-            Snackbar.Add("Unable to reach the server.", Severity.Error);
+            Snackbar.Add(T.Visits.Unreachable, Severity.Error);
         }
         finally
         {

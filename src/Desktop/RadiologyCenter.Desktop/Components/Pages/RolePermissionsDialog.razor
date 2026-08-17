@@ -1,11 +1,12 @@
 @inject IdentityService IdentityService
 @inject ISnackbar Snackbar
+@inject AppLocalizer T
 
 <MudDialog>
     <DialogContent>
-        <DialogHeader Icon="@Icons.Material.Filled.Security" Title="@($"Permissions - {Role.Name}")" />
+        <DialogHeader Icon="@Icons.Material.Filled.Security" Title="@(T.FormatValue(T.RoleDialog.PermissionsTitle, Role.Name))" />
         <MudText Typo="Typo.body2" Class="text-secondary mb-3">
-            Manage permissions for @Role.Name.
+            @(T.FormatValue(T.RoleDialog.PermissionsDescription, Role.Name))
         </MudText>
 
         <MudGrid Spacing="2">
@@ -33,7 +34,7 @@
         }
     </DialogContent>
     <DialogActions>
-        <MudButton Color="Color.Default" OnClick="CancelAsync" Disabled="_busy">Cancel</MudButton>
+        <MudButton Color="Color.Default" OnClick="CancelAsync" Disabled="_busy">@T.Common.Cancel</MudButton>
         <MudButton Color="Color.Primary" Variant="Variant.Filled" OnClick="SubmitAsync" Disabled="_busy">
             @if (_busy)
             {
@@ -41,7 +42,7 @@
             }
             else
             {
-                <text>Save Permissions</text>
+                <text>@T.RoleDialog.SavePermissions</text>
             }
         </MudButton>
     </DialogActions>
@@ -75,7 +76,7 @@
             foreach (var remove in current.Except(next))
                 await IdentityService.RemovePermissionFromRoleAsync(Role.Id, remove);
 
-            Snackbar.Add("Permissions updated.", Severity.Success);
+            Snackbar.Add(T.RoleDialog.PermissionsUpdated, Severity.Success);
             MudDialog.Close(DialogResult.Ok(true));
         }
         catch (ApiException ex)
@@ -84,7 +85,7 @@
         }
         catch (Exception)
         {
-            Snackbar.Add("Unable to reach the server.", Severity.Error);
+            Snackbar.Add(T.RoleDialog.Unreachable, Severity.Error);
         }
         finally
         {

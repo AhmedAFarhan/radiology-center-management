@@ -3,63 +3,64 @@
 @inject InventoryService InventoryService
 @inject IDialogService DialogService
 @inject ISnackbar Snackbar
+@inject AppLocalizer T
 @implements IDisposable
 
-<PageHeader Icon="@Icons.Material.Filled.ReceiptLong" Title="Purchase Orders"
-            Subtitle="Create and fulfill replenishment orders"
+<PageHeader Icon="@Icons.Material.Filled.ReceiptLong" Title="@T.PurchaseOrders.Title"
+            Subtitle="@T.PurchaseOrders.Subtitle"
             SearchValueChanged="OnSearchChanged"
-            SearchPlaceholder="Search orders..."
+            SearchPlaceholder="@T.PurchaseOrders.SearchPlaceholder"
             OnRefresh="ReloadAsync">
-    <MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Add" OnClick="OpenCreateDialogAsync">New Order</MudButton>
+    <MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Add" OnClick="OpenCreateDialogAsync">@T.PurchaseOrders.NewOrder</MudButton>
 </PageHeader>
 
 <MudTable T="PurchaseOrderDto" @ref="_table" ServerData="LoadServerData" Dense="true" Hover="true" Striped="true" Elevation="1" RowsPerPage="10">
     <HeaderContent>
-        <MudTh><MudTableSortLabel T="PurchaseOrderDto" SortLabel="@("OrderNumber")">Order</MudTableSortLabel></MudTh>
-        <MudTh><MudTableSortLabel T="PurchaseOrderDto" SortLabel="@("SupplierId")">Supplier</MudTableSortLabel></MudTh>
-        <MudTh><MudTableSortLabel T="PurchaseOrderDto" SortLabel="@("Status")">Status</MudTableSortLabel></MudTh>
-        <MudTh><MudTableSortLabel T="PurchaseOrderDto" SortLabel="@("ExpectedDeliveryAt")">Expected</MudTableSortLabel></MudTh>
-        <MudTh>Actions</MudTh>
+        <MudTh><MudTableSortLabel T="PurchaseOrderDto" SortLabel="@("OrderNumber")">@T.PurchaseOrders.Order</MudTableSortLabel></MudTh>
+        <MudTh><MudTableSortLabel T="PurchaseOrderDto" SortLabel="@("SupplierId")">@T.PurchaseOrders.Supplier</MudTableSortLabel></MudTh>
+        <MudTh><MudTableSortLabel T="PurchaseOrderDto" SortLabel="@("Status")">@T.Common.Status</MudTableSortLabel></MudTh>
+        <MudTh><MudTableSortLabel T="PurchaseOrderDto" SortLabel="@("ExpectedDeliveryAt")">@T.PurchaseOrders.Expected</MudTableSortLabel></MudTh>
+        <MudTh>@T.Common.Actions</MudTh>
     </HeaderContent>
     <RowTemplate>
-        <MudTd DataLabel="Order">
+        <MudTd DataLabel="@T.PurchaseOrders.Order">
             <MudText Class="font-weight-medium mono-text">@context.OrderNumber</MudText>
         </MudTd>
-        <MudTd DataLabel="Supplier">@context.SupplierName</MudTd>
-        <MudTd DataLabel="Status">
+        <MudTd DataLabel="@T.PurchaseOrders.Supplier">@context.SupplierName</MudTd>
+        <MudTd DataLabel="@T.Common.Status">
             <MudChip T="string" Size="Size.Small" Color="@StatusColor(context.Status)">@FormatStatus(context.Status)</MudChip>
         </MudTd>
-        <MudTd DataLabel="Expected">@(context.ExpectedDeliveryAt?.ToString("dd MMM yyyy") ?? "-")</MudTd>
-        <MudTd DataLabel="Actions">
+        <MudTd DataLabel="@T.PurchaseOrders.Expected">@(context.ExpectedDeliveryAt?.ToString("dd MMM yyyy") ?? "-")</MudTd>
+        <MudTd DataLabel="@T.Common.Actions">
             @if (context.Status == "Draft")
             {
-                <MudIconButton Icon="@Icons.Material.Filled.Send" Size="Size.Small" Color="Color.Primary" aria-label="Place order" OnClick="@(() => PlaceAsync(context))" />
+                <MudIconButton Icon="@Icons.Material.Filled.Send" Size="Size.Small" Color="Color.Primary" aria-label="@T.PurchaseOrders.PlaceOrder" OnClick="@(() => PlaceAsync(context))" />
             }
             @if (context.Status is "Ordered" or "PartiallyReceived")
             {
-                <MudIconButton Icon="@Icons.Material.Filled.Inventory2" Size="Size.Small" Color="Color.Info" aria-label="Receive" OnClick="@(() => OpenReceiveDialogAsync(context))" />
+                <MudIconButton Icon="@Icons.Material.Filled.Inventory2" Size="Size.Small" Color="Color.Info" aria-label="@T.PurchaseOrders.Receive" OnClick="@(() => OpenReceiveDialogAsync(context))" />
             }
             @if (context.Status is "Draft" or "Ordered")
             {
-                <MudIconButton Icon="@Icons.Material.Filled.Cancel" Size="Size.Small" Color="Color.Default" aria-label="Cancel order" OnClick="@(() => CancelAsync(context))" />
+                <MudIconButton Icon="@Icons.Material.Filled.Cancel" Size="Size.Small" Color="Color.Default" aria-label="@T.PurchaseOrders.CancelOrder" OnClick="@(() => CancelAsync(context))" />
             }
-            <MudIconButton Icon="@Icons.Material.Filled.Visibility" Size="Size.Small" Color="Color.Default" aria-label="View" OnClick="@(() => OpenViewDialogAsync(context))" />
+            <MudIconButton Icon="@Icons.Material.Filled.Visibility" Size="Size.Small" Color="Color.Default" aria-label="@T.PurchaseOrders.View" OnClick="@(() => OpenViewDialogAsync(context))" />
         </MudTd>
     </RowTemplate>
     <NoRecordsContent>
         @if (_loadError is not null)
         {
             <ErrorState Icon="@(_offline ? Icons.Material.Filled.CloudOff : Icons.Material.Filled.ErrorOutline)"
-                        Title="Couldn't load data"
+                        Title="@T.PurchaseOrders.LoadErrorTitle"
                         Message="@_loadError"
                         Action="ReloadAsync" />
         }
         else
         {
         <EmptyState Icon="@Icons.Material.Filled.ReceiptLong"
-                    Title="No purchase orders yet"
-                    Message="Create a purchase order to replenish inventory."
-                    ActionLabel="Create your first order"
+                    Title="@T.PurchaseOrders.NoOrdersTitle"
+                    Message="@T.PurchaseOrders.EmptyMessage"
+                    ActionLabel="@T.PurchaseOrders.CreateFirstOrder"
                     Action="OpenCreateDialogAsync" />
         }
     </NoRecordsContent>
@@ -100,8 +101,8 @@
         }
         catch (Exception)
         {
-            Snackbar.Add("Unable to reach the server.", Severity.Error);
-            _loadError = "Unable to reach the server.";
+            Snackbar.Add(T.PurchaseOrders.Unreachable, Severity.Error);
+            _loadError = T.PurchaseOrders.Unreachable;
             _offline = true;
             return new TableData<PurchaseOrderDto> { Items = Array.Empty<PurchaseOrderDto>(), TotalItems = 0 };
         }
@@ -132,7 +133,7 @@
     private async Task OpenCreateDialogAsync()
     {
         var options = new DialogOptions { MaxWidth = MaxWidth.Medium, FullWidth = true, NoHeader = true };
-        var dialog = await DialogService.ShowAsync<PurchaseOrderEditorDialog>("New Purchase Order", options);
+        var dialog = await DialogService.ShowAsync<PurchaseOrderEditorDialog>(T.PoDialog.NewPurchaseOrder, options);
         await ReloadIfSavedAsync(dialog);
     }
 
@@ -140,7 +141,7 @@
     {
         var parameters = new DialogParameters { ["PurchaseOrderId"] = po.Id };
         var options = new DialogOptions { MaxWidth = MaxWidth.Medium, FullWidth = true, NoHeader = true };
-        var dialog = await DialogService.ShowAsync<PurchaseOrderReceiveDialog>($"Receive {po.OrderNumber}", parameters, options);
+        var dialog = await DialogService.ShowAsync<PurchaseOrderReceiveDialog>(T.FormatValue(T.PoDialog.ReceiveOrderTitle, po.OrderNumber), parameters, options);
         await ReloadIfSavedAsync(dialog);
     }
 
@@ -148,7 +149,7 @@
     {
         var parameters = new DialogParameters { ["PurchaseOrderId"] = po.Id };
         var options = new DialogOptions { MaxWidth = MaxWidth.Medium, FullWidth = true, NoHeader = true };
-        await DialogService.ShowAsync<PurchaseOrderViewDialog>($"Order {po.OrderNumber}", parameters, options);
+        await DialogService.ShowAsync<PurchaseOrderViewDialog>(T.FormatValue(T.PoDialog.OrderTitle, po.OrderNumber), parameters, options);
     }
 
     private async Task ReloadIfSavedAsync(IDialogReference dialog)
@@ -161,10 +162,10 @@
     private async Task PlaceAsync(PurchaseOrderDto po)
     {
         var confirmed = await DialogService.ShowMessageBoxAsync(
-            "Place Order",
-            $"Place purchase order {po.OrderNumber}? It will be marked as ordered.",
-            "Place Order",
-            "Cancel");
+            T.PurchaseOrders.PlaceOrderTitle,
+            T.FormatValue(T.PurchaseOrders.PlaceOrderConfirm, po.OrderNumber),
+            T.PurchaseOrders.PlaceOrderTitle,
+            T.Common.Cancel);
 
         if (confirmed != true)
             return;
@@ -172,7 +173,7 @@
         try
         {
             await InventoryService.PlacePurchaseOrderAsync(po.Id);
-            Snackbar.Add("Purchase order placed.", Severity.Success);
+            Snackbar.Add(T.PurchaseOrders.OrderPlaced, Severity.Success);
             await ReloadAsync();
         }
         catch (ApiException ex)
@@ -181,17 +182,17 @@
         }
         catch (Exception)
         {
-            Snackbar.Add("Unable to reach the server.", Severity.Error);
+            Snackbar.Add(T.PurchaseOrders.Unreachable, Severity.Error);
         }
     }
 
     private async Task CancelAsync(PurchaseOrderDto po)
     {
         var confirmed = await DialogService.ShowMessageBoxAsync(
-            "Cancel Order",
-            $"Cancel purchase order {po.OrderNumber}? This cannot be undone.",
-            "Cancel Order",
-            "Keep Order");
+            T.PurchaseOrders.CancelOrderTitle,
+            T.FormatValue(T.PurchaseOrders.CancelOrderConfirm, po.OrderNumber),
+            T.PurchaseOrders.CancelOrderTitle,
+            T.PurchaseOrders.KeepOrder);
 
         if (confirmed != true)
             return;
@@ -199,7 +200,7 @@
         try
         {
             await InventoryService.CancelPurchaseOrderAsync(po.Id);
-            Snackbar.Add("Purchase order cancelled.", Severity.Success);
+            Snackbar.Add(T.PurchaseOrders.OrderCancelled, Severity.Success);
             await ReloadAsync();
         }
         catch (ApiException ex)
@@ -208,7 +209,7 @@
         }
         catch (Exception)
         {
-            Snackbar.Add("Unable to reach the server.", Severity.Error);
+            Snackbar.Add(T.PurchaseOrders.Unreachable, Severity.Error);
         }
     }
 

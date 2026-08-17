@@ -1,16 +1,17 @@
 @inject InventoryService InventoryService
 @inject ISnackbar Snackbar
+@inject AppLocalizer T
 
 <MudDialog>
     <DialogContent>
-        <DialogHeader Icon="@Icons.Material.Filled.ReceiptLong" Title="@(_po is null ? "Receive Order" : $"Receive {_po.OrderNumber}")" />
+        <DialogHeader Icon="@Icons.Material.Filled.ReceiptLong" Title="@(_po is null ? T.PoDialog.ReceiveOrder : T.FormatValue(T.PoDialog.ReceiveOrderTitle, _po.OrderNumber))" />
         @if (_loading)
         {
             <DialogSkeleton Rows="4" />
         }
         else if (_error is not null)
         {
-            <ErrorState Title="Couldn't load purchase order" Message="@_error" Action="LoadAsync" />
+            <ErrorState Title="@T.PoDialog.LoadErrorTitle" Message="@_error" Action="LoadAsync" />
         }
         else if (_po is not null)
         {
@@ -24,14 +25,14 @@
                 <MudDivider Class="my-2" />
                 <MudText Class="font-weight-medium">@item.ItemName</MudText>
                 <MudText Typo="Typo.caption" Class="text-secondary">
-                    Ordered @item.QuantityOrdered · Received @item.QuantityReceived · Remaining @remaining
+                    @T.PoDialog.Ordered @item.QuantityOrdered · @T.PoDialog.Received @item.QuantityReceived · @T.PoDialog.Remaining @remaining
                 </MudText>
 
                 <MudGrid Spacing="2" Class="mt-1">
                     <MudItem xs="12" sm="4">
                         <MudNumericField T="int?"
                                          @bind-Value="line.Quantity"
-                                         Label="Receive Qty"
+                                         Label="@T.PoDialog.ReceiveQty"
                                          Variant="Variant.Outlined"
                                          Margin="Margin.Dense"
                                          Min="1"
@@ -39,14 +40,14 @@
                     </MudItem>
                     <MudItem xs="12" sm="4">
                         <MudTextField @bind-Value="line.LotNumber"
-                                      Label="Lot Number"
+                                      Label="@T.PoDialog.LotNumber"
                                       Variant="Variant.Outlined"
                                       Margin="Margin.Dense"
                                       Immediate="true" />
                     </MudItem>
                     <MudItem xs="12" sm="4">
                         <MudDatePicker @bind-Date="line.ExpiryDate"
-                                       Label="Expiry Date"
+                                       Label="@T.PoDialog.ExpiryDate"
                                        Variant="Variant.Outlined"
                                        Margin="Margin.Dense"
                                        Clearable="true" />
@@ -56,7 +57,7 @@
         }
     </DialogContent>
     <DialogActions>
-        <MudButton Color="Color.Default" OnClick="CancelAsync" Disabled="_busy">Close</MudButton>
+        <MudButton Color="Color.Default" OnClick="CancelAsync" Disabled="_busy">@T.Common.Close</MudButton>
         <MudButton Color="Color.Primary" Variant="Variant.Filled" OnClick="SubmitAsync" Disabled="_busy || _po is null">
             @if (_busy)
             {
@@ -64,7 +65,7 @@
             }
             else
             {
-                <text>Receive Items</text>
+                <text>@T.PoDialog.ReceiveItems</text>
             }
         </MudButton>
     </DialogActions>
@@ -104,7 +105,7 @@
         }
         catch (Exception)
         {
-            _error = "Unable to reach the server.";
+            _error = T.PoDialog.Unreachable;
         }
         finally
         {
@@ -123,19 +124,19 @@
 
         if (lines.Count == 0)
         {
-            Snackbar.Add("Enter a quantity for at least one item.", Severity.Warning);
+            Snackbar.Add(T.PoDialog.QtyWarning, Severity.Warning);
             return;
         }
 
         if (lines.Any(l => string.IsNullOrWhiteSpace(l.LotNumber)))
         {
-            Snackbar.Add("A lot number is required for each received item.", Severity.Warning);
+            Snackbar.Add(T.PoDialog.LotRequired, Severity.Warning);
             return;
         }
 
         if (lines.Any(l => l.ExpiryDate is not null && l.ExpiryDate.Value.Date < DateTime.Today))
         {
-            Snackbar.Add("Expiry date cannot be in the past.", Severity.Warning);
+            Snackbar.Add(T.PoDialog.ExpiryInPast, Severity.Warning);
             return;
         }
 
@@ -154,7 +155,7 @@
             };
 
             await InventoryService.ReceivePurchaseOrderAsync(_po.Id, input);
-            Snackbar.Add("Items received.", Severity.Success);
+            Snackbar.Add(T.PoDialog.ItemsReceived, Severity.Success);
             MudDialog.Close(DialogResult.Ok(true));
         }
         catch (ApiException ex)
@@ -163,7 +164,7 @@
         }
         catch (Exception)
         {
-            Snackbar.Add("Unable to reach the server. Please try again.", Severity.Error);
+            Snackbar.Add(T.PoDialog.UnreachableRetry, Severity.Error);
         }
         finally
         {

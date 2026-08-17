@@ -1,15 +1,16 @@
 @inject PatientService PatientService
 @inject ISnackbar Snackbar
+@inject AppLocalizer T
 
 <MudDialog>
     <DialogContent>
-        <DialogHeader Icon="@Icons.Material.Filled.People" Title="@(Patient is null ? "New Patient" : "Edit Patient")" />
+        <DialogHeader Icon="@Icons.Material.Filled.People" Title="@(Patient is null ? T.PatientDialog.NewTitle : T.PatientDialog.EditTitle)" />
         <EditForm EditContext="_editContext">
             <DataAnnotationsValidator />
             <MudGrid Spacing="2">
                 <MudItem xs="12">
                     <MudTextField @bind-Value="_model.FullName"
-                                  Label="Full Name"
+                                  Label="@T.PatientDialog.FullName"
                                   Variant="Variant.Outlined"
                                   Margin="Margin.Dense"
                                   Immediate="true"
@@ -18,7 +19,7 @@
                 <MudItem xs="12" sm="6">
                     <MudSelect T="string"
                                @bind-Value="_model.Gender"
-                               Label="Gender"
+                               Label="@T.PatientDialog.Gender"
                                Variant="Variant.Outlined"
                                Margin="Margin.Dense"
                                For="@(() => _model.Gender)">
@@ -31,7 +32,7 @@
                 <MudItem xs="12" sm="6">
                     <MudNumericField T="int?"
                                      @bind-Value="_model.Age"
-                                     Label="Age"
+                                     Label="@T.PatientDialog.Age"
                                      Variant="Variant.Outlined"
                                      Margin="Margin.Dense"
                                      Min="0"
@@ -40,7 +41,7 @@
                 </MudItem>
                 <MudItem xs="12" sm="6">
                     <MudDatePicker @bind-Date="_model.DateOfBirth"
-                                   Label="Date of Birth"
+                                   Label="@T.PatientDialog.DateOfBirth"
                                    Variant="Variant.Outlined"
                                    Margin="Margin.Dense"
                                    Clearable="true"
@@ -48,7 +49,7 @@
                 </MudItem>
                 <MudItem xs="12" sm="6">
                     <MudTextField @bind-Value="_model.PhoneNumber"
-                                  Label="Phone Number"
+                                  Label="@T.PatientDialog.PhoneNumber"
                                   Variant="Variant.Outlined"
                                   Margin="Margin.Dense"
                                   Immediate="true"
@@ -56,7 +57,7 @@
                 </MudItem>
                 <MudItem xs="12" sm="6">
                     <MudTextField @bind-Value="_model.Email"
-                                  Label="Email"
+                                  Label="@T.PatientDialog.Email"
                                   Variant="Variant.Outlined"
                                   Margin="Margin.Dense"
                                   Immediate="true"
@@ -64,7 +65,7 @@
                 </MudItem>
                 <MudItem xs="12" sm="6">
                     <MudTextField @bind-Value="_model.NationalId"
-                                  Label="National ID"
+                                  Label="@T.PatientDialog.NationalId"
                                   Variant="Variant.Outlined"
                                   Margin="Margin.Dense"
                                   Immediate="true" />
@@ -72,7 +73,7 @@
                 <MudItem xs="12" sm="6">
                     <MudSelect T="string"
                                @bind-Value="_model.BloodType"
-                               Label="Blood Type"
+                               Label="@T.PatientDialog.BloodType"
                                Variant="Variant.Outlined"
                                Margin="Margin.Dense"
                                Clearable="true">
@@ -84,28 +85,28 @@
                 </MudItem>
                 <MudItem xs="12">
                     <MudTextField @bind-Value="_model.Address"
-                                  Label="Address"
+                                  Label="@T.PatientDialog.Address"
                                   Variant="Variant.Outlined"
                                   Margin="Margin.Dense"
                                   Immediate="true" />
                 </MudItem>
                 <MudItem xs="12" sm="6">
                     <MudTextField @bind-Value="_model.ReferringPhysician"
-                                  Label="Referring Physician"
+                                  Label="@T.PatientDialog.ReferringPhysician"
                                   Variant="Variant.Outlined"
                                   Margin="Margin.Dense"
                                   Immediate="true" />
                 </MudItem>
                 <MudItem xs="12" sm="6">
                     <MudTextField @bind-Value="_model.Allergies"
-                                  Label="Allergies"
+                                  Label="@T.PatientDialog.Allergies"
                                   Variant="Variant.Outlined"
                                   Margin="Margin.Dense"
                                   Immediate="true" />
                 </MudItem>
                 <MudItem xs="12">
                     <MudTextField @bind-Value="_model.MedicalHistory"
-                                  Label="Medical History"
+                                  Label="@T.PatientDialog.MedicalHistory"
                                   Variant="Variant.Outlined"
                                   Margin="Margin.Dense"
                                   Lines="3"
@@ -115,7 +116,7 @@
         </EditForm>
     </DialogContent>
     <DialogActions>
-        <MudButton Color="Color.Default" OnClick="CancelAsync" Disabled="_busy">Cancel</MudButton>
+        <MudButton Color="Color.Default" OnClick="CancelAsync" Disabled="_busy">@T.Common.Cancel</MudButton>
         <MudButton Color="Color.Primary" Variant="Variant.Filled" OnClick="SubmitAsync" Disabled="_busy">
             @if (_busy)
             {
@@ -123,7 +124,7 @@
             }
             else
             {
-                <text>@(IsEdit ? "Save Changes" : "Create Patient")</text>
+                <text>@(IsEdit ? T.PatientDialog.SaveChanges : T.PatientDialog.CreatePatient)</text>
             }
         </MudButton>
     </DialogActions>
@@ -193,7 +194,7 @@
             else
                 await PatientService.CreateAsync(input);
 
-            Snackbar.Add(IsEdit ? "Patient updated." : "Patient created.", Severity.Success);
+            Snackbar.Add(IsEdit ? T.PatientDialog.Updated : T.PatientDialog.Created, Severity.Success);
             MudDialog.Close(DialogResult.Ok(true));
         }
         catch (ApiException ex)
@@ -202,7 +203,7 @@
         }
         catch (Exception)
         {
-            Snackbar.Add("Unable to reach the server. Please try again.", Severity.Error);
+            Snackbar.Add(T.PatientDialog.Unreachable, Severity.Error);
         }
         finally
         {

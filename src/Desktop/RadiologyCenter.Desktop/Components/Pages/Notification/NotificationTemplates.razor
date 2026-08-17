@@ -3,61 +3,62 @@
 @inject NotificationService NotificationService
 @inject IDialogService DialogService
 @inject ISnackbar Snackbar
+@inject AppLocalizer T
 @implements IDisposable
 
-<PageHeader Icon="@Icons.Material.Filled.Article" Title="Notification Templates"
-            Subtitle="Manage SMS, email and push message templates"
+<PageHeader Icon="@Icons.Material.Filled.Article" Title="@T.Notifications.Title"
+            Subtitle="@T.Notifications.Subtitle"
             SearchValueChanged="OnSearchChanged"
-            SearchPlaceholder="Search templates..."
+            SearchPlaceholder="@T.Notifications.SearchPlaceholder"
             OnRefresh="ReloadAsync">
-    <MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Add" OnClick="OpenCreateDialogAsync">New Template</MudButton>
+    <MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Add" OnClick="OpenCreateDialogAsync">@T.Notifications.NewTemplate</MudButton>
 </PageHeader>
 
 <MudTable T="NotificationTemplateDto" @ref="_table" ServerData="LoadServerData" Dense="true" Hover="true" Striped="true" Elevation="1" RowsPerPage="10">
     <HeaderContent>
-        <MudTh><MudTableSortLabel T="NotificationTemplateDto" SortLabel="@("Code")">Code</MudTableSortLabel></MudTh>
-        <MudTh><MudTableSortLabel T="NotificationTemplateDto" SortLabel="@("Name")">Name</MudTableSortLabel></MudTh>
-        <MudTh>Subject</MudTh>
-        <MudTh>Body</MudTh>
-        <MudTh><MudTableSortLabel T="NotificationTemplateDto" SortLabel="@("IsActive")">Status</MudTableSortLabel></MudTh>
-        <MudTh>Actions</MudTh>
+        <MudTh><MudTableSortLabel T="NotificationTemplateDto" SortLabel="@("Code")">@T.Notifications.Code</MudTableSortLabel></MudTh>
+        <MudTh><MudTableSortLabel T="NotificationTemplateDto" SortLabel="@("Name")">@T.Common.Name</MudTableSortLabel></MudTh>
+        <MudTh>@T.Notifications.Subject</MudTh>
+        <MudTh>@T.Notifications.Body</MudTh>
+        <MudTh><MudTableSortLabel T="NotificationTemplateDto" SortLabel="@("IsActive")">@T.Common.Status</MudTableSortLabel></MudTh>
+        <MudTh>@T.Common.Actions</MudTh>
     </HeaderContent>
     <RowTemplate>
-        <MudTd DataLabel="Code">
+        <MudTd DataLabel="@T.Notifications.Code">
             <MudChip T="string" Size="Size.Small" Color="Color.Primary" Variant="Variant.Outlined">@context.Code</MudChip>
         </MudTd>
-        <MudTd DataLabel="Name">
+        <MudTd DataLabel="@T.Common.Name">
             <MudText Class="font-weight-medium">@context.Name</MudText>
         </MudTd>
-        <MudTd DataLabel="Subject">@(string.IsNullOrWhiteSpace(context.Subject) ? "-" : Truncate(context.Subject))</MudTd>
-        <MudTd DataLabel="Body">@Truncate(context.Body)</MudTd>
-        <MudTd DataLabel="Status">
-            <MudChip T="string" Size="Size.Small" Color="@(context.IsActive ? Color.Success : Color.Default)">@(context.IsActive ? "Active" : "Inactive")</MudChip>
+        <MudTd DataLabel="@T.Notifications.Subject">@(string.IsNullOrWhiteSpace(context.Subject) ? "-" : Truncate(context.Subject))</MudTd>
+        <MudTd DataLabel="@T.Notifications.Body">@Truncate(context.Body)</MudTd>
+        <MudTd DataLabel="@T.Common.Status">
+            <MudChip T="string" Size="Size.Small" Color="@(context.IsActive ? Color.Success : Color.Default)">@(context.IsActive ? T.Common.Active : T.Common.Inactive)</MudChip>
         </MudTd>
-        <MudTd DataLabel="Actions">
-            <MudIconButton Icon="@Icons.Material.Filled.Edit" Size="Size.Small" Color="Color.Default" aria-label="Edit" OnClick="@(() => OpenEditDialogAsync(context))" />
+        <MudTd DataLabel="@T.Common.Actions">
+            <MudIconButton Icon="@Icons.Material.Filled.Edit" Size="Size.Small" Color="Color.Default" aria-label="@T.Common.Edit" OnClick="@(() => OpenEditDialogAsync(context))" />
             <MudIconButton Icon="@(context.IsActive ? Icons.Material.Filled.Block : Icons.Material.Filled.CheckCircle)"
                            Size="Size.Small"
                            Color="@(context.IsActive ? Color.Default : Color.Success)"
-                           aria-label="Toggle status"
+                           aria-label="@T.Notifications.ToggleStatus"
                            OnClick="@(() => ToggleActiveAsync(context))" />
-            <MudIconButton Icon="@Icons.Material.Filled.Delete" Size="Size.Small" Color="Color.Error" aria-label="Delete" OnClick="@(() => DeleteTemplateAsync(context))" />
+            <MudIconButton Icon="@Icons.Material.Filled.Delete" Size="Size.Small" Color="Color.Error" aria-label="@T.Common.Delete" OnClick="@(() => DeleteTemplateAsync(context))" />
         </MudTd>
     </RowTemplate>
     <NoRecordsContent>
         @if (_loadError is not null)
         {
             <ErrorState Icon="@(_offline ? Icons.Material.Filled.CloudOff : Icons.Material.Filled.ErrorOutline)"
-                        Title="Couldn't load data"
+                        Title="@T.Notifications.LoadErrorTitle"
                         Message="@_loadError"
                         Action="ReloadAsync" />
         }
         else
         {
             <EmptyState Icon="@Icons.Material.Filled.Article"
-                        Title="No notification templates yet"
-                        Message="Create templates for SMS, email and push messages; they can include placeholders like {name}."
-                        ActionLabel="Create your first template"
+                        Title="@T.Notifications.EmptyTitle"
+                        Message="@T.Notifications.EmptyMessage"
+                        ActionLabel="@T.Notifications.EmptyActionLabel"
                         Action="OpenCreateDialogAsync" />
         }
     </NoRecordsContent>
@@ -98,8 +99,8 @@
         }
         catch (Exception)
         {
-            Snackbar.Add("Unable to reach the server.", Severity.Error);
-            _loadError = "Unable to reach the server.";
+            Snackbar.Add(T.Notifications.Unreachable, Severity.Error);
+            _loadError = T.Notifications.Unreachable;
             _offline = true;
             return new TableData<NotificationTemplateDto> { Items = Array.Empty<NotificationTemplateDto>(), TotalItems = 0 };
         }
@@ -130,7 +131,7 @@
     private async Task OpenCreateDialogAsync()
     {
         var options = new DialogOptions { MaxWidth = MaxWidth.Medium, FullWidth = true, NoHeader = true };
-        var dialog = await DialogService.ShowAsync<NotificationTemplateEditorDialog>("New Notification Template", options);
+        var dialog = await DialogService.ShowAsync<NotificationTemplateEditorDialog>(T.Notifications.NewTemplateDialogTitle, options);
         await ReloadIfSavedAsync(dialog);
     }
 
@@ -138,7 +139,7 @@
     {
         var parameters = new DialogParameters { ["Template"] = template };
         var options = new DialogOptions { MaxWidth = MaxWidth.Medium, FullWidth = true, NoHeader = true };
-        var dialog = await DialogService.ShowAsync<NotificationTemplateEditorDialog>($"Edit {template.Name}", parameters, options);
+        var dialog = await DialogService.ShowAsync<NotificationTemplateEditorDialog>(T.FormatValue(T.Notifications.EditTemplateTitle, template.Name), parameters, options);
         await ReloadIfSavedAsync(dialog);
     }
 
@@ -158,7 +159,7 @@
             else
                 await NotificationService.ActivateTemplateAsync(template.Id);
 
-            Snackbar.Add(template.IsActive ? "Template deactivated." : "Template activated.", Severity.Success);
+            Snackbar.Add(template.IsActive ? T.Notifications.Deactivated : T.Notifications.Activated, Severity.Success);
             await ReloadAsync();
         }
         catch (ApiException ex)
@@ -167,17 +168,17 @@
         }
         catch (Exception)
         {
-            Snackbar.Add("Unable to reach the server.", Severity.Error);
+            Snackbar.Add(T.Notifications.Unreachable, Severity.Error);
         }
     }
 
     private async Task DeleteTemplateAsync(NotificationTemplateDto template)
     {
         var confirmed = await DialogService.ShowMessageBoxAsync(
-            "Delete Template",
-            $"Are you sure you want to delete {template.Name}? This cannot be undone.",
-            "Delete",
-            "Cancel");
+            T.Notifications.DeleteTitle,
+            T.FormatValue(T.Notifications.DeleteConfirm, template.Name),
+            T.Common.Delete,
+            T.Common.Cancel);
 
         if (confirmed != true)
             return;
@@ -185,7 +186,7 @@
         try
         {
             await NotificationService.DeleteTemplateAsync(template.Id);
-            Snackbar.Add("Template deleted.", Severity.Success);
+            Snackbar.Add(T.Notifications.Deleted, Severity.Success);
             await ReloadAsync();
         }
         catch (ApiException ex)
@@ -194,7 +195,7 @@
         }
         catch (Exception)
         {
-            Snackbar.Add("Unable to reach the server.", Severity.Error);
+            Snackbar.Add(T.Notifications.Unreachable, Severity.Error);
         }
     }
 

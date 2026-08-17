@@ -2,17 +2,18 @@
 @inject ExaminationService ExaminationService
 @inject PatientService PatientService
 @inject ISnackbar Snackbar
+@inject AppLocalizer T
 
 <MudDialog>
     <DialogContent>
-        <DialogHeader Icon="@Icons.Material.Filled.RequestQuote" Title="Create Insurance Claim" />
+        <DialogHeader Icon="@Icons.Material.Filled.RequestQuote" Title="@T.ClaimDialog.Title" />
         <EditForm EditContext="_editContext">
             <DataAnnotationsValidator />
             <MudGrid Spacing="2">
                 <MudItem xs="12" sm="6">
                     <MudAutocomplete T="PatientDto"
                                      @bind-Value="_selectedPatient"
-                                     Label="Patient (search by name or phone)"
+                                     Label="@T.ClaimDialog.PatientSearchLabel"
                                      Variant="Variant.Outlined"
                                      Margin="Margin.Dense"
                                      MinCharacters="1"
@@ -24,7 +25,7 @@
                 <MudItem xs="12" sm="6">
                     <MudAutocomplete T="InsurancePolicyDto"
                                      @bind-Value="_selectedPolicy"
-                                     Label="Insurance Policy (search by policy #)"
+                                     Label="@T.ClaimDialog.PolicySearchLabel"
                                      Variant="Variant.Outlined"
                                      Margin="Margin.Dense"
                                      MinCharacters="1"
@@ -36,7 +37,7 @@
                 <MudItem xs="12" sm="6">
                     <MudAutocomplete T="ExaminationDto"
                                      @bind-Value="_selectedExamination"
-                                     Label="Examination (search by type name)"
+                                     Label="@T.ClaimDialog.ExaminationSearchLabel"
                                      Variant="Variant.Outlined"
                                      Margin="Margin.Dense"
                                      MinCharacters="1"
@@ -48,7 +49,7 @@
                 <MudItem xs="12" sm="6">
                     <MudAutocomplete T="PreAuthorizationDto"
                                      @bind-Value="_selectedPreAuthorization"
-                                     Label="Pre-Authorization (requested)"
+                                     Label="@T.ClaimDialog.PreAuthorizationLabel"
                                      Variant="Variant.Outlined"
                                      Margin="Margin.Dense"
                                      MinCharacters="1"
@@ -60,7 +61,7 @@
                 <MudItem xs="12" sm="6">
                     <MudNumericField T="decimal"
                                      @bind-Value="_model.BilledAmount"
-                                     Label="Billed Amount"
+                                     Label="@T.ClaimDialog.BilledAmount"
                                      Variant="Variant.Outlined"
                                      Margin="Margin.Dense"
                                      Min="0"
@@ -70,7 +71,7 @@
         </EditForm>
     </DialogContent>
     <DialogActions>
-        <MudButton Color="Color.Default" OnClick="CancelAsync" Disabled="_busy">Cancel</MudButton>
+        <MudButton Color="Color.Default" OnClick="CancelAsync" Disabled="_busy">@T.Common.Cancel</MudButton>
         <MudButton Color="Color.Primary" Variant="Variant.Filled" OnClick="SubmitAsync" Disabled="_busy">
             @if (_busy)
             {
@@ -78,7 +79,7 @@
             }
             else
             {
-                <text>Create Claim</text>
+                <text>@T.ClaimDialog.CreateClaim</text>
             }
         </MudButton>
     </DialogActions>
@@ -115,7 +116,7 @@
         }
         catch (Exception)
         {
-            Snackbar.Add("Unable to search patients.", Severity.Error);
+            Snackbar.Add(T.ClaimDialog.UnableSearchPatients, Severity.Error);
             return Array.Empty<PatientDto>();
         }
     }
@@ -124,7 +125,7 @@
     {
         if (_selectedPatient is null)
         {
-            Snackbar.Add("Select a patient first.", Severity.Info);
+            Snackbar.Add(T.ClaimDialog.SelectPatientFirst, Severity.Info);
             return Array.Empty<InsurancePolicyDto>();
         }
 
@@ -143,7 +144,7 @@
         }
         catch (Exception)
         {
-            Snackbar.Add("Unable to search policies.", Severity.Error);
+            Snackbar.Add(T.ClaimDialog.UnableSearchPolicies, Severity.Error);
             return Array.Empty<InsurancePolicyDto>();
         }
     }
@@ -152,7 +153,7 @@
     {
         if (_selectedPatient is null)
         {
-            Snackbar.Add("Select a patient first.", Severity.Info);
+            Snackbar.Add(T.ClaimDialog.SelectPatientFirst, Severity.Info);
             return Array.Empty<ExaminationDto>();
         }
 
@@ -168,7 +169,7 @@
         }
         catch (Exception)
         {
-            Snackbar.Add("Unable to search examinations.", Severity.Error);
+            Snackbar.Add(T.ClaimDialog.UnableSearchExaminations, Severity.Error);
             return Array.Empty<ExaminationDto>();
         }
     }
@@ -177,7 +178,7 @@
     {
         if (_selectedExamination is null)
         {
-            Snackbar.Add("Select an examination first.", Severity.Info);
+            Snackbar.Add(T.ClaimDialog.SelectExaminationFirst, Severity.Info);
             return Array.Empty<PreAuthorizationDto>();
         }
 
@@ -196,7 +197,7 @@
         }
         catch (Exception)
         {
-            Snackbar.Add("Unable to search pre-authorizations.", Severity.Error);
+            Snackbar.Add(T.ClaimDialog.UnableSearchPreAuthorizations, Severity.Error);
             return Array.Empty<PreAuthorizationDto>();
         }
     }
@@ -205,7 +206,7 @@
     {
         if (_selectedPatient is null || _selectedPolicy is null || _selectedExamination is null || _selectedPreAuthorization is null)
         {
-            Snackbar.Add("Patient, policy, examination and pre-authorization are required.", Severity.Error);
+            Snackbar.Add(T.ClaimDialog.AllRequired, Severity.Error);
             return;
         }
 
@@ -225,7 +226,7 @@
             };
 
             await InsuranceService.CreateClaimAsync(input);
-            Snackbar.Add("Claim created.", Severity.Success);
+            Snackbar.Add(T.ClaimDialog.Created, Severity.Success);
             MudDialog.Close(DialogResult.Ok(true));
         }
         catch (ApiException ex)
@@ -234,7 +235,7 @@
         }
         catch (Exception)
         {
-            Snackbar.Add("Unable to reach the server. Please try again.", Severity.Error);
+            Snackbar.Add(T.ClaimDialog.UnreachableRetry, Severity.Error);
         }
         finally
         {

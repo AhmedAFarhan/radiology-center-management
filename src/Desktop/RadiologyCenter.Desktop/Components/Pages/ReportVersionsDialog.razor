@@ -1,9 +1,10 @@
 @inject ReportService ReportService
 @inject ISnackbar Snackbar
+@inject AppLocalizer T
 
 <MudDialog>
     <DialogContent>
-        <DialogHeader Icon="@Icons.Material.Filled.History" Title="Report History" />
+        <DialogHeader Icon="@Icons.Material.Filled.History" Title="@T.ReportVersions.Title" />
 
         <div style="max-height: 440px; overflow-y: auto;">
             @if (_loading)
@@ -12,14 +13,14 @@
             }
             else if (_error is not null)
             {
-                <ErrorState Title="Could not load history"
+                <ErrorState Title="@T.ReportVersions.LoadErrorTitle"
                             Message="@_error"
-                            RetryLabel="Retry"
+                            RetryLabel="@T.Common.Retry"
                             Action="LoadAsync" />
             }
             else if (!_versions.Any())
             {
-                <EmptyState Icon="@Icons.Material.Filled.History" Title="No versions" Message="No report versions were found." />
+                <EmptyState Icon="@Icons.Material.Filled.History" Title="@T.ReportVersions.NoVersions" Message="@T.ReportVersions.NoVersionsMessage" />
             }
             else
             {
@@ -32,7 +33,7 @@
                         </div>
                         @if (!string.IsNullOrWhiteSpace(version.AmendmentReason))
                         {
-                            <MudText Typo="Typo.body2" Class="text-secondary mb-2">Amended: @version.AmendmentReason</MudText>
+                            <MudText Typo="Typo.body2" Class="text-secondary mb-2">@(T.FormatValue(T.ReportVersions.Amended, version.AmendmentReason))</MudText>
                         }
                         @foreach (var vsection in version.Sections.OrderBy(s => s.Position))
                         {
@@ -51,7 +52,7 @@
                         @if (version.Findings.Any())
                         {
                             <MudDivider Class="my-2" />
-                            <MudText Typo="Typo.subtitle2" Class="font-weight-medium mb-1">Findings</MudText>
+                            <MudText Typo="Typo.subtitle2" Class="font-weight-medium mb-1">@T.ReportVersions.Findings</MudText>
                             @foreach (var finding in version.Findings.OrderBy(f => f.Position))
                             {
                                 <div class="mb-1">
@@ -66,7 +67,7 @@
         </div>
     </DialogContent>
     <DialogActions>
-        <MudButton Color="Color.Default" OnClick="CancelAsync">Close</MudButton>
+        <MudButton Color="Color.Default" OnClick="CancelAsync">@T.Common.Close</MudButton>
     </DialogActions>
 </MudDialog>
 

@@ -5,61 +5,62 @@
 @inject ExaminationService ExaminationService
 @inject IDialogService DialogService
 @inject ISnackbar Snackbar
+@inject AppLocalizer T
 @implements IDisposable
 
-<PageHeader Icon="@Icons.Material.Filled.LocalHospital" Title="Referral Fees"
-            Subtitle="Fees paid to referring doctors"
+<PageHeader Icon="@Icons.Material.Filled.LocalHospital" Title="@T.ReferralFee.Title"
+            Subtitle="@T.ReferralFee.Subtitle"
             SearchValueChanged="OnSearchChanged"
-            SearchPlaceholder="Search fees..."
+            SearchPlaceholder="@T.ReferralFee.SearchPlaceholder"
             OnRefresh="ReloadAsync">
-    <MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Add" OnClick="OpenCreateDialogAsync">New Fee</MudButton>
+    <MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Add" OnClick="OpenCreateDialogAsync">@T.ReferralFee.NewFee</MudButton>
 </PageHeader>
 
 <MudTable T="ReferralFeeDto" @ref="_table" ServerData="LoadServerData" Dense="true" Hover="true" Striped="true" Elevation="1" RowsPerPage="10">
     <HeaderContent>
-        <MudTh>Doctor</MudTh>
-        <MudTh>Examination Type</MudTh>
-        <MudTh Class="text-right"><MudTableSortLabel T="ReferralFeeDto" SortLabel="@("Amount")">Amount</MudTableSortLabel></MudTh>
-        <MudTh>Type</MudTh>
-        <MudTh>Status</MudTh>
-        <MudTh>Actions</MudTh>
+        <MudTh>@T.ReferralFee.Doctor</MudTh>
+        <MudTh>@T.ReferralFee.ExaminationType</MudTh>
+        <MudTh Class="text-right"><MudTableSortLabel T="ReferralFeeDto" SortLabel="@("Amount")">@T.ReferralFee.Amount</MudTableSortLabel></MudTh>
+        <MudTh>@T.Common.Type</MudTh>
+        <MudTh>@T.Common.Status</MudTh>
+        <MudTh>@T.Common.Actions</MudTh>
     </HeaderContent>
     <RowTemplate>
-        <MudTd DataLabel="Doctor">
+        <MudTd DataLabel="@T.ReferralFee.Doctor">
             <MudText Class="font-weight-medium">@ResolveDoctor(context.ReferralDoctorId)</MudText>
         </MudTd>
-        <MudTd DataLabel="Examination Type">@ResolveExamType(context.ExaminationTypeId)</MudTd>
-        <MudTd DataLabel="Amount" Class="text-right">@(context.IsPercentage ? $"{context.Amount:N2}%" : context.Amount.ToString("N2"))</MudTd>
-        <MudTd DataLabel="Type">
-            <MudChip T="string" Size="Size.Small" Color="@(context.IsPercentage ? Color.Warning : Color.Default)">@(context.IsPercentage ? "Percentage" : "Flat")</MudChip>
+        <MudTd DataLabel="@T.ReferralFee.ExaminationType">@ResolveExamType(context.ExaminationTypeId)</MudTd>
+        <MudTd DataLabel="@T.ReferralFee.Amount" Class="text-right">@(context.IsPercentage ? $"{context.Amount:N2}%" : context.Amount.ToString("N2"))</MudTd>
+        <MudTd DataLabel="@T.Common.Type">
+            <MudChip T="string" Size="Size.Small" Color="@(context.IsPercentage ? Color.Warning : Color.Default)">@(context.IsPercentage ? T.ReferralFee.Percentage : T.ReferralFee.Flat)</MudChip>
         </MudTd>
-        <MudTd DataLabel="Status">
-            <MudChip T="string" Size="Size.Small" Color="@(context.IsActive ? Color.Success : Color.Default)">@(context.IsActive ? "Active" : "Inactive")</MudChip>
+        <MudTd DataLabel="@T.Common.Status">
+            <MudChip T="string" Size="Size.Small" Color="@(context.IsActive ? Color.Success : Color.Default)">@(context.IsActive ? T.Common.Active : T.Common.Inactive)</MudChip>
         </MudTd>
-        <MudTd DataLabel="Actions">
-            <MudIconButton Icon="@Icons.Material.Filled.Edit" Size="Size.Small" Color="Color.Default" aria-label="Edit" OnClick="@(() => OpenEditDialogAsync(context))" />
+        <MudTd DataLabel="@T.Common.Actions">
+            <MudIconButton Icon="@Icons.Material.Filled.Edit" Size="Size.Small" Color="Color.Default" aria-label="@T.Common.Edit" OnClick="@(() => OpenEditDialogAsync(context))" />
             <MudIconButton Icon="@(context.IsActive ? Icons.Material.Filled.Block : Icons.Material.Filled.CheckCircle)"
                            Size="Size.Small"
                            Color="@(context.IsActive ? Color.Default : Color.Success)"
-                           aria-label="Toggle status"
+                           aria-label="@T.ReferralFee.ToggleStatus"
                            OnClick="@(() => ToggleActiveAsync(context))" />
-            <MudIconButton Icon="@Icons.Material.Filled.Delete" Size="Size.Small" Color="Color.Error" aria-label="Delete" OnClick="@(() => DeleteFeeAsync(context))" />
+            <MudIconButton Icon="@Icons.Material.Filled.Delete" Size="Size.Small" Color="Color.Error" aria-label="@T.Common.Delete" OnClick="@(() => DeleteFeeAsync(context))" />
         </MudTd>
     </RowTemplate>
     <NoRecordsContent>
         @if (_loadError is not null)
         {
             <ErrorState Icon="@(_offline ? Icons.Material.Filled.CloudOff : Icons.Material.Filled.ErrorOutline)"
-                        Title="Couldn't load data"
+                        Title="@T.ReferralFee.LoadErrorTitle"
                         Message="@_loadError"
                         Action="ReloadAsync" />
         }
         else
         {
         <EmptyState Icon="@Icons.Material.Filled.LocalHospital"
-                    Title="No referral fees yet"
-                    Message="Set referral fees to pay referring doctors for examinations."
-                    ActionLabel="Create your first fee"
+                    Title="@T.ReferralFee.EmptyTitle"
+                    Message="@T.ReferralFee.EmptyMessage"
+                    ActionLabel="@T.ReferralFee.EmptyActionLabel"
                     Action="OpenCreateDialogAsync" />
         }
     </NoRecordsContent>
@@ -108,8 +109,8 @@
         }
         catch (Exception)
         {
-            Snackbar.Add("Unable to reach the server.", Severity.Error);
-            _loadError = "Unable to reach the server.";
+            Snackbar.Add(T.ReferralFee.Unreachable, Severity.Error);
+            _loadError = T.ReferralFee.Unreachable;
             _offline = true;
             return new TableData<ReferralFeeDto> { Items = Array.Empty<ReferralFeeDto>(), TotalItems = 0 };
         }
@@ -146,7 +147,7 @@
     private async Task OpenCreateDialogAsync()
     {
         var options = new DialogOptions { MaxWidth = MaxWidth.Medium, FullWidth = true, NoHeader = true };
-        var dialog = await DialogService.ShowAsync<ReferralFeeEditorDialog>("New Referral Fee", options);
+        var dialog = await DialogService.ShowAsync<ReferralFeeEditorDialog>(T.ReferralFee.NewReferralFee, options);
         await ReloadIfSavedAsync(dialog);
     }
 
@@ -154,7 +155,7 @@
     {
         var parameters = new DialogParameters { ["Fee"] = fee };
         var options = new DialogOptions { MaxWidth = MaxWidth.Medium, FullWidth = true, NoHeader = true };
-        var dialog = await DialogService.ShowAsync<ReferralFeeEditorDialog>("Edit Referral Fee", parameters, options);
+        var dialog = await DialogService.ShowAsync<ReferralFeeEditorDialog>(T.ReferralFee.EditReferralFee, parameters, options);
         await ReloadIfSavedAsync(dialog);
     }
 
@@ -174,7 +175,7 @@
             else
                 await PayrollService.ActivateReferralFeeAsync(fee.Id);
 
-            Snackbar.Add(fee.IsActive ? "Fee deactivated." : "Fee activated.", Severity.Success);
+            Snackbar.Add(fee.IsActive ? T.ReferralFee.Deactivated : T.ReferralFee.Activated, Severity.Success);
             await ReloadAsync();
         }
         catch (ApiException ex)
@@ -183,17 +184,17 @@
         }
         catch (Exception)
         {
-            Snackbar.Add("Unable to reach the server.", Severity.Error);
+            Snackbar.Add(T.ReferralFee.Unreachable, Severity.Error);
         }
     }
 
     private async Task DeleteFeeAsync(ReferralFeeDto fee)
     {
         var confirmed = await DialogService.ShowMessageBoxAsync(
-            "Delete Referral Fee",
-            "Are you sure you want to delete this fee? This cannot be undone.",
-            "Delete",
-            "Cancel");
+            T.ReferralFee.DeleteTitle,
+            T.ReferralFee.DeleteConfirm,
+            T.Common.Delete,
+            T.Common.Cancel);
 
         if (confirmed != true)
             return;
@@ -201,7 +202,7 @@
         try
         {
             await PayrollService.DeleteReferralFeeAsync(fee.Id);
-            Snackbar.Add("Referral fee deleted.", Severity.Success);
+            Snackbar.Add(T.ReferralFee.Deleted, Severity.Success);
             await ReloadAsync();
         }
         catch (ApiException ex)
@@ -210,7 +211,7 @@
         }
         catch (Exception)
         {
-            Snackbar.Add("Unable to reach the server.", Severity.Error);
+            Snackbar.Add(T.ReferralFee.Unreachable, Severity.Error);
         }
     }
 

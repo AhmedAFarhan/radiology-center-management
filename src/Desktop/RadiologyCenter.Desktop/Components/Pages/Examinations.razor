@@ -3,83 +3,84 @@
 @inject ExaminationService ExaminationService
 @inject IDialogService DialogService
 @inject ISnackbar Snackbar
+@inject AppLocalizer T
 @implements IDisposable
 
-<PageHeader Icon="@Icons.Material.Filled.MedicalServices" Title="Examinations"
-            Subtitle="Manage examination types"
+<PageHeader Icon="@Icons.Material.Filled.MedicalServices" Title="@T.Examinations.Title"
+            Subtitle="@T.Examinations.Subtitle"
             SearchValueChanged="OnSearchChanged"
-            SearchPlaceholder="Search types..."
+            SearchPlaceholder="@T.Examinations.SearchPlaceholder"
             OnRefresh="ReloadAsync">
-    <MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Add" OnClick="OpenCreateDialogAsync">Add Type</MudButton>
+    <MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Add" OnClick="OpenCreateDialogAsync">@T.Examinations.AddType</MudButton>
 </PageHeader>
 
 <MudTable T="ExaminationTypeDto" @ref="_table" ServerData="LoadServerData" Dense="true" Hover="true" Striped="true" Elevation="1" RowsPerPage="10">
     <HeaderContent>
-        <MudTh><MudTableSortLabel T="ExaminationTypeDto" SortLabel="@("Code")">Code</MudTableSortLabel></MudTh>
-        <MudTh><MudTableSortLabel T="ExaminationTypeDto" SortLabel="@("Name")">Name</MudTableSortLabel></MudTh>
-        <MudTh><MudTableSortLabel T="ExaminationTypeDto" SortLabel="@("Modality")">Modality</MudTableSortLabel></MudTh>
-        <MudTh><MudTableSortLabel T="ExaminationTypeDto" SortLabel="@("BodyPart")">Body Part</MudTableSortLabel></MudTh>
-        <MudTh><MudTableSortLabel T="ExaminationTypeDto" SortLabel="@("StandardDurationMinutes")">Duration</MudTableSortLabel></MudTh>
-        <MudTh><MudTableSortLabel T="ExaminationTypeDto" SortLabel="@("Price")">Price</MudTableSortLabel></MudTh>
-        <MudTh>Requirements</MudTh>
-        <MudTh>Status</MudTh>
-        <MudTh>Actions</MudTh>
+        <MudTh><MudTableSortLabel T="ExaminationTypeDto" SortLabel="@("Code")">@T.Examinations.Code</MudTableSortLabel></MudTh>
+        <MudTh><MudTableSortLabel T="ExaminationTypeDto" SortLabel="@("Name")">@T.Common.Name</MudTableSortLabel></MudTh>
+        <MudTh><MudTableSortLabel T="ExaminationTypeDto" SortLabel="@("Modality")">@T.Examinations.Modality</MudTableSortLabel></MudTh>
+        <MudTh><MudTableSortLabel T="ExaminationTypeDto" SortLabel="@("BodyPart")">@T.Examinations.BodyPart</MudTableSortLabel></MudTh>
+        <MudTh><MudTableSortLabel T="ExaminationTypeDto" SortLabel="@("StandardDurationMinutes")">@T.Examinations.Duration</MudTableSortLabel></MudTh>
+        <MudTh><MudTableSortLabel T="ExaminationTypeDto" SortLabel="@("Price")">@T.Examinations.Price</MudTableSortLabel></MudTh>
+        <MudTh>@T.Examinations.Requirements</MudTh>
+        <MudTh>@T.Common.Status</MudTh>
+        <MudTh>@T.Common.Actions</MudTh>
     </HeaderContent>
     <RowTemplate>
-        <MudTd DataLabel="Code" Class="mono-text">@context.Code</MudTd>
-        <MudTd DataLabel="Name">
+        <MudTd DataLabel="@T.Examinations.Code" Class="mono-text">@context.Code</MudTd>
+        <MudTd DataLabel="@T.Common.Name">
             <MudText Class="font-weight-medium">@context.Name</MudText>
-            <MudText Typo="Typo.caption" Class="text-secondary">@context.Items.Count item(s)</MudText>
+            <MudText Typo="Typo.caption" Class="text-secondary">@(T.FormatValue(T.Examinations.ItemCount, context.Items.Count))</MudText>
         </MudTd>
-        <MudTd DataLabel="Modality">@context.Modality</MudTd>
-        <MudTd DataLabel="Body Part">@context.BodyPart</MudTd>
-        <MudTd DataLabel="Duration">@(context.StandardDurationMinutes == 0 ? "-" : $"{context.StandardDurationMinutes} min")</MudTd>
-        <MudTd DataLabel="Price">@context.Price.ToString("C")</MudTd>
-        <MudTd DataLabel="Requirements">
+        <MudTd DataLabel="@T.Examinations.Modality">@context.Modality</MudTd>
+        <MudTd DataLabel="@T.Examinations.BodyPart">@context.BodyPart</MudTd>
+        <MudTd DataLabel="@T.Examinations.Duration">@(context.StandardDurationMinutes == 0 ? "-" : T.FormatValue(T.Examinations.Minutes, context.StandardDurationMinutes))</MudTd>
+        <MudTd DataLabel="@T.Examinations.Price">@context.Price.ToString("C")</MudTd>
+        <MudTd DataLabel="@T.Examinations.Requirements">
             @if (context.RequiresPreparation)
             {
-                <MudChip T="string" Size="Size.Small" Color="Color.Info" Variant="Variant.Outlined" Class="me-1">Prep</MudChip>
+                <MudChip T="string" Size="Size.Small" Color="Color.Info" Variant="Variant.Outlined" Class="me-1">@T.Examinations.Prep</MudChip>
             }
             @if (context.RequiresConsent)
             {
-                <MudChip T="string" Size="Size.Small" Color="Color.Warning" Variant="Variant.Outlined" Class="me-1">Consent</MudChip>
+                <MudChip T="string" Size="Size.Small" Color="Color.Warning" Variant="Variant.Outlined" Class="me-1">@T.Examinations.Consent</MudChip>
             }
             @if (context.RequiresContrast)
             {
-                <MudChip T="string" Size="Size.Small" Color="Color.Secondary" Variant="Variant.Outlined">Contrast</MudChip>
+                <MudChip T="string" Size="Size.Small" Color="Color.Secondary" Variant="Variant.Outlined">@T.Examinations.Contrast</MudChip>
             }
             @if (!context.RequiresPreparation && !context.RequiresConsent && !context.RequiresContrast)
             {
-                <MudText Typo="Typo.caption" Class="text-secondary">None</MudText>
+                <MudText Typo="Typo.caption" Class="text-secondary">@T.Common.None</MudText>
             }
         </MudTd>
-        <MudTd DataLabel="Status">
-            <MudChip T="string" Size="Size.Small" Color="@(context.IsActive ? Color.Success : Color.Default)">@(context.IsActive ? "Active" : "Inactive")</MudChip>
+        <MudTd DataLabel="@T.Common.Status">
+            <MudChip T="string" Size="Size.Small" Color="@(context.IsActive ? Color.Success : Color.Default)">@(context.IsActive ? T.Common.Active : T.Common.Inactive)</MudChip>
         </MudTd>
-        <MudTd DataLabel="Actions">
-            <MudIconButton Icon="@Icons.Material.Filled.Edit" Size="Size.Small" Color="Color.Default" aria-label="Edit" OnClick="@(() => OpenEditDialogAsync(context))" />
+        <MudTd DataLabel="@T.Common.Actions">
+            <MudIconButton Icon="@Icons.Material.Filled.Edit" Size="Size.Small" Color="Color.Default" aria-label="@T.Common.Edit" OnClick="@(() => OpenEditDialogAsync(context))" />
             <MudIconButton Icon="@(context.IsActive ? Icons.Material.Filled.Block : Icons.Material.Filled.CheckCircle)"
                            Size="Size.Small"
                            Color="@(context.IsActive ? Color.Default : Color.Success)"
-                           aria-label="Toggle status"
+                           aria-label="@T.Examinations.ToggleStatus"
                            OnClick="@(() => ToggleActiveAsync(context))" />
-            <MudIconButton Icon="@Icons.Material.Filled.Delete" Size="Size.Small" Color="Color.Error" aria-label="Delete" OnClick="@(() => DeleteTypeAsync(context))" />
+            <MudIconButton Icon="@Icons.Material.Filled.Delete" Size="Size.Small" Color="Color.Error" aria-label="@T.Common.Delete" OnClick="@(() => DeleteTypeAsync(context))" />
         </MudTd>
     </RowTemplate>
     <NoRecordsContent>
         @if (_loadError is not null)
         {
             <ErrorState Icon="@(_offline ? Icons.Material.Filled.CloudOff : Icons.Material.Filled.ErrorOutline)"
-                        Title="Couldn't load data"
+                        Title="@T.Examinations.LoadErrorTitle"
                         Message="@_loadError"
                         Action="ReloadAsync" />
         }
         else
         {
         <EmptyState Icon="@Icons.Material.Filled.MedicalServices"
-                    Title="No examination types yet"
-                    Message="Define examination types before booking visits or pricing fees."
-                    ActionLabel="Add your first type"
+                    Title="@T.Examinations.EmptyTitle"
+                    Message="@T.Examinations.EmptyMessage"
+                    ActionLabel="@T.Examinations.EmptyAction"
                     Action="OpenCreateDialogAsync" />
         }
     </NoRecordsContent>
@@ -120,8 +121,8 @@
         }
         catch (Exception)
         {
-            Snackbar.Add("Unable to reach the server.", Severity.Error);
-            _loadError = "Unable to reach the server.";
+            Snackbar.Add(T.Examinations.Unreachable, Severity.Error);
+            _loadError = T.Examinations.Unreachable;
             _offline = true;
             return new TableData<ExaminationTypeDto> { Items = Array.Empty<ExaminationTypeDto>(), TotalItems = 0 };
         }
@@ -152,7 +153,7 @@
     private async Task OpenCreateDialogAsync()
     {
         var options = new DialogOptions { MaxWidth = MaxWidth.Medium, FullWidth = true, NoHeader = true };
-        var dialog = await DialogService.ShowAsync<ExaminationTypeEditorDialog>("New Examination Type", options);
+        var dialog = await DialogService.ShowAsync<ExaminationTypeEditorDialog>(T.Examinations.NewType, options);
         await ReloadIfSavedAsync(dialog);
     }
 
@@ -160,7 +161,7 @@
     {
         var parameters = new DialogParameters { ["Type"] = type };
         var options = new DialogOptions { MaxWidth = MaxWidth.Medium, FullWidth = true, NoHeader = true };
-        var dialog = await DialogService.ShowAsync<ExaminationTypeEditorDialog>("Edit Examination Type", parameters, options);
+        var dialog = await DialogService.ShowAsync<ExaminationTypeEditorDialog>(T.Examinations.EditType, parameters, options);
         await ReloadIfSavedAsync(dialog);
     }
 
@@ -180,7 +181,7 @@
             else
                 await ExaminationService.ActivateTypeAsync(type.Id);
 
-            Snackbar.Add(type.IsActive ? "Examination type deactivated." : "Examination type activated.", Severity.Success);
+            Snackbar.Add(type.IsActive ? T.Examinations.Deactivated : T.Examinations.Activated, Severity.Success);
             await ReloadAsync();
         }
         catch (ApiException ex)
@@ -189,17 +190,17 @@
         }
         catch (Exception)
         {
-            Snackbar.Add("Unable to reach the server.", Severity.Error);
+            Snackbar.Add(T.Examinations.Unreachable, Severity.Error);
         }
     }
 
     private async Task DeleteTypeAsync(ExaminationTypeDto type)
     {
         var confirmed = await DialogService.ShowMessageBoxAsync(
-            "Delete Examination Type",
-            $"Are you sure you want to delete {type.Name}? This cannot be undone.",
-            "Delete",
-            "Cancel");
+            T.Examinations.DeleteTitle,
+            T.FormatValue(T.Examinations.DeleteConfirm, type.Name),
+            T.Common.Delete,
+            T.Common.Cancel);
 
         if (confirmed != true)
             return;
@@ -207,7 +208,7 @@
         try
         {
             await ExaminationService.DeleteTypeAsync(type.Id);
-            Snackbar.Add("Examination type deleted.", Severity.Success);
+            Snackbar.Add(T.Examinations.Deleted, Severity.Success);
             await ReloadAsync();
         }
         catch (ApiException ex)
@@ -216,7 +217,7 @@
         }
         catch (Exception)
         {
-            Snackbar.Add("Unable to reach the server.", Severity.Error);
+            Snackbar.Add(T.Examinations.Unreachable, Severity.Error);
         }
     }
 

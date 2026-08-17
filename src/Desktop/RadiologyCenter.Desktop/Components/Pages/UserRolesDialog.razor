@@ -1,15 +1,16 @@
 @inject IdentityService IdentityService
 @inject ISnackbar Snackbar
+@inject AppLocalizer T
 
 <MudDialog>
     <DialogContent>
-        <DialogHeader Icon="@Icons.Material.Filled.Security" Title="@($"Roles - {User.UserName}")" />
+        <DialogHeader Icon="@Icons.Material.Filled.Security" Title="@(T.FormatValue(T.UserDialog.RolesTitle, User.UserName))" />
         <MudText Typo="Typo.body2" Class="text-secondary mb-3">
-            Assign roles to @User.UserName. This replaces their current role set. Select all roles this user should have.
+            @(T.FormatValue(T.UserDialog.RolesDescription, User.UserName))
         </MudText>
         @if (_loadError is not null)
         {
-            <ErrorState Title="Couldn't load roles" Message="@_loadError" />
+            <ErrorState Title="@T.UserDialog.LoadRolesErrorTitle" Message="@_loadError" />
         }
         else if (_roles.Count == 0)
         {
@@ -27,7 +28,7 @@
                             <MudText>@role.Name</MudText>
                             @if (role.IsSystem)
                             {
-                                <MudText Typo="Typo.caption" Class="text-secondary">System role</MudText>
+                                <MudText Typo="Typo.caption" Class="text-secondary">@T.UserDialog.SystemRole</MudText>
                             }
                         </MudSwitch>
                     </MudListItem>
@@ -36,7 +37,7 @@
         }
     </DialogContent>
     <DialogActions>
-        <MudButton Color="Color.Default" OnClick="CancelAsync" Disabled="_busy">Cancel</MudButton>
+        <MudButton Color="Color.Default" OnClick="CancelAsync" Disabled="_busy">@T.Common.Cancel</MudButton>
         <MudButton Color="Color.Primary" Variant="Variant.Filled" OnClick="SubmitAsync" Disabled="_busy || _roles.Count == 0">
             @if (_busy)
             {
@@ -44,7 +45,7 @@
             }
             else
             {
-                <text>Save Roles</text>
+                <text>@T.UserDialog.SaveRoles</text>
             }
         </MudButton>
     </DialogActions>
@@ -75,7 +76,7 @@
         }
         catch (Exception)
         {
-            _loadError = "Unable to load roles.";
+            _loadError = T.UserDialog.LoadRolesError;
         }
     }
 
@@ -84,7 +85,7 @@
         var selectedIds = _selected.Where(kv => kv.Value).Select(kv => kv.Key).ToList();
         if (selectedIds.Count == 0)
         {
-            Snackbar.Add("Select at least one role.", Severity.Warning);
+            Snackbar.Add(T.UserDialog.SelectRole, Severity.Warning);
             return;
         }
 
@@ -92,7 +93,7 @@
         try
         {
             await IdentityService.UpdateUserRolesAsync(User.Id, selectedIds);
-            Snackbar.Add("Roles updated.", Severity.Success);
+            Snackbar.Add(T.UserDialog.RolesUpdated, Severity.Success);
             MudDialog.Close(DialogResult.Ok(true));
         }
         catch (ApiException ex)
@@ -101,7 +102,7 @@
         }
         catch (Exception)
         {
-            Snackbar.Add("Unable to reach the server.", Severity.Error);
+            Snackbar.Add(T.UserDialog.Unreachable, Severity.Error);
         }
         finally
         {

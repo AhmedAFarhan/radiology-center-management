@@ -1,16 +1,17 @@
 @inject InventoryService InventoryService
 @inject ISnackbar Snackbar
+@inject AppLocalizer T
 
 <MudDialog>
     <DialogContent>
-        <DialogHeader Icon="@Icons.Material.Filled.ReceiptLong" Title="New Purchase Order" />
+        <DialogHeader Icon="@Icons.Material.Filled.ReceiptLong" Title="@T.PoDialog.NewPurchaseOrder" />
         <EditForm EditContext="_editContext">
             <DataAnnotationsValidator />
             <MudGrid Spacing="2">
                 <MudItem xs="12" sm="8">
                     <MudSelect T="string"
                                @bind-Value="_model.SupplierId"
-                               Label="Supplier"
+                               Label="@T.PoDialog.Supplier"
                                Variant="Variant.Outlined"
                                Margin="Margin.Dense"
                                For="@(() => _model.SupplierId)">
@@ -22,7 +23,7 @@
                 </MudItem>
                 <MudItem xs="12" sm="4">
                     <MudDatePicker @bind-Date="_model.ExpectedDeliveryAt"
-                                   Label="Expected Delivery"
+                                   Label="@T.PoDialog.ExpectedDeliveryLabel"
                                    Variant="Variant.Outlined"
                                    Margin="Margin.Dense"
                                    Clearable="true" />
@@ -31,8 +32,8 @@
 
             <MudDivider Class="my-3" />
             <div class="d-flex align-center justify-space-between mb-2">
-                <MudText Typo="Typo.subtitle2">Items</MudText>
-                <MudButton Variant="Variant.Text" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Add" OnClick="AddLine" Size="Size.Small">Add Item</MudButton>
+                <MudText Typo="Typo.subtitle2">@T.PoDialog.Items</MudText>
+                <MudButton Variant="Variant.Text" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Add" OnClick="AddLine" Size="Size.Small">@T.PoDialog.AddItem</MudButton>
             </div>
 
             @foreach (var line in _model.Items)
@@ -41,7 +42,7 @@
                     <MudItem xs="12" sm="5">
                         <MudSelect T="string"
                                    @bind-Value="line.ItemId"
-                                   Label="Item"
+                                   Label="@T.PoDialog.Item"
                                    Variant="Variant.Outlined"
                                    Margin="Margin.Dense">
                             @foreach (var item in _items)
@@ -53,7 +54,7 @@
                     <MudItem xs="12" sm="3">
                         <MudNumericField T="int"
                                          @bind-Value="line.QuantityOrdered"
-                                         Label="Qty"
+                                         Label="@T.PoDialog.Qty"
                                          Variant="Variant.Outlined"
                                          Margin="Margin.Dense"
                                          Min="1" />
@@ -61,7 +62,7 @@
                     <MudItem xs="12" sm="3">
                         <MudNumericField T="decimal"
                                          @bind-Value="line.UnitCost"
-                                         Label="Unit Cost"
+                                         Label="@T.PoDialog.UnitCost"
                                          Variant="Variant.Outlined"
                                          Margin="Margin.Dense"
                                          Min="0" />
@@ -70,19 +71,19 @@
                         <MudIconButton Icon="@Icons.Material.Filled.RemoveCircleOutline"
                                        Size="Size.Small"
                                        Color="Color.Error"
-                                       aria-label="Remove item"
+                                       aria-label="@T.PoDialog.RemoveItem"
                                        OnClick="@(() => RemoveLine(line))" />
                     </MudItem>
                 </MudGrid>
             }
             @if (_model.Items.Count == 0)
             {
-                <MudText Typo="Typo.body2" Class="text-secondary">Add at least one item to the order.</MudText>
+                <MudText Typo="Typo.body2" Class="text-secondary">@T.PoDialog.AddAtLeastOneItem</MudText>
             }
 
             <MudDivider Class="my-3" />
             <MudTextField @bind-Value="_model.Notes"
-                          Label="Notes"
+                          Label="@T.PoDialog.Notes"
                           Variant="Variant.Outlined"
                           Margin="Margin.Dense"
                           Lines="3"
@@ -90,7 +91,7 @@
         </EditForm>
     </DialogContent>
     <DialogActions>
-        <MudButton Color="Color.Default" OnClick="CancelAsync" Disabled="_busy">Cancel</MudButton>
+        <MudButton Color="Color.Default" OnClick="CancelAsync" Disabled="_busy">@T.Common.Cancel</MudButton>
         <MudButton Color="Color.Primary" Variant="Variant.Filled" OnClick="SubmitAsync" Disabled="_busy || _suppliers.Count == 0">
             @if (_busy)
             {
@@ -98,7 +99,7 @@
             }
             else
             {
-                <text>Create Order</text>
+                <text>@T.PoDialog.CreateOrder</text>
             }
         </MudButton>
     </DialogActions>
@@ -131,7 +132,7 @@
         }
         catch (Exception)
         {
-            Snackbar.Add("Unable to load suppliers and items.", Severity.Error);
+            Snackbar.Add(T.PoDialog.LoadOptionsError, Severity.Error);
         }
     }
 
@@ -150,7 +151,7 @@
 
         if (missingItems || duplicateItems || invalidQuantities)
         {
-            Snackbar.Add("Each line needs an item, a positive quantity, and no duplicates.", Severity.Warning);
+            Snackbar.Add(T.PoDialog.LineValidationError, Severity.Warning);
             return;
         }
 
@@ -171,7 +172,7 @@
             };
 
             await InventoryService.CreatePurchaseOrderAsync(input);
-            Snackbar.Add("Purchase order created.", Severity.Success);
+            Snackbar.Add(T.PoDialog.PurchaseOrderCreated, Severity.Success);
             MudDialog.Close(DialogResult.Ok(true));
         }
         catch (ApiException ex)
@@ -180,7 +181,7 @@
         }
         catch (Exception)
         {
-            Snackbar.Add("Unable to reach the server. Please try again.", Severity.Error);
+            Snackbar.Add(T.PoDialog.UnreachableRetry, Severity.Error);
         }
         finally
         {

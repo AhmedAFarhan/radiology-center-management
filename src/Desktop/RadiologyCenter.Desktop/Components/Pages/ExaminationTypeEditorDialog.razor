@@ -1,16 +1,17 @@
 @inject ExaminationService ExaminationService
 @inject InventoryService InventoryService
 @inject ISnackbar Snackbar
+@inject AppLocalizer T
 
 <MudDialog>
     <DialogContent>
-        <DialogHeader Icon="@Icons.Material.Filled.MedicalServices" Title="@(Type is null ? "New Examination Type" : "Edit Examination Type")" />
+        <DialogHeader Icon="@Icons.Material.Filled.MedicalServices" Title="@(Type is null ? T.ExamDialog.NewTitle : T.ExamDialog.EditTitle)" />
         <EditForm EditContext="_editContext">
             <DataAnnotationsValidator />
             <MudGrid Spacing="2">
                 <MudItem xs="12" sm="4">
                     <MudTextField @bind-Value="_model.Code"
-                                  Label="Code"
+                                  Label="@T.ExamDialog.Code"
                                   Variant="Variant.Outlined"
                                   Margin="Margin.Dense"
                                   Immediate="true"
@@ -18,7 +19,7 @@
                 </MudItem>
                 <MudItem xs="12" sm="8">
                     <MudTextField @bind-Value="_model.Name"
-                                  Label="Name"
+                                  Label="@T.Common.Name"
                                   Variant="Variant.Outlined"
                                   Margin="Margin.Dense"
                                   Immediate="true"
@@ -27,7 +28,7 @@
                 <MudItem xs="12" sm="6">
                     <MudSelect T="string"
                                @bind-Value="_model.Modality"
-                               Label="Modality"
+                               Label="@T.ExamDialog.Modality"
                                Variant="Variant.Outlined"
                                Margin="Margin.Dense"
                                For="@(() => _model.Modality)">
@@ -39,7 +40,7 @@
                 </MudItem>
                 <MudItem xs="12" sm="6">
                     <MudTextField @bind-Value="_model.BodyPart"
-                                  Label="Body Part"
+                                  Label="@T.ExamDialog.BodyPart"
                                   Variant="Variant.Outlined"
                                   Margin="Margin.Dense"
                                   Immediate="true"
@@ -48,7 +49,7 @@
                 <MudItem xs="12" sm="6">
                     <MudNumericField T="int"
                                      @bind-Value="_model.StandardDurationMinutes"
-                                     Label="Standard Duration (min)"
+                                     Label="@T.ExamDialog.StandardDuration"
                                      Variant="Variant.Outlined"
                                      Margin="Margin.Dense"
                                      Min="0"
@@ -57,24 +58,24 @@
                 <MudItem xs="12" sm="6">
                     <MudNumericField T="decimal"
                                      @bind-Value="_model.Price"
-                                     Label="Price"
+                                     Label="@T.ExamDialog.Price"
                                      Variant="Variant.Outlined"
                                      Margin="Margin.Dense"
                                      Min="0"
                                      For="@(() => _model.Price)" />
                 </MudItem>
                 <MudItem xs="12" sm="6">
-                    <MudSwitch T="bool" @bind-Value="_model.RequiresPreparation" Color="Color.Info">Requires Preparation</MudSwitch>
+                    <MudSwitch T="bool" @bind-Value="_model.RequiresPreparation" Color="Color.Info">@T.ExamDialog.RequiresPreparation</MudSwitch>
                 </MudItem>
                 <MudItem xs="12" sm="6">
-                    <MudSwitch T="bool" @bind-Value="_model.RequiresConsent" Color="Color.Warning">Requires Consent</MudSwitch>
+                    <MudSwitch T="bool" @bind-Value="_model.RequiresConsent" Color="Color.Warning">@T.ExamDialog.RequiresConsent</MudSwitch>
                 </MudItem>
             </MudGrid>
 
             <MudDivider Class="my-3" />
             <div class="d-flex align-center justify-space-between mb-2">
-                <MudText Typo="Typo.subtitle2">Consumables / Preference Items</MudText>
-                <MudButton Variant="Variant.Text" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Add" OnClick="AddItem" Size="Size.Small">Add Item</MudButton>
+                <MudText Typo="Typo.subtitle2">@T.ExamDialog.ItemsTitle</MudText>
+                <MudButton Variant="Variant.Text" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Add" OnClick="AddItem" Size="Size.Small">@T.ExamDialog.AddItem</MudButton>
             </div>
 
             @foreach (var item in _model.Items)
@@ -83,7 +84,7 @@
                     <MudItem xs="12" sm="5">
                         <MudSelect T="string"
                                    @bind-Value="item.ItemId"
-                                   Label="Inventory Item"
+                                   Label="@T.ExamDialog.InventoryItem"
                                    Variant="Variant.Outlined"
                                    Margin="Margin.Dense">
                             @foreach (var invItem in _inventoryItems)
@@ -95,32 +96,32 @@
                     <MudItem xs="12" sm="2">
                         <MudNumericField T="int"
                                          @bind-Value="item.Quantity"
-                                         Label="Qty"
+                                         Label="@T.ExamDialog.Qty"
                                          Variant="Variant.Outlined"
                                          Margin="Margin.Dense"
                                          Min="1" />
                     </MudItem>
                     <MudItem xs="12" sm="4">
-                        <MudSwitch T="bool" @bind-Value="item.IsContrast" Color="Color.Secondary" Class="me-3">Contrast</MudSwitch>
-                        <MudSwitch T="bool" @bind-Value="item.IsRequired" Color="Color.Primary">Required</MudSwitch>
+                        <MudSwitch T="bool" @bind-Value="item.IsContrast" Color="Color.Secondary" Class="me-3">@T.ExamDialog.Contrast</MudSwitch>
+                        <MudSwitch T="bool" @bind-Value="item.IsRequired" Color="Color.Primary">@T.ExamDialog.Required</MudSwitch>
                     </MudItem>
                     <MudItem xs="12" sm="1">
                         <MudIconButton Icon="@Icons.Material.Filled.RemoveCircleOutline"
                                        Size="Size.Small"
                                        Color="Color.Error"
-                                       aria-label="Remove item"
+                                       aria-label="@T.ExamDialog.RemoveItem"
                                        OnClick="@(() => RemoveItem(item))" />
                     </MudItem>
                 </MudGrid>
             }
             @if (_model.Items.Count == 0)
             {
-                <MudText Typo="Typo.body2" Class="text-secondary">No preference items defined.</MudText>
+                <MudText Typo="Typo.body2" Class="text-secondary">@T.ExamDialog.NoItems</MudText>
             }
         </EditForm>
     </DialogContent>
     <DialogActions>
-        <MudButton Color="Color.Default" OnClick="CancelAsync" Disabled="_busy">Cancel</MudButton>
+        <MudButton Color="Color.Default" OnClick="CancelAsync" Disabled="_busy">@T.Common.Cancel</MudButton>
         <MudButton Color="Color.Primary" Variant="Variant.Filled" OnClick="SubmitAsync" Disabled="_busy">
             @if (_busy)
             {
@@ -128,7 +129,7 @@
             }
             else
             {
-                <text>@(IsEdit ? "Save Changes" : "Create Type")</text>
+                <text>@(IsEdit ? T.ExamDialog.SaveChanges : T.ExamDialog.CreateType)</text>
             }
         </MudButton>
     </DialogActions>
@@ -163,7 +164,7 @@
         }
         catch (Exception)
         {
-            Snackbar.Add("Unable to load inventory items.", Severity.Error);
+            Snackbar.Add(T.ExamDialog.LoadItemsError, Severity.Error);
         }
 
         if (Type is null)
@@ -202,7 +203,7 @@
 
         if (missingItems || duplicateItems || invalidQuantities)
         {
-            Snackbar.Add("Each item needs a selection, a positive quantity, and no duplicates.", Severity.Warning);
+            Snackbar.Add(T.ExamDialog.ItemsInvalid, Severity.Warning);
             return;
         }
 
@@ -234,7 +235,7 @@
             else
                 await ExaminationService.CreateTypeAsync(input);
 
-            Snackbar.Add(IsEdit ? "Examination type updated." : "Examination type created.", Severity.Success);
+            Snackbar.Add(IsEdit ? T.ExamDialog.Updated : T.ExamDialog.Created, Severity.Success);
             MudDialog.Close(DialogResult.Ok(true));
         }
         catch (ApiException ex)
@@ -243,7 +244,7 @@
         }
         catch (Exception)
         {
-            Snackbar.Add("Unable to reach the server. Please try again.", Severity.Error);
+            Snackbar.Add(T.ExamDialog.Unreachable, Severity.Error);
         }
         finally
         {

@@ -1,15 +1,16 @@
 @inject PayrollService PayrollService
 @inject ISnackbar Snackbar
+@inject AppLocalizer T
 
 <MudDialog>
     <DialogContent>
-        <DialogHeader Icon="@Icons.Material.Filled.Category" Title="@(Component is null ? "New Salary Component" : $"Edit {Component.Name}")" />
+        <DialogHeader Icon="@Icons.Material.Filled.Category" Title="@(Component is null ? T.SalaryComponent.NewSalaryComponent : T.FormatValue(T.SalaryComponent.EditTitle, Component.Name))" />
         <EditForm EditContext="_editContext">
             <DataAnnotationsValidator />
             <MudGrid Spacing="2">
                 <MudItem xs="12" sm="7">
                     <MudTextField @bind-Value="_model.Name"
-                                  Label="Name"
+                                  Label="@T.Common.Name"
                                   Variant="Variant.Outlined"
                                   Margin="Margin.Dense"
                                   Immediate="true"
@@ -18,7 +19,7 @@
                 <MudItem xs="12" sm="5">
                     <MudSelect T="string"
                                @bind-Value="_model.Kind"
-                               Label="Kind"
+                               Label="@T.SalaryComponent.Kind"
                                Variant="Variant.Outlined"
                                Margin="Margin.Dense"
                                For="@(() => _model.Kind)">
@@ -29,10 +30,10 @@
                 <MudItem xs="12" sm="4">
                     <MudSelect T="string"
                                @bind-Value="_model.Frequency"
-                               Label="Frequency (optional)"
+                               Label="@T.SalaryComponent.FrequencyOptional"
                                Variant="Variant.Outlined"
                                Margin="Margin.Dense">
-                        <MudSelectItem T="string" Value="@((string?)null)">Not set</MudSelectItem>
+                        <MudSelectItem T="string" Value="@((string?)null)">@T.SalaryComponent.NotSet</MudSelectItem>
                         @foreach (var frequency in Frequencies)
                         {
                             <MudSelectItem T="string" Value="@frequency">@FormatFrequency(frequency)</MudSelectItem>
@@ -42,21 +43,21 @@
                 <MudItem xs="12" sm="4">
                     <MudNumericField T="decimal"
                                      @bind-Value="_model.DefaultValue"
-                                     Label="@(_model.IsPercentage ? "Default (%)" : "Default Value")"
+                                     Label="@(_model.IsPercentage ? T.SalaryComponent.DefaultPercent : T.SalaryComponent.DefaultValue)"
                                      Variant="Variant.Outlined"
                                      Margin="Margin.Dense"
                                      Min="0"
                                      For="@(() => _model.DefaultValue)" />
                 </MudItem>
                 <MudItem xs="12" sm="4" Class="d-flex flex-column justify-center">
-                    <MudSwitch T="bool" @bind-Value="_model.IsPercentage" Color="Color.Primary">Value is a percentage</MudSwitch>
-                    <MudSwitch T="bool" @bind-Value="_model.IsPerWorkDay" Color="Color.Primary">Paid per work day</MudSwitch>
+                    <MudSwitch T="bool" @bind-Value="_model.IsPercentage" Color="Color.Primary">@T.SalaryComponent.ValueIsPercentage</MudSwitch>
+                    <MudSwitch T="bool" @bind-Value="_model.IsPerWorkDay" Color="Color.Primary">@T.SalaryComponent.PaidPerWorkDay</MudSwitch>
                 </MudItem>
             </MudGrid>
         </EditForm>
     </DialogContent>
     <DialogActions>
-        <MudButton Color="Color.Default" OnClick="CancelAsync" Disabled="_busy">Cancel</MudButton>
+        <MudButton Color="Color.Default" OnClick="CancelAsync" Disabled="_busy">@T.Common.Cancel</MudButton>
         <MudButton Color="Color.Primary" Variant="Variant.Filled" OnClick="SubmitAsync" Disabled="_busy">
             @if (_busy)
             {
@@ -64,7 +65,7 @@
             }
             else
             {
-                <text>@(IsEdit ? "Save Changes" : "Create Component")</text>
+                <text>@(IsEdit ? T.SalaryComponent.SaveChanges : T.SalaryComponent.CreateComponent)</text>
             }
         </MudButton>
     </DialogActions>
@@ -121,7 +122,7 @@
             else
                 await PayrollService.CreateSalaryComponentAsync(input);
 
-            Snackbar.Add(IsEdit ? "Component updated." : "Component created.", Severity.Success);
+            Snackbar.Add(IsEdit ? T.SalaryComponent.Updated : T.SalaryComponent.Created, Severity.Success);
             MudDialog.Close(DialogResult.Ok(true));
         }
         catch (ApiException ex)
@@ -130,7 +131,7 @@
         }
         catch (Exception)
         {
-            Snackbar.Add("Unable to reach the server. Please try again.", Severity.Error);
+            Snackbar.Add(T.SalaryComponent.UnreachableTryAgain, Severity.Error);
         }
         finally
         {

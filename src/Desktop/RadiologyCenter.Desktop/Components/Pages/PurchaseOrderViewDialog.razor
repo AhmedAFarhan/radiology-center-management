@@ -1,16 +1,17 @@
 @inject InventoryService InventoryService
 @inject ISnackbar Snackbar
+@inject AppLocalizer T
 
 <MudDialog>
     <DialogContent>
-        <DialogHeader Icon="@Icons.Material.Filled.ReceiptLong" Title="@(_po is null ? "Order Details" : $"Order {_po.OrderNumber}")" />
+        <DialogHeader Icon="@Icons.Material.Filled.ReceiptLong" Title="@(_po is null ? T.PoDialog.OrderDetails : T.FormatValue(T.PoDialog.OrderTitle, _po.OrderNumber))" />
         @if (_loading)
         {
             <DialogSkeleton Rows="4" />
         }
         else if (_error is not null)
         {
-            <ErrorState Title="Couldn't load purchase order" Message="@_error" Action="LoadAsync" />
+            <ErrorState Title="@T.PoDialog.LoadErrorTitle" Message="@_error" Action="LoadAsync" />
         }
         else if (_po is not null)
         {
@@ -21,11 +22,11 @@
             <MudSimpleTable Dense="true">
                 <thead>
                     <tr>
-                        <th>Item</th>
-                        <th>Ordered</th>
-                        <th>Received</th>
-                        <th>Unit Cost</th>
-                        <th>Total</th>
+                        <th>@T.PoDialog.Item</th>
+                        <th>@T.PoDialog.Ordered</th>
+                        <th>@T.PoDialog.Received</th>
+                        <th>@T.PoDialog.UnitCost</th>
+                        <th>@T.PoDialog.Total</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -40,7 +41,7 @@
                         </tr>
                     }
                     <tr>
-                        <td colspan="4" class="font-weight-medium text-right">Total</td>
+                        <td colspan="4" class="font-weight-medium text-right">@T.PoDialog.Total</td>
                         <td class="font-weight-medium">@Total().ToString("C")</td>
                     </tr>
                 </tbody>
@@ -52,16 +53,16 @@
             }
 
             <MudText Typo="Typo.caption" Class="mt-3 text-secondary">
-                Expected delivery: @(_po.ExpectedDeliveryAt?.ToString("dd MMM yyyy") ?? "Not set")
+                @T.PoDialog.ExpectedDelivery @(_po.ExpectedDeliveryAt?.ToString("dd MMM yyyy") ?? T.PoDialog.NotSet)
                 @if (_po.ReceivedAt is not null)
                 {
-                    <text> · Received: @_po.ReceivedAt.Value.ToLocalTime().ToString("dd MMM yyyy HH:mm")</text>
+                    <text> · @T.PoDialog.ReceivedAt @_po.ReceivedAt.Value.ToLocalTime().ToString("dd MMM yyyy HH:mm")</text>
                 }
             </MudText>
         }
     </DialogContent>
     <DialogActions>
-        <MudButton Color="Color.Default" OnClick="CloseAsync">Close</MudButton>
+        <MudButton Color="Color.Default" OnClick="CloseAsync">@T.Common.Close</MudButton>
     </DialogActions>
 </MudDialog>
 
@@ -91,7 +92,7 @@
         }
         catch (Exception)
         {
-            _error = "Unable to reach the server.";
+            _error = T.PoDialog.Unreachable;
         }
         finally
         {

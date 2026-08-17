@@ -1,14 +1,15 @@
 @inject ReportService ReportService
 @inject ISnackbar Snackbar
+@inject AppLocalizer T
 
 <MudDialog>
     <DialogContent>
-        <DialogHeader Icon="@Icons.Material.Filled.CancelPresentation" Title="Cancel Report" />
+        <DialogHeader Icon="@Icons.Material.Filled.CancelPresentation" Title="@T.CancelReport.Title" />
         <MudText Typo="Typo.body2" Class="text-muted-text mb-2">
-            The report will be cancelled and cannot be edited or finalized.
+            @T.CancelReport.Description
         </MudText>
         <MudTextField @bind-Value="_reason"
-                      Label="Cancellation reason (optional)"
+                      Label="@T.CancelReport.ReasonOptional"
                       Variant="Variant.Outlined"
                       Margin="Margin.Dense"
                       Immediate="true"
@@ -16,7 +17,7 @@
                       Disabled="_busy" />
     </DialogContent>
     <DialogActions>
-        <MudButton Color="Color.Default" OnClick="CancelAsync" Disabled="_busy">Back</MudButton>
+        <MudButton Color="Color.Default" OnClick="CancelAsync" Disabled="_busy">@T.CancelReport.Back</MudButton>
         <MudButton Color="Color.Error" Variant="Variant.Filled" OnClick="SubmitAsync" Disabled="_busy">
             @if (_busy)
             {
@@ -24,7 +25,7 @@
             }
             else
             {
-                <text>Cancel Report</text>
+                <text>@T.CancelReport.Title</text>
             }
         </MudButton>
     </DialogActions>
@@ -44,7 +45,7 @@
         try
         {
             await ReportService.CancelAsync(ReportId, _reason);
-            Snackbar.Add("Report cancelled.", Severity.Success);
+            Snackbar.Add(T.CancelReport.Cancelled, Severity.Success);
             MudDialog.Close(DialogResult.Ok(true));
         }
         catch (ApiException ex)
@@ -53,7 +54,7 @@
         }
         catch (Exception)
         {
-            Snackbar.Add("Unable to reach the server.", Severity.Error);
+            Snackbar.Add(T.CancelReport.Unreachable, Severity.Error);
         }
         finally
         {

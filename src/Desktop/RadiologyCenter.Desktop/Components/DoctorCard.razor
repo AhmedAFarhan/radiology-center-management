@@ -1,7 +1,9 @@
+@inject AppLocalizer T
+
 <MudCard Elevation="0" Class="dashboard-card h-100">
     <MudCardHeader>
         <CardHeaderContent>
-            <MudText Typo="Typo.subtitle1" Class="font-weight-medium">Top Referring Doctor</MudText>
+            <MudText Typo="Typo.subtitle1" Class="font-weight-medium">@T.Dashboard.TopDoctor</MudText>
         </CardHeaderContent>
     </MudCardHeader>
     <MudCardContent>
@@ -13,11 +15,11 @@
             <MudGrid Spacing="2" Class="w-100">
                 <MudItem xs="6">
                     <MudText Typo="Typo.h5" Align="Align.Center" Class="font-weight-medium">@Referrals</MudText>
-                    <MudText Typo="Typo.caption" Align="Align.Center" Class="text-secondary">Referrals</MudText>
+                    <MudText Typo="Typo.caption" Align="Align.Center" Class="text-secondary">@T.Dashboard.Referrals</MudText>
                 </MudItem>
                 <MudItem xs="6">
                     <MudText Typo="Typo.h5" Align="Align.Center" Class="font-weight-medium">4.9</MudText>
-                    <MudText Typo="Typo.caption" Align="Align.Center" Class="text-secondary">Rating</MudText>
+                    <MudText Typo="Typo.caption" Align="Align.Center" Class="text-secondary">@T.Dashboard.Rating</MudText>
                 </MudItem>
             </MudGrid>
         </MudStack>

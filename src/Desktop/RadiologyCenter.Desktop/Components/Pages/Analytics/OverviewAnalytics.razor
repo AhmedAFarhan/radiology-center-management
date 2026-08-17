@@ -3,8 +3,9 @@
 @inherits AnalyticsPageBase
 @using RadiologyCenter.Desktop.Components.Analytics
 @using RadiologyCenter.Desktop.Models
+@inject AppLocalizer T
 
-<PageHeader Icon="@Icons.Material.Filled.Insights" Title="Analytics" Subtitle="Business overview for the selected period" OnRefresh="() => ReloadAsync()" ShowSearch="false" />
+<PageHeader Icon="@Icons.Material.Filled.Insights" Title="@T.Overview.Title" Subtitle="@T.Overview.Subtitle" OnRefresh="() => ReloadAsync()" ShowSearch="false" />
 
 <PeriodSelector Class="mb-4" />
 
@@ -14,29 +15,29 @@
 }
 else if (Error)
 {
-    <ErrorState Title="Couldn't load analytics" Message="Unable to reach the server. Check your connection and try again." Action="ReloadAsync" RetryLabel="Try again" />
+    <ErrorState Title="@T.Overview.LoadErrorTitle" Message="@T.Overview.LoadErrorMsg" Action="ReloadAsync" RetryLabel="@T.Overview.Retry" />
 }
 else
 {
     <div class="profit-hero mb-4">
         <div class="profit-hero-body">
-            <div class="profit-hero-label">Net profit</div>
+            <div class="profit-hero-label">@T.Overview.NetProfit</div>
             <div class="profit-hero-value">@AnalyticsFormat.Money(_profit!.NetProfit)</div>
             <div class="profit-hero-sub">
-                Generated @AnalyticsFormat.Money(_profit.RevenueCollected) revenue this period
+                @(T.FormatValue(T.Overview.GeneratedRevenue, AnalyticsFormat.Money(_profit.RevenueCollected)))
             </div>
         </div>
         <div class="profit-hero-metrics">
             <div class="hero-metric">
-                <div class="hero-metric-label">Margin</div>
+                <div class="hero-metric-label">@T.Overview.Margin</div>
                 <div class="hero-metric-value">@AnalyticsFormat.Percent(_profit.NetMargin)</div>
             </div>
             <div class="hero-metric">
-                <div class="hero-metric-label">Billed</div>
+                <div class="hero-metric-label">@T.Overview.Billed</div>
                 <div class="hero-metric-value">@AnalyticsFormat.MoneyCompact(_profit.TotalBilled)</div>
             </div>
             <div class="hero-metric">
-                <div class="hero-metric-label">Total costs</div>
+                <div class="hero-metric-label">@T.Overview.TotalCosts</div>
                 <div class="hero-metric-value">@AnalyticsFormat.MoneyCompact(_profit.TotalCosts)</div>
             </div>
         </div>
@@ -44,37 +45,37 @@ else
 
     <MudGrid Spacing="3">
         <MudItem xs="12" sm="6" lg="3">
-            <StatCard Label="Revenue (collected)" Value="@AnalyticsFormat.Money(_financial!.TotalCollected)" Icon="@Icons.Material.Filled.Payments" Color="Color.Primary" TrendText="Net invoices & payments" TrendUp="true" />
+            <StatCard Label="@T.Overview.RevenueCollected" Value="@AnalyticsFormat.Money(_financial!.TotalCollected)" Icon="@Icons.Material.Filled.Payments" Color="Color.Primary" TrendText="@T.Overview.NetInvoicesPayments" TrendUp="true" />
         </MudItem>
         <MudItem xs="12" sm="6" lg="3">
-            <StatCard Label="Total billed" Value="@AnalyticsFormat.Money(_financial.TotalBilled)" Icon="@Icons.Material.Filled.ReceiptLong" Color="Color.Secondary" TrendText="@ExamCountLabel()" TrendUp="true" />
+            <StatCard Label="@T.Overview.TotalBilled" Value="@AnalyticsFormat.Money(_financial.TotalBilled)" Icon="@Icons.Material.Filled.ReceiptLong" Color="Color.Secondary" TrendText="@ExamCountLabel()" TrendUp="true" />
         </MudItem>
         <MudItem xs="12" sm="6" lg="3">
-            <StatCard Label="Outstanding (receivable)" Value="@AnalyticsFormat.Money(_financial.Receivables)" Icon="@Icons.Material.Filled.Wallet" Color="Color.Warning" TrendText="@($"Avg {AnalyticsFormat.Money(_financial.AvgPerExam)} / exam")" TrendUp="false" />
+            <StatCard Label="@T.Overview.OutstandingReceivable" Value="@AnalyticsFormat.Money(_financial.Receivables)" Icon="@Icons.Material.Filled.Wallet" Color="Color.Warning" TrendText="@(T.FormatValue(T.Overview.AvgPerExam, AnalyticsFormat.Money(_financial.AvgPerExam)))" TrendUp="false" />
         </MudItem>
         <MudItem xs="12" sm="6" lg="3">
-            <StatCard Label="Discounts given" Value="@AnalyticsFormat.Money(_financial.TotalDiscounts)" Icon="@Icons.Material.Filled.LocalOffer" Color="Color.Info" TrendText="Revenue stream" TrendUp="true" />
+            <StatCard Label="@T.Overview.DiscountsGiven" Value="@AnalyticsFormat.Money(_financial.TotalDiscounts)" Icon="@Icons.Material.Filled.LocalOffer" Color="Color.Info" TrendText="@T.Overview.RevenueStream" TrendUp="true" />
         </MudItem>
     </MudGrid>
 
     <MudGrid Spacing="3" Class="mt-1">
         <MudItem xs="12" lg="8">
-            <ChartCard Title="Revenue trend" Subtitle="Collected vs billed by month">
+            <ChartCard Title="@T.Overview.RevenueTrend" Subtitle="@T.Overview.CollectedVsBilledByMonth">
                 <RevenueTrendChart Items="@_financial!.RevenueByMonth" />
             </ChartCard>
         </MudItem>
         <MudItem xs="12" lg="4">
-            <ChartCard Title="Cost structure" Subtitle="Where the money goes">
+            <ChartCard Title="@T.Overview.CostStructure" Subtitle="@T.Overview.WhereTheMoneyGoes">
                 <DonutChart Items="@BuildCostBreakdown()" />
             </ChartCard>
         </MudItem>
         <MudItem xs="12" lg="5">
-            <ChartCard Title="Receivable aging" Subtitle="Outstanding balances">
+            <ChartCard Title="@T.Overview.ReceivableAging" Subtitle="@T.Overview.OutstandingBalances">
                 <DonutChart Items="@BuildReceivableSlices()" Height="260px" />
             </ChartCard>
         </MudItem>
         <MudItem xs="12" lg="7">
-            <ChartCard Title="Net income waterfall" Subtitle="From revenue to profit">
+            <ChartCard Title="@T.Overview.NetIncomeWaterfall" Subtitle="@T.Overview.FromRevenueToProfit">
                 <div class="waterfall">
                     @foreach (var row in BuildWaterfall())
                     {
@@ -105,21 +106,21 @@ else
         _financial = await Api.GetFinancialAsync(from, to);
     }
 
-    private string ExamCountLabel() => $"{AnalyticsFormat.Count(_financial!.ExamCount)} exams";
+    private string ExamCountLabel() => T.FormatValue(T.Overview.ExamCount, AnalyticsFormat.Count(_financial!.ExamCount));
 
     private IReadOnlyList<AnalyticsSlice> BuildCostBreakdown()
     {
         var list = new List<AnalyticsSlice>();
-        Add(list, "Staff case fees", _profit!.StaffCaseFees);
-        Add(list, "Referral fees", _profit.ReferralFees);
-        Add(list, "Labor (payroll)", _profit.LaborCosts);
-        Add(list, "Materials", _profit.MaterialCosts);
+        Add(list, T.Overview.StaffCaseFees, _profit!.StaffCaseFees);
+        Add(list, T.Overview.ReferralFees, _profit.ReferralFees);
+        Add(list, T.Overview.LaborPayroll, _profit.LaborCosts);
+        Add(list, T.Overview.Materials, _profit.MaterialCosts);
         return list.Count == 0
-            ? new List<AnalyticsSlice> { new AnalyticsSlice("No costs", 0) }
+            ? new List<AnalyticsSlice> { new AnalyticsSlice(T.Overview.NoCosts, 0) }
             : list;
     }
 
-    private static void Add(List<AnalyticsSlice> list, string label, decimal value)
+    private void Add(List<AnalyticsSlice> list, string label, decimal value)
     {
         if (value > 0)
             list.Add(new AnalyticsSlice(label, value));
@@ -137,16 +138,16 @@ else
 
         return new List<WaterfallRow>
         {
-            Build("Revenue", _profit.RevenueCollected, percent(_profit.RevenueCollected), "#4C58E0"),
-            Build("Staff fees", -_profit.StaffCaseFees, percent(_profit.StaffCaseFees), "#FF8A65"),
-            Build("Referral fees", -_profit.ReferralFees, percent(_profit.ReferralFees), "#FF8A65"),
-            Build("Labor", -_profit.LaborCosts, percent(_profit.LaborCosts), "#FF8A65"),
-            Build("Materials", -_profit.MaterialCosts, percent(_profit.MaterialCosts), "#FF8A65"),
-            Build("Net profit", _profit.NetProfit, percent(_profit.NetProfit), "#66BB6A"),
+            Build(T.Overview.Revenue, _profit.RevenueCollected, percent(_profit.RevenueCollected), "#4C58E0"),
+            Build(T.Overview.StaffFees, -_profit.StaffCaseFees, percent(_profit.StaffCaseFees), "#FF8A65"),
+            Build(T.Overview.ReferralFees, -_profit.ReferralFees, percent(_profit.ReferralFees), "#FF8A65"),
+            Build(T.Overview.Labor, -_profit.LaborCosts, percent(_profit.LaborCosts), "#FF8A65"),
+            Build(T.Overview.Materials, -_profit.MaterialCosts, percent(_profit.MaterialCosts), "#FF8A65"),
+            Build(T.Overview.NetProfit, _profit.NetProfit, percent(_profit.NetProfit), "#66BB6A"),
         };
     }
 
-    private static WaterfallRow Build(string label, decimal value, int percent, string color)
+    private WaterfallRow Build(string label, decimal value, int percent, string color)
         => new WaterfallRow(label, value, Math.Clamp(percent, 0, 100), color);
 
     private sealed record WaterfallRow(string Label, decimal Value, int Percent, string Color);

@@ -3,8 +3,9 @@
 @inherits AnalyticsPageBase
 @using RadiologyCenter.Desktop.Components.Analytics
 @using RadiologyCenter.Desktop.Models
+@inject AppLocalizer T
 
-<PageHeader Icon="@Icons.Material.Filled.Groups" Title="Staff &amp; Machines" Subtitle="Performance and machine utilization" OnRefresh="() => ReloadAsync()" ShowSearch="false" />
+<PageHeader Icon="@Icons.Material.Filled.Groups" Title="@T.StaffMachine.Title" Subtitle="@T.StaffMachine.Subtitle" OnRefresh="() => ReloadAsync()" ShowSearch="false" />
 
 <PeriodSelector Class="mb-4" />
 
@@ -14,43 +15,43 @@
 }
 else if (Error)
 {
-    <ErrorState Title="Couldn't load staffing" Message="Unable to reach the server. Check your connection and try again." Action="ReloadAsync" RetryLabel="Try again" />
+    <ErrorState Title="@T.StaffMachine.LoadErrorTitle" Message="@T.StaffMachine.LoadErrorMsg" Action="ReloadAsync" RetryLabel="@T.StaffMachine.Retry" />
 }
 else
 {
     <MudGrid Spacing="3">
         <MudItem xs="12" sm="6" lg="3">
-            <StatCard Label="Radiologists" Value="@AnalyticsFormat.Count(_data!.Radiologists.Count)" Icon="@Icons.Material.Filled.Biotech" Color="Color.Primary" TrendText="Performed exams" TrendUp="true" />
+            <StatCard Label="@T.StaffMachine.Radiologists" Value="@AnalyticsFormat.Count(_data!.Radiologists.Count)" Icon="@Icons.Material.Filled.Biotech" Color="Color.Primary" TrendText="@T.StaffMachine.PerformedExams" TrendUp="true" />
         </MudItem>
         <MudItem xs="12" sm="6" lg="3">
-            <StatCard Label="Technicians" Value="@AnalyticsFormat.Count(_data.Technicians.Count)" Icon="@Icons.Material.Filled.Handyman" Color="Color.Secondary" TrendText="Active in period" TrendUp="true" />
+            <StatCard Label="@T.StaffMachine.Technicians" Value="@AnalyticsFormat.Count(_data.Technicians.Count)" Icon="@Icons.Material.Filled.Handyman" Color="Color.Secondary" TrendText="@T.StaffMachine.ActiveInPeriod" TrendUp="true" />
         </MudItem>
         <MudItem xs="12" sm="6" lg="3">
-            <StatCard Label="Referral doctors" Value="@AnalyticsFormat.Count(_data.ReferralDoctors.Count)" Icon="@Icons.Material.Filled.LocalHospital" Color="Color.Warning" TrendText="Referred cases" TrendUp="true" />
+            <StatCard Label="@T.StaffMachine.ReferralDoctors" Value="@AnalyticsFormat.Count(_data.ReferralDoctors.Count)" Icon="@Icons.Material.Filled.LocalHospital" Color="Color.Warning" TrendText="@T.StaffMachine.ReferredCases" TrendUp="true" />
         </MudItem>
         <MudItem xs="12" sm="6" lg="3">
-            <StatCard Label="Modalities" Value="@AnalyticsFormat.Count(_data.ModalityUtilization.Count)" Icon="@Icons.Material.Filled.PrecisionManufacturing" Color="Color.Info" TrendText="With case activity" TrendUp="true" />
+            <StatCard Label="@T.StaffMachine.Modalities" Value="@AnalyticsFormat.Count(_data.ModalityUtilization.Count)" Icon="@Icons.Material.Filled.PrecisionManufacturing" Color="Color.Info" TrendText="@T.StaffMachine.WithCaseActivity" TrendUp="true" />
         </MudItem>
     </MudGrid>
 
     <MudGrid Spacing="3" Class="mt-1">
         <MudItem xs="12" lg="6">
-            <ChartCard Title="Top radiologists" Subtitle="Completed exams by case load">
-                <ListBarChart Items="@BuildRadiologistSlices()" SeriesName="Exams" />
+            <ChartCard Title="@T.StaffMachine.TopRadiologists" Subtitle="@T.StaffMachine.CompletedExamsByCaseLoad">
+                <ListBarChart Items="@BuildRadiologistSlices()" SeriesName="@T.StaffMachine.Exams" />
             </ChartCard>
         </MudItem>
         <MudItem xs="12" lg="6">
-            <ChartCard Title="Top technicians" Subtitle="Completed exams supported">
-                <ListBarChart Items="@BuildTechnicianSlices()" SeriesName="Exams" />
+            <ChartCard Title="@T.StaffMachine.TopTechnicians" Subtitle="@T.StaffMachine.CompletedExamsSupported">
+                <ListBarChart Items="@BuildTechnicianSlices()" SeriesName="@T.StaffMachine.Exams" />
             </ChartCard>
         </MudItem>
         <MudItem xs="12" lg="5">
-            <ChartCard Title="Referral performance" Subtitle="Cases referred to your center">
-                <ListBarChart Items="@BuildReferralSlices()" SeriesName="Referrals" />
+            <ChartCard Title="@T.StaffMachine.ReferralPerformance" Subtitle="@T.StaffMachine.CasesReferredToYourCenter">
+                <ListBarChart Items="@BuildReferralSlices()" SeriesName="@T.StaffMachine.Referrals" />
             </ChartCard>
         </MudItem>
         <MudItem xs="12" lg="7">
-            <ChartCard Title="Machine utilization" Subtitle="Exams per machine by modality">
+            <ChartCard Title="@T.StaffMachine.MachineUtilization" Subtitle="@T.StaffMachine.ExamsPerMachineByModality">
                 <UtilizationChart Items="@_data!.ModalityUtilization" />
             </ChartCard>
         </MudItem>

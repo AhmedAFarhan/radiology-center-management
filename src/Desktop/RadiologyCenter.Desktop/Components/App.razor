@@ -1,4 +1,6 @@
 @inject BackendStatusService Backend
+@inject AppLocalizer T
+@inject IJSRuntime JS
 
 <MudThemeProvider Theme="@AppTheme.Default" />
 <MudPopoverProvider />
@@ -32,17 +34,36 @@ else
 
 @code {
     private Action? _onBackendChanged;
+    private Action? _onLanguageChanged;
 
     protected override void OnInitialized()
     {
         _onBackendChanged = () => InvokeAsync(StateHasChanged);
+        _onLanguageChanged = () => InvokeAsync(async () =>
+        {
+            await SyncHtmlAsync();
+            StateHasChanged();
+        });
         Backend.StateChanged += _onBackendChanged;
+        T.LanguageChanged += _onLanguageChanged;
         base.OnInitialized();
     }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        await base.OnAfterRenderAsync(firstRender);
+        if (firstRender)
+            await SyncHtmlAsync();
+    }
+
+    private Task SyncHtmlAsync()
+        => JS.InvokeVoidAsync("setAppLanguage", T.CurrentCulture, T.IsRTL ? "rtl" : "ltr").AsTask();
 
     public void Dispose()
     {
         if (_onBackendChanged is not null)
             Backend.StateChanged -= _onBackendChanged;
+        if (_onLanguageChanged is not null)
+            T.LanguageChanged -= _onLanguageChanged;
     }
 }

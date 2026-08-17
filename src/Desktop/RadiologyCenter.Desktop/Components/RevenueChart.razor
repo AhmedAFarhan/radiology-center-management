@@ -1,10 +1,11 @@
 @using ApexCharts
+@inject AppLocalizer T
 
 <MudCard Elevation="0" Class="dashboard-card h-100">
     <MudCardHeader>
         <CardHeaderContent>
-            <MudText Typo="Typo.subtitle1" Class="font-weight-medium">Revenue Overview</MudText>
-            <MudText Typo="Typo.caption" Class="text-secondary">Monthly revenue</MudText>
+            <MudText Typo="Typo.subtitle1" Class="font-weight-medium">@T.Dashboard.RevenueOverview</MudText>
+            <MudText Typo="Typo.caption" Class="text-secondary">@T.Dashboard.MonthlyRevenue</MudText>
         </CardHeaderContent>
         <CardHeaderActions>
             <MudChip T="string" Size="MudBlazor.Size.Small" Color="MudBlazor.Color.Success" Variant="Variant.Filled">+12.4%</MudChip>
@@ -14,7 +15,7 @@
         <ApexChart TItem="RevenuePoint" Height="300" Options="@_options">
             <ApexPointSeries TItem="RevenuePoint"
                              Items="Data"
-                             Name="Revenue"
+                             Name="@T.Dashboard.Revenue"
                              SeriesType="SeriesType.Area"
                              XValue="@(r => r.Month)"
                              YValue="@(r => r.Amount)" />

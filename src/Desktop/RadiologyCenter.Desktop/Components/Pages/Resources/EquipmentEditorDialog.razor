@@ -1,15 +1,16 @@
 @inject ResourceService ResourceService
 @inject ISnackbar Snackbar
+@inject AppLocalizer T
 
 <MudDialog>
     <DialogContent>
-        <DialogHeader Icon="@Icons.Material.Filled.Biotech" Title="@(Equipment is null ? "New Equipment" : $"Edit {Equipment.Name}")" />
+        <DialogHeader Icon="@Icons.Material.Filled.Biotech" Title="@(Equipment is null ? T.Equipment.NewEquipment : T.FormatValue(T.Equipment.Edit, Equipment.Name))" />
         <EditForm EditContext="_editContext">
             <DataAnnotationsValidator />
             <MudGrid Spacing="2">
                 <MudItem xs="12">
                     <MudTextField @bind-Value="_model.Name"
-                                  Label="Name"
+                                  Label="@T.Common.Name"
                                   Variant="Variant.Outlined"
                                   Margin="Margin.Dense"
                                   Immediate="true"
@@ -18,7 +19,7 @@
                 <MudItem xs="12" sm="6">
                     <MudSelect T="string"
                                @bind-Value="_model.Modality"
-                               Label="Modality"
+                               Label="@T.Equipment.Modality"
                                Variant="Variant.Outlined"
                                Margin="Margin.Dense"
                                For="@(() => _model.Modality)">
@@ -30,14 +31,14 @@
                 </MudItem>
                 <MudItem xs="12" sm="6">
                     <MudTextField @bind-Value="_model.SerialNumber"
-                                  Label="Serial Number"
+                                  Label="@T.Equipment.SerialNumber"
                                   Variant="Variant.Outlined"
                                   Margin="Margin.Dense"
                                   Immediate="true" />
                 </MudItem>
                 <MudItem xs="12" sm="6">
                     <MudDatePicker @bind-Date="_model.PurchaseDate"
-                                   Label="Purchase Date"
+                                   Label="@T.Equipment.PurchaseDate"
                                    Variant="Variant.Outlined"
                                    Margin="Margin.Dense"
                                    Class="w-100" />
@@ -46,7 +47,7 @@
         </EditForm>
     </DialogContent>
     <DialogActions>
-        <MudButton Color="Color.Default" OnClick="CancelAsync" Disabled="_busy">Cancel</MudButton>
+        <MudButton Color="Color.Default" OnClick="CancelAsync" Disabled="_busy">@T.Common.Cancel</MudButton>
         <MudButton Color="Color.Primary" Variant="Variant.Filled" OnClick="SubmitAsync" Disabled="_busy">
             @if (_busy)
             {
@@ -54,7 +55,7 @@
             }
             else
             {
-                <text>@(IsEdit ? "Save Changes" : "Create Equipment")</text>
+                <text>@(IsEdit ? T.EquipmentDialog.SaveChanges : T.EquipmentDialog.CreateEquipment)</text>
             }
         </MudButton>
     </DialogActions>
@@ -117,7 +118,7 @@
             else
                 await ResourceService.CreateEquipmentAsync(input);
 
-            Snackbar.Add(IsEdit ? "Equipment updated." : "Equipment created.", Severity.Success);
+            Snackbar.Add(IsEdit ? T.EquipmentDialog.Updated : T.EquipmentDialog.Created, Severity.Success);
             MudDialog.Close(DialogResult.Ok(true));
         }
         catch (ApiException ex)
@@ -126,7 +127,7 @@
         }
         catch (Exception)
         {
-            Snackbar.Add("Unable to reach the server. Please try again.", Severity.Error);
+            Snackbar.Add(T.EquipmentDialog.Unreachable, Severity.Error);
         }
         finally
         {

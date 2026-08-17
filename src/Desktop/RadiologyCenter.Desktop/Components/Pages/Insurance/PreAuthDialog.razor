@@ -2,17 +2,18 @@
 @inject ExaminationService ExaminationService
 @inject PatientService PatientService
 @inject ISnackbar Snackbar
+@inject AppLocalizer T
 
 <MudDialog>
     <DialogContent>
-        <DialogHeader Icon="@Icons.Material.Filled.Approval" Title="Request Pre-Authorization" />
+        <DialogHeader Icon="@Icons.Material.Filled.Approval" Title="@T.PreAuthDialog.Title" />
         <EditForm EditContext="_editContext">
             <DataAnnotationsValidator />
             <MudGrid Spacing="2">
                 <MudItem xs="12" sm="6">
                     <MudAutocomplete T="PatientDto"
                                      @bind-Value="_selectedPatient"
-                                     Label="Patient (search by name or phone)"
+                                     Label="@T.PreAuthDialog.PatientSearchLabel"
                                      Variant="Variant.Outlined"
                                      Margin="Margin.Dense"
                                      MinCharacters="1"
@@ -24,7 +25,7 @@
                 <MudItem xs="12" sm="6">
                     <MudAutocomplete T="InsurancePolicyDto"
                                      @bind-Value="_selectedPolicy"
-                                     Label="Insurance Policy (search by policy #)"
+                                     Label="@T.PreAuthDialog.PolicySearchLabel"
                                      Variant="Variant.Outlined"
                                      Margin="Margin.Dense"
                                      MinCharacters="1"
@@ -36,7 +37,7 @@
                 <MudItem xs="12" sm="6">
                     <MudAutocomplete T="ExaminationDto"
                                      @bind-Value="_selectedExamination"
-                                     Label="Examination (search by type name)"
+                                     Label="@T.PreAuthDialog.ExaminationSearchLabel"
                                      Variant="Variant.Outlined"
                                      Margin="Margin.Dense"
                                      MinCharacters="1"
@@ -48,7 +49,7 @@
                 <MudItem xs="12" sm="6">
                     <MudNumericField T="decimal"
                                      @bind-Value="_model.EstimatedAmount"
-                                     Label="Estimated Amount"
+                                     Label="@T.PreAuthDialog.EstimatedAmount"
                                      Variant="Variant.Outlined"
                                      Margin="Margin.Dense"
                                      Min="0"
@@ -58,7 +59,7 @@
         </EditForm>
     </DialogContent>
     <DialogActions>
-        <MudButton Color="Color.Default" OnClick="CancelAsync" Disabled="_busy">Cancel</MudButton>
+        <MudButton Color="Color.Default" OnClick="CancelAsync" Disabled="_busy">@T.Common.Cancel</MudButton>
         <MudButton Color="Color.Primary" Variant="Variant.Filled" OnClick="SubmitAsync" Disabled="_busy">
             @if (_busy)
             {
@@ -66,7 +67,7 @@
             }
             else
             {
-                <text>Request Authorization</text>
+                <text>@T.PreAuthDialog.RequestAuthorization</text>
             }
         </MudButton>
     </DialogActions>
@@ -102,7 +103,7 @@
         }
         catch (Exception)
         {
-            Snackbar.Add("Unable to search patients.", Severity.Error);
+            Snackbar.Add(T.PreAuthDialog.UnableSearchPatients, Severity.Error);
             return Array.Empty<PatientDto>();
         }
     }
@@ -111,7 +112,7 @@
     {
         if (_selectedPatient is null)
         {
-            Snackbar.Add("Select a patient first.", Severity.Info);
+            Snackbar.Add(T.PreAuthDialog.SelectPatientFirst, Severity.Info);
             return Array.Empty<InsurancePolicyDto>();
         }
 
@@ -130,7 +131,7 @@
         }
         catch (Exception)
         {
-            Snackbar.Add("Unable to search policies.", Severity.Error);
+            Snackbar.Add(T.PreAuthDialog.UnableSearchPolicies, Severity.Error);
             return Array.Empty<InsurancePolicyDto>();
         }
     }
@@ -139,7 +140,7 @@
     {
         if (_selectedPatient is null)
         {
-            Snackbar.Add("Select a patient first.", Severity.Info);
+            Snackbar.Add(T.PreAuthDialog.SelectPatientFirst, Severity.Info);
             return Array.Empty<ExaminationDto>();
         }
 
@@ -155,7 +156,7 @@
         }
         catch (Exception)
         {
-            Snackbar.Add("Unable to search examinations.", Severity.Error);
+            Snackbar.Add(T.PreAuthDialog.UnableSearchExaminations, Severity.Error);
             return Array.Empty<ExaminationDto>();
         }
     }
@@ -164,7 +165,7 @@
     {
         if (_selectedPatient is null || _selectedPolicy is null || _selectedExamination is null)
         {
-            Snackbar.Add("Patient, policy and examination are required.", Severity.Error);
+            Snackbar.Add(T.PreAuthDialog.AllRequired, Severity.Error);
             return;
         }
 
@@ -183,7 +184,7 @@
             };
 
             await InsuranceService.CreatePreAuthorizationAsync(input);
-            Snackbar.Add("Pre-authorization requested.", Severity.Success);
+            Snackbar.Add(T.PreAuthDialog.Requested, Severity.Success);
             MudDialog.Close(DialogResult.Ok(true));
         }
         catch (ApiException ex)
@@ -192,7 +193,7 @@
         }
         catch (Exception)
         {
-            Snackbar.Add("Unable to reach the server. Please try again.", Severity.Error);
+            Snackbar.Add(T.PreAuthDialog.UnreachableRetry, Severity.Error);
         }
         finally
         {

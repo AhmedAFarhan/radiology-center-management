@@ -3,55 +3,56 @@
 @inject ResourceService ResourceService
 @inject IDialogService DialogService
 @inject ISnackbar Snackbar
+@inject AppLocalizer T
 @implements IDisposable
 
-<PageHeader Icon="@Icons.Material.Filled.CalendarMonth" Title="Work Shifts"
-            Subtitle="Schedule staff shifts and equipment"
+<PageHeader Icon="@Icons.Material.Filled.CalendarMonth" Title="@T.WorkShift.Title"
+            Subtitle="@T.WorkShift.Subtitle"
             SearchValueChanged="OnSearchChanged"
-            SearchPlaceholder="Search shifts..."
+            SearchPlaceholder="@T.WorkShift.SearchPlaceholder"
             OnRefresh="ReloadAsync">
-    <MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Add" OnClick="OpenCreateDialogAsync">Add Work Shift</MudButton>
+    <MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Add" OnClick="OpenCreateDialogAsync">@T.WorkShift.Add</MudButton>
 </PageHeader>
 
 <MudTable T="WorkShiftDto" @ref="_table" ServerData="LoadServerData" Dense="true" Hover="true" Striped="true" Elevation="1" RowsPerPage="10">
     <HeaderContent>
-        <MudTh><MudTableSortLabel T="WorkShiftDto" SortLabel="@("Date")">Date</MudTableSortLabel></MudTh>
-        <MudTh>Staff</MudTh>
-        <MudTh><MudTableSortLabel T="WorkShiftDto" SortLabel="@("StartTime")">Start</MudTableSortLabel></MudTh>
-        <MudTh><MudTableSortLabel T="WorkShiftDto" SortLabel="@("EndTime")">End</MudTableSortLabel></MudTh>
-        <MudTh>Equipment</MudTh>
-        <MudTh>Notes</MudTh>
-        <MudTh>Actions</MudTh>
+        <MudTh><MudTableSortLabel T="WorkShiftDto" SortLabel="@("Date")">@T.Common.Date</MudTableSortLabel></MudTh>
+        <MudTh>@T.WorkShift.Staff</MudTh>
+        <MudTh><MudTableSortLabel T="WorkShiftDto" SortLabel="@("StartTime")">@T.WorkShift.Start</MudTableSortLabel></MudTh>
+        <MudTh><MudTableSortLabel T="WorkShiftDto" SortLabel="@("EndTime")">@T.WorkShift.End</MudTableSortLabel></MudTh>
+        <MudTh>@T.WorkShift.Equipment</MudTh>
+        <MudTh>@T.WorkShift.Notes</MudTh>
+        <MudTh>@T.Common.Actions</MudTh>
     </HeaderContent>
     <RowTemplate>
-        <MudTd DataLabel="Date">
+        <MudTd DataLabel="@T.Common.Date">
             <MudText Class="font-weight-medium">@context.Date.ToString("yyyy-MM-dd")</MudText>
             <MudText Typo="Typo.caption" Class="text-secondary">@context.Date.ToString("dddd")</MudText>
         </MudTd>
-        <MudTd DataLabel="Staff">@(ResolveStaff(context.StaffId))</MudTd>
-        <MudTd DataLabel="Start">@context.StartTime.ToString(@"hh\:mm")</MudTd>
-        <MudTd DataLabel="End">@context.EndTime.ToString(@"hh\:mm")</MudTd>
-        <MudTd DataLabel="Equipment">@(string.IsNullOrWhiteSpace(context.EquipmentId) ? "-" : ResolveEquipment(context.EquipmentId))</MudTd>
-        <MudTd DataLabel="Notes">@(string.IsNullOrWhiteSpace(context.Notes) ? "-" : context.Notes)</MudTd>
-        <MudTd DataLabel="Actions">
-            <MudIconButton Icon="@Icons.Material.Filled.Edit" Size="Size.Small" Color="Color.Default" aria-label="Edit" OnClick="@(() => OpenEditDialogAsync(context))" />
-            <MudIconButton Icon="@Icons.Material.Filled.Delete" Size="Size.Small" Color="Color.Error" aria-label="Delete" OnClick="@(() => DeleteShiftAsync(context))" />
+        <MudTd DataLabel="@T.WorkShift.Staff">@(ResolveStaff(context.StaffId))</MudTd>
+        <MudTd DataLabel="@T.WorkShift.Start">@context.StartTime.ToString(@"hh\:mm")</MudTd>
+        <MudTd DataLabel="@T.WorkShift.End">@context.EndTime.ToString(@"hh\:mm")</MudTd>
+        <MudTd DataLabel="@T.WorkShift.Equipment">@(string.IsNullOrWhiteSpace(context.EquipmentId) ? "-" : ResolveEquipment(context.EquipmentId))</MudTd>
+        <MudTd DataLabel="@T.WorkShift.Notes">@(string.IsNullOrWhiteSpace(context.Notes) ? "-" : context.Notes)</MudTd>
+        <MudTd DataLabel="@T.Common.Actions">
+            <MudIconButton Icon="@Icons.Material.Filled.Edit" Size="Size.Small" Color="Color.Default" aria-label="@T.Common.Edit" OnClick="@(() => OpenEditDialogAsync(context))" />
+            <MudIconButton Icon="@Icons.Material.Filled.Delete" Size="Size.Small" Color="Color.Error" aria-label="@T.Common.Delete" OnClick="@(() => DeleteShiftAsync(context))" />
         </MudTd>
     </RowTemplate>
     <NoRecordsContent>
         @if (_loadError is not null)
         {
             <ErrorState Icon="@(_offline ? Icons.Material.Filled.CloudOff : Icons.Material.Filled.ErrorOutline)"
-                        Title="Couldn't load data"
+                        Title="@T.WorkShift.LoadErrorTitle"
                         Message="@_loadError"
                         Action="ReloadAsync" />
         }
         else
         {
         <EmptyState Icon="@Icons.Material.Filled.CalendarMonth"
-                    Title="No work shifts yet"
-                    Message="Schedule shifts to track staff and equipment availability."
-                    ActionLabel="Add your first shift"
+                    Title="@T.WorkShift.EmptyTitle"
+                    Message="@T.WorkShift.EmptyMessage"
+                    ActionLabel="@T.WorkShift.EmptyActionLabel"
                     Action="OpenCreateDialogAsync" />
         }
     </NoRecordsContent>
@@ -100,8 +101,8 @@
         }
         catch (Exception)
         {
-            Snackbar.Add("Unable to reach the server.", Severity.Error);
-            _loadError = "Unable to reach the server.";
+            Snackbar.Add(T.WorkShift.Unreachable, Severity.Error);
+            _loadError = T.WorkShift.Unreachable;
             _offline = true;
             return new TableData<WorkShiftDto> { Items = Array.Empty<WorkShiftDto>(), TotalItems = 0 };
         }
@@ -138,7 +139,7 @@
     private async Task OpenCreateDialogAsync()
     {
         var options = new DialogOptions { MaxWidth = MaxWidth.Medium, FullWidth = true, NoHeader = true };
-        var dialog = await DialogService.ShowAsync<WorkShiftEditorDialog>("New Work Shift", options);
+        var dialog = await DialogService.ShowAsync<WorkShiftEditorDialog>(T.WorkShift.NewWorkShift, options);
         await ReloadIfSavedAsync(dialog);
     }
 
@@ -146,7 +147,7 @@
     {
         var parameters = new DialogParameters { ["Shift"] = shift };
         var options = new DialogOptions { MaxWidth = MaxWidth.Medium, FullWidth = true, NoHeader = true };
-        var dialog = await DialogService.ShowAsync<WorkShiftEditorDialog>($"Edit Work Shift", parameters, options);
+        var dialog = await DialogService.ShowAsync<WorkShiftEditorDialog>(T.WorkShift.EditWorkShift, parameters, options);
         await ReloadIfSavedAsync(dialog);
     }
 
@@ -160,10 +161,10 @@
     private async Task DeleteShiftAsync(WorkShiftDto shift)
     {
         var confirmed = await DialogService.ShowMessageBoxAsync(
-            "Delete Work Shift",
-            $"Are you sure you want to delete the shift on {shift.Date.ToString("yyyy-MM-dd")}? This cannot be undone.",
-            "Delete",
-            "Cancel");
+            T.WorkShift.DeleteTitle,
+            T.FormatValue(T.WorkShift.DeleteConfirm, shift.Date.ToString("yyyy-MM-dd")),
+            T.Common.Delete,
+            T.Common.Cancel);
 
         if (confirmed != true)
             return;
@@ -171,7 +172,7 @@
         try
         {
             await ResourceService.DeleteWorkShiftAsync(shift.Id);
-            Snackbar.Add("Work shift deleted.", Severity.Success);
+            Snackbar.Add(T.WorkShift.Deleted, Severity.Success);
             await ReloadAsync();
         }
         catch (ApiException ex)
@@ -180,7 +181,7 @@
         }
         catch (Exception)
         {
-            Snackbar.Add("Unable to reach the server.", Severity.Error);
+            Snackbar.Add(T.WorkShift.Unreachable, Severity.Error);
         }
     }
 

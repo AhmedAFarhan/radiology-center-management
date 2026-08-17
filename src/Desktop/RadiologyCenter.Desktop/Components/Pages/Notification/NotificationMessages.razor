@@ -3,73 +3,74 @@
 @inject NotificationService NotificationService
 @inject IDialogService DialogService
 @inject ISnackbar Snackbar
+@inject AppLocalizer T
 @implements IDisposable
 
-<PageHeader Icon="@Icons.Material.Filled.Notifications" Title="Notification Messages"
-            Subtitle="View the message delivery ledger"
+<PageHeader Icon="@Icons.Material.Filled.Notifications" Title="@T.Notifications.MessagesTitle"
+            Subtitle="@T.Notifications.MessagesSubtitle"
             SearchValueChanged="OnSearchChanged"
-            SearchPlaceholder="Search recipient, reference..."
+            SearchPlaceholder="@T.Notifications.MessagesSearchPlaceholder"
             OnRefresh="ReloadAsync">
-    <MudSelect T="string" Value="_channel" ValueChanged="OnChannelChangedAsync" Label="Channel"
+    <MudSelect T="string" Value="_channel" ValueChanged="OnChannelChangedAsync" Label="@T.Notifications.Channel"
                Variant="Variant.Outlined" Margin="Margin.Dense" Dense="true" Class="status-filter ms-2">
-        <MudSelectItem Value="@(string.Empty)">All</MudSelectItem>
+        <MudSelectItem Value="@(string.Empty)">@T.Common.All</MudSelectItem>
         <MudSelectItem Value="@("Sms")">SMS</MudSelectItem>
         <MudSelectItem Value="@("Email")">Email</MudSelectItem>
         <MudSelectItem Value="@("Push")">Push</MudSelectItem>
     </MudSelect>
-    <MudSelect T="string" Value="_status" ValueChanged="OnStatusChangedAsync" Label="Status"
+    <MudSelect T="string" Value="_status" ValueChanged="OnStatusChangedAsync" Label="@T.Common.Status"
                Variant="Variant.Outlined" Margin="Margin.Dense" Dense="true" Class="status-filter ms-2">
-        <MudSelectItem Value="@(string.Empty)">All</MudSelectItem>
+        <MudSelectItem Value="@(string.Empty)">@T.Common.All</MudSelectItem>
         <MudSelectItem Value="@("Pending")">Pending</MudSelectItem>
         <MudSelectItem Value="@("Sent")">Sent</MudSelectItem>
         <MudSelectItem Value="@("Failed")">Failed</MudSelectItem>
     </MudSelect>
-    <MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Send" OnClick="OpenSendDialogAsync">Send Notification</MudButton>
+    <MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Send" OnClick="OpenSendDialogAsync">@T.SendDialog.Title</MudButton>
 </PageHeader>
 
 <MudTable T="NotificationMessageDto" @ref="_table" ServerData="LoadServerData" Dense="true" Hover="true" Striped="true" Elevation="1" RowsPerPage="10">
     <HeaderContent>
-        <MudTh><MudTableSortLabel T="NotificationMessageDto" SortLabel="@("CreatedAt")">Sent At</MudTableSortLabel></MudTh>
-        <MudTh>Channel</MudTh>
-        <MudTh>Recipient</MudTh>
-        <MudTh>Subject</MudTh>
-        <MudTh>Status</MudTh>
-        <MudTh><MudTableSortLabel T="NotificationMessageDto" SortLabel="@("Attempts")">Attempts</MudTableSortLabel></MudTh>
-        <MudTh>Reference</MudTh>
-        <MudTh>Actions</MudTh>
+        <MudTh><MudTableSortLabel T="NotificationMessageDto" SortLabel="@("CreatedAt")">@T.Notifications.SentAt</MudTableSortLabel></MudTh>
+        <MudTh>@T.Notifications.Channel</MudTh>
+        <MudTh>@T.Notifications.Recipient</MudTh>
+        <MudTh>@T.Notifications.Subject</MudTh>
+        <MudTh>@T.Common.Status</MudTh>
+        <MudTh><MudTableSortLabel T="NotificationMessageDto" SortLabel="@("Attempts")">@T.Notifications.Attempts</MudTableSortLabel></MudTh>
+        <MudTh>@T.Notifications.Reference</MudTh>
+        <MudTh>@T.Common.Actions</MudTh>
     </HeaderContent>
     <RowTemplate>
-        <MudTd DataLabel="Sent At">@context.CreatedAt.ToLocalTime().ToString("g")</MudTd>
-        <MudTd DataLabel="Channel">
+        <MudTd DataLabel="@T.Notifications.SentAt">@context.CreatedAt.ToLocalTime().ToString("g")</MudTd>
+        <MudTd DataLabel="@T.Notifications.Channel">
             <MudChip T="string" Size="Size.Small" Color="@ChannelColor(context.Channel)" Variant="Variant.Outlined">@context.Channel</MudChip>
         </MudTd>
-        <MudTd DataLabel="Recipient">
+        <MudTd DataLabel="@T.Notifications.Recipient">
             <MudText Class="font-weight-medium">@context.Recipient</MudText>
         </MudTd>
-        <MudTd DataLabel="Subject">@(string.IsNullOrWhiteSpace(context.Subject) ? "-" : Truncate(context.Subject))</MudTd>
-        <MudTd DataLabel="Status">
+        <MudTd DataLabel="@T.Notifications.Subject">@(string.IsNullOrWhiteSpace(context.Subject) ? "-" : Truncate(context.Subject))</MudTd>
+        <MudTd DataLabel="@T.Common.Status">
             <MudChip T="string" Size="Size.Small" Color="@StatusColor(context.Status)">@context.Status</MudChip>
         </MudTd>
-        <MudTd DataLabel="Attempts" Class="text-center">@context.Attempts</MudTd>
-        <MudTd DataLabel="Reference">@(string.IsNullOrWhiteSpace(context.ReferenceId) ? "-" : context.ReferenceId)</MudTd>
-        <MudTd DataLabel="Actions" Class="text-center">
-            <MudIconButton Icon="@Icons.Material.Filled.Visibility" Size="Size.Small" Color="Color.Default" aria-label="View" OnClick="@(() => OpenDetailAsync(context))" />
+        <MudTd DataLabel="@T.Notifications.Attempts" Class="text-center">@context.Attempts</MudTd>
+        <MudTd DataLabel="@T.Notifications.Reference">@(string.IsNullOrWhiteSpace(context.ReferenceId) ? "-" : context.ReferenceId)</MudTd>
+        <MudTd DataLabel="@T.Common.Actions" Class="text-center">
+            <MudIconButton Icon="@Icons.Material.Filled.Visibility" Size="Size.Small" Color="Color.Default" aria-label="@T.Notifications.View" OnClick="@(() => OpenDetailAsync(context))" />
         </MudTd>
     </RowTemplate>
     <NoRecordsContent>
         @if (_loadError is not null)
         {
             <ErrorState Icon="@(_offline ? Icons.Material.Filled.CloudOff : Icons.Material.Filled.ErrorOutline)"
-                        Title="Couldn't load data"
+                        Title="@T.Notifications.LoadErrorTitle"
                         Message="@_loadError"
                         Action="ReloadAsync" />
         }
         else
         {
             <EmptyState Icon="@Icons.Material.Filled.Notifications"
-                        Title="No notification messages yet"
-                        Message="Messages sent via the send endpoint appear here with their delivery status."
-                        ActionLabel="Send your first notification"
+                        Title="@T.Notifications.MessagesEmptyTitle"
+                        Message="@T.Notifications.MessagesEmptyMessage"
+                        ActionLabel="@T.Notifications.MessagesEmptyActionLabel"
                         Action="OpenSendDialogAsync" />
         }
     </NoRecordsContent>
@@ -114,8 +115,8 @@
         }
         catch (Exception)
         {
-            Snackbar.Add("Unable to reach the server.", Severity.Error);
-            _loadError = "Unable to reach the server.";
+            Snackbar.Add(T.Notifications.Unreachable, Severity.Error);
+            _loadError = T.Notifications.Unreachable;
             _offline = true;
             return new TableData<NotificationMessageDto> { Items = Array.Empty<NotificationMessageDto>(), TotalItems = 0 };
         }
@@ -158,7 +159,7 @@
     private async Task OpenSendDialogAsync()
     {
         var options = new DialogOptions { MaxWidth = MaxWidth.Medium, FullWidth = true, NoHeader = true };
-        var dialog = await DialogService.ShowAsync<SendNotificationDialog>("Send Notification", options);
+        var dialog = await DialogService.ShowAsync<SendNotificationDialog>(T.SendDialog.Title, options);
         await ReloadIfSavedAsync(dialog);
     }
 
@@ -166,7 +167,7 @@
     {
         var parameters = new DialogParameters { ["Message"] = message };
         var options = new DialogOptions { MaxWidth = MaxWidth.Medium, FullWidth = true, NoHeader = true };
-        await DialogService.ShowAsync<NotificationMessageDetailDialog>("Notification Message", parameters, options);
+        await DialogService.ShowAsync<NotificationMessageDetailDialog>(T.MessageDialog.Title, parameters, options);
     }
 
     private async Task ReloadIfSavedAsync(IDialogReference dialog)

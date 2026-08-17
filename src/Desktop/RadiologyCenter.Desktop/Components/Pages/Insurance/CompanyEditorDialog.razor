@@ -1,15 +1,16 @@
 @inject InsuranceService InsuranceService
 @inject ISnackbar Snackbar
+@inject AppLocalizer T
 
 <MudDialog>
     <DialogContent>
-        <DialogHeader Icon="@Icons.Material.Filled.Shield" Title="@(Company is null ? "New Insurance Company" : "Edit Insurance Company")" />
+        <DialogHeader Icon="@Icons.Material.Filled.Shield" Title="@(Company is null ? T.CompanyDialog.Title : T.CompanyDialog.EditTitle)" />
         <EditForm EditContext="_editContext">
             <DataAnnotationsValidator />
             <MudGrid Spacing="2">
                 <MudItem xs="12" sm="8">
                     <MudTextField @bind-Value="_model.Name"
-                                  Label="Name"
+                                  Label="@T.Common.Name"
                                   Variant="Variant.Outlined"
                                   Margin="Margin.Dense"
                                   Immediate="true"
@@ -17,7 +18,7 @@
                 </MudItem>
                 <MudItem xs="12" sm="4">
                     <MudTextField @bind-Value="_model.TaxId"
-                                  Label="Tax Number"
+                                  Label="@T.CompanyDialog.TaxNumber"
                                   Variant="Variant.Outlined"
                                   Margin="Margin.Dense"
                                   Immediate="true"
@@ -25,7 +26,7 @@
                 </MudItem>
                 <MudItem xs="12" sm="6">
                     <MudTextField @bind-Value="_model.Phone"
-                                  Label="Phone"
+                                  Label="@T.CompanyDialog.Phone"
                                   Variant="Variant.Outlined"
                                   Margin="Margin.Dense"
                                   Immediate="true"
@@ -33,7 +34,7 @@
                 </MudItem>
                 <MudItem xs="12" sm="6">
                     <MudTextField @bind-Value="_model.Email"
-                                  Label="Email"
+                                  Label="@T.CompanyDialog.Email"
                                   Variant="Variant.Outlined"
                                   Margin="Margin.Dense"
                                   Immediate="true"
@@ -41,7 +42,7 @@
                 </MudItem>
                 <MudItem xs="12">
                     <MudTextField @bind-Value="_model.Address"
-                                  Label="Address"
+                                  Label="@T.CompanyDialog.Address"
                                   Variant="Variant.Outlined"
                                   Margin="Margin.Dense"
                                   Immediate="true"
@@ -51,7 +52,7 @@
         </EditForm>
     </DialogContent>
     <DialogActions>
-        <MudButton Color="Color.Default" OnClick="CancelAsync" Disabled="_busy">Cancel</MudButton>
+        <MudButton Color="Color.Default" OnClick="CancelAsync" Disabled="_busy">@T.Common.Cancel</MudButton>
         <MudButton Color="Color.Primary" Variant="Variant.Filled" OnClick="SubmitAsync" Disabled="_busy">
             @if (_busy)
             {
@@ -59,7 +60,7 @@
             }
             else
             {
-                <text>@(IsEdit ? "Save Changes" : "Create Company")</text>
+                <text>@(IsEdit ? T.CompanyDialog.SaveChanges : T.CompanyDialog.Create)</text>
             }
         </MudButton>
     </DialogActions>
@@ -112,7 +113,7 @@
             else
                 await InsuranceService.CreateCompanyAsync(input);
 
-            Snackbar.Add(IsEdit ? "Company updated." : "Company created.", Severity.Success);
+            Snackbar.Add(IsEdit ? T.CompanyDialog.Updated : T.CompanyDialog.Created, Severity.Success);
             MudDialog.Close(DialogResult.Ok(true));
         }
         catch (ApiException ex)
@@ -121,7 +122,7 @@
         }
         catch (Exception)
         {
-            Snackbar.Add("Unable to reach the server. Please try again.", Severity.Error);
+            Snackbar.Add(T.CompanyDialog.Unreachable, Severity.Error);
         }
         finally
         {

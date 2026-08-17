@@ -3,57 +3,58 @@
 @inject InsuranceService InsuranceService
 @inject IDialogService DialogService
 @inject ISnackbar Snackbar
+@inject AppLocalizer T
 @implements IDisposable
 
-<PageHeader Icon="@Icons.Material.Filled.Approval" Title="Pre-Authorizations"
-            Subtitle="Insurance approval for planned examinations"
+<PageHeader Icon="@Icons.Material.Filled.Approval" Title="@T.PreAuth.Title"
+            Subtitle="@T.PreAuth.Subtitle"
             SearchValueChanged="OnSearchChanged"
-            SearchPlaceholder="Search by patient, examination or policy..."
+            SearchPlaceholder="@T.PreAuth.SearchPlaceholder"
             OnRefresh="ReloadAsync">
-    <MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Add" OnClick="OpenCreateDialogAsync">Request Authorization</MudButton>
+    <MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Add" OnClick="OpenCreateDialogAsync">@T.PreAuth.RequestAuthorization</MudButton>
 </PageHeader>
 
 <MudTable T="PreAuthorizationListItemDto" @ref="_table" ServerData="LoadServerData" Dense="true" Hover="true" Striped="true" Elevation="1" RowsPerPage="10">
     <HeaderContent>
-        <MudTh><MudTableSortLabel T="PreAuthorizationListItemDto" SortLabel="@("PatientName")">Patient</MudTableSortLabel></MudTh>
-        <MudTh><MudTableSortLabel T="PreAuthorizationListItemDto" SortLabel="@("ExaminationTypeName")">Examination</MudTableSortLabel></MudTh>
-        <MudTh><MudTableSortLabel T="PreAuthorizationListItemDto" SortLabel="@("PolicyNumber")">Policy #</MudTableSortLabel></MudTh>
-        <MudTh><MudTableSortLabel T="PreAuthorizationListItemDto" SortLabel="@("EstimatedAmount")">Estimated</MudTableSortLabel></MudTh>
-        <MudTh><MudTableSortLabel T="PreAuthorizationListItemDto" SortLabel="@("RequestedAt")">Requested</MudTableSortLabel></MudTh>
-        <MudTh>Status</MudTh>
-        <MudTh>Actions</MudTh>
+        <MudTh><MudTableSortLabel T="PreAuthorizationListItemDto" SortLabel="@("PatientName")">@T.PreAuth.Patient</MudTableSortLabel></MudTh>
+        <MudTh><MudTableSortLabel T="PreAuthorizationListItemDto" SortLabel="@("ExaminationTypeName")">@T.PreAuth.Examination</MudTableSortLabel></MudTh>
+        <MudTh><MudTableSortLabel T="PreAuthorizationListItemDto" SortLabel="@("PolicyNumber")">@T.PreAuth.PolicyNumber</MudTableSortLabel></MudTh>
+        <MudTh><MudTableSortLabel T="PreAuthorizationListItemDto" SortLabel="@("EstimatedAmount")">@T.PreAuth.Estimated</MudTableSortLabel></MudTh>
+        <MudTh><MudTableSortLabel T="PreAuthorizationListItemDto" SortLabel="@("RequestedAt")">@T.PreAuth.Requested</MudTableSortLabel></MudTh>
+        <MudTh>@T.Common.Status</MudTh>
+        <MudTh>@T.Common.Actions</MudTh>
     </HeaderContent>
     <RowTemplate>
-        <MudTd DataLabel="Patient">
+        <MudTd DataLabel="@T.PreAuth.Patient">
             <MudText Class="font-weight-medium">@context.PatientName</MudText>
         </MudTd>
-        <MudTd DataLabel="Examination">@context.ExaminationTypeName</MudTd>
-        <MudTd DataLabel="Policy #">
+        <MudTd DataLabel="@T.PreAuth.Examination">@context.ExaminationTypeName</MudTd>
+        <MudTd DataLabel="@T.PreAuth.PolicyNumber">
             <MudText Class="mono-text">@context.PolicyNumber</MudText>
         </MudTd>
-        <MudTd DataLabel="Estimated">@context.EstimatedAmount.ToString("C")</MudTd>
-        <MudTd DataLabel="Requested">@context.RequestedAt.ToString("yyyy-MM-dd")</MudTd>
-        <MudTd DataLabel="Status">
+        <MudTd DataLabel="@T.PreAuth.Estimated">@context.EstimatedAmount.ToString("C")</MudTd>
+        <MudTd DataLabel="@T.PreAuth.Requested">@context.RequestedAt.ToString("yyyy-MM-dd")</MudTd>
+        <MudTd DataLabel="@T.Common.Status">
             <MudChip T="string" Size="Size.Small" Color="@StatusColor(context.Status)">@FormatStatus(context.Status)</MudChip>
         </MudTd>
-        <MudTd DataLabel="Actions">
-            <MudIconButton Icon="@Icons.Material.Filled.Visibility" Size="Size.Small" Color="Color.Default" aria-label="View" OnClick="@(() => OpenDetailDialogAsync(context))" />
+        <MudTd DataLabel="@T.Common.Actions">
+            <MudIconButton Icon="@Icons.Material.Filled.Visibility" Size="Size.Small" Color="Color.Default" aria-label="@T.PreAuth.View" OnClick="@(() => OpenDetailDialogAsync(context))" />
         </MudTd>
     </RowTemplate>
     <NoRecordsContent>
         @if (_loadError is not null)
         {
             <ErrorState Icon="@(_offline ? Icons.Material.Filled.CloudOff : Icons.Material.Filled.ErrorOutline)"
-                        Title="Couldn't load data"
+                        Title="@T.PreAuth.LoadErrorTitle"
                         Message="@_loadError"
                         Action="ReloadAsync" />
         }
         else
         {
         <EmptyState Icon="@Icons.Material.Filled.Approval"
-                    Title="No pre-authorizations yet"
-                    Message="Request insurance approval before performing covered examinations."
-                    ActionLabel="Request your first authorization"
+                    Title="@T.PreAuth.EmptyTitle"
+                    Message="@T.PreAuth.EmptyMessage"
+                    ActionLabel="@T.PreAuth.EmptyActionLabel"
                     Action="OpenCreateDialogAsync" />
         }
     </NoRecordsContent>
@@ -94,8 +95,8 @@
         }
         catch (Exception)
         {
-            Snackbar.Add("Unable to reach the server.", Severity.Error);
-            _loadError = "Unable to reach the server.";
+            Snackbar.Add(T.PreAuth.Unreachable, Severity.Error);
+            _loadError = T.PreAuth.Unreachable;
             _offline = true;
             return new TableData<PreAuthorizationListItemDto> { Items = Array.Empty<PreAuthorizationListItemDto>(), TotalItems = 0 };
         }
@@ -126,7 +127,7 @@
     private async Task OpenCreateDialogAsync()
     {
         var options = new DialogOptions { MaxWidth = MaxWidth.Large, FullWidth = true, NoHeader = true };
-        var dialog = await DialogService.ShowAsync<PreAuthDialog>("Request Pre-Authorization", options);
+        var dialog = await DialogService.ShowAsync<PreAuthDialog>(T.PreAuth.RequestTitle, options);
         await ReloadIfSavedAsync(dialog);
     }
 

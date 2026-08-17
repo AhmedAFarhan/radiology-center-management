@@ -1,14 +1,15 @@
 @inject InsuranceService InsuranceService
 @inject IDialogService DialogService
 @inject ISnackbar Snackbar
+@inject AppLocalizer T
 
 <MudDialog>
     <DialogContent>
-        <DialogHeader Icon="@Icons.Material.Filled.Description" Title="@(_policy?.PolicyNumber ?? "Policy Details")" />
+        <DialogHeader Icon="@Icons.Material.Filled.Description" Title="@(_policy?.PolicyNumber ?? T.PolicyDialog.DetailsTitle)" />
 
         @if (_loadError is not null)
         {
-            <ErrorState Title="Couldn't load policy" Message="@_loadError" Action="LoadAsync" />
+            <ErrorState Title="@T.PolicyDialog.LoadErrorTitle" Message="@_loadError" Action="LoadAsync" />
         }
         else if (_policy is null)
         {
@@ -18,27 +19,27 @@
         {
             <MudGrid Spacing="2">
                 <MudItem xs="12" sm="6">
-                    <MudTextField Label="Patient" Variant="Variant.Outlined" Margin="Margin.Dense" ReadOnly="true" Value="@_patientName" />
+                    <MudTextField Label="@T.PolicyDialog.Patient" Variant="Variant.Outlined" Margin="Margin.Dense" ReadOnly="true" Value="@_patientName" />
                 </MudItem>
                 <MudItem xs="12" sm="6">
-                    <MudTextField Label="Insurance Company" Variant="Variant.Outlined" Margin="Margin.Dense" ReadOnly="true" Value="@_companyName" />
+                    <MudTextField Label="@T.PolicyDialog.Company" Variant="Variant.Outlined" Margin="Margin.Dense" ReadOnly="true" Value="@_companyName" />
                 </MudItem>
                 <MudItem xs="12" sm="6">
-                    <MudTextField Label="Coverage %" Variant="Variant.Outlined" Margin="Margin.Dense" ReadOnly="true" Value="@($"{_policy.CoveragePercent:0}%")" />
+                    <MudTextField Label="@T.PolicyDialog.CoveragePercent" Variant="Variant.Outlined" Margin="Margin.Dense" ReadOnly="true" Value="@($"{_policy.CoveragePercent:0}%")" />
                 </MudItem>
                 <MudItem xs="12" sm="6">
-                    <MudTextField Label="Status" Variant="Variant.Outlined" Margin="Margin.Dense" ReadOnly="true" Value="@_policy.Status" />
+                    <MudTextField Label="@T.Common.Status" Variant="Variant.Outlined" Margin="Margin.Dense" ReadOnly="true" Value="@_policy.Status" />
                 </MudItem>
                 <MudItem xs="12" sm="6">
-                    <MudTextField Label="Effective From" Variant="Variant.Outlined" Margin="Margin.Dense" ReadOnly="true" Value="@_policy.EffectiveFrom.ToString("yyyy-MM-dd")" />
+                    <MudTextField Label="@T.PolicyDialog.EffectiveFrom" Variant="Variant.Outlined" Margin="Margin.Dense" ReadOnly="true" Value="@_policy.EffectiveFrom.ToString("yyyy-MM-dd")" />
                 </MudItem>
                 <MudItem xs="12" sm="6">
-                    <MudTextField Label="Effective To" Variant="Variant.Outlined" Margin="Margin.Dense" ReadOnly="true" Value="@(_policy.EffectiveTo?.ToString("yyyy-MM-dd") ?? "-")" />
+                    <MudTextField Label="@T.PolicyDialog.EffectiveToLabel" Variant="Variant.Outlined" Margin="Margin.Dense" ReadOnly="true" Value="@(_policy.EffectiveTo?.ToString("yyyy-MM-dd") ?? "-")" />
                 </MudItem>
             </MudGrid>
 
             <MudDivider Class="my-2" />
-            <MudText Typo="Typo.subtitle2" Class="mb-1">Documents</MudText>
+            <MudText Typo="Typo.subtitle2" Class="mb-1">@T.PolicyDialog.Documents</MudText>
 
             @if (_documents is null)
             {
@@ -46,7 +47,7 @@
             }
             else if (_documents.Count == 0)
             {
-                <MudText Typo="Typo.body2" Class="text-secondary">No documents attached.</MudText>
+                <MudText Typo="Typo.body2" Class="text-secondary">@T.PolicyDialog.NoDocuments</MudText>
             }
             else
             {
@@ -58,8 +59,8 @@
                             <MudText Typo="Typo.body2">@document.FileName</MudText>
                             <MudText Typo="Typo.caption" Class="text-secondary">@FormatDocumentMeta(document)</MudText>
                         </div>
-                        <MudIconButton Icon="@Icons.Material.Filled.Download" Size="Size.Small" Color="Color.Default" aria-label="Download" OnClick="@(() => DownloadDocumentAsync(document))" />
-                        <MudIconButton Icon="@Icons.Material.Filled.Delete" Size="Size.Small" Color="Color.Error" aria-label="Delete" OnClick="@(() => DeleteDocumentAsync(document))" />
+                        <MudIconButton Icon="@Icons.Material.Filled.Download" Size="Size.Small" Color="Color.Default" aria-label="@T.PolicyDialog.Download" OnClick="@(() => DownloadDocumentAsync(document))" />
+                        <MudIconButton Icon="@Icons.Material.Filled.Delete" Size="Size.Small" Color="Color.Error" aria-label="@T.Common.Delete" OnClick="@(() => DeleteDocumentAsync(document))" />
                     </MudPaper>
                 }
             }
@@ -69,14 +70,14 @@
                        StartIcon="@Icons.Material.Filled.Upload"
                        Disabled="_busy"
                        Class="mt-2">
-                @(_busy ? "Uploading..." : "Upload Document")
+                @(_busy ? T.PolicyDialog.Uploading : T.PolicyDialog.UploadDocument)
             </MudButton>
             <InputFile id="policy-doc-input" OnChange="OnFileSelectedAsync" style="display:none" />
-            <MudText Typo="Typo.caption" Class="text-secondary mt-1">Policy documents (policy card, coverage agreement, etc.).</MudText>
+            <MudText Typo="Typo.caption" Class="text-secondary mt-1">@T.PolicyDialog.DocumentsHint</MudText>
         }
     </DialogContent>
     <DialogActions>
-        <MudButton Color="Color.Default" OnClick="CancelAsync">Close</MudButton>
+        <MudButton Color="Color.Default" OnClick="CancelAsync">@T.Common.Close</MudButton>
     </DialogActions>
 </MudDialog>
 
@@ -116,7 +117,7 @@
         }
         catch (Exception)
         {
-            _loadError = "Unable to reach the server.";
+            _loadError = T.PolicyDialog.Unreachable;
         }
     }
 
@@ -137,7 +138,7 @@
                 file.ContentType,
                 stream);
 
-            Snackbar.Add("Document uploaded.", Severity.Success);
+            Snackbar.Add(T.PolicyDialog.DocumentUploaded, Severity.Success);
             await LoadAsync();
         }
         catch (ApiException ex)
@@ -146,7 +147,7 @@
         }
         catch (Exception)
         {
-            Snackbar.Add("Unable to reach the server.", Severity.Error);
+            Snackbar.Add(T.PolicyDialog.Unreachable, Severity.Error);
         }
         finally
         {
@@ -160,7 +161,7 @@
         {
             var content = await InsuranceService.DownloadPolicyDocumentAsync(PolicyId, document.Id);
             await FileSaveHelper.SaveAsync(content, document.FileName);
-            Snackbar.Add("Document downloaded.", Severity.Success);
+            Snackbar.Add(T.PolicyDialog.DocumentDownloaded, Severity.Success);
         }
         catch (ApiException ex)
         {
@@ -168,17 +169,17 @@
         }
         catch (Exception)
         {
-            Snackbar.Add("Unable to download the document.", Severity.Error);
+            Snackbar.Add(T.PolicyDialog.UnableDownloadDocument, Severity.Error);
         }
     }
 
     private async Task DeleteDocumentAsync(PolicyDocumentDto document)
     {
         var confirmed = await DialogService.ShowMessageBoxAsync(
-            "Delete Document",
-            $"Delete {document.FileName}?",
-            "Delete",
-            "Cancel");
+            T.PolicyDialog.DeleteDocumentTitle,
+            T.FormatValue(T.PolicyDialog.DeleteDocumentConfirm, document.FileName),
+            T.Common.Delete,
+            T.Common.Cancel);
 
         if (confirmed != true)
             return;
@@ -186,7 +187,7 @@
         try
         {
             await InsuranceService.DeletePolicyDocumentAsync(PolicyId, document.Id);
-            Snackbar.Add("Document deleted.", Severity.Success);
+            Snackbar.Add(T.PolicyDialog.DocumentDeleted, Severity.Success);
             await LoadAsync();
         }
         catch (ApiException ex)
@@ -195,7 +196,7 @@
         }
         catch (Exception)
         {
-            Snackbar.Add("Unable to reach the server.", Severity.Error);
+            Snackbar.Add(T.PolicyDialog.Unreachable, Severity.Error);
         }
     }
 

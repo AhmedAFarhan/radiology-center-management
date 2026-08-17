@@ -4,63 +4,64 @@
 @inject ExaminationService ExaminationService
 @inject IDialogService DialogService
 @inject ISnackbar Snackbar
+@inject AppLocalizer T
 @implements IDisposable
 
-<PageHeader Icon="@Icons.Material.Filled.MedicalServices" Title="Examination Fees"
-            Subtitle="Per-procedure fees for radiologists and technicians"
+<PageHeader Icon="@Icons.Material.Filled.MedicalServices" Title="@T.ExamFee.Title"
+            Subtitle="@T.ExamFee.Subtitle"
             SearchValueChanged="OnSearchChanged"
-            SearchPlaceholder="Search fees..."
+            SearchPlaceholder="@T.ExamFee.SearchPlaceholder"
             OnRefresh="ReloadAsync">
-    <MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Add" OnClick="OpenCreateDialogAsync">New Fee</MudButton>
+    <MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Add" OnClick="OpenCreateDialogAsync">@T.ExamFee.NewFee</MudButton>
 </PageHeader>
 
 <MudTable T="ExaminationFeeDto" @ref="_table" ServerData="LoadServerData" Dense="true" Hover="true" Striped="true" Elevation="1" RowsPerPage="10">
     <HeaderContent>
-        <MudTh>Examination Type</MudTh>
-        <MudTh><MudTableSortLabel T="ExaminationFeeDto" SortLabel="@("Role")">Role</MudTableSortLabel></MudTh>
-        <MudTh Class="text-right"><MudTableSortLabel T="ExaminationFeeDto" SortLabel="@("Amount")">Amount</MudTableSortLabel></MudTh>
-        <MudTh>Type</MudTh>
-        <MudTh>Status</MudTh>
-        <MudTh>Actions</MudTh>
+        <MudTh>@T.ExamFee.ExaminationType</MudTh>
+        <MudTh><MudTableSortLabel T="ExaminationFeeDto" SortLabel="@("Role")">@T.ExamFee.Role</MudTableSortLabel></MudTh>
+        <MudTh Class="text-right"><MudTableSortLabel T="ExaminationFeeDto" SortLabel="@("Amount")">@T.ExamFee.Amount</MudTableSortLabel></MudTh>
+        <MudTh>@T.Common.Type</MudTh>
+        <MudTh>@T.Common.Status</MudTh>
+        <MudTh>@T.Common.Actions</MudTh>
     </HeaderContent>
     <RowTemplate>
-        <MudTd DataLabel="Examination Type">
+        <MudTd DataLabel="@T.ExamFee.ExaminationType">
             <MudText Class="font-weight-medium">@ResolveExamType(context.ExaminationTypeId)</MudText>
         </MudTd>
-        <MudTd DataLabel="Role">
+        <MudTd DataLabel="@T.ExamFee.Role">
             <MudChip T="string" Size="Size.Small" Color="Color.Primary" Variant="Variant.Outlined">@context.Role</MudChip>
         </MudTd>
-        <MudTd DataLabel="Amount" Class="text-right">@(context.IsPercentage ? $"{context.Amount:N2}%" : context.Amount.ToString("N2"))</MudTd>
-        <MudTd DataLabel="Type">
-            <MudChip T="string" Size="Size.Small" Color="@(context.IsPercentage ? Color.Warning : Color.Default)">@(context.IsPercentage ? "Percentage" : "Flat")</MudChip>
+        <MudTd DataLabel="@T.ExamFee.Amount" Class="text-right">@(context.IsPercentage ? $"{context.Amount:N2}%" : context.Amount.ToString("N2"))</MudTd>
+        <MudTd DataLabel="@T.Common.Type">
+            <MudChip T="string" Size="Size.Small" Color="@(context.IsPercentage ? Color.Warning : Color.Default)">@(context.IsPercentage ? T.ExamFee.Percentage : T.ExamFee.Flat)</MudChip>
         </MudTd>
-        <MudTd DataLabel="Status">
-            <MudChip T="string" Size="Size.Small" Color="@(context.IsActive ? Color.Success : Color.Default)">@(context.IsActive ? "Active" : "Inactive")</MudChip>
+        <MudTd DataLabel="@T.Common.Status">
+            <MudChip T="string" Size="Size.Small" Color="@(context.IsActive ? Color.Success : Color.Default)">@(context.IsActive ? T.Common.Active : T.Common.Inactive)</MudChip>
         </MudTd>
-        <MudTd DataLabel="Actions">
-            <MudIconButton Icon="@Icons.Material.Filled.Edit" Size="Size.Small" Color="Color.Default" aria-label="Edit" OnClick="@(() => OpenEditDialogAsync(context))" />
+        <MudTd DataLabel="@T.Common.Actions">
+            <MudIconButton Icon="@Icons.Material.Filled.Edit" Size="Size.Small" Color="Color.Default" aria-label="@T.Common.Edit" OnClick="@(() => OpenEditDialogAsync(context))" />
             <MudIconButton Icon="@(context.IsActive ? Icons.Material.Filled.Block : Icons.Material.Filled.CheckCircle)"
                            Size="Size.Small"
                            Color="@(context.IsActive ? Color.Default : Color.Success)"
-                           aria-label="Toggle status"
+                           aria-label="@T.ExamFee.ToggleStatus"
                            OnClick="@(() => ToggleActiveAsync(context))" />
-            <MudIconButton Icon="@Icons.Material.Filled.Delete" Size="Size.Small" Color="Color.Error" aria-label="Delete" OnClick="@(() => DeleteFeeAsync(context))" />
+            <MudIconButton Icon="@Icons.Material.Filled.Delete" Size="Size.Small" Color="Color.Error" aria-label="@T.Common.Delete" OnClick="@(() => DeleteFeeAsync(context))" />
         </MudTd>
     </RowTemplate>
     <NoRecordsContent>
         @if (_loadError is not null)
         {
             <ErrorState Icon="@(_offline ? Icons.Material.Filled.CloudOff : Icons.Material.Filled.ErrorOutline)"
-                        Title="Couldn't load data"
+                        Title="@T.ExamFee.LoadErrorTitle"
                         Message="@_loadError"
                         Action="ReloadAsync" />
         }
         else
         {
         <EmptyState Icon="@Icons.Material.Filled.MedicalServices"
-                    Title="No examination fees yet"
-                    Message="Set per-procedure fees before running payroll."
-                    ActionLabel="Create your first fee"
+                    Title="@T.ExamFee.EmptyTitle"
+                    Message="@T.ExamFee.EmptyMessage"
+                    ActionLabel="@T.ExamFee.EmptyActionLabel"
                     Action="OpenCreateDialogAsync" />
         }
     </NoRecordsContent>
@@ -106,8 +107,8 @@
         }
         catch (Exception)
         {
-            Snackbar.Add("Unable to reach the server.", Severity.Error);
-            _loadError = "Unable to reach the server.";
+            Snackbar.Add(T.ExamFee.Unreachable, Severity.Error);
+            _loadError = T.ExamFee.Unreachable;
             _offline = true;
             return new TableData<ExaminationFeeDto> { Items = Array.Empty<ExaminationFeeDto>(), TotalItems = 0 };
         }
@@ -141,7 +142,7 @@
     private async Task OpenCreateDialogAsync()
     {
         var options = new DialogOptions { MaxWidth = MaxWidth.Medium, FullWidth = true, NoHeader = true };
-        var dialog = await DialogService.ShowAsync<ExaminationFeeEditorDialog>("New Examination Fee", options);
+        var dialog = await DialogService.ShowAsync<ExaminationFeeEditorDialog>(T.ExamFee.NewExaminationFee, options);
         await ReloadIfSavedAsync(dialog);
     }
 
@@ -149,7 +150,7 @@
     {
         var parameters = new DialogParameters { ["Fee"] = fee };
         var options = new DialogOptions { MaxWidth = MaxWidth.Medium, FullWidth = true, NoHeader = true };
-        var dialog = await DialogService.ShowAsync<ExaminationFeeEditorDialog>("Edit Examination Fee", parameters, options);
+        var dialog = await DialogService.ShowAsync<ExaminationFeeEditorDialog>(T.ExamFee.EditExaminationFee, parameters, options);
         await ReloadIfSavedAsync(dialog);
     }
 
@@ -169,7 +170,7 @@
             else
                 await PayrollService.ActivateExaminationFeeAsync(fee.Id);
 
-            Snackbar.Add(fee.IsActive ? "Fee deactivated." : "Fee activated.", Severity.Success);
+            Snackbar.Add(fee.IsActive ? T.ExamFee.Deactivated : T.ExamFee.Activated, Severity.Success);
             await ReloadAsync();
         }
         catch (ApiException ex)
@@ -178,17 +179,17 @@
         }
         catch (Exception)
         {
-            Snackbar.Add("Unable to reach the server.", Severity.Error);
+            Snackbar.Add(T.ExamFee.Unreachable, Severity.Error);
         }
     }
 
     private async Task DeleteFeeAsync(ExaminationFeeDto fee)
     {
         var confirmed = await DialogService.ShowMessageBoxAsync(
-            "Delete Examination Fee",
-            "Are you sure you want to delete this fee? This cannot be undone.",
-            "Delete",
-            "Cancel");
+            T.ExamFee.DeleteTitle,
+            T.ExamFee.DeleteConfirm,
+            T.Common.Delete,
+            T.Common.Cancel);
 
         if (confirmed != true)
             return;
@@ -196,7 +197,7 @@
         try
         {
             await PayrollService.DeleteExaminationFeeAsync(fee.Id);
-            Snackbar.Add("Examination fee deleted.", Severity.Success);
+            Snackbar.Add(T.ExamFee.Deleted, Severity.Success);
             await ReloadAsync();
         }
         catch (ApiException ex)
@@ -205,7 +206,7 @@
         }
         catch (Exception)
         {
-            Snackbar.Add("Unable to reach the server.", Severity.Error);
+            Snackbar.Add(T.ExamFee.Unreachable, Severity.Error);
         }
     }
 

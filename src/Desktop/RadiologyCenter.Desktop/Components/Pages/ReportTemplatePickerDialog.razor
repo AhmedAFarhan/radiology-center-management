@@ -1,16 +1,17 @@
 @inject ReportService ReportService
 @inject ISnackbar Snackbar
+@inject AppLocalizer T
 
 <MudDialog>
     <DialogContent>
-        <DialogHeader Icon="@Icons.Material.Filled.Newspaper" Title="Apply Report Template" />
+        <DialogHeader Icon="@Icons.Material.Filled.Newspaper" Title="@T.ReportTemplate.ApplyTitle" />
         <MudText Typo="Typo.body2" Class="text-secondary mb-2">
-            Applies a saved template: it fills editable sections and locks template-defined content. Your typed sections are kept where they don't conflict.
+            @T.ReportTemplate.Description
         </MudText>
 
         <MudTextField T="string"
                       @bind-Value="_search"
-                      Placeholder="Search templates..."
+                      Placeholder="@T.ReportTemplate.SearchPlaceholder"
                       Variant="Variant.Outlined"
                       Margin="Margin.Dense"
                       Immediate="true"
@@ -25,16 +26,16 @@
             }
             else if (FilteredTemplates is null || !string.IsNullOrEmpty(_error))
             {
-                <ErrorState Title="Could not load templates"
-                            Message="Check your connection and try again."
-                            RetryLabel="Retry"
+                <ErrorState Title="@T.ReportTemplate.LoadErrorTitle"
+                            Message="@T.ReportTemplate.LoadErrorMessage"
+                            RetryLabel="@T.Common.Retry"
                             Action="LoadAsync" />
             }
             else if (!FilteredTemplates.Any())
             {
                 <EmptyState Icon="@Icons.Material.Filled.Newspaper"
-                            Title="No templates"
-                            Message="No report templates were found." />
+                            Title="@T.ReportTemplate.NoTemplates"
+                            Message="@T.ReportTemplate.NoTemplatesMessage" />
             }
             else
             {
@@ -53,9 +54,9 @@
                                 }
                                 @if (template.IsSystem)
                                 {
-                                    <MudChip T="string" Size="Size.Small" Color="Color.Info" Variant="Variant.Outlined" Class="ms-1 align-middle">System</MudChip>
+                                    <MudChip T="string" Size="Size.Small" Color="Color.Info" Variant="Variant.Outlined" Class="ms-1 align-middle">@T.ReportTemplate.System</MudChip>
                                 }
-                                <MudText Typo="Typo.caption" Class="text-secondary">@template.Sections.Count section(s) @(string.IsNullOrWhiteSpace(template.Description) ? string.Empty : $" - {template.Description}")</MudText>
+                                <MudText Typo="Typo.caption" Class="text-secondary">@(T.FormatValue(T.ReportTemplate.SectionCount, template.Sections.Count))@(string.IsNullOrWhiteSpace(template.Description) ? string.Empty : $" - {template.Description}")</MudText>
                             </div>
                         </MudListItem>
                     }
@@ -64,7 +65,7 @@
         </div>
     </DialogContent>
     <DialogActions>
-        <MudButton Color="Color.Default" OnClick="CancelAsync" Disabled="_busy">Close</MudButton>
+        <MudButton Color="Color.Default" OnClick="CancelAsync" Disabled="_busy">@T.Common.Close</MudButton>
     </DialogActions>
 </MudDialog>
 
@@ -98,7 +99,7 @@
         }
         catch (Exception)
         {
-            _error = "Failed to load templates.";
+            _error = T.ReportTemplate.LoadFailed;
         }
         finally
         {

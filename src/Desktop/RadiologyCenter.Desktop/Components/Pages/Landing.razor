@@ -4,6 +4,7 @@
 @inject NavigationManager Navigation
 @inject AuthenticationStateProvider AuthState
 @inject IDialogService DialogService
+@inject AppLocalizer T
 
 @if (_checking)
 {
@@ -12,6 +13,9 @@
 else
 {
 <div class="landing-hero">
+    <div class="landing-lang">
+        <LanguageSwitcher />
+    </div>
     <div class="corner-circles corner-right">
         <div class="corner-circle circle-outer"></div>
         <div class="corner-circle circle-mid"></div>
@@ -31,25 +35,24 @@ else
             </div>
 
             <div class="landing-copy">
-                <div class="landing-badge">Radiology Center Management</div>
-                <h1 class="landing-title">Your radiology practice,<br />brilliantly organized.</h1>
+                <div class="landing-badge">@T.Landing.Badge</div>
+                <h1 class="landing-title">@((MarkupString)T.Landing.Title)</h1>
                 <p class="landing-subtitle">
-                    EGcare brings patients, examinations, inventory, payroll and reporting into one
-                    calm, fast workspace — so your team can focus on care, not paperwork.
+                    @T.Landing.Subtitle
                 </p>
 
                 <div class="landing-features">
                     <div class="landing-feature">
                         <MudIcon Icon="@Icons.Material.Filled.CheckCircle" Color="Color.Primary" Size="Size.Small" />
-                        <span>Examinations &amp; reading room</span>
+                        <span>@T.Landing.Feature.Exams</span>
                     </div>
                     <div class="landing-feature">
                         <MudIcon Icon="@Icons.Material.Filled.CheckCircle" Color="Color.Primary" Size="Size.Small" />
-                        <span>Patients, visits &amp; scheduling</span>
+                        <span>@T.Landing.Feature.Patients</span>
                     </div>
                     <div class="landing-feature">
                         <MudIcon Icon="@Icons.Material.Filled.CheckCircle" Color="Color.Primary" Size="Size.Small" />
-                        <span>Inventory, payroll &amp; analytics</span>
+                        <span>@T.Landing.Feature.Operations</span>
                     </div>
                 </div>
             </div>
@@ -61,9 +64,9 @@ else
                            StartIcon="@Icons.Material.Filled.Login"
                            Class="landing-login-btn"
                            OnClick="OpenLogin">
-                    Sign in
+                    @T.Landing.SignIn
                 </MudButton>
-                <MudText Typo="Typo.body2" Class="landing-hint">Secure access for your team</MudText>
+                <MudText Typo="Typo.body2" Class="landing-hint">@T.Landing.Hint</MudText>
             </div>
         </div>
 
@@ -79,7 +82,7 @@ else
     </div>
 
     <div class="landing-footer">
-        <span>© @DateTime.Now.Year EGcare — Radiology Center Management System</span>
+        <span>© @DateTime.Now.Year @T.Landing.Footer</span>
     </div>
 </div>
 }
@@ -109,6 +112,6 @@ else
             FullWidth = true,
             BackdropClick = true,
         };
-        await DialogService.ShowAsync<LoginDialog>("Sign in", options);
+        await DialogService.ShowAsync<LoginDialog>(T.Login.DialogTitle, options);
     }
 }

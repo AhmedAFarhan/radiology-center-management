@@ -1,10 +1,11 @@
 @inject PayrollService PayrollService
 @inject ResourceService ResourceService
 @inject ISnackbar Snackbar
+@inject AppLocalizer T
 
 <MudDialog>
     <DialogContent>
-        <DialogHeader Icon="@Icons.Material.Filled.Calculate" Title="@(Salary is null ? "New Salary" : "Edit Salary")" />
+        <DialogHeader Icon="@Icons.Material.Filled.Calculate" Title="@(Salary is null ? T.Salary.NewSalary : T.Salary.EditTitle)" />
         <EditForm EditContext="_editContext">
             <DataAnnotationsValidator />
             <MudGrid Spacing="2">
@@ -12,7 +13,7 @@
                 {
                     <MudItem xs="12">
                         <MudTextField @bind-Value="_employeeName"
-                                      Label="Employee"
+                                      Label="@T.Salary.Employee"
                                       Variant="Variant.Outlined"
                                       Margin="Margin.Dense"
                                       ReadOnly="true" />
@@ -23,7 +24,7 @@
                     <MudItem xs="12">
                         <MudAutocomplete T="StaffDto"
                                          @bind-Value="_selectedStaff"
-                                         Label="Employee (search by name)"
+                                         Label="@T.SalaryDialog.EmployeeSearch"
                                          Variant="Variant.Outlined"
                                          Margin="Margin.Dense"
                                          MinCharacters="1"
@@ -37,7 +38,7 @@
                 <MudItem xs="12" sm="6">
                     <MudNumericField T="decimal"
                                      @bind-Value="_model.BaseSalary"
-                                     Label="Base Salary"
+                                     Label="@T.Salary.BaseSalary"
                                      Variant="Variant.Outlined"
                                      Margin="Margin.Dense"
                                      Min="0"
@@ -46,7 +47,7 @@
                 <MudItem xs="12" sm="6">
                     <MudSelect T="string"
                                @bind-Value="_model.SalaryType"
-                               Label="Salary Type"
+                               Label="@T.SalaryDialog.SalaryType"
                                Variant="Variant.Outlined"
                                Margin="Margin.Dense"
                                For="@(() => _model.SalaryType)">
@@ -56,7 +57,7 @@
                 </MudItem>
                 <MudItem xs="12" sm="6">
                     <MudDatePicker @bind-Date="_model.EffectiveDate"
-                                   Label="Effective Date"
+                                   Label="@T.SalaryDialog.EffectiveDate"
                                    Variant="Variant.Outlined"
                                    Margin="Margin.Dense"
                                    Class="w-100" />
@@ -65,7 +66,7 @@
         </EditForm>
     </DialogContent>
     <DialogActions>
-        <MudButton Color="Color.Default" OnClick="CancelAsync" Disabled="_busy">Cancel</MudButton>
+        <MudButton Color="Color.Default" OnClick="CancelAsync" Disabled="_busy">@T.Common.Cancel</MudButton>
         <MudButton Color="Color.Primary" Variant="Variant.Filled" OnClick="SubmitAsync" Disabled="_busy">
             @if (_busy)
             {
@@ -73,7 +74,7 @@
             }
             else
             {
-                <text>@(IsEdit ? "Save Changes" : "Create Salary")</text>
+                <text>@(IsEdit ? T.SalaryDialog.SaveChanges : T.SalaryDialog.CreateSalary)</text>
             }
         </MudButton>
     </DialogActions>
@@ -110,7 +111,7 @@
         }
         catch (Exception)
         {
-            Snackbar.Add("Unable to search staff.", Severity.Error);
+            Snackbar.Add(T.SalaryDialog.SearchError, Severity.Error);
             return Array.Empty<StaffDto>();
         }
     }
@@ -148,13 +149,13 @@
 
         if (!IsEdit && _selectedStaff is null)
         {
-            Snackbar.Add("Select an employee.", Severity.Warning);
+            Snackbar.Add(T.SalaryDialog.SelectEmployee, Severity.Warning);
             return;
         }
 
         if (_model.EffectiveDate is null)
         {
-            Snackbar.Add("Select an effective date.", Severity.Warning);
+            Snackbar.Add(T.SalaryDialog.SelectEffectiveDate, Severity.Warning);
             return;
         }
 
@@ -174,7 +175,7 @@
             else
                 await PayrollService.CreateSalaryAsync(input);
 
-            Snackbar.Add(IsEdit ? "Salary updated." : "Salary created.", Severity.Success);
+            Snackbar.Add(IsEdit ? T.SalaryDialog.Updated : T.SalaryDialog.Created, Severity.Success);
             MudDialog.Close(DialogResult.Ok(true));
         }
         catch (ApiException ex)
@@ -183,7 +184,7 @@
         }
         catch (Exception)
         {
-            Snackbar.Add("Unable to reach the server. Please try again.", Severity.Error);
+            Snackbar.Add(T.SalaryDialog.Unreachable, Severity.Error);
         }
         finally
         {

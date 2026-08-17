@@ -3,63 +3,64 @@
 @inject ResourceService ResourceService
 @inject IDialogService DialogService
 @inject ISnackbar Snackbar
+@inject AppLocalizer T
 @implements IDisposable
 
-<PageHeader Icon="@Icons.Material.Filled.Badge" Title="Staff"
-            Subtitle="Manage staff members"
+<PageHeader Icon="@Icons.Material.Filled.Badge" Title="@T.Staff.Title"
+            Subtitle="@T.Staff.Subtitle"
             SearchValueChanged="OnSearchChanged"
-            SearchPlaceholder="Search staff..."
+            SearchPlaceholder="@T.Staff.SearchPlaceholder"
             OnRefresh="ReloadAsync">
-    <MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Add" OnClick="OpenCreateDialogAsync">Add Staff</MudButton>
+    <MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Add" OnClick="OpenCreateDialogAsync">@T.Staff.Add</MudButton>
 </PageHeader>
 
 <MudTable T="StaffDto" @ref="_table" ServerData="LoadServerData" Dense="true" Hover="true" Striped="true" Elevation="1" RowsPerPage="10">
     <HeaderContent>
-        <MudTh><MudTableSortLabel T="StaffDto" SortLabel="@("LastName")">Name</MudTableSortLabel></MudTh>
-        <MudTh><MudTableSortLabel T="StaffDto" SortLabel="@("Position")">Position</MudTableSortLabel></MudTh>
-        <MudTh><MudTableSortLabel T="StaffDto" SortLabel="@("Department")">Department</MudTableSortLabel></MudTh>
-        <MudTh><MudTableSortLabel T="StaffDto" SortLabel="@("Specialization")">Specialization</MudTableSortLabel></MudTh>
-        <MudTh><MudTableSortLabel T="StaffDto" SortLabel="@("PhoneNumber")">Phone</MudTableSortLabel></MudTh>
-        <MudTh><MudTableSortLabel T="StaffDto" SortLabel="@("HireDate")">Hire Date</MudTableSortLabel></MudTh>
-        <MudTh>Status</MudTh>
-        <MudTh>Actions</MudTh>
+        <MudTh><MudTableSortLabel T="StaffDto" SortLabel="@("LastName")">@T.Common.Name</MudTableSortLabel></MudTh>
+        <MudTh><MudTableSortLabel T="StaffDto" SortLabel="@("Position")">@T.Staff.Position</MudTableSortLabel></MudTh>
+        <MudTh><MudTableSortLabel T="StaffDto" SortLabel="@("Department")">@T.Staff.Department</MudTableSortLabel></MudTh>
+        <MudTh><MudTableSortLabel T="StaffDto" SortLabel="@("Specialization")">@T.Staff.Specialization</MudTableSortLabel></MudTh>
+        <MudTh><MudTableSortLabel T="StaffDto" SortLabel="@("PhoneNumber")">@T.Staff.Phone</MudTableSortLabel></MudTh>
+        <MudTh><MudTableSortLabel T="StaffDto" SortLabel="@("HireDate")">@T.Staff.HireDate</MudTableSortLabel></MudTh>
+        <MudTh>@T.Common.Status</MudTh>
+        <MudTh>@T.Common.Actions</MudTh>
     </HeaderContent>
     <RowTemplate>
-        <MudTd DataLabel="Name">
+        <MudTd DataLabel="@T.Common.Name">
             <MudText Class="font-weight-medium">@context.FullName</MudText>
         </MudTd>
-        <MudTd DataLabel="Position">@FormatPosition(context.Position)</MudTd>
-        <MudTd DataLabel="Department">@(string.IsNullOrWhiteSpace(context.Department) ? "-" : context.Department)</MudTd>
-        <MudTd DataLabel="Specialization">@(string.IsNullOrWhiteSpace(context.Specialization) ? "-" : context.Specialization)</MudTd>
-        <MudTd DataLabel="Phone">@context.PhoneNumber</MudTd>
-        <MudTd DataLabel="Hire Date">@context.HireDate.ToString("yyyy-MM-dd")</MudTd>
-        <MudTd DataLabel="Status">
-            <MudChip T="string" Size="Size.Small" Color="@(context.IsActive ? Color.Success : Color.Default)">@(context.IsActive ? "Active" : "Inactive")</MudChip>
+        <MudTd DataLabel="@T.Staff.Position">@FormatPosition(context.Position)</MudTd>
+        <MudTd DataLabel="@T.Staff.Department">@(string.IsNullOrWhiteSpace(context.Department) ? "-" : context.Department)</MudTd>
+        <MudTd DataLabel="@T.Staff.Specialization">@(string.IsNullOrWhiteSpace(context.Specialization) ? "-" : context.Specialization)</MudTd>
+        <MudTd DataLabel="@T.Staff.Phone">@context.PhoneNumber</MudTd>
+        <MudTd DataLabel="@T.Staff.HireDate">@context.HireDate.ToString("yyyy-MM-dd")</MudTd>
+        <MudTd DataLabel="@T.Common.Status">
+            <MudChip T="string" Size="Size.Small" Color="@(context.IsActive ? Color.Success : Color.Default)">@(context.IsActive ? T.Common.Active : T.Common.Inactive)</MudChip>
         </MudTd>
-        <MudTd DataLabel="Actions">
-            <MudIconButton Icon="@Icons.Material.Filled.Edit" Size="Size.Small" Color="Color.Default" aria-label="Edit" OnClick="@(() => OpenEditDialogAsync(context))" />
+        <MudTd DataLabel="@T.Common.Actions">
+            <MudIconButton Icon="@Icons.Material.Filled.Edit" Size="Size.Small" Color="Color.Default" aria-label="@T.Common.Edit" OnClick="@(() => OpenEditDialogAsync(context))" />
             <MudIconButton Icon="@(context.IsActive ? Icons.Material.Filled.Block : Icons.Material.Filled.CheckCircle)"
                            Size="Size.Small"
                            Color="@(context.IsActive ? Color.Default : Color.Success)"
-                           aria-label="Toggle status"
+                           aria-label="@T.Staff.ToggleStatus"
                            OnClick="@(() => ToggleActiveAsync(context))" />
-            <MudIconButton Icon="@Icons.Material.Filled.Delete" Size="Size.Small" Color="Color.Error" aria-label="Delete" OnClick="@(() => DeleteStaffAsync(context))" />
+            <MudIconButton Icon="@Icons.Material.Filled.Delete" Size="Size.Small" Color="Color.Error" aria-label="@T.Common.Delete" OnClick="@(() => DeleteStaffAsync(context))" />
         </MudTd>
     </RowTemplate>
     <NoRecordsContent>
         @if (_loadError is not null)
         {
             <ErrorState Icon="@(_offline ? Icons.Material.Filled.CloudOff : Icons.Material.Filled.ErrorOutline)"
-                        Title="Couldn't load data"
+                        Title="@T.Staff.LoadErrorTitle"
                         Message="@_loadError"
                         Action="ReloadAsync" />
         }
         else
         {
         <EmptyState Icon="@Icons.Material.Filled.Badge"
-                    Title="No staff members yet"
-                    Message="Add staff before assigning shifts, salaries, or payroll."
-                    ActionLabel="Add your first staff member"
+                    Title="@T.Staff.EmptyTitle"
+                    Message="@T.Staff.EmptyMessage"
+                    ActionLabel="@T.Staff.EmptyActionLabel"
                     Action="OpenCreateDialogAsync" />
         }
     </NoRecordsContent>
@@ -100,8 +101,8 @@
         }
         catch (Exception)
         {
-            Snackbar.Add("Unable to reach the server.", Severity.Error);
-            _loadError = "Unable to reach the server.";
+            Snackbar.Add(T.Staff.Unreachable, Severity.Error);
+            _loadError = T.Staff.Unreachable;
             _offline = true;
             return new TableData<StaffDto> { Items = Array.Empty<StaffDto>(), TotalItems = 0 };
         }
@@ -132,7 +133,7 @@
     private async Task OpenCreateDialogAsync()
     {
         var options = new DialogOptions { MaxWidth = MaxWidth.Medium, FullWidth = true, NoHeader = true };
-        var dialog = await DialogService.ShowAsync<StaffEditorDialog>("New Staff", options);
+        var dialog = await DialogService.ShowAsync<StaffEditorDialog>(T.Staff.NewStaff, options);
         await ReloadIfSavedAsync(dialog);
     }
 
@@ -140,7 +141,7 @@
     {
         var parameters = new DialogParameters { ["Staff"] = staff };
         var options = new DialogOptions { MaxWidth = MaxWidth.Medium, FullWidth = true, NoHeader = true };
-        var dialog = await DialogService.ShowAsync<StaffEditorDialog>($"Edit {staff.FullName}", parameters, options);
+        var dialog = await DialogService.ShowAsync<StaffEditorDialog>(T.FormatValue(T.Staff.Edit, staff.FullName), parameters, options);
         await ReloadIfSavedAsync(dialog);
     }
 
@@ -160,7 +161,7 @@
             else
                 await ResourceService.ActivateStaffAsync(staff.Id);
 
-            Snackbar.Add(staff.IsActive ? "Staff member deactivated." : "Staff member activated.", Severity.Success);
+            Snackbar.Add(staff.IsActive ? T.Staff.Deactivated : T.Staff.Activated, Severity.Success);
             await ReloadAsync();
         }
         catch (ApiException ex)
@@ -169,17 +170,17 @@
         }
         catch (Exception)
         {
-            Snackbar.Add("Unable to reach the server.", Severity.Error);
+            Snackbar.Add(T.Staff.Unreachable, Severity.Error);
         }
     }
 
     private async Task DeleteStaffAsync(StaffDto staff)
     {
         var confirmed = await DialogService.ShowMessageBoxAsync(
-            "Delete Staff",
-            $"Are you sure you want to delete {staff.FullName}? This cannot be undone.",
-            "Delete",
-            "Cancel");
+            T.Staff.DeleteTitle,
+            T.FormatValue(T.Staff.DeleteConfirm, staff.FullName),
+            T.Common.Delete,
+            T.Common.Cancel);
 
         if (confirmed != true)
             return;
@@ -187,7 +188,7 @@
         try
         {
             await ResourceService.DeleteStaffAsync(staff.Id);
-            Snackbar.Add("Staff member deleted.", Severity.Success);
+            Snackbar.Add(T.Staff.Deleted, Severity.Success);
             await ReloadAsync();
         }
         catch (ApiException ex)
@@ -196,7 +197,7 @@
         }
         catch (Exception)
         {
-            Snackbar.Add("Unable to reach the server.", Severity.Error);
+            Snackbar.Add(T.Staff.Unreachable, Severity.Error);
         }
     }
 

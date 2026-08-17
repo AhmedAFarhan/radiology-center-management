@@ -1,16 +1,17 @@
 @inject ResourceService ResourceService
 @inject ISnackbar Snackbar
+@inject AppLocalizer T
 
 <MudDialog>
     <DialogContent>
-        <DialogHeader Icon="@Icons.Material.Filled.CalendarMonth" Title="@(Shift is null ? "New Work Shift" : "Edit Work Shift")" />
+        <DialogHeader Icon="@Icons.Material.Filled.CalendarMonth" Title="@(Shift is null ? T.WorkShift.NewWorkShift : T.WorkShift.EditWorkShift)" />
         <EditForm EditContext="_editContext">
             <DataAnnotationsValidator />
             <MudGrid Spacing="2">
                 <MudItem xs="12">
                     <MudAutocomplete T="StaffDto"
                                      @bind-Value="_selectedStaff"
-                                     Label="Staff member (search by name)"
+                                     Label="@T.WorkShiftDialog.StaffSearch"
                                      Variant="Variant.Outlined"
                                      Margin="Margin.Dense"
                                      MinCharacters="1"
@@ -22,21 +23,21 @@
                 </MudItem>
                 <MudItem xs="12" sm="6">
                     <MudDatePicker @bind-Date="_model.Date"
-                                   Label="Shift Date"
+                                   Label="@T.WorkShiftDialog.ShiftDate"
                                    Variant="Variant.Outlined"
                                    Margin="Margin.Dense"
                                    Class="w-100" />
                 </MudItem>
                 <MudItem xs="12" sm="3">
                     <MudTimePicker @bind-Time="_model.StartTime"
-                                   Label="Start Time"
+                                   Label="@T.WorkShiftDialog.StartTime"
                                    Variant="Variant.Outlined"
                                    Margin="Margin.Dense"
                                    Class="w-100" />
                 </MudItem>
                 <MudItem xs="12" sm="3">
                     <MudTimePicker @bind-Time="_model.EndTime"
-                                   Label="End Time"
+                                   Label="@T.WorkShiftDialog.EndTime"
                                    Variant="Variant.Outlined"
                                    Margin="Margin.Dense"
                                    Class="w-100" />
@@ -44,7 +45,7 @@
                 <MudItem xs="12">
                     <MudAutocomplete T="EquipmentDto"
                                      @bind-Value="_selectedEquipment"
-                                     Label="Equipment (optional)"
+                                     Label="@T.WorkShiftDialog.EquipmentOptional"
                                      Variant="Variant.Outlined"
                                      Margin="Margin.Dense"
                                      MinCharacters="1"
@@ -56,7 +57,7 @@
                 </MudItem>
                 <MudItem xs="12">
                     <MudTextField @bind-Value="_model.Notes"
-                                  Label="Notes"
+                                  Label="@T.WorkShift.Notes"
                                   Variant="Variant.Outlined"
                                   Margin="Margin.Dense"
                                   Lines="3"
@@ -66,7 +67,7 @@
         </EditForm>
     </DialogContent>
     <DialogActions>
-        <MudButton Color="Color.Default" OnClick="CancelAsync" Disabled="_busy">Cancel</MudButton>
+        <MudButton Color="Color.Default" OnClick="CancelAsync" Disabled="_busy">@T.Common.Cancel</MudButton>
         <MudButton Color="Color.Primary" Variant="Variant.Filled" OnClick="SubmitAsync" Disabled="_busy">
             @if (_busy)
             {
@@ -74,7 +75,7 @@
             }
             else
             {
-                <text>@(IsEdit ? "Save Changes" : "Create Work Shift")</text>
+                <text>@(IsEdit ? T.WorkShiftDialog.SaveChanges : T.WorkShiftDialog.CreateWorkShift)</text>
             }
         </MudButton>
     </DialogActions>
@@ -110,7 +111,7 @@
         }
         catch (Exception)
         {
-            Snackbar.Add("Unable to search staff.", Severity.Error);
+            Snackbar.Add(T.WorkShiftDialog.SearchStaffError, Severity.Error);
             return Array.Empty<StaffDto>();
         }
     }
@@ -132,7 +133,7 @@
         }
         catch (Exception)
         {
-            Snackbar.Add("Unable to search equipment.", Severity.Error);
+            Snackbar.Add(T.WorkShiftDialog.SearchEquipmentError, Severity.Error);
             return Array.Empty<EquipmentDto>();
         }
     }
@@ -171,25 +172,25 @@
 
         if (_selectedStaff is null)
         {
-            Snackbar.Add("Select a staff member.", Severity.Warning);
+            Snackbar.Add(T.WorkShiftDialog.SelectStaff, Severity.Warning);
             return;
         }
 
         if (_model.StartTime is null || _model.EndTime is null)
         {
-            Snackbar.Add("Select both start and end times.", Severity.Warning);
+            Snackbar.Add(T.WorkShiftDialog.SelectTimes, Severity.Warning);
             return;
         }
 
         if (_model.EndTime <= _model.StartTime)
         {
-            Snackbar.Add("End time must be after start time.", Severity.Warning);
+            Snackbar.Add(T.WorkShiftDialog.EndAfterStart, Severity.Warning);
             return;
         }
 
         if (_model.Date is null)
         {
-            Snackbar.Add("Select a shift date.", Severity.Warning);
+            Snackbar.Add(T.WorkShiftDialog.SelectDate, Severity.Warning);
             return;
         }
 
@@ -211,7 +212,7 @@
             else
                 await ResourceService.CreateWorkShiftAsync(input);
 
-            Snackbar.Add(IsEdit ? "Work shift updated." : "Work shift created.", Severity.Success);
+            Snackbar.Add(IsEdit ? T.WorkShiftDialog.Updated : T.WorkShiftDialog.Created, Severity.Success);
             MudDialog.Close(DialogResult.Ok(true));
         }
         catch (ApiException ex)
@@ -220,7 +221,7 @@
         }
         catch (Exception)
         {
-            Snackbar.Add("Unable to reach the server. Please try again.", Severity.Error);
+            Snackbar.Add(T.WorkShiftDialog.Unreachable, Severity.Error);
         }
         finally
         {

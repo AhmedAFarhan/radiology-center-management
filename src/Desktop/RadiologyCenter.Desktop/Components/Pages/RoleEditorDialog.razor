@@ -1,20 +1,21 @@
 @inject IdentityService IdentityService
 @inject ISnackbar Snackbar
+@inject AppLocalizer T
 
 <MudDialog>
     <DialogContent>
-        <DialogHeader Icon="@Icons.Material.Filled.Security" Title="@(Role is null ? "New Role" : "Edit Role")" />
+        <DialogHeader Icon="@Icons.Material.Filled.Security" Title="@(Role is null ? T.RoleDialog.NewRole : T.RoleDialog.EditTitle)" />
         <EditForm EditContext="_editContext">
             <DataAnnotationsValidator />
             <MudTextField @bind-Value="_model.Name"
-                          Label="Role Name"
+                          Label="@T.RoleDialog.RoleName"
                           Variant="Variant.Outlined"
                           Margin="Margin.Dense"
                           Immediate="true"
                           Class="mb-3"
                           For="@(() => _model.Name)" />
             <MudTextField @bind-Value="_model.Description"
-                          Label="Description"
+                          Label="@T.Roles.Description"
                           Variant="Variant.Outlined"
                           Margin="Margin.Dense"
                           Lines="3"
@@ -23,7 +24,7 @@
         </EditForm>
     </DialogContent>
     <DialogActions>
-        <MudButton Color="Color.Default" OnClick="CancelAsync" Disabled="_busy">Cancel</MudButton>
+        <MudButton Color="Color.Default" OnClick="CancelAsync" Disabled="_busy">@T.Common.Cancel</MudButton>
         <MudButton Color="Color.Primary" Variant="Variant.Filled" OnClick="SubmitAsync" Disabled="_busy">
             @if (_busy)
             {
@@ -31,7 +32,7 @@
             }
             else
             {
-                <text>@(IsEdit ? "Save Changes" : "Create Role")</text>
+                <text>@(IsEdit ? T.RoleDialog.SaveChanges : T.RoleDialog.CreateRole)</text>
             }
         </MudButton>
     </DialogActions>
@@ -74,7 +75,7 @@
                     Name = _model.Name,
                     Description = _model.Description,
                 });
-                Snackbar.Add("Role updated.", Severity.Success);
+                Snackbar.Add(T.RoleDialog.Updated, Severity.Success);
             }
             else
             {
@@ -83,7 +84,7 @@
                     Name = _model.Name,
                     Description = _model.Description,
                 });
-                Snackbar.Add("Role created.", Severity.Success);
+                Snackbar.Add(T.RoleDialog.Created, Severity.Success);
             }
 
             MudDialog.Close(DialogResult.Ok(true));
@@ -94,7 +95,7 @@
         }
         catch (Exception)
         {
-            Snackbar.Add("Unable to reach the server. Please try again.", Severity.Error);
+            Snackbar.Add(T.RoleDialog.UnreachableRetry, Severity.Error);
         }
         finally
         {

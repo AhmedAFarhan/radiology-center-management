@@ -26,6 +26,7 @@ public static class MauiProgram
         builder.Services.AddSingleton(updateService);
         builder.Services.AddMudServices();
 
+        builder.Services.AddSingleton<AppLocalizer>();
         builder.Services.AddSingleton<BackendStatusService>();
         builder.Services.AddSingleton<TokenStorage>();
         builder.Services.AddScoped<AppAuthenticationStateProvider>();

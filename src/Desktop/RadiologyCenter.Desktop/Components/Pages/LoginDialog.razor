@@ -3,6 +3,7 @@
 @inject IDialogService DialogService
 @inject ISnackbar Snackbar
 @inject NavigationManager Navigation
+@inject AppLocalizer T
 
 <MudDialog Class="login-dialog">
     <DialogContent>
@@ -10,19 +11,19 @@
             <MudAvatar Class="mb-3" Color="Color.Primary" Variant="Variant.Filled">
                 <MudIcon Icon="@Icons.Material.Filled.MedicalServices" />
             </MudAvatar>
-            <MudText Typo="Typo.h5" Class="mb-1">Sign in to EGcare</MudText>
-            <MudText Typo="Typo.body2" Class="text-secondary">Enter your credentials to continue</MudText>
+            <MudText Typo="Typo.h5" Class="mb-1">@T.Login.Title</MudText>
+            <MudText Typo="Typo.body2" Class="text-secondary">@T.Login.Subtitle</MudText>
         </div>
 
         <EditForm Model="@_model" OnValidSubmit="@SubmitAsync">
             <DataAnnotationsValidator />
             <MudTextField @bind-Value="_model.UserName"
-                          Label="Username"
+                          Label="@T.Login.Username"
                           Variant="Variant.Outlined"
                           Margin="Margin.Dense"
                           Immediate="true" />
             <MudTextField @bind-Value="_model.Password"
-                          Label="Password"
+                          Label="@T.Login.Password"
                           Variant="Variant.Outlined"
                           Margin="Margin.Dense"
                           InputType="InputType.Password"
@@ -41,7 +42,7 @@
                 }
                 else
                 {
-                    <text>Sign In</text>
+                    <text>@T.Login.Submit</text>
                 }
             </MudButton>
         </EditForm>
@@ -62,7 +63,7 @@
             var mustChangePassword = await AuthService.SignInAsync(_model.UserName, _model.Password);
             if (mustChangePassword)
             {
-                Snackbar.Add("You must set a new password before continuing.", Severity.Warning);
+                Snackbar.Add(T.Login.MustChangePassword, Severity.Warning);
                 MudDialog.Close(DialogResult.Ok(true));
                 var options = new DialogOptions
                 {
@@ -71,12 +72,12 @@
                     MaxWidth = MaxWidth.Small,
                     FullWidth = true,
                 };
-                await DialogService.ShowAsync<ChangePasswordDialog>("Change Password", new DialogParameters { ["Forced"] = true }, options);
+                await DialogService.ShowAsync<ChangePasswordDialog>(T.ChangePassword.Title, new DialogParameters { ["Forced"] = true }, options);
                 Navigation.NavigateTo("/dashboard");
                 return;
             }
 
-            Snackbar.Add("Welcome back!", Severity.Success);
+            Snackbar.Add(T.Login.Welcome, Severity.Success);
             MudDialog.Close(DialogResult.Ok(true));
             Navigation.NavigateTo("/dashboard");
         }
@@ -86,7 +87,7 @@
         }
         catch (Exception)
         {
-            Snackbar.Add("Unable to reach the server. Please try again.", Severity.Error);
+            Snackbar.Add(T.Login.Unreachable, Severity.Error);
         }
         finally
         {

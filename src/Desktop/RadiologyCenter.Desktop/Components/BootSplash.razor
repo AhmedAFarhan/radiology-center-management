@@ -1,4 +1,5 @@
 @inject BackendStatusService Backend
+@inject AppLocalizer T
 
 <div class="boot-splash" @onclick="() => { }" @oncontextmenu="() => { }">
     <div class="boot-splash-center">
@@ -21,11 +22,11 @@
         {
             <div class="boot-splash-error">
                 <MudIcon Icon="@Icons.Material.Filled.Error" Class="mr-2" Color="Color.Error" />
-                <span>Failed to start the local service.</span>
+                <span>@T.BootSplash.Failed</span>
             </div>
             <div class="boot-splash-error-detail">@Backend.Error</div>
             <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="RetryAsync" Disabled="_retrying" StartIcon="@Icons.Material.Filled.Refresh">
-                @if (_retrying) { @("Retrying…") } else { @("Try Again") }
+                @if (_retrying) { @T.BootSplash.Retrying } else { @T.BootSplash.TryAgain }
             </MudButton>
         }
     </div>

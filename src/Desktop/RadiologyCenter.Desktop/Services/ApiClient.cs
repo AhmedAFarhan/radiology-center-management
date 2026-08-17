@@ -33,11 +33,13 @@ public sealed class ApiClient
     private readonly HttpClient _http;
     private readonly TokenStorage _tokenStorage;
     private readonly AppAuthenticationStateProvider _authState;
+    private readonly AppLocalizer _localizer;
 
-    public ApiClient(TokenStorage tokenStorage, AppAuthenticationStateProvider authState)
+    public ApiClient(TokenStorage tokenStorage, AppAuthenticationStateProvider authState, AppLocalizer localizer)
     {
         _tokenStorage = tokenStorage;
         _authState = authState;
+        _localizer = localizer;
         _http = new HttpClient { BaseAddress = new Uri(BaseUrl), Timeout = TimeSpan.FromSeconds(30) };
     }
 
@@ -89,6 +91,7 @@ public sealed class ApiClient
     private async Task<T> SendCoreAsync<T>(Func<HttpRequestMessage> requestFactory, CancellationToken ct)
     {
         var request = requestFactory();
+        request.Headers.AcceptLanguage.TryParseAdd(_localizer.CurrentCulture);
         var tokens = _tokenStorage.GetTokens();
         if (tokens is not null)
             request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", tokens.AccessToken);
@@ -105,6 +108,7 @@ public sealed class ApiClient
             else
             {
                 request = requestFactory();
+                request.Headers.AcceptLanguage.TryParseAdd(_localizer.CurrentCulture);
                 request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", refreshed.AccessToken);
                 response = await _http.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, ct);
             }
@@ -116,6 +120,7 @@ public sealed class ApiClient
     private async Task<byte[]> SendCoreRawAsync(Func<HttpRequestMessage> requestFactory, CancellationToken ct)
     {
         var request = requestFactory();
+        request.Headers.AcceptLanguage.TryParseAdd(_localizer.CurrentCulture);
         var tokens = _tokenStorage.GetTokens();
         if (tokens is not null)
             request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", tokens.AccessToken);
@@ -132,6 +137,7 @@ public sealed class ApiClient
             else
             {
                 request = requestFactory();
+                request.Headers.AcceptLanguage.TryParseAdd(_localizer.CurrentCulture);
                 request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", refreshed.AccessToken);
                 response = await _http.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, ct);
             }

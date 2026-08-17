@@ -3,64 +3,65 @@
 @inject ResourceService ResourceService
 @inject IDialogService DialogService
 @inject ISnackbar Snackbar
+@inject AppLocalizer T
 @implements IDisposable
 
-<PageHeader Icon="@Icons.Material.Filled.Biotech" Title="Equipment"
-            Subtitle="Manage radiology equipment"
+<PageHeader Icon="@Icons.Material.Filled.Biotech" Title="@T.Equipment.Title"
+            Subtitle="@T.Equipment.Subtitle"
             SearchValueChanged="OnSearchChanged"
-            SearchPlaceholder="Search equipment..."
+            SearchPlaceholder="@T.Equipment.SearchPlaceholder"
             OnRefresh="ReloadAsync">
-    <MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Add" OnClick="OpenCreateDialogAsync">Add Equipment</MudButton>
+    <MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Add" OnClick="OpenCreateDialogAsync">@T.Equipment.Add</MudButton>
 </PageHeader>
 
 <MudTable T="EquipmentDto" @ref="_table" ServerData="LoadServerData" Dense="true" Hover="true" Striped="true" Elevation="1" RowsPerPage="10">
     <HeaderContent>
-        <MudTh><MudTableSortLabel T="EquipmentDto" SortLabel="@("Name")">Name</MudTableSortLabel></MudTh>
-        <MudTh><MudTableSortLabel T="EquipmentDto" SortLabel="@("SerialNumber")">Serial Number</MudTableSortLabel></MudTh>
-        <MudTh><MudTableSortLabel T="EquipmentDto" SortLabel="@("Modality")">Modality</MudTableSortLabel></MudTh>
-        <MudTh>Status</MudTh>
-        <MudTh><MudTableSortLabel T="EquipmentDto" SortLabel="@("PurchaseDate")">Purchase Date</MudTableSortLabel></MudTh>
-        <MudTh>Active</MudTh>
-        <MudTh>Actions</MudTh>
+        <MudTh><MudTableSortLabel T="EquipmentDto" SortLabel="@("Name")">@T.Common.Name</MudTableSortLabel></MudTh>
+        <MudTh><MudTableSortLabel T="EquipmentDto" SortLabel="@("SerialNumber")">@T.Equipment.SerialNumber</MudTableSortLabel></MudTh>
+        <MudTh><MudTableSortLabel T="EquipmentDto" SortLabel="@("Modality")">@T.Equipment.Modality</MudTableSortLabel></MudTh>
+        <MudTh>@T.Common.Status</MudTh>
+        <MudTh><MudTableSortLabel T="EquipmentDto" SortLabel="@("PurchaseDate")">@T.Equipment.PurchaseDate</MudTableSortLabel></MudTh>
+        <MudTh>@T.Common.Active</MudTh>
+        <MudTh>@T.Common.Actions</MudTh>
     </HeaderContent>
     <RowTemplate>
-        <MudTd DataLabel="Name">
+        <MudTd DataLabel="@T.Common.Name">
             <MudText Class="font-weight-medium">@context.Name</MudText>
         </MudTd>
-        <MudTd DataLabel="Serial Number">@(string.IsNullOrWhiteSpace(context.SerialNumber) ? "-" : context.SerialNumber)</MudTd>
-        <MudTd DataLabel="Modality">@FormatModality(context.Modality)</MudTd>
-        <MudTd DataLabel="Status">
+        <MudTd DataLabel="@T.Equipment.SerialNumber">@(string.IsNullOrWhiteSpace(context.SerialNumber) ? "-" : context.SerialNumber)</MudTd>
+        <MudTd DataLabel="@T.Equipment.Modality">@FormatModality(context.Modality)</MudTd>
+        <MudTd DataLabel="@T.Common.Status">
             <MudChip T="string" Size="Size.Small" Color="@StatusColor(context.Status)">@FormatStatus(context.Status)</MudChip>
         </MudTd>
-        <MudTd DataLabel="Purchase Date">@(context.PurchaseDate?.ToString("yyyy-MM-dd") ?? "-")</MudTd>
-        <MudTd DataLabel="Active">
-            <MudChip T="string" Size="Size.Small" Color="@(context.IsActive ? Color.Success : Color.Default)">@(context.IsActive ? "Active" : "Inactive")</MudChip>
+        <MudTd DataLabel="@T.Equipment.PurchaseDate">@(context.PurchaseDate?.ToString("yyyy-MM-dd") ?? "-")</MudTd>
+        <MudTd DataLabel="@T.Common.Active">
+            <MudChip T="string" Size="Size.Small" Color="@(context.IsActive ? Color.Success : Color.Default)">@(context.IsActive ? T.Common.Active : T.Common.Inactive)</MudChip>
         </MudTd>
-        <MudTd DataLabel="Actions">
-            <MudIconButton Icon="@Icons.Material.Filled.Edit" Size="Size.Small" Color="Color.Default" aria-label="Edit" OnClick="@(() => OpenEditDialogAsync(context))" />
-            <MudIconButton Icon="@Icons.Material.Filled.Settings" Size="Size.Small" Color="Color.Info" aria-label="Set status" OnClick="@(() => OpenStatusDialogAsync(context))" />
+        <MudTd DataLabel="@T.Common.Actions">
+            <MudIconButton Icon="@Icons.Material.Filled.Edit" Size="Size.Small" Color="Color.Default" aria-label="@T.Common.Edit" OnClick="@(() => OpenEditDialogAsync(context))" />
+            <MudIconButton Icon="@Icons.Material.Filled.Settings" Size="Size.Small" Color="Color.Info" aria-label="@T.Equipment.SetStatus" OnClick="@(() => OpenStatusDialogAsync(context))" />
             <MudIconButton Icon="@(context.IsActive ? Icons.Material.Filled.Block : Icons.Material.Filled.CheckCircle)"
                            Size="Size.Small"
                            Color="@(context.IsActive ? Color.Default : Color.Success)"
-                           aria-label="Toggle status"
+                           aria-label="@T.Equipment.ToggleStatus"
                            OnClick="@(() => ToggleActiveAsync(context))" />
-            <MudIconButton Icon="@Icons.Material.Filled.Delete" Size="Size.Small" Color="Color.Error" aria-label="Delete" OnClick="@(() => DeleteEquipmentAsync(context))" />
+            <MudIconButton Icon="@Icons.Material.Filled.Delete" Size="Size.Small" Color="Color.Error" aria-label="@T.Common.Delete" OnClick="@(() => DeleteEquipmentAsync(context))" />
         </MudTd>
     </RowTemplate>
     <NoRecordsContent>
         @if (_loadError is not null)
         {
             <ErrorState Icon="@(_offline ? Icons.Material.Filled.CloudOff : Icons.Material.Filled.ErrorOutline)"
-                        Title="Couldn't load data"
+                        Title="@T.Equipment.LoadErrorTitle"
                         Message="@_loadError"
                         Action="ReloadAsync" />
         }
         else
         {
         <EmptyState Icon="@Icons.Material.Filled.Biotech"
-                    Title="No equipment yet"
-                    Message="Add the radiology equipment used across the center."
-                    ActionLabel="Add your first equipment"
+                    Title="@T.Equipment.EmptyTitle"
+                    Message="@T.Equipment.EmptyMessage"
+                    ActionLabel="@T.Equipment.EmptyActionLabel"
                     Action="OpenCreateDialogAsync" />
         }
     </NoRecordsContent>
@@ -101,8 +102,8 @@
         }
         catch (Exception)
         {
-            Snackbar.Add("Unable to reach the server.", Severity.Error);
-            _loadError = "Unable to reach the server.";
+            Snackbar.Add(T.Equipment.Unreachable, Severity.Error);
+            _loadError = T.Equipment.Unreachable;
             _offline = true;
             return new TableData<EquipmentDto> { Items = Array.Empty<EquipmentDto>(), TotalItems = 0 };
         }
@@ -133,7 +134,7 @@
     private async Task OpenCreateDialogAsync()
     {
         var options = new DialogOptions { MaxWidth = MaxWidth.Medium, FullWidth = true, NoHeader = true };
-        var dialog = await DialogService.ShowAsync<EquipmentEditorDialog>("New Equipment", options);
+        var dialog = await DialogService.ShowAsync<EquipmentEditorDialog>(T.Equipment.NewEquipment, options);
         await ReloadIfSavedAsync(dialog);
     }
 
@@ -141,7 +142,7 @@
     {
         var parameters = new DialogParameters { ["Equipment"] = equipment };
         var options = new DialogOptions { MaxWidth = MaxWidth.Medium, FullWidth = true, NoHeader = true };
-        var dialog = await DialogService.ShowAsync<EquipmentEditorDialog>($"Edit {equipment.Name}", parameters, options);
+        var dialog = await DialogService.ShowAsync<EquipmentEditorDialog>(T.FormatValue(T.Equipment.Edit, equipment.Name), parameters, options);
         await ReloadIfSavedAsync(dialog);
     }
 
@@ -149,7 +150,7 @@
     {
         var parameters = new DialogParameters { ["Equipment"] = equipment };
         var options = new DialogOptions { MaxWidth = MaxWidth.Small, FullWidth = true, NoHeader = true };
-        var dialog = await DialogService.ShowAsync<EquipmentStatusDialog>($"Set Status - {equipment.Name}", parameters, options);
+        var dialog = await DialogService.ShowAsync<EquipmentStatusDialog>(T.FormatValue(T.Equipment.SetStatusTitle, equipment.Name), parameters, options);
         await ReloadIfSavedAsync(dialog);
     }
 
@@ -169,7 +170,7 @@
             else
                 await ResourceService.ActivateEquipmentAsync(equipment.Id);
 
-            Snackbar.Add(equipment.IsActive ? "Equipment deactivated." : "Equipment activated.", Severity.Success);
+            Snackbar.Add(equipment.IsActive ? T.Equipment.Deactivated : T.Equipment.Activated, Severity.Success);
             await ReloadAsync();
         }
         catch (ApiException ex)
@@ -178,17 +179,17 @@
         }
         catch (Exception)
         {
-            Snackbar.Add("Unable to reach the server.", Severity.Error);
+            Snackbar.Add(T.Equipment.Unreachable, Severity.Error);
         }
     }
 
     private async Task DeleteEquipmentAsync(EquipmentDto equipment)
     {
         var confirmed = await DialogService.ShowMessageBoxAsync(
-            "Delete Equipment",
-            $"Are you sure you want to delete {equipment.Name}? This cannot be undone.",
-            "Delete",
-            "Cancel");
+            T.Equipment.DeleteTitle,
+            T.FormatValue(T.Equipment.DeleteConfirm, equipment.Name),
+            T.Common.Delete,
+            T.Common.Cancel);
 
         if (confirmed != true)
             return;
@@ -196,7 +197,7 @@
         try
         {
             await ResourceService.DeleteEquipmentAsync(equipment.Id);
-            Snackbar.Add("Equipment deleted.", Severity.Success);
+            Snackbar.Add(T.Equipment.Deleted, Severity.Success);
             await ReloadAsync();
         }
         catch (ApiException ex)
@@ -205,7 +206,7 @@
         }
         catch (Exception)
         {
-            Snackbar.Add("Unable to reach the server.", Severity.Error);
+            Snackbar.Add(T.Equipment.Unreachable, Severity.Error);
         }
     }
 

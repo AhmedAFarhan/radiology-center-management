@@ -1,10 +1,11 @@
 @inject PayrollService PayrollService
 @inject ResourceService ResourceService
 @inject ISnackbar Snackbar
+@inject AppLocalizer T
 
 <MudDialog>
     <DialogContent>
-        <DialogHeader Icon="@Icons.Material.Filled.AttachMoney" Title="@(Allowance is null ? "New Allowance" : $"Edit {Allowance.Name}")" />
+        <DialogHeader Icon="@Icons.Material.Filled.AttachMoney" Title="@(Allowance is null ? T.Allowance.NewAllowance : T.FormatValue(T.Allowance.EditTitle, Allowance.Name))" />
         <EditForm EditContext="_editContext">
             <DataAnnotationsValidator />
             <MudGrid Spacing="2">
@@ -12,14 +13,14 @@
                 {
                     <MudItem xs="12" sm="6">
                         <MudTextField @bind-Value="_employeeName"
-                                      Label="Employee"
+                                      Label="@T.Allowance.Employee"
                                       Variant="Variant.Outlined"
                                       Margin="Margin.Dense"
                                       ReadOnly="true" />
                     </MudItem>
                     <MudItem xs="12" sm="6">
                         <MudTextField @bind-Value="_componentName"
-                                      Label="Salary Component"
+                                      Label="@T.AllowanceDialog.SalaryComponent"
                                       Variant="Variant.Outlined"
                                       Margin="Margin.Dense"
                                       ReadOnly="true" />
@@ -30,7 +31,7 @@
                     <MudItem xs="12" sm="6">
                         <MudAutocomplete T="StaffDto"
                                          @bind-Value="_selectedStaff"
-                                         Label="Employee (search by name)"
+                                         Label="@T.AllowanceDialog.EmployeeSearch"
                                          Variant="Variant.Outlined"
                                          Margin="Margin.Dense"
                                          MinCharacters="1"
@@ -43,7 +44,7 @@
                     <MudItem xs="12" sm="6">
                         <MudAutocomplete T="SalaryComponentDto"
                                          @bind-Value="_selectedComponent"
-                                         Label="Salary Component (optional)"
+                                         Label="@T.AllowanceDialog.SalaryComponentOptional"
                                          Variant="Variant.Outlined"
                                          Margin="Margin.Dense"
                                          MinCharacters="1"
@@ -56,7 +57,7 @@
                 }
                 <MudItem xs="12" sm="6">
                     <MudTextField @bind-Value="_model.Name"
-                                  Label="Allowance Name"
+                                  Label="@T.AllowanceDialog.AllowanceName"
                                   Variant="Variant.Outlined"
                                   Margin="Margin.Dense"
                                   Immediate="true"
@@ -65,7 +66,7 @@
                 <MudItem xs="12" sm="6">
                     <MudNumericField T="decimal"
                                      @bind-Value="_model.Amount"
-                                     Label="Amount"
+                                     Label="@T.AllowanceDialog.Amount"
                                      Variant="Variant.Outlined"
                                      Margin="Margin.Dense"
                                      Min="0"
@@ -74,10 +75,10 @@
                 <MudItem xs="12" sm="4">
                     <MudSelect T="string"
                                @bind-Value="_model.Frequency"
-                               Label="Frequency (optional)"
+                               Label="@T.AllowanceDialog.FrequencyOptional"
                                Variant="Variant.Outlined"
                                Margin="Margin.Dense">
-                        <MudSelectItem T="string" Value="@((string?)null)">Not set</MudSelectItem>
+                        <MudSelectItem T="string" Value="@((string?)null)">@T.AllowanceDialog.NotSet</MudSelectItem>
                         @foreach (var frequency in Frequencies)
                         {
                             <MudSelectItem T="string" Value="@frequency">@FormatFrequency(frequency)</MudSelectItem>
@@ -86,26 +87,26 @@
                 </MudItem>
                 <MudItem xs="12" sm="4">
                     <MudDatePicker @bind-Date="_model.EffectiveDate"
-                                   Label="Effective Date"
+                                   Label="@T.AllowanceDialog.EffectiveDate"
                                    Variant="Variant.Outlined"
                                    Margin="Margin.Dense"
                                    Class="w-100" />
                 </MudItem>
                 <MudItem xs="12" sm="4">
                     <MudDatePicker @bind-Date="_model.EndDate"
-                                   Label="End Date (optional)"
+                                   Label="@T.AllowanceDialog.EndDateOptional"
                                    Variant="Variant.Outlined"
                                    Margin="Margin.Dense"
                                    Class="w-100" />
                 </MudItem>
                 <MudItem xs="12">
-                    <MudSwitch T="bool" @bind-Value="_model.IsPerWorkDay" Color="Color.Primary">Paid per work day</MudSwitch>
+                    <MudSwitch T="bool" @bind-Value="_model.IsPerWorkDay" Color="Color.Primary">@T.AllowanceDialog.PaidPerWorkDay</MudSwitch>
                 </MudItem>
             </MudGrid>
         </EditForm>
     </DialogContent>
     <DialogActions>
-        <MudButton Color="Color.Default" OnClick="CancelAsync" Disabled="_busy">Cancel</MudButton>
+        <MudButton Color="Color.Default" OnClick="CancelAsync" Disabled="_busy">@T.Common.Cancel</MudButton>
         <MudButton Color="Color.Primary" Variant="Variant.Filled" OnClick="SubmitAsync" Disabled="_busy">
             @if (_busy)
             {
@@ -113,7 +114,7 @@
             }
             else
             {
-                <text>@(IsEdit ? "Save Changes" : "Create Allowance")</text>
+                <text>@(IsEdit ? T.AllowanceDialog.SaveChanges : T.AllowanceDialog.CreateAllowance)</text>
             }
         </MudButton>
     </DialogActions>
@@ -213,19 +214,19 @@
 
         if (!IsEdit && _selectedStaff is null)
         {
-            Snackbar.Add("Select an employee.", Severity.Warning);
+            Snackbar.Add(T.AllowanceDialog.SelectEmployee, Severity.Warning);
             return;
         }
 
         if (_model.EffectiveDate is null)
         {
-            Snackbar.Add("Select an effective date.", Severity.Warning);
+            Snackbar.Add(T.AllowanceDialog.SelectEffectiveDate, Severity.Warning);
             return;
         }
 
         if (_model.EndDate is { } end && end < _model.EffectiveDate)
         {
-            Snackbar.Add("End date must be on or after effective date.", Severity.Warning);
+            Snackbar.Add(T.AllowanceDialog.EndDateValidation, Severity.Warning);
             return;
         }
 
@@ -251,7 +252,7 @@
             else
                 await PayrollService.CreateAllowanceAsync(input);
 
-            Snackbar.Add(IsEdit ? "Allowance updated." : "Allowance created.", Severity.Success);
+            Snackbar.Add(IsEdit ? T.AllowanceDialog.Updated : T.AllowanceDialog.Created, Severity.Success);
             MudDialog.Close(DialogResult.Ok(true));
         }
         catch (ApiException ex)
@@ -260,7 +261,7 @@
         }
         catch (Exception)
         {
-            Snackbar.Add("Unable to reach the server. Please try again.", Severity.Error);
+            Snackbar.Add(T.AllowanceDialog.Unreachable, Severity.Error);
         }
         finally
         {

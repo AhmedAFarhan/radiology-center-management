@@ -3,70 +3,71 @@
 @inject InventoryService InventoryService
 @inject IDialogService DialogService
 @inject ISnackbar Snackbar
+@inject AppLocalizer T
 @implements IDisposable
 
-<PageHeader Icon="@Icons.Material.Filled.Inventory2" Title="Inventory"
-            Subtitle="Manage items and stock"
+<PageHeader Icon="@Icons.Material.Filled.Inventory2" Title="@T.Inventory.Title"
+            Subtitle="@T.Inventory.Subtitle"
             SearchValueChanged="OnSearchChanged"
-            SearchPlaceholder="Search items..."
+            SearchPlaceholder="@T.Inventory.SearchPlaceholder"
             OnRefresh="ReloadAsync">
-    <MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Add" OnClick="OpenCreateDialogAsync">Add Item</MudButton>
+    <MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Add" OnClick="OpenCreateDialogAsync">@T.Inventory.AddItem</MudButton>
 </PageHeader>
 
 <MudTable T="ItemDto" @ref="_table" ServerData="LoadServerData" Dense="true" Hover="true" Striped="true" Elevation="1" RowsPerPage="10">
     <HeaderContent>
-        <MudTh><MudTableSortLabel T="ItemDto" SortLabel="@("Name")">Name</MudTableSortLabel></MudTh>
-        <MudTh><MudTableSortLabel T="ItemDto" SortLabel="@("Category")">Category</MudTableSortLabel></MudTh>
-        <MudTh><MudTableSortLabel T="ItemDto" SortLabel="@("Unit")">Unit</MudTableSortLabel></MudTh>
-        <MudTh><MudTableSortLabel T="ItemDto" SortLabel="@("ReorderLevel")">Reorder Level</MudTableSortLabel></MudTh>
-        <MudTh><MudTableSortLabel T="ItemDto" SortLabel="@("ReorderQuantity")">Reorder Qty</MudTableSortLabel></MudTh>
-        <MudTh>Lot Tracked</MudTh>
-        <MudTh>Status</MudTh>
-        <MudTh>Actions</MudTh>
+        <MudTh><MudTableSortLabel T="ItemDto" SortLabel="@("Name")">@T.Common.Name</MudTableSortLabel></MudTh>
+        <MudTh><MudTableSortLabel T="ItemDto" SortLabel="@("Category")">@T.Inventory.Category</MudTableSortLabel></MudTh>
+        <MudTh><MudTableSortLabel T="ItemDto" SortLabel="@("Unit")">@T.Inventory.Unit</MudTableSortLabel></MudTh>
+        <MudTh><MudTableSortLabel T="ItemDto" SortLabel="@("ReorderLevel")">@T.Inventory.ReorderLevel</MudTableSortLabel></MudTh>
+        <MudTh><MudTableSortLabel T="ItemDto" SortLabel="@("ReorderQuantity")">@T.Inventory.ReorderQty</MudTableSortLabel></MudTh>
+        <MudTh>@T.Inventory.LotTracked</MudTh>
+        <MudTh>@T.Common.Status</MudTh>
+        <MudTh>@T.Common.Actions</MudTh>
     </HeaderContent>
     <RowTemplate>
-        <MudTd DataLabel="Name">
+        <MudTd DataLabel="@T.Common.Name">
             <MudText Class="font-weight-medium">@context.Name</MudText>
             @if (!string.IsNullOrWhiteSpace(context.Brand))
             {
                 <MudText Typo="Typo.caption" Class="text-secondary">@context.Brand</MudText>
             }
         </MudTd>
-        <MudTd DataLabel="Category">@FormatCategory(context.Category)</MudTd>
-        <MudTd DataLabel="Unit">@context.Unit</MudTd>
-        <MudTd DataLabel="Reorder Level">@context.ReorderLevel</MudTd>
-        <MudTd DataLabel="Reorder Qty">@context.ReorderQuantity</MudTd>
-        <MudTd DataLabel="Lot Tracked">
-            <MudChip T="string" Size="Size.Small" Color="@(context.LotTracked ? Color.Primary : Color.Default)">@(context.LotTracked ? "Yes" : "No")</MudChip>
+        <MudTd DataLabel="@T.Inventory.Category">@FormatCategory(context.Category)</MudTd>
+        <MudTd DataLabel="@T.Inventory.Unit">@context.Unit</MudTd>
+        <MudTd DataLabel="@T.Inventory.ReorderLevel">@context.ReorderLevel</MudTd>
+        <MudTd DataLabel="@T.Inventory.ReorderQty">@context.ReorderQuantity</MudTd>
+        <MudTd DataLabel="@T.Inventory.LotTracked">
+            <MudChip T="string" Size="Size.Small" Color="@(context.LotTracked ? Color.Primary : Color.Default)">@(context.LotTracked ? T.Common.Yes : T.Common.No)</MudChip>
         </MudTd>
-        <MudTd DataLabel="Status">
-            <MudChip T="string" Size="Size.Small" Color="@(context.IsActive ? Color.Success : Color.Default)">@(context.IsActive ? "Active" : "Inactive")</MudChip>
+        <MudTd DataLabel="@T.Common.Status">
+            <MudChip T="string" Size="Size.Small" Color="@(context.IsActive ? Color.Success : Color.Default)">@(context.IsActive ? T.Common.Active : T.Common.Inactive)</MudChip>
         </MudTd>
-        <MudTd DataLabel="Actions">
-            <MudIconButton Icon="@Icons.Material.Filled.Edit" Size="Size.Small" Color="Color.Default" aria-label="Edit" OnClick="@(() => OpenEditDialogAsync(context))" />
-            <MudIconButton Icon="@Icons.Material.Filled.Inventory2" Size="Size.Small" Color="Color.Info" aria-label="Stock" OnClick="@(() => OpenStockDialogAsync(context))" />
+        <MudTd DataLabel="@T.Common.Actions">
+            <MudIconButton Icon="@Icons.Material.Filled.Edit" Size="Size.Small" Color="Color.Default" aria-label="@T.Common.Edit" OnClick="@(() => OpenEditDialogAsync(context))" />
+            <MudIconButton Icon="@Icons.Material.Filled.Inventory2" Size="Size.Small" Color="Color.Info" aria-label="@T.Inventory.Stock" OnClick="@(() => OpenStockDialogAsync(context))" />
             <MudIconButton Icon="@(context.IsActive ? Icons.Material.Filled.Block : Icons.Material.Filled.CheckCircle)"
                            Size="Size.Small"
                            Color="@(context.IsActive ? Color.Default : Color.Success)"
-                           aria-label="Toggle status"
+                           aria-label="@T.Inventory.ToggleStatus"
                            OnClick="@(() => ToggleActiveAsync(context))" />
-            <MudIconButton Icon="@Icons.Material.Filled.Delete" Size="Size.Small" Color="Color.Error" aria-label="Delete" OnClick="@(() => DeleteItemAsync(context))" />
+            <MudIconButton Icon="@Icons.Material.Filled.Delete" Size="Size.Small" Color="Color.Error" aria-label="@T.Common.Delete" OnClick="@(() => DeleteItemAsync(context))" />
         </MudTd>
     </RowTemplate>
     <NoRecordsContent>
         @if (_loadError is not null)
         {
             <ErrorState Icon="@(_offline ? Icons.Material.Filled.CloudOff : Icons.Material.Filled.ErrorOutline)"
-                        Title="Couldn't load data"
+                        Title="@T.Inventory.LoadErrorTitle"
                         Message="@_loadError"
                         Action="ReloadAsync" />
         }
         else
         {
         <EmptyState Icon="@Icons.Material.Filled.Inventory2"
-                    Title="No items yet"
-                    Message="Add items to start tracking stock and suppliers."
-                    ActionLabel="Add your first item"
+                    Title="@T.Inventory.NoItemsTitle"
+                    Message="@T.Inventory.EmptyMessage"
+                    ActionLabel="@T.Inventory.AddFirstItem"
                     Action="OpenCreateDialogAsync" />
         }
     </NoRecordsContent>
@@ -107,8 +108,8 @@
         }
         catch (Exception)
         {
-            Snackbar.Add("Unable to reach the server.", Severity.Error);
-            _loadError = "Unable to reach the server.";
+            Snackbar.Add(T.Inventory.Unreachable, Severity.Error);
+            _loadError = T.Inventory.Unreachable;
             _offline = true;
             return new TableData<ItemDto> { Items = Array.Empty<ItemDto>(), TotalItems = 0 };
         }
@@ -139,7 +140,7 @@
     private async Task OpenCreateDialogAsync()
     {
         var options = new DialogOptions { MaxWidth = MaxWidth.Medium, FullWidth = true, NoHeader = true };
-        var dialog = await DialogService.ShowAsync<ItemEditorDialog>("New Item", options);
+        var dialog = await DialogService.ShowAsync<ItemEditorDialog>(T.ItemDialog.NewItem, options);
         await ReloadIfSavedAsync(dialog);
     }
 
@@ -147,7 +148,7 @@
     {
         var parameters = new DialogParameters { ["Item"] = item };
         var options = new DialogOptions { MaxWidth = MaxWidth.Medium, FullWidth = true, NoHeader = true };
-        var dialog = await DialogService.ShowAsync<ItemEditorDialog>("Edit Item", parameters, options);
+        var dialog = await DialogService.ShowAsync<ItemEditorDialog>(T.ItemDialog.EditItem, parameters, options);
         await ReloadIfSavedAsync(dialog);
     }
 
@@ -177,7 +178,7 @@
             else
                 await InventoryService.ActivateItemAsync(item.Id);
 
-            Snackbar.Add(item.IsActive ? "Item deactivated." : "Item activated.", Severity.Success);
+            Snackbar.Add(item.IsActive ? T.Inventory.ItemDeactivated : T.Inventory.ItemActivated, Severity.Success);
             await ReloadAsync();
         }
         catch (ApiException ex)
@@ -186,17 +187,17 @@
         }
         catch (Exception)
         {
-            Snackbar.Add("Unable to reach the server.", Severity.Error);
+            Snackbar.Add(T.Inventory.Unreachable, Severity.Error);
         }
     }
 
     private async Task DeleteItemAsync(ItemDto item)
     {
         var confirmed = await DialogService.ShowMessageBoxAsync(
-            "Delete Item",
-            $"Are you sure you want to delete {item.Name}? This cannot be undone.",
-            "Delete",
-            "Cancel");
+            T.Inventory.DeleteItemTitle,
+            T.FormatValue(T.Inventory.DeleteConfirm, item.Name),
+            T.Common.Delete,
+            T.Common.Cancel);
 
         if (confirmed != true)
             return;
@@ -204,7 +205,7 @@
         try
         {
             await InventoryService.DeleteItemAsync(item.Id);
-            Snackbar.Add("Item deleted.", Severity.Success);
+            Snackbar.Add(T.Inventory.ItemDeleted, Severity.Success);
             await ReloadAsync();
         }
         catch (ApiException ex)
@@ -213,7 +214,7 @@
         }
         catch (Exception)
         {
-            Snackbar.Add("Unable to reach the server.", Severity.Error);
+            Snackbar.Add(T.Inventory.Unreachable, Severity.Error);
         }
     }
 

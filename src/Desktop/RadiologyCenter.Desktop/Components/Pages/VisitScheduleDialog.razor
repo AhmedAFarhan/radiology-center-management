@@ -1,22 +1,23 @@
 @inject ExaminationService ExaminationService
 @inject ISnackbar Snackbar
+@inject AppLocalizer T
 
 <MudDialog>
     <DialogContent>
-        <DialogHeader Icon="@Icons.Material.Filled.EventNote" Title="@($"Schedule {Visit.ExaminationTypeName}")" />
+        <DialogHeader Icon="@Icons.Material.Filled.EventNote" Title="@(T.FormatValue(T.VisitSchedule.Title, Visit.ExaminationTypeName))" />
         <MudDatePicker @bind-Date="_scheduledAt"
-                       Label="Scheduled Date"
+                       Label="@T.VisitSchedule.ScheduledDate"
                        Variant="Variant.Outlined"
                        Margin="Margin.Dense"
                        Class="w-100" />
         <MudTimePicker @bind-Time="_scheduledTime"
-                       Label="Scheduled Time"
+                       Label="@T.VisitSchedule.ScheduledTime"
                        Variant="Variant.Outlined"
                        Margin="Margin.Dense"
                        Class="w-100" />
     </DialogContent>
     <DialogActions>
-        <MudButton Color="Color.Default" OnClick="CancelAsync" Disabled="_busy">Cancel</MudButton>
+        <MudButton Color="Color.Default" OnClick="CancelAsync" Disabled="_busy">@T.Common.Cancel</MudButton>
         <MudButton Color="Color.Primary" Variant="Variant.Filled" OnClick="SubmitAsync" Disabled="_busy">
             @if (_busy)
             {
@@ -24,7 +25,7 @@
             }
             else
             {
-                <text>Schedule</text>
+                <text>@T.VisitSchedule.Schedule</text>
             }
         </MudButton>
     </DialogActions>
@@ -43,7 +44,7 @@
     {
         if (_scheduledAt is null || _scheduledTime is null)
         {
-            Snackbar.Add("Select a date and time.", Severity.Warning);
+            Snackbar.Add(T.VisitSchedule.SelectDateTime, Severity.Warning);
             return;
         }
 
@@ -53,7 +54,7 @@
         try
         {
             await ExaminationService.ScheduleAsync(Visit.Id, scheduledAt);
-            Snackbar.Add("Visit scheduled.", Severity.Success);
+            Snackbar.Add(T.VisitSchedule.Scheduled, Severity.Success);
             MudDialog.Close(DialogResult.Ok(true));
         }
         catch (ApiException ex)
@@ -62,7 +63,7 @@
         }
         catch (Exception)
         {
-            Snackbar.Add("Unable to reach the server.", Severity.Error);
+            Snackbar.Add(T.VisitSchedule.Unreachable, Severity.Error);
         }
         finally
         {

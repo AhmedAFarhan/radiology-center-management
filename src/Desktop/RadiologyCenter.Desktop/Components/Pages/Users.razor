@@ -4,60 +4,61 @@
 @inject TokenStorage TokenStorage
 @inject IDialogService DialogService
 @inject ISnackbar Snackbar
+@inject AppLocalizer T
 @implements IDisposable
 
-<PageHeader Icon="@Icons.Material.Filled.Person" Title="Users"
-            Subtitle="Manage user accounts and roles"
+<PageHeader Icon="@Icons.Material.Filled.Person" Title="@T.Users.Title"
+            Subtitle="@T.Users.Subtitle"
             SearchValueChanged="OnSearchChanged"
-            SearchPlaceholder="Search users..."
+            SearchPlaceholder="@T.Users.SearchPlaceholder"
             OnRefresh="ReloadAsync">
-    <MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Add" OnClick="OpenCreateDialogAsync">New User</MudButton>
+    <MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Add" OnClick="OpenCreateDialogAsync">@T.Users.NewUser</MudButton>
 </PageHeader>
 
 <MudTable T="UserDto" @ref="_table" ServerData="LoadServerData" Dense="true" Hover="true" Striped="true" Elevation="1" RowsPerPage="10">
     <HeaderContent>
-        <MudTh><MudTableSortLabel T="UserDto" SortLabel="@("UserName")">Username</MudTableSortLabel></MudTh>
-        <MudTh><MudTableSortLabel T="UserDto" SortLabel="@("LastName")">Name</MudTableSortLabel></MudTh>
-        <MudTh><MudTableSortLabel T="UserDto" SortLabel="@("Email")">Email</MudTableSortLabel></MudTh>
-        <MudTh><MudTableSortLabel T="UserDto" SortLabel="@("PhoneNumber")">Phone</MudTableSortLabel></MudTh>
-        <MudTh>Status</MudTh>
-        <MudTh><MudTableSortLabel T="UserDto" SortLabel="@("LastLoginAt")">Last Login</MudTableSortLabel></MudTh>
-        <MudTh>Actions</MudTh>
+        <MudTh><MudTableSortLabel T="UserDto" SortLabel="@("UserName")">@T.Users.Username</MudTableSortLabel></MudTh>
+        <MudTh><MudTableSortLabel T="UserDto" SortLabel="@("LastName")">@T.Common.Name</MudTableSortLabel></MudTh>
+        <MudTh><MudTableSortLabel T="UserDto" SortLabel="@("Email")">@T.Users.Email</MudTableSortLabel></MudTh>
+        <MudTh><MudTableSortLabel T="UserDto" SortLabel="@("PhoneNumber")">@T.Users.Phone</MudTableSortLabel></MudTh>
+        <MudTh>@T.Common.Status</MudTh>
+        <MudTh><MudTableSortLabel T="UserDto" SortLabel="@("LastLoginAt")">@T.Users.LastLogin</MudTableSortLabel></MudTh>
+        <MudTh>@T.Common.Actions</MudTh>
     </HeaderContent>
     <RowTemplate>
-        <MudTd DataLabel="Username">
+        <MudTd DataLabel="@T.Users.Username">
             <MudText Class="font-weight-medium">@context.UserName</MudText>
             @if (IsCurrentUser(context))
             {
-                <MudChip T="string" Size="Size.Small" Color="Color.Primary" Variant="Variant.Outlined">You</MudChip>
+                <MudChip T="string" Size="Size.Small" Color="Color.Primary" Variant="Variant.Outlined">@T.Users.You</MudChip>
             }
         </MudTd>
-        <MudTd DataLabel="Name">@context.FullName</MudTd>
-        <MudTd DataLabel="Email">@context.Email</MudTd>
-        <MudTd DataLabel="Phone">@(string.IsNullOrWhiteSpace(context.PhoneNumber) ? "-" : context.PhoneNumber)</MudTd>
-        <MudTd DataLabel="Status">
+        <MudTd DataLabel="@T.Common.Name">@context.FullName</MudTd>
+        <MudTd DataLabel="@T.Users.Email">@context.Email</MudTd>
+        <MudTd DataLabel="@T.Users.Phone">@(string.IsNullOrWhiteSpace(context.PhoneNumber) ? "-" : context.PhoneNumber)</MudTd>
+        <MudTd DataLabel="@T.Common.Status">
             <MudChip T="string" Size="Size.Small" Color="@(StatusColor(context))">@StatusText(context)</MudChip>
         </MudTd>
-        <MudTd DataLabel="Last Login">@(context.LastLoginAt?.ToString("g") ?? "-")</MudTd>
-        <MudTd DataLabel="Actions">
-            <MudIconButton Icon="@Icons.Material.Filled.Edit" Size="Size.Small" Color="Color.Default" aria-label="Edit profile" OnClick="@(() => OpenEditDialogAsync(context))" />
-            <MudIconButton Icon="@Icons.Material.Filled.Groups" Size="Size.Small" Color="Color.Info" aria-label="Manage roles" OnClick="@(() => OpenRolesDialogAsync(context))" />
-            <MudIconButton Icon="@Icons.Material.Filled.Key" Size="Size.Small" Color="Color.Default" aria-label="Reset password" OnClick="@(() => OpenResetPasswordDialogAsync(context))" Disabled="@IsCurrentUser(context)" />
+        <MudTd DataLabel="@T.Users.LastLogin">@(context.LastLoginAt?.ToString("g") ?? "-")</MudTd>
+        <MudTd DataLabel="@T.Common.Actions">
+            <MudIconButton Icon="@Icons.Material.Filled.Edit" Size="Size.Small" Color="Color.Default" aria-label="@T.Users.EditProfile" OnClick="@(() => OpenEditDialogAsync(context))" />
+            <MudIconButton Icon="@Icons.Material.Filled.Groups" Size="Size.Small" Color="Color.Info" aria-label="@T.Users.ManageRoles" OnClick="@(() => OpenRolesDialogAsync(context))" />
+            <MudIconButton Icon="@Icons.Material.Filled.Key" Size="Size.Small" Color="Color.Default" aria-label="@T.Users.ResetPassword" OnClick="@(() => OpenResetPasswordDialogAsync(context))" Disabled="@IsCurrentUser(context)" />
             @if (context.IsLocked)
             {
-                <MudIconButton Icon="@Icons.Material.Filled.LockOpen" Size="Size.Small" Color="Color.Warning" aria-label="Unlock" OnClick="@(() => UnlockAsync(context))" />
+                <MudIconButton Icon="@Icons.Material.Filled.LockOpen" Size="Size.Small" Color="Color.Warning" aria-label="@T.Users.Unlock" OnClick="@(() => UnlockAsync(context))" />
             }
             else
             {
-                <MudIconButton Icon="@Icons.Material.Filled.Lock" Size="Size.Small" Color="Color.Default" aria-label="Lock" OnClick="@(() => OpenLockDialogAsync(context))" Disabled="@IsCurrentUser(context)" />
+                <MudIconButton Icon="@Icons.Material.Filled.Lock" Size="Size.Small" Color="Color.Default" aria-label="@T.Users.Lock" OnClick="@(() => OpenLockDialogAsync(context))" Disabled="@IsCurrentUser(context)" />
             }
             @if (context.IsActive)
             {
-                <MudIconButton Icon="@Icons.Material.Filled.Block" Size="Size.Small" Color="Color.Error" aria-label="Deactivate" OnClick="@(() => DeactivateAsync(context))" Disabled="@IsCurrentUser(context)" />
+                <MudIconButton Icon="@Icons.Material.Filled.Block" Size="Size.Small" Color="Color.Error" aria-label="@T.Users.Deactivate" OnClick="@(() => DeactivateAsync(context))" Disabled="@IsCurrentUser(context)" />
             }
             else
             {
-                <MudIconButton Icon="@Icons.Material.Filled.CheckCircle" Size="Size.Small" Color="Color.Success" aria-label="Activate" OnClick="@(() => ActivateAsync(context))" />
+                <MudIconButton Icon="@Icons.Material.Filled.CheckCircle" Size="Size.Small" Color="Color.Success" aria-label="@T.Users.Activate" OnClick="@(() => ActivateAsync(context))" />
             }
         </MudTd>
     </RowTemplate>
@@ -65,16 +66,16 @@
         @if (_loadError is not null)
         {
             <ErrorState Icon="@(_offline ? Icons.Material.Filled.CloudOff : Icons.Material.Filled.ErrorOutline)"
-                        Title="Couldn't load data"
+                        Title="@T.Users.LoadErrorTitle"
                         Message="@_loadError"
                         Action="ReloadAsync" />
         }
         else
         {
         <EmptyState Icon="@Icons.Material.Filled.Person"
-                    Title="No users yet"
-                    Message="Add users and assign them roles to control access."
-                    ActionLabel="Add your first user"
+                    Title="@T.Users.EmptyTitle"
+                    Message="@T.Users.EmptyMessage"
+                    ActionLabel="@T.Users.EmptyAction"
                     Action="OpenCreateDialogAsync" />
         }
     </NoRecordsContent>
@@ -122,8 +123,8 @@
         }
         catch (Exception)
         {
-            Snackbar.Add("Unable to reach the server.", Severity.Error);
-            _loadError = "Unable to reach the server.";
+            Snackbar.Add(T.Users.Unreachable, Severity.Error);
+            _loadError = T.Users.Unreachable;
             _offline = true;
             return new TableData<UserDto> { Items = Array.Empty<UserDto>(), TotalItems = 0 };
         }
@@ -154,7 +155,7 @@
     private async Task OpenCreateDialogAsync()
     {
         var options = new DialogOptions { MaxWidth = MaxWidth.Medium, FullWidth = true, NoHeader = true };
-        var dialog = await DialogService.ShowAsync<UserEditorDialog>("New User", options);
+        var dialog = await DialogService.ShowAsync<UserEditorDialog>(T.UserDialog.NewTitle, options);
         await ReloadIfSavedAsync(dialog);
     }
 
@@ -162,7 +163,7 @@
     {
         var parameters = new DialogParameters { ["User"] = user };
         var options = new DialogOptions { MaxWidth = MaxWidth.Medium, FullWidth = true, NoHeader = true };
-        var dialog = await DialogService.ShowAsync<UserEditorDialog>($"Edit {user.UserName}", parameters, options);
+        var dialog = await DialogService.ShowAsync<UserEditorDialog>(T.FormatValue(T.UserDialog.EditTitle, user.UserName), parameters, options);
         await ReloadIfSavedAsync(dialog);
     }
 
@@ -170,7 +171,7 @@
     {
         var parameters = new DialogParameters { ["User"] = user };
         var options = new DialogOptions { MaxWidth = MaxWidth.Small, FullWidth = true, NoHeader = true };
-        var dialog = await DialogService.ShowAsync<UserRolesDialog>($"Roles - {user.UserName}", parameters, options);
+        var dialog = await DialogService.ShowAsync<UserRolesDialog>(T.FormatValue(T.UserDialog.RolesTitle, user.UserName), parameters, options);
         await ReloadIfSavedAsync(dialog);
     }
 
@@ -178,7 +179,7 @@
     {
         var parameters = new DialogParameters { ["User"] = user };
         var options = new DialogOptions { MaxWidth = MaxWidth.Small, FullWidth = true, NoHeader = true };
-        var dialog = await DialogService.ShowAsync<UserLockDialog>($"Lock {user.UserName}", parameters, options);
+        var dialog = await DialogService.ShowAsync<UserLockDialog>(T.FormatValue(T.UserDialog.LockTitle, user.UserName), parameters, options);
         await ReloadIfSavedAsync(dialog);
     }
 
@@ -186,7 +187,7 @@
     {
         var parameters = new DialogParameters { ["User"] = user };
         var options = new DialogOptions { MaxWidth = MaxWidth.Small, FullWidth = true, NoHeader = true };
-        var dialog = await DialogService.ShowAsync<ResetPasswordDialog>($"Reset Password - {user.UserName}", parameters, options);
+        var dialog = await DialogService.ShowAsync<ResetPasswordDialog>(T.FormatValue(T.UserDialog.ResetPasswordTitle, user.UserName), parameters, options);
         await ReloadIfSavedAsync(dialog);
     }
 
@@ -202,7 +203,7 @@
         try
         {
             await IdentityService.ActivateUserAsync(user.Id);
-            Snackbar.Add($"{user.UserName} activated.", Severity.Success);
+            Snackbar.Add(T.FormatValue(T.Users.Activated, user.UserName), Severity.Success);
             await ReloadAsync();
         }
         catch (ApiException ex)
@@ -211,17 +212,17 @@
         }
         catch (Exception)
         {
-            Snackbar.Add("Unable to reach the server.", Severity.Error);
+            Snackbar.Add(T.Users.Unreachable, Severity.Error);
         }
     }
 
     private async Task DeactivateAsync(UserDto user)
     {
         var confirmed = await DialogService.ShowMessageBoxAsync(
-            "Deactivate User",
-            $"Are you sure you want to deactivate {user.UserName}? They will no longer be able to sign in.",
-            "Deactivate",
-            "Cancel");
+            T.Users.DeactivateTitle,
+            T.FormatValue(T.Users.DeactivateConfirm, user.UserName),
+            T.Users.Deactivate,
+            T.Common.Cancel);
 
         if (confirmed != true)
             return;
@@ -229,7 +230,7 @@
         try
         {
             await IdentityService.DeactivateUserAsync(user.Id);
-            Snackbar.Add($"{user.UserName} deactivated.", Severity.Success);
+            Snackbar.Add(T.FormatValue(T.Users.Deactivated, user.UserName), Severity.Success);
             await ReloadAsync();
         }
         catch (ApiException ex)
@@ -238,7 +239,7 @@
         }
         catch (Exception)
         {
-            Snackbar.Add("Unable to reach the server.", Severity.Error);
+            Snackbar.Add(T.Users.Unreachable, Severity.Error);
         }
     }
 
@@ -247,7 +248,7 @@
         try
         {
             await IdentityService.UnlockUserAsync(user.Id);
-            Snackbar.Add($"{user.UserName} unlocked.", Severity.Success);
+            Snackbar.Add(T.FormatValue(T.Users.Unlocked, user.UserName), Severity.Success);
             await ReloadAsync();
         }
         catch (ApiException ex)
@@ -256,15 +257,15 @@
         }
         catch (Exception)
         {
-            Snackbar.Add("Unable to reach the server.", Severity.Error);
+            Snackbar.Add(T.Users.Unreachable, Severity.Error);
         }
     }
 
-    private static string StatusText(UserDto user)
+    private string StatusText(UserDto user)
     {
         if (user.IsLocked)
-            return "Locked";
-        return user.IsActive ? "Active" : "Inactive";
+            return T.Users.Locked;
+        return user.IsActive ? T.Common.Active : T.Common.Inactive;
     }
 
     private static Color StatusColor(UserDto user)

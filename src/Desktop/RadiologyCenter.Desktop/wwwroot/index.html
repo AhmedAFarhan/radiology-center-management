@@ -23,6 +23,12 @@
         <span class="dismiss">🗙</span>
     </div>
 
+    <script>
+        window.setAppLanguage = function (lang, dir) {
+            document.documentElement.lang = lang;
+            document.documentElement.dir = dir;
+        };
+    </script>
     <script src="_framework/blazor.webview.js" autostart="false"></script>
     <script src="_content/MudBlazor/MudBlazor.min.js"></script>
 

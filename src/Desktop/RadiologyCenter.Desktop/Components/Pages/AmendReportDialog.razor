@@ -1,14 +1,15 @@
 @inject ReportService ReportService
 @inject ISnackbar Snackbar
+@inject AppLocalizer T
 
 <MudDialog>
     <DialogContent>
-        <DialogHeader Icon="@Icons.Material.Filled.EditNote" Title="Amend Report" />
+        <DialogHeader Icon="@Icons.Material.Filled.EditNote" Title="@T.AmendReport.Title" />
         <MudText Typo="Typo.body2" Class="text-secondary mb-2">
-            Amending opens a new draft (v@(@CurrentVersion + 1)) for re-reading. Enter a reason for the amendment.
+            @(T.FormatValue(T.AmendReport.Description, CurrentVersion + 1))
         </MudText>
         <MudTextField @bind-Value="_reason"
-                      Label="Amendment reason"
+                      Label="@T.AmendReport.Reason"
                       Variant="Variant.Outlined"
                       Margin="Margin.Dense"
                       Immediate="true"
@@ -18,7 +19,7 @@
                       Disabled="_busy" />
     </DialogContent>
     <DialogActions>
-        <MudButton Color="Color.Default" OnClick="CancelAsync" Disabled="_busy">Back</MudButton>
+        <MudButton Color="Color.Default" OnClick="CancelAsync" Disabled="_busy">@T.AmendReport.Back</MudButton>
         <MudButton Color="Color.Primary" Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.EditNote" OnClick="SubmitAsync" Disabled="_busy || string.IsNullOrWhiteSpace(_reason)">
             @if (_busy)
             {
@@ -26,7 +27,7 @@
             }
             else
             {
-                <text>Amend Report</text>
+                <text>@T.AmendReport.Title</text>
             }
         </MudButton>
     </DialogActions>
@@ -48,7 +49,7 @@
         try
         {
             var report = await ReportService.AmendAsync(ReportId, _reason!);
-            Snackbar.Add("Report reopened for amendment.", Severity.Success);
+            Snackbar.Add(T.AmendReport.Reopened, Severity.Success);
             MudDialog.Close(DialogResult.Ok(report));
         }
         catch (ApiException ex)
@@ -57,7 +58,7 @@
         }
         catch (Exception)
         {
-            Snackbar.Add("Unable to reach the server.", Severity.Error);
+            Snackbar.Add(T.AmendReport.Unreachable, Severity.Error);
         }
         finally
         {

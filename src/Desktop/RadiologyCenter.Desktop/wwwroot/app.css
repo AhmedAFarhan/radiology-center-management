@@ -85,6 +85,17 @@ h1:focus {
     overflow: hidden;
 }
 
+.landing-lang {
+    position: absolute;
+    top: 1.25rem;
+    right: 1.5rem;
+    z-index: 5;
+}
+
+.landing-lang .mud-icon-button {
+    color: #ffffff;
+}
+
 .corner-circles {
     position: absolute;
     left: 0;

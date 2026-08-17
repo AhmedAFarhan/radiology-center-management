@@ -3,56 +3,57 @@
 @inject ResourceService ResourceService
 @inject IDialogService DialogService
 @inject ISnackbar Snackbar
+@inject AppLocalizer T
 @implements IDisposable
 
-<PageHeader Icon="@Icons.Material.Filled.BeachAccess" Title="Leave"
-            Subtitle="Manage staff leave records"
+<PageHeader Icon="@Icons.Material.Filled.BeachAccess" Title="@T.Leave.Title"
+            Subtitle="@T.Leave.Subtitle"
             SearchValueChanged="OnSearchChanged"
-            SearchPlaceholder="Search leave..."
+            SearchPlaceholder="@T.Leave.SearchPlaceholder"
             OnRefresh="ReloadAsync">
-    <MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Add" OnClick="OpenCreateDialogAsync">Add Leave</MudButton>
+    <MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Add" OnClick="OpenCreateDialogAsync">@T.Leave.Add</MudButton>
 </PageHeader>
 
 <MudTable T="LeaveDto" @ref="_table" ServerData="LoadServerData" Dense="true" Hover="true" Striped="true" Elevation="1" RowsPerPage="10">
     <HeaderContent>
-        <MudTh>Staff</MudTh>
-        <MudTh><MudTableSortLabel T="LeaveDto" SortLabel="@("LeaveType")">Type</MudTableSortLabel></MudTh>
-        <MudTh><MudTableSortLabel T="LeaveDto" SortLabel="@("StartDate")">Start Date</MudTableSortLabel></MudTh>
-        <MudTh><MudTableSortLabel T="LeaveDto" SortLabel="@("EndDate")">End Date</MudTableSortLabel></MudTh>
-        <MudTh>Duration</MudTh>
-        <MudTh>Reason</MudTh>
-        <MudTh>Actions</MudTh>
+        <MudTh>@T.Leave.Staff</MudTh>
+        <MudTh><MudTableSortLabel T="LeaveDto" SortLabel="@("LeaveType")">@T.Common.Type</MudTableSortLabel></MudTh>
+        <MudTh><MudTableSortLabel T="LeaveDto" SortLabel="@("StartDate")">@T.Leave.StartDate</MudTableSortLabel></MudTh>
+        <MudTh><MudTableSortLabel T="LeaveDto" SortLabel="@("EndDate")">@T.Leave.EndDate</MudTableSortLabel></MudTh>
+        <MudTh>@T.Leave.Duration</MudTh>
+        <MudTh>@T.Leave.Reason</MudTh>
+        <MudTh>@T.Common.Actions</MudTh>
     </HeaderContent>
     <RowTemplate>
-        <MudTd DataLabel="Staff">
+        <MudTd DataLabel="@T.Leave.Staff">
             <MudText Class="font-weight-medium">@ResolveStaff(context.StaffId)</MudText>
         </MudTd>
-        <MudTd DataLabel="Type">
+        <MudTd DataLabel="@T.Common.Type">
             <MudChip T="string" Size="Size.Small">@FormatLeaveType(context.LeaveType)</MudChip>
         </MudTd>
-        <MudTd DataLabel="Start Date">@context.StartDate.ToString("yyyy-MM-dd")</MudTd>
-        <MudTd DataLabel="End Date">@context.EndDate.ToString("yyyy-MM-dd")</MudTd>
-        <MudTd DataLabel="Duration">@((context.EndDate.Date - context.StartDate.Date).Days + 1) day(s)</MudTd>
-        <MudTd DataLabel="Reason">@(string.IsNullOrWhiteSpace(context.Reason) ? "-" : context.Reason)</MudTd>
-        <MudTd DataLabel="Actions">
-            <MudIconButton Icon="@Icons.Material.Filled.Edit" Size="Size.Small" Color="Color.Default" aria-label="Edit" OnClick="@(() => OpenEditDialogAsync(context))" />
-            <MudIconButton Icon="@Icons.Material.Filled.Delete" Size="Size.Small" Color="Color.Error" aria-label="Delete" OnClick="@(() => DeleteLeaveAsync(context))" />
+        <MudTd DataLabel="@T.Leave.StartDate">@context.StartDate.ToString("yyyy-MM-dd")</MudTd>
+        <MudTd DataLabel="@T.Leave.EndDate">@context.EndDate.ToString("yyyy-MM-dd")</MudTd>
+        <MudTd DataLabel="@T.Leave.Duration">@(T.FormatValue(T.Leave.DurationDays, (context.EndDate.Date - context.StartDate.Date).Days + 1))</MudTd>
+        <MudTd DataLabel="@T.Leave.Reason">@(string.IsNullOrWhiteSpace(context.Reason) ? "-" : context.Reason)</MudTd>
+        <MudTd DataLabel="@T.Common.Actions">
+            <MudIconButton Icon="@Icons.Material.Filled.Edit" Size="Size.Small" Color="Color.Default" aria-label="@T.Common.Edit" OnClick="@(() => OpenEditDialogAsync(context))" />
+            <MudIconButton Icon="@Icons.Material.Filled.Delete" Size="Size.Small" Color="Color.Error" aria-label="@T.Common.Delete" OnClick="@(() => DeleteLeaveAsync(context))" />
         </MudTd>
     </RowTemplate>
     <NoRecordsContent>
         @if (_loadError is not null)
         {
             <ErrorState Icon="@(_offline ? Icons.Material.Filled.CloudOff : Icons.Material.Filled.ErrorOutline)"
-                        Title="Couldn't load data"
+                        Title="@T.Leave.LoadErrorTitle"
                         Message="@_loadError"
                         Action="ReloadAsync" />
         }
         else
         {
         <EmptyState Icon="@Icons.Material.Filled.BeachAccess"
-                    Title="No leave records yet"
-                    Message="Record staff leave so payroll can account for unpaid days."
-                    ActionLabel="Add your first leave record"
+                    Title="@T.Leave.EmptyTitle"
+                    Message="@T.Leave.EmptyMessage"
+                    ActionLabel="@T.Leave.EmptyActionLabel"
                     Action="OpenCreateDialogAsync" />
         }
     </NoRecordsContent>
@@ -98,8 +99,8 @@
         }
         catch (Exception)
         {
-            Snackbar.Add("Unable to reach the server.", Severity.Error);
-            _loadError = "Unable to reach the server.";
+            Snackbar.Add(T.Leave.Unreachable, Severity.Error);
+            _loadError = T.Leave.Unreachable;
             _offline = true;
             return new TableData<LeaveDto> { Items = Array.Empty<LeaveDto>(), TotalItems = 0 };
         }
@@ -133,7 +134,7 @@
     private async Task OpenCreateDialogAsync()
     {
         var options = new DialogOptions { MaxWidth = MaxWidth.Medium, FullWidth = true, NoHeader = true };
-        var dialog = await DialogService.ShowAsync<LeaveEditorDialog>("New Leave", options);
+        var dialog = await DialogService.ShowAsync<LeaveEditorDialog>(T.Leave.NewLeave, options);
         await ReloadIfSavedAsync(dialog);
     }
 
@@ -141,7 +142,7 @@
     {
         var parameters = new DialogParameters { ["Leave"] = leave };
         var options = new DialogOptions { MaxWidth = MaxWidth.Medium, FullWidth = true, NoHeader = true };
-        var dialog = await DialogService.ShowAsync<LeaveEditorDialog>("Edit Leave", parameters, options);
+        var dialog = await DialogService.ShowAsync<LeaveEditorDialog>(T.Leave.EditLeave, parameters, options);
         await ReloadIfSavedAsync(dialog);
     }
 
@@ -155,10 +156,10 @@
     private async Task DeleteLeaveAsync(LeaveDto leave)
     {
         var confirmed = await DialogService.ShowMessageBoxAsync(
-            "Delete Leave",
-            $"Are you sure you want to delete this leave ({leave.LeaveType})? This cannot be undone.",
-            "Delete",
-            "Cancel");
+            T.Leave.DeleteTitle,
+            T.FormatValue(T.Leave.DeleteConfirm, leave.LeaveType),
+            T.Common.Delete,
+            T.Common.Cancel);
 
         if (confirmed != true)
             return;
@@ -166,7 +167,7 @@
         try
         {
             await ResourceService.DeleteLeaveAsync(leave.Id);
-            Snackbar.Add("Leave record deleted.", Severity.Success);
+            Snackbar.Add(T.Leave.Deleted, Severity.Success);
             await ReloadAsync();
         }
         catch (ApiException ex)
@@ -175,7 +176,7 @@
         }
         catch (Exception)
         {
-            Snackbar.Add("Unable to reach the server.", Severity.Error);
+            Snackbar.Add(T.Leave.Unreachable, Severity.Error);
         }
     }
 

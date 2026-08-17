@@ -1,56 +1,58 @@
+@inject AppLocalizer T
+
 <MudDialog>
     <DialogContent>
-        <DialogHeader Icon="@Icons.Material.Filled.Notifications" Title="Notification Message" />
+        <DialogHeader Icon="@Icons.Material.Filled.Notifications" Title="@T.MessageDialog.Title" />
         <MudGrid Spacing="2">
             <MudItem xs="12" sm="6">
-                <MudText Typo="Typo.caption" Color="Color.Secondary">Recipient</MudText>
+                <MudText Typo="Typo.caption" Color="Color.Secondary">@T.MessageDialog.Recipient</MudText>
                 <MudText>@Message.Recipient</MudText>
             </MudItem>
             <MudItem xs="12" sm="3">
-                <MudText Typo="Typo.caption" Color="Color.Secondary">Channel</MudText>
+                <MudText Typo="Typo.caption" Color="Color.Secondary">@T.MessageDialog.Channel</MudText>
                 <MudChip T="string" Size="Size.Small" Color="Color.Primary" Variant="Variant.Outlined">@Message.Channel</MudChip>
             </MudItem>
             <MudItem xs="12" sm="3">
-                <MudText Typo="Typo.caption" Color="Color.Secondary">Status</MudText>
+                <MudText Typo="Typo.caption" Color="Color.Secondary">@T.Common.Status</MudText>
                 <MudChip T="string" Size="Size.Small" Color="@StatusColor(Message.Status)">@Message.Status</MudChip>
             </MudItem>
             <MudItem xs="12">
-                <MudText Typo="Typo.caption" Color="Color.Secondary">Subject</MudText>
+                <MudText Typo="Typo.caption" Color="Color.Secondary">@T.MessageDialog.Subject</MudText>
                 <MudText>@(string.IsNullOrWhiteSpace(Message.Subject) ? "-" : Message.Subject)</MudText>
             </MudItem>
             <MudItem xs="12">
-                <MudText Typo="Typo.caption" Color="Color.Secondary">Body</MudText>
+                <MudText Typo="Typo.caption" Color="Color.Secondary">@T.MessageDialog.Body</MudText>
                 <MudPaper Elevation="0" Class="pa-2 mud-theme-primary-bg-primary" Outlined="true">
                     <MudText Class="white-space-pre-wrap">@Message.Body</MudText>
                 </MudPaper>
             </MudItem>
             <MudItem xs="6">
-                <MudText Typo="Typo.caption" Color="Color.Secondary">Template</MudText>
+                <MudText Typo="Typo.caption" Color="Color.Secondary">@T.MessageDialog.Template</MudText>
                 <MudText>@(string.IsNullOrWhiteSpace(Message.TemplateCode) ? "-" : Message.TemplateCode)</MudText>
             </MudItem>
             <MudItem xs="6">
-                <MudText Typo="Typo.caption" Color="Color.Secondary">Reference</MudText>
+                <MudText Typo="Typo.caption" Color="Color.Secondary">@T.MessageDialog.Reference</MudText>
                 <MudText>@(string.IsNullOrWhiteSpace(Message.ReferenceId) ? "-" : Message.ReferenceId)</MudText>
             </MudItem>
             <MudItem xs="6">
-                <MudText Typo="Typo.caption" Color="Color.Secondary">Attempts</MudText>
+                <MudText Typo="Typo.caption" Color="Color.Secondary">@T.MessageDialog.Attempts</MudText>
                 <MudText>@Message.Attempts</MudText>
             </MudItem>
             <MudItem xs="6">
-                <MudText Typo="Typo.caption" Color="Color.Secondary">Sent At</MudText>
+                <MudText Typo="Typo.caption" Color="Color.Secondary">@T.MessageDialog.SentAt</MudText>
                 <MudText>@(Message.SentAtUtc?.ToLocalTime().ToString("g") ?? "-")</MudText>
             </MudItem>
             @if (!string.IsNullOrWhiteSpace(Message.FailureReason))
             {
                 <MudItem xs="12">
-                    <MudText Typo="Typo.caption" Color="Color.Error">Failure Reason</MudText>
+                    <MudText Typo="Typo.caption" Color="Color.Error">@T.MessageDialog.FailureReason</MudText>
                     <MudAlert Severity="Severity.Error" Variant="Variant.Outlined">@Message.FailureReason</MudAlert>
                 </MudItem>
             }
         </MudGrid>
     </DialogContent>
     <DialogActions>
-        <MudButton Color="Color.Primary" OnClick="CloseAsync">Close</MudButton>
+        <MudButton Color="Color.Primary" OnClick="CloseAsync">@T.Common.Close</MudButton>
     </DialogActions>
 </MudDialog>
 

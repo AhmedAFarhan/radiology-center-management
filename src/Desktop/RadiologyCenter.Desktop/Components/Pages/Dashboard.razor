@@ -2,9 +2,10 @@
 @attribute [Authorize]
 @inject DashboardService DashboardService
 @inject InsuranceService InsuranceService
+@inject AppLocalizer T
 
-<MudText Typo="Typo.h4">Dashboard</MudText>
-<MudText Typo="Typo.body1" Class="text-secondary mb-4">Live overview of your radiology center.</MudText>
+<MudText Typo="Typo.h4">@T.Dashboard.Title</MudText>
+<MudText Typo="Typo.body1" Class="text-secondary mb-4">@T.Dashboard.Subtitle</MudText>
 
 @if (_loading)
 {
@@ -12,28 +13,28 @@
 }
 else if (_error)
 {
-<ErrorState Title="Couldn't load the dashboard" Message="Unable to reach the server. Check your connection and try again." Action="LoadAsync" />
+<ErrorState Title="@T.Dashboard.LoadErrorTitle" Message="@T.Dashboard.LoadErrorMsg" Action="LoadAsync" />
 }
 else
 {
     <MudGrid Spacing="3">
         <MudItem xs="12" sm="6" lg="3">
-            <StatCard Label="Total Patients" Value="@_data!.TotalPatients.ToString()" Icon="@Icons.Material.Filled.People" Color="Color.Primary" TrendText="+8.2%" TrendUp="true">
+            <StatCard Label="@T.Dashboard.TotalPatients" Value="@_data!.TotalPatients.ToString()" Icon="@Icons.Material.Filled.People" Color="Color.Primary" TrendText="+8.2%" TrendUp="true">
                 <Trend><Sparkline Values="@DashboardSampleData.SparklineUp" /></Trend>
             </StatCard>
         </MudItem>
         <MudItem xs="12" sm="6" lg="3">
-            <StatCard Label="Total Examinations" Value="@_data!.TotalExaminations.ToString()" Icon="@Icons.Material.Filled.MedicalServices" Color="Color.Secondary" TrendText="+5.7%" TrendUp="true">
+            <StatCard Label="@T.Dashboard.TotalExaminations" Value="@_data!.TotalExaminations.ToString()" Icon="@Icons.Material.Filled.MedicalServices" Color="Color.Secondary" TrendText="+5.7%" TrendUp="true">
                 <Trend><Sparkline Values="@DashboardSampleData.SparklineUp" /></Trend>
             </StatCard>
         </MudItem>
         <MudItem xs="12" sm="6" lg="3">
-            <StatCard Label="In Progress" Value="@_data!.ExamsInProgress.ToString()" Icon="@Icons.Material.Filled.HourglassTop" Color="Color.Warning" TrendText="-3.1%" TrendUp="false">
+            <StatCard Label="@T.Dashboard.ExamsInProgress" Value="@_data!.ExamsInProgress.ToString()" Icon="@Icons.Material.Filled.HourglassTop" Color="Color.Warning" TrendText="-3.1%" TrendUp="false">
                 <Trend><Sparkline Values="@DashboardSampleData.SparklineDown" /></Trend>
             </StatCard>
         </MudItem>
         <MudItem xs="12" sm="6" lg="3">
-            <StatCard Label="Inventory Items" Value="@_data!.TotalInventoryItems.ToString()" Icon="@Icons.Material.Filled.Inventory2" Color="Color.Info" TrendText="+1.2%" TrendUp="true">
+            <StatCard Label="@T.Dashboard.InventoryItems" Value="@_data!.TotalInventoryItems.ToString()" Icon="@Icons.Material.Filled.Inventory2" Color="Color.Info" TrendText="+1.2%" TrendUp="true">
                 <Trend><Sparkline Values="@DashboardSampleData.SparklineSteady" /></Trend>
             </StatCard>
         </MudItem>
@@ -41,19 +42,19 @@ else
         {
             <MudDivider Class="my-3" />
             <MudItem xs="12">
-                <MudText Typo="Typo.h6" Class="mb-1">Insurance</MudText>
+                <MudText Typo="Typo.h6" Class="mb-1">@T.Dashboard.Insurance</MudText>
             </MudItem>
             <MudItem xs="12" sm="6" lg="3">
-                <StatCard Label="Outstanding Claims" Value="@_insuranceStats.OutstandingAmount.ToString("C")" Icon="@Icons.Material.Filled.RequestQuote" Color="Color.Primary" TrendText="@($"{_insuranceStats.SubmittedClaims} submitted")" TrendUp="true" />
+                <StatCard Label="@T.Dashboard.OutstandingClaims" Value="@_insuranceStats.OutstandingAmount.ToString("C")" Icon="@Icons.Material.Filled.RequestQuote" Color="Color.Primary" TrendText="@(T.FormatValue(T.Dashboard.Submitted, _insuranceStats.SubmittedClaims))" TrendUp="true" />
             </MudItem>
             <MudItem xs="12" sm="6" lg="3">
-                <StatCard Label="Pending Authorizations" Value="@_insuranceStats.PendingPreAuthorizations.ToString()" Icon="@Icons.Material.Filled.Approval" Color="Color.Warning" TrendText="@($"{_insuranceStats.ApprovedPreAuthorizations} approved")" TrendUp="true" />
+                <StatCard Label="@T.Dashboard.PendingAuthorizations" Value="@_insuranceStats.PendingPreAuthorizations.ToString()" Icon="@Icons.Material.Filled.Approval" Color="Color.Warning" TrendText="@(T.FormatValue(T.Dashboard.Approved, _insuranceStats.ApprovedPreAuthorizations))" TrendUp="true" />
             </MudItem>
             <MudItem xs="12" sm="6" lg="3">
-                <StatCard Label="Active Policies" Value="@_insuranceStats.ActivePolicies.ToString()" Icon="@Icons.Material.Filled.Description" Color="Color.Info" TrendText="@($"{_insuranceStats.TotalPolicies} total")" TrendUp="true" />
+                <StatCard Label="@T.Dashboard.ActivePolicies" Value="@_insuranceStats.ActivePolicies.ToString()" Icon="@Icons.Material.Filled.Description" Color="Color.Info" TrendText="@(T.FormatValue(T.Dashboard.Total, _insuranceStats.TotalPolicies))" TrendUp="true" />
             </MudItem>
             <MudItem xs="12" sm="6" lg="3">
-                <StatCard Label="Insurance Companies" Value="@_insuranceStats.TotalCompanies.ToString()" Icon="@Icons.Material.Filled.Shield" Color="Color.Secondary" TrendText="@($"{_insuranceStats.DraftClaims} draft claims")" TrendUp="true" />
+                <StatCard Label="@T.Dashboard.InsuranceCompanies" Value="@_insuranceStats.TotalCompanies.ToString()" Icon="@Icons.Material.Filled.Shield" Color="Color.Secondary" TrendText="@(T.FormatValue(T.Dashboard.DraftClaims, _insuranceStats.DraftClaims))" TrendUp="true" />
             </MudItem>
         }
     </MudGrid>
@@ -115,4 +116,3 @@ else
         }
     }
 }
-

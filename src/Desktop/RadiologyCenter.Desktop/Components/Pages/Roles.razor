@@ -3,56 +3,57 @@
 @inject IdentityService IdentityService
 @inject IDialogService DialogService
 @inject ISnackbar Snackbar
+@inject AppLocalizer T
 @implements IDisposable
 
-<PageHeader Icon="@Icons.Material.Filled.Security" Title="Roles"
-            Subtitle="Manage roles and their permissions"
+<PageHeader Icon="@Icons.Material.Filled.Security" Title="@T.Roles.Title"
+            Subtitle="@T.Roles.Subtitle"
             SearchValueChanged="OnSearchChanged"
-            SearchPlaceholder="Search roles..."
+            SearchPlaceholder="@T.Roles.SearchPlaceholder"
             OnRefresh="ReloadAsync">
-    <MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Add" OnClick="OpenCreateDialogAsync">New Role</MudButton>
+    <MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Add" OnClick="OpenCreateDialogAsync">@T.Roles.NewRole</MudButton>
 </PageHeader>
 
 <MudTable T="RoleDto" @ref="_table" ServerData="LoadServerData" Dense="true" Hover="true" Striped="true" Elevation="1" RowsPerPage="10">
     <HeaderContent>
-        <MudTh><MudTableSortLabel T="RoleDto" SortLabel="@("Name")">Name</MudTableSortLabel></MudTh>
-        <MudTh><MudTableSortLabel T="RoleDto" SortLabel="@("Description")">Description</MudTableSortLabel></MudTh>
-        <MudTh>Permissions</MudTh>
-        <MudTh><MudTableSortLabel T="RoleDto" SortLabel="@("CreatedAt")">Created</MudTableSortLabel></MudTh>
-        <MudTh>Actions</MudTh>
+        <MudTh><MudTableSortLabel T="RoleDto" SortLabel="@("Name")">@T.Common.Name</MudTableSortLabel></MudTh>
+        <MudTh><MudTableSortLabel T="RoleDto" SortLabel="@("Description")">@T.Roles.Description</MudTableSortLabel></MudTh>
+        <MudTh>@T.Roles.Permissions</MudTh>
+        <MudTh><MudTableSortLabel T="RoleDto" SortLabel="@("CreatedAt")">@T.Roles.Created</MudTableSortLabel></MudTh>
+        <MudTh>@T.Common.Actions</MudTh>
     </HeaderContent>
     <RowTemplate>
-        <MudTd DataLabel="Name">
+        <MudTd DataLabel="@T.Common.Name">
             <MudText Class="font-weight-medium">@context.Name</MudText>
             @if (context.IsSystem)
             {
-                <MudChip T="string" Size="Size.Small" Color="Color.Primary" Variant="Variant.Outlined">System</MudChip>
+                <MudChip T="string" Size="Size.Small" Color="Color.Primary" Variant="Variant.Outlined">@T.Roles.System</MudChip>
             }
         </MudTd>
-        <MudTd DataLabel="Description">@(string.IsNullOrWhiteSpace(context.Description) ? "-" : context.Description)</MudTd>
-        <MudTd DataLabel="Permissions">
-            <MudChip T="string" Size="Size.Small" Color="@(context.Permissions.Count == 0 ? Color.Default : Color.Success)">@context.Permissions.Count permission(s)</MudChip>
+        <MudTd DataLabel="@T.Roles.Description">@(string.IsNullOrWhiteSpace(context.Description) ? "-" : context.Description)</MudTd>
+        <MudTd DataLabel="@T.Roles.Permissions">
+            <MudChip T="string" Size="Size.Small" Color="@(context.Permissions.Count == 0 ? Color.Default : Color.Success)">@(T.FormatValue(T.Roles.PermissionCount, context.Permissions.Count))</MudChip>
         </MudTd>
-        <MudTd DataLabel="Created">@context.CreatedAt.ToString("g")</MudTd>
-        <MudTd DataLabel="Actions">
-            <MudIconButton Icon="@Icons.Material.Filled.Edit" Size="Size.Small" Color="Color.Default" aria-label="Edit role" OnClick="@(() => OpenEditDialogAsync(context))" />
-            <MudIconButton Icon="@Icons.Material.Filled.Key" Size="Size.Small" Color="Color.Info" aria-label="Manage permissions" OnClick="@(() => OpenPermissionsDialogAsync(context))" />
+        <MudTd DataLabel="@T.Roles.Created">@context.CreatedAt.ToString("g")</MudTd>
+        <MudTd DataLabel="@T.Common.Actions">
+            <MudIconButton Icon="@Icons.Material.Filled.Edit" Size="Size.Small" Color="Color.Default" aria-label="@T.Roles.EditRole" OnClick="@(() => OpenEditDialogAsync(context))" />
+            <MudIconButton Icon="@Icons.Material.Filled.Key" Size="Size.Small" Color="Color.Info" aria-label="@T.Roles.ManagePermissions" OnClick="@(() => OpenPermissionsDialogAsync(context))" />
         </MudTd>
     </RowTemplate>
     <NoRecordsContent>
         @if (_loadError is not null)
         {
             <ErrorState Icon="@(_offline ? Icons.Material.Filled.CloudOff : Icons.Material.Filled.ErrorOutline)"
-                        Title="Couldn't load data"
+                        Title="@T.Roles.LoadErrorTitle"
                         Message="@_loadError"
                         Action="ReloadAsync" />
         }
         else
         {
         <EmptyState Icon="@Icons.Material.Filled.Security"
-                    Title="No roles yet"
-                    Message="Create roles and grant them permissions to control access."
-                    ActionLabel="Create your first role"
+                    Title="@T.Roles.EmptyTitle"
+                    Message="@T.Roles.EmptyMessage"
+                    ActionLabel="@T.Roles.EmptyAction"
                     Action="OpenCreateDialogAsync" />
         }
     </NoRecordsContent>
@@ -93,8 +94,8 @@
         }
         catch (Exception)
         {
-            Snackbar.Add("Unable to reach the server.", Severity.Error);
-            _loadError = "Unable to reach the server.";
+            Snackbar.Add(T.Roles.Unreachable, Severity.Error);
+            _loadError = T.Roles.Unreachable;
             _offline = true;
             return new TableData<RoleDto> { Items = Array.Empty<RoleDto>(), TotalItems = 0 };
         }
@@ -125,7 +126,7 @@
     private async Task OpenCreateDialogAsync()
     {
         var options = new DialogOptions { MaxWidth = MaxWidth.Small, FullWidth = true, NoHeader = true };
-        var dialog = await DialogService.ShowAsync<RoleEditorDialog>("New Role", options);
+        var dialog = await DialogService.ShowAsync<RoleEditorDialog>(T.RoleDialog.NewRole, options);
         await ReloadIfSavedAsync(dialog);
     }
 
@@ -133,7 +134,7 @@
     {
         var parameters = new DialogParameters { ["Role"] = role };
         var options = new DialogOptions { MaxWidth = MaxWidth.Small, FullWidth = true, NoHeader = true };
-        var dialog = await DialogService.ShowAsync<RoleEditorDialog>($"Edit {role.Name}", parameters, options);
+        var dialog = await DialogService.ShowAsync<RoleEditorDialog>(T.FormatValue(T.Roles.EditTitle, role.Name), parameters, options);
         await ReloadIfSavedAsync(dialog);
     }
 
@@ -141,7 +142,7 @@
     {
         var parameters = new DialogParameters { ["Role"] = role };
         var options = new DialogOptions { MaxWidth = MaxWidth.Large, FullWidth = true, NoHeader = true };
-        var dialog = await DialogService.ShowAsync<RolePermissionsDialog>($"Permissions - {role.Name}", parameters, options);
+        var dialog = await DialogService.ShowAsync<RolePermissionsDialog>(T.FormatValue(T.RoleDialog.PermissionsTitle, role.Name), parameters, options);
         await ReloadIfSavedAsync(dialog);
     }
 

@@ -1,11 +1,12 @@
 @inject ISnackbar Snackbar
+@inject AppLocalizer T
 
 <MudDialog>
     <DialogContent>
-        <DialogHeader Icon="@Icons.Material.Filled.ReceiptLong" Title="Add Payslip" />
+        <DialogHeader Icon="@Icons.Material.Filled.ReceiptLong" Title="@T.Payslip.AddTitle" />
         <MudAutocomplete T="StaffDto"
                          @bind-Value="_selectedStaff"
-                         Label="Employee (search by name)"
+                         Label="@T.Payslip.EmployeeSearch"
                          Variant="Variant.Outlined"
                          Margin="Margin.Dense"
                          MinCharacters="1"
@@ -15,8 +16,8 @@
                          Clearable="true" />
     </DialogContent>
     <DialogActions>
-        <MudButton Color="Color.Default" OnClick="CancelAsync">Cancel</MudButton>
-        <MudButton Color="Color.Primary" Variant="Variant.Filled" OnClick="SubmitAsync">Add</MudButton>
+        <MudButton Color="Color.Default" OnClick="CancelAsync">@T.Common.Cancel</MudButton>
+        <MudButton Color="Color.Primary" Variant="Variant.Filled" OnClick="SubmitAsync">@T.Common.Add</MudButton>
     </DialogActions>
 </MudDialog>
 
@@ -31,7 +32,7 @@
     {
         if (_selectedStaff is null)
         {
-            Snackbar.Add("Select an employee.", Severity.Warning);
+            Snackbar.Add(T.Payslip.SelectEmployee, Severity.Warning);
             return;
         }
 

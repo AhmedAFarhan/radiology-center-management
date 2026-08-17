@@ -1,10 +1,12 @@
+@inject AppLocalizer T
+
 <MudStack AlignItems="AlignItems.Center" Spacing="1" Class="pa-6">
     <MudIcon Icon="@Icon" Size="Size.Large" Color="@Color" />
-    <MudText Typo="Typo.subtitle1" Align="Align.Center" Class="font-weight-medium">@Title</MudText>
-    <MudText Typo="Typo.body2" Align="Align.Center" Class="text-secondary">@Message</MudText>
+    <MudText Typo="Typo.subtitle1" Align="Align.Center" Class="font-weight-medium">@_title</MudText>
+    <MudText Typo="Typo.body2" Align="Align.Center" Class="text-secondary">@_message</MudText>
     @if (Action.HasDelegate)
     {
-        <MudButton Variant="Variant.Text" Color="Color.Primary" OnClick="OnActionClick" Class="mt-2">@ActionLabel</MudButton>
+        <MudButton Variant="Variant.Text" Color="Color.Primary" OnClick="OnActionClick" Class="mt-2">@_actionLabel</MudButton>
     }
 </MudStack>
 
@@ -13,13 +15,24 @@
 
     [Parameter] public Color Color { get; set; } = Color.Default;
 
-    [Parameter] public string Title { get; set; } = "Nothing here yet";
+    [Parameter] public string? Title { get; set; }
 
-    [Parameter] public string Message { get; set; } = string.Empty;
+    [Parameter] public string? Message { get; set; }
 
-    [Parameter] public string ActionLabel { get; set; } = string.Empty;
+    [Parameter] public string? ActionLabel { get; set; }
 
     [Parameter] public EventCallback Action { get; set; }
+
+    private string _title = string.Empty;
+    private string _message = string.Empty;
+    private string _actionLabel = string.Empty;
+
+    protected override void OnParametersSet()
+    {
+        _title = Title ?? T.Common.EmptyTitle;
+        _message = Message ?? string.Empty;
+        _actionLabel = ActionLabel ?? string.Empty;
+    }
 
     private Task OnActionClick()
         => Action.HasDelegate ? Action.InvokeAsync(null) : Task.CompletedTask;
