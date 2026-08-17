@@ -17,7 +17,7 @@
     <MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Add" OnClick="OpenCreateDialogAsync">@T.Visits.NewVisit</MudButton>
 </PageHeader>
 
-<MudTable T="ExaminationDto" @ref="_table" ServerData="LoadServerData" Dense="true" Hover="true" Striped="true" Elevation="1" RowsPerPage="10">
+<MudTable T="ExaminationDto" @ref="_table" ServerData="LoadServerData" Dense="true" Hover="true" Striped="true" Elevation="1" RowsPerPage="10" FixedHeader="true" Class="table-scroll">
     <HeaderContent>
         <MudTh><MudTableSortLabel T="ExaminationDto" SortLabel="@("PatientId")">@T.Visits.Patient</MudTableSortLabel></MudTh>
         <MudTh><MudTableSortLabel T="ExaminationDto" SortLabel="@("ExaminationTypeName")">@T.Visits.Examination</MudTableSortLabel></MudTh>

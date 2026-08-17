@@ -15,7 +15,7 @@
     <MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Add" OnClick="OpenCreateDialogAsync">@T.Users.NewUser</MudButton>
 </PageHeader>
 
-<MudTable T="UserDto" @ref="_table" ServerData="LoadServerData" Dense="true" Hover="true" Striped="true" Elevation="1" RowsPerPage="10">
+<MudTable T="UserDto" @ref="_table" ServerData="LoadServerData" Dense="true" Hover="true" Striped="true" Elevation="1" RowsPerPage="10" FixedHeader="true" Class="table-scroll">
     <HeaderContent>
         <MudTh><MudTableSortLabel T="UserDto" SortLabel="@("UserName")">@T.Users.Username</MudTableSortLabel></MudTh>
         <MudTh><MudTableSortLabel T="UserDto" SortLabel="@("LastName")">@T.Common.Name</MudTableSortLabel></MudTh>

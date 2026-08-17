@@ -1242,6 +1242,20 @@ h1:focus {
 .boot-splash-center .mud-button {
   margin-top: 20px;
 }
+.table-scroll .mud-table-container {
+  max-height: calc(100vh - 235px);
+  overflow: auto;
+}
+.table-scroll .mud-table-container .mud-table-head {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  background-color: var(--mud-palette-surface);
+  box-shadow: 0 1px 0 var(--mud-palette-lines-default);
+}
+.mud-dialog .table-scroll .mud-table-container {
+  max-height: 55vh;
+}
 .language-option {
   display: flex;
   flex-direction: column;
