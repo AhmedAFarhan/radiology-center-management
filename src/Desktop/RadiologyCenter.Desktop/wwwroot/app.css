@@ -1242,4 +1242,35 @@ h1:focus {
 .boot-splash-center .mud-button {
   margin-top: 20px;
 }
+.language-option {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 20px 12px;
+  border: 2px solid var(--mud-palette-lines-default);
+  border-radius: 16px;
+  cursor: pointer;
+  transition: border-color 0.15s ease, background-color 0.15s ease, box-shadow 0.15s ease;
+  user-select: none;
+}
+.language-option:hover {
+  border-color: var(--mud-palette-primary-lighten);
+  background-color: var(--mud-palette-action-default-hover);
+}
+.language-option.selected {
+  border-color: var(--mud-palette-primary);
+  background-color: var(--mud-palette-primary-hover);
+  box-shadow: 0 4px 14px rgba(76, 88, 224, 0.18);
+}
+.language-flag {
+  width: 64px;
+  height: 48px;
+  object-fit: cover;
+  border-radius: 8px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.18);
+}
+.language-dialog .mud-dialog-content {
+  padding-bottom: 8px;
+}
 

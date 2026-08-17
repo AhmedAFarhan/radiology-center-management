@@ -11,7 +11,7 @@
 {
     <CascadingAuthenticationState>
         <AppErrorBoundary>
-            <Router AppAssembly="typeof(MauiProgram).Assembly" NotFoundPage="typeof(Pages.NotFound)">
+            <Router AppAssembly="typeof(MauiProgram).Assembly" NotFoundPage="typeof(Pages.NotFound)" @key="_languageKey">
                 <Found Context="routeData">
                     <AuthorizeRouteView RouteData="routeData" DefaultLayout="typeof(Layout.MainLayout)">
                         <NotAuthorized>
@@ -37,6 +37,7 @@ else
 @code {
     private Action? _onBackendChanged;
     private Action? _onLanguageChanged;
+    private int _languageKey;
 
     protected override void OnInitialized()
     {
@@ -44,6 +45,7 @@ else
         _onLanguageChanged = () => InvokeAsync(async () =>
         {
             await SyncHtmlAsync();
+            _languageKey++;
             StateHasChanged();
         });
         Backend.StateChanged += _onBackendChanged;

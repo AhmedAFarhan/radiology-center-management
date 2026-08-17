@@ -1734,5 +1734,9 @@
     "error.signOut":  "تم تسجيل خروجك. يرجى تسجيل الدخول مرة أخرى.",
     "validation.addressMaxLength":  "يجب ألا يتجاوز العنوان 300 حرف.",
     "analytics.last90Days":  "آخر 90 يومًا",
-    "analytics.allTime":  "كل الفترات"
+    "analytics.allTime":  "كل الفترات",
+    "language.dialogTitle":  "اختر اللغة",
+    "common.apply":  "تطبيق",
+    "language.arabic":  "العربية",
+    "language.english":  "الإنجليزية"
 }

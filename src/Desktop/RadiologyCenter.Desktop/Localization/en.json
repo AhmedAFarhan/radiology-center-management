@@ -1734,5 +1734,9 @@
     "error.signOut":  "You have been signed out. Please sign in again.",
     "validation.addressMaxLength":  "Address must be 300 characters or fewer.",
     "analytics.last90Days":  "Last 90 days",
-    "analytics.allTime":  "All time"
+    "analytics.allTime":  "All time",
+    "language.dialogTitle":  "Select language",
+    "common.apply":  "Apply",
+    "language.arabic":  "Arabic",
+    "language.english":  "English"
 }

@@ -87,6 +87,9 @@ public sealed partial class AppLocalizer
     private LandingGroup? _landing;
     public LandingGroup Landing => _landing ??= new LandingGroup(this);
 
+    private LanguageGroup? _language;
+    public LanguageGroup Language => _language ??= new LanguageGroup(this);
+
     private LayoutGroup? _layout;
     public LayoutGroup Layout => _layout ??= new LayoutGroup(this);
 
@@ -546,6 +549,7 @@ public sealed class CommonGroup
     public string Active => _localizer.Get("common.active");
     public string Add => _localizer.Get("common.add");
     public string All => _localizer.Get("common.all");
+    public string Apply => _localizer.Get("common.apply");
     public string Cancel => _localizer.Get("common.cancel");
     public string Close => _localizer.Get("common.close");
     public string Confirm => _localizer.Get("common.confirm");
@@ -942,6 +946,15 @@ public sealed class LandingGroup
         public string Operations => _localizer.Get("landing.feature.operations");
         public string Patients => _localizer.Get("landing.feature.patients");
     }
+}
+
+public sealed class LanguageGroup
+{
+    private readonly AppLocalizer _localizer;
+    internal LanguageGroup(AppLocalizer localizer) => _localizer = localizer;
+    public string Arabic => _localizer.Get("language.arabic");
+    public string DialogTitle => _localizer.Get("language.dialogTitle");
+    public string English => _localizer.Get("language.english");
 }
 
 public sealed class LayoutGroup

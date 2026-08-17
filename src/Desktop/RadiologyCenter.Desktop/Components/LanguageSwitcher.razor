@@ -1,11 +1,22 @@
 @inject AppLocalizer T
+@inject IDialogService DialogService
 
 <MudIconButton Icon="@Icons.Material.Filled.Translate"
                Color="Color.Inherit"
-               Title="@(T.IsRTL ? "English" : "العربية")"
+               Title="@(T.IsRTL ? T.Language.English : T.Language.Arabic)"
                aria-label="Language"
-               OnClick="Toggle" />
+               OnClick="OpenAsync" />
 
 @code {
-    private void Toggle() => T.SetCulture(T.IsRTL ? AppLocalizer.DefaultCulture : AppLocalizer.ArabicCulture);
+    private async Task OpenAsync()
+    {
+        var options = new DialogOptions
+        {
+            CloseOnEscapeKey = true,
+            BackdropClick = true,
+            MaxWidth = MaxWidth.Small,
+            FullWidth = true,
+        };
+        await DialogService.ShowAsync<LanguageDialog>("", options);
+    }
 }

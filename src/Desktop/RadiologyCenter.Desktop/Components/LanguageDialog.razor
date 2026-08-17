@@ -1,0 +1,71 @@
+@inject AppLocalizer T
+
+<MudDialog Class="language-dialog">
+    <DialogContent>
+        <MudText Typo="Typo.h6" Align="Align.Center" Class="mb-4">@T.Language.DialogTitle</MudText>
+
+        <MudGrid Spacing="3">
+            <MudItem xs="12" sm="6">
+                <div class="language-option @(IsSelected(AppLocalizer.DefaultCulture) ? "selected" : "")" @onclick="@(() => Select(AppLocalizer.DefaultCulture))">
+                    <img src="images/flags/us.svg" alt="USA flag" class="language-flag" />
+                    <MudText Typo="Typo.body1" Class="font-weight-medium">@T.Language.English</MudText>
+                    <MudText Typo="Typo.caption" Class="text-secondary">English</MudText>
+                </div>
+            </MudItem>
+            <MudItem xs="12" sm="6">
+                <div class="language-option @(IsSelected(AppLocalizer.ArabicCulture) ? "selected" : "")" @onclick="@(() => Select(AppLocalizer.ArabicCulture))">
+                    <img src="images/flags/eg.svg" alt="Egypt flag" class="language-flag" />
+                    <MudText Typo="Typo.body1" Class="font-weight-medium">@T.Language.Arabic</MudText>
+                    <MudText Typo="Typo.caption" Class="text-secondary">العربية</MudText>
+                </div>
+            </MudItem>
+        </MudGrid>
+    </DialogContent>
+
+    <DialogActions>
+        <MudButton Color="Color.Default" OnClick="Cancel" Disabled="@_busy">@T.Common.Cancel</MudButton>
+        <MudButton Color="Color.Primary" Variant="Variant.Filled" OnClick="ApplyAsync" Disabled="@(_selected == _current || _busy)">
+            @T.Common.Apply
+        </MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    [CascadingParameter] public IMudDialogInstance MudDialog { get; set; } = default!;
+
+    private string _selected = AppLocalizer.DefaultCulture;
+    private string _current = AppLocalizer.DefaultCulture;
+    private bool _busy;
+
+    protected override void OnInitialized()
+    {
+        _current = T.CurrentCulture;
+        _selected = _current;
+    }
+
+    private bool IsSelected(string culture) => string.Equals(_selected, culture, StringComparison.Ordinal);
+
+    private void Select(string culture) => _selected = culture;
+
+    private async Task ApplyAsync()
+    {
+        if (_selected == _current)
+        {
+            MudDialog.Close(DialogResult.Ok(_selected));
+            return;
+        }
+
+        _busy = true;
+        try
+        {
+            T.SetCulture(_selected);
+            MudDialog.Close(DialogResult.Ok(_selected));
+        }
+        finally
+        {
+            _busy = false;
+        }
+    }
+
+    private void Cancel() => MudDialog.Cancel();
+}
