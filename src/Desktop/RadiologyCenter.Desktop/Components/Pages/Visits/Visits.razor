@@ -33,10 +33,10 @@
         </MudTd>
         <MudTd DataLabel="@T.Visits.Examination">@context.ExaminationTypeName</MudTd>
         <MudTd DataLabel="@T.Visits.Priority">
-            <MudChip T="string" Size="Size.Small" Color="@(PriorityColor(context.Priority))">@context.Priority</MudChip>
+            <MudChip T="string" Size="Size.Small" Color="@(PriorityColor(context.PriorityKey))">@context.Priority</MudChip>
         </MudTd>
         <MudTd DataLabel="@T.Common.Status">
-            <MudChip T="string" Size="Size.Small" Color="@(StatusColor(context.Status))">@context.Status</MudChip>
+            <MudChip T="string" Size="Size.Small" Color="@(StatusColor(context.StatusKey))">@context.Status</MudChip>
         </MudTd>
         <MudTd DataLabel="@T.Visits.Scheduled">@FormatScheduled(context.ScheduledAt)</MudTd>
         <MudTd DataLabel="@T.Visits.Balance">
@@ -55,27 +55,27 @@
             {
                 <MudIconButton Icon="@Icons.Material.Filled.Approval" Size="Size.Small" Color="Color.Info" aria-label="@T.Visits.Insurance" OnClick="@(() => OpenInsuranceAsync(context))" />
             }
-            @if (context.Status is "Requested" or "Scheduled")
+            @if (context.StatusKey is "Requested" or "Scheduled")
             {
                 <MudIconButton Icon="@Icons.Material.Filled.Edit" Size="Size.Small" Color="Color.Default" aria-label="@T.Common.Edit" OnClick="@(() => OpenEditDialogAsync(context))" />
             }
-            @if (context.Status is "Requested" or "Scheduled")
+            @if (context.StatusKey is "Requested" or "Scheduled")
             {
                 <MudIconButton Icon="@Icons.Material.Filled.Schedule" Size="Size.Small" Color="Color.Info" aria-label="@T.Visits.Schedule" OnClick="@(() => OpenScheduleDialogAsync(context))" />
             }
-            @if (context.Status == "Scheduled")
+            @if (context.StatusKey == "Scheduled")
             {
                 <MudIconButton Icon="@Icons.Material.Filled.Login" Size="Size.Small" Color="Color.Primary" aria-label="@T.Visits.CheckIn" OnClick="@(() => CheckInAsync(context))" />
             }
-            @if (context.Status == "CheckedIn")
+            @if (context.StatusKey == "CheckedIn")
             {
                 <MudIconButton Icon="@Icons.Material.Filled.PlayArrow" Size="Size.Small" Color="Color.Secondary" aria-label="@T.Visits.Start" OnClick="@(() => StartAsync(context))" />
             }
-            @if (context.Status == "InProgress")
+            @if (context.StatusKey == "InProgress")
             {
                 <MudIconButton Icon="@Icons.Material.Filled.CheckCircle" Size="Size.Small" Color="Color.Success" aria-label="@T.Visits.Complete" OnClick="@(() => CompleteAsync(context))" />
             }
-            @if (context.Status is not "Completed" and not "Cancelled")
+            @if (context.StatusKey is not "Completed" and not "Cancelled")
             {
                 <MudIconButton Icon="@Icons.Material.Filled.Cancel" Size="Size.Small" Color="Color.Error" aria-label="@T.Common.Cancel" OnClick="@(() => CancelAsync(context))" />
             }

@@ -96,7 +96,7 @@ public partial class ReadingRoom : ComponentBase
         try
         {
             var exams = await ExaminationService.GetPagedAsync(null, null, false, 1, 100);
-            var completed = exams.Items.Where(e => e.Status == "Completed").ToList();
+            var completed = exams.Items.Where(e => e.StatusKey == "Completed").ToList();
 
             IReadOnlyList<ReportListItemDto> reportItems = Array.Empty<ReportListItemDto>();
             try

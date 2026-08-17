@@ -27,11 +27,11 @@
                 </MudItem>
                 <MudItem xs="12" sm="6">
                     <MudText Typo="Typo.caption" Class="text-secondary">@T.Common.Status</MudText>
-                    <MudChip T="string" Size="Size.Small" Color="@(StatusColor(_visit.Status))">@_visit.Status</MudChip>
+                    <MudChip T="string" Size="Size.Small" Color="@(StatusColor(_visit.StatusKey))">@_visit.Status</MudChip>
                 </MudItem>
                 <MudItem xs="12" sm="6">
                     <MudText Typo="Typo.caption" Class="text-secondary">@T.VisitDialog.Priority</MudText>
-                    <MudChip T="string" Size="Size.Small" Color="@(PriorityColor(_visit.Priority))">@_visit.Priority</MudChip>
+                    <MudChip T="string" Size="Size.Small" Color="@(PriorityColor(_visit.PriorityKey))">@_visit.Priority</MudChip>
                 </MudItem>
                 <MudItem xs="12">
                     <MudText Typo="Typo.caption" Class="text-secondary">@T.VisitDialog.Radiologist</MudText>
