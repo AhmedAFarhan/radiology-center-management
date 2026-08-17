@@ -1261,7 +1261,8 @@ h1:focus {
   overflow-y: auto;
   padding-right: 4px;
 }
-.mud-table-loading .mud-table-pagination .mud-button {
+.mud-table:has(.mud-table-loading-row) .mud-table-pagination-actions,
+.mud-table:has(.mud-table-loading-row) .mud-table-pagination-select {
   pointer-events: none;
   opacity: 0.45;
 }
