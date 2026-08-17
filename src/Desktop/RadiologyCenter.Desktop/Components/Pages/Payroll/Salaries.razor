@@ -96,6 +96,12 @@
 
             return new TableData<SalaryDto> { Items = salaries.Items, TotalItems = salaries.TotalCount };
         }
+        catch (OperationCanceledException)
+        {
+            if (ct.IsCancellationRequested)
+                return new TableData<SalaryDto> { Items = Array.Empty<SalaryDto>(), TotalItems = 0 };
+            throw;
+        }
         catch (ApiException ex)
         {
             Snackbar.Add(ex.Message, Severity.Error);

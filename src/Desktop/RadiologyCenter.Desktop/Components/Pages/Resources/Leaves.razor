@@ -90,6 +90,12 @@
 
             return new TableData<LeaveDto> { Items = leaves.Items, TotalItems = leaves.TotalCount };
         }
+        catch (OperationCanceledException)
+        {
+            if (ct.IsCancellationRequested)
+                return new TableData<LeaveDto> { Items = Array.Empty<LeaveDto>(), TotalItems = 0 };
+            throw;
+        }
         catch (ApiException ex)
         {
             Snackbar.Add(ex.Message, Severity.Error);

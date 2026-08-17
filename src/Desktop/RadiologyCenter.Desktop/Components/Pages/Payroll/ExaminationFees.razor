@@ -98,6 +98,12 @@
 
             return new TableData<ExaminationFeeDto> { Items = fees.Items, TotalItems = fees.TotalCount };
         }
+        catch (OperationCanceledException)
+        {
+            if (ct.IsCancellationRequested)
+                return new TableData<ExaminationFeeDto> { Items = Array.Empty<ExaminationFeeDto>(), TotalItems = 0 };
+            throw;
+        }
         catch (ApiException ex)
         {
             Snackbar.Add(ex.Message, Severity.Error);

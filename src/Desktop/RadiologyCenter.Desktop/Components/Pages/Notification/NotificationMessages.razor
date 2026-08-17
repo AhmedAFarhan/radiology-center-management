@@ -106,6 +106,12 @@
             _offline = false;
             return new TableData<NotificationMessageDto> { Items = page.Items, TotalItems = page.TotalCount };
         }
+        catch (OperationCanceledException)
+        {
+            if (ct.IsCancellationRequested)
+                return new TableData<NotificationMessageDto> { Items = Array.Empty<NotificationMessageDto>(), TotalItems = 0 };
+            throw;
+        }
         catch (ApiException ex)
         {
             Snackbar.Add(ex.Message, Severity.Error);

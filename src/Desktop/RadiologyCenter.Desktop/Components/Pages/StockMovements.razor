@@ -78,6 +78,12 @@
             _offline = false;
             return new TableData<StockMovementDto> { Items = page.Items, TotalItems = page.TotalCount };
         }
+        catch (OperationCanceledException)
+        {
+            if (ct.IsCancellationRequested)
+                return new TableData<StockMovementDto> { Items = Array.Empty<StockMovementDto>(), TotalItems = 0 };
+            throw;
+        }
         catch (ApiException ex)
         {
             Snackbar.Add(ex.Message, Severity.Error);

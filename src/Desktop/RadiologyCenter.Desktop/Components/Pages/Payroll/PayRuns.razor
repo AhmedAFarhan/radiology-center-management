@@ -140,6 +140,12 @@
             _offline = false;
             return new TableData<PayRunDto> { Items = page.Items, TotalItems = page.TotalCount };
         }
+        catch (OperationCanceledException)
+        {
+            if (ct.IsCancellationRequested)
+                return new TableData<PayRunDto> { Items = Array.Empty<PayRunDto>(), TotalItems = 0 };
+            throw;
+        }
         catch (ApiException ex)
         {
             Snackbar.Add(ex.Message, Severity.Error);

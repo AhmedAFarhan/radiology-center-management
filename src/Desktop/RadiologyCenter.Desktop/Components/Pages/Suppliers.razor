@@ -94,6 +94,12 @@
             _offline = false;
             return new TableData<SupplierDto> { Items = page.Items, TotalItems = page.TotalCount };
         }
+        catch (OperationCanceledException)
+        {
+            if (ct.IsCancellationRequested)
+                return new TableData<SupplierDto> { Items = Array.Empty<SupplierDto>(), TotalItems = 0 };
+            throw;
+        }
         catch (ApiException ex)
         {
             Snackbar.Add(ex.Message, Severity.Error);

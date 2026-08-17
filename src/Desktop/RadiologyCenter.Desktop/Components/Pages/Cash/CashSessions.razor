@@ -94,6 +94,12 @@
             _offline = false;
             return new TableData<CashSessionDto> { Items = page.Items, TotalItems = page.TotalCount };
         }
+        catch (OperationCanceledException)
+        {
+            if (ct.IsCancellationRequested)
+                return new TableData<CashSessionDto> { Items = Array.Empty<CashSessionDto>(), TotalItems = 0 };
+            throw;
+        }
         catch (ApiException ex)
         {
             Snackbar.Add(ex.Message, Severity.Error);

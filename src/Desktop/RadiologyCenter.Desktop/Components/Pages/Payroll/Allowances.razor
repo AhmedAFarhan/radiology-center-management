@@ -109,6 +109,12 @@
 
             return new TableData<AllowanceAssignmentDto> { Items = allowances.Items, TotalItems = allowances.TotalCount };
         }
+        catch (OperationCanceledException)
+        {
+            if (ct.IsCancellationRequested)
+                return new TableData<AllowanceAssignmentDto> { Items = Array.Empty<AllowanceAssignmentDto>(), TotalItems = 0 };
+            throw;
+        }
         catch (ApiException ex)
         {
             Snackbar.Add(ex.Message, Severity.Error);

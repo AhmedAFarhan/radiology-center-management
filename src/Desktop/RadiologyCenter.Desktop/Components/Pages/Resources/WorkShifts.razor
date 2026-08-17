@@ -92,6 +92,12 @@
 
             return new TableData<WorkShiftDto> { Items = shifts.Items, TotalItems = shifts.TotalCount };
         }
+        catch (OperationCanceledException)
+        {
+            if (ct.IsCancellationRequested)
+                return new TableData<WorkShiftDto> { Items = Array.Empty<WorkShiftDto>(), TotalItems = 0 };
+            throw;
+        }
         catch (ApiException ex)
         {
             Snackbar.Add(ex.Message, Severity.Error);

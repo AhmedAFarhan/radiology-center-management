@@ -1261,6 +1261,10 @@ h1:focus {
   overflow-y: auto;
   padding-right: 4px;
 }
+.mud-table-loading .mud-table-pagination .mud-button {
+  pointer-events: none;
+  opacity: 0.45;
+}
 .language-option {
   display: flex;
   flex-direction: column;

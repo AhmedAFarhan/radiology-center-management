@@ -105,6 +105,12 @@
             _offline = false;
             return new TableData<InsurancePolicyListItemDto> { Items = page.Items, TotalItems = page.TotalCount };
         }
+        catch (OperationCanceledException)
+        {
+            if (ct.IsCancellationRequested)
+                return new TableData<InsurancePolicyListItemDto> { Items = Array.Empty<InsurancePolicyListItemDto>(), TotalItems = 0 };
+            throw;
+        }
         catch (ApiException ex)
         {
             Snackbar.Add(ex.Message, Severity.Error);
