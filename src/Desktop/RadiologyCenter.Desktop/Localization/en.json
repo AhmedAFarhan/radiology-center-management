@@ -1041,7 +1041,7 @@
     "users.searchPlaceholder":  "Search users...",
     "users.deactivated":  "{0} deactivated.",
     "workShiftDialog.selectDate":  "Select a shift date.",
-    "roleDialog.permissionsDescription":  "Manage permissions for {0}.",
+    "roleDialog.permissionsDescription":  "Manage permissions for Radiology Center.",
     "cashSession.handoverApproved":  "Handover approved.",
     "cash.emptyActionLabel":  "Open your first session",
     "cash.emptyMessage":  "Open a cash session to start recording movements, then close it with a counted handover.",

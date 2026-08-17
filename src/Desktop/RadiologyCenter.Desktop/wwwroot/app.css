@@ -1256,6 +1256,11 @@ h1:focus {
 .mud-dialog .table-scroll .mud-table-container {
   max-height: 55vh;
 }
+.permission-scroll {
+  max-height: calc(100vh - 320px);
+  overflow-y: auto;
+  padding-right: 4px;
+}
 .language-option {
   display: flex;
   flex-direction: column;

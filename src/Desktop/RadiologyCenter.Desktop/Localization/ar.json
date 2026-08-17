@@ -1041,7 +1041,7 @@
     "users.searchPlaceholder":  "ابحث عن المستخدمين...",
     "users.deactivated":  "تم إلغاء تفعيل {0}.",
     "workShiftDialog.selectDate":  "اختر تاريخ المناوبة.",
-    "roleDialog.permissionsDescription":  "إدارة الصلاحيات لـ {0}.",
+    "roleDialog.permissionsDescription":  "إدارة الصلاحيات لمركز الأشعة.",
     "cashSession.handoverApproved":  "تم اعتماد التسليم.",
     "cash.emptyActionLabel":  "افتح جلستك الأولى",
     "cash.emptyMessage":  "افتح جلسة خزينة لبدء تسجيل الحركات، ثم أغلقها مع تسليم المبلغ المُحصى.",

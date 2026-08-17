@@ -87,4 +87,7 @@ public sealed class IdentityService
 
     public Task RemovePermissionFromRoleAsync(string id, string permissionCode, CancellationToken ct = default)
         => _api.SendDeleteAsync($"api/roles/{id}/permissions/{permissionCode}", ct);
+
+    public Task<IReadOnlyList<PermissionDto>> GetPermissionsAsync(CancellationToken ct = default)
+        => _api.GetAsync<IReadOnlyList<PermissionDto>>("api/permissions", ct);
 }
