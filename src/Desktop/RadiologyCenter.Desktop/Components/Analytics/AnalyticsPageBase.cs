@@ -10,6 +10,7 @@ public abstract class AnalyticsPageBase : ComponentBase, IDisposable
 
     protected bool Loading = true;
     protected bool Error;
+    protected string? LastError;
 
     protected override void OnInitialized()
     {
@@ -20,25 +21,30 @@ public abstract class AnalyticsPageBase : ComponentBase, IDisposable
     protected override async Task OnInitializedAsync()
     {
         await base.OnInitializedAsync();
-        await ReloadAsync();
+        await ReloadCore(notify: false);
     }
 
-    protected async Task ReloadAsync()
+    protected Task ReloadAsync() => ReloadCore(notify: true);
+
+    protected async Task ReloadCore(bool notify)
     {
         Loading = true;
         Error = false;
+        LastError = null;
         try
         {
             await LoadAsync(Period.From, Period.To);
         }
-        catch
+        catch (Exception ex)
         {
             Error = true;
+            LastError = ex.Message;
         }
         finally
         {
             Loading = false;
-            await InvokeAsync(StateHasChanged);
+            if (notify)
+                await InvokeAsync(StateHasChanged);
         }
     }
 
@@ -52,6 +58,5 @@ public abstract class AnalyticsPageBase : ComponentBase, IDisposable
     public virtual void Dispose()
     {
         Period.Changed -= OnPeriodChanged;
-        GC.SuppressFinalize(this);
     }
 }

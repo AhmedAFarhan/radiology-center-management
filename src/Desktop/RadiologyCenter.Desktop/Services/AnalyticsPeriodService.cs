@@ -10,10 +10,10 @@ public enum AnalyticsRangePreset
     AllTime,
 }
 
-public sealed record AnalyticsRange(AnalyticsRangePreset Preset, DateTime From, DateTime To, string Label);
-
 public sealed class AnalyticsPeriodService
 {
+    private readonly AppLocalizer _t;
+
     public AnalyticsRangePreset Selected { get; private set; } = AnalyticsRangePreset.Last30Days;
 
     public DateTime From { get; private set; }
@@ -21,12 +21,21 @@ public sealed class AnalyticsPeriodService
     /// <summary>Exclusive upper bound (one day after the visible last day).</summary>
     public DateTime To { get; private set; }
 
-    public string Label { get; private set; } = string.Empty;
+    public string Label => Selected switch
+    {
+        AnalyticsRangePreset.Last7Days => _t.Analytics.Last7Days,
+        AnalyticsRangePreset.Last90Days => _t.Analytics.Last90Days,
+        AnalyticsRangePreset.ThisMonth => _t.Analytics.ThisMonth,
+        AnalyticsRangePreset.ThisYear => _t.Analytics.ThisYear,
+        AnalyticsRangePreset.AllTime => _t.Analytics.AllTime,
+        _ => _t.Analytics.Last30Days,
+    };
 
     public event Action? Changed;
 
-    public AnalyticsPeriodService()
+    public AnalyticsPeriodService(AppLocalizer t)
     {
+        _t = t;
         Apply(AnalyticsRangePreset.Last30Days);
     }
 
@@ -57,16 +66,5 @@ public sealed class AnalyticsPeriodService
 
         From = from;
         To = today.AddDays(1);
-
-        Label = preset switch
-        {
-            AnalyticsRangePreset.Last7Days => "Last 7 days",
-            AnalyticsRangePreset.Last30Days => "Last 30 days",
-            AnalyticsRangePreset.Last90Days => "Last 90 days",
-            AnalyticsRangePreset.ThisMonth => "This month",
-            AnalyticsRangePreset.ThisYear => "This year",
-            AnalyticsRangePreset.AllTime => "All time",
-            _ => "Last 30 days",
-        };
     }
 }

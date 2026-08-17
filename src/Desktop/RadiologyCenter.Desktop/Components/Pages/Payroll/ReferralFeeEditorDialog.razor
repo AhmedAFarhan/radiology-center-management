@@ -8,7 +8,7 @@
     <DialogContent>
         <DialogHeader Icon="@Icons.Material.Filled.LocalHospital" Title="@(Fee is null ? T.ReferralFee.NewReferralFee : T.ReferralFee.EditReferralFee)" />
         <EditForm EditContext="_editContext">
-            <DataAnnotationsValidator />
+            <LocalizedDataAnnotationsValidator />
             <MudGrid Spacing="2">
                 @if (IsEdit)
                 {

@@ -15,7 +15,7 @@
 }
 else if (Error)
 {
-    <ErrorState Title="@T.Overview.LoadErrorTitle" Message="@T.Overview.LoadErrorMsg" Action="ReloadAsync" RetryLabel="@T.Overview.Retry" />
+    <ErrorState Title="@T.Overview.LoadErrorTitle" Message="@T.Overview.LoadErrorMsg" Detail="@LastError" Action="ReloadAsync" RetryLabel="@T.Overview.Retry" />
 }
 else
 {

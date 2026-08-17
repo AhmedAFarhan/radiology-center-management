@@ -3,6 +3,7 @@ using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using MudBlazor;
 using RadiologyCenter.Desktop.Models;
 
 namespace RadiologyCenter.Desktop.Services;
@@ -34,12 +35,15 @@ public sealed class ApiClient
     private readonly TokenStorage _tokenStorage;
     private readonly AppAuthenticationStateProvider _authState;
     private readonly AppLocalizer _localizer;
+    private readonly ISnackbar _snackbar;
+    private Task<TokenResult?>? _refreshTask;
 
-    public ApiClient(TokenStorage tokenStorage, AppAuthenticationStateProvider authState, AppLocalizer localizer)
+    public ApiClient(TokenStorage tokenStorage, AppAuthenticationStateProvider authState, AppLocalizer localizer, ISnackbar snackbar)
     {
         _tokenStorage = tokenStorage;
         _authState = authState;
         _localizer = localizer;
+        _snackbar = snackbar;
         _http = new HttpClient { BaseAddress = new Uri(BaseUrl), Timeout = TimeSpan.FromSeconds(30) };
     }
 
@@ -90,61 +94,16 @@ public sealed class ApiClient
 
     private async Task<T> SendCoreAsync<T>(Func<HttpRequestMessage> requestFactory, CancellationToken ct)
     {
-        var request = requestFactory();
-        request.Headers.AcceptLanguage.TryParseAdd(_localizer.CurrentCulture);
-        var tokens = _tokenStorage.GetTokens();
-        if (tokens is not null)
-            request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", tokens.AccessToken);
-
-        var response = await _http.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, ct);
-
-        if (response.StatusCode == HttpStatusCode.Unauthorized && tokens is not null)
-        {
-            var refreshed = await TryRefreshAsync(tokens, ct);
-            if (refreshed is null)
-            {
-                await _authState.SignOutAsync();
-            }
-            else
-            {
-                request = requestFactory();
-                request.Headers.AcceptLanguage.TryParseAdd(_localizer.CurrentCulture);
-                request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", refreshed.AccessToken);
-                response = await _http.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, ct);
-            }
-        }
-
+        var response = await SendWithRefreshAsync(requestFactory, ct);
         return await DeserializeAsync<T>(response, ct);
     }
 
     private async Task<byte[]> SendCoreRawAsync(Func<HttpRequestMessage> requestFactory, CancellationToken ct)
     {
-        var request = requestFactory();
-        request.Headers.AcceptLanguage.TryParseAdd(_localizer.CurrentCulture);
-        var tokens = _tokenStorage.GetTokens();
-        if (tokens is not null)
-            request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", tokens.AccessToken);
-
-        var response = await _http.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, ct);
-
-        if (response.StatusCode == HttpStatusCode.Unauthorized && tokens is not null)
-        {
-            var refreshed = await TryRefreshAsync(tokens, ct);
-            if (refreshed is null)
-            {
-                await _authState.SignOutAsync();
-            }
-            else
-            {
-                request = requestFactory();
-                request.Headers.AcceptLanguage.TryParseAdd(_localizer.CurrentCulture);
-                request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", refreshed.AccessToken);
-                response = await _http.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, ct);
-            }
-        }
+        var response = await SendWithRefreshAsync(requestFactory, ct);
 
         if (response.StatusCode == HttpStatusCode.Unauthorized)
-            throw new ApiException(401, "Your session has expired. Please sign in again.");
+            throw new ApiException(401, _localizer.Error.SignOut);
 
         if (!response.IsSuccessStatusCode)
         {
@@ -168,7 +127,61 @@ public sealed class ApiClient
         return await response.Content.ReadAsByteArrayAsync(ct);
     }
 
-    private async Task<TokenResult?> TryRefreshAsync(AuthTokens tokens, CancellationToken ct)
+    private async Task<HttpResponseMessage> SendWithRefreshAsync(Func<HttpRequestMessage> requestFactory, CancellationToken ct)
+    {
+        var request = requestFactory();
+        ApplyAuth(request, null);
+        var response = await _http.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, ct);
+
+        if (response.StatusCode != HttpStatusCode.Unauthorized)
+            return response;
+
+        var tokens = _tokenStorage.GetTokens();
+        if (tokens is null)
+            return response;
+
+        var refreshed = await GetOrStartRefreshAsync(tokens, ct);
+        if (refreshed is null)
+        {
+            await _authState.SignOutAsync();
+            _snackbar.Add(_localizer.Error.SignOut, Severity.Warning);
+            return response;
+        }
+
+        request = requestFactory();
+        ApplyAuth(request, refreshed.AccessToken);
+        return await _http.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, ct);
+    }
+
+    private void ApplyAuth(HttpRequestMessage request, string? accessToken)
+    {
+        request.Headers.AcceptLanguage.TryParseAdd(_localizer.CurrentCulture);
+        if (accessToken is not null)
+        {
+            request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
+            return;
+        }
+
+        var tokens = _tokenStorage.GetTokens();
+        if (tokens is not null)
+            request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", tokens.AccessToken);
+    }
+
+    private Task<TokenResult?> GetOrStartRefreshAsync(AuthTokens tokens, CancellationToken ct)
+    {
+        if (_refreshTask is not null)
+            return _refreshTask;
+
+        _refreshTask = RefreshCoreAsync(tokens, ct);
+        _ = _refreshTask.ContinueWith(
+            _ => _refreshTask = null,
+            CancellationToken.None,
+            TaskContinuationOptions.ExecuteSynchronously,
+            TaskScheduler.Default);
+        return _refreshTask;
+    }
+
+    private async Task<TokenResult?> RefreshCoreAsync(AuthTokens tokens, CancellationToken ct)
     {
         try
         {

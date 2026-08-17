@@ -6,7 +6,7 @@
     <DialogContent>
         <DialogHeader Icon="@Icons.Material.Filled.Security" Title="@(Role is null ? T.RoleDialog.NewRole : T.RoleDialog.EditTitle)" />
         <EditForm EditContext="_editContext">
-            <DataAnnotationsValidator />
+            <LocalizedDataAnnotationsValidator />
             <MudTextField @bind-Value="_model.Name"
                           Label="@T.RoleDialog.RoleName"
                           Variant="Variant.Outlined"

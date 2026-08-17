@@ -7,7 +7,7 @@
     <DialogContent>
         <DialogHeader Icon="@Icons.Material.Filled.Badge" Title="@(Staff is null ? T.Staff.NewStaff : T.FormatValue(T.Staff.Edit, Staff.FullName))" />
         <EditForm EditContext="_editContext">
-            <DataAnnotationsValidator />
+            <LocalizedDataAnnotationsValidator />
             <MudGrid Spacing="2">
                 <MudItem xs="12">
                     <MudAutocomplete T="UserDto"

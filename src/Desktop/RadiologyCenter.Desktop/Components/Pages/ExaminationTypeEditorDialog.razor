@@ -7,7 +7,7 @@
     <DialogContent>
         <DialogHeader Icon="@Icons.Material.Filled.MedicalServices" Title="@(Type is null ? T.ExamDialog.NewTitle : T.ExamDialog.EditTitle)" />
         <EditForm EditContext="_editContext">
-            <DataAnnotationsValidator />
+            <LocalizedDataAnnotationsValidator />
             <MudGrid Spacing="2">
                 <MudItem xs="12" sm="4">
                     <MudTextField @bind-Value="_model.Code"

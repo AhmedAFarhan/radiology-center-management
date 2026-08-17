@@ -7,7 +7,7 @@
     <DialogContent>
         <DialogHeader Icon="@Icons.Material.Filled.Calculate" Title="@(Salary is null ? T.Salary.NewSalary : T.Salary.EditTitle)" />
         <EditForm EditContext="_editContext">
-            <DataAnnotationsValidator />
+            <LocalizedDataAnnotationsValidator />
             <MudGrid Spacing="2">
                 @if (IsEdit)
                 {

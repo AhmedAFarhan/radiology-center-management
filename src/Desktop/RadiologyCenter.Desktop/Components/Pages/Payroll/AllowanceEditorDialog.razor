@@ -7,7 +7,7 @@
     <DialogContent>
         <DialogHeader Icon="@Icons.Material.Filled.AttachMoney" Title="@(Allowance is null ? T.Allowance.NewAllowance : T.FormatValue(T.Allowance.EditTitle, Allowance.Name))" />
         <EditForm EditContext="_editContext">
-            <DataAnnotationsValidator />
+            <LocalizedDataAnnotationsValidator />
             <MudGrid Spacing="2">
                 @if (IsEdit)
                 {

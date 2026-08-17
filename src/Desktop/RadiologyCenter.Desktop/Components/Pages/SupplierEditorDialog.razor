@@ -6,7 +6,7 @@
     <DialogContent>
         <DialogHeader Icon="@Icons.Material.Filled.LocalShipping" Title="@(Supplier is null ? T.SupplierDialog.NewSupplier : T.SupplierDialog.EditSupplier)" />
         <EditForm EditContext="_editContext">
-            <DataAnnotationsValidator />
+            <LocalizedDataAnnotationsValidator />
             <MudGrid Spacing="2">
                 <MudItem xs="12" sm="8">
                     <MudTextField @bind-Value="_model.Name"

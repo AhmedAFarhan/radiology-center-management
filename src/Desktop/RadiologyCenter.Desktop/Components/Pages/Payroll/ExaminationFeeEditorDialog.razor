@@ -7,7 +7,7 @@
     <DialogContent>
         <DialogHeader Icon="@Icons.Material.Filled.MedicalServices" Title="@(Fee is null ? T.ExamFee.NewExaminationFee : T.ExamFee.EditExaminationFee)" />
         <EditForm EditContext="_editContext">
-            <DataAnnotationsValidator />
+            <LocalizedDataAnnotationsValidator />
             <MudGrid Spacing="2">
                 @if (IsEdit)
                 {

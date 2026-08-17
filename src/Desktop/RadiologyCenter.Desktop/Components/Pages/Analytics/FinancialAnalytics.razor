@@ -15,7 +15,7 @@
 }
 else if (Error)
 {
-    <ErrorState Title="@T.Financial.LoadErrorTitle" Message="@T.Financial.LoadErrorMsg" Action="ReloadAsync" RetryLabel="@T.Financial.Retry" />
+    <ErrorState Title="@T.Financial.LoadErrorTitle" Message="@T.Financial.LoadErrorMsg" Detail="@LastError" Action="ReloadAsync" RetryLabel="@T.Financial.Retry" />
 }
 else
 {

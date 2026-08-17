@@ -13,7 +13,7 @@
 }
 else if (_error)
 {
-<ErrorState Title="@T.Dashboard.LoadErrorTitle" Message="@T.Dashboard.LoadErrorMsg" Action="LoadAsync" />
+<ErrorState Title="@T.Dashboard.LoadErrorTitle" Message="@T.Dashboard.LoadErrorMsg" Detail="@_errorDetail" Action="LoadAsync" />
 }
 else
 {
@@ -80,6 +80,7 @@ else
     private InsuranceStatsDto? _insuranceStats;
     private bool _loading = true;
     private bool _error;
+    private string? _errorDetail;
 
     protected override async Task OnInitializedAsync()
     {
@@ -94,9 +95,10 @@ else
         {
             _data = await DashboardService.LoadAsync();
         }
-        catch
+        catch (Exception ex)
         {
             _error = true;
+            _errorDetail = ex.Message;
         }
         finally
         {

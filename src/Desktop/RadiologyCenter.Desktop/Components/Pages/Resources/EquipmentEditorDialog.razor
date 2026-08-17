@@ -6,7 +6,7 @@
     <DialogContent>
         <DialogHeader Icon="@Icons.Material.Filled.Biotech" Title="@(Equipment is null ? T.Equipment.NewEquipment : T.FormatValue(T.Equipment.Edit, Equipment.Name))" />
         <EditForm EditContext="_editContext">
-            <DataAnnotationsValidator />
+            <LocalizedDataAnnotationsValidator />
             <MudGrid Spacing="2">
                 <MudItem xs="12">
                     <MudTextField @bind-Value="_model.Name"

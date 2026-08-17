@@ -6,7 +6,7 @@
     <DialogContent>
         <DialogHeader Icon="@Icons.Material.Filled.Shield" Title="@(Company is null ? T.CompanyDialog.Title : T.CompanyDialog.EditTitle)" />
         <EditForm EditContext="_editContext">
-            <DataAnnotationsValidator />
+            <LocalizedDataAnnotationsValidator />
             <MudGrid Spacing="2">
                 <MudItem xs="12" sm="8">
                     <MudTextField @bind-Value="_model.Name"

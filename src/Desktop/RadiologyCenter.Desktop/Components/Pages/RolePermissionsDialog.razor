@@ -14,7 +14,7 @@
                 {
                     <MudItem xs="12" sm="6">
                         <MudPaper Elevation="0" Class="pa-3 mb-2 permission-group">
-                            <MudText Typo="Typo.subtitle2" Class="mb-1">@group</MudText>
+                            <MudText Typo="Typo.subtitle2" Class="mb-1">@T[$"roles.permissiongroup.{group.ToLowerInvariant()}"]</MudText>
                             @foreach (var permission in PermissionCatalog.ByGroup(group))
                             {
                                 <div>
@@ -22,7 +22,7 @@
                                                @bind-Value="_selected[permission.Code]"
                                                Color="Color.Primary"
                                                Size="Size.Small">
-                                        <MudText Typo="Typo.body2">@permission.Name</MudText>
+                                        <MudText Typo="Typo.body2">@T[$"roles.permission.{permission.Code.Replace(".", "").Replace("-", "")}"]</MudText>
                                         <MudText Typo="Typo.caption" Class="text-secondary d-block">@permission.Code</MudText>
                                     </MudSwitch>
                                 </div>

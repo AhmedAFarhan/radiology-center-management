@@ -8,7 +8,7 @@
     <DialogContent>
         <DialogHeader Icon="@Icons.Material.Filled.EventNote" Title="@(Visit is null ? T.VisitDialog.NewTitle : T.VisitDialog.EditTitle)" />
         <EditForm EditContext="_editContext">
-            <DataAnnotationsValidator />
+            <LocalizedDataAnnotationsValidator />
             <MudGrid Spacing="2">
                 @if (!IsEdit)
                 {

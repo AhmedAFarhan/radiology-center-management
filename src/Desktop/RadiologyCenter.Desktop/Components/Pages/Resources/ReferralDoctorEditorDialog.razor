@@ -6,7 +6,7 @@
     <DialogContent>
         <DialogHeader Icon="@Icons.Material.Filled.LocalHospital" Title="@(Doctor is null ? T.ReferralDoctor.NewReferralDoctor : T.FormatValue(T.ReferralDoctor.Edit, Doctor.FullName))" />
         <EditForm EditContext="_editContext">
-            <DataAnnotationsValidator />
+            <LocalizedDataAnnotationsValidator />
             <MudGrid Spacing="2">
                 <MudItem xs="12">
                     <MudTextField @bind-Value="_model.FullName"

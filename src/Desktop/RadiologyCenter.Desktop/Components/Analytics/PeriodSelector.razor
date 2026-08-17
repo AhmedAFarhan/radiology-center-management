@@ -1,24 +1,25 @@
 @inject AnalyticsPeriodService Preset
+@inject AppLocalizer T
 
 <MudCard Elevation="0" Class="@($"period-bar {@Class}")">
     <MudCardContent>
         <MudStack Row="true" Spacing="3" AlignItems="AlignItems.Center">
             <MudIcon Icon="@Icons.Material.Filled.DateRange" Color="Color.Primary" />
-            <MudText Typo="Typo.body2" Class="font-weight-medium me-2" Style="white-space:nowrap">Period</MudText>
+            <MudText Typo="Typo.body2" Class="font-weight-medium me-2" Style="white-space:nowrap">@T.Analytics.Period</MudText>
             <MudSelect T="AnalyticsRangePreset"
                        Value="@Preset.Selected"
                        ValueChanged="@OnPreset"
-                       Label="Range"
+                       Label="@T.Analytics.Range"
                        Variant="Variant.Outlined"
                        Dense="true"
                        Margin="Margin.Dense"
                        Class="period-select-control">
-                <MudSelectItem T="AnalyticsRangePreset" Value="AnalyticsRangePreset.Last7Days">Last 7 days</MudSelectItem>
-                <MudSelectItem T="AnalyticsRangePreset" Value="AnalyticsRangePreset.Last30Days">Last 30 days</MudSelectItem>
-                <MudSelectItem T="AnalyticsRangePreset" Value="AnalyticsRangePreset.Last90Days">Last 90 days</MudSelectItem>
-                <MudSelectItem T="AnalyticsRangePreset" Value="AnalyticsRangePreset.ThisMonth">This month</MudSelectItem>
-                <MudSelectItem T="AnalyticsRangePreset" Value="AnalyticsRangePreset.ThisYear">This year</MudSelectItem>
-                <MudSelectItem T="AnalyticsRangePreset" Value="AnalyticsRangePreset.AllTime">All time</MudSelectItem>
+                <MudSelectItem T="AnalyticsRangePreset" Value="AnalyticsRangePreset.Last7Days">@T.Analytics.Last7Days</MudSelectItem>
+                <MudSelectItem T="AnalyticsRangePreset" Value="AnalyticsRangePreset.Last30Days">@T.Analytics.Last30Days</MudSelectItem>
+                <MudSelectItem T="AnalyticsRangePreset" Value="AnalyticsRangePreset.Last90Days">@T.Analytics.Last90Days</MudSelectItem>
+                <MudSelectItem T="AnalyticsRangePreset" Value="AnalyticsRangePreset.ThisMonth">@T.Analytics.ThisMonth</MudSelectItem>
+                <MudSelectItem T="AnalyticsRangePreset" Value="AnalyticsRangePreset.ThisYear">@T.Analytics.ThisYear</MudSelectItem>
+                <MudSelectItem T="AnalyticsRangePreset" Value="AnalyticsRangePreset.AllTime">@T.Analytics.AllTime</MudSelectItem>
             </MudSelect>
             <MudText Typo="Typo.caption" Class="text-secondary mx-2" Style="white-space:nowrap">
                 @Preset.From.ToString("dd MMM yyyy") &mdash; @DateTime.Today.ToString("dd MMM yyyy")
@@ -27,7 +28,7 @@
             <MudChip T="string" Size="Size.Small" Color="Color.Primary" Variant="Variant.Outlined">@Preset.Label</MudChip>
             <MudIconButton Icon="@Icons.Material.Filled.Refresh"
                            Color="Color.Primary"
-                           aria-label="Refresh analytics"
+                           aria-label="@T.Analytics.Refresh"
                            OnClick="@(() => Preset.Refresh())"
                            Class="mx-1" />
         </MudStack>
@@ -50,7 +51,6 @@
     public void Dispose()
     {
         Preset.Changed -= OnPeriodChanged;
-        GC.SuppressFinalize(this);
     }
 
     private Task OnPreset(AnalyticsRangePreset preset)

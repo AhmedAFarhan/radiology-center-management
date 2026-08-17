@@ -32,6 +32,7 @@ public static class MauiProgram
         builder.Services.AddScoped<AppAuthenticationStateProvider>();
         builder.Services.AddScoped<AuthenticationStateProvider>(sp => sp.GetRequiredService<AppAuthenticationStateProvider>());
         builder.Services.AddScoped<ApiClient>();
+        builder.Services.AddScoped<ReturnUrlService>();
         builder.Services.AddScoped<AnalyticsService>();
         builder.Services.AddScoped<AnalyticsPeriodService>();
         builder.Services.AddScoped<AuthService>();
@@ -51,6 +52,8 @@ public static class MauiProgram
         builder.Services.AddBlazorWebViewDeveloperTools();
         builder.Logging.AddDebug();
 #endif
+
+        builder.Logging.AddProvider(new SimpleFileLoggerProvider());
 
         return builder.Build();
     }

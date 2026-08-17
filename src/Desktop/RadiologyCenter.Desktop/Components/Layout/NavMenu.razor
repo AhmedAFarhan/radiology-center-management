@@ -4,13 +4,13 @@
 <div class="app-nav-collapsed-side @(IsCollapsed ? "nav-visible" : "")">
     <nav class="app-nav">
         <MudNavMenu>
-            <MudNavLink Href="/dashboard" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.Dashboard" Ripple="false" />
-            <MudNavLink Href="/patients" Icon="@Icons.Material.Filled.People" Ripple="false" />
-            <MudNavLink Href="/visits" Icon="@Icons.Material.Filled.EventNote" Ripple="false" />
-            <MudNavLink Href="/radiologist" Icon="@Icons.Material.Filled.Biotech" Ripple="false" />
-            <MudNavLink Href="/examinations" Icon="@Icons.Material.Filled.MedicalServices" Ripple="false" />
+            <MudNavLink Href="/dashboard" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.Dashboard" aria-label="@T.Nav.Dashboard" Ripple="false" />
+            <MudNavLink Href="/patients" Icon="@Icons.Material.Filled.People" aria-label="@T.Nav.Patients" Ripple="false" />
+            <MudNavLink Href="/visits" Icon="@Icons.Material.Filled.EventNote" aria-label="@T.Nav.Visits" Ripple="false" />
+            <MudNavLink Href="/radiologist" Icon="@Icons.Material.Filled.Biotech" aria-label="@T.Nav.ReadingRoom" Ripple="false" />
+            <MudNavLink Href="/examinations" Icon="@Icons.Material.Filled.MedicalServices" aria-label="@T.Nav.Examinations" Ripple="false" />
 
-        <MudMenu Icon="@Icons.Material.Filled.Warehouse"
+        <MudMenu Icon="@Icons.Material.Filled.Warehouse" aria-label="@T.Nav.Inventory"
                  IconSize="Size.Medium"
                  Class="collapsed-nav-menu"
                  AnchorOrigin="Origin.CenterRight"
@@ -24,7 +24,7 @@
             <MudMenuItem Icon="@Icons.Material.Filled.SwapVert" OnClick="@(() => Go("/inventory/stock-movements"))">@T.Nav.StockMovements</MudMenuItem>
         </MudMenu>
 
-        <MudMenu Icon="@Icons.Material.Filled.Payments"
+        <MudMenu Icon="@Icons.Material.Filled.Payments" aria-label="@T.Nav.Payroll"
                  IconSize="Size.Medium"
                  Class="collapsed-nav-menu"
                  AnchorOrigin="Origin.CenterRight"
@@ -40,7 +40,7 @@
             <MudMenuItem Icon="@Icons.Material.Filled.LocalHospital" OnClick="@(() => Go("/payroll/referral-fees"))">@T.Nav.ReferralFees</MudMenuItem>
         </MudMenu>
 
-        <MudMenu Icon="@Icons.Material.Filled.Approval"
+        <MudMenu Icon="@Icons.Material.Filled.Approval" aria-label="@T.Nav.Insurance"
                  IconSize="Size.Medium"
                  Class="collapsed-nav-menu"
                  AnchorOrigin="Origin.CenterRight"
@@ -54,7 +54,7 @@
             <MudMenuItem Icon="@Icons.Material.Filled.RequestQuote" OnClick="@(() => Go("/insurance/claims"))">@T.Nav.Claims</MudMenuItem>
         </MudMenu>
 
-        <MudMenu Icon="@Icons.Material.Filled.AccountBalanceWallet"
+        <MudMenu Icon="@Icons.Material.Filled.AccountBalanceWallet" aria-label="@T.Nav.Cash"
                  IconSize="Size.Medium"
                  Class="collapsed-nav-menu"
                  AnchorOrigin="Origin.CenterRight"
@@ -65,7 +65,7 @@
             <MudMenuItem Icon="@Icons.Material.Filled.AccountBalanceWallet" OnClick="@(() => Go("/cash/sessions"))">@T.Nav.CashSessions</MudMenuItem>
         </MudMenu>
 
-        <MudMenu Icon="@Icons.Material.Filled.Notifications"
+        <MudMenu Icon="@Icons.Material.Filled.Notifications" aria-label="@T.Nav.Notifications"
                  IconSize="Size.Medium"
                  Class="collapsed-nav-menu"
                  AnchorOrigin="Origin.CenterRight"
@@ -77,7 +77,7 @@
             <MudMenuItem Icon="@Icons.Material.Filled.Notifications" OnClick="@(() => Go("/notifications/messages"))">@T.Nav.Messages</MudMenuItem>
         </MudMenu>
 
-        <MudMenu Icon="@Icons.Material.Filled.PrecisionManufacturing"
+        <MudMenu Icon="@Icons.Material.Filled.PrecisionManufacturing" aria-label="@T.Nav.Resources"
                  IconSize="Size.Medium"
                  Class="collapsed-nav-menu"
                  AnchorOrigin="Origin.CenterRight"
@@ -92,7 +92,7 @@
             <MudMenuItem Icon="@Icons.Material.Filled.LocalHospital" OnClick="@(() => Go("/resources/referral-doctors"))">@T.Nav.ReferralDoctors</MudMenuItem>
         </MudMenu>
 
-        <MudMenu Icon="@Icons.Material.Filled.Insights"
+        <MudMenu Icon="@Icons.Material.Filled.Insights" aria-label="@T.Nav.Analytics"
                  IconSize="Size.Medium"
                  Class="collapsed-nav-menu"
                  AnchorOrigin="Origin.CenterRight"
@@ -106,7 +106,7 @@
             <MudMenuItem Icon="@Icons.Material.Filled.Groups" OnClick="@(() => Go("/analytics/staff"))">@T.Nav.StaffMachines</MudMenuItem>
         </MudMenu>
 
-        <MudMenu Icon="@Icons.Material.Filled.AdminPanelSettings"
+        <MudMenu Icon="@Icons.Material.Filled.AdminPanelSettings" aria-label="@T.Nav.Administration"
                  IconSize="Size.Medium"
                  Class="collapsed-nav-menu"
                  AnchorOrigin="Origin.CenterRight"

@@ -4,6 +4,7 @@
 @inject ISnackbar Snackbar
 @inject NavigationManager Navigation
 @inject AppLocalizer T
+@inject ReturnUrlService ReturnUrl
 
 <MudDialog Class="login-dialog">
     <DialogContent>
@@ -16,7 +17,7 @@
         </div>
 
         <EditForm Model="@_model" OnValidSubmit="@SubmitAsync">
-            <DataAnnotationsValidator />
+            <LocalizedDataAnnotationsValidator />
             <MudTextField @bind-Value="_model.UserName"
                           Label="@T.Login.Username"
                           Variant="Variant.Outlined"
@@ -73,13 +74,13 @@
                     FullWidth = true,
                 };
                 await DialogService.ShowAsync<ChangePasswordDialog>(T.ChangePassword.Title, new DialogParameters { ["Forced"] = true }, options);
-                Navigation.NavigateTo("/dashboard");
+                Navigation.NavigateTo(ReturnUrl.Consume() ?? "/dashboard");
                 return;
             }
 
             Snackbar.Add(T.Login.Welcome, Severity.Success);
             MudDialog.Close(DialogResult.Ok(true));
-            Navigation.NavigateTo("/dashboard");
+            Navigation.NavigateTo(ReturnUrl.Consume() ?? "/dashboard");
         }
         catch (ApiException ex)
         {

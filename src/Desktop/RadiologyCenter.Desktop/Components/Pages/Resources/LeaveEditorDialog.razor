@@ -6,7 +6,7 @@
     <DialogContent>
         <DialogHeader Icon="@Icons.Material.Filled.BeachAccess" Title="@(Leave is null ? T.Leave.NewLeave : T.Leave.EditLeave)" />
         <EditForm EditContext="_editContext">
-            <DataAnnotationsValidator />
+            <LocalizedDataAnnotationsValidator />
             <MudGrid Spacing="2">
                 <MudItem xs="12">
                     <MudAutocomplete T="StaffDto"

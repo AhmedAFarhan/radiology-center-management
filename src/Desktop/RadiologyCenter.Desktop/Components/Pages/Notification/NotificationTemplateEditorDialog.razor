@@ -6,7 +6,7 @@
     <DialogContent>
         <DialogHeader Icon="@Icons.Material.Filled.Article" Title="@(Template is null ? T.TemplateDialog.NewTitle : T.FormatValue(T.TemplateDialog.EditTitle, Template.Name))" />
         <EditForm EditContext="_editContext">
-            <DataAnnotationsValidator />
+            <LocalizedDataAnnotationsValidator />
             <MudGrid Spacing="2">
                 <MudItem xs="12" sm="5">
                     <MudTextField @bind-Value="_model.Code"

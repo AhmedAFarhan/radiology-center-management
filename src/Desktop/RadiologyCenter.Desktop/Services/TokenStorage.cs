@@ -19,8 +19,8 @@ public sealed class TokenStorage
 
     public AuthTokens? GetTokens()
     {
-        var accessToken = Preferences.Default.Get(AccessTokenKey, string.Empty);
-        var refreshToken = Preferences.Default.Get(RefreshTokenKey, string.Empty);
+        var accessToken = DpapiProtector.Unprotect(Preferences.Default.Get(AccessTokenKey, string.Empty));
+        var refreshToken = DpapiProtector.Unprotect(Preferences.Default.Get(RefreshTokenKey, string.Empty));
 
         if (string.IsNullOrWhiteSpace(accessToken) || string.IsNullOrWhiteSpace(refreshToken))
             return null;
@@ -36,8 +36,8 @@ public sealed class TokenStorage
 
     public void Save(AuthTokens tokens)
     {
-        Preferences.Default.Set(AccessTokenKey, tokens.AccessToken);
-        Preferences.Default.Set(RefreshTokenKey, tokens.RefreshToken);
+        Preferences.Default.Set(AccessTokenKey, DpapiProtector.Protect(tokens.AccessToken));
+        Preferences.Default.Set(RefreshTokenKey, DpapiProtector.Protect(tokens.RefreshToken));
         Preferences.Default.Set(ExpiresAtKey, tokens.ExpiresAt.ToString("o"));
         Preferences.Default.Set(RefreshExpiresAtKey, tokens.RefreshTokenExpiresAt.ToString("o"));
         Preferences.Default.Set(UsernameKey, tokens.Username);

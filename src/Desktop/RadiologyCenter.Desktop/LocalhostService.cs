@@ -167,11 +167,41 @@ public sealed class LocalhostService : IDisposable
 
             foreach (Match match in Regex.Matches(output, $":{Port}\\s+\\S+\\s+LISTENING\\s+(\\d+)"))
             {
-                try { Process.GetProcessById(int.Parse(match.Groups[1].Value)).Kill(entireProcessTree: true); }
-                catch { /* already gone */ }
+                var pid = int.Parse(match.Groups[1].Value);
+                if (pid <= 0) continue;
+
+                try
+                {
+                    using var victim = Process.GetProcessById(pid);
+                    if (!IsOurBackend(victim))
+                        continue;
+                    victim.Kill(entireProcessTree: true);
+                    victim.WaitForExit(5000);
+                }
+                catch
+                {
+                    // already gone or access denied
+                }
             }
         }
         catch { /* netstat failed */ }
+    }
+
+    private static bool IsOurBackend(Process process)
+    {
+        try
+        {
+            if (process.ProcessName.Contains("RadiologyCenter.Localhost", StringComparison.OrdinalIgnoreCase))
+                return true;
+
+            var path = process.MainModule?.FileName;
+            return path is not null &&
+                   path.Contains("RadiologyCenter.Localhost", StringComparison.OrdinalIgnoreCase);
+        }
+        catch
+        {
+            return false;
+        }
     }
 
     private static (string exePath, string workDir, bool isDevelopment) ResolveLocalhostPaths()

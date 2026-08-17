@@ -6,7 +6,7 @@
     <DialogContent>
         <DialogHeader Icon="@Icons.Material.Filled.People" Title="@(Patient is null ? T.PatientDialog.NewTitle : T.PatientDialog.EditTitle)" />
         <EditForm EditContext="_editContext">
-            <DataAnnotationsValidator />
+            <LocalizedDataAnnotationsValidator />
             <MudGrid Spacing="2">
                 <MudItem xs="12">
                     <MudTextField @bind-Value="_model.FullName"

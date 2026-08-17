@@ -6,7 +6,7 @@
     <DialogContent>
         <DialogHeader Icon="@Icons.Material.Filled.CalendarMonth" Title="@(Shift is null ? T.WorkShift.NewWorkShift : T.WorkShift.EditWorkShift)" />
         <EditForm EditContext="_editContext">
-            <DataAnnotationsValidator />
+            <LocalizedDataAnnotationsValidator />
             <MudGrid Spacing="2">
                 <MudItem xs="12">
                     <MudAutocomplete T="StaffDto"

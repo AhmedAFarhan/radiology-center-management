@@ -1,8 +1,12 @@
 @inject NavigationManager Navigation
+@inject RadiologyCenter.Desktop.Services.ReturnUrlService ReturnUrl
 
 @code {
     protected override void OnInitialized()
     {
+        var relative = Navigation.ToBaseRelativePath(Navigation.Uri);
+        if (!string.IsNullOrWhiteSpace(relative) && !relative.Equals("/", StringComparison.Ordinal))
+            ReturnUrl.Store(Navigation.Uri);
         Navigation.NavigateTo("/", forceLoad: false);
     }
 }

@@ -6,7 +6,7 @@
     <DialogContent>
         <DialogHeader Icon="@Icons.Material.Filled.Category" Title="@(Component is null ? T.SalaryComponent.NewSalaryComponent : T.FormatValue(T.SalaryComponent.EditTitle, Component.Name))" />
         <EditForm EditContext="_editContext">
-            <DataAnnotationsValidator />
+            <LocalizedDataAnnotationsValidator />
             <MudGrid Spacing="2">
                 <MudItem xs="12" sm="7">
                     <MudTextField @bind-Value="_model.Name"

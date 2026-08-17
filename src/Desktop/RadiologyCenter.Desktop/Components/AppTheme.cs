@@ -41,5 +41,12 @@ public static class AppTheme
             DefaultBorderRadius = "16px",
             DrawerWidthLeft = "280px",
         },
+        Typography = new Typography
+        {
+            Default = new DefaultTypography
+            {
+                FontFamily = new[] { "Montserrat", "Cairo", "sans-serif" },
+            },
+        },
     };
 }

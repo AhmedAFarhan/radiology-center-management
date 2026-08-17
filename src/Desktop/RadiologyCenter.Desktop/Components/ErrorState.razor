@@ -4,6 +4,13 @@
     <MudIcon Icon="@Icon" Size="Size.Large" Color="@Color" />
     <MudText Typo="Typo.subtitle1" Align="Align.Center" Class="font-weight-medium">@_title</MudText>
     <MudText Typo="Typo.body2" Align="Align.Center" Class="text-secondary">@_message</MudText>
+    @if (!string.IsNullOrWhiteSpace(Detail))
+    {
+        <details class="text-secondary mt-2" style="max-width:100%;">
+            <summary class="cursor-pointer">@T.Error.Details</summary>
+            <pre style="white-space:pre-wrap; word-break:break-word; text-align:left;">@Detail</pre>
+        </details>
+    }
     @if (Action.HasDelegate)
     {
         <MudButton Variant="Variant.Outlined" Color="@Color" OnClick="OnActionClick" Class="mt-2">
@@ -21,6 +28,8 @@
     [Parameter] public string? Title { get; set; }
 
     [Parameter] public string? Message { get; set; }
+
+    [Parameter] public string? Detail { get; set; }
 
     [Parameter] public string? RetryLabel { get; set; }
 
