@@ -6,11 +6,13 @@ using RadiologyCenter.Desktop.Services;
 public partial class App : Application
 {
     private readonly LocalhostService _localhost;
+    private readonly PacsService _pacs;
 
     public App()
     {
         InitializeComponent();
         _localhost = new LocalhostService();
+        _pacs = new PacsService();
     }
 
     protected override Window CreateWindow(IActivationState? activationState)
@@ -57,8 +59,25 @@ public partial class App : Application
             },
         };
         CenterWindowOnLaunch(window);
-        window.Destroying += (_, _) => _localhost.Stop();
+        _ = StartPacsInBackgroundAsync();
+        window.Destroying += (_, _) =>
+        {
+            _localhost.Stop();
+            _pacs.Stop();
+        };
         return window;
+    }
+
+    private async Task StartPacsInBackgroundAsync()
+    {
+        try
+        {
+            await _pacs.StartAsync();
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"PACS start failed: {ex.Message}");
+        }
     }
 
     private void CenterWindowOnLaunch(Window window)
