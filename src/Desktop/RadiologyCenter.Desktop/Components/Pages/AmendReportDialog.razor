@@ -45,25 +45,15 @@
 
     private async Task SubmitAsync()
     {
-        _busy = true;
-        try
-        {
-            var report = await ReportService.AmendAsync(ReportId, _reason!);
-            Snackbar.Add(T.AmendReport.Reopened, Severity.Success);
-            MudDialog.Close(DialogResult.Ok(report));
-        }
-        catch (ApiException ex)
-        {
-            Snackbar.Add(ex.Message, Severity.Error);
-        }
-        catch (Exception)
-        {
-            Snackbar.Add(T.AmendReport.Unreachable, Severity.Error);
-        }
-        finally
-        {
-            _busy = false;
-        }
+        await SafeExecute.RunAsync(async () =>
+            {
+                var report = await ReportService.AmendAsync(ReportId, _reason!);
+                Snackbar.Add(T.AmendReport.Reopened, Severity.Success);
+                MudDialog.Close(DialogResult.Ok(report));
+            },
+            Snackbar,
+            () => T.AmendReport.Unreachable,
+            busy => _busy = busy);
     }
 
     private void CancelAsync()

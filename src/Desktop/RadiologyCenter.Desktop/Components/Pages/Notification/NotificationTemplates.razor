@@ -158,24 +158,18 @@
 
     private async Task ToggleActiveAsync(NotificationTemplateDto template)
     {
-        try
-        {
-            if (template.IsActive)
-                await NotificationService.DeactivateTemplateAsync(template.Id);
-            else
-                await NotificationService.ActivateTemplateAsync(template.Id);
+await SafeExecute.RunAsync(async () =>
+            {
+                if (template.IsActive)
+                    await NotificationService.DeactivateTemplateAsync(template.Id);
+                else
+                    await NotificationService.ActivateTemplateAsync(template.Id);
 
-            Snackbar.Add(template.IsActive ? T.Notifications.Deactivated : T.Notifications.Activated, Severity.Success);
-            await ReloadAsync();
-        }
-        catch (ApiException ex)
-        {
-            Snackbar.Add(ex.Message, Severity.Error);
-        }
-        catch (Exception)
-        {
-            Snackbar.Add(T.Notifications.Unreachable, Severity.Error);
-        }
+                Snackbar.Add(template.IsActive ? T.Notifications.Deactivated : T.Notifications.Activated, Severity.Success);
+                await ReloadAsync();
+            },
+            Snackbar,
+            () => T.Notifications.Unreachable);
     }
 
     private async Task DeleteTemplateAsync(NotificationTemplateDto template)
@@ -189,20 +183,14 @@
         if (confirmed != true)
             return;
 
-        try
-        {
-            await NotificationService.DeleteTemplateAsync(template.Id);
-            Snackbar.Add(T.Notifications.Deleted, Severity.Success);
-            await ReloadAsync();
-        }
-        catch (ApiException ex)
-        {
-            Snackbar.Add(ex.Message, Severity.Error);
-        }
-        catch (Exception)
-        {
-            Snackbar.Add(T.Notifications.Unreachable, Severity.Error);
-        }
+await SafeExecute.RunAsync(async () =>
+            {
+                await NotificationService.DeleteTemplateAsync(template.Id);
+                Snackbar.Add(T.Notifications.Deleted, Severity.Success);
+                await ReloadAsync();
+            },
+            Snackbar,
+            () => T.Notifications.Unreachable);
     }
 
     private static string Truncate(string value)

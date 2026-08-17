@@ -135,34 +135,24 @@
             return;
         }
 
-        _busy = true;
-        try
-        {
-            await InventoryService.IssueStockAsync(ItemId, new IssueStockInput
+        await SafeExecute.RunAsync(async () =>
             {
-                Quantity = qty,
-                Reference = _reference,
-                Notes = _notes,
-            });
+                await InventoryService.IssueStockAsync(ItemId, new IssueStockInput
+                {
+                    Quantity = qty,
+                    Reference = _reference,
+                    Notes = _notes,
+                });
 
-            Snackbar.Add(T.FormatValue(T.ItemDialog.IssuedUnits, qty), Severity.Success);
-            _quantity = null;
-            _reference = null;
-            _notes = null;
-            await LoadStockAsync();
-        }
-        catch (ApiException ex)
-        {
-            Snackbar.Add(ex.Message, Severity.Error);
-        }
-        catch (Exception)
-        {
-            Snackbar.Add(T.Inventory.Unreachable, Severity.Error);
-        }
-        finally
-        {
-            _busy = false;
-        }
+                Snackbar.Add(T.FormatValue(T.ItemDialog.IssuedUnits, qty), Severity.Success);
+                _quantity = null;
+                _reference = null;
+                _notes = null;
+                await LoadStockAsync();
+            },
+            Snackbar,
+            () => T.Inventory.Unreachable,
+            busy => _busy = busy);
     }
 
     private void CancelAsync()

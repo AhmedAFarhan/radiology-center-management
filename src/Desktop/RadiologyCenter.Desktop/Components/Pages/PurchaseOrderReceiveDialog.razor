@@ -140,36 +140,26 @@
             return;
         }
 
-        _busy = true;
-        try
-        {
-            var input = new ReceivePurchaseOrderInput
+        await SafeExecute.RunAsync(async () =>
             {
-                Lines = lines.Select(l => new ReceivePurchaseOrderLineInput
+                var input = new ReceivePurchaseOrderInput
                 {
-                    ItemId = l.ItemId,
-                    Quantity = l.Quantity!.Value,
-                    LotNumber = l.LotNumber.Trim(),
-                    ExpiryDate = l.ExpiryDate,
-                }).ToList(),
-            };
+                    Lines = lines.Select(l => new ReceivePurchaseOrderLineInput
+                    {
+                        ItemId = l.ItemId,
+                        Quantity = l.Quantity!.Value,
+                        LotNumber = l.LotNumber.Trim(),
+                        ExpiryDate = l.ExpiryDate,
+                    }).ToList(),
+                };
 
-            await InventoryService.ReceivePurchaseOrderAsync(_po.Id, input);
-            Snackbar.Add(T.PoDialog.ItemsReceived, Severity.Success);
-            MudDialog.Close(DialogResult.Ok(true));
-        }
-        catch (ApiException ex)
-        {
-            Snackbar.Add(ex.Message, Severity.Error);
-        }
-        catch (Exception)
-        {
-            Snackbar.Add(T.PoDialog.UnreachableRetry, Severity.Error);
-        }
-        finally
-        {
-            _busy = false;
-        }
+                await InventoryService.ReceivePurchaseOrderAsync(_po.Id, input);
+                Snackbar.Add(T.PoDialog.ItemsReceived, Severity.Success);
+                MudDialog.Close(DialogResult.Ok(true));
+            },
+            Snackbar,
+            () => T.PoDialog.UnreachableRetry,
+            busy => _busy = busy);
     }
 
     private void CancelAsync()

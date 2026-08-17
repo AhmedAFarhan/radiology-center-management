@@ -114,39 +114,27 @@
         if (!_editContext.Validate())
             return;
 
-        _busy = true;
-        try
+        var input = new SupplierInput
         {
-            var input = new SupplierInput
-            {
-                Name = _model.Name,
-                Phone = _model.Phone,
-                ContactPerson = _model.ContactPerson,
-                Email = _model.Email,
-                Address = _model.Address,
-                TaxNumber = _model.TaxNumber,
-                PaymentTerms = _model.PaymentTerms,
-            };
+            Name = _model.Name,
+            Phone = _model.Phone,
+            ContactPerson = _model.ContactPerson,
+            Email = _model.Email,
+            Address = _model.Address,
+            TaxNumber = _model.TaxNumber,
+            PaymentTerms = _model.PaymentTerms,
+        };
 
-            if (IsEdit)
-                await InventoryService.UpdateSupplierAsync(Supplier!.Id, input);
-            else
-                await InventoryService.CreateSupplierAsync(input);
-
+        if (await SafeExecute.RunAsync(
+                () => IsEdit
+                    ? InventoryService.UpdateSupplierAsync(Supplier!.Id, input)
+                    : InventoryService.CreateSupplierAsync(input),
+                Snackbar,
+                () => T.SupplierDialog.Unreachable,
+                busy => _busy = busy))
+        {
             Snackbar.Add(IsEdit ? T.SupplierDialog.SupplierUpdated : T.SupplierDialog.SupplierCreated, Severity.Success);
             MudDialog.Close(DialogResult.Ok(true));
-        }
-        catch (ApiException ex)
-        {
-            Snackbar.Add(ex.Message, Severity.Error);
-        }
-        catch (Exception)
-        {
-            Snackbar.Add(T.SupplierDialog.Unreachable, Severity.Error);
-        }
-        finally
-        {
-            _busy = false;
         }
     }
 

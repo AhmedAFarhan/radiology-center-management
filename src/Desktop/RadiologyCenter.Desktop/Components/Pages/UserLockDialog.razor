@@ -58,25 +58,15 @@
             return;
         }
 
-        _busy = true;
-        try
-        {
-            await IdentityService.LockUserAsync(User.Id, lockoutEnd);
-            Snackbar.Add(T.FormatValue(T.UserDialog.LockedUntil, User.UserName, lockoutEnd), Severity.Success);
-            MudDialog.Close(DialogResult.Ok(true));
-        }
-        catch (ApiException ex)
-        {
-            Snackbar.Add(ex.Message, Severity.Error);
-        }
-        catch (Exception)
-        {
-            Snackbar.Add(T.UserDialog.Unreachable, Severity.Error);
-        }
-        finally
-        {
-            _busy = false;
-        }
+        await SafeExecute.RunAsync(async () =>
+            {
+                await IdentityService.LockUserAsync(User.Id, lockoutEnd);
+                Snackbar.Add(T.FormatValue(T.UserDialog.LockedUntil, User.UserName, lockoutEnd), Severity.Success);
+                MudDialog.Close(DialogResult.Ok(true));
+            },
+            Snackbar,
+            () => T.UserDialog.Unreachable,
+            busy => _busy = busy);
     }
 
     private void CancelAsync()

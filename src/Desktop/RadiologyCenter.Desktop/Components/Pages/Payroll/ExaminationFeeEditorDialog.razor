@@ -153,37 +153,27 @@
             return;
         }
 
-        _busy = true;
-        try
-        {
-            var input = new ExaminationFeeInput
+        await SafeExecute.RunAsync(async () =>
             {
-                ExaminationTypeId = IsEdit ? _examTypeId : _selectedType!.Id,
-                Role = _model.Role,
-                Amount = _model.Amount,
-                IsPercentage = _model.IsPercentage,
-            };
+                var input = new ExaminationFeeInput
+                {
+                    ExaminationTypeId = IsEdit ? _examTypeId : _selectedType!.Id,
+                    Role = _model.Role,
+                    Amount = _model.Amount,
+                    IsPercentage = _model.IsPercentage,
+                };
 
-            if (IsEdit)
-                await PayrollService.UpdateExaminationFeeAsync(Fee!.Id, input);
-            else
-                await PayrollService.CreateExaminationFeeAsync(input);
+                if (IsEdit)
+                    await PayrollService.UpdateExaminationFeeAsync(Fee!.Id, input);
+                else
+                    await PayrollService.CreateExaminationFeeAsync(input);
 
-            Snackbar.Add(IsEdit ? T.ExamFee.Updated : T.ExamFee.Created, Severity.Success);
-            MudDialog.Close(DialogResult.Ok(true));
-        }
-        catch (ApiException ex)
-        {
-            Snackbar.Add(ex.Message, Severity.Error);
-        }
-        catch (Exception)
-        {
-            Snackbar.Add(T.ExamFee.UnreachableTryAgain, Severity.Error);
-        }
-        finally
-        {
-            _busy = false;
-        }
+                Snackbar.Add(IsEdit ? T.ExamFee.Updated : T.ExamFee.Created, Severity.Success);
+                MudDialog.Close(DialogResult.Ok(true));
+            },
+            Snackbar,
+            () => T.ExamFee.UnreachableTryAgain,
+            busy => _busy = busy);
     }
 
     private void CancelAsync()

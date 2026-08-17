@@ -79,31 +79,21 @@
             return;
         }
 
-        _busy = true;
-        try
-        {
-            await PayrollService.CreatePayRunAsync(new CreatePayRunInput
+        await SafeExecute.RunAsync(async () =>
             {
-                RunFrom = _model.RunFrom.Value.Date,
-                RunTo = _model.RunTo.Value.Date,
-                Notes = _model.Notes,
-            });
+                await PayrollService.CreatePayRunAsync(new CreatePayRunInput
+                {
+                    RunFrom = _model.RunFrom.Value.Date,
+                    RunTo = _model.RunTo.Value.Date,
+                    Notes = _model.Notes,
+                });
 
-            Snackbar.Add(T.PayRunDialog.Created, Severity.Success);
-            MudDialog.Close(DialogResult.Ok(true));
-        }
-        catch (ApiException ex)
-        {
-            Snackbar.Add(ex.Message, Severity.Error);
-        }
-        catch (Exception)
-        {
-            Snackbar.Add(T.PayRunDialog.Unreachable, Severity.Error);
-        }
-        finally
-        {
-            _busy = false;
-        }
+                Snackbar.Add(T.PayRunDialog.Created, Severity.Success);
+                MudDialog.Close(DialogResult.Ok(true));
+            },
+            Snackbar,
+            () => T.PayRunDialog.Unreachable,
+            busy => _busy = busy);
     }
 
     private void CancelAsync()

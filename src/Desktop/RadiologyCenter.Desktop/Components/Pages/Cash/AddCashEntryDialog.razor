@@ -93,35 +93,25 @@
         if (!_editContext.Validate())
             return;
 
-        _busy = true;
-        try
-        {
-            var input = new AddCashEntryInput
+        await SafeExecute.RunAsync(async () =>
             {
-                CashSessionId = SessionId,
-                Direction = _model.Direction,
-                Reason = _model.Reason,
-                Amount = _model.Amount,
-                Description = _model.Description,
-                ReferenceId = _model.ReferenceId,
-            };
+                var input = new AddCashEntryInput
+                {
+                    CashSessionId = SessionId,
+                    Direction = _model.Direction,
+                    Reason = _model.Reason,
+                    Amount = _model.Amount,
+                    Description = _model.Description,
+                    ReferenceId = _model.ReferenceId,
+                };
 
-            await CashService.AddEntryAsync(SessionId, input);
-            Snackbar.Add(T.CashEntry.Added, Severity.Success);
-            MudDialog.Close(DialogResult.Ok(true));
-        }
-        catch (ApiException ex)
-        {
-            Snackbar.Add(ex.Message, Severity.Error);
-        }
-        catch (Exception)
-        {
-            Snackbar.Add(T.CashEntry.UnreachableRetry, Severity.Error);
-        }
-        finally
-        {
-            _busy = false;
-        }
+                await CashService.AddEntryAsync(SessionId, input);
+                Snackbar.Add(T.CashEntry.Added, Severity.Success);
+                MudDialog.Close(DialogResult.Ok(true));
+            },
+            Snackbar,
+            () => T.CashEntry.UnreachableRetry,
+            busy => _busy = busy);
     }
 
     private void CancelAsync()

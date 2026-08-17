@@ -166,38 +166,28 @@
             return;
         }
 
-        _busy = true;
-        try
-        {
-            var input = new LeaveInput
+        await SafeExecute.RunAsync(async () =>
             {
-                StaffId = _selectedStaff.Id,
-                LeaveType = _model.LeaveType,
-                StartDate = _model.StartDate.Value.Date,
-                EndDate = _model.EndDate.Value.Date,
-                Reason = _model.Reason,
-            };
+                var input = new LeaveInput
+                {
+                    StaffId = _selectedStaff.Id,
+                    LeaveType = _model.LeaveType,
+                    StartDate = _model.StartDate.Value.Date,
+                    EndDate = _model.EndDate.Value.Date,
+                    Reason = _model.Reason,
+                };
 
-            if (IsEdit)
-                await ResourceService.UpdateLeaveAsync(Leave!.Id, input);
-            else
-                await ResourceService.CreateLeaveAsync(input);
+                if (IsEdit)
+                    await ResourceService.UpdateLeaveAsync(Leave!.Id, input);
+                else
+                    await ResourceService.CreateLeaveAsync(input);
 
-            Snackbar.Add(IsEdit ? T.LeaveDialog.Updated : T.LeaveDialog.Created, Severity.Success);
-            MudDialog.Close(DialogResult.Ok(true));
-        }
-        catch (ApiException ex)
-        {
-            Snackbar.Add(ex.Message, Severity.Error);
-        }
-        catch (Exception)
-        {
-            Snackbar.Add(T.LeaveDialog.Unreachable, Severity.Error);
-        }
-        finally
-        {
-            _busy = false;
-        }
+                Snackbar.Add(IsEdit ? T.LeaveDialog.Updated : T.LeaveDialog.Created, Severity.Success);
+                MudDialog.Close(DialogResult.Ok(true));
+            },
+            Snackbar,
+            () => T.LeaveDialog.Unreachable,
+            busy => _busy = busy);
     }
 
     private void CancelAsync()

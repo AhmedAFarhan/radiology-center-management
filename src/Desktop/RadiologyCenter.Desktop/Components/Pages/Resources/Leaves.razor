@@ -170,20 +170,14 @@
         if (confirmed != true)
             return;
 
-        try
-        {
-            await ResourceService.DeleteLeaveAsync(leave.Id);
-            Snackbar.Add(T.Leave.Deleted, Severity.Success);
-            await ReloadAsync();
-        }
-        catch (ApiException ex)
-        {
-            Snackbar.Add(ex.Message, Severity.Error);
-        }
-        catch (Exception)
-        {
-            Snackbar.Add(T.Leave.Unreachable, Severity.Error);
-        }
+        await SafeExecute.RunAsync(async () =>
+            {
+                await ResourceService.DeleteLeaveAsync(leave.Id);
+                Snackbar.Add(T.Leave.Deleted, Severity.Success);
+                await ReloadAsync();
+            },
+            Snackbar,
+            () => T.Leave.Unreachable);
     }
 
     private static string FormatLeaveType(string leaveType) => leaveType switch

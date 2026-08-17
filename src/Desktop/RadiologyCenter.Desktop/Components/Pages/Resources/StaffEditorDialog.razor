@@ -189,41 +189,31 @@
             return;
         }
 
-        _busy = true;
-        try
-        {
-            var input = new StaffInput
+        await SafeExecute.RunAsync(async () =>
             {
-                UserId = _selectedUser.Id,
-                FullName = _model.FullName,
-                PhoneNumber = _model.PhoneNumber,
-                Position = _model.Position,
-                HireDate = _model.HireDate ?? DateTime.Today,
-                Department = _model.Department,
-                Specialization = _model.Specialization,
-                LicenseNumber = _model.LicenseNumber,
-            };
+                var input = new StaffInput
+                {
+                    UserId = _selectedUser.Id,
+                    FullName = _model.FullName,
+                    PhoneNumber = _model.PhoneNumber,
+                    Position = _model.Position,
+                    HireDate = _model.HireDate ?? DateTime.Today,
+                    Department = _model.Department,
+                    Specialization = _model.Specialization,
+                    LicenseNumber = _model.LicenseNumber,
+                };
 
-            if (IsEdit)
-                await ResourceService.UpdateStaffAsync(Staff!.Id, input);
-            else
-                await ResourceService.CreateStaffAsync(input);
+                if (IsEdit)
+                    await ResourceService.UpdateStaffAsync(Staff!.Id, input);
+                else
+                    await ResourceService.CreateStaffAsync(input);
 
-            Snackbar.Add(IsEdit ? T.StaffDialog.Updated : T.StaffDialog.Created, Severity.Success);
-            MudDialog.Close(DialogResult.Ok(true));
-        }
-        catch (ApiException ex)
-        {
-            Snackbar.Add(ex.Message, Severity.Error);
-        }
-        catch (Exception)
-        {
-            Snackbar.Add(T.StaffDialog.Unreachable, Severity.Error);
-        }
-        finally
-        {
-            _busy = false;
-        }
+                Snackbar.Add(IsEdit ? T.StaffDialog.Updated : T.StaffDialog.Created, Severity.Success);
+                MudDialog.Close(DialogResult.Ok(true));
+            },
+            Snackbar,
+            () => T.StaffDialog.Unreachable,
+            busy => _busy = busy);
     }
 
     private void CancelAsync()

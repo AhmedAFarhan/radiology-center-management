@@ -170,44 +170,32 @@
         if (!_editContext.Validate())
             return;
 
-        _busy = true;
-        try
+        var input = new PatientInput
         {
-            var input = new PatientInput
-            {
-                FullName = _model.FullName,
-                Gender = _model.Gender,
-                DateOfBirth = _model.DateOfBirth,
-                Age = _model.Age,
-                PhoneNumber = _model.PhoneNumber,
-                Email = _model.Email,
-                Address = _model.Address,
-                NationalId = _model.NationalId,
-                BloodType = _model.BloodType,
-                Allergies = _model.Allergies,
-                MedicalHistory = _model.MedicalHistory,
-                ReferringPhysician = _model.ReferringPhysician,
-            };
+            FullName = _model.FullName,
+            Gender = _model.Gender,
+            DateOfBirth = _model.DateOfBirth,
+            Age = _model.Age,
+            PhoneNumber = _model.PhoneNumber,
+            Email = _model.Email,
+            Address = _model.Address,
+            NationalId = _model.NationalId,
+            BloodType = _model.BloodType,
+            Allergies = _model.Allergies,
+            MedicalHistory = _model.MedicalHistory,
+            ReferringPhysician = _model.ReferringPhysician,
+        };
 
-            if (IsEdit)
-                await PatientService.UpdateAsync(Patient!.Id, input);
-            else
-                await PatientService.CreateAsync(input);
-
+        if (await SafeExecute.RunAsync(
+                () => IsEdit
+                    ? PatientService.UpdateAsync(Patient!.Id, input)
+                    : PatientService.CreateAsync(input),
+                Snackbar,
+                () => T.PatientDialog.Unreachable,
+                busy => _busy = busy))
+        {
             Snackbar.Add(IsEdit ? T.PatientDialog.Updated : T.PatientDialog.Created, Severity.Success);
             MudDialog.Close(DialogResult.Ok(true));
-        }
-        catch (ApiException ex)
-        {
-            Snackbar.Add(ex.Message, Severity.Error);
-        }
-        catch (Exception)
-        {
-            Snackbar.Add(T.PatientDialog.Unreachable, Severity.Error);
-        }
-        finally
-        {
-            _busy = false;
         }
     }
 

@@ -194,39 +194,29 @@
             return;
         }
 
-        _busy = true;
-        try
-        {
-            var input = new WorkShiftInput
+        await SafeExecute.RunAsync(async () =>
             {
-                StaffId = _selectedStaff.Id,
-                EquipmentId = _selectedEquipment?.Id,
-                Date = _model.Date.Value.Date,
-                StartTime = _model.StartTime.Value,
-                EndTime = _model.EndTime.Value,
-                Notes = _model.Notes,
-            };
+                var input = new WorkShiftInput
+                {
+                    StaffId = _selectedStaff.Id,
+                    EquipmentId = _selectedEquipment?.Id,
+                    Date = _model.Date.Value.Date,
+                    StartTime = _model.StartTime.Value,
+                    EndTime = _model.EndTime.Value,
+                    Notes = _model.Notes,
+                };
 
-            if (IsEdit)
-                await ResourceService.UpdateWorkShiftAsync(Shift!.Id, input);
-            else
-                await ResourceService.CreateWorkShiftAsync(input);
+                if (IsEdit)
+                    await ResourceService.UpdateWorkShiftAsync(Shift!.Id, input);
+                else
+                    await ResourceService.CreateWorkShiftAsync(input);
 
-            Snackbar.Add(IsEdit ? T.WorkShiftDialog.Updated : T.WorkShiftDialog.Created, Severity.Success);
-            MudDialog.Close(DialogResult.Ok(true));
-        }
-        catch (ApiException ex)
-        {
-            Snackbar.Add(ex.Message, Severity.Error);
-        }
-        catch (Exception)
-        {
-            Snackbar.Add(T.WorkShiftDialog.Unreachable, Severity.Error);
-        }
-        finally
-        {
-            _busy = false;
-        }
+                Snackbar.Add(IsEdit ? T.WorkShiftDialog.Updated : T.WorkShiftDialog.Created, Severity.Success);
+                MudDialog.Close(DialogResult.Ok(true));
+            },
+            Snackbar,
+            () => T.WorkShiftDialog.Unreachable,
+            busy => _busy = busy);
     }
 
     private void CancelAsync()

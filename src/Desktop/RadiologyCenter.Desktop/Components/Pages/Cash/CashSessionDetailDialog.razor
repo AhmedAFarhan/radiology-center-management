@@ -230,25 +230,15 @@
         if (confirmed != true)
             return;
 
-        _busy = true;
-        try
-        {
-            await CashService.ApproveHandoverAsync(SessionId);
-            Snackbar.Add(T.CashSession.HandoverApproved, Severity.Success);
-            await LoadAsync();
-        }
-        catch (ApiException ex)
-        {
-            Snackbar.Add(ex.Message, Severity.Error);
-        }
-        catch (Exception)
-        {
-            Snackbar.Add(T.CashSession.Unreachable, Severity.Error);
-        }
-        finally
-        {
-            _busy = false;
-        }
+        await SafeExecute.RunAsync(async () =>
+            {
+                await CashService.ApproveHandoverAsync(SessionId);
+                Snackbar.Add(T.CashSession.HandoverApproved, Severity.Success);
+                await LoadAsync();
+            },
+            Snackbar,
+            () => T.CashSession.Unreachable,
+            busy => _busy = busy);
     }
 
     private static Color StatusColor(string status) => status switch

@@ -118,22 +118,16 @@
     {
         _editContext = new EditContext(_model);
 
-        try
-        {
-            var suppliersTask = InventoryService.GetSuppliersPagedAsync(null, null, false, 1, 200);
-            var itemsTask = InventoryService.GetItemsPagedAsync(null, "Name", false, 1, 200);
+        await SafeExecute.RunAsync(async () =>
+            {
+                var suppliersTask = InventoryService.GetSuppliersPagedAsync(null, null, false, 1, 200);
+                var itemsTask = InventoryService.GetItemsPagedAsync(null, "Name", false, 1, 200);
 
-            _suppliers = (await suppliersTask).Items.ToList();
-            _items = (await itemsTask).Items.ToList();
-        }
-        catch (ApiException ex)
-        {
-            Snackbar.Add(ex.Message, Severity.Error);
-        }
-        catch (Exception)
-        {
-            Snackbar.Add(T.PoDialog.LoadOptionsError, Severity.Error);
-        }
+                _suppliers = (await suppliersTask).Items.ToList();
+                _items = (await itemsTask).Items.ToList();
+            },
+            Snackbar,
+            () => T.PoDialog.LoadOptionsError);
     }
 
     private void AddLine() => _model.Items.Add(new PurchaseOrderLineModel());
@@ -155,38 +149,28 @@
             return;
         }
 
-        _busy = true;
-        try
-        {
-            var input = new CreatePurchaseOrderInput
+        await SafeExecute.RunAsync(async () =>
             {
-                SupplierId = _model.SupplierId,
-                ExpectedDeliveryAt = _model.ExpectedDeliveryAt,
-                Notes = _model.Notes,
-                Items = _model.Items.Select(i => new PurchaseOrderLineInput
+                var input = new CreatePurchaseOrderInput
                 {
-                    ItemId = i.ItemId,
-                    QuantityOrdered = i.QuantityOrdered,
-                    UnitCost = i.UnitCost,
-                }).ToList(),
-            };
+                    SupplierId = _model.SupplierId,
+                    ExpectedDeliveryAt = _model.ExpectedDeliveryAt,
+                    Notes = _model.Notes,
+                    Items = _model.Items.Select(i => new PurchaseOrderLineInput
+                    {
+                        ItemId = i.ItemId,
+                        QuantityOrdered = i.QuantityOrdered,
+                        UnitCost = i.UnitCost,
+                    }).ToList(),
+                };
 
-            await InventoryService.CreatePurchaseOrderAsync(input);
-            Snackbar.Add(T.PoDialog.PurchaseOrderCreated, Severity.Success);
-            MudDialog.Close(DialogResult.Ok(true));
-        }
-        catch (ApiException ex)
-        {
-            Snackbar.Add(ex.Message, Severity.Error);
-        }
-        catch (Exception)
-        {
-            Snackbar.Add(T.PoDialog.UnreachableRetry, Severity.Error);
-        }
-        finally
-        {
-            _busy = false;
-        }
+                await InventoryService.CreatePurchaseOrderAsync(input);
+                Snackbar.Add(T.PoDialog.PurchaseOrderCreated, Severity.Success);
+                MudDialog.Close(DialogResult.Ok(true));
+            },
+            Snackbar,
+            () => T.PoDialog.UnreachableRetry,
+            busy => _busy = busy);
     }
 
     private void CancelAsync()

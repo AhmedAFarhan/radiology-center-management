@@ -58,42 +58,32 @@
 
     private async Task SubmitAsync()
     {
-        _busy = true;
-        try
-        {
-            var mustChangePassword = await AuthService.SignInAsync(_model.UserName, _model.Password);
-            if (mustChangePassword)
+        await SafeExecute.RunAsync(async () =>
             {
-                Snackbar.Add(T.Login.MustChangePassword, Severity.Warning);
-                MudDialog.Close(DialogResult.Ok(true));
-                var options = new DialogOptions
+                var mustChangePassword = await AuthService.SignInAsync(_model.UserName, _model.Password);
+                if (mustChangePassword)
                 {
-                    CloseOnEscapeKey = false,
-                    BackdropClick = false,
-                    MaxWidth = MaxWidth.Small,
-                    FullWidth = true,
-                };
-                await DialogService.ShowAsync<ChangePasswordDialog>(T.ChangePassword.Title, new DialogParameters { ["Forced"] = true }, options);
-                Navigation.NavigateTo(ReturnUrl.Consume() ?? "/dashboard");
-                return;
-            }
+                    Snackbar.Add(T.Login.MustChangePassword, Severity.Warning);
+                    MudDialog.Close(DialogResult.Ok(true));
+                    var options = new DialogOptions
+                    {
+                        CloseOnEscapeKey = false,
+                        BackdropClick = false,
+                        MaxWidth = MaxWidth.Small,
+                        FullWidth = true,
+                    };
+                    await DialogService.ShowAsync<ChangePasswordDialog>(T.ChangePassword.Title, new DialogParameters { ["Forced"] = true }, options);
+                    Navigation.NavigateTo(ReturnUrl.Consume() ?? "/dashboard");
+                    return;
+                }
 
-            Snackbar.Add(T.Login.Welcome, Severity.Success);
-            MudDialog.Close(DialogResult.Ok(true));
-            Navigation.NavigateTo(ReturnUrl.Consume() ?? "/dashboard");
-        }
-        catch (ApiException ex)
-        {
-            Snackbar.Add(ex.Message, Severity.Error);
-        }
-        catch (Exception)
-        {
-            Snackbar.Add(T.Login.Unreachable, Severity.Error);
-        }
-        finally
-        {
-            _busy = false;
-        }
+                Snackbar.Add(T.Login.Welcome, Severity.Success);
+                MudDialog.Close(DialogResult.Ok(true));
+                Navigation.NavigateTo(ReturnUrl.Consume() ?? "/dashboard");
+            },
+            Snackbar,
+            () => T.Login.Unreachable,
+            busy => _busy = busy);
     }
 
     private sealed class LoginModel

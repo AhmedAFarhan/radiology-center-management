@@ -177,24 +177,18 @@
 
     private async Task ToggleActiveAsync(ItemDto item)
     {
-        try
-        {
-            if (item.IsActive)
-                await InventoryService.DeactivateItemAsync(item.Id);
-            else
-                await InventoryService.ActivateItemAsync(item.Id);
+        await SafeExecute.RunAsync(async () =>
+            {
+                if (item.IsActive)
+                    await InventoryService.DeactivateItemAsync(item.Id);
+                else
+                    await InventoryService.ActivateItemAsync(item.Id);
 
-            Snackbar.Add(item.IsActive ? T.Inventory.ItemDeactivated : T.Inventory.ItemActivated, Severity.Success);
-            await ReloadAsync();
-        }
-        catch (ApiException ex)
-        {
-            Snackbar.Add(ex.Message, Severity.Error);
-        }
-        catch (Exception)
-        {
-            Snackbar.Add(T.Inventory.Unreachable, Severity.Error);
-        }
+                Snackbar.Add(item.IsActive ? T.Inventory.ItemDeactivated : T.Inventory.ItemActivated, Severity.Success);
+                await ReloadAsync();
+            },
+            Snackbar,
+            () => T.Inventory.Unreachable);
     }
 
     private async Task DeleteItemAsync(ItemDto item)
@@ -208,20 +202,14 @@
         if (confirmed != true)
             return;
 
-        try
-        {
-            await InventoryService.DeleteItemAsync(item.Id);
-            Snackbar.Add(T.Inventory.ItemDeleted, Severity.Success);
-            await ReloadAsync();
-        }
-        catch (ApiException ex)
-        {
-            Snackbar.Add(ex.Message, Severity.Error);
-        }
-        catch (Exception)
-        {
-            Snackbar.Add(T.Inventory.Unreachable, Severity.Error);
-        }
+        await SafeExecute.RunAsync(async () =>
+            {
+                await InventoryService.DeleteItemAsync(item.Id);
+                Snackbar.Add(T.Inventory.ItemDeleted, Severity.Success);
+                await ReloadAsync();
+            },
+            Snackbar,
+            () => T.Inventory.Unreachable);
     }
 
     private static string FormatCategory(string category) => category switch

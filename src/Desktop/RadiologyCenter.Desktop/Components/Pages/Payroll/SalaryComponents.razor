@@ -173,24 +173,18 @@
 
     private async Task ToggleActiveAsync(SalaryComponentDto component)
     {
-        try
-        {
-            if (component.IsActive)
-                await PayrollService.DeactivateSalaryComponentAsync(component.Id);
-            else
-                await PayrollService.ActivateSalaryComponentAsync(component.Id);
+        await SafeExecute.RunAsync(async () =>
+            {
+                if (component.IsActive)
+                    await PayrollService.DeactivateSalaryComponentAsync(component.Id);
+                else
+                    await PayrollService.ActivateSalaryComponentAsync(component.Id);
 
-            Snackbar.Add(component.IsActive ? T.SalaryComponent.Deactivated : T.SalaryComponent.Activated, Severity.Success);
-            await ReloadAsync();
-        }
-        catch (ApiException ex)
-        {
-            Snackbar.Add(ex.Message, Severity.Error);
-        }
-        catch (Exception)
-        {
-            Snackbar.Add(T.SalaryComponent.Unreachable, Severity.Error);
-        }
+                Snackbar.Add(component.IsActive ? T.SalaryComponent.Deactivated : T.SalaryComponent.Activated, Severity.Success);
+                await ReloadAsync();
+            },
+            Snackbar,
+            () => T.SalaryComponent.Unreachable);
     }
 
     private async Task DeleteComponentAsync(SalaryComponentDto component)
@@ -204,20 +198,14 @@
         if (confirmed != true)
             return;
 
-        try
-        {
-            await PayrollService.DeleteSalaryComponentAsync(component.Id);
-            Snackbar.Add(T.SalaryComponent.Deleted, Severity.Success);
-            await ReloadAsync();
-        }
-        catch (ApiException ex)
-        {
-            Snackbar.Add(ex.Message, Severity.Error);
-        }
-        catch (Exception)
-        {
-            Snackbar.Add(T.SalaryComponent.Unreachable, Severity.Error);
-        }
+        await SafeExecute.RunAsync(async () =>
+            {
+                await PayrollService.DeleteSalaryComponentAsync(component.Id);
+                Snackbar.Add(T.SalaryComponent.Deleted, Severity.Success);
+                await ReloadAsync();
+            },
+            Snackbar,
+            () => T.SalaryComponent.Unreachable);
     }
 
     private static string FormatFrequency(string frequency) => frequency switch

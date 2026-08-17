@@ -180,24 +180,18 @@
 
     private async Task ToggleActiveAsync(AllowanceAssignmentDto allowance)
     {
-        try
-        {
-            if (allowance.IsActive)
-                await PayrollService.DeactivateAllowanceAsync(allowance.Id);
-            else
-                await PayrollService.ActivateAllowanceAsync(allowance.Id);
+        await SafeExecute.RunAsync(async () =>
+            {
+                if (allowance.IsActive)
+                    await PayrollService.DeactivateAllowanceAsync(allowance.Id);
+                else
+                    await PayrollService.ActivateAllowanceAsync(allowance.Id);
 
-            Snackbar.Add(allowance.IsActive ? T.Allowance.Deactivated : T.Allowance.Activated, Severity.Success);
-            await ReloadAsync();
-        }
-        catch (ApiException ex)
-        {
-            Snackbar.Add(ex.Message, Severity.Error);
-        }
-        catch (Exception)
-        {
-            Snackbar.Add(T.Allowance.Unreachable, Severity.Error);
-        }
+                Snackbar.Add(allowance.IsActive ? T.Allowance.Deactivated : T.Allowance.Activated, Severity.Success);
+                await ReloadAsync();
+            },
+            Snackbar,
+            () => T.Allowance.Unreachable);
     }
 
     private async Task DeleteAllowanceAsync(AllowanceAssignmentDto allowance)
@@ -211,20 +205,14 @@
         if (confirmed != true)
             return;
 
-        try
-        {
-            await PayrollService.DeleteAllowanceAsync(allowance.Id);
-            Snackbar.Add(T.Allowance.Deleted, Severity.Success);
-            await ReloadAsync();
-        }
-        catch (ApiException ex)
-        {
-            Snackbar.Add(ex.Message, Severity.Error);
-        }
-        catch (Exception)
-        {
-            Snackbar.Add(T.Allowance.Unreachable, Severity.Error);
-        }
+        await SafeExecute.RunAsync(async () =>
+            {
+                await PayrollService.DeleteAllowanceAsync(allowance.Id);
+                Snackbar.Add(T.Allowance.Deleted, Severity.Success);
+                await ReloadAsync();
+            },
+            Snackbar,
+            () => T.Allowance.Unreachable);
     }
 
     private static string FormatFrequency(string frequency) => frequency switch

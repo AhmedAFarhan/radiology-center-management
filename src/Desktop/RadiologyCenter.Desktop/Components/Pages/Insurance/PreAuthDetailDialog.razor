@@ -233,50 +233,34 @@
         if (file is null)
             return;
 
-        _busy = true;
-        try
-        {
-            await using var stream = file.OpenReadStream(maxAllowedSize: 25 * 1024 * 1024);
-            await InsuranceService.UploadPreAuthorizationDocumentAsync(
-                Id,
-                "SupportingDocument",
-                file.Name,
-                file.ContentType,
-                stream);
+        await SafeExecute.RunAsync(async () =>
+            {
+                await using var stream = file.OpenReadStream(maxAllowedSize: 25 * 1024 * 1024);
+                await InsuranceService.UploadPreAuthorizationDocumentAsync(
+                    Id,
+                    "SupportingDocument",
+                    file.Name,
+                    file.ContentType,
+                    stream);
 
-            Snackbar.Add(T.PreAuthDialog.DocumentUploaded, Severity.Success);
-            await LoadAsync();
-        }
-        catch (ApiException ex)
-        {
-            Snackbar.Add(ex.Message, Severity.Error);
-        }
-        catch (Exception)
-        {
-            Snackbar.Add(T.PreAuthDialog.Unreachable, Severity.Error);
-        }
-        finally
-        {
-            _busy = false;
-        }
+                Snackbar.Add(T.PreAuthDialog.DocumentUploaded, Severity.Success);
+                await LoadAsync();
+            },
+            Snackbar,
+            () => T.PreAuthDialog.Unreachable,
+            busy => _busy = busy);
     }
 
     private async Task DownloadDocumentAsync(PreAuthorizationDocumentDto document)
     {
-        try
-        {
-            var content = await InsuranceService.DownloadPreAuthorizationDocumentAsync(Id, document.Id);
-            await FileSaveHelper.SaveAsync(content, document.FileName);
-            Snackbar.Add(T.PreAuthDialog.DocumentDownloaded, Severity.Success);
-        }
-        catch (ApiException ex)
-        {
-            Snackbar.Add(ex.Message, Severity.Error);
-        }
-        catch (Exception)
-        {
-            Snackbar.Add(T.PreAuthDialog.UnableDownloadDocument, Severity.Error);
-        }
+        await SafeExecute.RunAsync(async () =>
+            {
+                var content = await InsuranceService.DownloadPreAuthorizationDocumentAsync(Id, document.Id);
+                await FileSaveHelper.SaveAsync(content, document.FileName);
+                Snackbar.Add(T.PreAuthDialog.DocumentDownloaded, Severity.Success);
+            },
+            Snackbar,
+            () => T.PreAuthDialog.UnableDownloadDocument);
     }
 
     private async Task DeleteDocumentAsync(PreAuthorizationDocumentDto document)
@@ -290,20 +274,14 @@
         if (confirmed != true)
             return;
 
-        try
-        {
-            await InsuranceService.DeletePreAuthorizationDocumentAsync(Id, document.Id);
-            Snackbar.Add(T.PreAuthDialog.DocumentDeleted, Severity.Success);
-            await LoadAsync();
-        }
-        catch (ApiException ex)
-        {
-            Snackbar.Add(ex.Message, Severity.Error);
-        }
-        catch (Exception)
-        {
-            Snackbar.Add(T.PreAuthDialog.Unreachable, Severity.Error);
-        }
+        await SafeExecute.RunAsync(async () =>
+            {
+                await InsuranceService.DeletePreAuthorizationDocumentAsync(Id, document.Id);
+                Snackbar.Add(T.PreAuthDialog.DocumentDeleted, Severity.Success);
+                await LoadAsync();
+            },
+            Snackbar,
+            () => T.PreAuthDialog.Unreachable);
     }
 
     private void CancelAsync()

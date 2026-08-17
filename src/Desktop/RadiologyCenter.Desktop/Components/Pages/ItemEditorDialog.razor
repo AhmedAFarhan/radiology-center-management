@@ -152,40 +152,28 @@
         if (!_editContext.Validate())
             return;
 
-        _busy = true;
-        try
+        var input = new ItemInput
         {
-            var input = new ItemInput
-            {
-                Name = _model.Name,
-                Brand = _model.Brand,
-                Category = _model.Category,
-                Unit = _model.Unit,
-                ReorderLevel = _model.ReorderLevel,
-                ReorderQuantity = _model.ReorderQuantity,
-                LotTracked = string.Equals(_model.LotTracked, "Yes", StringComparison.OrdinalIgnoreCase),
-                StorageInstructions = _model.StorageInstructions,
-            };
+            Name = _model.Name,
+            Brand = _model.Brand,
+            Category = _model.Category,
+            Unit = _model.Unit,
+            ReorderLevel = _model.ReorderLevel,
+            ReorderQuantity = _model.ReorderQuantity,
+            LotTracked = string.Equals(_model.LotTracked, "Yes", StringComparison.OrdinalIgnoreCase),
+            StorageInstructions = _model.StorageInstructions,
+        };
 
-            if (IsEdit)
-                await InventoryService.UpdateItemAsync(Item!.Id, input);
-            else
-                await InventoryService.CreateItemAsync(input);
-
+        if (await SafeExecute.RunAsync(
+                () => IsEdit
+                    ? InventoryService.UpdateItemAsync(Item!.Id, input)
+                    : InventoryService.CreateItemAsync(input),
+                Snackbar,
+                () => T.ItemDialog.Unreachable,
+                busy => _busy = busy))
+        {
             Snackbar.Add(IsEdit ? T.ItemDialog.ItemUpdated : T.ItemDialog.ItemCreated, Severity.Success);
             MudDialog.Close(DialogResult.Ok(true));
-        }
-        catch (ApiException ex)
-        {
-            Snackbar.Add(ex.Message, Severity.Error);
-        }
-        catch (Exception)
-        {
-            Snackbar.Add(T.ItemDialog.Unreachable, Severity.Error);
-        }
-        finally
-        {
-            _busy = false;
         }
     }
 

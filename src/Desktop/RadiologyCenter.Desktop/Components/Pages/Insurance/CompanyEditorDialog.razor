@@ -96,37 +96,25 @@
         if (!_editContext.Validate())
             return;
 
-        _busy = true;
-        try
+        var input = new InsuranceCompanyInput
         {
-            var input = new InsuranceCompanyInput
-            {
-                Name = _model.Name,
-                TaxId = _model.TaxId,
-                Phone = _model.Phone,
-                Email = _model.Email,
-                Address = _model.Address,
-            };
+            Name = _model.Name,
+            TaxId = _model.TaxId,
+            Phone = _model.Phone,
+            Email = _model.Email,
+            Address = _model.Address,
+        };
 
-            if (IsEdit)
-                await InsuranceService.UpdateCompanyAsync(Company!.Id, input);
-            else
-                await InsuranceService.CreateCompanyAsync(input);
-
+        if (await SafeExecute.RunAsync(
+                () => IsEdit
+                    ? InsuranceService.UpdateCompanyAsync(Company!.Id, input)
+                    : InsuranceService.CreateCompanyAsync(input),
+                Snackbar,
+                () => T.CompanyDialog.Unreachable,
+                busy => _busy = busy))
+        {
             Snackbar.Add(IsEdit ? T.CompanyDialog.Updated : T.CompanyDialog.Created, Severity.Success);
             MudDialog.Close(DialogResult.Ok(true));
-        }
-        catch (ApiException ex)
-        {
-            Snackbar.Add(ex.Message, Severity.Error);
-        }
-        catch (Exception)
-        {
-            Snackbar.Add(T.CompanyDialog.Unreachable, Severity.Error);
-        }
-        finally
-        {
-            _busy = false;
         }
     }
 

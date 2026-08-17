@@ -153,19 +153,13 @@
     {
         _editContext = new EditContext(_model);
 
-        try
-        {
-            var items = await InventoryService.GetItemsPagedAsync(null, "Name", false, 1, 200);
-            _inventoryItems = items.Items.ToList();
-        }
-        catch (ApiException ex)
-        {
-            Snackbar.Add(ex.Message, Severity.Error);
-        }
-        catch (Exception)
-        {
-            Snackbar.Add(T.ExamDialog.LoadItemsError, Severity.Error);
-        }
+        await SafeExecute.RunAsync(async () =>
+            {
+                var items = await InventoryService.GetItemsPagedAsync(null, "Name", false, 1, 200);
+                _inventoryItems = items.Items.ToList();
+            },
+            Snackbar,
+            () => T.ExamDialog.LoadItemsError);
 
         if (Type is null)
             return;
@@ -207,49 +201,39 @@
             return;
         }
 
-        _busy = true;
-        try
-        {
-            var input = new ExaminationTypeInput
+        await SafeExecute.RunAsync(async () =>
             {
-                Code = _model.Code,
-                Name = _model.Name,
-                Modality = _model.Modality,
-                BodyPart = _model.BodyPart,
-                StandardDurationMinutes = _model.StandardDurationMinutes,
-                Price = _model.Price,
-                RequiresPreparation = _model.RequiresPreparation,
-                RequiresConsent = _model.RequiresConsent,
-                Items = _model.Items.Select(i => new ExaminationTypeItemInput
+                var input = new ExaminationTypeInput
                 {
-                    ItemId = i.ItemId,
-                    Quantity = i.Quantity,
-                    IsContrast = i.IsContrast,
-                    IsRequired = i.IsRequired,
-                    Notes = i.Notes,
-                }).ToList(),
-            };
+                    Code = _model.Code,
+                    Name = _model.Name,
+                    Modality = _model.Modality,
+                    BodyPart = _model.BodyPart,
+                    StandardDurationMinutes = _model.StandardDurationMinutes,
+                    Price = _model.Price,
+                    RequiresPreparation = _model.RequiresPreparation,
+                    RequiresConsent = _model.RequiresConsent,
+                    Items = _model.Items.Select(i => new ExaminationTypeItemInput
+                    {
+                        ItemId = i.ItemId,
+                        Quantity = i.Quantity,
+                        IsContrast = i.IsContrast,
+                        IsRequired = i.IsRequired,
+                        Notes = i.Notes,
+                    }).ToList(),
+                };
 
-            if (IsEdit)
-                await ExaminationService.UpdateTypeAsync(Type!.Id, input);
-            else
-                await ExaminationService.CreateTypeAsync(input);
+                if (IsEdit)
+                    await ExaminationService.UpdateTypeAsync(Type!.Id, input);
+                else
+                    await ExaminationService.CreateTypeAsync(input);
 
-            Snackbar.Add(IsEdit ? T.ExamDialog.Updated : T.ExamDialog.Created, Severity.Success);
-            MudDialog.Close(DialogResult.Ok(true));
-        }
-        catch (ApiException ex)
-        {
-            Snackbar.Add(ex.Message, Severity.Error);
-        }
-        catch (Exception)
-        {
-            Snackbar.Add(T.ExamDialog.Unreachable, Severity.Error);
-        }
-        finally
-        {
-            _busy = false;
-        }
+                Snackbar.Add(IsEdit ? T.ExamDialog.Updated : T.ExamDialog.Created, Severity.Success);
+                MudDialog.Close(DialogResult.Ok(true));
+            },
+            Snackbar,
+            () => T.ExamDialog.Unreachable,
+            busy => _busy = busy);
     }
 
     private void CancelAsync()

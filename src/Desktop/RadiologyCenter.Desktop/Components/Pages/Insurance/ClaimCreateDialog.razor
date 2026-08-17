@@ -213,34 +213,24 @@
         if (!_editContext.Validate())
             return;
 
-        _busy = true;
-        try
-        {
-            var input = new CreateClaimInput
+        await SafeExecute.RunAsync(async () =>
             {
-                ExaminationId = _selectedExamination.Id,
-                PatientId = _selectedPatient.Id,
-                PolicyId = _selectedPolicy.Id,
-                PreAuthorizationId = _selectedPreAuthorization.Id,
-                BilledAmount = _model.BilledAmount,
-            };
+                var input = new CreateClaimInput
+                {
+                    ExaminationId = _selectedExamination.Id,
+                    PatientId = _selectedPatient.Id,
+                    PolicyId = _selectedPolicy.Id,
+                    PreAuthorizationId = _selectedPreAuthorization.Id,
+                    BilledAmount = _model.BilledAmount,
+                };
 
-            await InsuranceService.CreateClaimAsync(input);
-            Snackbar.Add(T.ClaimDialog.Created, Severity.Success);
-            MudDialog.Close(DialogResult.Ok(true));
-        }
-        catch (ApiException ex)
-        {
-            Snackbar.Add(ex.Message, Severity.Error);
-        }
-        catch (Exception)
-        {
-            Snackbar.Add(T.ClaimDialog.UnreachableRetry, Severity.Error);
-        }
-        finally
-        {
-            _busy = false;
-        }
+                await InsuranceService.CreateClaimAsync(input);
+                Snackbar.Add(T.ClaimDialog.Created, Severity.Success);
+                MudDialog.Close(DialogResult.Ok(true));
+            },
+            Snackbar,
+            () => T.ClaimDialog.UnreachableRetry,
+            busy => _busy = busy);
     }
 
     private void CancelAsync()

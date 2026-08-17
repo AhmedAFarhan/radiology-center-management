@@ -160,24 +160,18 @@
 
     private async Task ToggleActiveAsync(StaffDto staff)
     {
-        try
-        {
-            if (staff.IsActive)
-                await ResourceService.DeactivateStaffAsync(staff.Id);
-            else
-                await ResourceService.ActivateStaffAsync(staff.Id);
+        await SafeExecute.RunAsync(async () =>
+            {
+                if (staff.IsActive)
+                    await ResourceService.DeactivateStaffAsync(staff.Id);
+                else
+                    await ResourceService.ActivateStaffAsync(staff.Id);
 
-            Snackbar.Add(staff.IsActive ? T.Staff.Deactivated : T.Staff.Activated, Severity.Success);
-            await ReloadAsync();
-        }
-        catch (ApiException ex)
-        {
-            Snackbar.Add(ex.Message, Severity.Error);
-        }
-        catch (Exception)
-        {
-            Snackbar.Add(T.Staff.Unreachable, Severity.Error);
-        }
+                Snackbar.Add(staff.IsActive ? T.Staff.Deactivated : T.Staff.Activated, Severity.Success);
+                await ReloadAsync();
+            },
+            Snackbar,
+            () => T.Staff.Unreachable);
     }
 
     private async Task DeleteStaffAsync(StaffDto staff)
@@ -191,20 +185,14 @@
         if (confirmed != true)
             return;
 
-        try
-        {
-            await ResourceService.DeleteStaffAsync(staff.Id);
-            Snackbar.Add(T.Staff.Deleted, Severity.Success);
-            await ReloadAsync();
-        }
-        catch (ApiException ex)
-        {
-            Snackbar.Add(ex.Message, Severity.Error);
-        }
-        catch (Exception)
-        {
-            Snackbar.Add(T.Staff.Unreachable, Severity.Error);
-        }
+        await SafeExecute.RunAsync(async () =>
+            {
+                await ResourceService.DeleteStaffAsync(staff.Id);
+                Snackbar.Add(T.Staff.Deleted, Severity.Success);
+                await ReloadAsync();
+            },
+            Snackbar,
+            () => T.Staff.Unreachable);
     }
 
     private static string FormatPosition(string position) => position switch

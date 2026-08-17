@@ -255,56 +255,38 @@
 
     private async Task CheckInAsync(ExaminationDto visit)
     {
-        try
-        {
-            await ExaminationService.CheckInAsync(visit.Id);
-            Snackbar.Add(T.Visits.CheckedIn, Severity.Success);
-            await ReloadAsync();
-        }
-        catch (ApiException ex)
-        {
-            Snackbar.Add(ex.Message, Severity.Error);
-        }
-        catch (Exception)
-        {
-            Snackbar.Add(T.Visits.Unreachable, Severity.Error);
-        }
+        await SafeExecute.RunAsync(async () =>
+            {
+                await ExaminationService.CheckInAsync(visit.Id);
+                Snackbar.Add(T.Visits.CheckedIn, Severity.Success);
+                await ReloadAsync();
+            },
+            Snackbar,
+            () => T.Visits.Unreachable);
     }
 
     private async Task StartAsync(ExaminationDto visit)
     {
-        try
-        {
-            await ExaminationService.StartAsync(visit.Id);
-            Snackbar.Add(T.Visits.Started, Severity.Success);
-            await ReloadAsync();
-        }
-        catch (ApiException ex)
-        {
-            Snackbar.Add(ex.Message, Severity.Error);
-        }
-        catch (Exception)
-        {
-            Snackbar.Add(T.Visits.Unreachable, Severity.Error);
-        }
+        await SafeExecute.RunAsync(async () =>
+            {
+                await ExaminationService.StartAsync(visit.Id);
+                Snackbar.Add(T.Visits.Started, Severity.Success);
+                await ReloadAsync();
+            },
+            Snackbar,
+            () => T.Visits.Unreachable);
     }
 
     private async Task CompleteAsync(ExaminationDto visit)
     {
-        try
-        {
-            await ExaminationService.CompleteAsync(visit.Id);
-            Snackbar.Add(T.Visits.Completed, Severity.Success);
-            await ReloadAsync();
-        }
-        catch (ApiException ex)
-        {
-            Snackbar.Add(ex.Message, Severity.Error);
-        }
-        catch (Exception)
-        {
-            Snackbar.Add(T.Visits.Unreachable, Severity.Error);
-        }
+        await SafeExecute.RunAsync(async () =>
+            {
+                await ExaminationService.CompleteAsync(visit.Id);
+                Snackbar.Add(T.Visits.Completed, Severity.Success);
+                await ReloadAsync();
+            },
+            Snackbar,
+            () => T.Visits.Unreachable);
     }
 
     private async Task CancelAsync(ExaminationDto visit)

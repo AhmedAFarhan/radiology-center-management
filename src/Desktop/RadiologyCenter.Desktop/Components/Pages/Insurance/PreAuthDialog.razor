@@ -172,33 +172,23 @@
         if (!_editContext.Validate())
             return;
 
-        _busy = true;
-        try
-        {
-            var input = new CreatePreAuthorizationInput
+        await SafeExecute.RunAsync(async () =>
             {
-                ExaminationId = _selectedExamination.Id,
-                PatientId = _selectedPatient.Id,
-                PolicyId = _selectedPolicy.Id,
-                EstimatedAmount = _model.EstimatedAmount,
-            };
+                var input = new CreatePreAuthorizationInput
+                {
+                    ExaminationId = _selectedExamination.Id,
+                    PatientId = _selectedPatient.Id,
+                    PolicyId = _selectedPolicy.Id,
+                    EstimatedAmount = _model.EstimatedAmount,
+                };
 
-            await InsuranceService.CreatePreAuthorizationAsync(input);
-            Snackbar.Add(T.PreAuthDialog.Requested, Severity.Success);
-            MudDialog.Close(DialogResult.Ok(true));
-        }
-        catch (ApiException ex)
-        {
-            Snackbar.Add(ex.Message, Severity.Error);
-        }
-        catch (Exception)
-        {
-            Snackbar.Add(T.PreAuthDialog.UnreachableRetry, Severity.Error);
-        }
-        finally
-        {
-            _busy = false;
-        }
+                await InsuranceService.CreatePreAuthorizationAsync(input);
+                Snackbar.Add(T.PreAuthDialog.Requested, Severity.Success);
+                MudDialog.Close(DialogResult.Ok(true));
+            },
+            Snackbar,
+            () => T.PreAuthDialog.UnreachableRetry,
+            busy => _busy = busy);
     }
 
     private void CancelAsync()

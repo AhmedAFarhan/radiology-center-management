@@ -173,20 +173,14 @@
 
     private async Task ToggleActiveAsync(InsurancePolicyListItemDto policy)
     {
-        try
-        {
-            await InsuranceService.ChangePolicyStatusAsync(policy.Id, policy.IsActive ? "Deactivate" : "Reactivate");
-            Snackbar.Add(policy.IsActive ? T.Policy.Deactivated : T.Policy.Reactivated, Severity.Success);
-            await ReloadAsync();
-        }
-        catch (ApiException ex)
-        {
-            Snackbar.Add(ex.Message, Severity.Error);
-        }
-        catch (Exception)
-        {
-            Snackbar.Add(T.Policy.Unreachable, Severity.Error);
-        }
+        await SafeExecute.RunAsync(async () =>
+            {
+                await InsuranceService.ChangePolicyStatusAsync(policy.Id, policy.IsActive ? "Deactivate" : "Reactivate");
+                Snackbar.Add(policy.IsActive ? T.Policy.Deactivated : T.Policy.Reactivated, Severity.Success);
+                await ReloadAsync();
+            },
+            Snackbar,
+            () => T.Policy.Unreachable);
     }
 
     public void Dispose() => _searchCts?.Cancel();

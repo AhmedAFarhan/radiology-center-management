@@ -62,25 +62,15 @@
             return;
         }
 
-        _busy = true;
-        try
-        {
-            await ResourceService.SetEquipmentStatusAsync(Equipment.Id, _status);
-            Snackbar.Add(T.EquipmentDialog.StatusUpdated, Severity.Success);
-            MudDialog.Close(DialogResult.Ok(true));
-        }
-        catch (ApiException ex)
-        {
-            Snackbar.Add(ex.Message, Severity.Error);
-        }
-        catch (Exception)
-        {
-            Snackbar.Add(T.EquipmentDialog.Unreachable, Severity.Error);
-        }
-        finally
-        {
-            _busy = false;
-        }
+        await SafeExecute.RunAsync(async () =>
+            {
+                await ResourceService.SetEquipmentStatusAsync(Equipment.Id, _status);
+                Snackbar.Add(T.EquipmentDialog.StatusUpdated, Severity.Success);
+                MudDialog.Close(DialogResult.Ok(true));
+            },
+            Snackbar,
+            () => T.EquipmentDialog.Unreachable,
+            busy => _busy = busy);
     }
 
     private void CancelAsync()

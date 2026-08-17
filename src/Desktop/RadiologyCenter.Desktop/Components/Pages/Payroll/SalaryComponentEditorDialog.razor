@@ -104,39 +104,29 @@
         if (!_editContext.Validate())
             return;
 
-        _busy = true;
-        try
-        {
-            var input = new SalaryComponentInput
+        await SafeExecute.RunAsync(async () =>
             {
-                Name = _model.Name,
-                Kind = _model.Kind,
-                Frequency = string.IsNullOrWhiteSpace(_model.Frequency) ? null : _model.Frequency,
-                IsPercentage = _model.IsPercentage,
-                IsPerWorkDay = _model.IsPerWorkDay,
-                DefaultValue = _model.DefaultValue,
-            };
+                var input = new SalaryComponentInput
+                {
+                    Name = _model.Name,
+                    Kind = _model.Kind,
+                    Frequency = string.IsNullOrWhiteSpace(_model.Frequency) ? null : _model.Frequency,
+                    IsPercentage = _model.IsPercentage,
+                    IsPerWorkDay = _model.IsPerWorkDay,
+                    DefaultValue = _model.DefaultValue,
+                };
 
-            if (IsEdit)
-                await PayrollService.UpdateSalaryComponentAsync(Component!.Id, input);
-            else
-                await PayrollService.CreateSalaryComponentAsync(input);
+                if (IsEdit)
+                    await PayrollService.UpdateSalaryComponentAsync(Component!.Id, input);
+                else
+                    await PayrollService.CreateSalaryComponentAsync(input);
 
-            Snackbar.Add(IsEdit ? T.SalaryComponent.Updated : T.SalaryComponent.Created, Severity.Success);
-            MudDialog.Close(DialogResult.Ok(true));
-        }
-        catch (ApiException ex)
-        {
-            Snackbar.Add(ex.Message, Severity.Error);
-        }
-        catch (Exception)
-        {
-            Snackbar.Add(T.SalaryComponent.UnreachableTryAgain, Severity.Error);
-        }
-        finally
-        {
-            _busy = false;
-        }
+                Snackbar.Add(IsEdit ? T.SalaryComponent.Updated : T.SalaryComponent.Created, Severity.Success);
+                MudDialog.Close(DialogResult.Ok(true));
+            },
+            Snackbar,
+            () => T.SalaryComponent.UnreachableTryAgain,
+            busy => _busy = busy);
     }
 
     private void CancelAsync()

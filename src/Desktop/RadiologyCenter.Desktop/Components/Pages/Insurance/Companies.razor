@@ -158,20 +158,14 @@
         if (confirmed != true)
             return;
 
-        try
-        {
-            await InsuranceService.DeleteCompanyAsync(company.Id);
-            Snackbar.Add(T.Insurance.CompanyDeleted, Severity.Success);
-            await LoadAsync();
-        }
-        catch (ApiException ex)
-        {
-            Snackbar.Add(ex.Message, Severity.Error);
-        }
-        catch (Exception)
-        {
-            Snackbar.Add(T.Insurance.Unreachable, Severity.Error);
-        }
+        await SafeExecute.RunAsync(async () =>
+            {
+                await InsuranceService.DeleteCompanyAsync(company.Id);
+                Snackbar.Add(T.Insurance.CompanyDeleted, Severity.Success);
+                await LoadAsync();
+            },
+            Snackbar,
+            () => T.Insurance.Unreachable);
     }
 
     public void Dispose() => _searchCts?.Cancel();

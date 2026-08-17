@@ -158,23 +158,13 @@
         if (!_editContext.Validate())
             return;
 
-        _busy = true;
-        try
-        {
-            _preview = await NotificationService.PreviewAsync(BuildInput());
-        }
-        catch (ApiException ex)
-        {
-            Snackbar.Add(ex.Message, Severity.Error);
-        }
-        catch (Exception)
-        {
-            Snackbar.Add(T.SendDialog.Unreachable, Severity.Error);
-        }
-        finally
-        {
-            _busy = false;
-        }
+        await SafeExecute.RunAsync(async () =>
+            {
+                _preview = await NotificationService.PreviewAsync(BuildInput());
+            },
+            Snackbar,
+            () => T.SendDialog.Unreachable,
+            busy => _busy = busy);
     }
 
     private async Task SubmitAsync()
@@ -182,25 +172,15 @@
         if (!_editContext.Validate())
             return;
 
-        _busy = true;
-        try
-        {
-            await NotificationService.SendAsync(BuildInput());
-            Snackbar.Add(T.SendDialog.Sent, Severity.Success);
-            MudDialog.Close(DialogResult.Ok(true));
-        }
-        catch (ApiException ex)
-        {
-            Snackbar.Add(ex.Message, Severity.Error);
-        }
-        catch (Exception)
-        {
-            Snackbar.Add(T.SendDialog.UnreachableRetry, Severity.Error);
-        }
-        finally
-        {
-            _busy = false;
-        }
+        await SafeExecute.RunAsync(async () =>
+            {
+                await NotificationService.SendAsync(BuildInput());
+                Snackbar.Add(T.SendDialog.Sent, Severity.Success);
+                MudDialog.Close(DialogResult.Ok(true));
+            },
+            Snackbar,
+            () => T.SendDialog.UnreachableRetry,
+            busy => _busy = busy);
     }
 
     private void CancelAsync()

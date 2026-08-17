@@ -158,24 +158,18 @@
 
     private async Task ToggleActiveAsync(ReferralDoctorDto doctor)
     {
-        try
-        {
-            if (doctor.IsActive)
-                await ResourceService.DeactivateReferralDoctorAsync(doctor.Id);
-            else
-                await ResourceService.ActivateReferralDoctorAsync(doctor.Id);
+        await SafeExecute.RunAsync(async () =>
+            {
+                if (doctor.IsActive)
+                    await ResourceService.DeactivateReferralDoctorAsync(doctor.Id);
+                else
+                    await ResourceService.ActivateReferralDoctorAsync(doctor.Id);
 
-            Snackbar.Add(doctor.IsActive ? T.ReferralDoctor.Deactivated : T.ReferralDoctor.Activated, Severity.Success);
-            await ReloadAsync();
-        }
-        catch (ApiException ex)
-        {
-            Snackbar.Add(ex.Message, Severity.Error);
-        }
-        catch (Exception)
-        {
-            Snackbar.Add(T.ReferralDoctor.Unreachable, Severity.Error);
-        }
+                Snackbar.Add(doctor.IsActive ? T.ReferralDoctor.Deactivated : T.ReferralDoctor.Activated, Severity.Success);
+                await ReloadAsync();
+            },
+            Snackbar,
+            () => T.ReferralDoctor.Unreachable);
     }
 
     private async Task DeleteDoctorAsync(ReferralDoctorDto doctor)
@@ -189,20 +183,14 @@
         if (confirmed != true)
             return;
 
-        try
-        {
-            await ResourceService.DeleteReferralDoctorAsync(doctor.Id);
-            Snackbar.Add(T.ReferralDoctor.Deleted, Severity.Success);
-            await ReloadAsync();
-        }
-        catch (ApiException ex)
-        {
-            Snackbar.Add(ex.Message, Severity.Error);
-        }
-        catch (Exception)
-        {
-            Snackbar.Add(T.ReferralDoctor.Unreachable, Severity.Error);
-        }
+        await SafeExecute.RunAsync(async () =>
+            {
+                await ResourceService.DeleteReferralDoctorAsync(doctor.Id);
+                Snackbar.Add(T.ReferralDoctor.Deleted, Severity.Success);
+                await ReloadAsync();
+            },
+            Snackbar,
+            () => T.ReferralDoctor.Unreachable);
     }
 
     public void Dispose() => _searchCts?.Cancel();

@@ -217,20 +217,14 @@
         if (confirmed != true)
             return;
 
-        try
-        {
-            await PayrollService.DeletePayRunAsync(payRun.Id);
-            Snackbar.Add(T.Payroll.Deleted, Severity.Success);
-            await ReloadAsync();
-        }
-        catch (ApiException ex)
-        {
-            Snackbar.Add(ex.Message, Severity.Error);
-        }
-        catch (Exception)
-        {
-            Snackbar.Add(T.Payroll.Unreachable, Severity.Error);
-        }
+        await SafeExecute.RunAsync(async () =>
+            {
+                await PayrollService.DeletePayRunAsync(payRun.Id);
+                Snackbar.Add(T.Payroll.Deleted, Severity.Success);
+                await ReloadAsync();
+            },
+            Snackbar,
+            () => T.Payroll.Unreachable);
     }
 
     private static string FormatStatus(string status) => status switch

@@ -159,37 +159,27 @@
             return;
         }
 
-        _busy = true;
-        try
-        {
-            var input = new SalaryInput
+        await SafeExecute.RunAsync(async () =>
             {
-                StaffId = IsEdit ? _staffId : _selectedStaff!.Id,
-                BaseSalary = _model.BaseSalary,
-                SalaryType = _model.SalaryType,
-                EffectiveDate = _model.EffectiveDate.Value.Date,
-            };
+                var input = new SalaryInput
+                {
+                    StaffId = IsEdit ? _staffId : _selectedStaff!.Id,
+                    BaseSalary = _model.BaseSalary,
+                    SalaryType = _model.SalaryType,
+                    EffectiveDate = _model.EffectiveDate.Value.Date,
+                };
 
-            if (IsEdit)
-                await PayrollService.UpdateSalaryAsync(Salary!.Id, input);
-            else
-                await PayrollService.CreateSalaryAsync(input);
+                if (IsEdit)
+                    await PayrollService.UpdateSalaryAsync(Salary!.Id, input);
+                else
+                    await PayrollService.CreateSalaryAsync(input);
 
-            Snackbar.Add(IsEdit ? T.SalaryDialog.Updated : T.SalaryDialog.Created, Severity.Success);
-            MudDialog.Close(DialogResult.Ok(true));
-        }
-        catch (ApiException ex)
-        {
-            Snackbar.Add(ex.Message, Severity.Error);
-        }
-        catch (Exception)
-        {
-            Snackbar.Add(T.SalaryDialog.Unreachable, Severity.Error);
-        }
-        finally
-        {
-            _busy = false;
-        }
+                Snackbar.Add(IsEdit ? T.SalaryDialog.Updated : T.SalaryDialog.Created, Severity.Success);
+                MudDialog.Close(DialogResult.Ok(true));
+            },
+            Snackbar,
+            () => T.SalaryDialog.Unreachable,
+            busy => _busy = busy);
     }
 
     private void CancelAsync()

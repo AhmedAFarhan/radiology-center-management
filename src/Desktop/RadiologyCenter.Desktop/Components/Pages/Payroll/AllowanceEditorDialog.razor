@@ -230,43 +230,33 @@
             return;
         }
 
-        _busy = true;
-        try
-        {
-            var input = new AllowanceAssignmentInput
+        await SafeExecute.RunAsync(async () =>
             {
-                StaffId = IsEdit ? _staffId : _selectedStaff!.Id,
-                SalaryComponentId = IsEdit
-                    ? (string.IsNullOrWhiteSpace(_componentId) ? null : _componentId)
-                    : _selectedComponent?.Id,
-                Name = _model.Name,
-                Amount = _model.Amount,
-                Frequency = string.IsNullOrWhiteSpace(_model.Frequency) ? null : _model.Frequency,
-                IsPerWorkDay = _model.IsPerWorkDay,
-                EffectiveDate = _model.EffectiveDate.Value.Date,
-                EndDate = _model.EndDate?.Date,
-            };
+                var input = new AllowanceAssignmentInput
+                {
+                    StaffId = IsEdit ? _staffId : _selectedStaff!.Id,
+                    SalaryComponentId = IsEdit
+                        ? (string.IsNullOrWhiteSpace(_componentId) ? null : _componentId)
+                        : _selectedComponent?.Id,
+                    Name = _model.Name,
+                    Amount = _model.Amount,
+                    Frequency = string.IsNullOrWhiteSpace(_model.Frequency) ? null : _model.Frequency,
+                    IsPerWorkDay = _model.IsPerWorkDay,
+                    EffectiveDate = _model.EffectiveDate.Value.Date,
+                    EndDate = _model.EndDate?.Date,
+                };
 
-            if (IsEdit)
-                await PayrollService.UpdateAllowanceAsync(Allowance!.Id, input);
-            else
-                await PayrollService.CreateAllowanceAsync(input);
+                if (IsEdit)
+                    await PayrollService.UpdateAllowanceAsync(Allowance!.Id, input);
+                else
+                    await PayrollService.CreateAllowanceAsync(input);
 
-            Snackbar.Add(IsEdit ? T.AllowanceDialog.Updated : T.AllowanceDialog.Created, Severity.Success);
-            MudDialog.Close(DialogResult.Ok(true));
-        }
-        catch (ApiException ex)
-        {
-            Snackbar.Add(ex.Message, Severity.Error);
-        }
-        catch (Exception)
-        {
-            Snackbar.Add(T.AllowanceDialog.Unreachable, Severity.Error);
-        }
-        finally
-        {
-            _busy = false;
-        }
+                Snackbar.Add(IsEdit ? T.AllowanceDialog.Updated : T.AllowanceDialog.Created, Severity.Success);
+                MudDialog.Close(DialogResult.Ok(true));
+            },
+            Snackbar,
+            () => T.AllowanceDialog.Unreachable,
+            busy => _busy = busy);
     }
 
     private void CancelAsync()

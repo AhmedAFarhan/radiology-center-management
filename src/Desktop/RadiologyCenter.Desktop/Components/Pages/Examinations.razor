@@ -180,24 +180,18 @@
 
     private async Task ToggleActiveAsync(ExaminationTypeDto type)
     {
-        try
-        {
-            if (type.IsActive)
-                await ExaminationService.DeactivateTypeAsync(type.Id);
-            else
-                await ExaminationService.ActivateTypeAsync(type.Id);
+        await SafeExecute.RunAsync(async () =>
+            {
+                if (type.IsActive)
+                    await ExaminationService.DeactivateTypeAsync(type.Id);
+                else
+                    await ExaminationService.ActivateTypeAsync(type.Id);
 
-            Snackbar.Add(type.IsActive ? T.Examinations.Deactivated : T.Examinations.Activated, Severity.Success);
-            await ReloadAsync();
-        }
-        catch (ApiException ex)
-        {
-            Snackbar.Add(ex.Message, Severity.Error);
-        }
-        catch (Exception)
-        {
-            Snackbar.Add(T.Examinations.Unreachable, Severity.Error);
-        }
+                Snackbar.Add(type.IsActive ? T.Examinations.Deactivated : T.Examinations.Activated, Severity.Success);
+                await ReloadAsync();
+            },
+            Snackbar,
+            () => T.Examinations.Unreachable);
     }
 
     private async Task DeleteTypeAsync(ExaminationTypeDto type)
@@ -211,20 +205,14 @@
         if (confirmed != true)
             return;
 
-        try
-        {
-            await ExaminationService.DeleteTypeAsync(type.Id);
-            Snackbar.Add(T.Examinations.Deleted, Severity.Success);
-            await ReloadAsync();
-        }
-        catch (ApiException ex)
-        {
-            Snackbar.Add(ex.Message, Severity.Error);
-        }
-        catch (Exception)
-        {
-            Snackbar.Add(T.Examinations.Unreachable, Severity.Error);
-        }
+        await SafeExecute.RunAsync(async () =>
+            {
+                await ExaminationService.DeleteTypeAsync(type.Id);
+                Snackbar.Add(T.Examinations.Deleted, Severity.Success);
+                await ReloadAsync();
+            },
+            Snackbar,
+            () => T.Examinations.Unreachable);
     }
 
     public void Dispose() => _searchCts?.Cancel();

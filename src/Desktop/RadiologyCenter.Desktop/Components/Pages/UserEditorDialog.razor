@@ -126,19 +126,13 @@
     {
         _editContext = new EditContext(_model);
 
-        try
-        {
-            var roles = await IdentityService.GetRolesPagedAsync(null, "Name", false, 1, 100);
-            _roles = roles.Items.ToList();
-        }
-        catch (ApiException ex)
-        {
-            Snackbar.Add(ex.Message, Severity.Error);
-        }
-        catch (Exception)
-        {
-            Snackbar.Add(T.UserDialog.LoadRolesError, Severity.Error);
-        }
+        await SafeExecute.RunAsync(async () =>
+            {
+                var roles = await IdentityService.GetRolesPagedAsync(null, "Name", false, 1, 100);
+                _roles = roles.Items.ToList();
+            },
+            Snackbar,
+            () => T.UserDialog.LoadRolesError);
 
         if (User is null)
             return;
@@ -156,60 +150,50 @@
         if (!_editContext.Validate())
             return;
 
-        _busy = true;
-        try
-        {
-            if (IsEdit)
+        await SafeExecute.RunAsync(async () =>
             {
-                await IdentityService.UpdateUserProfileAsync(User!.Id, new UpdateUserProfileInput
+                if (IsEdit)
                 {
-                    FirstName = _model.FirstName,
-                    LastName = _model.LastName,
-                    PhoneNumber = _model.PhoneNumber,
-                });
-                Snackbar.Add(T.UserDialog.ProfileUpdated, Severity.Success);
-            }
-            else
-            {
-                if (string.IsNullOrWhiteSpace(_model.Password))
+                    await IdentityService.UpdateUserProfileAsync(User!.Id, new UpdateUserProfileInput
+                    {
+                        FirstName = _model.FirstName,
+                        LastName = _model.LastName,
+                        PhoneNumber = _model.PhoneNumber,
+                    });
+                    Snackbar.Add(T.UserDialog.ProfileUpdated, Severity.Success);
+                }
+                else
                 {
-                    Snackbar.Add(T.UserDialog.PasswordRequired, Severity.Warning);
-                    return;
+                    if (string.IsNullOrWhiteSpace(_model.Password))
+                    {
+                        Snackbar.Add(T.UserDialog.PasswordRequired, Severity.Warning);
+                        return;
+                    }
+
+                    if (!_model.SelectedRoleIds.Any())
+                    {
+                        Snackbar.Add(T.UserDialog.SelectRole, Severity.Warning);
+                        return;
+                    }
+
+                    await IdentityService.CreateUserAsync(new CreateUserInput
+                    {
+                        UserName = _model.UserName,
+                        Email = _model.Email,
+                        FirstName = _model.FirstName,
+                        LastName = _model.LastName,
+                        PhoneNumber = _model.PhoneNumber ?? string.Empty,
+                        Password = _model.Password,
+                        RoleIds = _model.SelectedRoleIds.ToList(),
+                    });
+                    Snackbar.Add(T.UserDialog.Created, Severity.Success);
                 }
 
-                if (!_model.SelectedRoleIds.Any())
-                {
-                    Snackbar.Add(T.UserDialog.SelectRole, Severity.Warning);
-                    return;
-                }
-
-                await IdentityService.CreateUserAsync(new CreateUserInput
-                {
-                    UserName = _model.UserName,
-                    Email = _model.Email,
-                    FirstName = _model.FirstName,
-                    LastName = _model.LastName,
-                    PhoneNumber = _model.PhoneNumber ?? string.Empty,
-                    Password = _model.Password,
-                    RoleIds = _model.SelectedRoleIds.ToList(),
-                });
-                Snackbar.Add(T.UserDialog.Created, Severity.Success);
-            }
-
-            MudDialog.Close(DialogResult.Ok(true));
-        }
-        catch (ApiException ex)
-        {
-            Snackbar.Add(ex.Message, Severity.Error);
-        }
-        catch (Exception)
-        {
-            Snackbar.Add(T.UserDialog.UnreachableRetry, Severity.Error);
-        }
-        finally
-        {
-            _busy = false;
-        }
+                MudDialog.Close(DialogResult.Ok(true));
+            },
+            Snackbar,
+            () => T.UserDialog.UnreachableRetry,
+            busy => _busy = busy);
     }
 
     private void CancelAsync()

@@ -176,20 +176,14 @@
         if (confirmed != true)
             return;
 
-        try
-        {
-            await InventoryService.PlacePurchaseOrderAsync(po.Id);
-            Snackbar.Add(T.PurchaseOrders.OrderPlaced, Severity.Success);
-            await ReloadAsync();
-        }
-        catch (ApiException ex)
-        {
-            Snackbar.Add(ex.Message, Severity.Error);
-        }
-        catch (Exception)
-        {
-            Snackbar.Add(T.PurchaseOrders.Unreachable, Severity.Error);
-        }
+        await SafeExecute.RunAsync(async () =>
+            {
+                await InventoryService.PlacePurchaseOrderAsync(po.Id);
+                Snackbar.Add(T.PurchaseOrders.OrderPlaced, Severity.Success);
+                await ReloadAsync();
+            },
+            Snackbar,
+            () => T.PurchaseOrders.Unreachable);
     }
 
     private async Task CancelAsync(PurchaseOrderDto po)
@@ -203,20 +197,14 @@
         if (confirmed != true)
             return;
 
-        try
-        {
-            await InventoryService.CancelPurchaseOrderAsync(po.Id);
-            Snackbar.Add(T.PurchaseOrders.OrderCancelled, Severity.Success);
-            await ReloadAsync();
-        }
-        catch (ApiException ex)
-        {
-            Snackbar.Add(ex.Message, Severity.Error);
-        }
-        catch (Exception)
-        {
-            Snackbar.Add(T.PurchaseOrders.Unreachable, Severity.Error);
-        }
+        await SafeExecute.RunAsync(async () =>
+            {
+                await InventoryService.CancelPurchaseOrderAsync(po.Id);
+                Snackbar.Add(T.PurchaseOrders.OrderCancelled, Severity.Success);
+                await ReloadAsync();
+            },
+            Snackbar,
+            () => T.PurchaseOrders.Unreachable);
     }
 
     private static string FormatStatus(string status) => status switch

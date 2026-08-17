@@ -65,41 +65,25 @@
         if (!_editContext.Validate())
             return;
 
-        _busy = true;
-        try
+        var message = IsEdit ? T.RoleDialog.Updated : T.RoleDialog.Created;
+        if (await SafeExecute.RunAsync(
+                () => IsEdit
+                    ? IdentityService.UpdateRoleAsync(Role!.Id, new UpdateRoleInput
+                    {
+                        Name = _model.Name,
+                        Description = _model.Description,
+                    })
+                    : IdentityService.CreateRoleAsync(new CreateRoleInput
+                    {
+                        Name = _model.Name,
+                        Description = _model.Description,
+                    }),
+                Snackbar,
+                () => T.RoleDialog.UnreachableRetry,
+                busy => _busy = busy))
         {
-            if (IsEdit)
-            {
-                await IdentityService.UpdateRoleAsync(Role!.Id, new UpdateRoleInput
-                {
-                    Name = _model.Name,
-                    Description = _model.Description,
-                });
-                Snackbar.Add(T.RoleDialog.Updated, Severity.Success);
-            }
-            else
-            {
-                await IdentityService.CreateRoleAsync(new CreateRoleInput
-                {
-                    Name = _model.Name,
-                    Description = _model.Description,
-                });
-                Snackbar.Add(T.RoleDialog.Created, Severity.Success);
-            }
-
+            Snackbar.Add(message, Severity.Success);
             MudDialog.Close(DialogResult.Ok(true));
-        }
-        catch (ApiException ex)
-        {
-            Snackbar.Add(ex.Message, Severity.Error);
-        }
-        catch (Exception)
-        {
-            Snackbar.Add(T.RoleDialog.UnreachableRetry, Severity.Error);
-        }
-        finally
-        {
-            _busy = false;
         }
     }
 

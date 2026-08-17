@@ -89,25 +89,15 @@
             return;
         }
 
-        _busy = true;
-        try
-        {
-            await IdentityService.UpdateUserRolesAsync(User.Id, selectedIds);
-            Snackbar.Add(T.UserDialog.RolesUpdated, Severity.Success);
-            MudDialog.Close(DialogResult.Ok(true));
-        }
-        catch (ApiException ex)
-        {
-            Snackbar.Add(ex.Message, Severity.Error);
-        }
-        catch (Exception)
-        {
-            Snackbar.Add(T.UserDialog.Unreachable, Severity.Error);
-        }
-        finally
-        {
-            _busy = false;
-        }
+        await SafeExecute.RunAsync(async () =>
+            {
+                await IdentityService.UpdateUserRolesAsync(User.Id, selectedIds);
+                Snackbar.Add(T.UserDialog.RolesUpdated, Severity.Success);
+                MudDialog.Close(DialogResult.Ok(true));
+            },
+            Snackbar,
+            () => T.UserDialog.Unreachable,
+            busy => _busy = busy);
     }
 
     private void CancelAsync()

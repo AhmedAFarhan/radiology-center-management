@@ -206,20 +206,14 @@
 
     private async Task ActivateAsync(UserDto user)
     {
-        try
-        {
-            await IdentityService.ActivateUserAsync(user.Id);
-            Snackbar.Add(T.FormatValue(T.Users.Activated, user.UserName), Severity.Success);
-            await ReloadAsync();
-        }
-        catch (ApiException ex)
-        {
-            Snackbar.Add(ex.Message, Severity.Error);
-        }
-        catch (Exception)
-        {
-            Snackbar.Add(T.Users.Unreachable, Severity.Error);
-        }
+        await SafeExecute.RunAsync(async () =>
+            {
+                await IdentityService.ActivateUserAsync(user.Id);
+                Snackbar.Add(T.FormatValue(T.Users.Activated, user.UserName), Severity.Success);
+                await ReloadAsync();
+            },
+            Snackbar,
+            () => T.Users.Unreachable);
     }
 
     private async Task DeactivateAsync(UserDto user)
@@ -233,38 +227,26 @@
         if (confirmed != true)
             return;
 
-        try
-        {
-            await IdentityService.DeactivateUserAsync(user.Id);
-            Snackbar.Add(T.FormatValue(T.Users.Deactivated, user.UserName), Severity.Success);
-            await ReloadAsync();
-        }
-        catch (ApiException ex)
-        {
-            Snackbar.Add(ex.Message, Severity.Error);
-        }
-        catch (Exception)
-        {
-            Snackbar.Add(T.Users.Unreachable, Severity.Error);
-        }
+        await SafeExecute.RunAsync(async () =>
+            {
+                await IdentityService.DeactivateUserAsync(user.Id);
+                Snackbar.Add(T.FormatValue(T.Users.Deactivated, user.UserName), Severity.Success);
+                await ReloadAsync();
+            },
+            Snackbar,
+            () => T.Users.Unreachable);
     }
 
     private async Task UnlockAsync(UserDto user)
     {
-        try
-        {
-            await IdentityService.UnlockUserAsync(user.Id);
-            Snackbar.Add(T.FormatValue(T.Users.Unlocked, user.UserName), Severity.Success);
-            await ReloadAsync();
-        }
-        catch (ApiException ex)
-        {
-            Snackbar.Add(ex.Message, Severity.Error);
-        }
-        catch (Exception)
-        {
-            Snackbar.Add(T.Users.Unreachable, Severity.Error);
-        }
+        await SafeExecute.RunAsync(async () =>
+            {
+                await IdentityService.UnlockUserAsync(user.Id);
+                Snackbar.Add(T.FormatValue(T.Users.Unlocked, user.UserName), Severity.Success);
+                await ReloadAsync();
+            },
+            Snackbar,
+            () => T.Users.Unreachable);
     }
 
     private string StatusText(UserDto user)

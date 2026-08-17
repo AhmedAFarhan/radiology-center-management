@@ -175,20 +175,14 @@
         if (confirmed != true)
             return;
 
-        try
-        {
-            await ResourceService.DeleteWorkShiftAsync(shift.Id);
-            Snackbar.Add(T.WorkShift.Deleted, Severity.Success);
-            await ReloadAsync();
-        }
-        catch (ApiException ex)
-        {
-            Snackbar.Add(ex.Message, Severity.Error);
-        }
-        catch (Exception)
-        {
-            Snackbar.Add(T.WorkShift.Unreachable, Severity.Error);
-        }
+        await SafeExecute.RunAsync(async () =>
+            {
+                await ResourceService.DeleteWorkShiftAsync(shift.Id);
+                Snackbar.Add(T.WorkShift.Deleted, Severity.Success);
+                await ReloadAsync();
+            },
+            Snackbar,
+            () => T.WorkShift.Unreachable);
     }
 
     public void Dispose() => _searchCts?.Cancel();

@@ -167,24 +167,18 @@
 
     private async Task ToggleActiveAsync(SalaryDto salary)
     {
-        try
-        {
-            if (salary.IsActive)
-                await PayrollService.DeactivateSalaryAsync(salary.Id);
-            else
-                await PayrollService.ActivateSalaryAsync(salary.Id);
+        await SafeExecute.RunAsync(async () =>
+            {
+                if (salary.IsActive)
+                    await PayrollService.DeactivateSalaryAsync(salary.Id);
+                else
+                    await PayrollService.ActivateSalaryAsync(salary.Id);
 
-            Snackbar.Add(salary.IsActive ? T.Salary.Deactivated : T.Salary.Activated, Severity.Success);
-            await ReloadAsync();
-        }
-        catch (ApiException ex)
-        {
-            Snackbar.Add(ex.Message, Severity.Error);
-        }
-        catch (Exception)
-        {
-            Snackbar.Add(T.Salary.Unreachable, Severity.Error);
-        }
+                Snackbar.Add(salary.IsActive ? T.Salary.Deactivated : T.Salary.Activated, Severity.Success);
+                await ReloadAsync();
+            },
+            Snackbar,
+            () => T.Salary.Unreachable);
     }
 
     private async Task DeleteSalaryAsync(SalaryDto salary)
@@ -198,20 +192,14 @@
         if (confirmed != true)
             return;
 
-        try
-        {
-            await PayrollService.DeleteSalaryAsync(salary.Id);
-            Snackbar.Add(T.Salary.Deleted, Severity.Success);
-            await ReloadAsync();
-        }
-        catch (ApiException ex)
-        {
-            Snackbar.Add(ex.Message, Severity.Error);
-        }
-        catch (Exception)
-        {
-            Snackbar.Add(T.Salary.Unreachable, Severity.Error);
-        }
+        await SafeExecute.RunAsync(async () =>
+            {
+                await PayrollService.DeleteSalaryAsync(salary.Id);
+                Snackbar.Add(T.Salary.Deleted, Severity.Success);
+                await ReloadAsync();
+            },
+            Snackbar,
+            () => T.Salary.Unreachable);
     }
 
     public void Dispose() => _searchCts?.Cancel();

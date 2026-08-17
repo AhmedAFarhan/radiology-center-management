@@ -93,37 +93,27 @@
         if (!_editContext.Validate())
             return;
 
-        _busy = true;
-        try
-        {
-            var input = new NotificationTemplateInput
+        await SafeExecute.RunAsync(async () =>
             {
-                Code = _model.Code.Trim(),
-                Name = _model.Name.Trim(),
-                Subject = (_model.Subject ?? string.Empty).Trim(),
-                Body = _model.Body.Trim(),
-            };
+                var input = new NotificationTemplateInput
+                {
+                    Code = _model.Code.Trim(),
+                    Name = _model.Name.Trim(),
+                    Subject = (_model.Subject ?? string.Empty).Trim(),
+                    Body = _model.Body.Trim(),
+                };
 
-            if (_isEdit)
-                await NotificationService.UpdateTemplateAsync(Template!.Id, input);
-            else
-                await NotificationService.CreateTemplateAsync(input);
+                if (_isEdit)
+                    await NotificationService.UpdateTemplateAsync(Template!.Id, input);
+                else
+                    await NotificationService.CreateTemplateAsync(input);
 
-            Snackbar.Add(_isEdit ? T.TemplateDialog.Updated : T.TemplateDialog.Created, Severity.Success);
-            MudDialog.Close(DialogResult.Ok(true));
-        }
-        catch (ApiException ex)
-        {
-            Snackbar.Add(ex.Message, Severity.Error);
-        }
-        catch (Exception)
-        {
-            Snackbar.Add(T.TemplateDialog.Unreachable, Severity.Error);
-        }
-        finally
-        {
-            _busy = false;
-        }
+                Snackbar.Add(_isEdit ? T.TemplateDialog.Updated : T.TemplateDialog.Created, Severity.Success);
+                MudDialog.Close(DialogResult.Ok(true));
+            },
+            Snackbar,
+            () => T.TemplateDialog.Unreachable,
+            busy => _busy = busy);
     }
 
     private void CancelAsync()

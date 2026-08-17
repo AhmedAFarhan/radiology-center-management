@@ -127,50 +127,34 @@
         if (file is null)
             return;
 
-        _busy = true;
-        try
-        {
-            await using var stream = file.OpenReadStream(maxAllowedSize: 25 * 1024 * 1024);
-            await InsuranceService.UploadPolicyDocumentAsync(
-                PolicyId,
-                "PolicyDocument",
-                file.Name,
-                file.ContentType,
-                stream);
+        await SafeExecute.RunAsync(async () =>
+            {
+                await using var stream = file.OpenReadStream(maxAllowedSize: 25 * 1024 * 1024);
+                await InsuranceService.UploadPolicyDocumentAsync(
+                    PolicyId,
+                    "PolicyDocument",
+                    file.Name,
+                    file.ContentType,
+                    stream);
 
-            Snackbar.Add(T.PolicyDialog.DocumentUploaded, Severity.Success);
-            await LoadAsync();
-        }
-        catch (ApiException ex)
-        {
-            Snackbar.Add(ex.Message, Severity.Error);
-        }
-        catch (Exception)
-        {
-            Snackbar.Add(T.PolicyDialog.Unreachable, Severity.Error);
-        }
-        finally
-        {
-            _busy = false;
-        }
+                Snackbar.Add(T.PolicyDialog.DocumentUploaded, Severity.Success);
+                await LoadAsync();
+            },
+            Snackbar,
+            () => T.PolicyDialog.Unreachable,
+            busy => _busy = busy);
     }
 
     private async Task DownloadDocumentAsync(PolicyDocumentDto document)
     {
-        try
-        {
-            var content = await InsuranceService.DownloadPolicyDocumentAsync(PolicyId, document.Id);
-            await FileSaveHelper.SaveAsync(content, document.FileName);
-            Snackbar.Add(T.PolicyDialog.DocumentDownloaded, Severity.Success);
-        }
-        catch (ApiException ex)
-        {
-            Snackbar.Add(ex.Message, Severity.Error);
-        }
-        catch (Exception)
-        {
-            Snackbar.Add(T.PolicyDialog.UnableDownloadDocument, Severity.Error);
-        }
+        await SafeExecute.RunAsync(async () =>
+            {
+                var content = await InsuranceService.DownloadPolicyDocumentAsync(PolicyId, document.Id);
+                await FileSaveHelper.SaveAsync(content, document.FileName);
+                Snackbar.Add(T.PolicyDialog.DocumentDownloaded, Severity.Success);
+            },
+            Snackbar,
+            () => T.PolicyDialog.UnableDownloadDocument);
     }
 
     private async Task DeleteDocumentAsync(PolicyDocumentDto document)
@@ -184,20 +168,14 @@
         if (confirmed != true)
             return;
 
-        try
-        {
-            await InsuranceService.DeletePolicyDocumentAsync(PolicyId, document.Id);
-            Snackbar.Add(T.PolicyDialog.DocumentDeleted, Severity.Success);
-            await LoadAsync();
-        }
-        catch (ApiException ex)
-        {
-            Snackbar.Add(ex.Message, Severity.Error);
-        }
-        catch (Exception)
-        {
-            Snackbar.Add(T.PolicyDialog.Unreachable, Severity.Error);
-        }
+        await SafeExecute.RunAsync(async () =>
+            {
+                await InsuranceService.DeletePolicyDocumentAsync(PolicyId, document.Id);
+                Snackbar.Add(T.PolicyDialog.DocumentDeleted, Severity.Success);
+                await LoadAsync();
+            },
+            Snackbar,
+            () => T.PolicyDialog.Unreachable);
     }
 
     private static string FormatDocumentMeta(PolicyDocumentDto document)

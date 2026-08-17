@@ -102,37 +102,27 @@
         if (!_editContext.Validate())
             return;
 
-        _busy = true;
-        try
-        {
-            var input = new EquipmentInput
+        await SafeExecute.RunAsync(async () =>
             {
-                Name = _model.Name,
-                Modality = _model.Modality,
-                SerialNumber = _model.SerialNumber,
-                PurchaseDate = _model.PurchaseDate,
-            };
+                var input = new EquipmentInput
+                {
+                    Name = _model.Name,
+                    Modality = _model.Modality,
+                    SerialNumber = _model.SerialNumber,
+                    PurchaseDate = _model.PurchaseDate,
+                };
 
-            if (IsEdit)
-                await ResourceService.UpdateEquipmentAsync(Equipment!.Id, input);
-            else
-                await ResourceService.CreateEquipmentAsync(input);
+                if (IsEdit)
+                    await ResourceService.UpdateEquipmentAsync(Equipment!.Id, input);
+                else
+                    await ResourceService.CreateEquipmentAsync(input);
 
-            Snackbar.Add(IsEdit ? T.EquipmentDialog.Updated : T.EquipmentDialog.Created, Severity.Success);
-            MudDialog.Close(DialogResult.Ok(true));
-        }
-        catch (ApiException ex)
-        {
-            Snackbar.Add(ex.Message, Severity.Error);
-        }
-        catch (Exception)
-        {
-            Snackbar.Add(T.EquipmentDialog.Unreachable, Severity.Error);
-        }
-        finally
-        {
-            _busy = false;
-        }
+                Snackbar.Add(IsEdit ? T.EquipmentDialog.Updated : T.EquipmentDialog.Created, Severity.Success);
+                MudDialog.Close(DialogResult.Ok(true));
+            },
+            Snackbar,
+            () => T.EquipmentDialog.Unreachable,
+            busy => _busy = busy);
     }
 
     private void CancelAsync()

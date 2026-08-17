@@ -246,57 +246,47 @@
             return;
         }
 
-        _busy = true;
-        try
-        {
-            if (IsEdit)
+        await SafeExecute.RunAsync(async () =>
             {
-                await ExaminationService.UpdateAsync(Visit!.Id, new ExaminationUpdateInput
+                if (IsEdit)
                 {
-                    RadiologistId = _model.RadiologistId,
-                    TechnicianId = _model.TechnicianId,
-                    ReferralDoctorId = string.IsNullOrWhiteSpace(_model.ReferralDoctorId) ? null : _model.ReferralDoctorId,
-                    ClinicalIndication = _model.ClinicalIndication,
-                    Priority = _model.Priority,
-                    Notes = _model.Notes,
-                    Discount = _model.Discount,
-                    IsDiscountPercentage = _model.IsDiscountPercentage,
-                });
-                Snackbar.Add(T.VisitDialog.Updated, Severity.Success);
-            }
-            else
-            {
-                await ExaminationService.CreateAsync(new ExaminationInput
+                    await ExaminationService.UpdateAsync(Visit!.Id, new ExaminationUpdateInput
+                    {
+                        RadiologistId = _model.RadiologistId,
+                        TechnicianId = _model.TechnicianId,
+                        ReferralDoctorId = string.IsNullOrWhiteSpace(_model.ReferralDoctorId) ? null : _model.ReferralDoctorId,
+                        ClinicalIndication = _model.ClinicalIndication,
+                        Priority = _model.Priority,
+                        Notes = _model.Notes,
+                        Discount = _model.Discount,
+                        IsDiscountPercentage = _model.IsDiscountPercentage,
+                    });
+                    Snackbar.Add(T.VisitDialog.Updated, Severity.Success);
+                }
+                else
                 {
-                    PatientId = _selectedPatient!.Id,
-                    ExaminationTypeId = _selectedType!.Id,
-                    RadiologistId = _model.RadiologistId,
-                    TechnicianId = _model.TechnicianId,
-                    ReferralDoctorId = string.IsNullOrWhiteSpace(_model.ReferralDoctorId) ? null : _model.ReferralDoctorId,
-                    ClinicalIndication = _model.ClinicalIndication,
-                    Priority = _model.Priority,
-                    Discount = _model.Discount,
-                    IsDiscountPercentage = _model.IsDiscountPercentage,
-                    Paid = _model.Paid,
-                    Notes = _model.Notes,
-                });
-                Snackbar.Add(T.VisitDialog.Created, Severity.Success);
-            }
+                    await ExaminationService.CreateAsync(new ExaminationInput
+                    {
+                        PatientId = _selectedPatient!.Id,
+                        ExaminationTypeId = _selectedType!.Id,
+                        RadiologistId = _model.RadiologistId,
+                        TechnicianId = _model.TechnicianId,
+                        ReferralDoctorId = string.IsNullOrWhiteSpace(_model.ReferralDoctorId) ? null : _model.ReferralDoctorId,
+                        ClinicalIndication = _model.ClinicalIndication,
+                        Priority = _model.Priority,
+                        Discount = _model.Discount,
+                        IsDiscountPercentage = _model.IsDiscountPercentage,
+                        Paid = _model.Paid,
+                        Notes = _model.Notes,
+                    });
+                    Snackbar.Add(T.VisitDialog.Created, Severity.Success);
+                }
 
-            MudDialog.Close(DialogResult.Ok(true));
-        }
-        catch (ApiException ex)
-        {
-            Snackbar.Add(ex.Message, Severity.Error);
-        }
-        catch (Exception)
-        {
-            Snackbar.Add(T.VisitDialog.Unreachable, Severity.Error);
-        }
-        finally
-        {
-            _busy = false;
-        }
+                MudDialog.Close(DialogResult.Ok(true));
+            },
+            Snackbar,
+            () => T.VisitDialog.Unreachable,
+            busy => _busy = busy);
     }
 
     private void CancelAsync()

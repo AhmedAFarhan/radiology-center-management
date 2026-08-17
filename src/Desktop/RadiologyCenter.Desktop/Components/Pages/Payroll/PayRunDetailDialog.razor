@@ -208,23 +208,17 @@
 
     protected override async Task OnInitializedAsync()
     {
-        try
-        {
-            var staffTask = ResourceService.GetStaffsPagedAsync(null, null, false, 1, 100);
-            var payRunTask = PayrollService.GetPayRunByIdAsync(PayRunId);
-            await Task.WhenAll(staffTask, payRunTask);
+        await SafeExecute.RunAsync(async () =>
+            {
+                var staffTask = ResourceService.GetStaffsPagedAsync(null, null, false, 1, 100);
+                var payRunTask = PayrollService.GetPayRunByIdAsync(PayRunId);
+                await Task.WhenAll(staffTask, payRunTask);
 
-            _payRun = await payRunTask;
-            _staffNames = (await staffTask).Items.ToDictionary(s => s.Id, s => s.FullName);
-        }
-        catch (ApiException ex)
-        {
-            Snackbar.Add(ex.Message, Severity.Error);
-        }
-        catch (Exception)
-        {
-            Snackbar.Add(T.PayRunDialog.LoadError, Severity.Error);
-        }
+                _payRun = await payRunTask;
+                _staffNames = (await staffTask).Items.ToDictionary(s => s.Id, s => s.FullName);
+            },
+            Snackbar,
+            () => T.PayRunDialog.LoadError);
     }
 
     private string ResolveStaff(string staffId)
@@ -232,18 +226,12 @@
 
     private async Task ReloadAsync()
     {
-        try
-        {
-            _payRun = await PayrollService.GetPayRunByIdAsync(PayRunId);
-        }
-        catch (ApiException ex)
-        {
-            Snackbar.Add(ex.Message, Severity.Error);
-        }
-        catch (Exception)
-        {
-            Snackbar.Add(T.PayRunDialog.ReloadError, Severity.Error);
-        }
+        await SafeExecute.RunAsync(async () =>
+            {
+                _payRun = await PayrollService.GetPayRunByIdAsync(PayRunId);
+            },
+            Snackbar,
+            () => T.PayRunDialog.ReloadError);
     }
 
     private async Task AddPayslipAsync()
@@ -255,25 +243,16 @@
 
         if (result is { Canceled: false } && result.Data is string staffId)
         {
-            try
-            {
-                _busy = true;
-                await PayrollService.AddPayslipAsync(PayRunId, staffId);
-                Snackbar.Add(T.PayRunDialog.PayslipAdded, Severity.Success);
-                await ReloadAsync();
-            }
-            catch (ApiException ex)
-            {
-                Snackbar.Add(ex.Message, Severity.Error);
-            }
-            catch (Exception)
-            {
-                Snackbar.Add(T.PayRunDialog.AddError, Severity.Error);
-            }
-            finally
-            {
-                _busy = false;
-            }
+            await SafeExecute.RunAsync(async () =>
+                {
+                    _busy = true;
+                    await PayrollService.AddPayslipAsync(PayRunId, staffId);
+                    Snackbar.Add(T.PayRunDialog.PayslipAdded, Severity.Success);
+                    await ReloadAsync();
+                },
+                Snackbar,
+                () => T.PayRunDialog.AddError,
+                busy => _busy = busy);
         }
     }
 
@@ -304,25 +283,16 @@
         if (confirmed != true)
             return;
 
-        try
-        {
-            _busy = true;
-            await PayrollService.RemovePayslipAsync(PayRunId, payslip.StaffId);
-            Snackbar.Add(T.PayRunDialog.PayslipRemoved, Severity.Success);
-            await ReloadAsync();
-        }
-        catch (ApiException ex)
-        {
-            Snackbar.Add(ex.Message, Severity.Error);
-        }
-        catch (Exception)
-        {
-            Snackbar.Add(T.PayRunDialog.RemoveError, Severity.Error);
-        }
-        finally
-        {
-            _busy = false;
-        }
+        await SafeExecute.RunAsync(async () =>
+            {
+                _busy = true;
+                await PayrollService.RemovePayslipAsync(PayRunId, payslip.StaffId);
+                Snackbar.Add(T.PayRunDialog.PayslipRemoved, Severity.Success);
+                await ReloadAsync();
+            },
+            Snackbar,
+            () => T.PayRunDialog.RemoveError,
+            busy => _busy = busy);
     }
 
     private async Task RunLifecycleAsync(string verb, string confirmTitle, string confirmMessage, string confirmOk)
@@ -331,33 +301,24 @@
         if (confirmed != true)
             return;
 
-        try
-        {
-            _busy = true;
-            switch (verb)
+        await SafeExecute.RunAsync(async () =>
             {
-                case "compute": await PayrollService.ComputePayRunAsync(PayRunId); break;
-                case "approve": await PayrollService.ApprovePayRunAsync(PayRunId); break;
-                case "reject": await PayrollService.RejectPayRunAsync(PayRunId); break;
-                case "restart": await PayrollService.RestartPayRunAsync(PayRunId); break;
-                case "pay": await PayrollService.PayPayRunAsync(PayRunId); break;
-            }
+                _busy = true;
+                switch (verb)
+                {
+                    case "compute": await PayrollService.ComputePayRunAsync(PayRunId); break;
+                    case "approve": await PayrollService.ApprovePayRunAsync(PayRunId); break;
+                    case "reject": await PayrollService.RejectPayRunAsync(PayRunId); break;
+                    case "restart": await PayrollService.RestartPayRunAsync(PayRunId); break;
+                    case "pay": await PayrollService.PayPayRunAsync(PayRunId); break;
+                }
 
-            Snackbar.Add(T.FormatValue(T.PayRunDialog.LifecycleDone, verb), Severity.Success);
-            await ReloadAsync();
-        }
-        catch (ApiException ex)
-        {
-            Snackbar.Add(ex.Message, Severity.Error);
-        }
-        catch (Exception)
-        {
-            Snackbar.Add(T.PayRunDialog.ServerError, Severity.Error);
-        }
-        finally
-        {
-            _busy = false;
-        }
+                Snackbar.Add(T.FormatValue(T.PayRunDialog.LifecycleDone, verb), Severity.Success);
+                await ReloadAsync();
+            },
+            Snackbar,
+            () => T.PayRunDialog.ServerError,
+            busy => _busy = busy);
     }
 
     private Task ComputeAsync() => RunLifecycleAsync("compute", T.PayRunDialog.ComputeTitle, T.PayRunDialog.ComputeConfirm, T.PayRunDialog.Compute);

@@ -50,25 +50,15 @@
 
         var scheduledAt = _scheduledAt.Value.Date + _scheduledTime.Value;
 
-        _busy = true;
-        try
-        {
-            await ExaminationService.ScheduleAsync(Visit.Id, scheduledAt);
-            Snackbar.Add(T.VisitSchedule.Scheduled, Severity.Success);
-            MudDialog.Close(DialogResult.Ok(true));
-        }
-        catch (ApiException ex)
-        {
-            Snackbar.Add(ex.Message, Severity.Error);
-        }
-        catch (Exception)
-        {
-            Snackbar.Add(T.VisitSchedule.Unreachable, Severity.Error);
-        }
-        finally
-        {
-            _busy = false;
-        }
+        await SafeExecute.RunAsync(async () =>
+            {
+                await ExaminationService.ScheduleAsync(Visit.Id, scheduledAt);
+                Snackbar.Add(T.VisitSchedule.Scheduled, Severity.Success);
+                MudDialog.Close(DialogResult.Ok(true));
+            },
+            Snackbar,
+            () => T.VisitSchedule.Unreachable,
+            busy => _busy = busy);
     }
 
     private void CancelAsync()

@@ -152,36 +152,26 @@
         if (!_editContext.Validate())
             return;
 
-        _busy = true;
-        try
-        {
-            var input = new InsurancePolicyInput
+        await SafeExecute.RunAsync(async () =>
             {
-                CompanyId = _model.CompanyId,
-                PatientId = _model.PatientId,
-                PolicyNumber = _model.PolicyNumber,
-                CoveragePercent = _model.CoveragePercent,
-                EffectiveFrom = _model.EffectiveFrom ?? DateTime.Today,
-                EffectiveTo = _model.EffectiveTo,
-                IsGovernment = _model.IsGovernment,
-            };
+                var input = new InsurancePolicyInput
+                {
+                    CompanyId = _model.CompanyId,
+                    PatientId = _model.PatientId,
+                    PolicyNumber = _model.PolicyNumber,
+                    CoveragePercent = _model.CoveragePercent,
+                    EffectiveFrom = _model.EffectiveFrom ?? DateTime.Today,
+                    EffectiveTo = _model.EffectiveTo,
+                    IsGovernment = _model.IsGovernment,
+                };
 
-            await InsuranceService.CreatePolicyAsync(input);
-            Snackbar.Add(T.PolicyDialog.Created, Severity.Success);
-            MudDialog.Close(DialogResult.Ok(true));
-        }
-        catch (ApiException ex)
-        {
-            Snackbar.Add(ex.Message, Severity.Error);
-        }
-        catch (Exception)
-        {
-            Snackbar.Add(T.PolicyDialog.UnreachableRetry, Severity.Error);
-        }
-        finally
-        {
-            _busy = false;
-        }
+                await InsuranceService.CreatePolicyAsync(input);
+                Snackbar.Add(T.PolicyDialog.Created, Severity.Success);
+                MudDialog.Close(DialogResult.Ok(true));
+            },
+            Snackbar,
+            () => T.PolicyDialog.UnreachableRetry,
+            busy => _busy = busy);
     }
 
     private void CancelAsync()

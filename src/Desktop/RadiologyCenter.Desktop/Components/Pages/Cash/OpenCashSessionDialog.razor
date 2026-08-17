@@ -58,31 +58,21 @@
         if (!_editContext.Validate())
             return;
 
-        _busy = true;
-        try
-        {
-            var input = new OpenCashSessionInput
+        await SafeExecute.RunAsync(async () =>
             {
-                OpeningFloat = _model.OpeningFloat,
-                Notes = _model.Notes,
-            };
+                var input = new OpenCashSessionInput
+                {
+                    OpeningFloat = _model.OpeningFloat,
+                    Notes = _model.Notes,
+                };
 
-            await CashService.OpenAsync(input);
-            Snackbar.Add(T.OpenCash.Opened, Severity.Success);
-            MudDialog.Close(DialogResult.Ok(true));
-        }
-        catch (ApiException ex)
-        {
-            Snackbar.Add(ex.Message, Severity.Error);
-        }
-        catch (Exception)
-        {
-            Snackbar.Add(T.OpenCash.UnreachableRetry, Severity.Error);
-        }
-        finally
-        {
-            _busy = false;
-        }
+                await CashService.OpenAsync(input);
+                Snackbar.Add(T.OpenCash.Opened, Severity.Success);
+                MudDialog.Close(DialogResult.Ok(true));
+            },
+            Snackbar,
+            () => T.OpenCash.UnreachableRetry,
+            busy => _busy = busy);
     }
 
     private void CancelAsync()

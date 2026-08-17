@@ -162,24 +162,18 @@
 
     private async Task ToggleActiveAsync(SupplierDto supplier)
     {
-        try
-        {
-            if (supplier.IsActive)
-                await InventoryService.DeactivateSupplierAsync(supplier.Id);
-            else
-                await InventoryService.ActivateSupplierAsync(supplier.Id);
+        await SafeExecute.RunAsync(async () =>
+            {
+                if (supplier.IsActive)
+                    await InventoryService.DeactivateSupplierAsync(supplier.Id);
+                else
+                    await InventoryService.ActivateSupplierAsync(supplier.Id);
 
-            Snackbar.Add(supplier.IsActive ? T.Suppliers.SupplierDeactivated : T.Suppliers.SupplierActivated, Severity.Success);
-            await ReloadAsync();
-        }
-        catch (ApiException ex)
-        {
-            Snackbar.Add(ex.Message, Severity.Error);
-        }
-        catch (Exception)
-        {
-            Snackbar.Add(T.Suppliers.Unreachable, Severity.Error);
-        }
+                Snackbar.Add(supplier.IsActive ? T.Suppliers.SupplierDeactivated : T.Suppliers.SupplierActivated, Severity.Success);
+                await ReloadAsync();
+            },
+            Snackbar,
+            () => T.Suppliers.Unreachable);
     }
 
     private async Task DeleteSupplierAsync(SupplierDto supplier)
@@ -193,20 +187,14 @@
         if (confirmed != true)
             return;
 
-        try
-        {
-            await InventoryService.DeleteSupplierAsync(supplier.Id);
-            Snackbar.Add(T.Suppliers.SupplierDeleted, Severity.Success);
-            await ReloadAsync();
-        }
-        catch (ApiException ex)
-        {
-            Snackbar.Add(ex.Message, Severity.Error);
-        }
-        catch (Exception)
-        {
-            Snackbar.Add(T.Suppliers.Unreachable, Severity.Error);
-        }
+        await SafeExecute.RunAsync(async () =>
+            {
+                await InventoryService.DeleteSupplierAsync(supplier.Id);
+                Snackbar.Add(T.Suppliers.SupplierDeleted, Severity.Success);
+                await ReloadAsync();
+            },
+            Snackbar,
+            () => T.Suppliers.Unreachable);
     }
 
     public void Dispose() => _searchCts?.Cancel();

@@ -174,24 +174,18 @@
 
     private async Task ToggleActiveAsync(ReferralFeeDto fee)
     {
-        try
-        {
-            if (fee.IsActive)
-                await PayrollService.DeactivateReferralFeeAsync(fee.Id);
-            else
-                await PayrollService.ActivateReferralFeeAsync(fee.Id);
+        await SafeExecute.RunAsync(async () =>
+            {
+                if (fee.IsActive)
+                    await PayrollService.DeactivateReferralFeeAsync(fee.Id);
+                else
+                    await PayrollService.ActivateReferralFeeAsync(fee.Id);
 
-            Snackbar.Add(fee.IsActive ? T.ReferralFee.Deactivated : T.ReferralFee.Activated, Severity.Success);
-            await ReloadAsync();
-        }
-        catch (ApiException ex)
-        {
-            Snackbar.Add(ex.Message, Severity.Error);
-        }
-        catch (Exception)
-        {
-            Snackbar.Add(T.ReferralFee.Unreachable, Severity.Error);
-        }
+                Snackbar.Add(fee.IsActive ? T.ReferralFee.Deactivated : T.ReferralFee.Activated, Severity.Success);
+                await ReloadAsync();
+            },
+            Snackbar,
+            () => T.ReferralFee.Unreachable);
     }
 
     private async Task DeleteFeeAsync(ReferralFeeDto fee)
@@ -205,20 +199,14 @@
         if (confirmed != true)
             return;
 
-        try
-        {
-            await PayrollService.DeleteReferralFeeAsync(fee.Id);
-            Snackbar.Add(T.ReferralFee.Deleted, Severity.Success);
-            await ReloadAsync();
-        }
-        catch (ApiException ex)
-        {
-            Snackbar.Add(ex.Message, Severity.Error);
-        }
-        catch (Exception)
-        {
-            Snackbar.Add(T.ReferralFee.Unreachable, Severity.Error);
-        }
+        await SafeExecute.RunAsync(async () =>
+            {
+                await PayrollService.DeleteReferralFeeAsync(fee.Id);
+                Snackbar.Add(T.ReferralFee.Deleted, Severity.Success);
+                await ReloadAsync();
+            },
+            Snackbar,
+            () => T.ReferralFee.Unreachable);
     }
 
     public void Dispose() => _searchCts?.Cancel();

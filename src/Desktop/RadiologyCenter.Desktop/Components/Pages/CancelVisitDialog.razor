@@ -37,25 +37,15 @@
 
     private async Task SubmitAsync()
     {
-        _busy = true;
-        try
-        {
-            await ExaminationService.CancelAsync(Visit.Id, _reason);
-            Snackbar.Add(T.Visits.Cancelled, Severity.Success);
-            MudDialog.Close(DialogResult.Ok(true));
-        }
-        catch (ApiException ex)
-        {
-            Snackbar.Add(ex.Message, Severity.Error);
-        }
-        catch (Exception)
-        {
-            Snackbar.Add(T.Visits.Unreachable, Severity.Error);
-        }
-        finally
-        {
-            _busy = false;
-        }
+        await SafeExecute.RunAsync(async () =>
+            {
+                await ExaminationService.CancelAsync(Visit.Id, _reason);
+                Snackbar.Add(T.Visits.Cancelled, Severity.Success);
+                MudDialog.Close(DialogResult.Ok(true));
+            },
+            Snackbar,
+            () => T.Visits.Unreachable,
+            busy => _busy = busy);
     }
 
     private void CancelAsync()

@@ -169,24 +169,18 @@
 
     private async Task ToggleActiveAsync(ExaminationFeeDto fee)
     {
-        try
-        {
-            if (fee.IsActive)
-                await PayrollService.DeactivateExaminationFeeAsync(fee.Id);
-            else
-                await PayrollService.ActivateExaminationFeeAsync(fee.Id);
+        await SafeExecute.RunAsync(async () =>
+            {
+                if (fee.IsActive)
+                    await PayrollService.DeactivateExaminationFeeAsync(fee.Id);
+                else
+                    await PayrollService.ActivateExaminationFeeAsync(fee.Id);
 
-            Snackbar.Add(fee.IsActive ? T.ExamFee.Deactivated : T.ExamFee.Activated, Severity.Success);
-            await ReloadAsync();
-        }
-        catch (ApiException ex)
-        {
-            Snackbar.Add(ex.Message, Severity.Error);
-        }
-        catch (Exception)
-        {
-            Snackbar.Add(T.ExamFee.Unreachable, Severity.Error);
-        }
+                Snackbar.Add(fee.IsActive ? T.ExamFee.Deactivated : T.ExamFee.Activated, Severity.Success);
+                await ReloadAsync();
+            },
+            Snackbar,
+            () => T.ExamFee.Unreachable);
     }
 
     private async Task DeleteFeeAsync(ExaminationFeeDto fee)
@@ -200,20 +194,14 @@
         if (confirmed != true)
             return;
 
-        try
-        {
-            await PayrollService.DeleteExaminationFeeAsync(fee.Id);
-            Snackbar.Add(T.ExamFee.Deleted, Severity.Success);
-            await ReloadAsync();
-        }
-        catch (ApiException ex)
-        {
-            Snackbar.Add(ex.Message, Severity.Error);
-        }
-        catch (Exception)
-        {
-            Snackbar.Add(T.ExamFee.Unreachable, Severity.Error);
-        }
+        await SafeExecute.RunAsync(async () =>
+            {
+                await PayrollService.DeleteExaminationFeeAsync(fee.Id);
+                Snackbar.Add(T.ExamFee.Deleted, Severity.Success);
+                await ReloadAsync();
+            },
+            Snackbar,
+            () => T.ExamFee.Unreachable);
     }
 
     public void Dispose() => _searchCts?.Cancel();

@@ -158,24 +158,18 @@
 
     private async Task ToggleActiveAsync(PatientDto patient)
     {
-        try
-        {
-            if (patient.IsActive)
-                await PatientService.DeactivateAsync(patient.Id);
-            else
-                await PatientService.ActivateAsync(patient.Id);
+        await SafeExecute.RunAsync(async () =>
+            {
+                if (patient.IsActive)
+                    await PatientService.DeactivateAsync(patient.Id);
+                else
+                    await PatientService.ActivateAsync(patient.Id);
 
-            Snackbar.Add(patient.IsActive ? T.Patients.Deactivated : T.Patients.Activated, Severity.Success);
-            await ReloadAsync();
-        }
-        catch (ApiException ex)
-        {
-            Snackbar.Add(ex.Message, Severity.Error);
-        }
-        catch (Exception)
-        {
-            Snackbar.Add(T.Patients.Unreachable, Severity.Error);
-        }
+                Snackbar.Add(patient.IsActive ? T.Patients.Deactivated : T.Patients.Activated, Severity.Success);
+                await ReloadAsync();
+            },
+            Snackbar,
+            () => T.Patients.Unreachable);
     }
 
     private async Task DeletePatientAsync(PatientDto patient)
@@ -189,20 +183,14 @@
         if (confirmed != true)
             return;
 
-        try
-        {
-            await PatientService.DeleteAsync(patient.Id);
-            Snackbar.Add(T.Patients.Deleted, Severity.Success);
-            await ReloadAsync();
-        }
-        catch (ApiException ex)
-        {
-            Snackbar.Add(ex.Message, Severity.Error);
-        }
-        catch (Exception)
-        {
-            Snackbar.Add(T.Patients.Unreachable, Severity.Error);
-        }
+        await SafeExecute.RunAsync(async () =>
+            {
+                await PatientService.DeleteAsync(patient.Id);
+                Snackbar.Add(T.Patients.Deleted, Severity.Success);
+                await ReloadAsync();
+            },
+            Snackbar,
+            () => T.Patients.Unreachable);
     }
 
     private static string FormatAge(int? age, DateTime? dateOfBirth)

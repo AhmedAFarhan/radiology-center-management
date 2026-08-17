@@ -169,24 +169,18 @@
 
     private async Task ToggleActiveAsync(EquipmentDto equipment)
     {
-        try
-        {
-            if (equipment.IsActive)
-                await ResourceService.DeactivateEquipmentAsync(equipment.Id);
-            else
-                await ResourceService.ActivateEquipmentAsync(equipment.Id);
+        await SafeExecute.RunAsync(async () =>
+            {
+                if (equipment.IsActive)
+                    await ResourceService.DeactivateEquipmentAsync(equipment.Id);
+                else
+                    await ResourceService.ActivateEquipmentAsync(equipment.Id);
 
-            Snackbar.Add(equipment.IsActive ? T.Equipment.Deactivated : T.Equipment.Activated, Severity.Success);
-            await ReloadAsync();
-        }
-        catch (ApiException ex)
-        {
-            Snackbar.Add(ex.Message, Severity.Error);
-        }
-        catch (Exception)
-        {
-            Snackbar.Add(T.Equipment.Unreachable, Severity.Error);
-        }
+                Snackbar.Add(equipment.IsActive ? T.Equipment.Deactivated : T.Equipment.Activated, Severity.Success);
+                await ReloadAsync();
+            },
+            Snackbar,
+            () => T.Equipment.Unreachable);
     }
 
     private async Task DeleteEquipmentAsync(EquipmentDto equipment)
@@ -200,20 +194,14 @@
         if (confirmed != true)
             return;
 
-        try
-        {
-            await ResourceService.DeleteEquipmentAsync(equipment.Id);
-            Snackbar.Add(T.Equipment.Deleted, Severity.Success);
-            await ReloadAsync();
-        }
-        catch (ApiException ex)
-        {
-            Snackbar.Add(ex.Message, Severity.Error);
-        }
-        catch (Exception)
-        {
-            Snackbar.Add(T.Equipment.Unreachable, Severity.Error);
-        }
+        await SafeExecute.RunAsync(async () =>
+            {
+                await ResourceService.DeleteEquipmentAsync(equipment.Id);
+                Snackbar.Add(T.Equipment.Deleted, Severity.Success);
+                await ReloadAsync();
+            },
+            Snackbar,
+            () => T.Equipment.Unreachable);
     }
 
     private static string FormatModality(string modality) => modality switch

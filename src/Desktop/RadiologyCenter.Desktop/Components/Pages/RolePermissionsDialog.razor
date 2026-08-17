@@ -129,33 +129,23 @@
 
     private async Task SubmitAsync()
     {
-        _busy = true;
-        try
-        {
-            var current = Role.Permissions.Select(p => p.ToLowerInvariant()).ToHashSet();
-            var next = _selected.Where(kv => kv.Value).Select(kv => kv.Key.ToLowerInvariant()).ToHashSet();
+        await SafeExecute.RunAsync(async () =>
+            {
+                var current = Role.Permissions.Select(p => p.ToLowerInvariant()).ToHashSet();
+                var next = _selected.Where(kv => kv.Value).Select(kv => kv.Key.ToLowerInvariant()).ToHashSet();
 
-            foreach (var add in next.Except(current))
-                await IdentityService.AddPermissionToRoleAsync(Role.Id, add);
+                foreach (var add in next.Except(current))
+                    await IdentityService.AddPermissionToRoleAsync(Role.Id, add);
 
-            foreach (var remove in current.Except(next))
-                await IdentityService.RemovePermissionFromRoleAsync(Role.Id, remove);
+                foreach (var remove in current.Except(next))
+                    await IdentityService.RemovePermissionFromRoleAsync(Role.Id, remove);
 
-            Snackbar.Add(T.RoleDialog.PermissionsUpdated, Severity.Success);
-            MudDialog.Close(DialogResult.Ok(true));
-        }
-        catch (ApiException ex)
-        {
-            Snackbar.Add(ex.Message, Severity.Error);
-        }
-        catch (Exception)
-        {
-            Snackbar.Add(T.RoleDialog.Unreachable, Severity.Error);
-        }
-        finally
-        {
-            _busy = false;
-        }
+                Snackbar.Add(T.RoleDialog.PermissionsUpdated, Severity.Success);
+                MudDialog.Close(DialogResult.Ok(true));
+            },
+            Snackbar,
+            () => T.RoleDialog.Unreachable,
+            busy => _busy = busy);
     }
 
     private void CancelAsync()
