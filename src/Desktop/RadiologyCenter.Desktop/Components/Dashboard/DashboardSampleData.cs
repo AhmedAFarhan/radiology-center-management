@@ -1,4 +1,4 @@
-namespace RadiologyCenter.Desktop.Components;
+namespace RadiologyCenter.Desktop.Components.Dashboard;
 
 public record RevenuePoint(string Month, decimal Amount);
 

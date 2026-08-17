@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Components;
 using MudBlazor;
 using RadiologyCenter.Desktop.Models;
 using RadiologyCenter.Desktop.Services;
+using RadiologyCenter.Desktop.Components.Pages.Reports;
 using Color = MudBlazor.Color;
 
 namespace RadiologyCenter.Desktop.Components.Pages;

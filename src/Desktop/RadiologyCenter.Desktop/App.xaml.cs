@@ -1,6 +1,7 @@
 ﻿namespace RadiologyCenter.Desktop;
 
 using WindowsColor = Windows.UI.Color;
+using RadiologyCenter.Desktop.Services;
 
 public partial class App : Application
 {

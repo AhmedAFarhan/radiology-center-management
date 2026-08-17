@@ -1,4 +1,4 @@
-namespace RadiologyCenter.Desktop;
+namespace RadiologyCenter.Desktop.Services;
 
 public sealed class BackendStatusService
 {
