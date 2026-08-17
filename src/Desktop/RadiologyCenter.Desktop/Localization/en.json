@@ -1738,5 +1738,16 @@
     "language.dialogTitle":  "Select language",
     "common.apply":  "Apply",
     "language.arabic":  "Arabic",
-    "language.english":  "English"
+    "language.english":  "English",
+    "search.group.insuranceCompanies":  "Insurance companies",
+    "search.error":  "Search failed",
+    "search.group.patients":  "Patients",
+    "search.group.users":  "Users",
+    "search.group.suppliers":  "Suppliers",
+    "search.noResults":  "No results found",
+    "search.group.staff":  "Staff",
+    "search.group.insurancePolicies":  "Insurance policies",
+    "search.group.referralDoctors":  "Referral doctors",
+    "search.group.examinationTypes":  "Examination types",
+    "search.group.items":  "Items"
 }

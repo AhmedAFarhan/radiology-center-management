@@ -1738,5 +1738,16 @@
     "language.dialogTitle":  "اختر اللغة",
     "common.apply":  "تطبيق",
     "language.arabic":  "العربية",
-    "language.english":  "الإنجليزية"
+    "language.english":  "الإنجليزية",
+    "search.group.insuranceCompanies":  "شركات التأمين",
+    "search.error":  "تعذر إجراء البحث",
+    "search.group.patients":  "المرضى",
+    "search.group.users":  "المستخدمون",
+    "search.group.suppliers":  "الموردون",
+    "search.noResults":  "لا توجد نتائج",
+    "search.group.staff":  "الموظفون",
+    "search.group.insurancePolicies":  "وثائق التأمين",
+    "search.group.referralDoctors":  "الأطباء المحوَّلون",
+    "search.group.examinationTypes":  "أنواع الفحوصات",
+    "search.group.items":  "الأصناف"
 }

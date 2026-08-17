@@ -4,6 +4,7 @@
 @inject IDialogService DialogService
 @inject ISnackbar Snackbar
 @inject AppLocalizer T
+@inject NavigationManager NavigationManager
 @implements IDisposable
 
 <PageHeader Icon="@Icons.Material.Filled.People" Title="@T.Patients.Title"
@@ -73,6 +74,46 @@
     private CancellationTokenSource? _searchCts;
     private string? _loadError;
     private bool _offline;
+    private string? _openPatientId;
+
+    [SupplyParameterFromQuery(Name = "open")]
+    public string? OpenId { get; set; }
+
+    protected override void OnParametersSet()
+    {
+        base.OnParametersSet();
+        if (!string.IsNullOrWhiteSpace(OpenId) && Guid.TryParse(OpenId, out _))
+            _openPatientId = OpenId;
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (_openPatientId is not null)
+        {
+            var id = _openPatientId;
+            _openPatientId = null;
+            await OpenPatientAsync(id);
+        }
+    }
+
+    private async Task OpenPatientAsync(string id)
+    {
+        PatientDto? patient = null;
+        var ok = await SafeExecute.RunAsync(
+            async () => patient = await PatientService.GetByIdAsync(id),
+            Snackbar,
+            () => T.Patients.Unreachable);
+
+        if (ok && patient is not null)
+        {
+            var parameters = new DialogParameters { ["Patient"] = patient };
+            var options = new DialogOptions { MaxWidth = MaxWidth.Medium, FullWidth = true, NoHeader = true };
+            var dialog = await DialogService.ShowAsync<PatientEditorDialog>(T.Patients.EditPatient, parameters, options);
+            await ReloadIfSavedAsync(dialog);
+        }
+
+        NavigationManager.NavigateTo("/patients", replace: true);
+    }
 
     private async Task<TableData<PatientDto>> LoadServerData(TableState state, CancellationToken ct)
     {

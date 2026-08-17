@@ -1,10 +1,12 @@
 @inherits LayoutComponentBase
 @using RadiologyCenter.Desktop.Components.Pages
+@using RadiologyCenter.Desktop.Models
 @inject NavigationManager Navigation
 @inject AuthService AuthService
 @inject IDialogService DialogService
 @inject ISnackbar Snackbar
 @inject AppLocalizer T
+@inject SearchService SearchService
 
 <div class="app-shell">
     <aside class="app-sidebar @(_drawerOpen ? "open" : "collapsed")">
@@ -18,13 +20,62 @@
     <div class="app-main-col">
         <header class="app-topbar">
             <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" OnClick="@(() => _drawerOpen = !_drawerOpen)" aria-label="@T.Layout.ToggleNav" />
-            <MudTextField T="string"
-                          Placeholder="@T.Layout.SearchPlaceholder"
-                          Variant="Variant.Outlined"
-                          Margin="Margin.Dense"
-                          Adornment="Adornment.Start"
-                          AdornmentIcon="@Icons.Material.Filled.Search"
-                          Class="header-search app-bar-search" />
+            <div class="global-search">
+                <MudTextField T="string"
+                              Placeholder="@T.Layout.SearchPlaceholder"
+                              Variant="Variant.Outlined"
+                              Margin="Margin.Dense"
+                              Immediate="true"
+                              Adornment="Adornment.Start"
+                              AdornmentIcon="@Icons.Material.Filled.Search"
+                              Value="@_searchText"
+                              ValueChanged="@(v => OnSearchTextChanged(v))"
+                              OnKeyDown="OnSearchKeyDown"
+                              OnBlur="OnSearchBlur"
+                              Class="header-search app-bar-search" />
+
+                @if (_resultsOpen)
+                {
+                    <div class="global-search-overlay" @onmousedown="CloseSearch"></div>
+                    <div class="global-search-results">
+                        @if (_searching)
+                        {
+                            <div class="global-search-status">@T.Common.Loading</div>
+                        }
+                        else if (_searchError)
+                        {
+                            <div class="global-search-status">@T.Search.Error</div>
+                        }
+                        else if (_flatItems.Count == 0)
+                        {
+                            <div class="global-search-status">@T.Search.NoResults</div>
+                        }
+                        else
+                        {
+                            @foreach (var group in _results!.Where(g => g.Items.Count > 0))
+                            {
+                                <div class="global-search-group">
+                                    <div class="global-search-group-title">@GroupLabel(group.EntityType)</div>
+                                    @foreach (var item in group.Items)
+                                    {
+                                        <button type="button"
+                                                class="global-search-item @(IsSelected(item) ? "selected" : "")"
+                                                @onmousedown:preventDefault="true"
+                                                @onmousedown="() => ActivateAsync(new SearchFlatItem(group.EntityType, item))"
+                                                @onmouseenter="() => SelectItem(item)">
+                                            <span class="global-search-item-title">@item.Title</span>
+                                            @if (!string.IsNullOrWhiteSpace(item.Subtitle))
+                                            {
+                                                <span class="global-search-item-subtitle">@item.Subtitle</span>
+                                            }
+                                        </button>
+                                    }
+                                </div>
+                            }
+                        }
+                    </div>
+                }
+            </div>
             <MudSpacer />
             <MudIconButton Icon="@Icons.Material.Filled.Notifications" Color="Color.Inherit" aria-label="@T.Layout.Notifications" OnClick="OnNotifications" />
             <LanguageSwitcher />
@@ -48,6 +99,17 @@
 
     private bool _drawerOpen = true;
     private string _userName = string.Empty;
+
+    private string _searchText = string.Empty;
+    private IReadOnlyList<GlobalSearchGroupDto>? _results;
+    private readonly List<SearchFlatItem> _flatItems = new();
+    private CancellationTokenSource? _searchCts;
+    private bool _resultsOpen;
+    private bool _searching;
+    private bool _searchError;
+    private int _selectedIndex = -1;
+
+    private sealed record SearchFlatItem(string EntityType, GlobalSearchItemDto Item);
 
     protected override void OnParametersSet()
     {
@@ -84,4 +146,185 @@
             return "?";
         return _userName[..1].ToUpperInvariant();
     }
+
+    private async Task OnSearchTextChanged(string? value)
+    {
+        _searchText = value ?? string.Empty;
+        _searchCts?.Cancel();
+        var cts = _searchCts = new CancellationTokenSource();
+        _selectedIndex = -1;
+
+        if (string.IsNullOrWhiteSpace(_searchText))
+        {
+            _results = null;
+            _flatItems.Clear();
+            _resultsOpen = false;
+            _searching = false;
+            _searchError = false;
+            StateHasChanged();
+            return;
+        }
+
+        _resultsOpen = true;
+        StateHasChanged();
+
+        if (_searchText.Trim().Length < 2)
+        {
+            _results = null;
+            _flatItems.Clear();
+            return;
+        }
+
+        try
+        {
+            await Task.Delay(250, cts.Token);
+        }
+        catch (TaskCanceledException)
+        {
+            return;
+        }
+
+        if (cts.IsCancellationRequested)
+            return;
+
+        _searching = true;
+        _searchError = false;
+        StateHasChanged();
+
+        try
+        {
+            var groups = await SearchService.SearchAsync(_searchText.Trim(), 5, cts.Token);
+            if (cts.IsCancellationRequested)
+                return;
+            _results = groups;
+            RebuildFlatList();
+        }
+        catch (OperationCanceledException)
+        {
+            if (cts.IsCancellationRequested)
+                return;
+            _searchError = true;
+        }
+        catch (ApiException)
+        {
+            if (cts.IsCancellationRequested)
+                return;
+            _searchError = true;
+        }
+        catch (Exception)
+        {
+            if (cts.IsCancellationRequested)
+                return;
+            _searchError = true;
+        }
+        finally
+        {
+            if (!cts.IsCancellationRequested)
+            {
+                _searching = false;
+                StateHasChanged();
+            }
+        }
+    }
+
+    private void RebuildFlatList()
+    {
+        _flatItems.Clear();
+        _selectedIndex = -1;
+        if (_results is null)
+            return;
+
+        foreach (var group in _results)
+        {
+            foreach (var item in group.Items)
+                _flatItems.Add(new SearchFlatItem(group.EntityType, item));
+        }
+    }
+
+    private async Task OnSearchKeyDown(KeyboardEventArgs e)
+    {
+        if (_flatItems.Count == 0)
+            return;
+
+        switch (e.Key)
+        {
+            case "ArrowDown":
+                _selectedIndex = Math.Min(_selectedIndex + 1, _flatItems.Count - 1);
+                StateHasChanged();
+                break;
+            case "ArrowUp":
+                _selectedIndex = Math.Max(_selectedIndex - 1, 0);
+                StateHasChanged();
+                break;
+            case "Enter":
+                if (_selectedIndex >= 0 && _selectedIndex < _flatItems.Count)
+                    await ActivateAsync(_flatItems[_selectedIndex]);
+                break;
+            case "Escape":
+                CloseSearch();
+                break;
+        }
+    }
+
+    private void OnSearchBlur(FocusEventArgs e)
+    {
+        if (_resultsOpen)
+            CloseSearch();
+    }
+
+    private void SelectItem(GlobalSearchItemDto item)
+    {
+        _selectedIndex = _flatItems.FindIndex(f => ReferenceEquals(f.Item, item));
+        StateHasChanged();
+    }
+
+    private bool IsSelected(GlobalSearchItemDto item)
+        => _selectedIndex >= 0 && _selectedIndex < _flatItems.Count
+           && ReferenceEquals(_flatItems[_selectedIndex].Item, item);
+
+    private async Task ActivateAsync(SearchFlatItem item)
+    {
+        var route = GetRoute(item);
+        CloseSearch();
+        if (route is not null)
+            Navigation.NavigateTo(route);
+        await Task.CompletedTask;
+    }
+
+    private void CloseSearch()
+    {
+        _resultsOpen = false;
+        _selectedIndex = -1;
+        StateHasChanged();
+    }
+
+    private static string? GetRoute(SearchFlatItem item)
+        => item.EntityType switch
+        {
+            "patient" => $"/patients?open={item.Item.Id}",
+            "staff" => "/resources/staff",
+            "referralDoctor" => "/resources/referral-doctors",
+            "item" => "/inventory/items",
+            "supplier" => "/inventory/suppliers",
+            "insuranceCompany" => "/insurance/companies",
+            "insurancePolicy" => "/insurance/policies",
+            "user" => "/users",
+            "examinationType" => "/examinations",
+            _ => null,
+        };
+
+    private string GroupLabel(string entityType)
+        => entityType switch
+        {
+            "patient" => T.Search.Group.Patients,
+            "staff" => T.Search.Group.Staff,
+            "referralDoctor" => T.Search.Group.ReferralDoctors,
+            "item" => T.Search.Group.Items,
+            "supplier" => T.Search.Group.Suppliers,
+            "insuranceCompany" => T.Search.Group.InsuranceCompanies,
+            "insurancePolicy" => T.Search.Group.InsurancePolicies,
+            "user" => T.Search.Group.Users,
+            "examinationType" => T.Search.Group.ExaminationTypes,
+            _ => entityType,
+        };
 }

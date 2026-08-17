@@ -189,6 +189,9 @@ public sealed partial class AppLocalizer
     private SalaryDialogGroup? _salaryDialog;
     public SalaryDialogGroup SalaryDialog => _salaryDialog ??= new SalaryDialogGroup(this);
 
+    private SearchGroup? _search;
+    public SearchGroup Search => _search ??= new SearchGroup(this);
+
     private SendDialogGroup? _sendDialog;
     public SendDialogGroup SendDialog => _sendDialog ??= new SendDialogGroup(this);
 
@@ -1970,6 +1973,32 @@ public sealed class SalaryDialogGroup
     public string SelectEmployee => _localizer.Get("salaryDialog.selectEmployee");
     public string Unreachable => _localizer.Get("salaryDialog.unreachable");
     public string Updated => _localizer.Get("salaryDialog.updated");
+}
+
+public sealed class SearchGroup
+{
+    private readonly AppLocalizer _localizer;
+    internal SearchGroup(AppLocalizer localizer) => _localizer = localizer;
+    public string Error => _localizer.Get("search.error");
+    public string NoResults => _localizer.Get("search.noResults");
+
+    private GroupGroup? _group;
+    public GroupGroup Group => _group ??= new GroupGroup(_localizer);
+
+    public sealed class GroupGroup
+    {
+        private readonly AppLocalizer _localizer;
+        internal GroupGroup(AppLocalizer localizer) => _localizer = localizer;
+        public string ExaminationTypes => _localizer.Get("search.group.examinationTypes");
+        public string InsuranceCompanies => _localizer.Get("search.group.insuranceCompanies");
+        public string InsurancePolicies => _localizer.Get("search.group.insurancePolicies");
+        public string Items => _localizer.Get("search.group.items");
+        public string Patients => _localizer.Get("search.group.patients");
+        public string ReferralDoctors => _localizer.Get("search.group.referralDoctors");
+        public string Staff => _localizer.Get("search.group.staff");
+        public string Suppliers => _localizer.Get("search.group.suppliers");
+        public string Users => _localizer.Get("search.group.users");
+    }
 }
 
 public sealed class SendDialogGroup
