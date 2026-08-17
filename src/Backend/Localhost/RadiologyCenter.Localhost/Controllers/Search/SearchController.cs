@@ -53,38 +53,64 @@ public class SearchController : ControllerBase
         var take = Math.Clamp(limit, 1, MaxLimit);
         var like = "%" + EscapeLike(term) + "%";
 
-        var tasks = new List<Task<GlobalSearchGroupDto>>();
+        // Run sequentially: several searches share the same scoped DbContext
+        // (staff/referralDoctors, items/suppliers, companies/policies) and EF Core
+        // forbids concurrent operations on one context instance.
+        var groups = new List<GlobalSearchGroupDto>();
 
         if (Can(PatientsReadCode))
-            tasks.Add(SearchPatientsAsync(like, take, ct));
+        {
+            var g = await SearchPatientsAsync(like, take, ct);
+            if (g.Items.Count > 0) groups.Add(g);
+        }
 
         if (Can(StaffReadCode))
-            tasks.Add(SearchStaffAsync(like, take, ct));
+        {
+            var g = await SearchStaffAsync(like, take, ct);
+            if (g.Items.Count > 0) groups.Add(g);
+        }
 
         if (Can(ReferralDoctorsReadCode))
-            tasks.Add(SearchReferralDoctorsAsync(like, take, ct));
+        {
+            var g = await SearchReferralDoctorsAsync(like, take, ct);
+            if (g.Items.Count > 0) groups.Add(g);
+        }
 
         if (Can(InventoryItemsReadCode))
-            tasks.Add(SearchItemsAsync(like, take, ct));
+        {
+            var g = await SearchItemsAsync(like, take, ct);
+            if (g.Items.Count > 0) groups.Add(g);
+        }
 
         if (Can(InventorySuppliersReadCode))
-            tasks.Add(SearchSuppliersAsync(like, take, ct));
+        {
+            var g = await SearchSuppliersAsync(like, take, ct);
+            if (g.Items.Count > 0) groups.Add(g);
+        }
 
         if (Can(InsuranceCompaniesReadCode))
-            tasks.Add(SearchInsuranceCompaniesAsync(like, take, ct));
+        {
+            var g = await SearchInsuranceCompaniesAsync(like, take, ct);
+            if (g.Items.Count > 0) groups.Add(g);
+        }
 
         if (Can(InsurancePoliciesReadCode))
-            tasks.Add(SearchInsurancePoliciesAsync(like, take, ct));
+        {
+            var g = await SearchInsurancePoliciesAsync(like, take, ct);
+            if (g.Items.Count > 0) groups.Add(g);
+        }
 
         if (Can(UsersReadCode))
-            tasks.Add(SearchUsersAsync(like, take, ct));
+        {
+            var g = await SearchUsersAsync(like, take, ct);
+            if (g.Items.Count > 0) groups.Add(g);
+        }
 
         if (Can(ExaminationsTypesManageCode))
-            tasks.Add(SearchExaminationTypesAsync(like, take, ct));
-
-        var groups = (await Task.WhenAll(tasks))
-            .Where(g => g.Items.Count > 0)
-            .ToList();
+        {
+            var g = await SearchExaminationTypesAsync(like, take, ct);
+            if (g.Items.Count > 0) groups.Add(g);
+        }
 
         return Result.Success<IReadOnlyList<GlobalSearchGroupDto>>(groups).ToActionResult();
     }
