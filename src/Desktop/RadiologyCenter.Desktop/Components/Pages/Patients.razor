@@ -10,6 +10,7 @@
 <PageHeader Icon="@Icons.Material.Filled.People" Title="@T.Patients.Title"
             Subtitle="@T.Patients.Subtitle"
             SearchValueChanged="OnSearchChanged"
+            SearchValue="@SearchQuery"
             SearchPlaceholder="@T.Patients.SearchPlaceholder"
             OnRefresh="ReloadAsync">
     <MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Add" OnClick="OpenCreateDialogAsync">@T.Patients.AddPatient</MudButton>
@@ -75,6 +76,9 @@
     private string? _loadError;
     private bool _offline;
     private string? _openPatientId;
+
+    [SupplyParameterFromQuery(Name = "q")]
+    public string? SearchQuery { get; set; }
 
     [SupplyParameterFromQuery(Name = "open")]
     public string? OpenId { get; set; }

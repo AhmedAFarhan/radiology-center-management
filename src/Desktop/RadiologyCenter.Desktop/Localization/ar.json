@@ -1749,5 +1749,9 @@
     "search.group.insurancePolicies":  "وثائق التأمين",
     "search.group.referralDoctors":  "الأطباء المحوَّلون",
     "search.group.examinationTypes":  "أنواع الفحوصات",
-    "search.group.items":  "الأصناف"
+    "search.group.items":  "الأصناف",
+    "search.recents":  "عمليات البحث الأخيرة",
+    "search.viewAll":  "عرض الكل",
+    "search.typeHint":  "اكتب حرفين على الأقل للبحث",
+    "search.retry":  "إعادة المحاولة"
 }

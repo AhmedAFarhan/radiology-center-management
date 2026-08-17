@@ -1981,6 +1981,10 @@ public sealed class SearchGroup
     internal SearchGroup(AppLocalizer localizer) => _localizer = localizer;
     public string Error => _localizer.Get("search.error");
     public string NoResults => _localizer.Get("search.noResults");
+    public string Recents => _localizer.Get("search.recents");
+    public string Retry => _localizer.Get("search.retry");
+    public string TypeHint => _localizer.Get("search.typeHint");
+    public string ViewAll => _localizer.Get("search.viewAll");
 
     private GroupGroup? _group;
     public GroupGroup Group => _group ??= new GroupGroup(_localizer);

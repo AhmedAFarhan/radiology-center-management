@@ -7,8 +7,9 @@
 @inject ISnackbar Snackbar
 @inject AppLocalizer T
 @inject SearchService SearchService
+@inject SearchHistoryService SearchHistory
 
-<div class="app-shell">
+<div class="app-shell" @onkeydown="HandleGlobalKeyDown">
     <aside class="app-sidebar @(_drawerOpen ? "open" : "collapsed")">
         <div class="app-brand">
             <img src="images/healthcare-logo-64.png" alt="EGcare" class="app-brand-logo" />
@@ -20,8 +21,9 @@
     <div class="app-main-col">
         <header class="app-topbar">
             <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" OnClick="@(() => _drawerOpen = !_drawerOpen)" aria-label="@T.Layout.ToggleNav" />
-            <div class="global-search">
+            <div class="global-search" @onclick="OnSearchBoxClick">
                 <MudTextField T="string"
+                              @ref="_searchField"
                               Placeholder="@T.Layout.SearchPlaceholder"
                               Variant="Variant.Outlined"
                               Margin="Margin.Dense"
@@ -38,13 +40,55 @@
                 {
                     <div class="global-search-overlay" @onmousedown="CloseSearch"></div>
                     <div class="global-search-results">
-                        @if (_searching)
+                        @if (_searching && _flatItems.Count > 0)
+                        {
+                            <div class="global-search-loading">
+                                <MudProgressCircular Size="Size.Small" Color="Color.Primary" Indeterminate="true" />
+                            </div>
+                        }
+
+                        @if (_showRecents)
+                        {
+                            @if (_recentSearches.Count > 0)
+                            {
+                                <div class="global-search-group">
+                                    <div class="global-search-group-title">@T.Search.Recents</div>
+                                    @foreach (var term in _recentSearches)
+                                    {
+                                        <button type="button"
+                                                class="global-search-item"
+                                                @onmousedown:preventDefault="true"
+                                                @onmousedown="() => RecentClickedAsync(term)">
+                                            <span class="global-search-item-title">
+                                                <MudIcon Icon="@Icons.Material.Filled.History" Size="Size.Small" Class="me-1 global-search-recent-icon" />
+                                                @term
+                                            </span>
+                                        </button>
+                                    }
+                                </div>
+                            }
+                            else
+                            {
+                                <div class="global-search-status">@T.Search.TypeHint</div>
+                            }
+                        }
+                        else if (_searching && _flatItems.Count == 0)
                         {
                             <div class="global-search-status">@T.Common.Loading</div>
                         }
                         else if (_searchError)
                         {
-                            <div class="global-search-status">@T.Search.Error</div>
+                            <div class="global-search-status">
+                                @T.Search.Error
+                                <button type="button"
+                                        class="global-search-retry"
+                                        @onmousedown:preventDefault="true"
+                                        @onmousedown="RetrySearchAsync">@T.Search.Retry</button>
+                            </div>
+                        }
+                        else if (_searchText.Trim().Length < 2)
+                        {
+                            <div class="global-search-status">@T.Search.TypeHint</div>
                         }
                         else if (_flatItems.Count == 0)
                         {
@@ -55,7 +99,14 @@
                             @foreach (var group in _results!.Where(g => g.Items.Count > 0))
                             {
                                 <div class="global-search-group">
-                                    <div class="global-search-group-title">@GroupLabel(group.EntityType)</div>
+                                    <div class="global-search-group-head">
+                                        <span class="global-search-group-title">@GroupLabel(group.EntityType)</span>
+                                        <span class="global-search-group-count">@group.Count</span>
+                                        <button type="button"
+                                                class="global-search-viewall"
+                                                @onmousedown:preventDefault="true"
+                                                @onmousedown="() => ViewAllAsync(group.EntityType)">@T.Search.ViewAll</button>
+                                    </div>
                                     @foreach (var item in group.Items)
                                     {
                                         <button type="button"
@@ -63,7 +114,7 @@
                                                 @onmousedown:preventDefault="true"
                                                 @onmousedown="() => ActivateAsync(new SearchFlatItem(group.EntityType, item))"
                                                 @onmouseenter="() => SelectItem(item)">
-                                            <span class="global-search-item-title">@item.Title</span>
+                                            <span class="global-search-item-title">@Highlighted(item.Title)</span>
                                             @if (!string.IsNullOrWhiteSpace(item.Subtitle))
                                             {
                                                 <span class="global-search-item-subtitle">@item.Subtitle</span>
@@ -100,6 +151,7 @@
     private bool _drawerOpen = true;
     private string _userName = string.Empty;
 
+    private MudTextField<string>? _searchField;
     private string _searchText = string.Empty;
     private IReadOnlyList<GlobalSearchGroupDto>? _results;
     private readonly List<SearchFlatItem> _flatItems = new();
@@ -107,7 +159,10 @@
     private bool _resultsOpen;
     private bool _searching;
     private bool _searchError;
+    private bool _showRecents;
     private int _selectedIndex = -1;
+    private List<string> _highlightWords = new();
+    private IReadOnlyList<string> _recentSearches = Array.Empty<string>();
 
     private sealed record SearchFlatItem(string EntityType, GlobalSearchItemDto Item);
 
@@ -147,12 +202,54 @@
         return _userName[..1].ToUpperInvariant();
     }
 
+    private async Task HandleGlobalKeyDown(KeyboardEventArgs e)
+    {
+        if ((e.CtrlKey || e.MetaKey) && string.Equals(e.Key, "k", StringComparison.OrdinalIgnoreCase))
+        {
+            await FocusSearchAsync();
+        }
+        else if (string.Equals(e.Key, "Escape", StringComparison.OrdinalIgnoreCase) && _resultsOpen)
+        {
+            CloseSearch();
+        }
+    }
+
+    private async Task FocusSearchAsync()
+    {
+        if (_searchField is not null)
+            await _searchField.FocusAsync();
+
+        if (string.IsNullOrWhiteSpace(_searchText))
+            ShowRecents();
+    }
+
+    private void OnSearchBoxClick()
+    {
+        if (string.IsNullOrWhiteSpace(_searchText) && !_searching && !_resultsOpen)
+            ShowRecents();
+    }
+
+    private void ShowRecents()
+    {
+        _recentSearches = SearchHistory.Get(_userName);
+        _results = null;
+        _flatItems.Clear();
+        _searching = false;
+        _searchError = false;
+        _selectedIndex = -1;
+        _showRecents = true;
+        _resultsOpen = true;
+        StateHasChanged();
+    }
+
     private async Task OnSearchTextChanged(string? value)
     {
         _searchText = value ?? string.Empty;
+        _highlightWords = ParseWords(_searchText);
         _searchCts?.Cancel();
         var cts = _searchCts = new CancellationTokenSource();
         _selectedIndex = -1;
+        _showRecents = false;
 
         if (string.IsNullOrWhiteSpace(_searchText))
         {
@@ -175,6 +272,11 @@
             return;
         }
 
+        await RunSearchAsync(cts);
+    }
+
+    private async Task RunSearchAsync(CancellationTokenSource cts)
+    {
         try
         {
             await Task.Delay(250, cts.Token);
@@ -227,6 +329,19 @@
         }
     }
 
+    private async Task RetrySearchAsync()
+    {
+        _searchCts?.Cancel();
+        var cts = _searchCts = new CancellationTokenSource();
+        _searchError = false;
+        _resultsOpen = true;
+        StateHasChanged();
+        await RunSearchAsync(cts);
+    }
+
+    private async Task RecentClickedAsync(string term)
+        => await OnSearchTextChanged(term);
+
     private void RebuildFlatList()
     {
         _flatItems.Clear();
@@ -243,22 +358,29 @@
 
     private async Task OnSearchKeyDown(KeyboardEventArgs e)
     {
-        if (_flatItems.Count == 0)
-            return;
-
         switch (e.Key)
         {
             case "ArrowDown":
-                _selectedIndex = Math.Min(_selectedIndex + 1, _flatItems.Count - 1);
+                if (_showRecents && _recentSearches.Count > 0)
+                {
+                    _selectedIndex = 0;
+                    break;
+                }
+
+                if (_flatItems.Count > 0)
+                    _selectedIndex = Math.Min(_selectedIndex + 1, _flatItems.Count - 1);
                 StateHasChanged();
                 break;
             case "ArrowUp":
-                _selectedIndex = Math.Max(_selectedIndex - 1, 0);
+                if (_flatItems.Count > 0)
+                    _selectedIndex = Math.Max(_selectedIndex - 1, 0);
                 StateHasChanged();
                 break;
             case "Enter":
                 if (_selectedIndex >= 0 && _selectedIndex < _flatItems.Count)
                     await ActivateAsync(_flatItems[_selectedIndex]);
+                else if (_showRecents && _recentSearches.Count > 0)
+                    await RecentClickedAsync(_recentSearches[0]);
                 break;
             case "Escape":
                 CloseSearch();
@@ -284,6 +406,7 @@
 
     private async Task ActivateAsync(SearchFlatItem item)
     {
+        SearchHistory.Add(_userName, _searchText.Trim());
         var route = GetRoute(item);
         CloseSearch();
         if (route is not null)
@@ -291,9 +414,20 @@
         await Task.CompletedTask;
     }
 
+    private async Task ViewAllAsync(string entityType)
+    {
+        SearchHistory.Add(_userName, _searchText.Trim());
+        var route = GetListRoute(entityType);
+        CloseSearch();
+        if (route is not null)
+            Navigation.NavigateTo(route + $"?q={Uri.EscapeDataString(_searchText.Trim())}");
+        await Task.CompletedTask;
+    }
+
     private void CloseSearch()
     {
         _resultsOpen = false;
+        _showRecents = false;
         _selectedIndex = -1;
         StateHasChanged();
     }
@@ -302,6 +436,21 @@
         => item.EntityType switch
         {
             "patient" => $"/patients?open={item.Item.Id}",
+            "staff" => $"/resources/staff?open={item.Item.Id}",
+            "referralDoctor" => $"/resources/referral-doctors?open={item.Item.Id}",
+            "item" => $"/inventory/items?open={item.Item.Id}",
+            "supplier" => $"/inventory/suppliers?open={item.Item.Id}",
+            "insuranceCompany" => $"/insurance/companies?open={item.Item.Id}",
+            "insurancePolicy" => $"/insurance/policies?open={item.Item.Id}",
+            "user" => $"/users?open={item.Item.Id}",
+            "examinationType" => $"/examinations?open={item.Item.Id}",
+            _ => null,
+        };
+
+    private static string? GetListRoute(string entityType)
+        => entityType switch
+        {
+            "patient" => "/patients",
             "staff" => "/resources/staff",
             "referralDoctor" => "/resources/referral-doctors",
             "item" => "/inventory/items",
@@ -327,4 +476,78 @@
             "examinationType" => T.Search.Group.ExaminationTypes,
             _ => entityType,
         };
+
+    private static List<string> ParseWords(string text)
+        => text.Split(' ', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries).ToList();
+
+    private RenderFragment Highlighted(string? text)
+    {
+        var raw = text ?? string.Empty;
+        return builder =>
+        {
+            if (string.IsNullOrEmpty(raw) || _highlightWords.Count == 0)
+            {
+                builder.AddContent(0, raw);
+                return;
+            }
+
+            var spans = new List<(int Start, int Length)>();
+            foreach (var word in _highlightWords)
+            {
+                if (string.IsNullOrWhiteSpace(word))
+                    continue;
+
+                var index = 0;
+                while (index < raw.Length)
+                {
+                    var found = raw.IndexOf(word, index, StringComparison.OrdinalIgnoreCase);
+                    if (found < 0)
+                        break;
+                    spans.Add((found, word.Length));
+                    index = found + word.Length;
+                }
+            }
+
+            if (spans.Count == 0)
+            {
+                builder.AddContent(0, raw);
+                return;
+            }
+
+            var merged = new List<(int Start, int Length)>();
+            foreach (var span in spans.OrderBy(s => s.Start).ThenByDescending(s => s.Length))
+            {
+                if (merged.Count == 0 || span.Start > merged[^1].Start + merged[^1].Length)
+                {
+                    merged.Add(span);
+                }
+                else
+                {
+                    var last = merged[^1];
+                    var end = Math.Max(last.Start + last.Length, span.Start + span.Length);
+                    merged[^1] = (last.Start, end - last.Start);
+                }
+            }
+
+            var cursor = 0;
+            var seq = 0;
+            foreach (var span in merged)
+            {
+                if (span.Start > cursor)
+                {
+                    builder.AddContent(seq++, raw.Substring(cursor, span.Start - cursor));
+                }
+
+                builder.OpenElement(seq++, "mark");
+                builder.AddAttribute(seq++, "class", "global-search-mark");
+                builder.AddContent(seq++, raw.Substring(span.Start, span.Length));
+                builder.CloseElement();
+
+                cursor = span.Start + span.Length;
+            }
+
+            if (cursor < raw.Length)
+                builder.AddContent(seq++, raw.Substring(cursor));
+        };
+    }
 }

@@ -4,11 +4,13 @@
 @inject IDialogService DialogService
 @inject ISnackbar Snackbar
 @inject AppLocalizer T
+@inject NavigationManager NavigationManager
 @implements IDisposable
 
 <PageHeader Icon="@Icons.Material.Filled.Badge" Title="@T.Staff.Title"
             Subtitle="@T.Staff.Subtitle"
             SearchValueChanged="OnSearchChanged"
+            SearchValue="@SearchQuery"
             SearchPlaceholder="@T.Staff.SearchPlaceholder"
             OnRefresh="ReloadAsync">
     <MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Add" OnClick="OpenCreateDialogAsync">@T.Staff.Add</MudButton>
@@ -75,6 +77,49 @@
     private CancellationTokenSource? _searchCts;
     private string? _loadError;
     private bool _offline;
+    private string? _openId;
+
+    [SupplyParameterFromQuery(Name = "q")]
+    public string? SearchQuery { get; set; }
+
+    [SupplyParameterFromQuery(Name = "open")]
+    public string? OpenId { get; set; }
+
+    protected override void OnParametersSet()
+    {
+        base.OnParametersSet();
+        if (!string.IsNullOrWhiteSpace(OpenId) && Guid.TryParse(OpenId, out _))
+            _openId = OpenId;
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (_openId is not null)
+        {
+            var id = _openId;
+            _openId = null;
+            await OpenByDeepLinkAsync(id);
+        }
+    }
+
+    private async Task OpenByDeepLinkAsync(string id)
+    {
+        StaffDto? staff = null;
+        var ok = await SafeExecute.RunAsync(
+            async () => staff = await ResourceService.GetStaffByIdAsync(id),
+            Snackbar,
+            () => T.Staff.Unreachable);
+
+        if (ok && staff is not null)
+        {
+            var parameters = new DialogParameters { ["Staff"] = staff };
+            var options = new DialogOptions { MaxWidth = MaxWidth.Medium, FullWidth = true, NoHeader = true };
+            var dialog = await DialogService.ShowAsync<StaffEditorDialog>(T.FormatValue(T.Staff.Edit, staff.FullName), parameters, options);
+            await ReloadIfSavedAsync(dialog);
+        }
+
+        NavigationManager.NavigateTo("/resources/staff", replace: true);
+    }
 
     private async Task<TableData<StaffDto>> LoadServerData(TableState state, CancellationToken ct)
     {
