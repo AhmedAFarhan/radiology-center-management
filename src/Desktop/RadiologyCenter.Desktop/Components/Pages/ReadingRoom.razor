@@ -59,14 +59,14 @@
                         <div class="rr-item-top">
                             <span class="rr-prio @PriorityClass(current.Priority)" title="@current.Priority"></span>
                             <span class="rr-item-name">@current.PatientName</span>
-                            <span class="rr-item-time">@current.CompletedLabel</span>
+                            <span class="rr-item-time">@current.DateLabel</span>
                         </div>
                         <div class="rr-item-exam">
                             <MudIcon Icon="@Icons.Material.Filled.MedicalServices" Size="Size.Small" />
                             <span>@current.ExamName</span>
                         </div>
                         <div class="rr-item-meta">
-                            <MudChip T="string" Size="Size.Small" Color="@ReportStatusColor(current.ReportStatus)">@current.ReportStatus</MudChip>
+                            <MudChip T="string" Size="Size.Small" Color="@ReportStatusColor(current.ReportStatusKey)">@current.ReportStatus</MudChip>
                             <MudChip T="string" Size="Size.Small" Color="@PriorityChipColor(current.Priority)">@current.Priority</MudChip>
                             @if (current.StudyInstanceUid is null)
                             {
@@ -184,7 +184,7 @@
                         <MudText Typo="Typo.caption" Class="text-secondary">@Selected.PatientCode â€¢ v@(_report.CurrentVersionNumber)</MudText>
                     </div>
                 </MudStack>
-                <MudChip T="string" Size="Size.Small" Color="@ReportStatusColor(_report.Status)">@_report.Status</MudChip>
+                <MudChip T="string" Size="Size.Small" Color="@ReportStatusColor(_report.StatusKey)">@_report.Status</MudChip>
             </div>
 
             <div class="rr-patient-summary">
@@ -201,7 +201,7 @@
             <MudDivider />
 
             <div class="rr-report-body">
-                @if (!string.IsNullOrWhiteSpace(_report.CancelReason) && _report.Status == "Cancelled")
+                @if (!string.IsNullOrWhiteSpace(_report.CancelReason) && _report.StatusKey == "Cancelled")
                 {
                     <MudAlert Severity="Severity.Error" Variant="Variant.Outlined" Dense="true" Class="mb-3">
                         @(T.FormatValue(T.ReadingRoom.CancelledWithReason, _report.CancelReason))
@@ -325,14 +325,14 @@
                     </MudStack>
                     <MudButton Variant="Variant.Filled" Color="Color.Success" StartIcon="@Icons.Material.Filled.CheckCircle" OnClick="FinalizeAsync" Disabled="_busy">@T.ReadingRoom.SignReport</MudButton>
                 }
-                else if (_report.Status == "Finalized")
+                else if (_report.StatusKey == "Finalized")
                 {
                     <MudStack Row="true" Spacing="2">
                         <MudButton Variant="Variant.Outlined" Color="Color.Primary" StartIcon="@Icons.Material.Filled.EditNote" OnClick="OpenAmendAsync" Disabled="_busy">@T.ReadingRoom.Amend</MudButton>
                         <MudChip T="string" Color="Color.Success" Size="Size.Medium" Variant="Variant.Filled" Label="true">@(T.FormatValue(T.ReadingRoom.SignedAt, _report.FinalizedAt?.ToString("yyyy-MM-dd") ?? "-"))</MudChip>
                     </MudStack>
                 }
-                else if (_report.Status == "Cancelled")
+                else if (_report.StatusKey == "Cancelled")
                 {
                     <MudChip T="string" Color="Color.Error" Size="Size.Medium" Variant="Variant.Outlined">@T.ReadingRoom.Cancelled</MudChip>
                 }

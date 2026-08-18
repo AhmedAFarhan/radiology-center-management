@@ -21,6 +21,7 @@ public partial class ReadingRoom : ComponentBase
     private readonly List<QueueExam> _queue = new();
     private readonly Dictionary<string, PatientDto> _patientCache = new(StringComparer.OrdinalIgnoreCase);
     private readonly Dictionary<string, string> _reportStatusByExam = new(StringComparer.OrdinalIgnoreCase);
+    private readonly Dictionary<string, string> _reportStatusKeyByExam = new(StringComparer.OrdinalIgnoreCase);
     private readonly HashSet<string> _linking = new(StringComparer.OrdinalIgnoreCase);
 
     private string? _filter;
@@ -71,11 +72,11 @@ public partial class ReadingRoom : ComponentBase
         }
     }
 
-    private int PendingCount => _queue.Count(q => q.ReportStatus is "New" or "Draft");
+    private int PendingCount => _queue.Count(q => q.ReportStatusKey is "New" or "Draft");
 
     private int ImagedCount => _queue.Count(q => q.StudyInstanceUid is not null);
 
-    private bool CanEdit => _report is { Status: "Draft" };
+    private bool CanEdit => _report is { StatusKey: "Draft" };
 
     private QueueExam? Selected => _selected;
 
@@ -111,7 +112,9 @@ public partial class ReadingRoom : ComponentBase
         try
         {
             var exams = await ExaminationService.GetPagedAsync(null, null, false, 1, 100);
-            var completed = exams.Items.Where(e => e.StatusKey == "Completed").ToList();
+            var visible = exams.Items
+                .Where(e => e.StatusKey is "CheckedIn" or "Completed")
+                .ToList();
 
             IReadOnlyList<ReportListItemDto> reportItems = Array.Empty<ReportListItemDto>();
             try
@@ -125,11 +128,15 @@ public partial class ReadingRoom : ComponentBase
             }
 
             _reportStatusByExam.Clear();
+            _reportStatusKeyByExam.Clear();
             foreach (var report in reportItems)
+            {
                 _reportStatusByExam[report.ExaminationId] = report.Status;
+                _reportStatusKeyByExam[report.ExaminationId] = report.StatusKey;
+            }
 
             _queue.Clear();
-            foreach (var exam in completed)
+            foreach (var exam in visible)
             {
                 var patient = await GetPatientAsync(exam.PatientId);
                 var patientCode = patient?.PatientCode;
@@ -140,16 +147,29 @@ public partial class ReadingRoom : ComponentBase
                     PatientName = patient?.FullName ?? $"Patient {exam.PatientId}",
                     PatientCode = patientCode ?? "-",
                     ExamName = exam.ExaminationTypeName ?? "Examination",
+                    StatusKey = exam.StatusKey,
+                    ScheduledAt = exam.ScheduledAt,
                     CompletedAt = exam.CompletedAt,
                     Priority = exam.Priority,
                     Indication = exam.ClinicalIndication,
                     AssignedRadiologistId = exam.RadiologistId,
                     ReportStatus = _reportStatusByExam.GetValueOrDefault(exam.Id, "New"),
+                    ReportStatusKey = _reportStatusKeyByExam.GetValueOrDefault(exam.Id, "New"),
                     StudyInstanceUid = string.IsNullOrEmpty(exam.StudyInstanceUID) ? null : exam.StudyInstanceUID,
                 });
             }
 
-            _queue.Sort((a, b) => (b.CompletedAt ?? DateTime.MinValue).CompareTo(a.CompletedAt ?? DateTime.MinValue));
+            _queue.Sort((a, b) =>
+            {
+                // CheckedIn first, then Completed; within each group by their own date.
+                var groupCompare = (a.StatusKey == "CheckedIn" ? 0 : 1)
+                    .CompareTo(b.StatusKey == "CheckedIn" ? 0 : 1);
+                if (groupCompare != 0)
+                    return groupCompare;
+                return a.StatusKey == "CheckedIn"
+                    ? (a.ScheduledAt ?? DateTime.MaxValue).CompareTo(b.ScheduledAt ?? DateTime.MaxValue)
+                    : (b.CompletedAt ?? DateTime.MinValue).CompareTo(a.CompletedAt ?? DateTime.MinValue);
+            });
         }
         catch (Exception)
         {
@@ -295,7 +315,9 @@ public partial class ReadingRoom : ComponentBase
         }
 
         _reportStatusByExam[item.Id] = "Draft";
+        _reportStatusKeyByExam[item.Id] = "Draft";
         item.ReportStatus = "Draft";
+        item.ReportStatusKey = "Draft";
         return draft;
     }
 
@@ -429,7 +451,9 @@ public partial class ReadingRoom : ComponentBase
             if (_selected is not null)
             {
                 _selected.ReportStatus = "Finalized";
+                _selected.ReportStatusKey = "Finalized";
                 _reportStatusByExam[_selected.Id] = "Finalized";
+                _reportStatusKeyByExam[_selected.Id] = "Finalized";
             }
             Snackbar.Add(T.ReadingRoom.ReportSigned, Severity.Success);
         }
@@ -565,7 +589,10 @@ public partial class ReadingRoom : ComponentBase
             _report = amended;
             BuildEditor(amended);
             if (_selected is not null)
+            {
                 _selected.ReportStatus = "Draft";
+                _selected.ReportStatusKey = "Draft";
+            }
             Snackbar.Add(T.ReadingRoom.ReopenedForAmendment, Severity.Success);
         }
     }
@@ -586,7 +613,10 @@ public partial class ReadingRoom : ComponentBase
         {
             await ReloadReportAsync();
             if (_selected is not null)
+            {
                 _selected.ReportStatus = "Cancelled";
+                _selected.ReportStatusKey = "Cancelled";
+            }
         }
     }
 
@@ -667,14 +697,17 @@ public partial class ReadingRoom : ComponentBase
         public string PatientName { get; init; } = string.Empty;
         public string PatientCode { get; init; } = string.Empty;
         public string ExamName { get; init; } = string.Empty;
+        public string StatusKey { get; init; } = "Completed";
+        public DateTime? ScheduledAt { get; init; }
         public DateTime? CompletedAt { get; init; }
         public string Priority { get; init; } = string.Empty;
         public string Indication { get; init; } = string.Empty;
         public string? AssignedRadiologistId { get; init; }
         public string ReportStatus { get; set; } = "New";
+        public string ReportStatusKey { get; set; } = "New";
         public string? StudyInstanceUid { get; init; }
 
-        public string CompletedLabel => CompletedAt?.ToString("yyyy-MM-dd") ?? string.Empty;
+        public string DateLabel => (StatusKey == "CheckedIn" ? ScheduledAt : CompletedAt)?.ToString("yyyy-MM-dd") ?? string.Empty;
     }
 
     private sealed class SectionEditor

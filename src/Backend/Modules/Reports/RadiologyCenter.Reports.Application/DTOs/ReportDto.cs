@@ -6,6 +6,7 @@ public record ReportDto(
     Guid PatientId,
     Guid RadiologistId,
     string Status,
+    string StatusKey,
     int CurrentVersionNumber,
     DateTime? FinalizedAt,
     string? CancelReason,

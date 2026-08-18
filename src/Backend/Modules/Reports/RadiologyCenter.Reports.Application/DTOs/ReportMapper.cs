@@ -13,6 +13,7 @@ internal static class ReportMapper
             report.PatientId,
             report.RadiologistId,
             report.Status.LocalizedName(),
+            report.Status.Name,
             report.CurrentVersionNumber,
             report.FinalizedAt,
             report.CancelReason,
@@ -25,6 +26,7 @@ internal static class ReportMapper
             report.PatientId,
             report.RadiologistId,
             report.Status.LocalizedName(),
+            report.Status.Name,
             report.CurrentVersionNumber,
             report.FinalizedAt,
             report.CancelReason);
