@@ -21,6 +21,7 @@ public partial class ReadingRoom : ComponentBase
     private readonly List<QueueExam> _queue = new();
     private readonly Dictionary<string, PatientDto> _patientCache = new(StringComparer.OrdinalIgnoreCase);
     private readonly Dictionary<string, string> _reportStatusByExam = new(StringComparer.OrdinalIgnoreCase);
+    private readonly HashSet<string> _linking = new(StringComparer.OrdinalIgnoreCase);
 
     private string? _filter;
     private bool _loadingQueue;
@@ -109,8 +110,6 @@ public partial class ReadingRoom : ComponentBase
         _queueError = null;
         try
         {
-            try { await PacsSync.ReconcileAsync(); } catch { /* best-effort */ }
-
             var exams = await ExaminationService.GetPagedAsync(null, null, false, 1, 100);
             var completed = exams.Items.Where(e => e.StatusKey == "Completed").ToList();
 
@@ -129,11 +128,6 @@ public partial class ReadingRoom : ComponentBase
             foreach (var report in reportItems)
                 _reportStatusByExam[report.ExaminationId] = report.Status;
 
-            var studyByPatientId = (await LoadStudiesAsync())
-                .Where(s => !string.IsNullOrWhiteSpace(s.PatientId))
-                .GroupBy(s => s.PatientId, StringComparer.OrdinalIgnoreCase)
-                .ToDictionary(g => g.Key, g => g.First().StudyInstanceUid, StringComparer.OrdinalIgnoreCase);
-
             _queue.Clear();
             foreach (var exam in completed)
             {
@@ -151,9 +145,7 @@ public partial class ReadingRoom : ComponentBase
                     Indication = exam.ClinicalIndication,
                     AssignedRadiologistId = exam.RadiologistId,
                     ReportStatus = _reportStatusByExam.GetValueOrDefault(exam.Id, "New"),
-                    StudyInstanceUid = !string.IsNullOrEmpty(exam.StudyInstanceUID)
-                        ? exam.StudyInstanceUID
-                        : patientCode is not null ? studyByPatientId.GetValueOrDefault(patientCode) : null,
+                    StudyInstanceUid = string.IsNullOrEmpty(exam.StudyInstanceUID) ? null : exam.StudyInstanceUID,
                 });
             }
 
@@ -185,22 +177,47 @@ public partial class ReadingRoom : ComponentBase
         }
     }
 
-    private async Task<IReadOnlyList<PacsService.PacsStudy>> LoadStudiesAsync()
-    {
-        if (PacsService.Instance is not { } pacs || !pacs.IsReady)
-            return Array.Empty<PacsService.PacsStudy>();
-        try
-        {
-            return await pacs.GetStudiesAsync();
-        }
-        catch
-        {
-            return Array.Empty<PacsService.PacsStudy>();
-        }
-    }
-
     private void OnFilterChanged(string? value)
         => _filter = value;
+
+    private bool IsLinking(QueueExam exam) => _linking.Contains(exam.Id);
+
+    private async Task LinkImagesAsync(QueueExam item)
+    {
+        if (IsLinking(item) || item.StudyInstanceUid is not null)
+            return;
+
+        _linking.Add(item.Id);
+        StateHasChanged();
+        try
+        {
+            var linkedUid = await PacsSync.LinkStudyToExamAsync(
+                item.Id,
+                item.PatientCode,
+                accessionNumber: null,
+                item.PatientName);
+
+            if (linkedUid is null)
+            {
+                Snackbar.Add(T.ReadingRoom.NoMatchingStudy, Severity.Warning);
+                return;
+            }
+
+            await LoadQueueAsync();
+            var refreshed = _queue.FirstOrDefault(q => q.Id == item.Id);
+            if (refreshed is not null)
+                await SelectExamAsync(refreshed);
+            Snackbar.Add(T.ReadingRoom.ImagesLinked, Severity.Success);
+        }
+        catch (Exception)
+        {
+            Snackbar.Add(T.ReadingRoom.Unreachable, Severity.Error);
+        }
+        finally
+        {
+            _linking.Remove(item.Id);
+        }
+    }
 
     private async Task SelectExamAsync(QueueExam item)
     {

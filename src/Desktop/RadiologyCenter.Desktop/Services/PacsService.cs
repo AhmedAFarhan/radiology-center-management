@@ -45,9 +45,15 @@ public sealed class PacsService : IDisposable
     public string? StartupError { get; private set; }
 
     public async Task<IReadOnlyList<PacsStudy>> GetStudiesAsync(CancellationToken ct = default)
+        => await GetStudiesAsync(null, ct);
+
+    public async Task<IReadOnlyList<PacsStudy>> GetStudiesAsync(string? patientId, CancellationToken ct = default)
     {
         using var httpClient = new HttpClient { Timeout = TimeSpan.FromSeconds(10) };
-        using var request = new HttpRequestMessage(HttpMethod.Get, $"{HttpEndpoint}/dicom-web/studies");
+        var url = $"{HttpEndpoint}/dicom-web/studies";
+        if (!string.IsNullOrWhiteSpace(patientId))
+            url += $"?PatientID={Uri.EscapeDataString(patientId.Trim())}";
+        using var request = new HttpRequestMessage(HttpMethod.Get, url);
         request.Headers.TryAddWithoutValidation("Accept", "application/dicom+json");
 
         using var response = await httpClient.SendAsync(request, ct);

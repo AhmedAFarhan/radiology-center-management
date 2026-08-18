@@ -68,6 +68,22 @@
                         <div class="rr-item-meta">
                             <MudChip T="string" Size="Size.Small" Color="@ReportStatusColor(current.ReportStatus)">@current.ReportStatus</MudChip>
                             <MudChip T="string" Size="Size.Small" Color="@PriorityChipColor(current.Priority)">@current.Priority</MudChip>
+                            @if (current.StudyInstanceUid is null)
+                            {
+                                @if (IsLinking(current))
+                                {
+                                    <MudProgressCircular Size="Size.Small" Indeterminate="true" Class="rr-link-busy" />
+                                }
+                                else
+                                {
+                                    <span class="rr-link-btn" title="@T.ReadingRoom.LoadImages"
+                                          @onclick="() => LinkImagesAsync(current)"
+                                          @onclick:stopPropagation="true">
+                                        <MudIcon Icon="@Icons.Material.Filled.ImageSearch" Size="Size.Small" />
+                                        <span>@T.ReadingRoom.LoadImages</span>
+                                    </span>
+                                }
+                            }
                         </div>
                     </button>
                 }

@@ -1,20 +1,14 @@
+using System.Globalization;
 using Microsoft.Extensions.DependencyInjection;
 using RadiologyCenter.Desktop.Models;
 
 namespace RadiologyCenter.Desktop.Services;
 
-public sealed class PacsSyncService : IAsyncDisposable
+public sealed class PacsSyncService
 {
-    private static readonly TimeSpan Interval = TimeSpan.FromSeconds(15);
-
     private readonly IServiceScopeFactory _scopeFactory;
     private readonly TokenStorage _tokenStorage;
     private readonly BackendStatusService _backendStatus;
-    private readonly HashSet<string> _knownStudies = new(StringComparer.OrdinalIgnoreCase);
-    private readonly SemaphoreSlim _gate = new(1, 1);
-
-    private CancellationTokenSource? _cts;
-    private Task? _loop;
 
     public PacsSyncService(
         IServiceScopeFactory scopeFactory,
@@ -26,113 +20,106 @@ public sealed class PacsSyncService : IAsyncDisposable
         _backendStatus = backendStatus;
     }
 
-    public void Start()
+    /// <summary>
+    /// Links the best-matching Orthanc study to a single examination (manual, per-record).
+    /// Returns the linked StudyInstanceUID, or null when no match was found or the services
+    /// are not ready.
+    /// </summary>
+    public async Task<string?> LinkStudyToExamAsync(
+        string examId,
+        string patientCode,
+        string? accessionNumber,
+        string? patientName,
+        CancellationToken ct = default)
     {
-        if (_loop is not null)
-            return;
-        _cts = new CancellationTokenSource();
-        _loop = Task.Run(() => LoopAsync(_cts.Token));
-    }
+        if (_tokenStorage.GetTokens() is null)
+            return null;
+        if (!_backendStatus.IsReady)
+            return null;
+        if (PacsService.Instance is not { } pacs || !pacs.IsReady)
+            return null;
 
-    public async Task StopAsync()
-    {
-        if (_cts is null)
-            return;
-        _cts.Cancel();
-        try { await _loop; }
-        catch { /* cancellation */ }
-        finally
+        IReadOnlyList<PacsService.PacsStudy> candidates;
+        try
         {
-            _cts.Dispose();
-            _cts = null;
-            _loop = null;
+            candidates = await pacs.GetStudiesAsync(patientCode, ct);
         }
-    }
-
-    public ValueTask DisposeAsync() => new(StopAsync());
-
-    private async Task LoopAsync(CancellationToken ct)
-    {
-        while (!ct.IsCancellationRequested)
+        catch
         {
-            try { await ReconcileAsync(ct); }
-            catch { /* transient, retry next tick */ }
-
-            try { await Task.Delay(Interval, ct); }
-            catch (OperationCanceledException) { return; }
+            return null;
         }
-    }
 
-    /// <summary>Links newly-arrived Orthanc studies to their examinations via PatientID == PatientCode.</summary>
-    public async Task ReconcileAsync(CancellationToken ct = default)
-    {
-        if (!await _gate.WaitAsync(0, ct))
-            return;
+        candidates = candidates.Where(s => !string.IsNullOrWhiteSpace(s.StudyInstanceUid)).ToList();
+
+        if (candidates.Count == 0)
+        {
+            // Fall back to all studies matched by AccessionNumber or patient name.
+            try
+            {
+                var all = await pacs.GetStudiesAsync(ct);
+                candidates = all
+                    .Where(s => !string.IsNullOrWhiteSpace(s.StudyInstanceUid))
+                    .Where(s => AccessionsMatch(s.AccessionNumber, accessionNumber)
+                                || NamesMatch(s.PatientName, patientName))
+                    .ToList();
+            }
+            catch
+            {
+                return null;
+            }
+        }
+
+        var best = SelectBestStudy(candidates, accessionNumber);
+        if (best is null)
+            return null;
 
         try
         {
-            if (_tokenStorage.GetTokens() is null)
-                return;
-            if (!_backendStatus.IsReady)
-                return;
-            if (PacsService.Instance is not { } pacs || !pacs.IsReady)
-                return;
-
-            IReadOnlyList<PacsService.PacsStudy> studies;
-            try { studies = await pacs.GetStudiesAsync(ct); }
-            catch { return; }
-
-            var fresh = studies.Where(s => !_knownStudies.Contains(s.StudyInstanceUid)).ToList();
-            if (fresh.Count == 0)
-                return;
-
-            foreach (var study in fresh)
-                _knownStudies.Add(study.StudyInstanceUid);
-
             using var scope = _scopeFactory.CreateScope();
-
-            var patients = await scope.ServiceProvider
-                .GetRequiredService<PatientService>()
-                .GetPagedAsync(null, null, false, 1, 1000, ct);
-
-            var exams = await scope.ServiceProvider
-                .GetRequiredService<ExaminationService>()
-                .GetPagedAsync(null, null, false, 1, 1000, ct);
-
-            var patientByCode = patients.Items
-                .Where(p => !string.IsNullOrWhiteSpace(p.PatientCode))
-                .GroupBy(p => p.PatientCode, StringComparer.OrdinalIgnoreCase)
-                .ToDictionary(g => g.Key, g => g.First(), StringComparer.OrdinalIgnoreCase);
-
             var examService = scope.ServiceProvider.GetRequiredService<ExaminationService>();
-
-            foreach (var study in fresh)
-            {
-                if (string.IsNullOrWhiteSpace(study.PatientId))
-                    continue;
-                if (!patientByCode.TryGetValue(study.PatientId, out var patient))
-                    continue;
-
-                var target = exams.Items
-                    .Where(e => e.PatientId == patient.Id && string.IsNullOrEmpty(e.StudyInstanceUID))
-                    .OrderByDescending(e => e.CompletedAt ?? DateTime.MinValue)
-                    .FirstOrDefault();
-                if (target is null)
-                    continue;
-
-                try
-                {
-                    await examService.RecordPacsImagesAsync(target.Id, study.StudyInstanceUid, study.AccessionNumber, ct);
-                }
-                catch
-                {
-                    // keep reconciling the remaining studies
-                }
-            }
+            await examService.RecordPacsImagesAsync(examId, best.StudyInstanceUid, best.AccessionNumber, ct);
         }
-        finally
+        catch
         {
-            _gate.Release();
+            return null;
         }
+
+        return best.StudyInstanceUid;
+    }
+
+    private static PacsService.PacsStudy? SelectBestStudy(
+        IReadOnlyList<PacsService.PacsStudy> candidates,
+        string? accessionNumber)
+    {
+        var byAccession = candidates.FirstOrDefault(s =>
+            AccessionsMatch(s.AccessionNumber, accessionNumber));
+        if (byAccession is not null)
+            return byAccession;
+
+        return candidates
+            .OrderByDescending(s => ParseDate(s.StudyDate))
+            .ThenByDescending(s => s.StudyDate)
+            .FirstOrDefault();
+    }
+
+    private static DateTime? ParseDate(string? value)
+        => DateTime.TryParseExact(
+            value, "yyyyMMdd", CultureInfo.InvariantCulture, DateTimeStyles.None, out var date)
+            ? date
+            : null;
+
+    private static bool AccessionsMatch(string? a, string? b)
+        => !string.IsNullOrWhiteSpace(a)
+           && !string.IsNullOrWhiteSpace(b)
+           && a.Trim().Equals(b.Trim(), StringComparison.OrdinalIgnoreCase);
+
+    private static bool NamesMatch(string? a, string? b)
+    {
+        if (string.IsNullOrWhiteSpace(a) || string.IsNullOrWhiteSpace(b))
+            return false;
+        var normalizedA = new string(a.Where(char.IsLetterOrDigit).ToArray());
+        var normalizedB = new string(b.Where(char.IsLetterOrDigit).ToArray());
+        return !string.IsNullOrWhiteSpace(normalizedA)
+               && normalizedA.Equals(normalizedB, StringComparison.OrdinalIgnoreCase);
     }
 }

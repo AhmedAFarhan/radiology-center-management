@@ -1607,12 +1607,15 @@ public sealed class ReadingRoomGroup
     public string Findings => _localizer.Get("readingRoom.findings");
     public string FindingUpdated => _localizer.Get("readingRoom.findingUpdated");
     public string Imaged => _localizer.Get("readingRoom.imaged");
+    public string ImagesLinked => _localizer.Get("readingRoom.imagesLinked");
     public string ImageViewer => _localizer.Get("readingRoom.imageViewer");
     public string Keep => _localizer.Get("readingRoom.keep");
+    public string LoadImages => _localizer.Get("readingRoom.loadImages");
     public string NoDraftMessage => _localizer.Get("readingRoom.noDraftMessage");
     public string NoFindings => _localizer.Get("readingRoom.noFindings");
     public string NoImagedStudies => _localizer.Get("readingRoom.noImagedStudies");
     public string NoImagedStudiesMessage => _localizer.Get("readingRoom.noImagedStudiesMessage");
+    public string NoMatchingStudy => _localizer.Get("readingRoom.noMatchingStudy");
     public string NoReport => _localizer.Get("readingRoom.noReport");
     public string NoStudySelected => _localizer.Get("readingRoom.noStudySelected");
     public string Pending => _localizer.Get("readingRoom.pending");
