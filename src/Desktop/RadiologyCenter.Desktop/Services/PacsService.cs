@@ -12,6 +12,14 @@ public sealed class PacsService : IDisposable
     private const int StartupTimeoutMs = 20000;
     private const int HealthCheckIntervalMs = 500;
 
+    public sealed record PacsStudy(
+        string StudyInstanceUid,
+        string PatientId,
+        string? PatientName,
+        string? StudyDate,
+        string? Modality,
+        string? AccessionNumber);
+
     private static readonly string[] PluginFiles =
     {
         "OrthancDicomWeb.dll",
@@ -35,6 +43,60 @@ public sealed class PacsService : IDisposable
     public string ViewerBaseUrl => $"{HttpEndpoint}/ohif";
     public bool IsReady => _startupTask is { IsCompletedSuccessfully: true };
     public string? StartupError { get; private set; }
+
+    public async Task<IReadOnlyList<PacsStudy>> GetStudiesAsync(CancellationToken ct = default)
+    {
+        using var httpClient = new HttpClient { Timeout = TimeSpan.FromSeconds(10) };
+        using var request = new HttpRequestMessage(HttpMethod.Get, $"{HttpEndpoint}/dicom-web/studies");
+        request.Headers.TryAddWithoutValidation("Accept", "application/dicom+json");
+
+        using var response = await httpClient.SendAsync(request, ct);
+        response.EnsureSuccessStatusCode();
+
+        await using var stream = await response.Content.ReadAsStreamAsync(ct);
+        using var document = await JsonDocument.ParseAsync(stream, cancellationToken: ct);
+
+        var studies = new List<PacsStudy>();
+        if (document.RootElement.ValueKind != JsonValueKind.Array)
+            return studies;
+
+        foreach (var item in document.RootElement.EnumerateArray())
+        {
+            var uid = GetString(item, "0020000D");
+            if (string.IsNullOrWhiteSpace(uid))
+                continue;
+
+            studies.Add(new PacsStudy(
+                StudyInstanceUid: uid,
+                PatientId: GetString(item, "00100020"),
+                PatientName: GetPersonName(item, "00100010"),
+                StudyDate: GetString(item, "00080020"),
+                Modality: GetString(item, "00080060"),
+                AccessionNumber: GetString(item, "00080050")));
+        }
+
+        return studies;
+    }
+
+    private static string? GetString(JsonElement item, string tag)
+    {
+        if (!item.TryGetProperty(tag, out var el) || el.ValueKind != JsonValueKind.Object)
+            return null;
+        if (!el.TryGetProperty("Value", out var value) || value.ValueKind != JsonValueKind.Array)
+            return null;
+        return value.GetArrayLength() == 0 ? null : value[0].ToString();
+    }
+
+    private static string? GetPersonName(JsonElement item, string tag)
+    {
+        if (!item.TryGetProperty(tag, out var el) || el.ValueKind != JsonValueKind.Object)
+            return null;
+        if (!el.TryGetProperty("Value", out var value) || value.ValueKind != JsonValueKind.Array)
+            return null;
+        if (value.GetArrayLength() == 0 || value[0].ValueKind != JsonValueKind.Object)
+            return null;
+        return value[0].TryGetProperty("Alphabetic", out var alpha) ? alpha.ToString() : null;
+    }
 
     private static string DataRoot =>
         Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData), "EGcare", "pacs");

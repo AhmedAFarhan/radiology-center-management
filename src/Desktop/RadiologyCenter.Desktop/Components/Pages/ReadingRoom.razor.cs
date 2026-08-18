@@ -9,9 +9,10 @@ namespace RadiologyCenter.Desktop.Components.Pages;
 
 public partial class ReadingRoom : ComponentBase
 {
-    [Inject] private ExaminationService ExaminationService { get; set; } = default!;
+[Inject] private ExaminationService ExaminationService { get; set; } = default!;
     [Inject] private PatientService PatientService { get; set; } = default!;
     [Inject] private ReportService ReportService { get; set; } = default!;
+    [Inject] private PacsSyncService PacsSync { get; set; } = default!;
     [Inject] private IDialogService DialogService { get; set; } = default!;
     [Inject] private ISnackbar Snackbar { get; set; } = default!;
     [Inject] private AppLocalizer T { get; set; } = default!;
@@ -71,11 +72,24 @@ public partial class ReadingRoom : ComponentBase
 
     private int PendingCount => _queue.Count(q => q.ReportStatus is "New" or "Draft");
 
+    private int ImagedCount => _queue.Count(q => q.StudyInstanceUid is not null);
+
     private bool CanEdit => _report is { Status: "Draft" };
 
     private QueueExam? Selected => _selected;
 
     private static int SeriesCount => 4;
+
+    private string? SelectedStudyUrl
+    {
+        get
+        {
+            if (_selected is not { StudyInstanceUid.Length: > 0 } selected)
+                return null;
+            var baseUrl = PacsService.Instance?.ViewerBaseUrl;
+            return baseUrl is null ? null : $"{baseUrl}/viewer?StudyInstanceUIDs={Uri.EscapeDataString(selected.StudyInstanceUid)}";
+        }
+    }
 
     protected override void OnAfterRender(bool firstRender)
     {
@@ -95,6 +109,8 @@ public partial class ReadingRoom : ComponentBase
         _queueError = null;
         try
         {
+            try { await PacsSync.ReconcileAsync(); } catch { /* best-effort */ }
+
             var exams = await ExaminationService.GetPagedAsync(null, null, false, 1, 100);
             var completed = exams.Items.Where(e => e.StatusKey == "Completed").ToList();
 
@@ -113,22 +129,31 @@ public partial class ReadingRoom : ComponentBase
             foreach (var report in reportItems)
                 _reportStatusByExam[report.ExaminationId] = report.Status;
 
+            var studyByPatientId = (await LoadStudiesAsync())
+                .Where(s => !string.IsNullOrWhiteSpace(s.PatientId))
+                .GroupBy(s => s.PatientId, StringComparer.OrdinalIgnoreCase)
+                .ToDictionary(g => g.Key, g => g.First().StudyInstanceUid, StringComparer.OrdinalIgnoreCase);
+
             _queue.Clear();
             foreach (var exam in completed)
             {
                 var patient = await GetPatientAsync(exam.PatientId);
+                var patientCode = patient?.PatientCode;
                 _queue.Add(new QueueExam
                 {
                     Id = exam.Id,
                     PatientId = exam.PatientId,
                     PatientName = patient?.FullName ?? $"Patient {exam.PatientId}",
-                    PatientCode = patient?.PatientCode ?? "-",
+                    PatientCode = patientCode ?? "-",
                     ExamName = exam.ExaminationTypeName ?? "Examination",
                     CompletedAt = exam.CompletedAt,
                     Priority = exam.Priority,
                     Indication = exam.ClinicalIndication,
                     AssignedRadiologistId = exam.RadiologistId,
                     ReportStatus = _reportStatusByExam.GetValueOrDefault(exam.Id, "New"),
+                    StudyInstanceUid = !string.IsNullOrEmpty(exam.StudyInstanceUID)
+                        ? exam.StudyInstanceUID
+                        : patientCode is not null ? studyByPatientId.GetValueOrDefault(patientCode) : null,
                 });
             }
 
@@ -157,6 +182,20 @@ public partial class ReadingRoom : ComponentBase
         catch
         {
             return null;
+        }
+    }
+
+    private async Task<IReadOnlyList<PacsService.PacsStudy>> LoadStudiesAsync()
+    {
+        if (PacsService.Instance is not { } pacs || !pacs.IsReady)
+            return Array.Empty<PacsService.PacsStudy>();
+        try
+        {
+            return await pacs.GetStudiesAsync();
+        }
+        catch
+        {
+            return Array.Empty<PacsService.PacsStudy>();
         }
     }
 
@@ -616,6 +655,7 @@ public partial class ReadingRoom : ComponentBase
         public string Indication { get; init; } = string.Empty;
         public string? AssignedRadiologistId { get; init; }
         public string ReportStatus { get; set; } = "New";
+        public string? StudyInstanceUid { get; init; }
 
         public string CompletedLabel => CompletedAt?.ToString("yyyy-MM-dd") ?? string.Empty;
     }

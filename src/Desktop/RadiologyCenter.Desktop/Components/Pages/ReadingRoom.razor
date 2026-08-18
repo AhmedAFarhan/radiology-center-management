@@ -9,7 +9,7 @@
         @PendingCount @T.ReadingRoom.Pending
     </MudChip>
     <MudChip T="string" Color="Color.Secondary" Size="Size.Medium" Label="true" Variant="Variant.Outlined">
-        @Queue.Count() @T.ReadingRoom.Imaged
+        @ImagedCount @T.ReadingRoom.Imaged
     </MudChip>
 </PageHeader>
 
@@ -91,6 +91,10 @@
                             Title="@T.ReadingRoom.NoStudySelected"
                             Message="@T.ReadingRoom.SelectStudyMessage" />
             }
+            else if (SelectedStudyUrl is { } viewerUrl)
+            {
+                <iframe class="rr-ohif-frame" src="@viewerUrl" title="@Selected.ExamName" allowfullscreen></iframe>
+            }
             else
             {
                 <div class="rr-placeholder">
@@ -98,24 +102,26 @@
                     <MudText Typo="Typo.h6" Class="text-secondary">@Selected.PatientName</MudText>
                     <MudText Typo="Typo.body2" Class="text-secondary">@Selected.ExamName - @Selected.PatientCode</MudText>
                     <MudText Typo="Typo.body2" Class="text-secondary">@Selected.Priority @T.ReadingRoom.Priority</MudText>
-                    <MudText Typo="Typo.caption" Class="mt-2">@(T.FormatValue(T.ReadingRoom.SeriesProgress, _selectedSeries, SeriesCount))</MudText>
-                    <MudText Typo="Typo.caption" Class="mt-2">@T.ReadingRoom.ComingSoon</MudText>
+                    <MudText Typo="Typo.caption" Class="mt-2">@T.ReadingRoom.NoImagedStudiesMessage</MudText>
                 </div>
             }
         </div>
-        <div class="rr-thumbnails">
-            <span class="rr-thumbs-label">@T.ReadingRoom.Series</span>
-            @for (var i = 1; i <= SeriesCount; i++)
-            {
-                var index = i;
-                <button type="button"
-                        class="rr-thumb @(index == _selectedSeries ? "selected" : string.Empty)"
-                        title="@(T.FormatValue(T.ReadingRoom.SeriesThumbTitle, index))"
-                        @onclick="() => _selectedSeries = index">
-                    <MudText Typo="Typo.caption">S@index</MudText>
-                </button>
-            }
-        </div>
+        @if (Selected is not null && SelectedStudyUrl is null)
+        {
+            <div class="rr-thumbnails">
+                <span class="rr-thumbs-label">@T.ReadingRoom.Series</span>
+                @for (var i = 1; i <= SeriesCount; i++)
+                {
+                    var index = i;
+                    <button type="button"
+                            class="rr-thumb @(index == _selectedSeries ? "selected" : string.Empty)"
+                            title="@(T.FormatValue(T.ReadingRoom.SeriesThumbTitle, index))"
+                            @onclick="() => _selectedSeries = index">
+                        <MudText Typo="Typo.caption">S@index</MudText>
+                    </button>
+                }
+            </div>
+        }
     </section>
 
     <!-- â•â•â•â•â•â•â•â•â•â• Report pane â•â•â•â•â•â•â•â•â•â• -->

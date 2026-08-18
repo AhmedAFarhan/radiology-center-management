@@ -24,4 +24,7 @@ public record ExaminationDto(
     bool IsDiscountPercentage,
     decimal Paid,
     decimal Remaining,
+    string? StudyInstanceUID,
+    string? AccessionNumber,
+    DateTime? ImagesReceivedAt,
     IReadOnlyList<ExaminationItemDto> Items);

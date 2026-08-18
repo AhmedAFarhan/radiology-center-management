@@ -31,6 +31,9 @@ public sealed class Examination : AuditableAggregateRoot<Guid>
     public bool IsDiscountPercentage { get; private set; }
     public decimal Paid { get; private set; }
     public decimal Remaining { get; private set; }
+    public string? StudyInstanceUID { get; private set; }
+    public string? AccessionNumber { get; private set; }
+    public DateTime? ImagesReceivedAt { get; private set; }
 
     public IReadOnlyCollection<ExaminationItem> Items => _items.AsReadOnly();
 
@@ -186,6 +189,16 @@ public sealed class Examination : AuditableAggregateRoot<Guid>
     }
 
     public bool IsTerminal => Status == ExaminationStatus.Completed || Status == ExaminationStatus.Cancelled;
+
+    public void RecordPacsImages(string? studyInstanceUID, string? accessionNumber)
+    {
+        if (!string.IsNullOrWhiteSpace(studyInstanceUID))
+            StudyInstanceUID = studyInstanceUID.Trim();
+        if (!string.IsNullOrWhiteSpace(accessionNumber))
+            AccessionNumber = accessionNumber.Trim();
+        if (!string.IsNullOrWhiteSpace(studyInstanceUID) || !string.IsNullOrWhiteSpace(accessionNumber))
+            ImagesReceivedAt = DateTime.UtcNow;
+    }
 
     public void SetBilling(decimal discount, bool isDiscountPercentage, decimal? paid = null)
     {

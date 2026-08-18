@@ -1020,6 +1020,13 @@ h1:focus {
     padding: 16px;
 }
 
+.rr-ohif-frame {
+    width: 100%;
+    height: 100%;
+    border: none;
+    background: #0e1420;
+}
+
 .rr-placeholder {
     display: flex;
     flex-direction: column;

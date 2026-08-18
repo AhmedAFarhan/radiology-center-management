@@ -9,6 +9,7 @@ using RadiologyCenter.Examinations.Application.Commands.CheckInExamination;
 using RadiologyCenter.Examinations.Application.Commands.CompleteExamination;
 using RadiologyCenter.Examinations.Application.Commands.CreateExamination;
 using RadiologyCenter.Examinations.Application.Commands.RecordExaminationPayment;
+using RadiologyCenter.Examinations.Application.Commands.RecordPacsImages;
 using RadiologyCenter.Examinations.Application.Commands.RemoveExaminationItem;
 using RadiologyCenter.Examinations.Application.Commands.RemoveExaminationTypeItem;
 using RadiologyCenter.Examinations.Application.Commands.ScheduleExamination;
@@ -94,6 +95,14 @@ public class ExaminationsController : ControllerBase
     public async Task<IActionResult> CompleteAsync(Guid examinationId, CancellationToken ct)
     {
         var result = await _bus.InvokeAsync<Result>(new CompleteExaminationCommand(examinationId), ct);
+        return result.ToActionResult();
+    }
+
+    [HasPermission(ExaminationsPerformCode)]
+    [HttpPost("{examinationId:guid}/pacs-images")]
+    public async Task<IActionResult> RecordPacsImagesAsync(Guid examinationId, [FromBody] RecordPacsImagesCommand command, CancellationToken ct)
+    {
+        var result = await _bus.InvokeAsync<Result>(command with { ExaminationId = examinationId }, ct);
         return result.ToActionResult();
     }
 

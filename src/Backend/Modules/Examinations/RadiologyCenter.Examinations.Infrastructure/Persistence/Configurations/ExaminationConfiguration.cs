@@ -31,6 +31,9 @@ public class ExaminationConfiguration : IEntityTypeConfiguration<Examination>
         builder.Property(e => e.PerformedByUserId);
         builder.Property(e => e.Notes).HasMaxLength(500);
         builder.Property(e => e.CancellationReason).HasMaxLength(500);
+        builder.Property(e => e.StudyInstanceUID).HasMaxLength(64);
+        builder.Property(e => e.AccessionNumber).HasMaxLength(64);
+        builder.Property(e => e.ImagesReceivedAt);
         builder.Property(e => e.Price).HasPrecision(18, 2).IsRequired();
         builder.Property(e => e.Discount).HasPrecision(18, 2).IsRequired();
         builder.Property(e => e.IsDiscountPercentage).IsRequired();

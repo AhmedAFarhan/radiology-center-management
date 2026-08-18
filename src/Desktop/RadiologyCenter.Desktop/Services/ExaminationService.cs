@@ -85,6 +85,9 @@ public sealed class ExaminationService
     public Task CompleteAsync(string id, CancellationToken ct = default)
         => _api.SendAsync($"api/examinations/{id}/complete", ct: ct);
 
+    public Task RecordPacsImagesAsync(string id, string studyInstanceUID, string? accessionNumber = null, CancellationToken ct = default)
+        => _api.SendAsync($"api/examinations/{id}/pacs-images", new { studyInstanceUID, accessionNumber }, ct);
+
     public Task CancelAsync(string id, string? reason = null, CancellationToken ct = default)
         => _api.SendAsync($"api/examinations/{id}/cancel", new { reason }, ct);
 }

@@ -1,5 +1,6 @@
 ﻿namespace RadiologyCenter.Desktop;
 
+using Microsoft.Extensions.DependencyInjection;
 using WindowsColor = Windows.UI.Color;
 using RadiologyCenter.Desktop.Services;
 
@@ -7,12 +8,14 @@ public partial class App : Application
 {
     private readonly LocalhostService _localhost;
     private readonly PacsService _pacs;
+    private readonly PacsSyncService _pacsSync;
 
-    public App()
+    public App(IServiceProvider services)
     {
         InitializeComponent();
         _localhost = new LocalhostService();
         _pacs = new PacsService();
+        _pacsSync = services.GetRequiredService<PacsSyncService>();
     }
 
     protected override Window CreateWindow(IActivationState? activationState)
@@ -60,10 +63,12 @@ public partial class App : Application
         };
         CenterWindowOnLaunch(window);
         _ = StartPacsInBackgroundAsync();
+        _pacsSync.Start();
         window.Destroying += (_, _) =>
         {
             _localhost.Stop();
             _pacs.Stop();
+            _ = _pacsSync.StopAsync();
         };
         return window;
     }

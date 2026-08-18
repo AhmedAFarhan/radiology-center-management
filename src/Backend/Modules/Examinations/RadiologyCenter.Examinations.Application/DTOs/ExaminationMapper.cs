@@ -31,5 +31,8 @@ internal static class ExaminationMapper
             examination.IsDiscountPercentage,
             examination.Paid,
             examination.Remaining,
+            examination.StudyInstanceUID,
+            examination.AccessionNumber,
+            examination.ImagesReceivedAt,
             examination.Items.Select(i => i.Adapt<ExaminationItemDto>()).ToList());
 }
