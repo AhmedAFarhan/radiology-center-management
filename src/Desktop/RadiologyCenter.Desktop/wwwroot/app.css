@@ -492,7 +492,7 @@ h1:focus {
     position: absolute;
     top: 64px;
     bottom: 0;
-    left: 0;
+    inset-inline: 0;
     display: flex;
     flex-direction: column;
     opacity: 0;
@@ -501,12 +501,11 @@ h1:focus {
 
 .app-nav-collapsed-side {
     width: 76px;
-    right: auto;
+    inset-inline-end: auto;
     transition: opacity 0.4s ease;
 }
 
 .app-nav-expanded-side {
-    right: 0;
     transition: opacity 0.4s ease;
 }
 
@@ -532,18 +531,19 @@ h1:focus {
 }
 
 .app-sidebar.collapsed .app-nav {
-    padding-left: 12px;
-    padding-right: 8px;
+    padding-inline-start: 12px;
+    padding-inline-end: 8px;
 }
 
-/* Both trees place their icons at the identical left position so the
-   crossfade is a pure alpha blend +?" no horizontal translation of buttons.
-   Expanded tree: mud-nav-link padding-left 16px + app-nav 12px = 28px.
-   We mirror 16px padding-left here so the collapsed icons land at the same X. */
+/* Both trees place their icons at the identical inline-start position so
+   the crossfade is a pure alpha blend -- no horizontal translation.
+   Expanded tree: mud-nav-link padding-inline-start 16px + app-nav 12px = 28px.
+   We mirror 16px padding-inline-start here so the collapsed icons land at the
+   same X (logical properties keep the mirror symmetric in RTL). */
 .app-nav-collapsed-side .mud-nav-link {
     justify-content: flex-start;
-    padding-left: 16px;
-    padding-right: 0;
+    padding-inline-start: 16px;
+    padding-inline-end: 0;
 }
 
 .app-nav-collapsed-side .mud-nav-link-text,
@@ -563,7 +563,9 @@ h1:focus {
     height: 32px;
     min-width: 0;
     margin: 0 0 5px;
-    padding: 0 0 0 16px;
+    padding-block: 0;
+    padding-inline-start: 16px;
+    padding-inline-end: 0;
     border-radius: 8px;
     vertical-align: middle;
     width: 100%;
@@ -578,7 +580,7 @@ h1:focus {
 .app-nav-collapsed-side .mud-menu-button .mud-icon-root,
 .app-nav-collapsed-side .mud-menu .mud-icon-size-medium {
     font-size: 24px;
-    margin-right: 0;
+    margin-inline-end: 0;
 }
 
 .app-nav-collapsed-side .mud-menu-button:hover,
