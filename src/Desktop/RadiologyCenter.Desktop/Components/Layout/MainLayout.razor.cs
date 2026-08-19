@@ -29,6 +29,9 @@ public partial class MainLayout : LayoutComponentBase, IDisposable
 private bool _drawerOpen = true;
     private bool _loggingOut;
     private string _userName = string.Empty;
+    private string _displayName = string.Empty;
+    private string _userEmail = string.Empty;
+    private string _userFullName = string.Empty;
 
     private MudTextField<string>? _searchField;
     private string _searchText = string.Empty;
@@ -65,10 +68,18 @@ protected override void OnParametersSet()
         BusyState.Instance.Changed -= OnBusyChanged;
     }
 
-    private async Task RefreshUserAsync(Task<AuthenticationState> task)
+private async Task RefreshUserAsync(Task<AuthenticationState> task)
     {
         var state = await task;
-        _userName = state.User.Identity?.Name ?? string.Empty;
+        var user = state.User;
+        _userName = user.Identity?.Name ?? string.Empty;
+        _displayName = user.Claims.FirstOrDefault(c => c.Type == ClaimTypes.GivenName)?.Value;
+        if (string.IsNullOrWhiteSpace(_displayName))
+            _displayName = _userName;
+
+        _userEmail = user.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value ?? string.Empty;
+        var lastName = user.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Surname)?.Value ?? string.Empty;
+        _userFullName = string.Join(' ', new[] { _displayName, lastName }.Where(p => !string.IsNullOrWhiteSpace(p)));
     }
 
 private async Task OnLogout()
@@ -112,11 +123,11 @@ private async Task OnLogout()
     private void OnNotifications()
         => Snackbar.Add(T.Layout.NoNotifications, Severity.Info);
 
-    private string GetInitial()
+private string GetInitial()
     {
-        if (string.IsNullOrWhiteSpace(_userName))
+        if (string.IsNullOrWhiteSpace(_displayName))
             return "?";
-        return _userName[..1].ToUpperInvariant();
+        return _displayName[..1].ToUpperInvariant();
     }
 
     private async Task HandleGlobalKeyDown(KeyboardEventArgs e)

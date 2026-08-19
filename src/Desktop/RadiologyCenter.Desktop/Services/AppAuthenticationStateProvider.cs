@@ -50,8 +50,16 @@ public sealed class AppAuthenticationStateProvider : AuthenticationStateProvider
             return Task.FromResult(new AuthenticationState(new ClaimsPrincipal(new ClaimsIdentity())));
         }
 
+        var claims = JwtClaimsParser.Parse(tokens.AccessToken);
+
         var identity = new ClaimsIdentity(
-            new[] { new Claim(ClaimTypes.Name, tokens.Username) },
+            new[]
+            {
+                new Claim(ClaimTypes.Name, tokens.Username),
+                new Claim(ClaimTypes.Email, claims.GetValueOrDefault("email") ?? string.Empty),
+                new Claim(ClaimTypes.GivenName, claims.GetValueOrDefault("firstName") ?? string.Empty),
+                new Claim(ClaimTypes.Surname, claims.GetValueOrDefault("lastName") ?? string.Empty),
+            },
             authenticationType: "AppSession");
 
         return Task.FromResult(new AuthenticationState(new ClaimsPrincipal(identity)));

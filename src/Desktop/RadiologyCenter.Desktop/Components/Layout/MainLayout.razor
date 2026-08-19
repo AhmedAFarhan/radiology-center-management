@@ -138,15 +138,24 @@
             <MudMenu ActivationEvent="MouseEvent.LeftClick"
                      AnchorOrigin="@(T.IsRTL ? Origin.BottomLeft : Origin.BottomRight)"
                      TransformOrigin="@(T.IsRTL ? Origin.TopLeft : Origin.TopRight)"
-                     Class="profile-menu">
+                     Class="profile-menu"
+                     ListClass="profile-menu-list">
                 <ActivatorContent>
                     <div class="d-flex align-center profile-trigger" @onclick="context.ToggleAsync">
                         <MudAvatar Size="Size.Small" Color="Color.Primary" Class="mx-2 app-bar-avatar">@GetInitial()</MudAvatar>
-                        <MudText Typo="Typo.body2" Class="me-2 app-bar-user">@_userName</MudText>
+                        <MudText Typo="Typo.body2" Class="me-2 app-bar-user">@_displayName</MudText>
                         <MudIcon Icon="@Icons.Material.Filled.ArrowDropDown" Size="Size.Small" Class="app-bar-chevron" />
                     </div>
                 </ActivatorContent>
                 <ChildContent>
+                    <div class="profile-menu-header">
+                        <MudAvatar Size="Size.Medium" Class="profile-menu-avatar">@GetInitial()</MudAvatar>
+                        <div class="profile-menu-meta">
+                            <div class="profile-menu-name">@_userFullName</div>
+                            <div class="profile-menu-email">@_userEmail</div>
+                        </div>
+                    </div>
+                    <MudDivider />
                     <MudMenuItem Icon="@Icons.Material.Filled.Key" OnClick="OnChangePassword">@T.Layout.ChangePassword</MudMenuItem>
                     <MudMenuItem Icon="@Icons.Material.Filled.Logout" OnClick="OnLogout">@T.Layout.SignOut</MudMenuItem>
                 </ChildContent>
