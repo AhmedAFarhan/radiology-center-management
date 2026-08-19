@@ -66,13 +66,20 @@ public partial class WorkShifts : ListPageBase<WorkShiftDto>
 
     private async Task DeleteShiftAsync(WorkShiftDto shift)
     {
-        var confirmed = await DialogService.ShowMessageBoxAsync(
-            T.WorkShift.DeleteTitle,
-            T.FormatValue(T.WorkShift.DeleteConfirm, shift.Date.ToString("yyyy-MM-dd")),
-            T.Common.Delete,
-            T.Common.Cancel);
+        var parameters = new DialogParameters
+        {
+            ["Title"] = T.WorkShift.DeleteTitle,
+            ["Message"] = T.FormatValue(T.WorkShift.DeleteConfirm, shift.Date.ToString("yyyy-MM-dd")),
+            ["Icon"] = Icons.Material.Filled.Delete,
+            ["Color"] = MudBlazor.Color.Error,
+            ["ConfirmText"] = T.Common.Delete,
+            ["CancelText"] = T.Common.Cancel,
+        };
+        var options = new DialogOptions { MaxWidth = MaxWidth.Small, FullWidth = true, NoHeader = true };
+        var dialog = await DialogService.ShowAsync<ConfirmDialog>(string.Empty, parameters, options);
+        var result = await dialog.Result;
 
-        if (confirmed != true)
+        if (result?.Canceled != false)
             return;
 
         await SafeExecute.RunAsync(async () =>

@@ -101,6 +101,9 @@ public partial class Users : ListPageBase<UserDto>
 
     private async Task ActivateAsync(UserDto user)
     {
+        if (!await ConfirmDialogs.ConfirmStatusChangeAsync(DialogService, T, T.Users.Activate, user.UserName, activating: true))
+            return;
+
         await SafeExecute.RunAsync(async () =>
             {
                 await IdentityService.ActivateUserAsync(user.Id);
@@ -113,13 +116,20 @@ public partial class Users : ListPageBase<UserDto>
 
     private async Task DeactivateAsync(UserDto user)
     {
-        var confirmed = await DialogService.ShowMessageBoxAsync(
-            T.Users.DeactivateTitle,
-            T.FormatValue(T.Users.DeactivateConfirm, user.UserName),
-            T.Users.Deactivate,
-            T.Common.Cancel);
+        var parameters = new DialogParameters
+        {
+            ["Title"] = T.Users.DeactivateTitle,
+            ["Message"] = T.FormatValue(T.Users.DeactivateConfirm, user.UserName),
+            ["Icon"] = Icons.Material.Filled.Block,
+            ["Color"] = MudBlazor.Color.Warning,
+            ["ConfirmText"] = T.Users.Deactivate,
+            ["CancelText"] = T.Common.Cancel,
+        };
+        var options = new DialogOptions { MaxWidth = MaxWidth.Small, FullWidth = true, NoHeader = true };
+        var dialog = await DialogService.ShowAsync<ConfirmDialog>(string.Empty, parameters, options);
+        var result = await dialog.Result;
 
-        if (confirmed != true)
+        if (result?.Canceled != false)
             return;
 
         await SafeExecute.RunAsync(async () =>

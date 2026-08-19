@@ -46,6 +46,9 @@ public partial class InsurancePolicies : ListPageBase<InsurancePolicyListItemDto
 
     private async Task ToggleActiveAsync(InsurancePolicyListItemDto policy)
     {
+        if (!await ConfirmDialogs.ConfirmStatusChangeAsync(DialogService, T, T.Policy.ToggleStatus, policy.PolicyNumber, !policy.IsActive))
+            return;
+
         await SafeExecute.RunAsync(async () =>
             {
                 await InsuranceService.ChangePolicyStatusAsync(policy.Id, policy.IsActive ? "Deactivate" : "Reactivate");

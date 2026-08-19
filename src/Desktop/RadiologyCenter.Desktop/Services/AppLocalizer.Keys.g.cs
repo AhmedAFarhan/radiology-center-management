@@ -548,6 +548,7 @@ public sealed class CommonGroup : LocalizerGroup
 {
     internal CommonGroup(AppLocalizer localizer) : base(localizer) { }
     public string Actions => Get("common.actions");
+    public string Activate => Get("common.activate");
     public string Active => Get("common.active");
     public string Add => Get("common.add");
     public string All => Get("common.all");
@@ -556,6 +557,7 @@ public sealed class CommonGroup : LocalizerGroup
     public string Close => Get("common.close");
     public string Confirm => Get("common.confirm");
     public string Date => Get("common.date");
+    public string Deactivate => Get("common.deactivate");
     public string Delete => Get("common.delete");
     public string Edit => Get("common.edit");
     public string EmptyTitle => Get("common.emptyTitle");
@@ -574,6 +576,7 @@ public sealed class CommonGroup : LocalizerGroup
     public string SearchPlaceholder => Get("common.searchPlaceholder");
     public string Status => Get("common.status");
     public string Today => Get("common.today");
+    public string ToggleConfirm => Get("common.toggleConfirm");
     public string Type => Get("common.type");
     public string Yes => Get("common.yes");
 }
@@ -956,7 +959,9 @@ public sealed class LayoutGroup : LocalizerGroup
     public string Notifications => Get("layout.notifications");
     public string SearchPlaceholder => Get("layout.searchPlaceholder");
     public string SignedOut => Get("layout.signedOut");
+    public string SigningOut => Get("layout.signingOut");
     public string SignOut => Get("layout.signOut");
+    public string SignOutConfirm => Get("layout.signOutConfirm");
     public string ToggleNav => Get("layout.toggleNav");
 }
 

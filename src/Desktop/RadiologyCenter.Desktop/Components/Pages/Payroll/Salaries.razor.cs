@@ -61,6 +61,9 @@ public partial class Salaries : ListPageBase<SalaryDto>
 
     private async Task ToggleActiveAsync(SalaryDto salary)
     {
+        if (!await ConfirmDialogs.ConfirmStatusChangeAsync(DialogService, T, T.Salary.ToggleStatus, ResolveStaff(salary.StaffId), !salary.IsActive))
+            return;
+
         await SafeExecute.RunAsync(async () =>
             {
                 if (salary.IsActive)
@@ -77,13 +80,20 @@ public partial class Salaries : ListPageBase<SalaryDto>
 
     private async Task DeleteSalaryAsync(SalaryDto salary)
     {
-        var confirmed = await DialogService.ShowMessageBoxAsync(
-            T.Salary.DeleteTitle,
-            T.Salary.DeleteConfirm,
-            T.Common.Delete,
-            T.Common.Cancel);
+        var parameters = new DialogParameters
+        {
+            ["Title"] = T.Salary.DeleteTitle,
+            ["Message"] = T.Salary.DeleteConfirm,
+            ["Icon"] = Icons.Material.Filled.Delete,
+            ["Color"] = MudBlazor.Color.Error,
+            ["ConfirmText"] = T.Common.Delete,
+            ["CancelText"] = T.Common.Cancel,
+        };
+        var options = new DialogOptions { MaxWidth = MaxWidth.Small, FullWidth = true, NoHeader = true };
+        var dialog = await DialogService.ShowAsync<ConfirmDialog>(string.Empty, parameters, options);
+        var result = await dialog.Result;
 
-        if (confirmed != true)
+        if (result?.Canceled != false)
             return;
 
         await SafeExecute.RunAsync(async () =>

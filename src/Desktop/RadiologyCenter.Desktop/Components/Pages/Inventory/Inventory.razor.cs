@@ -75,6 +75,9 @@ public partial class Inventory : ListPageBase<ItemDto>
 
     private async Task ToggleActiveAsync(ItemDto item)
     {
+        if (!await ConfirmDialogs.ConfirmStatusChangeAsync(DialogService, T, T.Inventory.ToggleStatus, item.Name, !item.IsActive))
+            return;
+
         await SafeExecute.RunAsync(async () =>
             {
                 if (item.IsActive)
@@ -91,13 +94,20 @@ public partial class Inventory : ListPageBase<ItemDto>
 
     private async Task DeleteItemAsync(ItemDto item)
     {
-        var confirmed = await DialogService.ShowMessageBoxAsync(
-            T.Inventory.DeleteItemTitle,
-            T.FormatValue(T.Inventory.DeleteConfirm, item.Name),
-            T.Common.Delete,
-            T.Common.Cancel);
+        var parameters = new DialogParameters
+        {
+            ["Title"] = T.Inventory.DeleteItemTitle,
+            ["Message"] = T.FormatValue(T.Inventory.DeleteConfirm, item.Name),
+            ["Icon"] = Icons.Material.Filled.Delete,
+            ["Color"] = MudBlazor.Color.Error,
+            ["ConfirmText"] = T.Common.Delete,
+            ["CancelText"] = T.Common.Cancel,
+        };
+        var options = new DialogOptions { MaxWidth = MaxWidth.Small, FullWidth = true, NoHeader = true };
+        var dialog = await DialogService.ShowAsync<ConfirmDialog>(string.Empty, parameters, options);
+        var result = await dialog.Result;
 
-        if (confirmed != true)
+        if (result?.Canceled != false)
             return;
 
         await SafeExecute.RunAsync(async () =>

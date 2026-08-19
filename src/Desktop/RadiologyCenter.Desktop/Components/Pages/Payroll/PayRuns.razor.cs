@@ -123,13 +123,20 @@ private MudTable<PayRunDto>? _table;
 
     private async Task DeletePayRunAsync(PayRunDto payRun)
     {
-        var confirmed = await DialogService.ShowMessageBoxAsync(
-            T.Payroll.DeleteTitle,
-            T.FormatValue(T.Payroll.DeleteConfirm, payRun.RunFrom.ToString("yyyy-MM-dd"), payRun.RunTo.ToString("yyyy-MM-dd")),
-            T.Common.Delete,
-            T.Common.Cancel);
+        var parameters = new DialogParameters
+        {
+            ["Title"] = T.Payroll.DeleteTitle,
+            ["Message"] = T.FormatValue(T.Payroll.DeleteConfirm, payRun.RunFrom.ToString("yyyy-MM-dd"), payRun.RunTo.ToString("yyyy-MM-dd")),
+            ["Icon"] = Icons.Material.Filled.Delete,
+            ["Color"] = MudBlazor.Color.Error,
+            ["ConfirmText"] = T.Common.Delete,
+            ["CancelText"] = T.Common.Cancel,
+        };
+        var options = new DialogOptions { MaxWidth = MaxWidth.Small, FullWidth = true, NoHeader = true };
+        var dialog = await DialogService.ShowAsync<ConfirmDialog>(string.Empty, parameters, options);
+        var result = await dialog.Result;
 
-        if (confirmed != true)
+        if (result?.Canceled != false)
             return;
 
         await SafeExecute.RunAsync(async () =>

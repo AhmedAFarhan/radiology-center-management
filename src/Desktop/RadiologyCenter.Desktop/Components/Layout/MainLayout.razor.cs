@@ -17,6 +17,7 @@ using RadiologyCenter.Desktop.Models;
 using RadiologyCenter.Desktop.Services;
 using RadiologyCenter.Desktop.Components.Pages.Auth;
 using FocusEventArgs = Microsoft.AspNetCore.Components.Web.FocusEventArgs;
+using Color = MudBlazor.Color;
 
 namespace RadiologyCenter.Desktop.Components.Layout;
 
@@ -25,7 +26,8 @@ public partial class MainLayout : LayoutComponentBase
 [CascadingParameter]
     private Task<AuthenticationState>? AuthStateTask { get; set; }
 
-    private bool _drawerOpen = true;
+private bool _drawerOpen = true;
+    private bool _loggingOut;
     private string _userName = string.Empty;
 
     private MudTextField<string>? _searchField;
@@ -56,11 +58,36 @@ public partial class MainLayout : LayoutComponentBase
         _userName = state.User.Identity?.Name ?? string.Empty;
     }
 
-    private async Task OnLogout()
+private async Task OnLogout()
     {
-        await AuthService.SignOutAsync();
-        Snackbar.Add(T.Layout.SignedOut, Severity.Info);
-        Navigation.NavigateTo("/");
+        var parameters = new DialogParameters
+        {
+            ["Title"] = T.Layout.SignOut,
+            ["Message"] = T.Layout.SignOutConfirm,
+            ["Icon"] = Icons.Material.Filled.Logout,
+            ["Color"] = Color.Primary,
+            ["ConfirmText"] = T.Layout.SignOut,
+            ["CancelText"] = T.Common.Cancel,
+        };
+        var options = new DialogOptions { MaxWidth = MaxWidth.Small, FullWidth = true, NoHeader = true };
+        var dialog = await DialogService.ShowAsync<ConfirmDialog>(string.Empty, parameters, options);
+        var result = await dialog.Result;
+
+        if (result is { Canceled: false })
+        {
+            _loggingOut = true;
+            StateHasChanged();
+
+            try
+            {
+                await AuthService.SignOutAsync();
+            }
+            finally
+            {
+                Snackbar.Add(T.Layout.SignedOut, Severity.Info);
+                Navigation.NavigateTo("/");
+            }
+        }
     }
 
     private async Task OnChangePassword()

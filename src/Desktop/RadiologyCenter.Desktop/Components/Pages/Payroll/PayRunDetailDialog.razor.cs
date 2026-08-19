@@ -112,13 +112,20 @@ public partial class PayRunDetailDialog : ComponentBase
 
     private async Task RemovePayslipAsync(PayslipDto payslip)
     {
-        var confirmed = await DialogService.ShowMessageBoxAsync(
-            T.PayRunDialog.RemovePayslipTitle,
-            T.FormatValue(T.PayRunDialog.RemoveConfirm, ResolveStaff(payslip.StaffId)),
-            T.PayRunDialog.Remove,
-            T.Common.Cancel);
+        var parameters = new DialogParameters
+        {
+            ["Title"] = T.PayRunDialog.RemovePayslipTitle,
+            ["Message"] = T.FormatValue(T.PayRunDialog.RemoveConfirm, ResolveStaff(payslip.StaffId)),
+            ["Icon"] = Icons.Material.Filled.Delete,
+            ["Color"] = MudBlazor.Color.Error,
+            ["ConfirmText"] = T.PayRunDialog.Remove,
+            ["CancelText"] = T.Common.Cancel,
+        };
+        var options = new DialogOptions { MaxWidth = MaxWidth.Small, FullWidth = true, NoHeader = true };
+        var dialog = await DialogService.ShowAsync<ConfirmDialog>(string.Empty, parameters, options);
+        var result = await dialog.Result;
 
-        if (confirmed != true)
+        if (result?.Canceled != false)
             return;
 
         await SafeExecute.RunAsync(async () =>
@@ -135,8 +142,20 @@ public partial class PayRunDetailDialog : ComponentBase
 
     private async Task RunLifecycleAsync(string verb, string confirmTitle, string confirmMessage, string confirmOk)
     {
-        var confirmed = await DialogService.ShowMessageBoxAsync(confirmTitle, confirmMessage, confirmOk, T.Common.Cancel);
-        if (confirmed != true)
+        var parameters = new DialogParameters
+        {
+            ["Title"] = confirmTitle,
+            ["Message"] = confirmMessage,
+            ["Icon"] = Icons.Material.Filled.HelpOutline,
+            ["Color"] = MudBlazor.Color.Primary,
+            ["ConfirmText"] = confirmOk,
+            ["CancelText"] = T.Common.Cancel,
+        };
+        var options = new DialogOptions { MaxWidth = MaxWidth.Small, FullWidth = true, NoHeader = true };
+        var dialog = await DialogService.ShowAsync<ConfirmDialog>(string.Empty, parameters, options);
+        var result = await dialog.Result;
+
+        if (result?.Canceled != false)
             return;
 
         await SafeExecute.RunAsync(async () =>

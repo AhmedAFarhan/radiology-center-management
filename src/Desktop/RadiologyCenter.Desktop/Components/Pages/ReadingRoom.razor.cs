@@ -472,13 +472,20 @@ public partial class ReadingRoom : ComponentBase
         if (!CanEdit || _report is null)
             return;
 
-        var confirmed = await DialogService.ShowMessageBoxAsync(
-            T.ReadingRoom.SignReport,
-            T.ReadingRoom.FinalizeConfirm,
-            yesText: T.ReadingRoom.SignAndFinalize,
-            cancelText: T.ReadingRoom.Back);
+        var parameters = new DialogParameters
+        {
+            ["Title"] = T.ReadingRoom.SignReport,
+            ["Message"] = T.ReadingRoom.FinalizeConfirm,
+            ["Icon"] = Icons.Material.Filled.EditNote,
+            ["Color"] = Color.Primary,
+            ["ConfirmText"] = T.ReadingRoom.SignAndFinalize,
+            ["CancelText"] = T.ReadingRoom.Back,
+        };
+        var options = new DialogOptions { MaxWidth = MaxWidth.Small, FullWidth = true, NoHeader = true };
+        var dialog = await DialogService.ShowAsync<ConfirmDialog>(string.Empty, parameters, options);
+        var result = await dialog.Result;
 
-        if (confirmed is not true)
+        if (result?.Canceled != false)
             return;
 
         _busy = true;
@@ -574,13 +581,20 @@ public partial class ReadingRoom : ComponentBase
         if (_report is null)
             return;
 
-        var confirmed = await DialogService.ShowMessageBoxAsync(
-            T.ReadingRoom.RemoveFinding,
-            T.FormatValue(T.ReadingRoom.RemoveFindingConfirm, finding.Region),
-            yesText: T.ReadingRoom.Remove,
-            cancelText: T.ReadingRoom.Keep);
+        var parameters = new DialogParameters
+        {
+            ["Title"] = T.ReadingRoom.RemoveFinding,
+            ["Message"] = T.FormatValue(T.ReadingRoom.RemoveFindingConfirm, finding.Region),
+            ["Icon"] = Icons.Material.Filled.Delete,
+            ["Color"] = Color.Error,
+            ["ConfirmText"] = T.ReadingRoom.Remove,
+            ["CancelText"] = T.ReadingRoom.Keep,
+        };
+        var options = new DialogOptions { MaxWidth = MaxWidth.Small, FullWidth = true, NoHeader = true };
+        var dialog = await DialogService.ShowAsync<ConfirmDialog>(string.Empty, parameters, options);
+        var result = await dialog.Result;
 
-        if (confirmed is not true)
+        if (result?.Canceled != false)
             return;
 
         try

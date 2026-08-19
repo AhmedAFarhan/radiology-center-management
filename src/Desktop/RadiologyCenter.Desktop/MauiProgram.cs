@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.Logging;
 using MudBlazor;
 using MudBlazor.Services;
+using MudBlazor.Utilities;
 using Microsoft.AspNetCore.Components.Authorization;
 using RadiologyCenter.Desktop.Services;
 
@@ -25,7 +26,10 @@ public static class MauiProgram
         builder.Services.AddMauiBlazorWebView();
         builder.Services.AddAuthorizationCore();
         builder.Services.AddSingleton(updateService);
-        builder.Services.AddMudServices();
+        builder.Services.AddMudServices(config =>
+        {
+            config.SnackbarConfiguration.PositionClass = Defaults.Classes.Position.TopEnd;
+        });
 
         builder.Services.AddSingleton<AppLocalizer>();
         builder.Services.AddSingleton<MudLocalizer, AppMudLocalizer>();

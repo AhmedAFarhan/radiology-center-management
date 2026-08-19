@@ -55,13 +55,20 @@ public partial class PurchaseOrders : ListPageBase<PurchaseOrderDto>
 
     private async Task PlaceAsync(PurchaseOrderDto po)
     {
-        var confirmed = await DialogService.ShowMessageBoxAsync(
-            T.PurchaseOrders.PlaceOrderTitle,
-            T.FormatValue(T.PurchaseOrders.PlaceOrderConfirm, po.OrderNumber),
-            T.PurchaseOrders.PlaceOrderTitle,
-            T.Common.Cancel);
+        var parameters = new DialogParameters
+        {
+            ["Title"] = T.PurchaseOrders.PlaceOrderTitle,
+            ["Message"] = T.FormatValue(T.PurchaseOrders.PlaceOrderConfirm, po.OrderNumber),
+            ["Icon"] = Icons.Material.Filled.CheckCircle,
+            ["Color"] = MudBlazor.Color.Success,
+            ["ConfirmText"] = T.PurchaseOrders.PlaceOrderTitle,
+            ["CancelText"] = T.Common.Cancel,
+        };
+        var options = new DialogOptions { MaxWidth = MaxWidth.Small, FullWidth = true, NoHeader = true };
+        var dialog = await DialogService.ShowAsync<ConfirmDialog>(string.Empty, parameters, options);
+        var result = await dialog.Result;
 
-        if (confirmed != true)
+        if (result?.Canceled != false)
             return;
 
         await SafeExecute.RunAsync(async () =>
@@ -76,13 +83,20 @@ public partial class PurchaseOrders : ListPageBase<PurchaseOrderDto>
 
     private async Task CancelAsync(PurchaseOrderDto po)
     {
-        var confirmed = await DialogService.ShowMessageBoxAsync(
-            T.PurchaseOrders.CancelOrderTitle,
-            T.FormatValue(T.PurchaseOrders.CancelOrderConfirm, po.OrderNumber),
-            T.PurchaseOrders.CancelOrderTitle,
-            T.PurchaseOrders.KeepOrder);
+        var parameters = new DialogParameters
+        {
+            ["Title"] = T.PurchaseOrders.CancelOrderTitle,
+            ["Message"] = T.FormatValue(T.PurchaseOrders.CancelOrderConfirm, po.OrderNumber),
+            ["Icon"] = Icons.Material.Filled.Cancel,
+            ["Color"] = MudBlazor.Color.Warning,
+            ["ConfirmText"] = T.PurchaseOrders.CancelOrderTitle,
+            ["CancelText"] = T.PurchaseOrders.KeepOrder,
+        };
+        var options = new DialogOptions { MaxWidth = MaxWidth.Small, FullWidth = true, NoHeader = true };
+        var dialog = await DialogService.ShowAsync<ConfirmDialog>(string.Empty, parameters, options);
+        var result = await dialog.Result;
 
-        if (confirmed != true)
+        if (result?.Canceled != false)
             return;
 
         await SafeExecute.RunAsync(async () =>

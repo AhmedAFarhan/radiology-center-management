@@ -159,5 +159,13 @@
             </MudContainer>
         </main>
     </div>
+
+    @if (_loggingOut)
+    {
+        <div class="logout-overlay">
+            <MudProgressCircular Size="Size.Medium" Indeterminate="true" Color="Color.Primary" />
+            <span>@T.Layout.SigningOut</span>
+        </div>
+    }
 </div>
 

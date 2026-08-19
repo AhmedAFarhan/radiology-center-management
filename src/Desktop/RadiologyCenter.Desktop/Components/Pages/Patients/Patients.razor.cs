@@ -153,6 +153,9 @@ private MudTable<PatientDto>? _table;
 
     private async Task ToggleActiveAsync(PatientDto patient)
     {
+        if (!await ConfirmDialogs.ConfirmStatusChangeAsync(DialogService, T, T.Patients.ToggleStatus, patient.FullName, !patient.IsActive))
+            return;
+
         await SafeExecute.RunAsync(async () =>
             {
                 if (patient.IsActive)
@@ -169,13 +172,20 @@ private MudTable<PatientDto>? _table;
 
     private async Task DeletePatientAsync(PatientDto patient)
     {
-        var confirmed = await DialogService.ShowMessageBoxAsync(
-            T.Patients.DeleteTitle,
-            T.FormatValue(T.Patients.DeleteConfirm, patient.FullName, patient.PatientCode),
-            T.Common.Delete,
-            T.Common.Cancel);
+        var parameters = new DialogParameters
+        {
+            ["Title"] = T.Patients.DeleteTitle,
+            ["Message"] = T.FormatValue(T.Patients.DeleteConfirm, patient.FullName, patient.PatientCode),
+            ["Icon"] = Icons.Material.Filled.Delete,
+            ["Color"] = MudBlazor.Color.Error,
+            ["ConfirmText"] = T.Common.Delete,
+            ["CancelText"] = T.Common.Cancel,
+        };
+        var options = new DialogOptions { MaxWidth = MaxWidth.Small, FullWidth = true, NoHeader = true };
+        var dialog = await DialogService.ShowAsync<ConfirmDialog>(string.Empty, parameters, options);
+        var result = await dialog.Result;
 
-        if (confirmed != true)
+        if (result?.Canceled != false)
             return;
 
         await SafeExecute.RunAsync(async () =>

@@ -68,6 +68,9 @@ public partial class Examinations : ListPageBase<ExaminationTypeDto>
 
     private async Task ToggleActiveAsync(ExaminationTypeDto type)
     {
+        if (!await ConfirmDialogs.ConfirmStatusChangeAsync(DialogService, T, T.Examinations.ToggleStatus, type.Name, !type.IsActive))
+            return;
+
         await SafeExecute.RunAsync(async () =>
             {
                 if (type.IsActive)
@@ -84,13 +87,20 @@ public partial class Examinations : ListPageBase<ExaminationTypeDto>
 
     private async Task DeleteTypeAsync(ExaminationTypeDto type)
     {
-        var confirmed = await DialogService.ShowMessageBoxAsync(
-            T.Examinations.DeleteTitle,
-            T.FormatValue(T.Examinations.DeleteConfirm, type.Name),
-            T.Common.Delete,
-            T.Common.Cancel);
+        var parameters = new DialogParameters
+        {
+            ["Title"] = T.Examinations.DeleteTitle,
+            ["Message"] = T.FormatValue(T.Examinations.DeleteConfirm, type.Name),
+            ["Icon"] = Icons.Material.Filled.Delete,
+            ["Color"] = MudBlazor.Color.Error,
+            ["ConfirmText"] = T.Common.Delete,
+            ["CancelText"] = T.Common.Cancel,
+        };
+        var options = new DialogOptions { MaxWidth = MaxWidth.Small, FullWidth = true, NoHeader = true };
+        var dialog = await DialogService.ShowAsync<ConfirmDialog>(string.Empty, parameters, options);
+        var result = await dialog.Result;
 
-        if (confirmed != true)
+        if (result?.Canceled != false)
             return;
 
         await SafeExecute.RunAsync(async () =>

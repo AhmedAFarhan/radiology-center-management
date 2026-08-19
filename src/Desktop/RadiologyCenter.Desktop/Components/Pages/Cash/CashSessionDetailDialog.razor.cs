@@ -85,13 +85,20 @@ public partial class CashSessionDetailDialog : ComponentBase
 
     private async Task ApproveAsync()
     {
-        var confirmed = await DialogService.ShowMessageBoxAsync(
-            T.CashSession.ApproveHandover,
-            T.CashSession.ApproveHandoverConfirm,
-            T.CashSession.Approve,
-            T.Common.Cancel);
+var parameters = new DialogParameters
+        {
+            ["Title"] = T.CashSession.ApproveHandover,
+            ["Message"] = T.CashSession.ApproveHandoverConfirm,
+            ["Icon"] = Icons.Material.Filled.CheckCircle,
+            ["Color"] = MudBlazor.Color.Success,
+            ["ConfirmText"] = T.CashSession.Approve,
+            ["CancelText"] = T.Common.Cancel,
+        };
+        var options = new DialogOptions { MaxWidth = MaxWidth.Small, FullWidth = true, NoHeader = true };
+        var dialog = await DialogService.ShowAsync<ConfirmDialog>(string.Empty, parameters, options);
+        var result = await dialog.Result;
 
-        if (confirmed != true)
+        if (result?.Canceled != false)
             return;
 
         await SafeExecute.RunAsync(async () =>

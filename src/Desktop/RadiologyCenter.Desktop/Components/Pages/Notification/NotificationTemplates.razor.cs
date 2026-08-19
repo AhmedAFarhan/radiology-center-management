@@ -46,6 +46,9 @@ public partial class NotificationTemplates : ListPageBase<NotificationTemplateDt
 
     private async Task ToggleActiveAsync(NotificationTemplateDto template)
     {
+        if (!await ConfirmDialogs.ConfirmStatusChangeAsync(DialogService, T, T.Notifications.ToggleStatus, template.Name, !template.IsActive))
+            return;
+
         await SafeExecute.RunAsync(async () =>
             {
                 if (template.IsActive)
@@ -62,13 +65,20 @@ public partial class NotificationTemplates : ListPageBase<NotificationTemplateDt
 
     private async Task DeleteTemplateAsync(NotificationTemplateDto template)
     {
-        var confirmed = await DialogService.ShowMessageBoxAsync(
-            T.Notifications.DeleteTitle,
-            T.FormatValue(T.Notifications.DeleteConfirm, template.Name),
-            T.Common.Delete,
-            T.Common.Cancel);
+        var parameters = new DialogParameters
+        {
+            ["Title"] = T.Notifications.DeleteTitle,
+            ["Message"] = T.FormatValue(T.Notifications.DeleteConfirm, template.Name),
+            ["Icon"] = Icons.Material.Filled.Delete,
+            ["Color"] = MudBlazor.Color.Error,
+            ["ConfirmText"] = T.Common.Delete,
+            ["CancelText"] = T.Common.Cancel,
+        };
+        var options = new DialogOptions { MaxWidth = MaxWidth.Small, FullWidth = true, NoHeader = true };
+        var dialog = await DialogService.ShowAsync<ConfirmDialog>(string.Empty, parameters, options);
+        var result = await dialog.Result;
 
-        if (confirmed != true)
+        if (result?.Canceled != false)
             return;
 
         await SafeExecute.RunAsync(async () =>

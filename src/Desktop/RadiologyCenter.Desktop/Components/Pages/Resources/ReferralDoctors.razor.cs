@@ -66,6 +66,9 @@ public partial class ReferralDoctors : ListPageBase<ReferralDoctorDto>
 
     private async Task ToggleActiveAsync(ReferralDoctorDto doctor)
     {
+        if (!await ConfirmDialogs.ConfirmStatusChangeAsync(DialogService, T, T.ReferralDoctor.ToggleStatus, doctor.FullName, !doctor.IsActive))
+            return;
+
         await SafeExecute.RunAsync(async () =>
             {
                 if (doctor.IsActive)
@@ -82,13 +85,20 @@ public partial class ReferralDoctors : ListPageBase<ReferralDoctorDto>
 
     private async Task DeleteDoctorAsync(ReferralDoctorDto doctor)
     {
-        var confirmed = await DialogService.ShowMessageBoxAsync(
-            T.ReferralDoctor.DeleteTitle,
-            T.FormatValue(T.ReferralDoctor.DeleteConfirm, doctor.FullName),
-            T.Common.Delete,
-            T.Common.Cancel);
+        var parameters = new DialogParameters
+        {
+            ["Title"] = T.ReferralDoctor.DeleteTitle,
+            ["Message"] = T.FormatValue(T.ReferralDoctor.DeleteConfirm, doctor.FullName),
+            ["Icon"] = Icons.Material.Filled.Delete,
+            ["Color"] = MudBlazor.Color.Error,
+            ["ConfirmText"] = T.Common.Delete,
+            ["CancelText"] = T.Common.Cancel,
+        };
+        var options = new DialogOptions { MaxWidth = MaxWidth.Small, FullWidth = true, NoHeader = true };
+        var dialog = await DialogService.ShowAsync<ConfirmDialog>(string.Empty, parameters, options);
+        var result = await dialog.Result;
 
-        if (confirmed != true)
+        if (result?.Canceled != false)
             return;
 
         await SafeExecute.RunAsync(async () =>

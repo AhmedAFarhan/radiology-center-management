@@ -61,6 +61,9 @@ public partial class Allowances : ListPageBase<AllowanceAssignmentDto>
 
     private async Task ToggleActiveAsync(AllowanceAssignmentDto allowance)
     {
+        if (!await ConfirmDialogs.ConfirmStatusChangeAsync(DialogService, T, T.Allowance.ToggleStatus, allowance.Name, !allowance.IsActive))
+            return;
+
         await SafeExecute.RunAsync(async () =>
             {
                 if (allowance.IsActive)
@@ -77,13 +80,20 @@ public partial class Allowances : ListPageBase<AllowanceAssignmentDto>
 
     private async Task DeleteAllowanceAsync(AllowanceAssignmentDto allowance)
     {
-        var confirmed = await DialogService.ShowMessageBoxAsync(
-            T.Allowance.DeleteTitle,
-            T.FormatValue(T.Allowance.DeleteConfirm, allowance.Name),
-            T.Common.Delete,
-            T.Common.Cancel);
+        var parameters = new DialogParameters
+        {
+            ["Title"] = T.Allowance.DeleteTitle,
+            ["Message"] = T.FormatValue(T.Allowance.DeleteConfirm, allowance.Name),
+            ["Icon"] = Icons.Material.Filled.Delete,
+            ["Color"] = MudBlazor.Color.Error,
+            ["ConfirmText"] = T.Common.Delete,
+            ["CancelText"] = T.Common.Cancel,
+        };
+        var options = new DialogOptions { MaxWidth = MaxWidth.Small, FullWidth = true, NoHeader = true };
+        var dialog = await DialogService.ShowAsync<ConfirmDialog>(string.Empty, parameters, options);
+        var result = await dialog.Result;
 
-        if (confirmed != true)
+        if (result?.Canceled != false)
             return;
 
         await SafeExecute.RunAsync(async () =>
