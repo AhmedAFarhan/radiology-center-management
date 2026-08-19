@@ -44,6 +44,13 @@ public partial class ReadingRoom : ComponentBase
     private string _newSeverity = "None";
     private bool _busy;
 
+    private bool _worklistCollapsed;
+    private bool _reportCollapsed;
+
+    private void ToggleWorklist() => _worklistCollapsed = !_worklistCollapsed;
+
+    private void ToggleReport() => _reportCollapsed = !_reportCollapsed;
+
     private record CanonicalSection(string Type, string Label, int Position);
 
     private static readonly CanonicalSection[] CanonicalTypes =

@@ -1785,5 +1785,9 @@
     "validation.scheduledDateRequired":  "التاريخ المحدد مطلوب.",
     "validation.scheduledTimeRequired":  "الوقت المحدد مطلوب.",
     "validation.statusRequired":  "الحالة مطلوبة.",
-    "validation.quantityMinOne":  "يجب أن تكون الكمية 1 على الأقل."
+    "validation.quantityMinOne":  "يجب أن تكون الكمية 1 على الأقل.",
+    "readingRoom.hideWorklist":  "إخفاء قائمة العمل",
+    "readingRoom.showWorklist":  "إظهار قائمة العمل",
+    "readingRoom.hideReport":  "إخفاء التقرير",
+    "readingRoom.showReport":  "إظهار التقرير"
 }

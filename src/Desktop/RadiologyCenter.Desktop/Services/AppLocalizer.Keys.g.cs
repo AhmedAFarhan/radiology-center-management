@@ -1619,6 +1619,8 @@ public sealed class ReadingRoomGroup
     public string FindingRemoved => _localizer.Get("readingRoom.findingRemoved");
     public string Findings => _localizer.Get("readingRoom.findings");
     public string FindingUpdated => _localizer.Get("readingRoom.findingUpdated");
+    public string HideReport => _localizer.Get("readingRoom.hideReport");
+    public string HideWorklist => _localizer.Get("readingRoom.hideWorklist");
     public string Imaged => _localizer.Get("readingRoom.imaged");
     public string ImagesLinked => _localizer.Get("readingRoom.imagesLinked");
     public string ImageViewer => _localizer.Get("readingRoom.imageViewer");
@@ -1651,6 +1653,8 @@ public sealed class ReadingRoomGroup
     public string SeriesProgress => _localizer.Get("readingRoom.seriesProgress");
     public string SeriesThumbTitle => _localizer.Get("readingRoom.seriesThumbTitle");
     public string Severity => _localizer.Get("readingRoom.severity");
+    public string ShowReport => _localizer.Get("readingRoom.showReport");
+    public string ShowWorklist => _localizer.Get("readingRoom.showWorklist");
     public string SignAndFinalize => _localizer.Get("readingRoom.signAndFinalize");
     public string SignedAt => _localizer.Get("readingRoom.signedAt");
     public string SignReport => _localizer.Get("readingRoom.signReport");

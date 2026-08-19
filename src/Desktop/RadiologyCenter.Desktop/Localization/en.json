@@ -1785,5 +1785,9 @@
     "validation.scheduledDateRequired":  "Scheduled date is required.",
     "validation.scheduledTimeRequired":  "Scheduled time is required.",
     "validation.statusRequired":  "Status is required.",
-    "validation.quantityMinOne":  "Quantity must be at least 1."
+    "validation.quantityMinOne":  "Quantity must be at least 1.",
+    "readingRoom.hideWorklist":  "Hide worklist",
+    "readingRoom.showWorklist":  "Show worklist",
+    "readingRoom.hideReport":  "Hide report",
+    "readingRoom.showReport":  "Show report"
 }

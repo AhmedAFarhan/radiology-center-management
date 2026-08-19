@@ -13,7 +13,7 @@
     </MudChip>
 </PageHeader>
 
-<div class="reading-room">
+<div class="reading-room @(_worklistCollapsed ? "wl-collapsed" : string.Empty) @(_reportCollapsed ? "rpt-collapsed" : string.Empty)">
     <!-- â•â•â•â•â•â•â•â•â•â• Worklist pane â•â•â•â•â•â•â•â•â•â• -->
     <section class="reading-room-pane rr-worklist">
         <div class="rr-pane-header">
@@ -100,6 +100,26 @@
             <MudStack Row="true" AlignItems="AlignItems.Center" Spacing="1">
                 <MudIcon Icon="@Icons.Material.Filled.Monitor" Size="Size.Small" />
                 <MudText Typo="Typo.subtitle1" Class="font-weight-medium">@T.ReadingRoom.ImageViewer</MudText>
+            </MudStack>
+            <MudStack Row="true" AlignItems="AlignItems.Center" Spacing="1" Class="rr-pane-toggles">
+                <MudTooltip Placement="Placement.Bottom" Text="@(_worklistCollapsed ? T.ReadingRoom.ShowWorklist : T.ReadingRoom.HideWorklist)">
+                    <MudIconButton Icon="@(_worklistCollapsed
+                                               ? (T.IsRTL ? Icons.Material.Filled.ChevronLeft : Icons.Material.Filled.ChevronRight)
+                                               : (T.IsRTL ? Icons.Material.Filled.ChevronRight : Icons.Material.Filled.ChevronLeft))"
+                                   Size="Size.Small"
+                                   Color="Color.Default"
+                                   aria-label="@(_worklistCollapsed ? T.ReadingRoom.ShowWorklist : T.ReadingRoom.HideWorklist)"
+                                   OnClick="ToggleWorklist" />
+                </MudTooltip>
+                <MudTooltip Placement="Placement.Bottom" Text="@(_reportCollapsed ? T.ReadingRoom.ShowReport : T.ReadingRoom.HideReport)">
+                    <MudIconButton Icon="@(_reportCollapsed
+                                               ? (T.IsRTL ? Icons.Material.Filled.ChevronRight : Icons.Material.Filled.ChevronLeft)
+                                               : (T.IsRTL ? Icons.Material.Filled.ChevronLeft : Icons.Material.Filled.ChevronRight))"
+                                   Size="Size.Small"
+                                   Color="Color.Default"
+                                   aria-label="@(_reportCollapsed ? T.ReadingRoom.ShowReport : T.ReadingRoom.HideReport)"
+                                   OnClick="ToggleReport" />
+                </MudTooltip>
             </MudStack>
             <span class="rr-modality">@(Selected?.ExamName ?? "-")</span>
         </div>
@@ -195,7 +215,7 @@
             <div class="rr-patient-summary">
                 <div class="rr-summary-block">
                     <span class="rr-summary-label">@T.ReadingRoom.ClinicalIndication</span>
-                    <span class="rr-summary-value">@Selected.Indication</span>
+                    <span class="rr-summary-value">@(string.IsNullOrWhiteSpace(Selected.Indication) ? T.Common.None : Selected.Indication)</span>
                 </div>
                 <MudStack Row="true" Spacing="2">
                     <div class="rr-summary-cell"><span class="rr-summary-label">@T.ReadingRoom.Exam</span><span>@Selected.ExamName- @Selected.Priority</span></div>
@@ -213,7 +233,7 @@
                     </MudAlert>
                 }
 
-                <div class="d-flex align-center mb-2">
+                <div class="d-flex align-center mb-1">
                     <MudText Typo="Typo.subtitle1" Class="font-weight-medium">@T.ReadingRoom.Sections</MudText>
                     <MudSpacer />
                     @if (CanEdit)
