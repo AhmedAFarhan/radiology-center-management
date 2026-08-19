@@ -17,7 +17,7 @@ else
     <div class="landing-lang">
         <LanguageSwitcher />
     </div>
-    <div class="corner-circles corner-right">
+    <div class="corner-circles corner-right" aria-hidden="true">
         <div class="corner-circle circle-outer"></div>
         <div class="corner-circle circle-mid"></div>
         <div class="corner-circle circle-inner">
@@ -37,7 +37,7 @@ else
 
             <div class="landing-copy">
                 <div class="landing-badge">@T.Landing.Badge</div>
-                <h1 class="landing-title">@((MarkupString)T.Landing.Title)</h1>
+                <h1 class="landing-title">@T.Landing.TitleLine1<br />@T.Landing.TitleLine2</h1>
                 <p class="landing-subtitle">
                     @T.Landing.Subtitle
                 </p>
@@ -73,11 +73,11 @@ else
 
         <div class="landing-right">
             <div class="hero-image-wrapper">
-                <img src="images/landing-auth.jpg" alt="EGcare" class="hero-image" />
-                <span class="float-ring float-ring-1"><MudIcon Icon="@Icons.Material.Filled.Speed" /></span>
-                <span class="float-ring float-ring-2"><MudIcon Icon="@Icons.Material.Filled.MonitorHeart" /></span>
-                <span class="float-ring float-ring-3"><MudIcon Icon="@Icons.Material.Filled.Emergency" /></span>
-                <span class="float-ring float-ring-4"><MudIcon Icon="@Icons.Material.Filled.MedicalServices" /></span>
+                <img src="images/landing-auth.jpg" alt="" class="hero-image" />
+                <span class="float-ring float-ring-1" aria-hidden="true"><MudIcon Icon="@Icons.Material.Filled.Speed" /></span>
+                <span class="float-ring float-ring-2" aria-hidden="true"><MudIcon Icon="@Icons.Material.Filled.MonitorHeart" /></span>
+                <span class="float-ring float-ring-3" aria-hidden="true"><MudIcon Icon="@Icons.Material.Filled.Emergency" /></span>
+                <span class="float-ring float-ring-4" aria-hidden="true"><MudIcon Icon="@Icons.Material.Filled.MedicalServices" /></span>
             </div>
         </div>
     </div>
@@ -112,6 +112,7 @@ else
             MaxWidth = MaxWidth.Small,
             FullWidth = true,
             BackdropClick = true,
+            NoHeader = true,
         };
         await DialogService.ShowAsync<LoginDialog>(T.Login.DialogTitle, options);
     }

@@ -9,7 +9,7 @@
         <div style="max-height: 440px; overflow-y: auto;">
             @if (_loading)
             {
-                <MudProgressCircular Size="Size.Large" Class="mx-auto d-block py-6" Indeterminate="true" />
+                <DialogSkeleton Rows="3" />
             }
             else if (_error is not null)
             {
@@ -56,7 +56,7 @@
                             @foreach (var finding in version.Findings.OrderBy(f => f.Position))
                             {
                                 <div class="mb-1">
-                                    <MudChip T="string" Size="Size.Small" Color="@SeverityColor(finding.Severity)" Variant="Variant.Outlined" Class="me-1">@finding.Severity</MudChip>
+                                    <StatusChip Token="@finding.Severity" Variant="Variant.Outlined" Class="me-1">@finding.Severity</StatusChip>
                                     <MudText Typo="Typo.body2" Class="d-inline">@finding.Region - @finding.Description</MudText>
                                 </div>
                             }
@@ -100,14 +100,6 @@
             _loading = false;
         }
     }
-
-    private static Color SeverityColor(string severity) => severity switch
-    {
-        "Severe" => Color.Error,
-        "Moderate" => Color.Warning,
-        "Mild" => Color.Info,
-        _ => Color.Default,
-    };
 
     private void CancelAsync()
         => MudDialog.Cancel();

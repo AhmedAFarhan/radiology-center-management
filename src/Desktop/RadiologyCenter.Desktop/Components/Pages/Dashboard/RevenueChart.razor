@@ -13,14 +13,16 @@
         </CardHeaderActions>
     </MudCardHeader>
     <MudCardContent>
-        <ApexChart TItem="RevenuePoint" Height="300" Options="@_options">
-            <ApexPointSeries TItem="RevenuePoint"
-                             Items="Data"
-                             Name="@T.Dashboard.Revenue"
-                             SeriesType="SeriesType.Area"
-                             XValue="@(r => r.Month)"
-                             YValue="@(r => r.Amount)" />
-        </ApexChart>
+        <div role="img" aria-label="@T.Dashboard.RevenueOverview">
+            <ApexChart TItem="RevenuePoint" Height="300" Options="@_options">
+                <ApexPointSeries TItem="RevenuePoint"
+                                 Items="Data"
+                                 Name="@T.Dashboard.Revenue"
+                                 SeriesType="SeriesType.Area"
+                                 XValue="@(r => r.Month)"
+                                 YValue="@(r => r.Amount)" />
+            </ApexChart>
+        </div>
     </MudCardContent>
 </MudCard>
 
@@ -33,6 +35,8 @@
         {
             Toolbar = new Toolbar { Show = false },
             Zoom = new Zoom { Enabled = false },
+            ForeColor = "#8B93A7",
+            FontFamily = "Montserrat, Cairo, sans-serif",
         },
         DataLabels = new DataLabels { Enabled = false },
         Stroke = new Stroke { Curve = Curve.Smooth, Width = 3 },

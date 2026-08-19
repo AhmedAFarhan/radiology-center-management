@@ -40,7 +40,7 @@
         <MudTd DataLabel="@T.Users.Email">@context.Email</MudTd>
         <MudTd DataLabel="@T.Users.Phone">@(string.IsNullOrWhiteSpace(context.PhoneNumber) ? "-" : context.PhoneNumber)</MudTd>
         <MudTd DataLabel="@T.Common.Status">
-            <MudChip T="string" Size="Size.Small" Color="@(StatusColor(context))">@StatusText(context)</MudChip>
+            <StatusChip Token="@(context.IsLocked ? "Locked" : context.IsActive ? "Active" : "Inactive")">@StatusText(context)</StatusChip>
         </MudTd>
         <MudTd DataLabel="@T.Users.LastLogin">@(context.LastLoginAt?.ToString("g") ?? "-")</MudTd>
         <MudTd DataLabel="@T.Common.Actions">
@@ -300,13 +300,6 @@
         if (user.IsLocked)
             return T.Users.Locked;
         return user.IsActive ? T.Common.Active : T.Common.Inactive;
-    }
-
-    private static Color StatusColor(UserDto user)
-    {
-        if (user.IsLocked)
-            return Color.Warning;
-        return user.IsActive ? Color.Success : Color.Default;
     }
 
     public void Dispose() => _searchCts?.Cancel();

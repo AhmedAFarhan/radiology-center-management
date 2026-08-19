@@ -1,8 +1,9 @@
 @using ApexCharts
+@inject AppLocalizer T
 
 @if (Items.Count == 0)
 {
-    <div class="pa-6 text-center text-secondary">No data in this period.</div>
+    <div class="pa-6 text-center text-secondary">@T.Analytics.NoData</div>
 }
 else
 {
@@ -27,14 +28,14 @@ else
         {
             Type = ApexCharts.ChartType.Donut,
             ForeColor = "#8B93A7",
-            FontFamily = "OpenSansRegular, sans-serif",
+            FontFamily = "Montserrat, Cairo, sans-serif",
         },
         DataLabels = new DataLabels { Enabled = false },
         Legend = new Legend { Position = LegendPosition.Bottom },
         Stroke = new Stroke { Colors = new List<string> { "#FFFFFF" }, Width = 3 },
         Colors = new List<string>
         {
-            "#4C58E0", "#7A5CFF", "#FF8A65", "#26C6DA", "#66BB6A", "#FDD835", "#EC407A", "#8D6E63",
+            "#4C58E0", "#34A853", "#ED6C02", "#2196F3", "#D32F2F", "#7A84EA", "#9BB3FD", "#2E7D32",
         },
     };
 }

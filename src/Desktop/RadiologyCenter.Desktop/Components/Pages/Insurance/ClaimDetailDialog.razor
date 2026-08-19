@@ -13,40 +13,22 @@
         }
         else if (_claim is null)
         {
-            <MudProgressCircular Indeterminate="true" Class="d-flex mx-auto my-4" />
+            <DialogSkeleton Rows="3" />
         }
         else
         {
             <MudGrid Spacing="2">
-                <MudItem xs="12" sm="6">
-                    <MudTextField Label="@T.ClaimDialog.Patient" Variant="Variant.Outlined" Margin="Margin.Dense" ReadOnly="true" Value="@_patientName" />
-                </MudItem>
-                <MudItem xs="12" sm="6">
-                    <MudTextField Label="@T.ClaimDialog.Examination" Variant="Variant.Outlined" Margin="Margin.Dense" ReadOnly="true" Value="@_examinationName" />
-                </MudItem>
-                <MudItem xs="12" sm="6">
-                    <MudTextField Label="@T.ClaimDialog.Policy" Variant="Variant.Outlined" Margin="Margin.Dense" ReadOnly="true" Value="@_policyNumber" />
-                </MudItem>
-                <MudItem xs="12" sm="6">
-                    <MudTextField Label="@T.Common.Status" Variant="Variant.Outlined" Margin="Margin.Dense" ReadOnly="true" Value="@_claim.Status" />
-                </MudItem>
-                <MudItem xs="12" sm="4">
-                    <MudTextField Label="@T.ClaimDialog.BilledAmount" Variant="Variant.Outlined" Margin="Margin.Dense" ReadOnly="true" Value="@_claim.BilledAmount.ToString("C")" />
-                </MudItem>
-                <MudItem xs="12" sm="4">
-                    <MudTextField Label="@T.ClaimDialog.PayerShare" Variant="Variant.Outlined" Margin="Margin.Dense" ReadOnly="true" Value="@_claim.PayerShare.ToString("C")" />
-                </MudItem>
-                <MudItem xs="12" sm="4">
-                    <MudTextField Label="@T.ClaimDialog.PatientShare" Variant="Variant.Outlined" Margin="Margin.Dense" ReadOnly="true" Value="@_claim.PatientShare.ToString("C")" />
-                </MudItem>
+                <DetailField Label="@T.ClaimDialog.Patient" Value="@_patientName" />
+                <DetailField Label="@T.ClaimDialog.Examination" Value="@_examinationName" />
+                <DetailField Label="@T.ClaimDialog.Policy" Value="@_policyNumber" />
+                <DetailField Label="@T.Common.Status" Value="@_claim.Status" />
+                <DetailField Label="@T.ClaimDialog.BilledAmount" Value="@_claim.BilledAmount.ToString("C")" Xs="12" Sm="4" Md="4" />
+                <DetailField Label="@T.ClaimDialog.PayerShare" Value="@_claim.PayerShare.ToString("C")" Xs="12" Sm="4" Md="4" />
+                <DetailField Label="@T.ClaimDialog.PatientShare" Value="@_claim.PatientShare.ToString("C")" Xs="12" Sm="4" Md="4" />
                 @if (_claim.RemainingOwed > 0)
                 {
-                    <MudItem xs="12" sm="6">
-                        <MudTextField Label="@T.ClaimDialog.TotalSettled" Variant="Variant.Outlined" Margin="Margin.Dense" ReadOnly="true" Value="@_claim.TotalSettled.ToString("C")" />
-                    </MudItem>
-                    <MudItem xs="12" sm="6">
-                        <MudTextField Label="@T.ClaimDialog.RemainingOwed" Variant="Variant.Outlined" Margin="Margin.Dense" ReadOnly="true" Value="@_claim.RemainingOwed.ToString("C")" />
-                    </MudItem>
+                    <DetailField Label="@T.ClaimDialog.TotalSettled" Value="@_claim.TotalSettled.ToString("C")" />
+                    <DetailField Label="@T.ClaimDialog.RemainingOwed" Value="@_claim.RemainingOwed.ToString("C")" />
                 }
             </MudGrid>
 

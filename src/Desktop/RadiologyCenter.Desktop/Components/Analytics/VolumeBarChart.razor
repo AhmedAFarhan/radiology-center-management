@@ -1,9 +1,10 @@
 @using ApexCharts
 @using RadiologyCenter.Desktop.Models
+@inject AppLocalizer T
 
 @if (Items.Count == 0)
 {
-    <div class="pa-6 text-center text-secondary">No volume data in this period.</div>
+    <div class="pa-6 text-center text-secondary">@T.Analytics.NoVolumeData</div>
 }
 else
 {
@@ -35,7 +36,7 @@ else
             Toolbar = new Toolbar { Show = false },
             Zoom = new Zoom { Enabled = false },
             ForeColor = "#8B93A7",
-            FontFamily = "OpenSansRegular, sans-serif",
+            FontFamily = "Montserrat, Cairo, sans-serif",
         },
         DataLabels = new DataLabels { Enabled = false },
         PlotOptions = new PlotOptions

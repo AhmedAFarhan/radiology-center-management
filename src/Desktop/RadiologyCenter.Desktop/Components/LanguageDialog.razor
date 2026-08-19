@@ -6,18 +6,24 @@
 
         <MudGrid Spacing="3">
             <MudItem xs="12" sm="6">
-                <div class="language-option @(IsSelected(AppLocalizer.DefaultCulture) ? "selected" : "")" @onclick="@(() => Select(AppLocalizer.DefaultCulture))">
-                    <img src="images/flags/us.svg" alt="USA flag" class="language-flag" />
+                <button type="button"
+                        class="language-option @(IsSelected(AppLocalizer.DefaultCulture) ? "selected" : "")"
+                        aria-pressed="@(IsSelected(AppLocalizer.DefaultCulture))"
+                        @onclick="@(() => Select(AppLocalizer.DefaultCulture))">
+                    <img src="images/flags/us.svg" alt="@T.Language.EnglishFlag" class="language-flag" />
                     <MudText Typo="Typo.body1" Class="font-weight-medium">@T.Language.English</MudText>
                     <MudText Typo="Typo.caption" Class="text-secondary">English</MudText>
-                </div>
+                </button>
             </MudItem>
             <MudItem xs="12" sm="6">
-                <div class="language-option @(IsSelected(AppLocalizer.ArabicCulture) ? "selected" : "")" @onclick="@(() => Select(AppLocalizer.ArabicCulture))">
-                    <img src="images/flags/eg.svg" alt="Egypt flag" class="language-flag" />
+                <button type="button"
+                        class="language-option @(IsSelected(AppLocalizer.ArabicCulture) ? "selected" : "")"
+                        aria-pressed="@(IsSelected(AppLocalizer.ArabicCulture))"
+                        @onclick="@(() => Select(AppLocalizer.ArabicCulture))">
+                    <img src="images/flags/eg.svg" alt="@T.Language.ArabicFlag" class="language-flag" />
                     <MudText Typo="Typo.body1" Class="font-weight-medium">@T.Language.Arabic</MudText>
                     <MudText Typo="Typo.caption" Class="text-secondary">العربية</MudText>
-                </div>
+                </button>
             </MudItem>
         </MudGrid>
     </DialogContent>

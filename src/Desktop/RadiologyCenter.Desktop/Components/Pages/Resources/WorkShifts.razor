@@ -14,7 +14,7 @@
     <MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Add" OnClick="OpenCreateDialogAsync">@T.WorkShift.Add</MudButton>
 </PageHeader>
 
-<MudTable T="WorkShiftDto" @ref="_table" ServerData="LoadServerData" Dense="true" Hover="true" Striped="true" Elevation="1" RowsPerPage="10">
+<MudTable T="WorkShiftDto" @ref="_table" ServerData="LoadServerData" Dense="true" Hover="true" Striped="true" Elevation="1" RowsPerPage="10" FixedHeader="true" Class="table-scroll">
     <HeaderContent>
         <MudTh><MudTableSortLabel T="WorkShiftDto" SortLabel="@("Date")">@T.Common.Date</MudTableSortLabel></MudTh>
         <MudTh>@T.WorkShift.Staff</MudTh>

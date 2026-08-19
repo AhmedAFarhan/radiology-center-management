@@ -11,9 +11,7 @@
 
         @if (_loading)
         {
-            <div class="d-flex align-items-center justify-content-center" style="min-height: 240px;">
-                <MudProgressCircular Indeterminate="true" />
-            </div>
+            <DialogSkeleton Rows="4" />
         }
         else if (_loadError is not null)
         {

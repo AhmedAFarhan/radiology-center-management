@@ -15,7 +15,7 @@
     <MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Add" OnClick="OpenCreateDialogAsync">@T.Salary.NewSalary</MudButton>
 </PageHeader>
 
-<MudTable T="SalaryDto" @ref="_table" ServerData="LoadServerData" Dense="true" Hover="true" Striped="true" Elevation="1" RowsPerPage="10">
+<MudTable T="SalaryDto" @ref="_table" ServerData="LoadServerData" Dense="true" Hover="true" Striped="true" Elevation="1" RowsPerPage="10" FixedHeader="true" Class="table-scroll">
     <HeaderContent>
         <MudTh>@T.Salary.Employee</MudTh>
         <MudTh Class="text-right"><MudTableSortLabel T="SalaryDto" SortLabel="@("BaseSalary")">@T.Salary.BaseSalary</MudTableSortLabel></MudTh>
@@ -30,7 +30,7 @@
         </MudTd>
         <MudTd DataLabel="@T.Salary.BaseSalary" Class="text-right">@context.BaseSalary.ToString("N2")</MudTd>
         <MudTd DataLabel="@T.Common.Type">
-            <MudChip T="string" Size="Size.Small">@context.SalaryType</MudChip>
+            <StatusChip Token="@context.SalaryType">@context.SalaryType</StatusChip>
         </MudTd>
         <MudTd DataLabel="@T.Salary.Effective">@context.EffectiveDate.ToString("yyyy-MM-dd")</MudTd>
         <MudTd DataLabel="@T.Common.Status">

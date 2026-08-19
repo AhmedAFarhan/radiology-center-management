@@ -6,19 +6,23 @@
     <DialogContent>
         <DialogHeader Icon="@Icons.Material.Filled.Biotech" Title="@(T.FormatValue(T.Equipment.SetStatusTitle, Equipment.Name))" />
         <MudText Typo="Typo.body2" Class="mb-2 text-secondary">
-            @(T.Equipment.CurrentStatus): <MudChip T="string" Size="Size.Small" Color="@StatusColor(Equipment.Status)">@FormatStatus(Equipment.Status)</MudChip>
+            @(T.Equipment.CurrentStatus): <StatusChip Token="@Equipment.Status">@FormatStatus(Equipment.Status)</StatusChip>
         </MudText>
-        <MudSelect T="string"
-                   @bind-Value="_status"
-                   Label="@T.Common.Status"
-                   Variant="Variant.Outlined"
-                   Margin="Margin.Dense"
-                   Class="w-100">
-            @foreach (var option in StatusOptions)
-            {
-                <MudSelectItem T="string" Value="@option.Key">@option.Value</MudSelectItem>
-            }
-        </MudSelect>
+        <EditForm EditContext="_editContext">
+            <LocalizedDataAnnotationsValidator />
+            <MudSelect T="string"
+                       @bind-Value="_model.Status"
+                       For="@(() => _model.Status)"
+                       Label="@T.Common.Status"
+                       Variant="Variant.Outlined"
+                       Margin="Margin.Dense"
+                       Class="w-100">
+                @foreach (var option in StatusOptions)
+                {
+                    <MudSelectItem T="string" Value="@option.Key">@option.Value</MudSelectItem>
+                }
+            </MudSelect>
+        </EditForm>
     </DialogContent>
     <DialogActions>
         <MudButton Color="Color.Default" OnClick="CancelAsync" Disabled="_busy">@T.Common.Cancel</MudButton>
@@ -48,23 +52,24 @@
         ["Retired"] = "Retired",
     };
 
-    private string _status = string.Empty;
+    private readonly EquipmentStatusModel _model = new();
+    private EditContext _editContext = default!;
     private bool _busy;
 
     protected override void OnInitialized()
-        => _status = Equipment.Status;
+    {
+        _editContext = new EditContext(_model);
+        _model.Status = Equipment.Status;
+    }
 
     private async Task SubmitAsync()
     {
-        if (string.IsNullOrWhiteSpace(_status))
-        {
-            Snackbar.Add(T.EquipmentDialog.SelectStatus, Severity.Warning);
+        if (!_editContext.Validate())
             return;
-        }
 
         await SafeExecute.RunAsync(async () =>
             {
-                await ResourceService.SetEquipmentStatusAsync(Equipment.Id, _status);
+                await ResourceService.SetEquipmentStatusAsync(Equipment.Id, _model.Status);
                 Snackbar.Add(T.EquipmentDialog.StatusUpdated, Severity.Success);
                 MudDialog.Close(DialogResult.Ok(true));
             },
@@ -83,11 +88,10 @@
         _ => status,
     };
 
-    private static Color StatusColor(string status) => status switch
+    private sealed class EquipmentStatusModel
     {
-        "Operational" => Color.Success,
-        "UnderMaintenance" => Color.Warning,
-        "OutOfService" => Color.Error,
-        _ => Color.Default,
-    };
-}
+        [Required(ErrorMessage = "Status is required.")]
+        public string Status { get; set; } = string.Empty;
+    }
+
+    }

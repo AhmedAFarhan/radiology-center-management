@@ -14,7 +14,7 @@
     <MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Add" OnClick="OpenCreateDialogAsync">@T.Equipment.Add</MudButton>
 </PageHeader>
 
-<MudTable T="EquipmentDto" @ref="_table" ServerData="LoadServerData" Dense="true" Hover="true" Striped="true" Elevation="1" RowsPerPage="10">
+<MudTable T="EquipmentDto" @ref="_table" ServerData="LoadServerData" Dense="true" Hover="true" Striped="true" Elevation="1" RowsPerPage="10" FixedHeader="true" Class="table-scroll">
     <HeaderContent>
         <MudTh><MudTableSortLabel T="EquipmentDto" SortLabel="@("Name")">@T.Common.Name</MudTableSortLabel></MudTh>
         <MudTh><MudTableSortLabel T="EquipmentDto" SortLabel="@("SerialNumber")">@T.Equipment.SerialNumber</MudTableSortLabel></MudTh>
@@ -31,7 +31,7 @@
         <MudTd DataLabel="@T.Equipment.SerialNumber">@(string.IsNullOrWhiteSpace(context.SerialNumber) ? "-" : context.SerialNumber)</MudTd>
         <MudTd DataLabel="@T.Equipment.Modality">@FormatModality(context.Modality)</MudTd>
         <MudTd DataLabel="@T.Common.Status">
-            <MudChip T="string" Size="Size.Small" Color="@StatusColor(context.Status)">@FormatStatus(context.Status)</MudChip>
+            <StatusChip Token="@context.Status">@FormatStatus(context.Status)</StatusChip>
         </MudTd>
         <MudTd DataLabel="@T.Equipment.PurchaseDate">@(context.PurchaseDate?.ToString("yyyy-MM-dd") ?? "-")</MudTd>
         <MudTd DataLabel="@T.Common.Active">
@@ -218,15 +218,6 @@
         "UnderMaintenance" => "Under Maintenance",
         "OutOfService" => "Out of Service",
         _ => status,
-    };
-
-    private static Color StatusColor(string status) => status switch
-    {
-        "Operational" => Color.Success,
-        "UnderMaintenance" => Color.Warning,
-        "OutOfService" => Color.Error,
-        "Retired" => Color.Default,
-        _ => Color.Default,
     };
 
     public void Dispose() => _searchCts?.Cancel();

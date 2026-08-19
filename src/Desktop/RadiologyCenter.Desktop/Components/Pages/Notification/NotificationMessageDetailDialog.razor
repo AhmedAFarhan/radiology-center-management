@@ -14,7 +14,7 @@
             </MudItem>
             <MudItem xs="12" sm="3">
                 <MudText Typo="Typo.caption" Color="Color.Secondary">@T.Common.Status</MudText>
-                <MudChip T="string" Size="Size.Small" Color="@StatusColor(Message.Status)">@Message.Status</MudChip>
+                <StatusChip Token="@Message.Status">@Message.Status</StatusChip>
             </MudItem>
             <MudItem xs="12">
                 <MudText Typo="Typo.caption" Color="Color.Secondary">@T.MessageDialog.Subject</MudText>
@@ -52,7 +52,7 @@
         </MudGrid>
     </DialogContent>
     <DialogActions>
-        <MudButton Color="Color.Primary" OnClick="CloseAsync">@T.Common.Close</MudButton>
+        <MudButton Color="Color.Default" OnClick="CloseAsync">@T.Common.Close</MudButton>
     </DialogActions>
 </MudDialog>
 
@@ -63,12 +63,4 @@
 
     private void CloseAsync()
         => MudDialog.Close();
-
-    private static Color StatusColor(string status) => status switch
-    {
-        "Sent" => Color.Success,
-        "Failed" => Color.Error,
-        "Pending" => Color.Warning,
-        _ => Color.Default,
-    };
 }

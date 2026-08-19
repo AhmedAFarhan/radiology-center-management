@@ -15,7 +15,7 @@
     <MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Add" OnClick="OpenCreateDialogAsync">@T.Allowance.NewAllowance</MudButton>
 </PageHeader>
 
-<MudTable T="AllowanceAssignmentDto" @ref="_table" ServerData="LoadServerData" Dense="true" Hover="true" Striped="true" Elevation="1" RowsPerPage="10">
+<MudTable T="AllowanceAssignmentDto" @ref="_table" ServerData="LoadServerData" Dense="true" Hover="true" Striped="true" Elevation="1" RowsPerPage="10" FixedHeader="true" Class="table-scroll">
     <HeaderContent>
         <MudTh>@T.Allowance.Employee</MudTh>
         <MudTh><MudTableSortLabel T="AllowanceAssignmentDto" SortLabel="@("Name")">@T.Allowance.Allowance</MudTableSortLabel></MudTh>

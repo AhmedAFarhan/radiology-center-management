@@ -14,7 +14,7 @@
     <MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Add" OnClick="OpenCreateDialogAsync">@T.SalaryComponent.NewComponent</MudButton>
 </PageHeader>
 
-<MudTable T="SalaryComponentDto" @ref="_table" ServerData="LoadServerData" Dense="true" Hover="true" Striped="true" Elevation="1" RowsPerPage="10">
+<MudTable T="SalaryComponentDto" @ref="_table" ServerData="LoadServerData" Dense="true" Hover="true" Striped="true" Elevation="1" RowsPerPage="10" FixedHeader="true" Class="table-scroll">
     <HeaderContent>
         <MudTh><MudTableSortLabel T="SalaryComponentDto" SortLabel="@("Name")">@T.Common.Name</MudTableSortLabel></MudTh>
         <MudTh><MudTableSortLabel T="SalaryComponentDto" SortLabel="@("Kind")">@T.SalaryComponent.Kind</MudTableSortLabel></MudTh>
@@ -42,7 +42,7 @@
             }
             @if (!context.IsPercentage && !context.IsPerWorkDay)
             {
-                <MudChip T="string" Size="Size.Small">@T.SalaryComponent.Fixed</MudChip>
+                <StatusChip Token="Fixed">@T.SalaryComponent.Fixed</StatusChip>
             }
         </MudTd>
         <MudTd DataLabel="@T.SalaryComponent.Frequency">@(string.IsNullOrWhiteSpace(context.Frequency) ? "-" : FormatFrequency(context.Frequency))</MudTd>

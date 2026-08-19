@@ -13,29 +13,17 @@
         }
         else if (_policy is null)
         {
-            <MudProgressCircular Indeterminate="true" Class="d-flex mx-auto my-4" />
+            <DialogSkeleton Rows="3" />
         }
         else
         {
             <MudGrid Spacing="2">
-                <MudItem xs="12" sm="6">
-                    <MudTextField Label="@T.PolicyDialog.Patient" Variant="Variant.Outlined" Margin="Margin.Dense" ReadOnly="true" Value="@_patientName" />
-                </MudItem>
-                <MudItem xs="12" sm="6">
-                    <MudTextField Label="@T.PolicyDialog.Company" Variant="Variant.Outlined" Margin="Margin.Dense" ReadOnly="true" Value="@_companyName" />
-                </MudItem>
-                <MudItem xs="12" sm="6">
-                    <MudTextField Label="@T.PolicyDialog.CoveragePercent" Variant="Variant.Outlined" Margin="Margin.Dense" ReadOnly="true" Value="@($"{_policy.CoveragePercent:0}%")" />
-                </MudItem>
-                <MudItem xs="12" sm="6">
-                    <MudTextField Label="@T.Common.Status" Variant="Variant.Outlined" Margin="Margin.Dense" ReadOnly="true" Value="@_policy.Status" />
-                </MudItem>
-                <MudItem xs="12" sm="6">
-                    <MudTextField Label="@T.PolicyDialog.EffectiveFrom" Variant="Variant.Outlined" Margin="Margin.Dense" ReadOnly="true" Value="@_policy.EffectiveFrom.ToString("yyyy-MM-dd")" />
-                </MudItem>
-                <MudItem xs="12" sm="6">
-                    <MudTextField Label="@T.PolicyDialog.EffectiveToLabel" Variant="Variant.Outlined" Margin="Margin.Dense" ReadOnly="true" Value="@(_policy.EffectiveTo?.ToString("yyyy-MM-dd") ?? "-")" />
-                </MudItem>
+                <DetailField Label="@T.PolicyDialog.Patient" Value="@_patientName" />
+                <DetailField Label="@T.PolicyDialog.Company" Value="@_companyName" />
+                <DetailField Label="@T.PolicyDialog.CoveragePercent" Value="@($"{_policy.CoveragePercent:0}%")" />
+                <DetailField Label="@T.Common.Status" Value="@_policy.Status" />
+                <DetailField Label="@T.PolicyDialog.EffectiveFrom" Value="@_policy.EffectiveFrom.ToString("yyyy-MM-dd")" />
+                <DetailField Label="@T.PolicyDialog.EffectiveToLabel" Value="@(_policy.EffectiveTo?.ToString("yyyy-MM-dd") ?? "-")" />
             </MudGrid>
 
             <MudDivider Class="my-2" />

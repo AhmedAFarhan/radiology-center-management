@@ -21,7 +21,9 @@
 
     <div class="app-main-col">
         <header class="app-topbar">
-            <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" OnClick="@(() => _drawerOpen = !_drawerOpen)" aria-label="@T.Layout.ToggleNav" />
+            <MudTooltip Placement="Placement.Bottom" Text="@T.Layout.ToggleNav">
+                <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" OnClick="@(() => _drawerOpen = !_drawerOpen)" aria-label="@T.Layout.ToggleNav" />
+            </MudTooltip>
             <div class="global-search" @onclick="OnSearchBoxClick">
                 <MudTextField T="string"
                               @ref="_searchField"
@@ -129,12 +131,26 @@
                 }
             </div>
             <MudSpacer />
-            <MudIconButton Icon="@Icons.Material.Filled.Notifications" Color="Color.Inherit" aria-label="@T.Layout.Notifications" OnClick="OnNotifications" />
+            <MudTooltip Placement="Placement.Bottom" Text="@T.Layout.Notifications">
+                <MudIconButton Icon="@Icons.Material.Filled.Notifications" Color="Color.Inherit" aria-label="@T.Layout.Notifications" OnClick="OnNotifications" />
+            </MudTooltip>
             <LanguageSwitcher />
-            <MudAvatar Size="Size.Small" Color="Color.Primary" Class="mx-2 app-bar-avatar">@GetInitial()</MudAvatar>
-            <MudText Typo="Typo.body2" Class="me-2 app-bar-user">@_userName</MudText>
-            <MudIconButton Icon="@Icons.Material.Filled.Key" Color="Color.Inherit" aria-label="@T.Layout.ChangePassword" OnClick="@OnChangePassword" />
-            <MudIconButton Icon="@Icons.Material.Filled.Logout" Color="Color.Inherit" aria-label="@T.Layout.SignOut" OnClick="@OnLogout" />
+            <MudMenu ActivationEvent="MouseEvent.LeftClick"
+                     AnchorOrigin="@(T.IsRTL ? Origin.BottomLeft : Origin.BottomRight)"
+                     TransformOrigin="@(T.IsRTL ? Origin.TopLeft : Origin.TopRight)"
+                     Class="profile-menu">
+                <ActivatorContent>
+                    <div class="d-flex align-center profile-trigger">
+                        <MudAvatar Size="Size.Small" Color="Color.Primary" Class="mx-2 app-bar-avatar">@GetInitial()</MudAvatar>
+                        <MudText Typo="Typo.body2" Class="me-2 app-bar-user">@_userName</MudText>
+                        <MudIcon Icon="@Icons.Material.Filled.ArrowDropDown" Size="Size.Small" Class="app-bar-chevron" />
+                    </div>
+                </ActivatorContent>
+                <ChildContent>
+                    <MudMenuItem Icon="@Icons.Material.Filled.Key" OnClick="OnChangePassword">@T.Layout.ChangePassword</MudMenuItem>
+                    <MudMenuItem Icon="@Icons.Material.Filled.Logout" OnClick="OnLogout">@T.Layout.SignOut</MudMenuItem>
+                </ChildContent>
+            </MudMenu>
         </header>
 
         <main class="app-main-content">

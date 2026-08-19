@@ -1,11 +1,12 @@
 @inject AppLocalizer T
 @inject IDialogService DialogService
 
-<MudIconButton Icon="@Icons.Material.Filled.Translate"
-               Color="Color.Inherit"
-               Title="@(T.IsRTL ? T.Language.English : T.Language.Arabic)"
-               aria-label="Language"
-               OnClick="OpenAsync" />
+<MudTooltip Placement="Placement.Bottom" Text="@(T.IsRTL ? T.Language.English : T.Language.Arabic)">
+    <MudIconButton Icon="@Icons.Material.Filled.Translate"
+                   Color="Color.Inherit"
+                   aria-label="@T.Language.Language"
+                   OnClick="OpenAsync" />
+</MudTooltip>
 
 @code {
     private async Task OpenAsync()
@@ -16,6 +17,7 @@
             BackdropClick = true,
             MaxWidth = MaxWidth.Small,
             FullWidth = true,
+            NoHeader = true,
         };
         await DialogService.ShowAsync<LanguageDialog>("", options);
     }

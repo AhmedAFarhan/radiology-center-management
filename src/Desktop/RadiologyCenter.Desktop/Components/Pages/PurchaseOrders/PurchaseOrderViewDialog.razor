@@ -16,7 +16,7 @@
         else if (_po is not null)
         {
             <MudText Typo="Typo.body2" Class="text-secondary mb-3">
-                @_po.SupplierName · <MudChip T="string" Size="Size.Small" Color="@StatusColor(_po.Status)">@FormatStatus(_po.Status)</MudChip>
+                @_po.SupplierName · <StatusChip Token="@_po.Status">@FormatStatus(_po.Status)</StatusChip>
             </MudText>
 
             <MudSimpleTable Dense="true">
@@ -107,16 +107,6 @@
     {
         "PartiallyReceived" => "Partially Received",
         _ => status,
-    };
-
-    private static Color StatusColor(string status) => status switch
-    {
-        "Draft" => Color.Default,
-        "Ordered" => Color.Primary,
-        "PartiallyReceived" => Color.Warning,
-        "Received" => Color.Success,
-        "Cancelled" => Color.Error,
-        _ => Color.Primary,
     };
 
     private void CloseAsync()

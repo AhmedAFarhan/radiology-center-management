@@ -33,7 +33,7 @@ public sealed class DashboardService
         return new DashboardData(
             patients.TotalCount,
             examinations.TotalCount,
-            examinations.Items.Count(e => string.Equals(e.Status, "InProgress", StringComparison.OrdinalIgnoreCase)),
+            examinations.Items.Count(e => string.Equals(e.StatusKey, "InProgress", StringComparison.OrdinalIgnoreCase)),
             items.TotalCount,
             examinations.Items
                 .OrderByDescending(e => e.CompletedAt ?? e.ScheduledAt ?? e.StartedAt)

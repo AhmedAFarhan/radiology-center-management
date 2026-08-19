@@ -14,7 +14,7 @@
     <MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Add" OnClick="OpenCreateDialogAsync">@T.Leave.Add</MudButton>
 </PageHeader>
 
-<MudTable T="LeaveDto" @ref="_table" ServerData="LoadServerData" Dense="true" Hover="true" Striped="true" Elevation="1" RowsPerPage="10">
+<MudTable T="LeaveDto" @ref="_table" ServerData="LoadServerData" Dense="true" Hover="true" Striped="true" Elevation="1" RowsPerPage="10" FixedHeader="true" Class="table-scroll">
     <HeaderContent>
         <MudTh>@T.Leave.Staff</MudTh>
         <MudTh><MudTableSortLabel T="LeaveDto" SortLabel="@("LeaveType")">@T.Common.Type</MudTableSortLabel></MudTh>
@@ -29,7 +29,7 @@
             <MudText Class="font-weight-medium">@ResolveStaff(context.StaffId)</MudText>
         </MudTd>
         <MudTd DataLabel="@T.Common.Type">
-            <MudChip T="string" Size="Size.Small">@FormatLeaveType(context.LeaveType)</MudChip>
+            <StatusChip Token="@context.LeaveType">@FormatLeaveType(context.LeaveType)</StatusChip>
         </MudTd>
         <MudTd DataLabel="@T.Leave.StartDate">@context.StartDate.ToString("yyyy-MM-dd")</MudTd>
         <MudTd DataLabel="@T.Leave.EndDate">@context.EndDate.ToString("yyyy-MM-dd")</MudTd>

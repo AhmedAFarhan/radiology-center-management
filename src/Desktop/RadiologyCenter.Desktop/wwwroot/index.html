@@ -17,7 +17,7 @@
     <div id="app"></div>
 
     <div id="blazor-error-ui" data-nosnippet>
-        An unhandled error has occurred.
+        <span id="blazor-error-message">An unhandled error has occurred.</span>
         <a href="." class="reload">Reload</a>
         <span class="dismiss">🗙</span>
     </div>
@@ -26,6 +26,14 @@
         window.setAppLanguage = function (lang, dir) {
             document.documentElement.lang = lang;
             document.documentElement.dir = dir;
+            var errorMessage = document.getElementById('blazor-error-message');
+            if (errorMessage) {
+                errorMessage.textContent = lang === 'ar' ? 'حدث خطأ غير متوقع.' : 'An unhandled error has occurred.';
+            }
+            var reload = document.querySelector('#blazor-error-ui .reload');
+            if (reload) {
+                reload.textContent = lang === 'ar' ? 'إعادة التحميل' : 'Reload';
+            }
         };
     </script>
     <script src="_framework/blazor.webview.js" autostart="false"></script>

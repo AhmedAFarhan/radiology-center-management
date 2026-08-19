@@ -16,7 +16,7 @@
     <MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Add" OnClick="OpenCreateDialogAsync">@T.ReferralDoctor.Add</MudButton>
 </PageHeader>
 
-<MudTable T="ReferralDoctorDto" @ref="_table" ServerData="LoadServerData" Dense="true" Hover="true" Striped="true" Elevation="1" RowsPerPage="10">
+<MudTable T="ReferralDoctorDto" @ref="_table" ServerData="LoadServerData" Dense="true" Hover="true" Striped="true" Elevation="1" RowsPerPage="10" FixedHeader="true" Class="table-scroll">
     <HeaderContent>
         <MudTh><MudTableSortLabel T="ReferralDoctorDto" SortLabel="@("LastName")">@T.Common.Name</MudTableSortLabel></MudTh>
         <MudTh><MudTableSortLabel T="ReferralDoctorDto" SortLabel="@("Phone")">@T.ReferralDoctor.Phone</MudTableSortLabel></MudTh>

@@ -15,7 +15,7 @@ public static class AppTheme
             Tertiary = "#34A853",
             Info = "#2196F3",
             Success = "#2E7D32",
-            Warning = "#ED6C02",
+            Warning = "#E65100",
             Error = "#D32F2F",
             Dark = "#334155",
             Background = "#F4F7FC",
@@ -29,12 +29,6 @@ public static class AppTheme
             TextPrimary = "#111827",
             TextSecondary = "#6B7280",
             ActionDefault = "#6B7280",
-        },
-        PaletteDark = new PaletteDark
-        {
-            Primary = "#9BB3FD",
-            Background = "#0B1220",
-            Surface = "#111827",
         },
         LayoutProperties = new LayoutProperties
         {

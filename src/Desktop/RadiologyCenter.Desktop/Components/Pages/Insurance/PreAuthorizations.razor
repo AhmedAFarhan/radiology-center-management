@@ -14,12 +14,12 @@
     <MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Add" OnClick="OpenCreateDialogAsync">@T.PreAuth.RequestAuthorization</MudButton>
 </PageHeader>
 
-<MudTable T="PreAuthorizationListItemDto" @ref="_table" ServerData="LoadServerData" Dense="true" Hover="true" Striped="true" Elevation="1" RowsPerPage="10">
+<MudTable T="PreAuthorizationListItemDto" @ref="_table" ServerData="LoadServerData" Dense="true" Hover="true" Striped="true" Elevation="1" RowsPerPage="10" FixedHeader="true" Class="table-scroll">
     <HeaderContent>
         <MudTh><MudTableSortLabel T="PreAuthorizationListItemDto" SortLabel="@("PatientName")">@T.PreAuth.Patient</MudTableSortLabel></MudTh>
         <MudTh><MudTableSortLabel T="PreAuthorizationListItemDto" SortLabel="@("ExaminationTypeName")">@T.PreAuth.Examination</MudTableSortLabel></MudTh>
         <MudTh><MudTableSortLabel T="PreAuthorizationListItemDto" SortLabel="@("PolicyNumber")">@T.PreAuth.PolicyNumber</MudTableSortLabel></MudTh>
-        <MudTh><MudTableSortLabel T="PreAuthorizationListItemDto" SortLabel="@("EstimatedAmount")">@T.PreAuth.Estimated</MudTableSortLabel></MudTh>
+        <MudTh Class="text-right"><MudTableSortLabel T="PreAuthorizationListItemDto" SortLabel="@("EstimatedAmount")">@T.PreAuth.Estimated</MudTableSortLabel></MudTh>
         <MudTh><MudTableSortLabel T="PreAuthorizationListItemDto" SortLabel="@("RequestedAt")">@T.PreAuth.Requested</MudTableSortLabel></MudTh>
         <MudTh>@T.Common.Status</MudTh>
         <MudTh>@T.Common.Actions</MudTh>
@@ -32,10 +32,10 @@
         <MudTd DataLabel="@T.PreAuth.PolicyNumber">
             <MudText Class="mono-text">@context.PolicyNumber</MudText>
         </MudTd>
-        <MudTd DataLabel="@T.PreAuth.Estimated">@context.EstimatedAmount.ToString("C")</MudTd>
+        <MudTd DataLabel="@T.PreAuth.Estimated" Class="text-right">@context.EstimatedAmount.ToString("C")</MudTd>
         <MudTd DataLabel="@T.PreAuth.Requested">@context.RequestedAt.ToString("yyyy-MM-dd")</MudTd>
         <MudTd DataLabel="@T.Common.Status">
-            <MudChip T="string" Size="Size.Small" Color="@StatusColor(context.Status)">@FormatStatus(context.Status)</MudChip>
+            <StatusChip Token="@context.Status">@FormatStatus(context.Status)</StatusChip>
         </MudTd>
         <MudTd DataLabel="@T.Common.Actions">
             <MudIconButton Icon="@Icons.Material.Filled.Visibility" Size="Size.Small" Color="Color.Default" aria-label="@T.PreAuth.View" OnClick="@(() => OpenDetailDialogAsync(context))" />
@@ -158,13 +158,6 @@
         "Approved" => "Approved",
         "Denied" => "Denied",
         _ => status,
-    };
-
-    private static Color StatusColor(string status) => status switch
-    {
-        "Approved" => Color.Success,
-        "Denied" => Color.Error,
-        _ => Color.Warning,
     };
 
     public void Dispose() => _searchCts?.Cancel();

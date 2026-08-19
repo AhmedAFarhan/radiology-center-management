@@ -1,9 +1,10 @@
 @using ApexCharts
 @using RadiologyCenter.Desktop.Models
+@inject AppLocalizer T
 
 @if (Items.Count == 0)
 {
-    <div class="pa-6 text-center text-secondary">No modality data in this period.</div>
+    <div class="pa-6 text-center text-secondary">@T.Analytics.NoModalityData</div>
 }
 else
 {
@@ -28,11 +29,11 @@ else
         {
             Toolbar = new Toolbar { Show = false },
             ForeColor = "#8B93A7",
-            FontFamily = "OpenSansRegular, sans-serif",
+            FontFamily = "Montserrat, Cairo, sans-serif",
         },
         DataLabels = new DataLabels { Enabled = false },
         Grid = new Grid { Show = true, BorderColor = "#EDEFF5" },
-        Colors = new List<string> { "#7A5CFF" },
+        Colors = new List<string> { "#7A84EA" },
         PlotOptions = new PlotOptions
         {
             Bar = new PlotOptionsBar { BorderRadius = 8, ColumnWidth = "45%" }

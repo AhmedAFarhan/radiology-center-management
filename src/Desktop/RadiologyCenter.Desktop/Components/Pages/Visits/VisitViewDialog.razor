@@ -27,11 +27,11 @@
                 </MudItem>
                 <MudItem xs="12" sm="6">
                     <MudText Typo="Typo.caption" Class="text-secondary">@T.Common.Status</MudText>
-                    <MudChip T="string" Size="Size.Small" Color="@(StatusColor(_visit.StatusKey))">@_visit.Status</MudChip>
+                    <StatusChip Token="@_visit.StatusKey">@_visit.Status</StatusChip>
                 </MudItem>
                 <MudItem xs="12" sm="6">
                     <MudText Typo="Typo.caption" Class="text-secondary">@T.VisitDialog.Priority</MudText>
-                    <MudChip T="string" Size="Size.Small" Color="@(PriorityColor(_visit.PriorityKey))">@_visit.Priority</MudChip>
+                    <StatusChip Token="@_visit.PriorityKey">@_visit.Priority</StatusChip>
                 </MudItem>
                 <MudItem xs="12">
                     <MudText Typo="Typo.caption" Class="text-secondary">@T.VisitDialog.Radiologist</MudText>
@@ -201,23 +201,6 @@
 
     private string ResolveItemName(string itemId)
         => _itemNames.TryGetValue(itemId, out var name) ? name : itemId;
-
-    private static Color PriorityColor(string priority) => priority switch
-    {
-        "Stat" => Color.Error,
-        "Urgent" => Color.Warning,
-        _ => Color.Default,
-    };
-
-    private static Color StatusColor(string status) => status switch
-    {
-        "Completed" => Color.Success,
-        "Cancelled" => Color.Default,
-        "InProgress" => Color.Secondary,
-        "CheckedIn" => Color.Info,
-        "Scheduled" => Color.Primary,
-        _ => Color.Default,
-    };
 
     private void CloseAsync()
         => MudDialog.Cancel();

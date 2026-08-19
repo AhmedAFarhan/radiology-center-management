@@ -22,7 +22,7 @@
         <div class="mt-2" style="max-height: 380px; overflow-y: auto;">
             @if (_loading)
             {
-                <MudProgressCircular Size="Size.Large" Class="mx-auto d-block py-6" Indeterminate="true" />
+                <DialogSkeleton Rows="3" />
             }
             else if (FilteredTemplates is null || !string.IsNullOrEmpty(_error))
             {

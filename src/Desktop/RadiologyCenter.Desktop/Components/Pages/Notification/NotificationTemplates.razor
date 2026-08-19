@@ -14,7 +14,7 @@
     <MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Add" OnClick="OpenCreateDialogAsync">@T.Notifications.NewTemplate</MudButton>
 </PageHeader>
 
-<MudTable T="NotificationTemplateDto" @ref="_table" ServerData="LoadServerData" Dense="true" Hover="true" Striped="true" Elevation="1" RowsPerPage="10">
+<MudTable T="NotificationTemplateDto" @ref="_table" ServerData="LoadServerData" Dense="true" Hover="true" Striped="true" Elevation="1" RowsPerPage="10" FixedHeader="true" Class="table-scroll">
     <HeaderContent>
         <MudTh><MudTableSortLabel T="NotificationTemplateDto" SortLabel="@("Code")">@T.Notifications.Code</MudTableSortLabel></MudTh>
         <MudTh><MudTableSortLabel T="NotificationTemplateDto" SortLabel="@("Name")">@T.Common.Name</MudTableSortLabel></MudTh>

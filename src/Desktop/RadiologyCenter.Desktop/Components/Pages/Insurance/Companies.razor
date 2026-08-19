@@ -16,7 +16,7 @@
     <MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Add" OnClick="OpenCreateDialogAsync">@T.Insurance.AddCompany</MudButton>
 </PageHeader>
 
-<MudTable T="InsuranceCompanyDto" @ref="_table" Items="@_filtered" Dense="true" Hover="true" Striped="true" Elevation="1" RowsPerPage="10">
+<MudTable T="InsuranceCompanyDto" @ref="_table" ServerData="LoadServerData" Dense="true" Hover="true" Striped="true" Elevation="1" RowsPerPage="10" FixedHeader="true" Class="table-scroll">
     <HeaderContent>
         <MudTh><MudTableSortLabel T="InsuranceCompanyDto" SortLabel="@("Name")">@T.Common.Name</MudTableSortLabel></MudTh>
         <MudTh>@T.Insurance.TaxNumber</MudTh>
@@ -63,11 +63,11 @@
 @code {
     private MudTable<InsuranceCompanyDto>? _table;
     private List<InsuranceCompanyDto> _companies = new();
-    private IEnumerable<InsuranceCompanyDto> _filtered => Filter(_companies);
     private string? _search;
     private CancellationTokenSource? _searchCts;
     private string? _loadError;
     private bool _offline;
+    private bool _loaded;
     private string? _openId;
 
     [SupplyParameterFromQuery(Name = "q")]
@@ -112,9 +112,6 @@
         NavigationManager.NavigateTo("/insurance/companies", replace: true);
     }
 
-    protected override async Task OnInitializedAsync()
-        => await LoadAsync();
-
     private IEnumerable<InsuranceCompanyDto> Filter(IEnumerable<InsuranceCompanyDto> companies)
     {
         if (string.IsNullOrWhiteSpace(_search))
@@ -128,13 +125,14 @@
             || (c.TaxId?.Contains(term, StringComparison.OrdinalIgnoreCase) ?? false));
     }
 
-    private async Task LoadAsync()
+    private async Task LoadAsync(CancellationToken ct = default)
     {
         try
         {
-            _companies = (await InsuranceService.GetCompaniesAsync()).ToList();
+            _companies = (await InsuranceService.GetCompaniesAsync(ct)).ToList();
             _loadError = null;
             _offline = false;
+            _loaded = true;
         }
         catch (ApiException ex)
         {
@@ -149,6 +147,30 @@
         }
     }
 
+    private async Task<TableData<InsuranceCompanyDto>> LoadServerData(TableState state, CancellationToken ct)
+    {
+        if (!_loaded)
+            await LoadAsync(ct);
+
+        if (_loadError is not null)
+            return new TableData<InsuranceCompanyDto> { Items = Array.Empty<InsuranceCompanyDto>(), TotalItems = 0 };
+
+        var query = Filter(_companies);
+        if (!string.IsNullOrWhiteSpace(state.SortLabel))
+        {
+            query = state.SortDirection == SortDirection.Descending
+                ? query.OrderByDescending(c => c.Name)
+                : query.OrderBy(c => c.Name);
+        }
+
+        var items = query.ToList();
+        return new TableData<InsuranceCompanyDto>
+        {
+            Items = items.Skip(state.Page * state.PageSize).Take(state.PageSize).ToList(),
+            TotalItems = items.Count,
+        };
+    }
+
     private async Task OnSearchChanged(string? value)
     {
         _search = value;
@@ -157,18 +179,25 @@
         var cts = _searchCts = new CancellationTokenSource();
         try
         {
-            await Task.Delay(300, cts.Token);
+            await Task.Delay(400, cts.Token);
         }
         catch (TaskCanceledException)
         {
             return;
         }
 
-        await InvokeAsync(StateHasChanged);
+        if (_table is not null)
+            await _table.ReloadServerData();
     }
 
-    private Task ReloadAsync()
-        => LoadAsync();
+    private async Task ReloadAsync()
+    {
+        _loaded = false;
+        if (_table is not null)
+            await _table.ReloadServerData();
+        else
+            await LoadAsync();
+    }
 
     private async Task OpenCreateDialogAsync()
     {
@@ -189,7 +218,7 @@
     {
         var result = await dialog.Result;
         if (result is { Canceled: false })
-            await LoadAsync();
+            await ReloadAsync();
     }
 
     private async Task DeleteCompanyAsync(InsuranceCompanyDto company)
@@ -207,7 +236,7 @@
             {
                 await InsuranceService.DeleteCompanyAsync(company.Id);
                 Snackbar.Add(T.Insurance.CompanyDeleted, Severity.Success);
-                await LoadAsync();
+                await ReloadAsync();
             },
             Snackbar,
             () => T.Insurance.Unreachable);

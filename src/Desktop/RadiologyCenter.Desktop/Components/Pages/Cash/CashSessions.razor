@@ -20,12 +20,12 @@
     <MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Add" OnClick="OpenSessionAsync">@T.Cash.OpenSession</MudButton>
 </PageHeader>
 
-<MudTable T="CashSessionDto" @ref="_table" ServerData="LoadServerData" Dense="true" Hover="true" Striped="true" Elevation="1" RowsPerPage="10">
+<MudTable T="CashSessionDto" @ref="_table" ServerData="LoadServerData" Dense="true" Hover="true" Striped="true" Elevation="1" RowsPerPage="10" FixedHeader="true" Class="table-scroll">
     <HeaderContent>
         <MudTh><MudTableSortLabel T="CashSessionDto" SortLabel="@("OpenedAt")">@T.Cash.OpenedAt</MudTableSortLabel></MudTh>
         <MudTh>@T.Cash.User</MudTh>
         <MudTh><MudTableSortLabel T="CashSessionDto" SortLabel="@("Status")">@T.Common.Status</MudTableSortLabel></MudTh>
-        <MudTh><MudTableSortLabel T="CashSessionDto" SortLabel="@("OpeningFloat")">@T.Cash.OpeningFloat</MudTableSortLabel></MudTh>
+        <MudTh Class="text-right"><MudTableSortLabel T="CashSessionDto" SortLabel="@("OpeningFloat")">@T.Cash.OpeningFloat</MudTableSortLabel></MudTh>
         <MudTh Class="text-right">@T.Cash.Balance</MudTh>
         <MudTh Class="text-center">@T.Cash.Entries</MudTh>
         <MudTh><MudTableSortLabel T="CashSessionDto" SortLabel="@("OpenedAt")">@T.Cash.ClosedAt</MudTableSortLabel></MudTh>
@@ -35,9 +35,9 @@
         <MudTd DataLabel="@T.Cash.OpenedAt">@context.OpenedAt.ToLocalTime().ToString("g")</MudTd>
         <MudTd DataLabel="@T.Cash.User">@(string.IsNullOrWhiteSpace(context.UserName) ? ShortId(context.UserId) : context.UserName)</MudTd>
         <MudTd DataLabel="@T.Common.Status">
-            <MudChip T="string" Size="Size.Small" Color="@StatusColor(context.Status)">@context.Status</MudChip>
+            <StatusChip Token="@context.Status">@context.Status</StatusChip>
         </MudTd>
-        <MudTd DataLabel="@T.Cash.OpeningFloat">@context.OpeningFloat.ToString("C")</MudTd>
+        <MudTd DataLabel="@T.Cash.OpeningFloat" Class="text-right">@context.OpeningFloat.ToString("C")</MudTd>
         <MudTd DataLabel="@T.Cash.Balance" Class="text-right">
             <MudText Class="font-weight-medium" Color="@(context.Balance < 0 ? Color.Error : Color.Default)">@context.Balance.ToString("C")</MudText>
         </MudTd>
@@ -165,14 +165,7 @@
             await ReloadAsync();
     }
 
-    private static Color StatusColor(string status) => status switch
-    {
-        "Open" => Color.Success,
-        "Closed" => Color.Default,
-        _ => Color.Primary,
-    };
-
-    private static string ShortId(string id)
+private static string ShortId(string id)
         => id.Length > 8 ? id[..8] : id;
 
     public void Dispose() => _searchCts?.Cancel();

@@ -35,11 +35,11 @@ else
             </div>
             <div class="hero-metric">
                 <div class="hero-metric-label">@T.Overview.Billed</div>
-                <div class="hero-metric-value">@AnalyticsFormat.MoneyCompact(_profit.TotalBilled)</div>
+                <div class="hero-metric-value">@AnalyticsFormat.MoneyCompact(_profit.TotalBilled, T.Overview.FormatThousand, T.Overview.FormatMillion)</div>
             </div>
             <div class="hero-metric">
                 <div class="hero-metric-label">@T.Overview.TotalCosts</div>
-                <div class="hero-metric-value">@AnalyticsFormat.MoneyCompact(_profit.TotalCosts)</div>
+                <div class="hero-metric-value">@AnalyticsFormat.MoneyCompact(_profit.TotalCosts, T.Overview.FormatThousand, T.Overview.FormatMillion)</div>
             </div>
         </div>
     </div>

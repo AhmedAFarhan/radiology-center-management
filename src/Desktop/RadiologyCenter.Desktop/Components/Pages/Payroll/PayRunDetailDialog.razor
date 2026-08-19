@@ -23,7 +23,7 @@
                             </MudItem>
                             <MudItem xs="12" sm="6" md="3">
                                 <MudText Typo="Typo.caption" Class="text-secondary">@T.Common.Status</MudText>
-                                <MudChip T="string" Size="Size.Small" Color="@StatusColor(_payRun.Status)">@FormatStatus(_payRun.Status)</MudChip>
+                                <StatusChip Token="@_payRun.Status">@_payRun.Status</StatusChip>
                             </MudItem>
                             <MudItem xs="12" sm="6" md="3">
                                 <MudText Typo="Typo.caption" Class="text-secondary">@T.PayRunDialog.Processed</MudText>
@@ -329,16 +329,5 @@
 
     private void CloseAsync()
         => MudDialog.Close(DialogResult.Ok(true));
-
-    private static string FormatStatus(string status) => status;
-    private static Color StatusColor(string status) => status switch
-    {
-        "Draft" => Color.Default,
-        "Computed" => Color.Info,
-        "Approved" => Color.Primary,
-        "Paid" => Color.Success,
-        "Rejected" => Color.Error,
-        _ => Color.Default,
-    };
 }
 

@@ -22,13 +22,15 @@
                           Label="@T.Login.Username"
                           Variant="Variant.Outlined"
                           Margin="Margin.Dense"
-                          Immediate="true" />
+                          Immediate="true"
+                          Autocomplete="username" />
             <MudTextField @bind-Value="_model.Password"
                           Label="@T.Login.Password"
                           Variant="Variant.Outlined"
                           Margin="Margin.Dense"
                           InputType="InputType.Password"
-                          Immediate="true" />
+                          Immediate="true"
+                          Autocomplete="current-password" />
             <MudButton ButtonType="ButtonType.Submit"
                        Color="Color.Primary"
                        Variant="Variant.Filled"
@@ -71,6 +73,7 @@
                         BackdropClick = false,
                         MaxWidth = MaxWidth.Small,
                         FullWidth = true,
+                        NoHeader = true,
                     };
                     await DialogService.ShowAsync<ChangePasswordDialog>(T.ChangePassword.Title, new DialogParameters { ["Forced"] = true }, options);
                     Navigation.NavigateTo(ReturnUrl.Consume() ?? "/dashboard");

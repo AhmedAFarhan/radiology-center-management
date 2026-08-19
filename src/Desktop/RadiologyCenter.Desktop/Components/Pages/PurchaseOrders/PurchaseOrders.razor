@@ -28,7 +28,7 @@
         </MudTd>
         <MudTd DataLabel="@T.PurchaseOrders.Supplier">@context.SupplierName</MudTd>
         <MudTd DataLabel="@T.Common.Status">
-            <MudChip T="string" Size="Size.Small" Color="@StatusColor(context.Status)">@FormatStatus(context.Status)</MudChip>
+            <StatusChip Token="@context.Status">@FormatStatus(context.Status)</StatusChip>
         </MudTd>
         <MudTd DataLabel="@T.PurchaseOrders.Expected">@(context.ExpectedDeliveryAt?.ToString("dd MMM yyyy") ?? "-")</MudTd>
         <MudTd DataLabel="@T.Common.Actions">
@@ -211,16 +211,6 @@
     {
         "PartiallyReceived" => "Partially Received",
         _ => status,
-    };
-
-    private static Color StatusColor(string status) => status switch
-    {
-        "Draft" => Color.Default,
-        "Ordered" => Color.Primary,
-        "PartiallyReceived" => Color.Warning,
-        "Received" => Color.Success,
-        "Cancelled" => Color.Error,
-        _ => Color.Primary,
     };
 
     public void Dispose() => _searchCts?.Cancel();

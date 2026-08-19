@@ -15,7 +15,7 @@
     <MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Add" OnClick="OpenCreateDialogAsync">@T.ExamFee.NewFee</MudButton>
 </PageHeader>
 
-<MudTable T="ExaminationFeeDto" @ref="_table" ServerData="LoadServerData" Dense="true" Hover="true" Striped="true" Elevation="1" RowsPerPage="10">
+<MudTable T="ExaminationFeeDto" @ref="_table" ServerData="LoadServerData" Dense="true" Hover="true" Striped="true" Elevation="1" RowsPerPage="10" FixedHeader="true" Class="table-scroll">
     <HeaderContent>
         <MudTh>@T.ExamFee.ExaminationType</MudTh>
         <MudTh><MudTableSortLabel T="ExaminationFeeDto" SortLabel="@("Role")">@T.ExamFee.Role</MudTableSortLabel></MudTh>

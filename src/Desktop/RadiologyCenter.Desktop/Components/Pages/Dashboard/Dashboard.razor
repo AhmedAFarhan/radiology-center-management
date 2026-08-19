@@ -4,7 +4,7 @@
 @inject InsuranceService InsuranceService
 @inject AppLocalizer T
 
-<MudText Typo="Typo.h4">@T.Dashboard.Title</MudText>
+<h1 class="mud-typography mud-typography-h4" tabindex="-1">@T.Dashboard.Title</h1>
 <MudText Typo="Typo.body1" Class="text-secondary mb-4">@T.Dashboard.Subtitle</MudText>
 
 @if (_loading)
@@ -19,24 +19,16 @@ else
 {
     <MudGrid Spacing="3">
         <MudItem xs="12" sm="6" lg="3">
-            <StatCard Label="@T.Dashboard.TotalPatients" Value="@_data!.TotalPatients.ToString()" Icon="@Icons.Material.Filled.People" Color="Color.Primary" TrendText="+8.2%" TrendUp="true">
-                <Trend><Sparkline Values="@DashboardSampleData.SparklineUp" /></Trend>
-            </StatCard>
+            <StatCard Label="@T.Dashboard.TotalPatients" Value="@_data!.TotalPatients.ToString()" Icon="@Icons.Material.Filled.People" Color="Color.Primary" />
         </MudItem>
         <MudItem xs="12" sm="6" lg="3">
-            <StatCard Label="@T.Dashboard.TotalExaminations" Value="@_data!.TotalExaminations.ToString()" Icon="@Icons.Material.Filled.MedicalServices" Color="Color.Secondary" TrendText="+5.7%" TrendUp="true">
-                <Trend><Sparkline Values="@DashboardSampleData.SparklineUp" /></Trend>
-            </StatCard>
+            <StatCard Label="@T.Dashboard.TotalExaminations" Value="@_data!.TotalExaminations.ToString()" Icon="@Icons.Material.Filled.MedicalServices" Color="Color.Secondary" />
         </MudItem>
         <MudItem xs="12" sm="6" lg="3">
-            <StatCard Label="@T.Dashboard.ExamsInProgress" Value="@_data!.ExamsInProgress.ToString()" Icon="@Icons.Material.Filled.HourglassTop" Color="Color.Warning" TrendText="-3.1%" TrendUp="false">
-                <Trend><Sparkline Values="@DashboardSampleData.SparklineDown" /></Trend>
-            </StatCard>
+            <StatCard Label="@T.Dashboard.ExamsInProgress" Value="@_data!.ExamsInProgress.ToString()" Icon="@Icons.Material.Filled.HourglassTop" Color="Color.Warning" />
         </MudItem>
         <MudItem xs="12" sm="6" lg="3">
-            <StatCard Label="@T.Dashboard.InventoryItems" Value="@_data!.TotalInventoryItems.ToString()" Icon="@Icons.Material.Filled.Inventory2" Color="Color.Info" TrendText="+1.2%" TrendUp="true">
-                <Trend><Sparkline Values="@DashboardSampleData.SparklineSteady" /></Trend>
-            </StatCard>
+            <StatCard Label="@T.Dashboard.InventoryItems" Value="@_data!.TotalInventoryItems.ToString()" Icon="@Icons.Material.Filled.Inventory2" Color="Color.Info" />
         </MudItem>
         @if (_insuranceStats is not null)
         {

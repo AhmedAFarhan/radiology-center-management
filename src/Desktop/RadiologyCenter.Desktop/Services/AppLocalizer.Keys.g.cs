@@ -318,6 +318,12 @@ public sealed class AnalyticsGroup
     public string Last90Days => _localizer.Get("analytics.last90Days");
     public string LastMonth => _localizer.Get("analytics.lastMonth");
     public string LastYear => _localizer.Get("analytics.lastYear");
+    public string NoData => _localizer.Get("analytics.noData");
+    public string NoMachineData => _localizer.Get("analytics.noMachineData");
+    public string NoModalityActivity => _localizer.Get("analytics.noModalityActivity");
+    public string NoModalityData => _localizer.Get("analytics.noModalityData");
+    public string NoRevenueData => _localizer.Get("analytics.noRevenueData");
+    public string NoVolumeData => _localizer.Get("analytics.noVolumeData");
     public string Period => _localizer.Get("analytics.period");
     public string Range => _localizer.Get("analytics.range");
     public string Refresh => _localizer.Get("analytics.refresh");
@@ -936,7 +942,8 @@ public sealed class LandingGroup
     public string Hint => _localizer.Get("landing.hint");
     public string SignIn => _localizer.Get("landing.signIn");
     public string Subtitle => _localizer.Get("landing.subtitle");
-    public string Title => _localizer.Get("landing.title");
+    public string TitleLine1 => _localizer.Get("landing.titleLine1");
+    public string TitleLine2 => _localizer.Get("landing.titleLine2");
 
     private FeatureGroup? _feature;
     public FeatureGroup Feature => _feature ??= new FeatureGroup(_localizer);
@@ -956,8 +963,11 @@ public sealed class LanguageGroup
     private readonly AppLocalizer _localizer;
     internal LanguageGroup(AppLocalizer localizer) => _localizer = localizer;
     public string Arabic => _localizer.Get("language.arabic");
+    public string ArabicFlag => _localizer.Get("language.arabicFlag");
     public string DialogTitle => _localizer.Get("language.dialogTitle");
     public string English => _localizer.Get("language.english");
+    public string EnglishFlag => _localizer.Get("language.englishFlag");
+    public string Language => _localizer.Get("language.language");
 }
 
 public sealed class LayoutGroup
@@ -1097,6 +1107,7 @@ public sealed class NotFoundGroup
 {
     private readonly AppLocalizer _localizer;
     internal NotFoundGroup(AppLocalizer localizer) => _localizer = localizer;
+    public string Action => _localizer.Get("notFound.action");
     public string Message => _localizer.Get("notFound.message");
     public string Title => _localizer.Get("notFound.title");
 }
@@ -1194,6 +1205,8 @@ public sealed class OverviewGroup
     public string CostStructure => _localizer.Get("overview.costStructure");
     public string DiscountsGiven => _localizer.Get("overview.discountsGiven");
     public string ExamCount => _localizer.Get("overview.examCount");
+    public string FormatMillion => _localizer.Get("overview.formatMillion");
+    public string FormatThousand => _localizer.Get("overview.formatThousand");
     public string FromRevenueToProfit => _localizer.Get("overview.fromRevenueToProfit");
     public string GeneratedRevenue => _localizer.Get("overview.generatedRevenue");
     public string Labor => _localizer.Get("overview.labor");
@@ -1641,6 +1654,7 @@ public sealed class ReadingRoomGroup
     public string SignAndFinalize => _localizer.Get("readingRoom.signAndFinalize");
     public string SignedAt => _localizer.Get("readingRoom.signedAt");
     public string SignReport => _localizer.Get("readingRoom.signReport");
+    public string StartReport => _localizer.Get("readingRoom.startReport");
     public string Subtitle => _localizer.Get("readingRoom.subtitle");
     public string TemplateApplied => _localizer.Get("readingRoom.templateApplied");
     public string Title => _localizer.Get("readingRoom.title");
@@ -2289,6 +2303,7 @@ public sealed class ValidationGroup
     public string ContactPersonMaxLength => _localizer.Get("validation.contactPersonMaxLength");
     public string CountedTotalInvalid => _localizer.Get("validation.countedTotalInvalid");
     public string CoverageRange => _localizer.Get("validation.coverageRange");
+    public string CurrentPasswordRequired => _localizer.Get("validation.currentPasswordRequired");
     public string DepartmentMaxLength => _localizer.Get("validation.departmentMaxLength");
     public string DescriptionMaxLength => _localizer.Get("validation.descriptionMaxLength");
     public string EffectiveFromRequired => _localizer.Get("validation.effectiveFromRequired");
@@ -2310,6 +2325,8 @@ public sealed class ValidationGroup
     public string LastNameRequired => _localizer.Get("validation.lastNameRequired");
     public string LeaveTypeRequired => _localizer.Get("validation.leaveTypeRequired");
     public string LicenseNumberMaxLength => _localizer.Get("validation.licenseNumberMaxLength");
+    public string LockUntilDateRequired => _localizer.Get("validation.lockUntilDateRequired");
+    public string LockUntilTimeRequired => _localizer.Get("validation.lockUntilTimeRequired");
     public string ModalityRequired => _localizer.Get("validation.modalityRequired");
     public string NameMaxLength100 => _localizer.Get("validation.nameMaxLength100");
     public string NameMaxLength200 => _localizer.Get("validation.nameMaxLength200");
@@ -2319,6 +2336,7 @@ public sealed class ValidationGroup
     public string OpeningFloatInvalid => _localizer.Get("validation.openingFloatInvalid");
     public string PasswordLettersDigits => _localizer.Get("validation.passwordLettersDigits");
     public string PasswordMinLength => _localizer.Get("validation.passwordMinLength");
+    public string PasswordMismatch => _localizer.Get("validation.passwordMismatch");
     public string PasswordRequired => _localizer.Get("validation.passwordRequired");
     public string PatientRequired => _localizer.Get("validation.patientRequired");
     public string PaymentTermsMaxLength => _localizer.Get("validation.paymentTermsMaxLength");
@@ -2330,6 +2348,7 @@ public sealed class ValidationGroup
     public string PolicyNumberMaxLength => _localizer.Get("validation.policyNumberMaxLength");
     public string PolicyNumberRequired => _localizer.Get("validation.policyNumberRequired");
     public string PositionRequired => _localizer.Get("validation.positionRequired");
+    public string QuantityMinOne => _localizer.Get("validation.quantityMinOne");
     public string RadiologistRequired => _localizer.Get("validation.radiologistRequired");
     public string ReasonMaxLength => _localizer.Get("validation.reasonMaxLength");
     public string ReceivingOpeningFloatInvalid => _localizer.Get("validation.receivingOpeningFloatInvalid");
@@ -2343,8 +2362,11 @@ public sealed class ValidationGroup
     public string RoleNameRequired => _localizer.Get("validation.roleNameRequired");
     public string RoleRequired => _localizer.Get("validation.roleRequired");
     public string SalaryTypeRequired => _localizer.Get("validation.salaryTypeRequired");
+    public string ScheduledDateRequired => _localizer.Get("validation.scheduledDateRequired");
+    public string ScheduledTimeRequired => _localizer.Get("validation.scheduledTimeRequired");
     public string SerialNumberMaxLength => _localizer.Get("validation.serialNumberMaxLength");
     public string SpecializationMaxLength => _localizer.Get("validation.specializationMaxLength");
+    public string StatusRequired => _localizer.Get("validation.statusRequired");
     public string SubjectMaxLength => _localizer.Get("validation.subjectMaxLength");
     public string SupplierRequired => _localizer.Get("validation.supplierRequired");
     public string TaxNumberMaxLength => _localizer.Get("validation.taxNumberMaxLength");

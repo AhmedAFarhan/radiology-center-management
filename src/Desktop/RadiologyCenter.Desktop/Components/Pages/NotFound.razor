@@ -1,9 +1,11 @@
 @page "/not-found"
 @layout Layout.MainLayout
 @inject AppLocalizer T
+@inject NavigationManager Navigation
 
 <MudPaper Class="pa-8 text-center">
     <MudIcon Icon="@Icons.Material.Filled.SearchOff" Size="Size.Large" Color="Color.Error" />
     <MudText Typo="Typo.h5" Class="mt-2">@T.NotFound.Title</MudText>
     <MudText Class="text-secondary">@T.NotFound.Message</MudText>
+    <MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Home" Class="mt-6" OnClick="@(() => Navigation.NavigateTo("/"))">@T.NotFound.Action</MudButton>
 </MudPaper>

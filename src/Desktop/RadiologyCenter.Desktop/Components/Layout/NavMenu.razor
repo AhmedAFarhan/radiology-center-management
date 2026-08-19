@@ -4,119 +4,135 @@
 <div class="app-nav-collapsed-side @(IsCollapsed ? "nav-visible" : "")">
     <nav class="app-nav">
         <MudNavMenu>
-            <MudNavLink Href="/dashboard" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.Dashboard" aria-label="@T.Nav.Dashboard" Ripple="false" />
-            <MudNavLink Href="/patients" Icon="@Icons.Material.Filled.People" aria-label="@T.Nav.Patients" Ripple="false" />
-            <MudNavLink Href="/visits" Icon="@Icons.Material.Filled.EventNote" aria-label="@T.Nav.Visits" Ripple="false" />
-            <MudNavLink Href="/radiologist" Icon="@Icons.Material.Filled.Biotech" aria-label="@T.Nav.ReadingRoom" Ripple="false" />
-            <MudNavLink Href="/examinations" Icon="@Icons.Material.Filled.MedicalServices" aria-label="@T.Nav.Examinations" Ripple="false" />
+            <MudTooltip Text="@T.Nav.Dashboard"><MudNavLink Href="/dashboard" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.Dashboard" aria-label="@T.Nav.Dashboard" Ripple="false" /></MudTooltip>
+            <MudTooltip Text="@T.Nav.Patients"><MudNavLink Href="/patients" Icon="@Icons.Material.Filled.People" aria-label="@T.Nav.Patients" Ripple="false" /></MudTooltip>
+            <MudTooltip Text="@T.Nav.Visits"><MudNavLink Href="/visits" Icon="@Icons.Material.Filled.EventNote" aria-label="@T.Nav.Visits" Ripple="false" /></MudTooltip>
+            <MudTooltip Text="@T.Nav.ReadingRoom"><MudNavLink Href="/radiologist" Icon="@Icons.Material.Filled.Biotech" aria-label="@T.Nav.ReadingRoom" Ripple="false" /></MudTooltip>
+            <MudTooltip Text="@T.Nav.Examinations"><MudNavLink Href="/examinations" Icon="@Icons.Material.Filled.MedicalServices" aria-label="@T.Nav.Examinations" Ripple="false" /></MudTooltip>
 
-        <MudMenu Icon="@Icons.Material.Filled.Warehouse" aria-label="@T.Nav.Inventory"
-                 IconSize="Size.Medium"
-                 Class="collapsed-nav-menu"
-                 AnchorOrigin="Origin.CenterRight"
-                 TransformOrigin="Origin.TopLeft"
-                 Dense="true"
-                 OffsetX="12"
-                 Direction="Direction.Left">
-            <MudMenuItem Icon="@Icons.Material.Filled.Inventory2" OnClick="@(() => Go("/inventory/items"))">@T.Nav.Inventory</MudMenuItem>
-            <MudMenuItem Icon="@Icons.Material.Filled.LocalShipping" OnClick="@(() => Go("/inventory/suppliers"))">@T.Nav.Suppliers</MudMenuItem>
-            <MudMenuItem Icon="@Icons.Material.Filled.ReceiptLong" OnClick="@(() => Go("/inventory/purchase-orders"))">@T.Nav.PurchaseOrders</MudMenuItem>
-            <MudMenuItem Icon="@Icons.Material.Filled.SwapVert" OnClick="@(() => Go("/inventory/stock-movements"))">@T.Nav.StockMovements</MudMenuItem>
-        </MudMenu>
+        <MudTooltip Text="@T.Nav.Inventory">
+            <MudMenu Icon="@Icons.Material.Filled.Warehouse" aria-label="@T.Nav.Inventory"
+                     IconSize="Size.Medium"
+                     Class="collapsed-nav-menu"
+                     AnchorOrigin="Origin.CenterRight"
+                     TransformOrigin="Origin.TopLeft"
+                     Dense="true"
+                     OffsetX="12"
+                     Direction="Direction.Left">
+                <MudMenuItem Icon="@Icons.Material.Filled.Inventory2" OnClick="@(() => Go("/inventory/items"))">@T.Nav.Inventory</MudMenuItem>
+                <MudMenuItem Icon="@Icons.Material.Filled.LocalShipping" OnClick="@(() => Go("/inventory/suppliers"))">@T.Nav.Suppliers</MudMenuItem>
+                <MudMenuItem Icon="@Icons.Material.Filled.ReceiptLong" OnClick="@(() => Go("/inventory/purchase-orders"))">@T.Nav.PurchaseOrders</MudMenuItem>
+                <MudMenuItem Icon="@Icons.Material.Filled.SwapVert" OnClick="@(() => Go("/inventory/stock-movements"))">@T.Nav.StockMovements</MudMenuItem>
+            </MudMenu>
+        </MudTooltip>
 
-        <MudMenu Icon="@Icons.Material.Filled.Payments" aria-label="@T.Nav.Payroll"
-                 IconSize="Size.Medium"
-                 Class="collapsed-nav-menu"
-                 AnchorOrigin="Origin.CenterRight"
-                 TransformOrigin="Origin.TopLeft"
-                 Dense="true"
-                 OffsetX="12"
-                 Direction="Direction.Left">
-            <MudMenuItem Icon="@Icons.Material.Filled.ReceiptLong" OnClick="@(() => Go("/payroll/payruns"))">@T.Nav.PayRuns</MudMenuItem>
-            <MudMenuItem Icon="@Icons.Material.Filled.Category" OnClick="@(() => Go("/payroll/salary-components"))">@T.Nav.SalaryComponents</MudMenuItem>
-            <MudMenuItem Icon="@Icons.Material.Filled.Calculate" OnClick="@(() => Go("/payroll/salaries"))">@T.Nav.Salaries</MudMenuItem>
-            <MudMenuItem Icon="@Icons.Material.Filled.AttachMoney" OnClick="@(() => Go("/payroll/allowances"))">@T.Nav.Allowances</MudMenuItem>
-            <MudMenuItem Icon="@Icons.Material.Filled.MedicalServices" OnClick="@(() => Go("/payroll/examination-fees"))">@T.Nav.ExaminationFees</MudMenuItem>
-            <MudMenuItem Icon="@Icons.Material.Filled.LocalHospital" OnClick="@(() => Go("/payroll/referral-fees"))">@T.Nav.ReferralFees</MudMenuItem>
-        </MudMenu>
+        <MudTooltip Text="@T.Nav.Payroll">
+            <MudMenu Icon="@Icons.Material.Filled.Payments" aria-label="@T.Nav.Payroll"
+                     IconSize="Size.Medium"
+                     Class="collapsed-nav-menu"
+                     AnchorOrigin="Origin.CenterRight"
+                     TransformOrigin="Origin.TopLeft"
+                     Dense="true"
+                     OffsetX="12"
+                     Direction="Direction.Left">
+                <MudMenuItem Icon="@Icons.Material.Filled.ReceiptLong" OnClick="@(() => Go("/payroll/payruns"))">@T.Nav.PayRuns</MudMenuItem>
+                <MudMenuItem Icon="@Icons.Material.Filled.Category" OnClick="@(() => Go("/payroll/salary-components"))">@T.Nav.SalaryComponents</MudMenuItem>
+                <MudMenuItem Icon="@Icons.Material.Filled.Calculate" OnClick="@(() => Go("/payroll/salaries"))">@T.Nav.Salaries</MudMenuItem>
+                <MudMenuItem Icon="@Icons.Material.Filled.AttachMoney" OnClick="@(() => Go("/payroll/allowances"))">@T.Nav.Allowances</MudMenuItem>
+                <MudMenuItem Icon="@Icons.Material.Filled.MedicalServices" OnClick="@(() => Go("/payroll/examination-fees"))">@T.Nav.ExaminationFees</MudMenuItem>
+                <MudMenuItem Icon="@Icons.Material.Filled.LocalHospital" OnClick="@(() => Go("/payroll/referral-fees"))">@T.Nav.ReferralFees</MudMenuItem>
+            </MudMenu>
+        </MudTooltip>
 
-        <MudMenu Icon="@Icons.Material.Filled.Approval" aria-label="@T.Nav.Insurance"
-                 IconSize="Size.Medium"
-                 Class="collapsed-nav-menu"
-                 AnchorOrigin="Origin.CenterRight"
-                 TransformOrigin="Origin.TopLeft"
-                 Dense="true"
-                 OffsetX="12"
-                 Direction="Direction.Left">
-            <MudMenuItem Icon="@Icons.Material.Filled.Shield" OnClick="@(() => Go("/insurance/companies"))">@T.Nav.Companies</MudMenuItem>
-            <MudMenuItem Icon="@Icons.Material.Filled.Description" OnClick="@(() => Go("/insurance/policies"))">@T.Nav.Policies</MudMenuItem>
-            <MudMenuItem Icon="@Icons.Material.Filled.Approval" OnClick="@(() => Go("/insurance/preauthorizations"))">@T.Nav.PreAuthorizations</MudMenuItem>
-            <MudMenuItem Icon="@Icons.Material.Filled.RequestQuote" OnClick="@(() => Go("/insurance/claims"))">@T.Nav.Claims</MudMenuItem>
-        </MudMenu>
+        <MudTooltip Text="@T.Nav.Insurance">
+            <MudMenu Icon="@Icons.Material.Filled.Approval" aria-label="@T.Nav.Insurance"
+                     IconSize="Size.Medium"
+                     Class="collapsed-nav-menu"
+                     AnchorOrigin="Origin.CenterRight"
+                     TransformOrigin="Origin.TopLeft"
+                     Dense="true"
+                     OffsetX="12"
+                     Direction="Direction.Left">
+                <MudMenuItem Icon="@Icons.Material.Filled.Shield" OnClick="@(() => Go("/insurance/companies"))">@T.Nav.Companies</MudMenuItem>
+                <MudMenuItem Icon="@Icons.Material.Filled.Description" OnClick="@(() => Go("/insurance/policies"))">@T.Nav.Policies</MudMenuItem>
+                <MudMenuItem Icon="@Icons.Material.Filled.Approval" OnClick="@(() => Go("/insurance/preauthorizations"))">@T.Nav.PreAuthorizations</MudMenuItem>
+                <MudMenuItem Icon="@Icons.Material.Filled.RequestQuote" OnClick="@(() => Go("/insurance/claims"))">@T.Nav.Claims</MudMenuItem>
+            </MudMenu>
+        </MudTooltip>
 
-        <MudMenu Icon="@Icons.Material.Filled.AccountBalanceWallet" aria-label="@T.Nav.Cash"
-                 IconSize="Size.Medium"
-                 Class="collapsed-nav-menu"
-                 AnchorOrigin="Origin.CenterRight"
-                 TransformOrigin="Origin.TopLeft"
-                 Dense="true"
-                 OffsetX="12"
-                 Direction="Direction.Left">
-            <MudMenuItem Icon="@Icons.Material.Filled.AccountBalanceWallet" OnClick="@(() => Go("/cash/sessions"))">@T.Nav.CashSessions</MudMenuItem>
-        </MudMenu>
+        <MudTooltip Text="@T.Nav.Cash">
+            <MudMenu Icon="@Icons.Material.Filled.AccountBalanceWallet" aria-label="@T.Nav.Cash"
+                     IconSize="Size.Medium"
+                     Class="collapsed-nav-menu"
+                     AnchorOrigin="Origin.CenterRight"
+                     TransformOrigin="Origin.TopLeft"
+                     Dense="true"
+                     OffsetX="12"
+                     Direction="Direction.Left">
+                <MudMenuItem Icon="@Icons.Material.Filled.AccountBalanceWallet" OnClick="@(() => Go("/cash/sessions"))">@T.Nav.CashSessions</MudMenuItem>
+            </MudMenu>
+        </MudTooltip>
 
-        <MudMenu Icon="@Icons.Material.Filled.Notifications" aria-label="@T.Nav.Notifications"
-                 IconSize="Size.Medium"
-                 Class="collapsed-nav-menu"
-                 AnchorOrigin="Origin.CenterRight"
-                 TransformOrigin="Origin.TopLeft"
-                 Dense="true"
-                 OffsetX="12"
-                 Direction="Direction.Left">
-            <MudMenuItem Icon="@Icons.Material.Filled.Article" OnClick="@(() => Go("/notifications/templates"))">@T.Nav.Templates</MudMenuItem>
-            <MudMenuItem Icon="@Icons.Material.Filled.Notifications" OnClick="@(() => Go("/notifications/messages"))">@T.Nav.Messages</MudMenuItem>
-        </MudMenu>
+        <MudTooltip Text="@T.Nav.Notifications">
+            <MudMenu Icon="@Icons.Material.Filled.Notifications" aria-label="@T.Nav.Notifications"
+                     IconSize="Size.Medium"
+                     Class="collapsed-nav-menu"
+                     AnchorOrigin="Origin.CenterRight"
+                     TransformOrigin="Origin.TopLeft"
+                     Dense="true"
+                     OffsetX="12"
+                     Direction="Direction.Left">
+                <MudMenuItem Icon="@Icons.Material.Filled.Article" OnClick="@(() => Go("/notifications/templates"))">@T.Nav.Templates</MudMenuItem>
+                <MudMenuItem Icon="@Icons.Material.Filled.Notifications" OnClick="@(() => Go("/notifications/messages"))">@T.Nav.Messages</MudMenuItem>
+            </MudMenu>
+        </MudTooltip>
 
-        <MudMenu Icon="@Icons.Material.Filled.PrecisionManufacturing" aria-label="@T.Nav.Resources"
-                 IconSize="Size.Medium"
-                 Class="collapsed-nav-menu"
-                 AnchorOrigin="Origin.CenterRight"
-                 TransformOrigin="Origin.TopLeft"
-                 Dense="true"
-                 OffsetX="12"
-                 Direction="Direction.Left">
-            <MudMenuItem Icon="@Icons.Material.Filled.Biotech" OnClick="@(() => Go("/resources/equipment"))">@T.Nav.Equipment</MudMenuItem>
-            <MudMenuItem Icon="@Icons.Material.Filled.Badge" OnClick="@(() => Go("/resources/staff"))">@T.Nav.Staff</MudMenuItem>
-            <MudMenuItem Icon="@Icons.Material.Filled.CalendarMonth" OnClick="@(() => Go("/resources/work-shifts"))">@T.Nav.WorkShifts</MudMenuItem>
-            <MudMenuItem Icon="@Icons.Material.Filled.BeachAccess" OnClick="@(() => Go("/resources/leaves"))">@T.Nav.Leave</MudMenuItem>
-            <MudMenuItem Icon="@Icons.Material.Filled.LocalHospital" OnClick="@(() => Go("/resources/referral-doctors"))">@T.Nav.ReferralDoctors</MudMenuItem>
-        </MudMenu>
+        <MudTooltip Text="@T.Nav.Resources">
+            <MudMenu Icon="@Icons.Material.Filled.PrecisionManufacturing" aria-label="@T.Nav.Resources"
+                     IconSize="Size.Medium"
+                     Class="collapsed-nav-menu"
+                     AnchorOrigin="Origin.CenterRight"
+                     TransformOrigin="Origin.TopLeft"
+                     Dense="true"
+                     OffsetX="12"
+                     Direction="Direction.Left">
+                <MudMenuItem Icon="@Icons.Material.Filled.Biotech" OnClick="@(() => Go("/resources/equipment"))">@T.Nav.Equipment</MudMenuItem>
+                <MudMenuItem Icon="@Icons.Material.Filled.Badge" OnClick="@(() => Go("/resources/staff"))">@T.Nav.Staff</MudMenuItem>
+                <MudMenuItem Icon="@Icons.Material.Filled.CalendarMonth" OnClick="@(() => Go("/resources/work-shifts"))">@T.Nav.WorkShifts</MudMenuItem>
+                <MudMenuItem Icon="@Icons.Material.Filled.BeachAccess" OnClick="@(() => Go("/resources/leaves"))">@T.Nav.Leave</MudMenuItem>
+                <MudMenuItem Icon="@Icons.Material.Filled.LocalHospital" OnClick="@(() => Go("/resources/referral-doctors"))">@T.Nav.ReferralDoctors</MudMenuItem>
+            </MudMenu>
+        </MudTooltip>
 
-        <MudMenu Icon="@Icons.Material.Filled.Insights" aria-label="@T.Nav.Analytics"
-                 IconSize="Size.Medium"
-                 Class="collapsed-nav-menu"
-                 AnchorOrigin="Origin.CenterRight"
-                 TransformOrigin="Origin.TopLeft"
-                 Dense="true"
-                 OffsetX="12"
-                 Direction="Direction.Left">
-            <MudMenuItem Icon="@Icons.Material.Filled.Speed" OnClick="@(() => Go("/analytics/overview"))">@T.Nav.Overview</MudMenuItem>
-            <MudMenuItem Icon="@Icons.Material.Filled.AccountBalanceWallet" OnClick="@(() => Go("/analytics/financial"))">@T.Nav.Financials</MudMenuItem>
-            <MudMenuItem Icon="@Icons.Material.Filled.Construction" OnClick="@(() => Go("/analytics/operations"))">@T.Nav.Operations</MudMenuItem>
-            <MudMenuItem Icon="@Icons.Material.Filled.Groups" OnClick="@(() => Go("/analytics/staff"))">@T.Nav.StaffMachines</MudMenuItem>
-        </MudMenu>
+        <MudTooltip Text="@T.Nav.Analytics">
+            <MudMenu Icon="@Icons.Material.Filled.Insights" aria-label="@T.Nav.Analytics"
+                     IconSize="Size.Medium"
+                     Class="collapsed-nav-menu"
+                     AnchorOrigin="Origin.CenterRight"
+                     TransformOrigin="Origin.TopLeft"
+                     Dense="true"
+                     OffsetX="12"
+                     Direction="Direction.Left">
+                <MudMenuItem Icon="@Icons.Material.Filled.Speed" OnClick="@(() => Go("/analytics/overview"))">@T.Nav.Overview</MudMenuItem>
+                <MudMenuItem Icon="@Icons.Material.Filled.AccountBalanceWallet" OnClick="@(() => Go("/analytics/financial"))">@T.Nav.Financials</MudMenuItem>
+                <MudMenuItem Icon="@Icons.Material.Filled.Construction" OnClick="@(() => Go("/analytics/operations"))">@T.Nav.Operations</MudMenuItem>
+                <MudMenuItem Icon="@Icons.Material.Filled.Groups" OnClick="@(() => Go("/analytics/staff"))">@T.Nav.StaffMachines</MudMenuItem>
+            </MudMenu>
+        </MudTooltip>
 
-        <MudMenu Icon="@Icons.Material.Filled.AdminPanelSettings" aria-label="@T.Nav.Administration"
-                 IconSize="Size.Medium"
-                 Class="collapsed-nav-menu"
-                 AnchorOrigin="Origin.CenterRight"
-                 TransformOrigin="Origin.TopLeft"
-                 Dense="true"
-                 OffsetX="12"
-                 Direction="Direction.Left">
-            <MudMenuItem Icon="@Icons.Material.Filled.Person" OnClick="@(() => Go("/users"))">@T.Nav.Users</MudMenuItem>
-            <MudMenuItem Icon="@Icons.Material.Filled.Security" OnClick="@(() => Go("/roles"))">@T.Nav.Roles</MudMenuItem>
-        </MudMenu>
+        <MudTooltip Text="@T.Nav.Administration">
+            <MudMenu Icon="@Icons.Material.Filled.AdminPanelSettings" aria-label="@T.Nav.Administration"
+                     IconSize="Size.Medium"
+                     Class="collapsed-nav-menu"
+                     AnchorOrigin="Origin.CenterRight"
+                     TransformOrigin="Origin.TopLeft"
+                     Dense="true"
+                     OffsetX="12"
+                     Direction="Direction.Left">
+                <MudMenuItem Icon="@Icons.Material.Filled.Person" OnClick="@(() => Go("/users"))">@T.Nav.Users</MudMenuItem>
+                <MudMenuItem Icon="@Icons.Material.Filled.Security" OnClick="@(() => Go("/roles"))">@T.Nav.Roles</MudMenuItem>
+            </MudMenu>
+        </MudTooltip>
     </MudNavMenu>
     </nav>
 </div>

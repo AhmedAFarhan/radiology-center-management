@@ -55,34 +55,38 @@
 
             <MudDivider Class="my-4" />
             <MudText Typo="Typo.subtitle2" Class="mb-1">@T.ItemDialog.IssueStock</MudText>
-            <MudGrid Spacing="2">
-                <MudItem xs="12" sm="4">
-                    <MudNumericField T="int?" @bind-Value="_quantity"
-                                     Label="@T.ItemDialog.Quantity"
-                                     Variant="Variant.Outlined"
-                                     Margin="Margin.Dense"
-                                     Min="1" />
-                </MudItem>
-                <MudItem xs="12" sm="8">
-                    <MudTextField @bind-Value="_reference"
-                                  Label="@T.ItemDialog.Reference"
-                                  Variant="Variant.Outlined"
-                                  Margin="Margin.Dense"
-                                  Immediate="true" />
-                </MudItem>
-                <MudItem xs="12">
-                    <MudTextField @bind-Value="_notes"
-                                  Label="@T.ItemDialog.Notes"
-                                  Variant="Variant.Outlined"
-                                  Margin="Margin.Dense"
-                                  Immediate="true" />
-                </MudItem>
-            </MudGrid>
+            <EditForm EditContext="_editContext">
+                <LocalizedDataAnnotationsValidator />
+                <MudGrid Spacing="2">
+                    <MudItem xs="12" sm="4">
+                        <MudNumericField T="int?" @bind-Value="_model.Quantity"
+                                         For="@(() => _model.Quantity)"
+                                         Label="@T.ItemDialog.Quantity"
+                                         Variant="Variant.Outlined"
+                                         Margin="Margin.Dense"
+                                         Min="1" />
+                    </MudItem>
+                    <MudItem xs="12" sm="8">
+                        <MudTextField @bind-Value="_model.Reference"
+                                      Label="@T.ItemDialog.Reference"
+                                      Variant="Variant.Outlined"
+                                      Margin="Margin.Dense"
+                                      Immediate="true" />
+                    </MudItem>
+                    <MudItem xs="12">
+                        <MudTextField @bind-Value="_model.Notes"
+                                      Label="@T.ItemDialog.Notes"
+                                      Variant="Variant.Outlined"
+                                      Margin="Margin.Dense"
+                                      Immediate="true" />
+                    </MudItem>
+                </MudGrid>
+            </EditForm>
         }
     </DialogContent>
     <DialogActions>
-        <MudButton Color="Color.Default" OnClick="CancelAsync" Disabled="_busy">@T.Common.Close</MudButton>
-        <MudButton Color="Color.Warning" Variant="Variant.Filled" OnClick="IssueAsync" Disabled="_busy || _stock is null || _loadError is not null">
+        <MudButton Color="Color.Default" OnClick="CancelAsync" Disabled="_busy">@T.Common.Cancel</MudButton>
+        <MudButton Color="Color.Primary" Variant="Variant.Filled" OnClick="IssueAsync" Disabled="_busy || _stock is null || _loadError is not null">
             @if (_busy)
             {
                 <MudProgressCircular Size="Size.Small" Indeterminate="true" Class="mx-1" />
@@ -102,13 +106,15 @@
 
     private ItemStockDto? _stock;
     private string? _loadError;
-    private int? _quantity;
-    private string? _reference;
-    private string? _notes;
+    private readonly IssueStockModel _model = new();
+    private EditContext _editContext = default!;
     private bool _busy;
 
     protected override async Task OnInitializedAsync()
-        => await LoadStockAsync();
+    {
+        _editContext = new EditContext(_model);
+        await LoadStockAsync();
+    }
 
     private async Task LoadStockAsync()
     {
@@ -129,25 +135,25 @@
 
     private async Task IssueAsync()
     {
-        if (_quantity is not { } qty || qty <= 0)
-        {
-            Snackbar.Add(T.ItemDialog.IssueQuantityWarning, Severity.Warning);
+        if (!_editContext.Validate())
             return;
-        }
+
+        if (_model.Quantity is not { } qty)
+            return;
 
         await SafeExecute.RunAsync(async () =>
             {
                 await InventoryService.IssueStockAsync(ItemId, new IssueStockInput
                 {
                     Quantity = qty,
-                    Reference = _reference,
-                    Notes = _notes,
+                    Reference = _model.Reference,
+                    Notes = _model.Notes,
                 });
 
                 Snackbar.Add(T.FormatValue(T.ItemDialog.IssuedUnits, qty), Severity.Success);
-                _quantity = null;
-                _reference = null;
-                _notes = null;
+                _model.Quantity = null;
+                _model.Reference = null;
+                _model.Notes = null;
                 await LoadStockAsync();
             },
             Snackbar,
@@ -157,5 +163,15 @@
 
     private void CancelAsync()
         => MudDialog.Cancel();
+
+    private sealed class IssueStockModel
+    {
+        [Range(1, int.MaxValue, ErrorMessage = "Quantity must be at least 1.")]
+        public int? Quantity { get; set; }
+
+        public string? Reference { get; set; }
+
+        public string? Notes { get; set; }
+    }
 }
 

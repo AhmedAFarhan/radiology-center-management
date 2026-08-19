@@ -1,8 +1,9 @@
 @using ApexCharts
+@inject AppLocalizer T
 
 @if (Items.Count == 0)
 {
-    <div class="pa-6 text-center text-secondary">No data in this period.</div>
+    <div class="pa-6 text-center text-secondary">@T.Analytics.NoData</div>
 }
 else
 {
@@ -29,7 +30,7 @@ else
         {
             Toolbar = new Toolbar { Show = false },
             ForeColor = "#8B93A7",
-            FontFamily = "OpenSansRegular, sans-serif",
+            FontFamily = "Montserrat, Cairo, sans-serif",
         },
         DataLabels = new DataLabels { Enabled = false },
         PlotOptions = new PlotOptions

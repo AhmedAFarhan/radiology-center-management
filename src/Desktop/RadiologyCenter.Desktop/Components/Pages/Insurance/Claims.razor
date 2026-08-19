@@ -14,13 +14,13 @@
     <MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Add" OnClick="OpenCreateDialogAsync">@T.Claim.CreateClaim</MudButton>
 </PageHeader>
 
-<MudTable T="ClaimListItemDto" @ref="_table" ServerData="LoadServerData" Dense="true" Hover="true" Striped="true" Elevation="1" RowsPerPage="10">
+<MudTable T="ClaimListItemDto" @ref="_table" ServerData="LoadServerData" Dense="true" Hover="true" Striped="true" Elevation="1" RowsPerPage="10" FixedHeader="true" Class="table-scroll">
     <HeaderContent>
         <MudTh><MudTableSortLabel T="ClaimListItemDto" SortLabel="@("PatientName")">@T.Claim.Patient</MudTableSortLabel></MudTh>
         <MudTh><MudTableSortLabel T="ClaimListItemDto" SortLabel="@("ExaminationTypeName")">@T.Claim.Examination</MudTableSortLabel></MudTh>
         <MudTh><MudTableSortLabel T="ClaimListItemDto" SortLabel="@("PolicyNumber")">@T.Claim.PolicyNumber</MudTableSortLabel></MudTh>
-        <MudTh><MudTableSortLabel T="ClaimListItemDto" SortLabel="@("BilledAmount")">@T.Claim.Billed</MudTableSortLabel></MudTh>
-        <MudTh><MudTableSortLabel T="ClaimListItemDto" SortLabel="@("PayerShare")">@T.Claim.PayerShare</MudTableSortLabel></MudTh>
+        <MudTh Class="text-right"><MudTableSortLabel T="ClaimListItemDto" SortLabel="@("BilledAmount")">@T.Claim.Billed</MudTableSortLabel></MudTh>
+        <MudTh Class="text-right"><MudTableSortLabel T="ClaimListItemDto" SortLabel="@("PayerShare")">@T.Claim.PayerShare</MudTableSortLabel></MudTh>
         <MudTh><MudTableSortLabel T="ClaimListItemDto" SortLabel="@("Status")">@T.Common.Status</MudTableSortLabel></MudTh>
         <MudTh>@T.Common.Actions</MudTh>
     </HeaderContent>
@@ -32,8 +32,8 @@
         <MudTd DataLabel="@T.Claim.PolicyNumber">
             <MudText Class="mono-text">@context.PolicyNumber</MudText>
         </MudTd>
-        <MudTd DataLabel="@T.Claim.Billed">@context.BilledAmount.ToString("C")</MudTd>
-        <MudTd DataLabel="@T.Claim.PayerShare">
+        <MudTd DataLabel="@T.Claim.Billed" Class="text-right">@context.BilledAmount.ToString("C")</MudTd>
+        <MudTd DataLabel="@T.Claim.PayerShare" Class="text-right">
             @if (context.Status is "Approved" or "Paid")
             {
                 <MudText>@context.PayerShare.ToString("C")</MudText>
@@ -44,7 +44,7 @@
             }
         </MudTd>
         <MudTd DataLabel="@T.Common.Status">
-            <MudChip T="string" Size="Size.Small" Color="@(StatusColor(context.Status))">@FormatStatus(context.Status)</MudChip>
+            <StatusChip Token="@context.Status">@FormatStatus(context.Status)</StatusChip>
         </MudTd>
         <MudTd DataLabel="@T.Common.Actions">
             <MudIconButton Icon="@Icons.Material.Filled.Visibility" Size="Size.Small" Color="Color.Default" aria-label="@T.Claim.View" OnClick="@(() => OpenDetailDialogAsync(context))" />
@@ -169,16 +169,6 @@
         "Rejected" => "Rejected",
         "Paid" => "Paid",
         _ => status,
-    };
-
-    private static Color StatusColor(string status) => status switch
-    {
-        "Draft" => Color.Default,
-        "Submitted" => Color.Info,
-        "Approved" => Color.Success,
-        "Rejected" => Color.Error,
-        "Paid" => Color.Secondary,
-        _ => Color.Default,
     };
 
     public void Dispose() => _searchCts?.Cancel();

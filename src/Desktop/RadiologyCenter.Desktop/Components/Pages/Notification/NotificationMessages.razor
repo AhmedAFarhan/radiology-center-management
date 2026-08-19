@@ -28,7 +28,7 @@
     <MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Send" OnClick="OpenSendDialogAsync">@T.SendDialog.Title</MudButton>
 </PageHeader>
 
-<MudTable T="NotificationMessageDto" @ref="_table" ServerData="LoadServerData" Dense="true" Hover="true" Striped="true" Elevation="1" RowsPerPage="10">
+<MudTable T="NotificationMessageDto" @ref="_table" ServerData="LoadServerData" Dense="true" Hover="true" Striped="true" Elevation="1" RowsPerPage="10" FixedHeader="true" Class="table-scroll">
     <HeaderContent>
         <MudTh><MudTableSortLabel T="NotificationMessageDto" SortLabel="@("CreatedAt")">@T.Notifications.SentAt</MudTableSortLabel></MudTh>
         <MudTh>@T.Notifications.Channel</MudTh>
@@ -49,7 +49,7 @@
         </MudTd>
         <MudTd DataLabel="@T.Notifications.Subject">@(string.IsNullOrWhiteSpace(context.Subject) ? "-" : Truncate(context.Subject))</MudTd>
         <MudTd DataLabel="@T.Common.Status">
-            <MudChip T="string" Size="Size.Small" Color="@StatusColor(context.Status)">@context.Status</MudChip>
+            <StatusChip Token="@context.Status">@context.Status</StatusChip>
         </MudTd>
         <MudTd DataLabel="@T.Notifications.Attempts" Class="text-center">@context.Attempts</MudTd>
         <MudTd DataLabel="@T.Notifications.Reference">@(string.IsNullOrWhiteSpace(context.ReferenceId) ? "-" : context.ReferenceId)</MudTd>
@@ -191,15 +191,7 @@
         _ => Color.Default,
     };
 
-    private static Color StatusColor(string status) => status switch
-    {
-        "Sent" => Color.Success,
-        "Failed" => Color.Error,
-        "Pending" => Color.Warning,
-        _ => Color.Default,
-    };
-
-    private static string Truncate(string value)
+private static string Truncate(string value)
         => value.Length > 55 ? value[..55] + "…" : value;
 
     public void Dispose() => _searchCts?.Cancel();

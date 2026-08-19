@@ -16,8 +16,8 @@
     <HeaderContent>
         <MudTh><MudTableSortLabel T="StockMovementDto" SortLabel="@("CreatedAt")">@T.Common.Date</MudTableSortLabel></MudTh>
         <MudTh><MudTableSortLabel T="StockMovementDto" SortLabel="@("MovementType")">@T.Common.Type</MudTableSortLabel></MudTh>
-        <MudTh><MudTableSortLabel T="StockMovementDto" SortLabel="@("Quantity")">@T.StockMovements.Quantity</MudTableSortLabel></MudTh>
-        <MudTh>@T.StockMovements.UnitCost</MudTh>
+        <MudTh Class="text-right"><MudTableSortLabel T="StockMovementDto" SortLabel="@("Quantity")">@T.StockMovements.Quantity</MudTableSortLabel></MudTh>
+        <MudTh Class="text-right">@T.StockMovements.UnitCost</MudTh>
         <MudTh>@T.StockMovements.Item</MudTh>
         <MudTh>@T.StockMovements.Reference</MudTh>
         <MudTh>@T.StockMovements.Notes</MudTh>
@@ -25,12 +25,12 @@
     <RowTemplate>
         <MudTd DataLabel="@T.Common.Date">@context.CreatedAt.ToLocalTime().ToString("dd MMM yyyy HH:mm")</MudTd>
         <MudTd DataLabel="@T.Common.Type">
-            <MudChip T="string" Size="Size.Small" Color="@MovementColor(context.MovementType)">@FormatMovementType(context.MovementType)</MudChip>
+            <StatusChip Token="@context.MovementType">@FormatMovementType(context.MovementType)</StatusChip>
         </MudTd>
-        <MudTd DataLabel="@T.StockMovements.Quantity">
+        <MudTd DataLabel="@T.StockMovements.Quantity" Class="text-right">
             <MudText Color="@(context.Quantity < 0 ? Color.Error : Color.Success)">@(context.Quantity > 0 ? $"+{context.Quantity}" : context.Quantity.ToString())</MudText>
         </MudTd>
-        <MudTd DataLabel="@T.StockMovements.UnitCost">@(context.UnitCost?.ToString("C") ?? "-")</MudTd>
+        <MudTd DataLabel="@T.StockMovements.UnitCost" Class="text-right">@(context.UnitCost?.ToString("C") ?? "-")</MudTd>
         <MudTd DataLabel="@T.StockMovements.Item" Class="mono-text">@ShortId(context.ItemId)</MudTd>
         <MudTd DataLabel="@T.StockMovements.Reference">@(context.Reference ?? "-")</MudTd>
         <MudTd DataLabel="@T.StockMovements.Notes">@(context.Notes ?? "-")</MudTd>
@@ -126,16 +126,6 @@
     {
         "ReturnToSupplier" => "Return to Supplier",
         _ => type,
-    };
-
-    private static Color MovementColor(string type) => type switch
-    {
-        "Receive" => Color.Success,
-        "Issue" => Color.Warning,
-        "Adjustment" => Color.Info,
-        "ReturnToSupplier" => Color.Secondary,
-        "Disposal" => Color.Error,
-        _ => Color.Primary,
     };
 
     private static string ShortId(string id)

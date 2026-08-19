@@ -83,18 +83,18 @@ else
                     <HeaderContent>
                         <MudTh>@T.Financial.Exam</MudTh>
                         <MudTh>@T.Financial.Completed</MudTh>
-                        <MudTh Right="true">@T.Financial.Billed</MudTh>
-                        <MudTh Right="true">@T.Financial.Discount</MudTh>
-                        <MudTh Right="true">@T.Financial.Paid</MudTh>
-                        <MudTh Right="true">@T.Financial.Remaining</MudTh>
+                        <MudTh Class="text-right">@T.Financial.Billed</MudTh>
+                        <MudTh Class="text-right">@T.Financial.Discount</MudTh>
+                        <MudTh Class="text-right">@T.Financial.Paid</MudTh>
+                        <MudTh Class="text-right">@T.Financial.Remaining</MudTh>
                     </HeaderContent>
                     <RowTemplate>
                         <MudTd DataLabel="@T.Financial.Exam">@context.ExaminationTypeName</MudTd>
                         <MudTd DataLabel="@T.Financial.Completed">@(context.CompletedAt?.ToString("dd MMM") ?? "-")</MudTd>
-                        <MudTd DataLabel="@T.Financial.Billed" Right="true">@context.Billed.ToString("C")</MudTd>
-                        <MudTd DataLabel="@T.Financial.Discount" Right="true">@context.Discount.ToString("C")</MudTd>
-                        <MudTd DataLabel="@T.Financial.Paid" Right="true">@context.Paid.ToString("C")</MudTd>
-                        <MudTd DataLabel="@T.Financial.Remaining" Right="true">@context.Remaining.ToString("C")</MudTd>
+                        <MudTd DataLabel="@T.Financial.Billed" Class="text-right">@context.Billed.ToString("C")</MudTd>
+                        <MudTd DataLabel="@T.Financial.Discount" Class="text-right">@context.Discount.ToString("C")</MudTd>
+                        <MudTd DataLabel="@T.Financial.Paid" Class="text-right">@context.Paid.ToString("C")</MudTd>
+                        <MudTd DataLabel="@T.Financial.Remaining" Class="text-right">@context.Remaining.ToString("C")</MudTd>
                     </RowTemplate>
                 </MudTable>
             </ChartCard>

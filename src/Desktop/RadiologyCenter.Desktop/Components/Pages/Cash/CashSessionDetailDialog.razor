@@ -18,7 +18,7 @@
                         <MudGrid Spacing="2">
                             <MudItem xs="12" sm="6" md="3">
                                 <MudText Typo="Typo.caption" Class="text-secondary">@T.Common.Status</MudText>
-                                <MudChip T="string" Size="Size.Small" Color="@StatusColor(Session.Status)">@Session.Status</MudChip>
+                                <StatusChip Token="@Session.Status">@Session.Status</StatusChip>
                             </MudItem>
                             <MudItem xs="12" sm="6" md="3">
                                 <MudText Typo="Typo.caption" Class="text-secondary">@T.CashSession.User</MudText>
@@ -131,7 +131,7 @@
                             <RowTemplate Context="entry">
                                 <MudTd DataLabel="@T.Common.Date">@entry.OccurredAt.ToLocalTime().ToString("g")</MudTd>
                                 <MudTd DataLabel="@T.CashSession.Direction">
-                                    <MudChip T="string" Size="Size.Small" Color="@DirectionColor(entry.Direction)">@entry.Direction</MudChip>
+                                    <StatusChip Token="@entry.Direction">@entry.Direction</StatusChip>
                                 </MudTd>
                                 <MudTd DataLabel="@T.CashSession.Reason">@entry.Reason</MudTd>
                                 <MudTd DataLabel="@T.CashSession.Amount" Class="text-right">
@@ -240,20 +240,6 @@
             () => T.CashSession.Unreachable,
             busy => _busy = busy);
     }
-
-    private static Color StatusColor(string status) => status switch
-    {
-        "Open" => Color.Success,
-        "Closed" => Color.Default,
-        _ => Color.Primary,
-    };
-
-    private static Color DirectionColor(string direction) => direction switch
-    {
-        "In" => Color.Success,
-        "Out" => Color.Error,
-        _ => Color.Primary,
-    };
 
     private static Color OverShortColor(decimal amount) => amount switch
     {

@@ -5,7 +5,7 @@
     {
         <MudIcon Icon="@Icon" Class="page-header-icon" />
     }
-    <MudText Typo="Typo.h5">@Title</MudText>
+    <h1 class="mud-typography mud-typography-h5 page-header-title" tabindex="-1">@Title</h1>
     @if (!string.IsNullOrWhiteSpace(Subtitle))
     {
         <MudText Typo="Typo.body2" Class="text-secondary ms-2">@Subtitle</MudText>

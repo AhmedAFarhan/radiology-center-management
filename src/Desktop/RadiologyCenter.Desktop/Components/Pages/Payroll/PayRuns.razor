@@ -56,12 +56,12 @@
     </MudGrid>
 }
 
-<MudTable T="PayRunDto" @ref="_table" ServerData="LoadServerData" Dense="true" Hover="true" Striped="true" Elevation="1" RowsPerPage="10">
+<MudTable T="PayRunDto" @ref="_table" ServerData="LoadServerData" Dense="true" Hover="true" Striped="true" Elevation="1" RowsPerPage="10" FixedHeader="true" Class="table-scroll">
     <HeaderContent>
         <MudTh><MudTableSortLabel T="PayRunDto" SortLabel="@("RunFrom")">@T.Payroll.Period</MudTableSortLabel></MudTh>
         <MudTh><MudTableSortLabel T="PayRunDto" SortLabel="@("Status")">@T.Common.Status</MudTableSortLabel></MudTh>
         <MudTh>@T.Payroll.Employees</MudTh>
-        <MudTh>@T.Payroll.NetPay</MudTh>
+        <MudTh Class="text-right">@T.Payroll.NetPay</MudTh>
         <MudTh><MudTableSortLabel T="PayRunDto" SortLabel="@("ProcessedAt")">@T.Payroll.Processed</MudTableSortLabel></MudTh>
         <MudTh>@T.Payroll.Notes</MudTh>
         <MudTh>@T.Common.Actions</MudTh>
@@ -71,10 +71,10 @@
             <MudText Class="font-weight-medium">@context.RunFrom.ToString("yyyy-MM-dd") → @context.RunTo.ToString("yyyy-MM-dd")</MudText>
         </MudTd>
         <MudTd DataLabel="@T.Common.Status">
-            <MudChip T="string" Size="Size.Small" Color="@StatusColor(context.Status)">@FormatStatus(context.Status)</MudChip>
+            <StatusChip Token="@context.Status">@FormatStatus(context.Status)</StatusChip>
         </MudTd>
         <MudTd DataLabel="@T.Payroll.Employees">@context.Payslips.Count</MudTd>
-        <MudTd DataLabel="@T.Payroll.NetPay">@context.Payslips.Sum(p => p.NetSalary).ToString("N2")</MudTd>
+        <MudTd DataLabel="@T.Payroll.NetPay" Class="text-right">@context.Payslips.Sum(p => p.NetSalary).ToString("N2")</MudTd>
         <MudTd DataLabel="@T.Payroll.Processed">@(context.ProcessedAt?.ToString("g") ?? "-")</MudTd>
         <MudTd DataLabel="@T.Payroll.Notes">@(string.IsNullOrWhiteSpace(context.Notes) ? "-" : context.Notes)</MudTd>
         <MudTd DataLabel="@T.Common.Actions">
@@ -233,16 +233,6 @@
         "Approved" => "Approved",
         "Rejected" => "Rejected",
         _ => status,
-    };
-
-    private static Color StatusColor(string status) => status switch
-    {
-        "Draft" => Color.Default,
-        "Computed" => Color.Info,
-        "Approved" => Color.Primary,
-        "Paid" => Color.Success,
-        "Rejected" => Color.Error,
-        _ => Color.Default,
     };
 
     public void Dispose() => _searchCts?.Cancel();

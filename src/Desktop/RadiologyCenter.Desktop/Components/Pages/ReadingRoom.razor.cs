@@ -279,18 +279,49 @@ public partial class ReadingRoom : ComponentBase
 
     private async Task LoadReportForExamAsync(QueueExam item)
     {
-        ReportDto report;
+        ReportDto? report;
         try
         {
             report = await ReportService.GetByExaminationAsync(item.Id);
         }
         catch (ApiException ex) when (ex.StatusCode == 404)
         {
-            report = await CreateDraftAsync(item);
+            report = null;
         }
 
         _report = report;
-        BuildEditor(report);
+        if (report is not null)
+        {
+            BuildEditor(report);
+        }
+        else
+        {
+            _sections.Clear();
+        }
+    }
+
+    private async Task StartReportAsync()
+    {
+        if (_selected is null)
+            return;
+
+        _loadingReport = true;
+        _reportError = null;
+        StateHasChanged();
+        try
+        {
+            var report = await CreateDraftAsync(_selected);
+            _report = report;
+            BuildEditor(report);
+        }
+        catch (Exception)
+        {
+            _reportError = T.ReadingRoom.ReportLoadError;
+        }
+        finally
+        {
+            _loadingReport = false;
+        }
     }
 
     private async Task<ReportDto> CreateDraftAsync(QueueExam item)
@@ -607,7 +638,8 @@ public partial class ReadingRoom : ComponentBase
             { nameof(CancelReportDialog.ReportId), _report.Id },
         };
 
-        var dialog = await DialogService.ShowAsync<CancelReportDialog>(T.CancelReport.Title, parameters);
+        var dialog = await DialogService.ShowAsync<CancelReportDialog>(T.CancelReport.Title, parameters,
+            new DialogOptions { MaxWidth = MaxWidth.Medium, FullWidth = true, NoHeader = true });
         var result = await dialog.Result;
         if (result is { Canceled: false, Data: true })
         {
@@ -625,7 +657,8 @@ public partial class ReadingRoom : ComponentBase
         if (_report is null)
             return;
 
-        var dialog = await DialogService.ShowAsync<ReportTemplatePickerDialog>(T.ReportTemplate.Title);
+        var dialog = await DialogService.ShowAsync<ReportTemplatePickerDialog>(T.ReportTemplate.Title,
+            new DialogOptions { MaxWidth = MaxWidth.Medium, FullWidth = true, NoHeader = true });
         var result = await dialog.Result;
         if (result?.Canceled != false || result.Data is not string templateId || _report is null)
             return;
@@ -656,24 +689,9 @@ public partial class ReadingRoom : ComponentBase
             { nameof(ReportVersionsDialog.ReportId), _report.Id },
         };
 
-        await DialogService.ShowAsync<ReportVersionsDialog>(T.ReportVersions.Title, parameters);
+        await DialogService.ShowAsync<ReportVersionsDialog>(T.ReportVersions.Title, parameters,
+            new DialogOptions { MaxWidth = MaxWidth.Medium, FullWidth = true, NoHeader = true });
     }
-
-    private static MudBlazor.Color ReportStatusColor(string status) => status switch
-    {
-        "Draft" => Color.Info,
-        "Finalized" => Color.Success,
-        "Cancelled" => Color.Error,
-        "New" => Color.Secondary,
-        _ => Color.Secondary,
-    };
-
-    private static MudBlazor.Color PriorityChipColor(string priority) => priority switch
-    {
-        "Stat" => Color.Error,
-        "Urgent" => Color.Warning,
-        _ => Color.Default,
-    };
 
     private static string PriorityClass(string priority) => priority switch
     {

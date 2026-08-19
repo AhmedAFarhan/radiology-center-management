@@ -17,7 +17,7 @@
     </DialogContent>
     <DialogActions>
         <MudButton Color="Color.Default" OnClick="CancelAsync">@T.Common.Cancel</MudButton>
-        <MudButton Color="Color.Primary" Variant="Variant.Filled" OnClick="SubmitAsync">@T.Common.Add</MudButton>
+        <MudButton Color="Color.Primary" Variant="Variant.Filled" OnClick="SubmitAsync" Disabled="_selectedStaff is null">@T.Common.Add</MudButton>
     </DialogActions>
 </MudDialog>
 

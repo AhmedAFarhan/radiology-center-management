@@ -12,7 +12,9 @@
         </CardHeaderActions>
     </MudCardHeader>
     <MudCardContent>
-        @ChildContent
+        <div role="img" aria-label="@(string.IsNullOrWhiteSpace(Subtitle) ? Title : $"{Title} — {Subtitle}")">
+            @ChildContent
+        </div>
     </MudCardContent>
 </MudCard>
 

@@ -17,7 +17,7 @@
             <RowTemplate>
                 <MudTd DataLabel="@T.Dashboard.ExamType">@context.ExaminationTypeName</MudTd>
                 <MudTd DataLabel="@T.Dashboard.ExamStatus">
-                    <MudChip T="string" Size="Size.Small" Color="@StatusColor(context.Status)">@context.Status</MudChip>
+                    <StatusChip Token="@context.StatusKey">@context.Status</StatusChip>
                 </MudTd>
                 <MudTd DataLabel="@T.Dashboard.ExamPriority">@context.Priority</MudTd>
                 <MudTd DataLabel="@T.Dashboard.ReferringDoctor">@(context.ReferralDoctorId ?? "-")</MudTd>
@@ -31,14 +31,4 @@
 
 @code {
     [Parameter] public IReadOnlyList<ExaminationDto> Items { get; set; } = Array.Empty<ExaminationDto>();
-
-    private static Color StatusColor(string status) => status switch
-    {
-        "Completed" => Color.Success,
-        "Cancelled" => Color.Default,
-        "InProgress" => Color.Warning,
-        "CheckedIn" => Color.Info,
-        "Scheduled" => Color.Secondary,
-        _ => Color.Primary,
-    };
 }

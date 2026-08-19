@@ -13,40 +13,26 @@
         }
         else if (_preAuth is null)
         {
-            <MudProgressCircular Indeterminate="true" Class="d-flex mx-auto my-4" />
+            <DialogSkeleton Rows="3" />
         }
         else
         {
             <MudGrid Spacing="2">
-                <MudItem xs="12" sm="6">
-                    <MudTextField Label="@T.PreAuthDialog.Patient" Variant="Variant.Outlined" Margin="Margin.Dense" ReadOnly="true" Value="@_patientName" />
-                </MudItem>
-                <MudItem xs="12" sm="6">
-                    <MudTextField Label="@T.PreAuthDialog.Examination" Variant="Variant.Outlined" Margin="Margin.Dense" ReadOnly="true" Value="@_examinationName" />
-                </MudItem>
-                <MudItem xs="12" sm="6">
-                    <MudTextField Label="@T.PreAuthDialog.Policy" Variant="Variant.Outlined" Margin="Margin.Dense" ReadOnly="true" Value="@_policyNumber" />
-                </MudItem>
-                <MudItem xs="12" sm="6">
-                    <MudTextField Label="@T.PreAuthDialog.EstimatedAmount" Variant="Variant.Outlined" Margin="Margin.Dense" ReadOnly="true" Value="@_preAuth.EstimatedAmount.ToString("C")" />
-                </MudItem>
-                <MudItem xs="12" sm="6">
-                    <MudTextField Label="@T.Common.Status" Variant="Variant.Outlined" Margin="Margin.Dense" ReadOnly="true" Value="@_preAuth.Status" />
-                </MudItem>
-                <MudItem xs="12" sm="6">
-                    <MudTextField Label="@T.PreAuthDialog.RequestedAt" Variant="Variant.Outlined" Margin="Margin.Dense" ReadOnly="true" Value="@_preAuth.RequestedAt.ToString("yyyy-MM-dd HH:mm")" />
-                </MudItem>
+                <DetailField Label="@T.PreAuthDialog.Patient" Value="@_patientName" />
+                <DetailField Label="@T.PreAuthDialog.Examination" Value="@_examinationName" />
+                <DetailField Label="@T.PreAuthDialog.Policy" Value="@_policyNumber" />
+                <DetailField Label="@T.PreAuthDialog.EstimatedAmount" Value="@_preAuth.EstimatedAmount.ToString("C")" />
+                <DetailField Label="@T.Common.Status" Value="@_preAuth.Status" />
+                <DetailField Label="@T.PreAuthDialog.RequestedAt" Value="@_preAuth.RequestedAt.ToString("yyyy-MM-dd HH:mm")" />
                 @if (_preAuth.Status == "Approved")
                 {
-                    <MudItem xs="12" sm="6">
-                        <MudTextField Label="@T.PreAuthDialog.ApprovedAmount" Variant="Variant.Outlined" Margin="Margin.Dense" ReadOnly="true" Value="@(_preAuth.ApprovedAmount?.ToString("C") ?? "-")" />
-                    </MudItem>
+                    <DetailField Label="@T.PreAuthDialog.ApprovedAmount" Value="@(_preAuth.ApprovedAmount?.ToString("C") ?? "-")" />
                 }
                 @if (_preAuth.Status == "Denied" && !string.IsNullOrWhiteSpace(_preAuth.RejectionReason))
                 {
-                    <MudItem xs="12">
-                        <MudTextField Label="@T.PreAuthDialog.RejectionReason" Variant="Variant.Outlined" Margin="Margin.Dense" ReadOnly="true" Lines="3" Value="@_preAuth.RejectionReason" />
-                    </MudItem>
+                    <DetailField Label="@T.PreAuthDialog.RejectionReason" Sm="12" Md="12">
+                        <MudText>@_preAuth.RejectionReason</MudText>
+                    </DetailField>
                 }
             </MudGrid>
 

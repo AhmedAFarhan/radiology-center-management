@@ -23,7 +23,7 @@
         <MudTh><MudTableSortLabel T="ExaminationTypeDto" SortLabel="@("Modality")">@T.Examinations.Modality</MudTableSortLabel></MudTh>
         <MudTh><MudTableSortLabel T="ExaminationTypeDto" SortLabel="@("BodyPart")">@T.Examinations.BodyPart</MudTableSortLabel></MudTh>
         <MudTh><MudTableSortLabel T="ExaminationTypeDto" SortLabel="@("StandardDurationMinutes")">@T.Examinations.Duration</MudTableSortLabel></MudTh>
-        <MudTh><MudTableSortLabel T="ExaminationTypeDto" SortLabel="@("Price")">@T.Examinations.Price</MudTableSortLabel></MudTh>
+        <MudTh Class="text-right"><MudTableSortLabel T="ExaminationTypeDto" SortLabel="@("Price")">@T.Examinations.Price</MudTableSortLabel></MudTh>
         <MudTh>@T.Examinations.Requirements</MudTh>
         <MudTh>@T.Common.Status</MudTh>
         <MudTh>@T.Common.Actions</MudTh>
@@ -32,12 +32,12 @@
         <MudTd DataLabel="@T.Examinations.Code" Class="mono-text">@context.Code</MudTd>
         <MudTd DataLabel="@T.Common.Name">
             <MudText Class="font-weight-medium">@context.Name</MudText>
-            <MudText Typo="Typo.caption" Class="text-secondary">@(T.FormatValue(T.Examinations.ItemCount, context.Items.Count))</MudText>
+            <MudText Typo="Typo.caption" Class="text-secondary">@(T.FormatValue(T.Examinations.ItemCount, context.Items?.Count ?? 0))</MudText>
         </MudTd>
         <MudTd DataLabel="@T.Examinations.Modality">@context.Modality</MudTd>
         <MudTd DataLabel="@T.Examinations.BodyPart">@context.BodyPart</MudTd>
         <MudTd DataLabel="@T.Examinations.Duration">@(context.StandardDurationMinutes == 0 ? "-" : T.FormatValue(T.Examinations.Minutes, context.StandardDurationMinutes))</MudTd>
-        <MudTd DataLabel="@T.Examinations.Price">@context.Price.ToString("C")</MudTd>
+        <MudTd DataLabel="@T.Examinations.Price" Class="text-right">@context.Price.ToString("C")</MudTd>
         <MudTd DataLabel="@T.Examinations.Requirements">
             @if (context.RequiresPreparation)
             {
