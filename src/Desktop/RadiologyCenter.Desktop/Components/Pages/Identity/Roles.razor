@@ -33,8 +33,12 @@
         </MudTd>
         <MudTd DataLabel="@T.Roles.Created">@context.CreatedAt.ToString("g")</MudTd>
         <MudTd DataLabel="@T.Common.Actions">
-            <MudIconButton Icon="@Icons.Material.Filled.Edit" Size="Size.Small" Color="Color.Default" aria-label="@T.Roles.EditRole" OnClick="@(() => OpenEditDialogAsync(context))" />
-            <MudIconButton Icon="@Icons.Material.Filled.Key" Size="Size.Small" Color="Color.Info" aria-label="@T.Roles.ManagePermissions" OnClick="@(() => OpenPermissionsDialogAsync(context))" />
+            <MudTooltip Placement="Placement.Bottom" Text="@T.Roles.EditRole">
+                <MudIconButton Icon="@Icons.Material.Filled.Edit" Size="Size.Small" Color="Color.Default" aria-label="@T.Roles.EditRole" OnClick="@(() => OpenEditDialogAsync(context))" />
+            </MudTooltip>
+            <MudTooltip Placement="Placement.Bottom" Text="@T.Roles.ManagePermissions">
+                <MudIconButton Icon="@Icons.Material.Filled.Key" Size="Size.Small" Color="Color.Info" aria-label="@T.Roles.ManagePermissions" OnClick="@(() => OpenPermissionsDialogAsync(context))" />
+            </MudTooltip>
         </MudTd>
     </RowTemplate>
     <NoRecordsContent>

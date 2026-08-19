@@ -40,24 +40,38 @@
         </MudTd>
         <MudTd DataLabel="@T.Users.LastLogin">@(context.LastLoginAt?.ToString("g") ?? "-")</MudTd>
         <MudTd DataLabel="@T.Common.Actions">
-            <MudIconButton Icon="@Icons.Material.Filled.Edit" Size="Size.Small" Color="Color.Default" aria-label="@T.Users.EditProfile" OnClick="@(() => OpenEditDialogAsync(context))" />
-            <MudIconButton Icon="@Icons.Material.Filled.Groups" Size="Size.Small" Color="Color.Info" aria-label="@T.Users.ManageRoles" OnClick="@(() => OpenRolesDialogAsync(context))" />
-            <MudIconButton Icon="@Icons.Material.Filled.Key" Size="Size.Small" Color="Color.Default" aria-label="@T.Users.ResetPassword" OnClick="@(() => OpenResetPasswordDialogAsync(context))" Disabled="@IsCurrentUser(context)" />
+            <MudTooltip Placement="Placement.Bottom" Text="@T.Users.EditProfile">
+                <MudIconButton Icon="@Icons.Material.Filled.Edit" Size="Size.Small" Color="Color.Default" aria-label="@T.Users.EditProfile" OnClick="@(() => OpenEditDialogAsync(context))" />
+            </MudTooltip>
+            <MudTooltip Placement="Placement.Bottom" Text="@T.Users.ManageRoles">
+                <MudIconButton Icon="@Icons.Material.Filled.Groups" Size="Size.Small" Color="Color.Info" aria-label="@T.Users.ManageRoles" OnClick="@(() => OpenRolesDialogAsync(context))" />
+            </MudTooltip>
+            <MudTooltip Placement="Placement.Bottom" Text="@T.Users.ResetPassword">
+                <MudIconButton Icon="@Icons.Material.Filled.Key" Size="Size.Small" Color="Color.Default" aria-label="@T.Users.ResetPassword" OnClick="@(() => OpenResetPasswordDialogAsync(context))" Disabled="@IsCurrentUser(context)" />
+            </MudTooltip>
             @if (context.IsLocked)
             {
-                <MudIconButton Icon="@Icons.Material.Filled.LockOpen" Size="Size.Small" Color="Color.Warning" aria-label="@T.Users.Unlock" OnClick="@(() => UnlockAsync(context))" />
+                <MudTooltip Placement="Placement.Bottom" Text="@T.Users.Unlock">
+                    <MudIconButton Icon="@Icons.Material.Filled.LockOpen" Size="Size.Small" Color="Color.Warning" aria-label="@T.Users.Unlock" OnClick="@(() => UnlockAsync(context))" />
+                </MudTooltip>
             }
             else
             {
-                <MudIconButton Icon="@Icons.Material.Filled.Lock" Size="Size.Small" Color="Color.Default" aria-label="@T.Users.Lock" OnClick="@(() => OpenLockDialogAsync(context))" Disabled="@IsCurrentUser(context)" />
+                <MudTooltip Placement="Placement.Bottom" Text="@T.Users.Lock">
+                    <MudIconButton Icon="@Icons.Material.Filled.Lock" Size="Size.Small" Color="Color.Default" aria-label="@T.Users.Lock" OnClick="@(() => OpenLockDialogAsync(context))" Disabled="@IsCurrentUser(context)" />
+                </MudTooltip>
             }
             @if (context.IsActive)
             {
-                <MudIconButton Icon="@Icons.Material.Filled.Block" Size="Size.Small" Color="Color.Error" aria-label="@T.Users.Deactivate" OnClick="@(() => DeactivateAsync(context))" Disabled="@IsCurrentUser(context)" />
+                <MudTooltip Placement="Placement.Bottom" Text="@T.Users.Deactivate">
+                    <MudIconButton Icon="@Icons.Material.Filled.Block" Size="Size.Small" Color="Color.Error" aria-label="@T.Users.Deactivate" OnClick="@(() => DeactivateAsync(context))" Disabled="@IsCurrentUser(context)" />
+                </MudTooltip>
             }
             else
             {
-                <MudIconButton Icon="@Icons.Material.Filled.CheckCircle" Size="Size.Small" Color="Color.Success" aria-label="@T.Users.Activate" OnClick="@(() => ActivateAsync(context))" />
+                <MudTooltip Placement="Placement.Bottom" Text="@T.Users.Activate">
+                    <MudIconButton Icon="@Icons.Material.Filled.CheckCircle" Size="Size.Small" Color="Color.Success" aria-label="@T.Users.Activate" OnClick="@(() => ActivateAsync(context))" />
+                </MudTooltip>
             }
         </MudTd>
     </RowTemplate>

@@ -33,8 +33,12 @@
         <MudTd DataLabel="@T.Leave.Duration">@(T.FormatValue(T.Leave.DurationDays, (context.EndDate.Date - context.StartDate.Date).Days + 1))</MudTd>
         <MudTd DataLabel="@T.Leave.Reason">@(string.IsNullOrWhiteSpace(context.Reason) ? "-" : context.Reason)</MudTd>
         <MudTd DataLabel="@T.Common.Actions">
-            <MudIconButton Icon="@Icons.Material.Filled.Edit" Size="Size.Small" Color="Color.Default" aria-label="@T.Common.Edit" OnClick="@(() => OpenEditDialogAsync(context))" />
-            <MudIconButton Icon="@Icons.Material.Filled.Delete" Size="Size.Small" Color="Color.Error" aria-label="@T.Common.Delete" OnClick="@(() => DeleteLeaveAsync(context))" />
+            <MudTooltip Placement="Placement.Bottom" Text="@T.Common.Edit">
+                <MudIconButton Icon="@Icons.Material.Filled.Edit" Size="Size.Small" Color="Color.Default" aria-label="@T.Common.Edit" OnClick="@(() => OpenEditDialogAsync(context))" />
+            </MudTooltip>
+            <MudTooltip Placement="Placement.Bottom" Text="@T.Common.Delete">
+                <MudIconButton Icon="@Icons.Material.Filled.Delete" Size="Size.Small" Color="Color.Error" aria-label="@T.Common.Delete" OnClick="@(() => DeleteLeaveAsync(context))" />
+            </MudTooltip>
         </MudTd>
     </RowTemplate>
     <NoRecordsContent>

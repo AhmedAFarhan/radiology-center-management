@@ -50,34 +50,50 @@
             }
         </MudTd>
         <MudTd DataLabel="@T.Common.Actions">
-            <MudIconButton Icon="@Icons.Material.Filled.Visibility" Size="Size.Small" Color="Color.Default" aria-label="@T.Visits.View" OnClick="@(() => OpenViewDialogAsync(context))" />
+            <MudTooltip Placement="Placement.Bottom" Text="@T.Visits.View">
+                <MudIconButton Icon="@Icons.Material.Filled.Visibility" Size="Size.Small" Color="Color.Default" aria-label="@T.Visits.View" OnClick="@(() => OpenViewDialogAsync(context))" />
+            </MudTooltip>
             @if (HasInsurance(context))
             {
-                <MudIconButton Icon="@Icons.Material.Filled.Approval" Size="Size.Small" Color="Color.Info" aria-label="@T.Visits.Insurance" OnClick="@(() => OpenInsuranceAsync(context))" />
+                <MudTooltip Placement="Placement.Bottom" Text="@T.Visits.Insurance">
+                    <MudIconButton Icon="@Icons.Material.Filled.Approval" Size="Size.Small" Color="Color.Info" aria-label="@T.Visits.Insurance" OnClick="@(() => OpenInsuranceAsync(context))" />
+                </MudTooltip>
             }
             @if (context.StatusKey is "Requested" or "Scheduled")
             {
-                <MudIconButton Icon="@Icons.Material.Filled.Edit" Size="Size.Small" Color="Color.Default" aria-label="@T.Common.Edit" OnClick="@(() => OpenEditDialogAsync(context))" />
+                <MudTooltip Placement="Placement.Bottom" Text="@T.Common.Edit">
+                    <MudIconButton Icon="@Icons.Material.Filled.Edit" Size="Size.Small" Color="Color.Default" aria-label="@T.Common.Edit" OnClick="@(() => OpenEditDialogAsync(context))" />
+                </MudTooltip>
             }
             @if (context.StatusKey is "Requested" or "Scheduled")
             {
-                <MudIconButton Icon="@Icons.Material.Filled.Schedule" Size="Size.Small" Color="Color.Info" aria-label="@T.Visits.Schedule" OnClick="@(() => OpenScheduleDialogAsync(context))" />
+                <MudTooltip Placement="Placement.Bottom" Text="@T.Visits.Schedule">
+                    <MudIconButton Icon="@Icons.Material.Filled.Schedule" Size="Size.Small" Color="Color.Info" aria-label="@T.Visits.Schedule" OnClick="@(() => OpenScheduleDialogAsync(context))" />
+                </MudTooltip>
             }
             @if (context.StatusKey == "Scheduled")
             {
-                <MudIconButton Icon="@Icons.Material.Filled.Login" Size="Size.Small" Color="Color.Primary" aria-label="@T.Visits.CheckIn" OnClick="@(() => CheckInAsync(context))" />
+                <MudTooltip Placement="Placement.Bottom" Text="@T.Visits.CheckIn">
+                    <MudIconButton Icon="@Icons.Material.Filled.Login" Size="Size.Small" Color="Color.Primary" aria-label="@T.Visits.CheckIn" OnClick="@(() => CheckInAsync(context))" />
+                </MudTooltip>
             }
             @if (context.StatusKey == "CheckedIn")
             {
-                <MudIconButton Icon="@Icons.Material.Filled.PlayArrow" Size="Size.Small" Color="Color.Secondary" aria-label="@T.Visits.Start" OnClick="@(() => StartAsync(context))" />
+                <MudTooltip Placement="Placement.Bottom" Text="@T.Visits.Start">
+                    <MudIconButton Icon="@Icons.Material.Filled.PlayArrow" Size="Size.Small" Color="Color.Secondary" aria-label="@T.Visits.Start" OnClick="@(() => StartAsync(context))" />
+                </MudTooltip>
             }
             @if (context.StatusKey == "InProgress")
             {
-                <MudIconButton Icon="@Icons.Material.Filled.CheckCircle" Size="Size.Small" Color="Color.Success" aria-label="@T.Visits.Complete" OnClick="@(() => CompleteAsync(context))" />
+                <MudTooltip Placement="Placement.Bottom" Text="@T.Visits.Complete">
+                    <MudIconButton Icon="@Icons.Material.Filled.CheckCircle" Size="Size.Small" Color="Color.Success" aria-label="@T.Visits.Complete" OnClick="@(() => CompleteAsync(context))" />
+                </MudTooltip>
             }
             @if (context.StatusKey is not "Completed" and not "Cancelled")
             {
-                <MudIconButton Icon="@Icons.Material.Filled.Cancel" Size="Size.Small" Color="Color.Error" aria-label="@T.Common.Cancel" OnClick="@(() => CancelAsync(context))" />
+                <MudTooltip Placement="Placement.Bottom" Text="@T.Common.Cancel">
+                    <MudIconButton Icon="@Icons.Material.Filled.Cancel" Size="Size.Small" Color="Color.Error" aria-label="@T.Common.Cancel" OnClick="@(() => CancelAsync(context))" />
+                </MudTooltip>
             }
         </MudTd>
     </RowTemplate>

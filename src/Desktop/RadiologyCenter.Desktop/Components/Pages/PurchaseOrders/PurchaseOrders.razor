@@ -31,17 +31,25 @@
         <MudTd DataLabel="@T.Common.Actions">
             @if (context.Status == "Draft")
             {
-                <MudIconButton Icon="@Icons.Material.Filled.Send" Size="Size.Small" Color="Color.Primary" aria-label="@T.PurchaseOrders.PlaceOrder" OnClick="@(() => PlaceAsync(context))" />
+                <MudTooltip Placement="Placement.Bottom" Text="@T.PurchaseOrders.PlaceOrder">
+                    <MudIconButton Icon="@Icons.Material.Filled.Send" Size="Size.Small" Color="Color.Primary" aria-label="@T.PurchaseOrders.PlaceOrder" OnClick="@(() => PlaceAsync(context))" />
+                </MudTooltip>
             }
             @if (context.Status is "Ordered" or "PartiallyReceived")
             {
-                <MudIconButton Icon="@Icons.Material.Filled.Inventory2" Size="Size.Small" Color="Color.Info" aria-label="@T.PurchaseOrders.Receive" OnClick="@(() => OpenReceiveDialogAsync(context))" />
+                <MudTooltip Placement="Placement.Bottom" Text="@T.PurchaseOrders.Receive">
+                    <MudIconButton Icon="@Icons.Material.Filled.Inventory2" Size="Size.Small" Color="Color.Info" aria-label="@T.PurchaseOrders.Receive" OnClick="@(() => OpenReceiveDialogAsync(context))" />
+                </MudTooltip>
             }
             @if (context.Status is "Draft" or "Ordered")
             {
-                <MudIconButton Icon="@Icons.Material.Filled.Cancel" Size="Size.Small" Color="Color.Default" aria-label="@T.PurchaseOrders.CancelOrder" OnClick="@(() => CancelAsync(context))" />
+                <MudTooltip Placement="Placement.Bottom" Text="@T.PurchaseOrders.CancelOrder">
+                    <MudIconButton Icon="@Icons.Material.Filled.Cancel" Size="Size.Small" Color="Color.Default" aria-label="@T.PurchaseOrders.CancelOrder" OnClick="@(() => CancelAsync(context))" />
+                </MudTooltip>
             }
-            <MudIconButton Icon="@Icons.Material.Filled.Visibility" Size="Size.Small" Color="Color.Default" aria-label="@T.PurchaseOrders.View" OnClick="@(() => OpenViewDialogAsync(context))" />
+            <MudTooltip Placement="Placement.Bottom" Text="@T.PurchaseOrders.View">
+                <MudIconButton Icon="@Icons.Material.Filled.Visibility" Size="Size.Small" Color="Color.Default" aria-label="@T.PurchaseOrders.View" OnClick="@(() => OpenViewDialogAsync(context))" />
+            </MudTooltip>
         </MudTd>
     </RowTemplate>
     <NoRecordsContent>

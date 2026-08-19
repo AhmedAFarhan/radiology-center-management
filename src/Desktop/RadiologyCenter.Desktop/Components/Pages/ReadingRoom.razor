@@ -290,12 +290,14 @@
                                         <MudSelectItem T="string" Value="@level">@level</MudSelectItem>
                                     }
                                 </MudSelect>
-                                <MudIconButton Icon="@Icons.Material.Filled.Delete"
-                                               Size="Size.Small"
-                                               Color="Color.Error"
-                                               aria-label="@T.ReadingRoom.RemoveFinding"
-                                               OnClick="@(() => RemoveFindingAsync(currentFinding))"
-                                               Class="ms-1" />
+                                <MudTooltip Placement="Placement.Bottom" Text="@T.ReadingRoom.RemoveFinding">
+                                    <MudIconButton Icon="@Icons.Material.Filled.Delete"
+                                                   Size="Size.Small"
+                                                   Color="Color.Error"
+                                                   aria-label="@T.ReadingRoom.RemoveFinding"
+                                                   OnClick="@(() => RemoveFindingAsync(currentFinding))"
+                                                   Class="ms-1" />
+                                </MudTooltip>
                             }
                         </div>
                     }

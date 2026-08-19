@@ -1600,6 +1600,7 @@ h1:focus {
 .permission-scroll {
   max-height: calc(100vh - 320px);
   overflow-y: auto;
+  overflow-x: hidden;
   padding-inline-end: 4px;
 }
 .mud-table:has(.mud-table-loading-row) .mud-table-pagination-actions,

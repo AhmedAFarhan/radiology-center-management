@@ -35,7 +35,9 @@
             <StatusChip Token="@context.Status">@FormatStatus(context.Status)</StatusChip>
         </MudTd>
         <MudTd DataLabel="@T.Common.Actions">
-            <MudIconButton Icon="@Icons.Material.Filled.Visibility" Size="Size.Small" Color="Color.Default" aria-label="@T.PreAuth.View" OnClick="@(() => OpenDetailDialogAsync(context))" />
+            <MudTooltip Placement="Placement.Bottom" Text="@T.PreAuth.View">
+                <MudIconButton Icon="@Icons.Material.Filled.Visibility" Size="Size.Small" Color="Color.Default" aria-label="@T.PreAuth.View" OnClick="@(() => OpenDetailDialogAsync(context))" />
+            </MudTooltip>
         </MudTd>
     </RowTemplate>
     <NoRecordsContent>

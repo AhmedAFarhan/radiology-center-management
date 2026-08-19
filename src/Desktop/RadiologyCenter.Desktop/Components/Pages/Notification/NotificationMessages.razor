@@ -52,7 +52,9 @@
         <MudTd DataLabel="@T.Notifications.Attempts" Class="text-center">@context.Attempts</MudTd>
         <MudTd DataLabel="@T.Notifications.Reference">@(string.IsNullOrWhiteSpace(context.ReferenceId) ? "-" : context.ReferenceId)</MudTd>
         <MudTd DataLabel="@T.Common.Actions" Class="text-center">
-            <MudIconButton Icon="@Icons.Material.Filled.Visibility" Size="Size.Small" Color="Color.Default" aria-label="@T.Notifications.View" OnClick="@(() => OpenDetailAsync(context))" />
+            <MudTooltip Placement="Placement.Bottom" Text="@T.Notifications.View">
+                <MudIconButton Icon="@Icons.Material.Filled.Visibility" Size="Size.Small" Color="Color.Default" aria-label="@T.Notifications.View" OnClick="@(() => OpenDetailAsync(context))" />
+            </MudTooltip>
         </MudTd>
     </RowTemplate>
     <NoRecordsContent>

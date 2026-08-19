@@ -42,7 +42,9 @@
         <MudTd DataLabel="@T.Cash.Entries" Class="text-center">@context.EntryCount</MudTd>
         <MudTd DataLabel="@T.Cash.ClosedAt">@(context.ClosedAt?.ToLocalTime().ToString("g") ?? "-")</MudTd>
         <MudTd DataLabel="@T.Common.Actions" Class="text-center">
-            <MudIconButton Icon="@Icons.Material.Filled.Visibility" Size="Size.Small" Color="Color.Default" aria-label="@T.Cash.View" OnClick="@(() => OpenDetailAsync(context))" />
+            <MudTooltip Placement="Placement.Bottom" Text="@T.Cash.View">
+                <MudIconButton Icon="@Icons.Material.Filled.Visibility" Size="Size.Small" Color="Color.Default" aria-label="@T.Cash.View" OnClick="@(() => OpenDetailAsync(context))" />
+            </MudTooltip>
         </MudTd>
     </RowTemplate>
     <NoRecordsContent>

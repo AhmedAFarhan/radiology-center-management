@@ -38,13 +38,19 @@
             <MudChip T="string" Size="Size.Small" Color="@(context.IsActive ? Color.Success : Color.Default)">@(context.IsActive ? T.Common.Active : T.Common.Inactive)</MudChip>
         </MudTd>
         <MudTd DataLabel="@T.Common.Actions">
-            <MudIconButton Icon="@Icons.Material.Filled.Edit" Size="Size.Small" Color="Color.Default" aria-label="@T.Common.Edit" OnClick="@(() => OpenEditDialogAsync(context))" />
-            <MudIconButton Icon="@(context.IsActive ? Icons.Material.Filled.Block : Icons.Material.Filled.CheckCircle)"
-                           Size="Size.Small"
-                           Color="@(context.IsActive ? Color.Default : Color.Success)"
-                           aria-label="@T.Patients.ToggleStatus"
-                           OnClick="@(() => ToggleActiveAsync(context))" />
-            <MudIconButton Icon="@Icons.Material.Filled.Delete" Size="Size.Small" Color="Color.Error" aria-label="@T.Common.Delete" OnClick="@(() => DeletePatientAsync(context))" />
+            <MudTooltip Placement="Placement.Bottom" Text="@T.Common.Edit">
+                <MudIconButton Icon="@Icons.Material.Filled.Edit" Size="Size.Small" Color="Color.Default" aria-label="@T.Common.Edit" OnClick="@(() => OpenEditDialogAsync(context))" />
+            </MudTooltip>
+            <MudTooltip Placement="Placement.Bottom" Text="@T.Patients.ToggleStatus">
+                <MudIconButton Icon="@(context.IsActive ? Icons.Material.Filled.Block : Icons.Material.Filled.CheckCircle)"
+                               Size="Size.Small"
+                               Color="@(context.IsActive ? Color.Default : Color.Success)"
+                               aria-label="@T.Patients.ToggleStatus"
+                               OnClick="@(() => ToggleActiveAsync(context))" />
+            </MudTooltip>
+            <MudTooltip Placement="Placement.Bottom" Text="@T.Common.Delete">
+                <MudIconButton Icon="@Icons.Material.Filled.Delete" Size="Size.Small" Color="Color.Error" aria-label="@T.Common.Delete" OnClick="@(() => DeletePatientAsync(context))" />
+            </MudTooltip>
         </MudTd>
     </RowTemplate>
     <NoRecordsContent>

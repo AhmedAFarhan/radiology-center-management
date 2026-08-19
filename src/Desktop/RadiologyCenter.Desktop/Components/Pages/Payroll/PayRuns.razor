@@ -78,8 +78,12 @@
         <MudTd DataLabel="@T.Payroll.Processed">@(context.ProcessedAt?.ToString("g") ?? "-")</MudTd>
         <MudTd DataLabel="@T.Payroll.Notes">@(string.IsNullOrWhiteSpace(context.Notes) ? "-" : context.Notes)</MudTd>
         <MudTd DataLabel="@T.Common.Actions">
-            <MudIconButton Icon="@Icons.Material.Filled.Visibility" Size="Size.Small" Color="Color.Default" aria-label="@T.Payroll.View" OnClick="@(() => OpenDetailDialogAsync(context))" />
-            <MudIconButton Icon="@Icons.Material.Filled.Delete" Size="Size.Small" Color="Color.Error" aria-label="@T.Common.Delete" OnClick="@(() => DeletePayRunAsync(context))" />
+            <MudTooltip Placement="Placement.Bottom" Text="@T.Payroll.View">
+                <MudIconButton Icon="@Icons.Material.Filled.Visibility" Size="Size.Small" Color="Color.Default" aria-label="@T.Payroll.View" OnClick="@(() => OpenDetailDialogAsync(context))" />
+            </MudTooltip>
+            <MudTooltip Placement="Placement.Bottom" Text="@T.Common.Delete">
+                <MudIconButton Icon="@Icons.Material.Filled.Delete" Size="Size.Small" Color="Color.Error" aria-label="@T.Common.Delete" OnClick="@(() => DeletePayRunAsync(context))" />
+            </MudTooltip>
         </MudTd>
     </RowTemplate>
     <NoRecordsContent>
