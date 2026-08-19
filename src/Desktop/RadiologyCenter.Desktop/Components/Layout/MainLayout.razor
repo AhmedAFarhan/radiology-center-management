@@ -167,5 +167,13 @@
             <span>@T.Layout.SigningOut</span>
         </div>
     }
+
+    @if (BusyState.Instance.IsBusy)
+    {
+        <div class="busy-overlay">
+            <MudProgressCircular Size="Size.Large" Indeterminate="true" Color="Color.Primary" />
+            <span>@T.Common.Loading</span>
+        </div>
+    }
 </div>
 

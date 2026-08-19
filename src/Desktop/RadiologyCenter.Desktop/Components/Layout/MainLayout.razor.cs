@@ -21,7 +21,7 @@ using Color = MudBlazor.Color;
 
 namespace RadiologyCenter.Desktop.Components.Layout;
 
-public partial class MainLayout : LayoutComponentBase
+public partial class MainLayout : LayoutComponentBase, IDisposable
 {
 [CascadingParameter]
     private Task<AuthenticationState>? AuthStateTask { get; set; }
@@ -45,11 +45,24 @@ private bool _drawerOpen = true;
 
     private sealed record SearchFlatItem(string EntityType, GlobalSearchItemDto Item);
 
-    protected override void OnParametersSet()
+protected override void OnParametersSet()
     {
         base.OnParametersSet();
         if (AuthStateTask is not null)
             _ = RefreshUserAsync(AuthStateTask);
+    }
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+        BusyState.Instance.Changed += OnBusyChanged;
+    }
+
+    private void OnBusyChanged() => InvokeAsync(StateHasChanged);
+
+    public void Dispose()
+    {
+        BusyState.Instance.Changed -= OnBusyChanged;
     }
 
     private async Task RefreshUserAsync(Task<AuthenticationState> task)
