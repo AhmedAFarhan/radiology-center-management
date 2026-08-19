@@ -56,11 +56,3 @@
     </DialogActions>
 </MudDialog>
 
-@code {
-    [Parameter] public NotificationMessageDto Message { get; set; } = default!;
-
-    [CascadingParameter] public IMudDialogInstance MudDialog { get; set; } = default!;
-
-    private void CloseAsync()
-        => MudDialog.Close();
-}

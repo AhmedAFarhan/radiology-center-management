@@ -66,50 +66,5 @@
     </DialogActions>
 </MudDialog>
 
-@code {
-    [Parameter] public string PurchaseOrderId { get; set; } = string.Empty;
 
-    [CascadingParameter] public IMudDialogInstance MudDialog { get; set; } = default!;
-
-    private PurchaseOrderDto? _po;
-    private string? _error;
-    private bool _loading;
-
-    protected override async Task OnInitializedAsync()
-        => await LoadAsync();
-
-    private async Task LoadAsync()
-    {
-        _loading = true;
-        _error = null;
-        try
-        {
-            _po = await InventoryService.GetPurchaseOrderByIdAsync(PurchaseOrderId);
-        }
-        catch (ApiException ex)
-        {
-            _error = ex.Message;
-        }
-        catch (Exception)
-        {
-            _error = T.PoDialog.Unreachable;
-        }
-        finally
-        {
-            _loading = false;
-        }
-    }
-
-    private decimal Total()
-        => _po is null ? 0 : _po.Items.Sum(i => i.QuantityOrdered * i.UnitCost);
-
-    private static string FormatStatus(string status) => status switch
-    {
-        "PartiallyReceived" => "Partially Received",
-        _ => status,
-    };
-
-    private void CloseAsync()
-        => MudDialog.Close();
-}
 

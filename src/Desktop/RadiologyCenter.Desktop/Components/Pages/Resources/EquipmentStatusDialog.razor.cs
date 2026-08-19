@@ -1,0 +1,76 @@
+using System.Net.Http;
+using System.Net.Http.Json;
+using System.ComponentModel.DataAnnotations;
+using System.Security.Claims;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Authorization;
+using Microsoft.AspNetCore.Components.Forms;
+using Microsoft.AspNetCore.Components.Routing;
+using Microsoft.AspNetCore.Components.Web;
+using Microsoft.AspNetCore.Components.Web.Virtualization;
+using Microsoft.JSInterop;
+using MudBlazor;
+using RadiologyCenter.Desktop;
+using RadiologyCenter.Desktop.Components;
+using RadiologyCenter.Desktop.Models;
+using RadiologyCenter.Desktop.Services;
+
+namespace RadiologyCenter.Desktop.Components.Pages.Resources;
+
+public partial class EquipmentStatusDialog : ComponentBase
+{
+[Parameter] public EquipmentDto Equipment { get; set; } = default!;
+
+    [CascadingParameter] public IMudDialogInstance MudDialog { get; set; } = default!;
+
+    private static readonly Dictionary<string, string> StatusOptions = new()
+    {
+        ["Operational"] = "Operational",
+        ["UnderMaintenance"] = "Under Maintenance",
+        ["OutOfService"] = "Out of Service",
+        ["Retired"] = "Retired",
+    };
+
+    private readonly EquipmentStatusModel _model = new();
+    private EditContext _editContext = default!;
+    private bool _busy;
+
+    protected override void OnInitialized()
+    {
+        _editContext = new EditContext(_model);
+        _model.Status = Equipment.Status;
+    }
+
+    private async Task SubmitAsync()
+    {
+        if (!_editContext.Validate())
+            return;
+
+        await SafeExecute.RunAsync(async () =>
+            {
+                await ResourceService.SetEquipmentStatusAsync(Equipment.Id, _model.Status);
+                Snackbar.Add(T.EquipmentDialog.StatusUpdated, Severity.Success);
+                MudDialog.Close(DialogResult.Ok(true));
+            },
+            Snackbar,
+            () => T.EquipmentDialog.Unreachable,
+            busy => _busy = busy);
+    }
+
+    private void CancelAsync()
+        => MudDialog.Cancel();
+
+    private static string FormatStatus(string status) => status switch
+    {
+        "UnderMaintenance" => "Under Maintenance",
+        "OutOfService" => "Out of Service",
+        _ => status,
+    };
+
+    private sealed class EquipmentStatusModel
+    {
+        [Required(ErrorMessage = "Status is required.")]
+        public string Status { get; set; } = string.Empty;
+    }
+}

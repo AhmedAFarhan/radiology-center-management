@@ -8,17 +8,3 @@
                    OnClick="OpenAsync" />
 </MudTooltip>
 
-@code {
-    private async Task OpenAsync()
-    {
-        var options = new DialogOptions
-        {
-            CloseOnEscapeKey = true,
-            BackdropClick = true,
-            MaxWidth = MaxWidth.Small,
-            FullWidth = true,
-            NoHeader = true,
-        };
-        await DialogService.ShowAsync<LanguageDialog>("", options);
-    }
-}

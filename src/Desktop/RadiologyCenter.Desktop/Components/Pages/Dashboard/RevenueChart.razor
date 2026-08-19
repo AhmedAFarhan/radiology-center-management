@@ -26,20 +26,3 @@
     </MudCardContent>
 </MudCard>
 
-@code {
-    [Parameter] public IReadOnlyList<RevenuePoint> Data { get; set; } = Array.Empty<RevenuePoint>();
-
-    private static readonly ApexChartOptions<RevenuePoint> _options = new()
-    {
-        Chart = new ApexCharts.Chart
-        {
-            Toolbar = new Toolbar { Show = false },
-            Zoom = new Zoom { Enabled = false },
-            ForeColor = "#8B93A7",
-            FontFamily = "Montserrat, Cairo, sans-serif",
-        },
-        DataLabels = new DataLabels { Enabled = false },
-        Stroke = new Stroke { Curve = Curve.Smooth, Width = 3 },
-        Colors = new List<string> { "#4C58E0" },
-    };
-}

@@ -18,25 +18,3 @@ else
     </ApexChart>
 }
 
-@code {
-    [Parameter] public IReadOnlyList<RevenueByModalityDto> Items { get; set; } = Array.Empty<RevenueByModalityDto>();
-
-    [Parameter] public string Height { get; set; } = "300px";
-
-    private static readonly ApexChartOptions<RevenueByModalityDto> _options = new()
-    {
-        Chart = new ApexCharts.Chart
-        {
-            Toolbar = new Toolbar { Show = false },
-            ForeColor = "#8B93A7",
-            FontFamily = "Montserrat, Cairo, sans-serif",
-        },
-        DataLabels = new DataLabels { Enabled = false },
-        Grid = new Grid { Show = true, BorderColor = "#EDEFF5" },
-        Colors = new List<string> { "#7A84EA" },
-        PlotOptions = new PlotOptions
-        {
-            Bar = new PlotOptionsBar { BorderRadius = 8, ColumnWidth = "45%" }
-        },
-    };
-}

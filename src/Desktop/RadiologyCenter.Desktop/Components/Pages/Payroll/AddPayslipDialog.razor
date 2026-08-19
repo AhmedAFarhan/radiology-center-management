@@ -21,24 +21,3 @@
     </DialogActions>
 </MudDialog>
 
-@code {
-    [Parameter] public Func<string?, CancellationToken, Task<IEnumerable<StaffDto>>> StaffSearchFunc { get; set; } = default!;
-
-    [CascadingParameter] public IMudDialogInstance MudDialog { get; set; } = default!;
-
-    private StaffDto? _selectedStaff;
-
-    private void SubmitAsync()
-    {
-        if (_selectedStaff is null)
-        {
-            Snackbar.Add(T.Payslip.SelectEmployee, Severity.Warning);
-            return;
-        }
-
-        MudDialog.Close(DialogResult.Ok(_selectedStaff.Id));
-    }
-
-    private void CancelAsync()
-        => MudDialog.Cancel();
-}

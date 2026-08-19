@@ -10,30 +10,3 @@
     }
 </MudStack>
 
-@code {
-    [Parameter] public string Icon { get; set; } = Icons.Material.Filled.Inbox;
-
-    [Parameter] public Color Color { get; set; } = Color.Default;
-
-    [Parameter] public string? Title { get; set; }
-
-    [Parameter] public string? Message { get; set; }
-
-    [Parameter] public string? ActionLabel { get; set; }
-
-    [Parameter] public EventCallback Action { get; set; }
-
-    private string _title = string.Empty;
-    private string _message = string.Empty;
-    private string _actionLabel = string.Empty;
-
-    protected override void OnParametersSet()
-    {
-        _title = Title ?? T.Common.EmptyTitle;
-        _message = Message ?? string.Empty;
-        _actionLabel = ActionLabel ?? string.Empty;
-    }
-
-    private Task OnActionClick()
-        => Action.HasDelegate ? Action.InvokeAsync(null) : Task.CompletedTask;
-}

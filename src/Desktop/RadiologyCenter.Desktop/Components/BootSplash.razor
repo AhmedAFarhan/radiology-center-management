@@ -32,24 +32,3 @@
     </div>
 </div>
 
-@code {
-    private bool _retrying;
-
-    protected override async Task OnInitializedAsync()
-    {
-        Backend.StateChanged += NotifyStateChanged;
-        await Backend.EnsureStartedAsync();
-    }
-
-    private void NotifyStateChanged() => InvokeAsync(StateHasChanged);
-
-    private async Task RetryAsync()
-    {
-        _retrying = true;
-        StateHasChanged();
-        await Backend.RetryAsync();
-        _retrying = false;
-    }
-
-    public void Dispose() => Backend.StateChanged -= NotifyStateChanged;
-}

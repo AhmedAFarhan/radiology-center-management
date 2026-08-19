@@ -27,27 +27,4 @@
     </DialogActions>
 </MudDialog>
 
-@code {
-    [Parameter] public ExaminationDto Visit { get; set; } = default!;
 
-    [CascadingParameter] public IMudDialogInstance MudDialog { get; set; } = default!;
-
-    private string? _reason;
-    private bool _busy;
-
-    private async Task SubmitAsync()
-    {
-        await SafeExecute.RunAsync(async () =>
-            {
-                await ExaminationService.CancelAsync(Visit.Id, _reason);
-                Snackbar.Add(T.Visits.Cancelled, Severity.Success);
-                MudDialog.Close(DialogResult.Ok(true));
-            },
-            Snackbar,
-            () => T.Visits.Unreachable,
-            busy => _busy = busy);
-    }
-
-    private void CancelAsync()
-        => MudDialog.Cancel();
-}

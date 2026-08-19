@@ -51,56 +51,5 @@
     </DialogActions>
 </MudDialog>
 
-@code {
-    [Parameter] public UserDto User { get; set; } = default!;
 
-    [CascadingParameter] public IMudDialogInstance MudDialog { get; set; } = default!;
-
-    private List<RoleDto> _roles = new();
-    private readonly Dictionary<string, bool> _selected = new();
-    private string? _loadError;
-    private bool _busy;
-
-    protected override async Task OnInitializedAsync()
-    {
-        try
-        {
-            var roles = await IdentityService.GetRolesPagedAsync(null, "Name", false, 1, 100);
-            _roles = roles.Items.ToList();
-            foreach (var role in _roles)
-                _selected[role.Id] = false;
-        }
-        catch (ApiException ex)
-        {
-            _loadError = ex.Message;
-        }
-        catch (Exception)
-        {
-            _loadError = T.UserDialog.LoadRolesError;
-        }
-    }
-
-    private async Task SubmitAsync()
-    {
-        var selectedIds = _selected.Where(kv => kv.Value).Select(kv => kv.Key).ToList();
-        if (selectedIds.Count == 0)
-        {
-            Snackbar.Add(T.UserDialog.SelectRole, Severity.Warning);
-            return;
-        }
-
-        await SafeExecute.RunAsync(async () =>
-            {
-                await IdentityService.UpdateUserRolesAsync(User.Id, selectedIds);
-                Snackbar.Add(T.UserDialog.RolesUpdated, Severity.Success);
-                MudDialog.Close(DialogResult.Ok(true));
-            },
-            Snackbar,
-            () => T.UserDialog.Unreachable,
-            busy => _busy = busy);
-    }
-
-    private void CancelAsync()
-        => MudDialog.Cancel();
-}
 

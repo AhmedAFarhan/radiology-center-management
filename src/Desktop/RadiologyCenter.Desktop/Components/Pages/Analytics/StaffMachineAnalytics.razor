@@ -59,31 +59,6 @@ else
     </MudGrid>
 }
 
-@code {
-    [Inject]
-    private AnalyticsService Api { get; set; } = null!;
 
-    private StaffMachineAnalyticsDto? _data;
-
-    protected override async Task LoadAsync(DateTime from, DateTime to)
-    {
-        _data = await Api.GetStaffMachineAsync(from, to);
-    }
-
-    private IReadOnlyList<AnalyticsSlice> BuildRadiologistSlices()
-        => (_data?.Radiologists ?? Array.Empty<StaffPerformanceDto>())
-            .Select(s => new AnalyticsSlice(s.Name, s.CompletedExams))
-            .ToList();
-
-    private IReadOnlyList<AnalyticsSlice> BuildTechnicianSlices()
-        => (_data?.Technicians ?? Array.Empty<StaffPerformanceDto>())
-            .Select(s => new AnalyticsSlice(s.Name, s.CompletedExams))
-            .ToList();
-
-    private IReadOnlyList<AnalyticsSlice> BuildReferralSlices()
-        => (_data?.ReferralDoctors ?? Array.Empty<ReferralDoctorPerformanceDto>())
-            .Select(r => new AnalyticsSlice(r.Name, r.ReferredExams))
-            .ToList();
-}
 
 

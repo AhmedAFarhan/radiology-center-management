@@ -35,27 +35,3 @@
     </MudCardContent>
 </MudCard>
 
-@code {
-    [Parameter] public string? Class { get; set; }
-
-    protected override void OnInitialized()
-    {
-        Preset.Changed += OnPeriodChanged;
-    }
-
-    private void OnPeriodChanged()
-    {
-        InvokeAsync(StateHasChanged);
-    }
-
-    public void Dispose()
-    {
-        Preset.Changed -= OnPeriodChanged;
-    }
-
-    private Task OnPreset(AnalyticsRangePreset preset)
-    {
-        Preset.SetPreset(preset);
-        return Task.CompletedTask;
-    }
-}

@@ -24,28 +24,6 @@ else
     </ApexChart>
 }
 
-@code {
-    [Parameter] public IReadOnlyList<ModalityVolumeDto> Items { get; set; } = Array.Empty<ModalityVolumeDto>();
 
-    [Parameter] public string Height { get; set; } = "300px";
-
-    private static readonly ApexChartOptions<ModalityVolumeDto> _options = new()
-    {
-        Chart = new ApexCharts.Chart
-        {
-            Toolbar = new Toolbar { Show = false },
-            ForeColor = "#8B93A7",
-            FontFamily = "Montserrat, Cairo, sans-serif",
-        },
-        DataLabels = new DataLabels { Enabled = false },
-        PlotOptions = new PlotOptions
-        {
-            Bar = new PlotOptionsBar { BorderRadius = 6, ColumnWidth = "45%" }
-        },
-Grid = new Grid { Show = true, BorderColor = "#EDEFF5" },
-        Legend = new Legend { Position = LegendPosition.Top },
-        Colors = new List<string> { "#7A5CFF", "#BFA7FF" },
-    };
-}
 
 

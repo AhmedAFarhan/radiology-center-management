@@ -71,36 +71,3 @@
     </DialogActions>
 </MudDialog>
 
-@code {
-    [Parameter] public string ReportId { get; set; } = string.Empty;
-
-    [CascadingParameter] public IMudDialogInstance MudDialog { get; set; } = default!;
-
-    private bool _loading;
-    private string? _error;
-    private IReadOnlyList<ReportVersionDto> _versions = Array.Empty<ReportVersionDto>();
-
-    protected override async Task OnInitializedAsync()
-        => await LoadAsync();
-
-    private async Task LoadAsync()
-    {
-        _loading = true;
-        _error = null;
-        try
-        {
-            _versions = await ReportService.GetVersionsAsync(ReportId);
-        }
-        catch (Exception ex)
-        {
-            _error = ex.Message;
-        }
-        finally
-        {
-            _loading = false;
-        }
-    }
-
-    private void CancelAsync()
-        => MudDialog.Cancel();
-}

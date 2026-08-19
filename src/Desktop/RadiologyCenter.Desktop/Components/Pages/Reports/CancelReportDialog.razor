@@ -31,27 +31,3 @@
     </DialogActions>
 </MudDialog>
 
-@code {
-    [Parameter] public string ReportId { get; set; } = string.Empty;
-
-    [CascadingParameter] public IMudDialogInstance MudDialog { get; set; } = default!;
-
-    private string? _reason;
-    private bool _busy;
-
-    private async Task SubmitAsync()
-    {
-        await SafeExecute.RunAsync(async () =>
-            {
-                await ReportService.CancelAsync(ReportId, _reason);
-                Snackbar.Add(T.CancelReport.Cancelled, Severity.Success);
-                MudDialog.Close(DialogResult.Ok(true));
-            },
-            Snackbar,
-            () => T.CancelReport.Unreachable,
-            busy => _busy = busy);
-    }
-
-    private void CancelAsync()
-        => MudDialog.Cancel();
-}

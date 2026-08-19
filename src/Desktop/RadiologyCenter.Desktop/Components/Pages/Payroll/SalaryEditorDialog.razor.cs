@@ -1,0 +1,136 @@
+using System.Net.Http;
+using System.Net.Http.Json;
+using System.ComponentModel.DataAnnotations;
+using System.Security.Claims;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Authorization;
+using Microsoft.AspNetCore.Components.Forms;
+using Microsoft.AspNetCore.Components.Routing;
+using Microsoft.AspNetCore.Components.Web;
+using Microsoft.AspNetCore.Components.Web.Virtualization;
+using Microsoft.JSInterop;
+using MudBlazor;
+using RadiologyCenter.Desktop;
+using RadiologyCenter.Desktop.Components;
+using RadiologyCenter.Desktop.Models;
+using RadiologyCenter.Desktop.Services;
+
+namespace RadiologyCenter.Desktop.Components.Pages.Payroll;
+
+public partial class SalaryEditorDialog : ComponentBase
+{
+[Parameter] public SalaryDto? Salary { get; set; }
+
+    [CascadingParameter] public IMudDialogInstance MudDialog { get; set; } = default!;
+
+    private readonly SalaryFormModel _model = new();
+    private EditContext _editContext = default!;
+    private StaffDto? _selectedStaff;
+    private string _employeeName = string.Empty;
+    private string _staffId = string.Empty;
+    private bool _busy;
+
+    private bool IsEdit => Salary is not null;
+
+    private async Task<IEnumerable<StaffDto>> SearchStaffAsync(string? value, CancellationToken ct)
+    {
+        if (string.IsNullOrWhiteSpace(value))
+            return Array.Empty<StaffDto>();
+
+        try
+        {
+            var page = await ResourceService.GetStaffsPagedAsync(value, "LastName", false, 1, 20, ct);
+            return page.Items;
+        }
+        catch (ApiException ex)
+        {
+            Snackbar.Add(ex.Message, Severity.Error);
+            return Array.Empty<StaffDto>();
+        }
+        catch (Exception)
+        {
+            Snackbar.Add(T.SalaryDialog.SearchError, Severity.Error);
+            return Array.Empty<StaffDto>();
+        }
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        _editContext = new EditContext(_model);
+
+        if (Salary is null)
+        {
+            _model.EffectiveDate = DateTime.Today;
+            return;
+        }
+
+        _staffId = Salary.StaffId;
+        _model.BaseSalary = Salary.BaseSalary;
+        _model.SalaryType = Salary.SalaryType;
+        _model.EffectiveDate = Salary.EffectiveDate;
+
+        try
+        {
+            var staff = await ResourceService.GetStaffByIdAsync(Salary.StaffId);
+            _employeeName = staff.FullName;
+        }
+        catch (Exception)
+        {
+            _employeeName = Salary.StaffId;
+        }
+    }
+
+    private async Task SubmitAsync()
+    {
+        if (!_editContext.Validate())
+            return;
+
+        if (!IsEdit && _selectedStaff is null)
+        {
+            Snackbar.Add(T.SalaryDialog.SelectEmployee, Severity.Warning);
+            return;
+        }
+
+        if (_model.EffectiveDate is null)
+        {
+            Snackbar.Add(T.SalaryDialog.SelectEffectiveDate, Severity.Warning);
+            return;
+        }
+
+        await SafeExecute.RunAsync(async () =>
+            {
+                var input = new SalaryInput
+                {
+                    StaffId = IsEdit ? _staffId : _selectedStaff!.Id,
+                    BaseSalary = _model.BaseSalary,
+                    SalaryType = _model.SalaryType,
+                    EffectiveDate = _model.EffectiveDate.Value.Date,
+                };
+
+                if (IsEdit)
+                    await PayrollService.UpdateSalaryAsync(Salary!.Id, input);
+                else
+                    await PayrollService.CreateSalaryAsync(input);
+
+                Snackbar.Add(IsEdit ? T.SalaryDialog.Updated : T.SalaryDialog.Created, Severity.Success);
+                MudDialog.Close(DialogResult.Ok(true));
+            },
+            Snackbar,
+            () => T.SalaryDialog.Unreachable,
+            busy => _busy = busy);
+    }
+
+    private void CancelAsync()
+        => MudDialog.Cancel();
+
+    private sealed class SalaryFormModel
+    {
+        public decimal BaseSalary { get; set; }
+
+        [Required(ErrorMessage = "Salary type is required.")]
+        public string SalaryType { get; set; } = "Monthly";
+
+        public DateTime? EffectiveDate { get; set; }
+    }
+}

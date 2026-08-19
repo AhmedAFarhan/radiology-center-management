@@ -88,32 +88,3 @@ else
 </div>
 }
 
-@code {
-    private bool _checking = true;
-
-    protected override async Task OnInitializedAsync()
-    {
-        _checking = true;
-        var state = await AuthState.GetAuthenticationStateAsync();
-        if (state.User.Identity?.IsAuthenticated == true)
-        {
-            Navigation.NavigateTo("/dashboard", replace: true);
-            return;
-        }
-
-        _checking = false;
-    }
-
-    private async Task OpenLogin()
-    {
-        var options = new DialogOptions
-        {
-            CloseOnEscapeKey = true,
-            MaxWidth = MaxWidth.Small,
-            FullWidth = true,
-            BackdropClick = true,
-            NoHeader = true,
-        };
-        await DialogService.ShowAsync<LoginDialog>(T.Login.DialogTitle, options);
-    }
-}

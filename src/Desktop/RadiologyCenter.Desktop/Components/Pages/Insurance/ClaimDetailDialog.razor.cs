@@ -1,0 +1,183 @@
+using System.Net.Http;
+using System.Net.Http.Json;
+using System.ComponentModel.DataAnnotations;
+using System.Security.Claims;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Authorization;
+using Microsoft.AspNetCore.Components.Forms;
+using Microsoft.AspNetCore.Components.Routing;
+using Microsoft.AspNetCore.Components.Web;
+using Microsoft.AspNetCore.Components.Web.Virtualization;
+using Microsoft.JSInterop;
+using MudBlazor;
+using RadiologyCenter.Desktop;
+using RadiologyCenter.Desktop.Components;
+using RadiologyCenter.Desktop.Models;
+using RadiologyCenter.Desktop.Services;
+
+namespace RadiologyCenter.Desktop.Components.Pages.Insurance;
+
+public partial class ClaimDetailDialog : ComponentBase
+{
+[Parameter] public string ClaimId { get; set; } = string.Empty;
+    [Parameter] public string? PatientName { get; set; }
+    [Parameter] public string? ExaminationName { get; set; }
+    [Parameter] public string? PolicyNumber { get; set; }
+
+    [CascadingParameter] public IMudDialogInstance MudDialog { get; set; } = default!;
+
+    private static readonly string[] SettlementMethods = { "Check", "Wire Transfer", "Electronic Funds Transfer", "Adjustment" };
+
+    private ClaimDto? _claim;
+    private string _patientName = string.Empty;
+    private string _examinationName = string.Empty;
+    private string _policyNumber = string.Empty;
+    private decimal? _approvedAmount;
+    private string? _rejectionCode;
+    private string? _rejectionReason;
+    private decimal _settlementAmount;
+    private string _settlementMethod = "Check";
+    private string? _settlementReference;
+    private string? _loadError;
+    private bool _busy;
+
+    protected override async Task OnInitializedAsync()
+    {
+        _patientName = PatientName ?? string.Empty;
+        _examinationName = ExaminationName ?? string.Empty;
+        _policyNumber = PolicyNumber ?? string.Empty;
+        await LoadAsync();
+    }
+
+    private async Task LoadAsync()
+    {
+        _loadError = null;
+        try
+        {
+            _claim = await InsuranceService.GetClaimByIdAsync(ClaimId);
+            _loadError = null;
+        }
+        catch (ApiException ex)
+        {
+            _loadError = ex.Message;
+        }
+        catch (Exception)
+        {
+            _loadError = T.ClaimDialog.Unreachable;
+        }
+    }
+
+    private async Task SubmitAsync()
+    {
+        _busy = true;
+        try
+        {
+            _claim = await InsuranceService.SubmitClaimAsync(ClaimId);
+            Snackbar.Add(T.ClaimDialog.Submitted, Severity.Success);
+        }
+        catch (ApiException ex)
+        {
+            Snackbar.Add(ex.Message, Severity.Error);
+        }
+        finally
+        {
+            _busy = false;
+        }
+    }
+
+    private async Task ApproveAsync()
+    {
+        _busy = true;
+        try
+        {
+            var input = new AdjudicateClaimInput
+            {
+                Decision = "Approve",
+                ApprovedAmount = _approvedAmount,
+            };
+
+            _claim = await InsuranceService.AdjudicateClaimAsync(ClaimId, input);
+            Snackbar.Add(T.ClaimDialog.Approved, Severity.Success);
+        }
+        catch (ApiException ex)
+        {
+            Snackbar.Add(ex.Message, Severity.Error);
+        }
+        finally
+        {
+            _busy = false;
+        }
+    }
+
+    private async Task RejectAsync()
+    {
+        _busy = true;
+        try
+        {
+            var input = new AdjudicateClaimInput
+            {
+                Decision = "Reject",
+                RejectionCode = _rejectionCode,
+                RejectionReason = _rejectionReason,
+            };
+
+            _claim = await InsuranceService.AdjudicateClaimAsync(ClaimId, input);
+            Snackbar.Add(T.ClaimDialog.Rejected, Severity.Success);
+        }
+        catch (ApiException ex)
+        {
+            Snackbar.Add(ex.Message, Severity.Error);
+        }
+        finally
+        {
+            _busy = false;
+        }
+    }
+
+    private async Task ResubmitAsync()
+    {
+        _busy = true;
+        try
+        {
+            _claim = await InsuranceService.ResubmitClaimAsync(ClaimId);
+            Snackbar.Add(T.ClaimDialog.Resubmitted, Severity.Success);
+        }
+        catch (ApiException ex)
+        {
+            Snackbar.Add(ex.Message, Severity.Error);
+        }
+        finally
+        {
+            _busy = false;
+        }
+    }
+
+    private async Task RecordSettlementAsync()
+    {
+        _busy = true;
+        try
+        {
+            var input = new RecordSettlementInput
+            {
+                Method = _settlementMethod,
+                Amount = _settlementAmount,
+                Reference = _settlementReference,
+            };
+
+            _claim = await InsuranceService.RecordSettlementAsync(ClaimId, input);
+            Snackbar.Add(T.ClaimDialog.SettlementRecorded, Severity.Success);
+        }
+        catch (ApiException ex)
+        {
+            Snackbar.Add(ex.Message, Severity.Error);
+        }
+        finally
+        {
+            _busy = false;
+        }
+    }
+
+    private void CancelAsync()
+        => MudDialog.Close();
+}

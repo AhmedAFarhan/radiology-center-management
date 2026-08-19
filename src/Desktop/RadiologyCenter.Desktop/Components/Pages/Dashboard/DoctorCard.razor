@@ -29,23 +29,3 @@
     </MudCardContent>
 </MudCard>
 
-@code {
-    [Parameter] public string Name { get; set; } = string.Empty;
-
-    [Parameter] public string Specialty { get; set; } = string.Empty;
-
-    [Parameter] public int Referrals { get; set; }
-
-    private string Initials
-    {
-        get
-        {
-            if (string.IsNullOrWhiteSpace(Name))
-                return "?";
-
-            var parts = Name.Split(' ', StringSplitOptions.RemoveEmptyEntries);
-            var letters = parts.Take(2).Select(p => p[0]);
-            return string.Concat(letters).ToUpperInvariant();
-        }
-    }
-}

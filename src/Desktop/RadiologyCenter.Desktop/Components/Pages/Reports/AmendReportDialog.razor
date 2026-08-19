@@ -33,29 +33,3 @@
     </DialogActions>
 </MudDialog>
 
-@code {
-    [Parameter] public string ReportId { get; set; } = string.Empty;
-
-    [Parameter] public int CurrentVersion { get; set; }
-
-    [CascadingParameter] public IMudDialogInstance MudDialog { get; set; } = default!;
-
-    private string? _reason;
-    private bool _busy;
-
-    private async Task SubmitAsync()
-    {
-        await SafeExecute.RunAsync(async () =>
-            {
-                var report = await ReportService.AmendAsync(ReportId, _reason!);
-                Snackbar.Add(T.AmendReport.Reopened, Severity.Success);
-                MudDialog.Close(DialogResult.Ok(report));
-            },
-            Snackbar,
-            () => T.AmendReport.Unreachable,
-            busy => _busy = busy);
-    }
-
-    private void CancelAsync()
-        => MudDialog.Cancel();
-}
