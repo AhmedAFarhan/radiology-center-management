@@ -18,18 +18,15 @@ using RadiologyCenter.Desktop.Services;
 
 namespace RadiologyCenter.Desktop.Components.Pages.Examinations;
 
-public partial class ExaminationTypeEditorDialog : ComponentBase
+public partial class ExaminationTypeEditorDialog : EditorDialogBase
 {
 [Parameter] public ExaminationTypeDto? Type { get; set; }
-
-    [CascadingParameter] public IMudDialogInstance MudDialog { get; set; } = default!;
 
     private static readonly string[] Modalities = { "XRay", "CT", "MRI", "Ultrasound", "Mammography", "Fluoroscopy", "DEXA", "Other" };
 
     private readonly TypeFormModel _model = new();
     private EditContext _editContext = default!;
     private List<ItemDto> _inventoryItems = new();
-    private bool _busy;
 
     private bool IsEdit => Type is not null;
 
@@ -85,7 +82,7 @@ public partial class ExaminationTypeEditorDialog : ComponentBase
             return;
         }
 
-        await SafeExecute.RunAsync(async () =>
+        await TrySaveAsync(async () =>
             {
                 var input = new ExaminationTypeInput
                 {
@@ -115,13 +112,8 @@ public partial class ExaminationTypeEditorDialog : ComponentBase
                 Snackbar.Add(IsEdit ? T.ExamDialog.Updated : T.ExamDialog.Created, Severity.Success);
                 MudDialog.Close(DialogResult.Ok(true));
             },
-            Snackbar,
-            () => T.ExamDialog.Unreachable,
-            busy => _busy = busy);
+            () => T.ExamDialog.Unreachable);
     }
-
-    private void CancelAsync()
-        => MudDialog.Cancel();
 
     private sealed class TypeFormModel
     {

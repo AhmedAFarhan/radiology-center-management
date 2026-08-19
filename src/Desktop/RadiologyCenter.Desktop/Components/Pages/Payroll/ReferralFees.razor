@@ -1,12 +1,9 @@
 @page "/payroll/referral-fees"
 @attribute [Authorize]
+@inherits ListPageBase<ReferralFeeDto>
 @inject PayrollService PayrollService
 @inject ResourceService ResourceService
 @inject ExaminationService ExaminationService
-@inject IDialogService DialogService
-@inject ISnackbar Snackbar
-@inject AppLocalizer T
-@implements IDisposable
 
 <PageHeader Icon="@Icons.Material.Filled.LocalHospital" Title="@T.ReferralFee.Title"
             Subtitle="@T.ReferralFee.Subtitle"
@@ -16,7 +13,7 @@
     <MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Add" OnClick="OpenCreateDialogAsync">@T.ReferralFee.NewFee</MudButton>
 </PageHeader>
 
-<MudTable T="ReferralFeeDto" @ref="_table" ServerData="LoadServerData" Dense="true" Hover="true" Striped="true" Elevation="1" RowsPerPage="10" FixedHeader="true" Class="table-scroll">
+<MudTable T="ReferralFeeDto" @ref="Table" ServerData="LoadServerData" Dense="true" Hover="true" Striped="true" Elevation="1" RowsPerPage="10" FixedHeader="true" Class="table-scroll">
     <HeaderContent>
         <MudTh>@T.ReferralFee.Doctor</MudTh>
         <MudTh>@T.ReferralFee.ExaminationType</MudTh>
@@ -35,38 +32,30 @@
             <MudChip T="string" Size="Size.Small" Color="@(context.IsPercentage ? Color.Warning : Color.Default)">@(context.IsPercentage ? T.ReferralFee.Percentage : T.ReferralFee.Flat)</MudChip>
         </MudTd>
         <MudTd DataLabel="@T.Common.Status">
-            <MudChip T="string" Size="Size.Small" Color="@(context.IsActive ? Color.Success : Color.Default)">@(context.IsActive ? T.Common.Active : T.Common.Inactive)</MudChip>
+            <ActiveStatusChip IsActive="context.IsActive" ActiveLabel="@T.Common.Active" InactiveLabel="@T.Common.Inactive" />
         </MudTd>
         <MudTd DataLabel="@T.Common.Actions">
-            <MudIconButton Icon="@Icons.Material.Filled.Edit" Size="Size.Small" Color="Color.Default" aria-label="@T.Common.Edit" OnClick="@(() => OpenEditDialogAsync(context))" />
-            <MudIconButton Icon="@(context.IsActive ? Icons.Material.Filled.Block : Icons.Material.Filled.CheckCircle)"
-                           Size="Size.Small"
-                           Color="@(context.IsActive ? Color.Default : Color.Success)"
-                           aria-label="@T.ReferralFee.ToggleStatus"
-                           OnClick="@(() => ToggleActiveAsync(context))" />
-            <MudIconButton Icon="@Icons.Material.Filled.Delete" Size="Size.Small" Color="Color.Error" aria-label="@T.Common.Delete" OnClick="@(() => DeleteFeeAsync(context))" />
+            <RowActions IsActive="context.IsActive"
+                        EditLabel="@T.Common.Edit"
+                        ToggleLabel="@T.ReferralFee.ToggleStatus"
+                        DeleteLabel="@T.Common.Delete"
+                        OnEdit="@(() => OpenEditDialogAsync(context))"
+                        OnToggle="@(() => ToggleActiveAsync(context))"
+                        OnDelete="@(() => DeleteFeeAsync(context))" />
         </MudTd>
     </RowTemplate>
     <NoRecordsContent>
-        @if (_loadError is not null)
-        {
-            <ErrorState Icon="@(_offline ? Icons.Material.Filled.CloudOff : Icons.Material.Filled.ErrorOutline)"
-                        Title="@T.ReferralFee.LoadErrorTitle"
-                        Message="@_loadError"
-                        Action="ReloadAsync" />
-        }
-        else
-        {
-        <EmptyState Icon="@Icons.Material.Filled.LocalHospital"
-                    Title="@T.ReferralFee.EmptyTitle"
-                    Message="@T.ReferralFee.EmptyMessage"
-                    ActionLabel="@T.ReferralFee.EmptyActionLabel"
-                    Action="OpenCreateDialogAsync" />
-        }
+        <TableNoRecords LoadError="@LoadError"
+                        Offline="@Offline"
+                        ErrorTitle="@T.ReferralFee.LoadErrorTitle"
+                        EmptyIcon="@Icons.Material.Filled.LocalHospital"
+                        EmptyTitle="@T.ReferralFee.EmptyTitle"
+                        EmptyMessage="@T.ReferralFee.EmptyMessage"
+                        EmptyActionLabel="@T.ReferralFee.EmptyActionLabel"
+                        OnReload="ReloadAsync"
+                        OnEmptyAction="OpenCreateDialogAsync" />
     </NoRecordsContent>
     <PagerContent>
         <MudTablePager PageSizeOptions="@(new[] { 10, 25, 50 })" />
     </PagerContent>
 </MudTable>
-
-

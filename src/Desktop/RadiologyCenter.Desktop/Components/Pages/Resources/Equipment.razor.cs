@@ -18,86 +18,29 @@ using RadiologyCenter.Desktop.Services;
 
 namespace RadiologyCenter.Desktop.Components.Pages.Resources;
 
-public partial class Equipment : ComponentBase, IDisposable
+public partial class Equipment : ListPageBase<EquipmentDto>
 {
-private MudTable<EquipmentDto>? _table;
-    private string? _search;
-    private CancellationTokenSource? _searchCts;
-    private string? _loadError;
-    private bool _offline;
+    protected override string UnreachableMessage => T.Equipment.Unreachable;
 
-    private async Task<TableData<EquipmentDto>> LoadServerData(TableState state, CancellationToken ct)
-    {
-        try
-        {
-            var page = await ResourceService.GetEquipmentPagedAsync(
-                _search,
-                state.SortLabel,
-                state.SortDirection == SortDirection.Descending,
-                state.Page + 1,
-                state.PageSize,
-                ct);
-
-            _loadError = null;
-            _offline = false;
-            return new TableData<EquipmentDto> { Items = page.Items, TotalItems = page.TotalCount };
-        }
-        catch (OperationCanceledException)
-        {
-            if (ct.IsCancellationRequested)
-                return new TableData<EquipmentDto> { Items = Array.Empty<EquipmentDto>(), TotalItems = 0 };
-            throw;
-        }
-        catch (ApiException ex)
-        {
-            Snackbar.Add(ex.Message, Severity.Error);
-            _loadError = ex.Message;
-            _offline = false;
-            return new TableData<EquipmentDto> { Items = Array.Empty<EquipmentDto>(), TotalItems = 0 };
-        }
-        catch (Exception)
-        {
-            Snackbar.Add(T.Equipment.Unreachable, Severity.Error);
-            _loadError = T.Equipment.Unreachable;
-            _offline = true;
-            return new TableData<EquipmentDto> { Items = Array.Empty<EquipmentDto>(), TotalItems = 0 };
-        }
-    }
-
-    private async Task OnSearchChanged(string? value)
-    {
-        _search = value;
-
-        _searchCts?.Cancel();
-        var cts = _searchCts = new CancellationTokenSource();
-        try
-        {
-            await Task.Delay(400, cts.Token);
-        }
-        catch (TaskCanceledException)
-        {
-            return;
-        }
-
-        if (_table is not null)
-            await _table.ReloadServerData();
-    }
-
-    private Task ReloadAsync()
-        => _table is null ? Task.CompletedTask : _table.ReloadServerData();
+    protected override async Task<PagedResult<EquipmentDto>> LoadPageAsync(
+        string? search,
+        string? sortBy,
+        bool sortDescending,
+        int page,
+        int pageSize,
+        CancellationToken ct)
+        => await ResourceService.GetEquipmentPagedAsync(search, sortBy, sortDescending, page, pageSize, ct);
 
     private async Task OpenCreateDialogAsync()
     {
-        var options = new DialogOptions { MaxWidth = MaxWidth.Medium, FullWidth = true, NoHeader = true };
-        var dialog = await DialogService.ShowAsync<EquipmentEditorDialog>(T.Equipment.NewEquipment, options);
+        var dialog = await DialogService.ShowAsync<EquipmentEditorDialog>(T.Equipment.NewEquipment, EditorDialogOptions);
         await ReloadIfSavedAsync(dialog);
     }
 
     private async Task OpenEditDialogAsync(EquipmentDto equipment)
     {
         var parameters = new DialogParameters { ["Equipment"] = equipment };
-        var options = new DialogOptions { MaxWidth = MaxWidth.Medium, FullWidth = true, NoHeader = true };
-        var dialog = await DialogService.ShowAsync<EquipmentEditorDialog>(T.FormatValue(T.Equipment.Edit, equipment.Name), parameters, options);
+        var dialog = await DialogService.ShowAsync<EquipmentEditorDialog>(T.FormatValue(T.Equipment.Edit, equipment.Name), parameters, EditorDialogOptions);
         await ReloadIfSavedAsync(dialog);
     }
 
@@ -107,13 +50,6 @@ private MudTable<EquipmentDto>? _table;
         var options = new DialogOptions { MaxWidth = MaxWidth.Small, FullWidth = true, NoHeader = true };
         var dialog = await DialogService.ShowAsync<EquipmentStatusDialog>(T.FormatValue(T.Equipment.SetStatusTitle, equipment.Name), parameters, options);
         await ReloadIfSavedAsync(dialog);
-    }
-
-    private async Task ReloadIfSavedAsync(IDialogReference dialog)
-    {
-        var result = await dialog.Result;
-        if (result is { Canceled: false })
-            await ReloadAsync();
     }
 
     private async Task ToggleActiveAsync(EquipmentDto equipment)
@@ -168,6 +104,4 @@ private MudTable<EquipmentDto>? _table;
         "OutOfService" => "Out of Service",
         _ => status,
     };
-
-    public void Dispose() => _searchCts?.Cancel();
 }

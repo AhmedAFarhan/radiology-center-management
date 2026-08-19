@@ -1,32 +1,18 @@
-using System.Net.Http;
-using System.Net.Http.Json;
 using System.ComponentModel.DataAnnotations;
-using System.Security.Claims;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Components;
-using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Components.Forms;
-using Microsoft.AspNetCore.Components.Routing;
-using Microsoft.AspNetCore.Components.Web;
-using Microsoft.AspNetCore.Components.Web.Virtualization;
-using Microsoft.JSInterop;
 using MudBlazor;
-using RadiologyCenter.Desktop;
-using RadiologyCenter.Desktop.Components;
 using RadiologyCenter.Desktop.Models;
 using RadiologyCenter.Desktop.Services;
 
 namespace RadiologyCenter.Desktop.Components.Pages.Insurance;
 
-public partial class PolicyEditorDialog : ComponentBase
+public partial class PolicyEditorDialog : EditorDialogBase
 {
-[CascadingParameter] public IMudDialogInstance MudDialog { get; set; } = default!;
-
     private readonly PolicyFormModel _model = new();
     private EditContext _editContext = default!;
     private PatientDto? _selectedPatient;
     private InsuranceCompanyDto? _selectedCompany;
-    private bool _busy;
 
     protected override void OnInitialized()
     {
@@ -86,30 +72,25 @@ public partial class PolicyEditorDialog : ComponentBase
         if (!_editContext.Validate())
             return;
 
-        await SafeExecute.RunAsync(async () =>
-            {
-                var input = new InsurancePolicyInput
-                {
-                    CompanyId = _model.CompanyId,
-                    PatientId = _model.PatientId,
-                    PolicyNumber = _model.PolicyNumber,
-                    CoveragePercent = _model.CoveragePercent,
-                    EffectiveFrom = _model.EffectiveFrom ?? DateTime.Today,
-                    EffectiveTo = _model.EffectiveTo,
-                    IsGovernment = _model.IsGovernment,
-                };
+        var input = new InsurancePolicyInput
+        {
+            CompanyId = _model.CompanyId,
+            PatientId = _model.PatientId,
+            PolicyNumber = _model.PolicyNumber,
+            CoveragePercent = _model.CoveragePercent,
+            EffectiveFrom = _model.EffectiveFrom ?? DateTime.Today,
+            EffectiveTo = _model.EffectiveTo,
+            IsGovernment = _model.IsGovernment,
+        };
 
-                await InsuranceService.CreatePolicyAsync(input);
-                Snackbar.Add(T.PolicyDialog.Created, Severity.Success);
-                MudDialog.Close(DialogResult.Ok(true));
-            },
-            Snackbar,
-            () => T.PolicyDialog.UnreachableRetry,
-            busy => _busy = busy);
+        if (await TrySaveAsync(
+                () => InsuranceService.CreatePolicyAsync(input),
+                () => T.PolicyDialog.UnreachableRetry))
+        {
+            Snackbar.Add(T.PolicyDialog.Created, Severity.Success);
+            MudDialog.Close(DialogResult.Ok(true));
+        }
     }
-
-    private void CancelAsync()
-        => MudDialog.Cancel();
 
     private sealed class PolicyFormModel : IValidatableObject
     {

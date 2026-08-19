@@ -1,10 +1,8 @@
+@using static RadiologyCenter.Desktop.Services.Formatting
 @page "/cash/sessions"
 @attribute [Authorize]
+@inherits ListPageBase<CashSessionDto>
 @inject CashService CashService
-@inject IDialogService DialogService
-@inject ISnackbar Snackbar
-@inject AppLocalizer T
-@implements IDisposable
 
 <PageHeader Icon="@Icons.Material.Filled.AccountBalanceWallet" Title="@T.Cash.Title"
             Subtitle="@T.Cash.Subtitle"
@@ -20,7 +18,7 @@
     <MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Add" OnClick="OpenSessionAsync">@T.Cash.OpenSession</MudButton>
 </PageHeader>
 
-<MudTable T="CashSessionDto" @ref="_table" ServerData="LoadServerData" Dense="true" Hover="true" Striped="true" Elevation="1" RowsPerPage="10" FixedHeader="true" Class="table-scroll">
+<MudTable T="CashSessionDto" @ref="Table" ServerData="LoadServerData" Dense="true" Hover="true" Striped="true" Elevation="1" RowsPerPage="10" FixedHeader="true" Class="table-scroll">
     <HeaderContent>
         <MudTh><MudTableSortLabel T="CashSessionDto" SortLabel="@("OpenedAt")">@T.Cash.OpenedAt</MudTableSortLabel></MudTh>
         <MudTh>@T.Cash.User</MudTh>
@@ -48,21 +46,15 @@
         </MudTd>
     </RowTemplate>
     <NoRecordsContent>
-        @if (_loadError is not null)
-        {
-            <ErrorState Icon="@(_offline ? Icons.Material.Filled.CloudOff : Icons.Material.Filled.ErrorOutline)"
-                        Title="@T.Cash.LoadErrorTitle"
-                        Message="@_loadError"
-                        Action="ReloadAsync" />
-        }
-        else
-        {
-            <EmptyState Icon="@Icons.Material.Filled.AccountBalanceWallet"
-                        Title="@T.Cash.EmptyTitle"
-                        Message="@T.Cash.EmptyMessage"
-                        ActionLabel="@T.Cash.EmptyActionLabel"
-                        Action="OpenSessionAsync" />
-        }
+        <TableNoRecords LoadError="@LoadError"
+                        Offline="@Offline"
+                        ErrorTitle="@T.Cash.LoadErrorTitle"
+                        EmptyIcon="@Icons.Material.Filled.AccountBalanceWallet"
+                        EmptyTitle="@T.Cash.EmptyTitle"
+                        EmptyMessage="@T.Cash.EmptyMessage"
+                        EmptyActionLabel="@T.Cash.EmptyActionLabel"
+                        OnReload="ReloadAsync"
+                        OnEmptyAction="OpenSessionAsync" />
     </NoRecordsContent>
     <PagerContent>
         <MudTablePager PageSizeOptions="@(new[] { 10, 25, 50 })" />

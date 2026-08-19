@@ -18,15 +18,12 @@ using RadiologyCenter.Desktop.Services;
 
 namespace RadiologyCenter.Desktop.Components.Pages.Resources;
 
-public partial class ReferralDoctorEditorDialog : ComponentBase
+public partial class ReferralDoctorEditorDialog : EditorDialogBase
 {
-[Parameter] public ReferralDoctorDto? Doctor { get; set; }
-
-    [CascadingParameter] public IMudDialogInstance MudDialog { get; set; } = default!;
+    [Parameter] public ReferralDoctorDto? Doctor { get; set; }
 
     private readonly ReferralDoctorFormModel _model = new();
     private EditContext _editContext = default!;
-    private bool _busy;
 
     private bool IsEdit => Doctor is not null;
 
@@ -49,32 +46,25 @@ public partial class ReferralDoctorEditorDialog : ComponentBase
         if (!_editContext.Validate())
             return;
 
-        await SafeExecute.RunAsync(async () =>
-            {
-                var input = new ReferralDoctorInput
-                {
-                    FullName = _model.FullName,
-                    Phone = _model.Phone,
-                    Email = _model.Email,
-                    Specialization = _model.Specialization,
-                    Hospital = _model.Hospital,
-                };
+        var input = new ReferralDoctorInput
+        {
+            FullName = _model.FullName,
+            Phone = _model.Phone,
+            Email = _model.Email,
+            Specialization = _model.Specialization,
+            Hospital = _model.Hospital,
+        };
 
-                if (IsEdit)
-                    await ResourceService.UpdateReferralDoctorAsync(Doctor!.Id, input);
-                else
-                    await ResourceService.CreateReferralDoctorAsync(input);
-
-                Snackbar.Add(IsEdit ? T.ReferralDoctorDialog.Updated : T.ReferralDoctorDialog.Created, Severity.Success);
-                MudDialog.Close(DialogResult.Ok(true));
-            },
-            Snackbar,
-            () => T.ReferralDoctorDialog.Unreachable,
-            busy => _busy = busy);
+        if (await TrySaveAsync(
+                () => IsEdit
+                    ? ResourceService.UpdateReferralDoctorAsync(Doctor!.Id, input)
+                    : ResourceService.CreateReferralDoctorAsync(input),
+                () => T.ReferralDoctorDialog.Unreachable))
+        {
+            Snackbar.Add(IsEdit ? T.ReferralDoctorDialog.Updated : T.ReferralDoctorDialog.Created, Severity.Success);
+            MudDialog.Close(DialogResult.Ok(true));
+        }
     }
-
-    private void CancelAsync()
-        => MudDialog.Cancel();
 
     private sealed class ReferralDoctorFormModel : IValidatableObject
     {

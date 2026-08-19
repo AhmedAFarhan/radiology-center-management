@@ -18,39 +18,22 @@ using RadiologyCenter.Desktop.Services;
 
 namespace RadiologyCenter.Desktop.Components.Pages.Resources;
 
-public partial class ReferralDoctors : ComponentBase, IDisposable
+public partial class ReferralDoctors : ListPageBase<ReferralDoctorDto>
 {
-private MudTable<ReferralDoctorDto>? _table;
-    private string? _search;
-    private CancellationTokenSource? _searchCts;
-    private string? _loadError;
-    private bool _offline;
-    private string? _openId;
+    protected override string BaseRoute => "/resources/referral-doctors";
 
-    [SupplyParameterFromQuery(Name = "q")]
-    public string? SearchQuery { get; set; }
+    protected override string UnreachableMessage => T.ReferralDoctor.Unreachable;
 
-    [SupplyParameterFromQuery(Name = "open")]
-    public string? OpenId { get; set; }
+    protected override async Task<PagedResult<ReferralDoctorDto>> LoadPageAsync(
+        string? search,
+        string? sortBy,
+        bool sortDescending,
+        int page,
+        int pageSize,
+        CancellationToken ct)
+        => await ResourceService.GetReferralDoctorsPagedAsync(search, sortBy, sortDescending, page, pageSize, ct);
 
-    protected override void OnParametersSet()
-    {
-        base.OnParametersSet();
-        if (!string.IsNullOrWhiteSpace(OpenId) && Guid.TryParse(OpenId, out _))
-            _openId = OpenId;
-    }
-
-    protected override async Task OnAfterRenderAsync(bool firstRender)
-    {
-        if (_openId is not null)
-        {
-            var id = _openId;
-            _openId = null;
-            await OpenByDeepLinkAsync(id);
-        }
-    }
-
-    private async Task OpenByDeepLinkAsync(string id)
+    protected override async Task OpenByDeepLinkAsync(string id)
     {
         ReferralDoctorDto? doctor = null;
         var ok = await SafeExecute.RunAsync(
@@ -61,94 +44,24 @@ private MudTable<ReferralDoctorDto>? _table;
         if (ok && doctor is not null)
         {
             var parameters = new DialogParameters { ["Doctor"] = doctor };
-            var options = new DialogOptions { MaxWidth = MaxWidth.Medium, FullWidth = true, NoHeader = true };
-            var dialog = await DialogService.ShowAsync<ReferralDoctorEditorDialog>(T.FormatValue(T.ReferralDoctor.Edit, doctor.FullName), parameters, options);
+            var dialog = await DialogService.ShowAsync<ReferralDoctorEditorDialog>(T.FormatValue(T.ReferralDoctor.Edit, doctor.FullName), parameters, EditorDialogOptions);
             await ReloadIfSavedAsync(dialog);
         }
 
-        NavigationManager.NavigateTo("/resources/referral-doctors", replace: true);
+        NavigationManager.NavigateTo(BaseRoute, replace: true);
     }
-
-    private async Task<TableData<ReferralDoctorDto>> LoadServerData(TableState state, CancellationToken ct)
-    {
-        try
-        {
-            var page = await ResourceService.GetReferralDoctorsPagedAsync(
-                _search,
-                state.SortLabel,
-                state.SortDirection == SortDirection.Descending,
-                state.Page + 1,
-                state.PageSize,
-                ct);
-
-            _loadError = null;
-            _offline = false;
-            return new TableData<ReferralDoctorDto> { Items = page.Items, TotalItems = page.TotalCount };
-        }
-        catch (OperationCanceledException)
-        {
-            if (ct.IsCancellationRequested)
-                return new TableData<ReferralDoctorDto> { Items = Array.Empty<ReferralDoctorDto>(), TotalItems = 0 };
-            throw;
-        }
-        catch (ApiException ex)
-        {
-            Snackbar.Add(ex.Message, Severity.Error);
-            _loadError = ex.Message;
-            _offline = false;
-            return new TableData<ReferralDoctorDto> { Items = Array.Empty<ReferralDoctorDto>(), TotalItems = 0 };
-        }
-        catch (Exception)
-        {
-            Snackbar.Add(T.ReferralDoctor.Unreachable, Severity.Error);
-            _loadError = T.ReferralDoctor.Unreachable;
-            _offline = true;
-            return new TableData<ReferralDoctorDto> { Items = Array.Empty<ReferralDoctorDto>(), TotalItems = 0 };
-        }
-    }
-
-    private async Task OnSearchChanged(string? value)
-    {
-        _search = value;
-
-        _searchCts?.Cancel();
-        var cts = _searchCts = new CancellationTokenSource();
-        try
-        {
-            await Task.Delay(400, cts.Token);
-        }
-        catch (TaskCanceledException)
-        {
-            return;
-        }
-
-        if (_table is not null)
-            await _table.ReloadServerData();
-    }
-
-    private Task ReloadAsync()
-        => _table is null ? Task.CompletedTask : _table.ReloadServerData();
 
     private async Task OpenCreateDialogAsync()
     {
-        var options = new DialogOptions { MaxWidth = MaxWidth.Medium, FullWidth = true, NoHeader = true };
-        var dialog = await DialogService.ShowAsync<ReferralDoctorEditorDialog>(T.ReferralDoctor.NewReferralDoctor, options);
+        var dialog = await DialogService.ShowAsync<ReferralDoctorEditorDialog>(T.ReferralDoctor.NewReferralDoctor, EditorDialogOptions);
         await ReloadIfSavedAsync(dialog);
     }
 
     private async Task OpenEditDialogAsync(ReferralDoctorDto doctor)
     {
         var parameters = new DialogParameters { ["Doctor"] = doctor };
-        var options = new DialogOptions { MaxWidth = MaxWidth.Medium, FullWidth = true, NoHeader = true };
-        var dialog = await DialogService.ShowAsync<ReferralDoctorEditorDialog>(T.FormatValue(T.ReferralDoctor.Edit, doctor.FullName), parameters, options);
+        var dialog = await DialogService.ShowAsync<ReferralDoctorEditorDialog>(T.FormatValue(T.ReferralDoctor.Edit, doctor.FullName), parameters, EditorDialogOptions);
         await ReloadIfSavedAsync(dialog);
-    }
-
-    private async Task ReloadIfSavedAsync(IDialogReference dialog)
-    {
-        var result = await dialog.Result;
-        if (result is { Canceled: false })
-            await ReloadAsync();
     }
 
     private async Task ToggleActiveAsync(ReferralDoctorDto doctor)
@@ -187,6 +100,4 @@ private MudTable<ReferralDoctorDto>? _table;
             Snackbar,
             () => T.ReferralDoctor.Unreachable);
     }
-
-    public void Dispose() => _searchCts?.Cancel();
 }

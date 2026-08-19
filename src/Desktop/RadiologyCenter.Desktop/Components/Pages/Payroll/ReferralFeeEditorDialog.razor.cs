@@ -18,11 +18,9 @@ using RadiologyCenter.Desktop.Services;
 
 namespace RadiologyCenter.Desktop.Components.Pages.Payroll;
 
-public partial class ReferralFeeEditorDialog : ComponentBase
+public partial class ReferralFeeEditorDialog : EditorDialogBase
 {
-[Parameter] public ReferralFeeDto? Fee { get; set; }
-
-    [CascadingParameter] public IMudDialogInstance MudDialog { get; set; } = default!;
+    [Parameter] public ReferralFeeDto? Fee { get; set; }
 
     private readonly ReferralFeeFormModel _model = new();
     private EditContext _editContext = default!;
@@ -32,7 +30,6 @@ public partial class ReferralFeeEditorDialog : ComponentBase
     private string _examTypeId = string.Empty;
     private string _doctorName = string.Empty;
     private string _examTypeName = string.Empty;
-    private bool _busy;
 
     private bool IsEdit => Fee is not null;
 
@@ -119,31 +116,24 @@ public partial class ReferralFeeEditorDialog : ComponentBase
             return;
         }
 
-        await SafeExecute.RunAsync(async () =>
-            {
-                var input = new ReferralFeeInput
-                {
-                    ReferralDoctorId = IsEdit ? _doctorId : _selectedDoctor!.Id,
-                    ExaminationTypeId = IsEdit ? _examTypeId : _selectedType!.Id,
-                    Amount = _model.Amount,
-                    IsPercentage = _model.IsPercentage,
-                };
+        var input = new ReferralFeeInput
+        {
+            ReferralDoctorId = IsEdit ? _doctorId : _selectedDoctor!.Id,
+            ExaminationTypeId = IsEdit ? _examTypeId : _selectedType!.Id,
+            Amount = _model.Amount,
+            IsPercentage = _model.IsPercentage,
+        };
 
-                if (IsEdit)
-                    await PayrollService.UpdateReferralFeeAsync(Fee!.Id, input);
-                else
-                    await PayrollService.CreateReferralFeeAsync(input);
-
-                Snackbar.Add(IsEdit ? T.ReferralFee.Updated : T.ReferralFee.Created, Severity.Success);
-                MudDialog.Close(DialogResult.Ok(true));
-            },
-            Snackbar,
-            () => T.ReferralFee.UnreachableTryAgain,
-            busy => _busy = busy);
+        if (await TrySaveAsync(
+                () => IsEdit
+                    ? PayrollService.UpdateReferralFeeAsync(Fee!.Id, input)
+                    : PayrollService.CreateReferralFeeAsync(input),
+                () => T.ReferralFee.UnreachableTryAgain))
+        {
+            Snackbar.Add(IsEdit ? T.ReferralFee.Updated : T.ReferralFee.Created, Severity.Success);
+            MudDialog.Close(DialogResult.Ok(true));
+        }
     }
-
-    private void CancelAsync()
-        => MudDialog.Cancel();
 
     private sealed class ReferralFeeFormModel
     {

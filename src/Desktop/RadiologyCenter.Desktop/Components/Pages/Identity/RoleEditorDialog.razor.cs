@@ -18,15 +18,12 @@ using RadiologyCenter.Desktop.Services;
 
 namespace RadiologyCenter.Desktop.Components.Pages.Identity;
 
-public partial class RoleEditorDialog : ComponentBase
+public partial class RoleEditorDialog : EditorDialogBase
 {
 [Parameter] public RoleDto? Role { get; set; }
 
-    [CascadingParameter] public IMudDialogInstance MudDialog { get; set; } = default!;
-
     private readonly RoleFormModel _model = new();
     private EditContext _editContext = default!;
-    private bool _busy;
 
     private bool IsEdit => Role is not null;
 
@@ -47,7 +44,7 @@ public partial class RoleEditorDialog : ComponentBase
             return;
 
         var message = IsEdit ? T.RoleDialog.Updated : T.RoleDialog.Created;
-        if (await SafeExecute.RunAsync(
+        if (await TrySaveAsync(
                 () => IsEdit
                     ? IdentityService.UpdateRoleAsync(Role!.Id, new UpdateRoleInput
                     {
@@ -59,17 +56,12 @@ public partial class RoleEditorDialog : ComponentBase
                         Name = _model.Name,
                         Description = _model.Description,
                     }),
-                Snackbar,
-                () => T.RoleDialog.UnreachableRetry,
-                busy => _busy = busy))
+                () => T.RoleDialog.UnreachableRetry))
         {
             Snackbar.Add(message, Severity.Success);
             MudDialog.Close(DialogResult.Ok(true));
         }
     }
-
-    private void CancelAsync()
-        => MudDialog.Cancel();
 
     private sealed class RoleFormModel
     {

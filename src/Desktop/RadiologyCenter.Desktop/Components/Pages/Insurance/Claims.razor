@@ -1,10 +1,7 @@
 @page "/insurance/claims"
 @attribute [Authorize]
+@inherits ListPageBase<ClaimListItemDto>
 @inject InsuranceService InsuranceService
-@inject IDialogService DialogService
-@inject ISnackbar Snackbar
-@inject AppLocalizer T
-@implements IDisposable
 
 <PageHeader Icon="@Icons.Material.Filled.RequestQuote" Title="@T.Claim.Title"
             Subtitle="@T.Claim.Subtitle"
@@ -14,7 +11,7 @@
     <MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Add" OnClick="OpenCreateDialogAsync">@T.Claim.CreateClaim</MudButton>
 </PageHeader>
 
-<MudTable T="ClaimListItemDto" @ref="_table" ServerData="LoadServerData" Dense="true" Hover="true" Striped="true" Elevation="1" RowsPerPage="10" FixedHeader="true" Class="table-scroll">
+<MudTable T="ClaimListItemDto" @ref="Table" ServerData="LoadServerData" Dense="true" Hover="true" Striped="true" Elevation="1" RowsPerPage="10" FixedHeader="true" Class="table-scroll">
     <HeaderContent>
         <MudTh><MudTableSortLabel T="ClaimListItemDto" SortLabel="@("PatientName")">@T.Claim.Patient</MudTableSortLabel></MudTh>
         <MudTh><MudTableSortLabel T="ClaimListItemDto" SortLabel="@("ExaminationTypeName")">@T.Claim.Examination</MudTableSortLabel></MudTh>
@@ -51,21 +48,15 @@
         </MudTd>
     </RowTemplate>
     <NoRecordsContent>
-        @if (_loadError is not null)
-        {
-            <ErrorState Icon="@(_offline ? Icons.Material.Filled.CloudOff : Icons.Material.Filled.ErrorOutline)"
-                        Title="@T.Claim.LoadErrorTitle"
-                        Message="@_loadError"
-                        Action="ReloadAsync" />
-        }
-        else
-        {
-        <EmptyState Icon="@Icons.Material.Filled.RequestQuote"
-                    Title="@T.Claim.EmptyTitle"
-                    Message="@T.Claim.EmptyMessage"
-                    ActionLabel="@T.Claim.EmptyActionLabel"
-                    Action="OpenCreateDialogAsync" />
-        }
+        <TableNoRecords LoadError="@LoadError"
+                        Offline="@Offline"
+                        ErrorTitle="@T.Claim.LoadErrorTitle"
+                        EmptyIcon="@Icons.Material.Filled.RequestQuote"
+                        EmptyTitle="@T.Claim.EmptyTitle"
+                        EmptyMessage="@T.Claim.EmptyMessage"
+                        EmptyActionLabel="@T.Claim.EmptyActionLabel"
+                        OnReload="ReloadAsync"
+                        OnEmptyAction="OpenCreateDialogAsync" />
     </NoRecordsContent>
     <PagerContent>
         <MudTablePager PageSizeOptions="@(new[] { 10, 25, 50 })" />

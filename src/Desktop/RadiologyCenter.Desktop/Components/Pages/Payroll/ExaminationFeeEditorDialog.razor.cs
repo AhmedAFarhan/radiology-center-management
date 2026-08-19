@@ -18,18 +18,15 @@ using RadiologyCenter.Desktop.Services;
 
 namespace RadiologyCenter.Desktop.Components.Pages.Payroll;
 
-public partial class ExaminationFeeEditorDialog : ComponentBase
+public partial class ExaminationFeeEditorDialog : EditorDialogBase
 {
-[Parameter] public ExaminationFeeDto? Fee { get; set; }
-
-    [CascadingParameter] public IMudDialogInstance MudDialog { get; set; } = default!;
+    [Parameter] public ExaminationFeeDto? Fee { get; set; }
 
     private readonly ExaminationFeeFormModel _model = new();
     private EditContext _editContext = default!;
     private ExaminationTypeDto? _selectedType;
     private string _examTypeId = string.Empty;
     private string _examTypeName = string.Empty;
-    private bool _busy;
 
     private bool IsEdit => Fee is not null;
 
@@ -89,31 +86,24 @@ public partial class ExaminationFeeEditorDialog : ComponentBase
             return;
         }
 
-        await SafeExecute.RunAsync(async () =>
-            {
-                var input = new ExaminationFeeInput
-                {
-                    ExaminationTypeId = IsEdit ? _examTypeId : _selectedType!.Id,
-                    Role = _model.Role,
-                    Amount = _model.Amount,
-                    IsPercentage = _model.IsPercentage,
-                };
+        var input = new ExaminationFeeInput
+        {
+            ExaminationTypeId = IsEdit ? _examTypeId : _selectedType!.Id,
+            Role = _model.Role,
+            Amount = _model.Amount,
+            IsPercentage = _model.IsPercentage,
+        };
 
-                if (IsEdit)
-                    await PayrollService.UpdateExaminationFeeAsync(Fee!.Id, input);
-                else
-                    await PayrollService.CreateExaminationFeeAsync(input);
-
-                Snackbar.Add(IsEdit ? T.ExamFee.Updated : T.ExamFee.Created, Severity.Success);
-                MudDialog.Close(DialogResult.Ok(true));
-            },
-            Snackbar,
-            () => T.ExamFee.UnreachableTryAgain,
-            busy => _busy = busy);
+        if (await TrySaveAsync(
+                () => IsEdit
+                    ? PayrollService.UpdateExaminationFeeAsync(Fee!.Id, input)
+                    : PayrollService.CreateExaminationFeeAsync(input),
+                () => T.ExamFee.UnreachableTryAgain))
+        {
+            Snackbar.Add(IsEdit ? T.ExamFee.Updated : T.ExamFee.Created, Severity.Success);
+            MudDialog.Close(DialogResult.Ok(true));
+        }
     }
-
-    private void CancelAsync()
-        => MudDialog.Cancel();
 
     private sealed class ExaminationFeeFormModel
     {

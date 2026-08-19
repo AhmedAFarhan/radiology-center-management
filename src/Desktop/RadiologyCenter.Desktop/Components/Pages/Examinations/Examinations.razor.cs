@@ -18,39 +18,22 @@ using RadiologyCenter.Desktop.Services;
 
 namespace RadiologyCenter.Desktop.Components.Pages.Examinations;
 
-public partial class Examinations : ComponentBase, IDisposable
+public partial class Examinations : ListPageBase<ExaminationTypeDto>
 {
-private MudTable<ExaminationTypeDto>? _table;
-    private string? _search;
-    private CancellationTokenSource? _searchCts;
-    private string? _loadError;
-    private bool _offline;
-    private string? _openId;
+    protected override string BaseRoute => "/examinations";
 
-    [SupplyParameterFromQuery(Name = "q")]
-    public string? SearchQuery { get; set; }
+    protected override string UnreachableMessage => T.Examinations.Unreachable;
 
-    [SupplyParameterFromQuery(Name = "open")]
-    public string? OpenId { get; set; }
+    protected override async Task<PagedResult<ExaminationTypeDto>> LoadPageAsync(
+        string? search,
+        string? sortBy,
+        bool sortDescending,
+        int page,
+        int pageSize,
+        CancellationToken ct)
+        => await ExaminationService.GetTypesPagedAsync(search, sortBy, sortDescending, page, pageSize, ct);
 
-    protected override void OnParametersSet()
-    {
-        base.OnParametersSet();
-        if (!string.IsNullOrWhiteSpace(OpenId) && Guid.TryParse(OpenId, out _))
-            _openId = OpenId;
-    }
-
-    protected override async Task OnAfterRenderAsync(bool firstRender)
-    {
-        if (_openId is not null)
-        {
-            var id = _openId;
-            _openId = null;
-            await OpenByDeepLinkAsync(id);
-        }
-    }
-
-    private async Task OpenByDeepLinkAsync(string id)
+    protected override async Task OpenByDeepLinkAsync(string id)
     {
         ExaminationTypeDto? type = null;
         var ok = await SafeExecute.RunAsync(
@@ -61,73 +44,12 @@ private MudTable<ExaminationTypeDto>? _table;
         if (ok && type is not null)
         {
             var parameters = new DialogParameters { ["Type"] = type };
-            var options = new DialogOptions { MaxWidth = MaxWidth.Medium, FullWidth = true, NoHeader = true };
-            var dialog = await DialogService.ShowAsync<ExaminationTypeEditorDialog>(T.Examinations.EditType, parameters, options);
+            var dialog = await DialogService.ShowAsync<ExaminationTypeEditorDialog>(T.Examinations.EditType, parameters, EditorDialogOptions);
             await ReloadIfSavedAsync(dialog);
         }
 
-        NavigationManager.NavigateTo("/examinations", replace: true);
+        NavigationManager.NavigateTo(BaseRoute, replace: true);
     }
-
-    private async Task<TableData<ExaminationTypeDto>> LoadServerData(TableState state, CancellationToken ct)
-    {
-        try
-        {
-            var page = await ExaminationService.GetTypesPagedAsync(
-                _search,
-                state.SortLabel,
-                state.SortDirection == SortDirection.Descending,
-                state.Page + 1,
-                state.PageSize,
-                ct);
-
-            _loadError = null;
-            _offline = false;
-            return new TableData<ExaminationTypeDto> { Items = page.Items, TotalItems = page.TotalCount };
-        }
-        catch (OperationCanceledException)
-        {
-            if (ct.IsCancellationRequested)
-                return new TableData<ExaminationTypeDto> { Items = Array.Empty<ExaminationTypeDto>(), TotalItems = 0 };
-            throw;
-        }
-        catch (ApiException ex)
-        {
-            Snackbar.Add(ex.Message, Severity.Error);
-            _loadError = ex.Message;
-            _offline = false;
-            return new TableData<ExaminationTypeDto> { Items = Array.Empty<ExaminationTypeDto>(), TotalItems = 0 };
-        }
-        catch (Exception)
-        {
-            Snackbar.Add(T.Examinations.Unreachable, Severity.Error);
-            _loadError = T.Examinations.Unreachable;
-            _offline = true;
-            return new TableData<ExaminationTypeDto> { Items = Array.Empty<ExaminationTypeDto>(), TotalItems = 0 };
-        }
-    }
-
-    private async Task OnSearchChanged(string? value)
-    {
-        _search = value;
-
-        _searchCts?.Cancel();
-        var cts = _searchCts = new CancellationTokenSource();
-        try
-        {
-            await Task.Delay(400, cts.Token);
-        }
-        catch (TaskCanceledException)
-        {
-            return;
-        }
-
-        if (_table is not null)
-            await _table.ReloadServerData();
-    }
-
-    private Task ReloadAsync()
-        => _table is null ? Task.CompletedTask : _table.ReloadServerData();
 
     private async Task OpenCreateDialogAsync()
     {
@@ -142,13 +64,6 @@ private MudTable<ExaminationTypeDto>? _table;
         var options = new DialogOptions { MaxWidth = MaxWidth.Medium, FullWidth = true, NoHeader = true };
         var dialog = await DialogService.ShowAsync<ExaminationTypeEditorDialog>(T.Examinations.EditType, parameters, options);
         await ReloadIfSavedAsync(dialog);
-    }
-
-    private async Task ReloadIfSavedAsync(IDialogReference dialog)
-    {
-        var result = await dialog.Result;
-        if (result is { Canceled: false })
-            await ReloadAsync();
     }
 
     private async Task ToggleActiveAsync(ExaminationTypeDto type)
@@ -187,6 +102,4 @@ private MudTable<ExaminationTypeDto>? _table;
             Snackbar,
             () => T.Examinations.Unreachable);
     }
-
-    public void Dispose() => _searchCts?.Cancel();
 }

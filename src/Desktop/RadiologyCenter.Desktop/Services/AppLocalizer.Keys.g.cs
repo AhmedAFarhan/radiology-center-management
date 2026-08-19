@@ -242,2289 +242,2214 @@ public sealed partial class AppLocalizer
 
 }
 
-public sealed class AllowanceGroup
+public abstract class LocalizerGroup
 {
-    private readonly AppLocalizer _localizer;
-    internal AllowanceGroup(AppLocalizer localizer) => _localizer = localizer;
-    public string Activated => _localizer.Get("allowance.activated");
-    public string Allowance => _localizer.Get("allowance.allowance");
-    public string Amount => _localizer.Get("allowance.amount");
-    public string Deactivated => _localizer.Get("allowance.deactivated");
-    public string DeleteConfirm => _localizer.Get("allowance.deleteConfirm");
-    public string Deleted => _localizer.Get("allowance.deleted");
-    public string DeleteTitle => _localizer.Get("allowance.deleteTitle");
-    public string EditTitle => _localizer.Get("allowance.editTitle");
-    public string Effective => _localizer.Get("allowance.effective");
-    public string Employee => _localizer.Get("allowance.employee");
-    public string EmptyActionLabel => _localizer.Get("allowance.emptyActionLabel");
-    public string EmptyMessage => _localizer.Get("allowance.emptyMessage");
-    public string EmptyTitle => _localizer.Get("allowance.emptyTitle");
-    public string End => _localizer.Get("allowance.end");
-    public string Frequency => _localizer.Get("allowance.frequency");
-    public string LoadErrorTitle => _localizer.Get("allowance.loadErrorTitle");
-    public string NewAllowance => _localizer.Get("allowance.newAllowance");
-    public string PerWorkDay => _localizer.Get("allowance.perWorkDay");
-    public string SearchPlaceholder => _localizer.Get("allowance.searchPlaceholder");
-    public string Subtitle => _localizer.Get("allowance.subtitle");
-    public string Title => _localizer.Get("allowance.title");
-    public string ToggleStatus => _localizer.Get("allowance.toggleStatus");
-    public string Unreachable => _localizer.Get("allowance.unreachable");
+    protected readonly AppLocalizer Localizer;
+    protected LocalizerGroup(AppLocalizer localizer) => Localizer = localizer;
+    protected string Get(string key) => Localizer.Get(key);
 }
 
-public sealed class AllowanceDialogGroup
+public sealed class AllowanceGroup : LocalizerGroup
 {
-    private readonly AppLocalizer _localizer;
-    internal AllowanceDialogGroup(AppLocalizer localizer) => _localizer = localizer;
-    public string AllowanceName => _localizer.Get("allowanceDialog.allowanceName");
-    public string Amount => _localizer.Get("allowanceDialog.amount");
-    public string CreateAllowance => _localizer.Get("allowanceDialog.createAllowance");
-    public string Created => _localizer.Get("allowanceDialog.created");
-    public string EffectiveDate => _localizer.Get("allowanceDialog.effectiveDate");
-    public string EmployeeSearch => _localizer.Get("allowanceDialog.employeeSearch");
-    public string EndDateOptional => _localizer.Get("allowanceDialog.endDateOptional");
-    public string EndDateValidation => _localizer.Get("allowanceDialog.endDateValidation");
-    public string FrequencyOptional => _localizer.Get("allowanceDialog.frequencyOptional");
-    public string NotSet => _localizer.Get("allowanceDialog.notSet");
-    public string PaidPerWorkDay => _localizer.Get("allowanceDialog.paidPerWorkDay");
-    public string SalaryComponent => _localizer.Get("allowanceDialog.salaryComponent");
-    public string SalaryComponentOptional => _localizer.Get("allowanceDialog.salaryComponentOptional");
-    public string SaveChanges => _localizer.Get("allowanceDialog.saveChanges");
-    public string SelectEffectiveDate => _localizer.Get("allowanceDialog.selectEffectiveDate");
-    public string SelectEmployee => _localizer.Get("allowanceDialog.selectEmployee");
-    public string Unreachable => _localizer.Get("allowanceDialog.unreachable");
-    public string Updated => _localizer.Get("allowanceDialog.updated");
+    internal AllowanceGroup(AppLocalizer localizer) : base(localizer) { }
+    public string Activated => Get("allowance.activated");
+    public string Allowance => Get("allowance.allowance");
+    public string Amount => Get("allowance.amount");
+    public string Deactivated => Get("allowance.deactivated");
+    public string DeleteConfirm => Get("allowance.deleteConfirm");
+    public string Deleted => Get("allowance.deleted");
+    public string DeleteTitle => Get("allowance.deleteTitle");
+    public string EditTitle => Get("allowance.editTitle");
+    public string Effective => Get("allowance.effective");
+    public string Employee => Get("allowance.employee");
+    public string EmptyActionLabel => Get("allowance.emptyActionLabel");
+    public string EmptyMessage => Get("allowance.emptyMessage");
+    public string EmptyTitle => Get("allowance.emptyTitle");
+    public string End => Get("allowance.end");
+    public string Frequency => Get("allowance.frequency");
+    public string LoadErrorTitle => Get("allowance.loadErrorTitle");
+    public string NewAllowance => Get("allowance.newAllowance");
+    public string PerWorkDay => Get("allowance.perWorkDay");
+    public string SearchPlaceholder => Get("allowance.searchPlaceholder");
+    public string Subtitle => Get("allowance.subtitle");
+    public string Title => Get("allowance.title");
+    public string ToggleStatus => Get("allowance.toggleStatus");
+    public string Unreachable => Get("allowance.unreachable");
 }
 
-public sealed class AmendReportGroup
+public sealed class AllowanceDialogGroup : LocalizerGroup
 {
-    private readonly AppLocalizer _localizer;
-    internal AmendReportGroup(AppLocalizer localizer) => _localizer = localizer;
-    public string Back => _localizer.Get("amendReport.back");
-    public string Description => _localizer.Get("amendReport.description");
-    public string Reason => _localizer.Get("amendReport.reason");
-    public string Reopened => _localizer.Get("amendReport.reopened");
-    public string Title => _localizer.Get("amendReport.title");
-    public string Unreachable => _localizer.Get("amendReport.unreachable");
+    internal AllowanceDialogGroup(AppLocalizer localizer) : base(localizer) { }
+    public string AllowanceName => Get("allowanceDialog.allowanceName");
+    public string Amount => Get("allowanceDialog.amount");
+    public string CreateAllowance => Get("allowanceDialog.createAllowance");
+    public string Created => Get("allowanceDialog.created");
+    public string EffectiveDate => Get("allowanceDialog.effectiveDate");
+    public string EmployeeSearch => Get("allowanceDialog.employeeSearch");
+    public string EndDateOptional => Get("allowanceDialog.endDateOptional");
+    public string EndDateValidation => Get("allowanceDialog.endDateValidation");
+    public string FrequencyOptional => Get("allowanceDialog.frequencyOptional");
+    public string NotSet => Get("allowanceDialog.notSet");
+    public string PaidPerWorkDay => Get("allowanceDialog.paidPerWorkDay");
+    public string SalaryComponent => Get("allowanceDialog.salaryComponent");
+    public string SalaryComponentOptional => Get("allowanceDialog.salaryComponentOptional");
+    public string SaveChanges => Get("allowanceDialog.saveChanges");
+    public string SelectEffectiveDate => Get("allowanceDialog.selectEffectiveDate");
+    public string SelectEmployee => Get("allowanceDialog.selectEmployee");
+    public string Unreachable => Get("allowanceDialog.unreachable");
+    public string Updated => Get("allowanceDialog.updated");
 }
 
-public sealed class AnalyticsGroup
+public sealed class AmendReportGroup : LocalizerGroup
 {
-    private readonly AppLocalizer _localizer;
-    internal AnalyticsGroup(AppLocalizer localizer) => _localizer = localizer;
-    public string AllTime => _localizer.Get("analytics.allTime");
-    public string Custom => _localizer.Get("analytics.custom");
-    public string Last30Days => _localizer.Get("analytics.last30Days");
-    public string Last7Days => _localizer.Get("analytics.last7Days");
-    public string Last90Days => _localizer.Get("analytics.last90Days");
-    public string LastMonth => _localizer.Get("analytics.lastMonth");
-    public string LastYear => _localizer.Get("analytics.lastYear");
-    public string NoData => _localizer.Get("analytics.noData");
-    public string NoMachineData => _localizer.Get("analytics.noMachineData");
-    public string NoModalityActivity => _localizer.Get("analytics.noModalityActivity");
-    public string NoModalityData => _localizer.Get("analytics.noModalityData");
-    public string NoRevenueData => _localizer.Get("analytics.noRevenueData");
-    public string NoVolumeData => _localizer.Get("analytics.noVolumeData");
-    public string Period => _localizer.Get("analytics.period");
-    public string Range => _localizer.Get("analytics.range");
-    public string Refresh => _localizer.Get("analytics.refresh");
-    public string ThisMonth => _localizer.Get("analytics.thisMonth");
-    public string ThisYear => _localizer.Get("analytics.thisYear");
-    public string Today => _localizer.Get("analytics.today");
+    internal AmendReportGroup(AppLocalizer localizer) : base(localizer) { }
+    public string Back => Get("amendReport.back");
+    public string Description => Get("amendReport.description");
+    public string Reason => Get("amendReport.reason");
+    public string Reopened => Get("amendReport.reopened");
+    public string Title => Get("amendReport.title");
+    public string Unreachable => Get("amendReport.unreachable");
 }
 
-public sealed class BootSplashGroup
+public sealed class AnalyticsGroup : LocalizerGroup
 {
-    private readonly AppLocalizer _localizer;
-    internal BootSplashGroup(AppLocalizer localizer) => _localizer = localizer;
-    public string Failed => _localizer.Get("bootSplash.failed");
-    public string Retrying => _localizer.Get("bootSplash.retrying");
-    public string TryAgain => _localizer.Get("bootSplash.tryAgain");
+    internal AnalyticsGroup(AppLocalizer localizer) : base(localizer) { }
+    public string AllTime => Get("analytics.allTime");
+    public string Custom => Get("analytics.custom");
+    public string Last30Days => Get("analytics.last30Days");
+    public string Last7Days => Get("analytics.last7Days");
+    public string Last90Days => Get("analytics.last90Days");
+    public string LastMonth => Get("analytics.lastMonth");
+    public string LastYear => Get("analytics.lastYear");
+    public string NoData => Get("analytics.noData");
+    public string NoMachineData => Get("analytics.noMachineData");
+    public string NoModalityActivity => Get("analytics.noModalityActivity");
+    public string NoModalityData => Get("analytics.noModalityData");
+    public string NoRevenueData => Get("analytics.noRevenueData");
+    public string NoVolumeData => Get("analytics.noVolumeData");
+    public string Period => Get("analytics.period");
+    public string Range => Get("analytics.range");
+    public string Refresh => Get("analytics.refresh");
+    public string ThisMonth => Get("analytics.thisMonth");
+    public string ThisYear => Get("analytics.thisYear");
+    public string Today => Get("analytics.today");
 }
 
-public sealed class CancelReportGroup
+public sealed class BootSplashGroup : LocalizerGroup
 {
-    private readonly AppLocalizer _localizer;
-    internal CancelReportGroup(AppLocalizer localizer) => _localizer = localizer;
-    public string Back => _localizer.Get("cancelReport.back");
-    public string Cancelled => _localizer.Get("cancelReport.cancelled");
-    public string Description => _localizer.Get("cancelReport.description");
-    public string ReasonOptional => _localizer.Get("cancelReport.reasonOptional");
-    public string Title => _localizer.Get("cancelReport.title");
-    public string Unreachable => _localizer.Get("cancelReport.unreachable");
+    internal BootSplashGroup(AppLocalizer localizer) : base(localizer) { }
+    public string Failed => Get("bootSplash.failed");
+    public string Retrying => Get("bootSplash.retrying");
+    public string TryAgain => Get("bootSplash.tryAgain");
 }
 
-public sealed class CashGroup
+public sealed class CancelReportGroup : LocalizerGroup
 {
-    private readonly AppLocalizer _localizer;
-    internal CashGroup(AppLocalizer localizer) => _localizer = localizer;
-    public string Balance => _localizer.Get("cash.balance");
-    public string ClosedAt => _localizer.Get("cash.closedAt");
-    public string EmptyActionLabel => _localizer.Get("cash.emptyActionLabel");
-    public string EmptyMessage => _localizer.Get("cash.emptyMessage");
-    public string EmptyTitle => _localizer.Get("cash.emptyTitle");
-    public string Entries => _localizer.Get("cash.entries");
-    public string LoadErrorTitle => _localizer.Get("cash.loadErrorTitle");
-    public string OpenCashSessionTitle => _localizer.Get("cash.openCashSessionTitle");
-    public string OpenedAt => _localizer.Get("cash.openedAt");
-    public string OpeningFloat => _localizer.Get("cash.openingFloat");
-    public string OpenSession => _localizer.Get("cash.openSession");
-    public string SearchPlaceholder => _localizer.Get("cash.searchPlaceholder");
-    public string SessionTitle => _localizer.Get("cash.sessionTitle");
-    public string StatusClosed => _localizer.Get("cash.statusClosed");
-    public string StatusOpen => _localizer.Get("cash.statusOpen");
-    public string Subtitle => _localizer.Get("cash.subtitle");
-    public string Title => _localizer.Get("cash.title");
-    public string Unreachable => _localizer.Get("cash.unreachable");
-    public string User => _localizer.Get("cash.user");
-    public string View => _localizer.Get("cash.view");
+    internal CancelReportGroup(AppLocalizer localizer) : base(localizer) { }
+    public string Back => Get("cancelReport.back");
+    public string Cancelled => Get("cancelReport.cancelled");
+    public string Description => Get("cancelReport.description");
+    public string ReasonOptional => Get("cancelReport.reasonOptional");
+    public string Title => Get("cancelReport.title");
+    public string Unreachable => Get("cancelReport.unreachable");
 }
 
-public sealed class CashEntryGroup
+public sealed class CashGroup : LocalizerGroup
 {
-    private readonly AppLocalizer _localizer;
-    internal CashEntryGroup(AppLocalizer localizer) => _localizer = localizer;
-    public string Added => _localizer.Get("cashEntry.added");
-    public string Amount => _localizer.Get("cashEntry.amount");
-    public string Description => _localizer.Get("cashEntry.description");
-    public string Direction => _localizer.Get("cashEntry.direction");
-    public string DirectionIn => _localizer.Get("cashEntry.directionIn");
-    public string DirectionOut => _localizer.Get("cashEntry.directionOut");
-    public string Reason => _localizer.Get("cashEntry.reason");
-    public string ReasonAdjustment => _localizer.Get("cashEntry.reasonAdjustment");
-    public string ReasonDeposit => _localizer.Get("cashEntry.reasonDeposit");
-    public string ReasonPayment => _localizer.Get("cashEntry.reasonPayment");
-    public string ReasonPayout => _localizer.Get("cashEntry.reasonPayout");
-    public string ReasonRefund => _localizer.Get("cashEntry.reasonRefund");
-    public string Reference => _localizer.Get("cashEntry.reference");
-    public string Submit => _localizer.Get("cashEntry.submit");
-    public string Title => _localizer.Get("cashEntry.title");
-    public string UnreachableRetry => _localizer.Get("cashEntry.unreachableRetry");
+    internal CashGroup(AppLocalizer localizer) : base(localizer) { }
+    public string Balance => Get("cash.balance");
+    public string ClosedAt => Get("cash.closedAt");
+    public string EmptyActionLabel => Get("cash.emptyActionLabel");
+    public string EmptyMessage => Get("cash.emptyMessage");
+    public string EmptyTitle => Get("cash.emptyTitle");
+    public string Entries => Get("cash.entries");
+    public string LoadErrorTitle => Get("cash.loadErrorTitle");
+    public string OpenCashSessionTitle => Get("cash.openCashSessionTitle");
+    public string OpenedAt => Get("cash.openedAt");
+    public string OpeningFloat => Get("cash.openingFloat");
+    public string OpenSession => Get("cash.openSession");
+    public string SearchPlaceholder => Get("cash.searchPlaceholder");
+    public string SessionTitle => Get("cash.sessionTitle");
+    public string StatusClosed => Get("cash.statusClosed");
+    public string StatusOpen => Get("cash.statusOpen");
+    public string Subtitle => Get("cash.subtitle");
+    public string Title => Get("cash.title");
+    public string Unreachable => Get("cash.unreachable");
+    public string User => Get("cash.user");
+    public string View => Get("cash.view");
 }
 
-public sealed class CashSessionGroup
+public sealed class CashEntryGroup : LocalizerGroup
 {
-    private readonly AppLocalizer _localizer;
-    internal CashSessionGroup(AppLocalizer localizer) => _localizer = localizer;
-    public string AddCashEntryTitle => _localizer.Get("cashSession.addCashEntryTitle");
-    public string AddEntry => _localizer.Get("cashSession.addEntry");
-    public string Amount => _localizer.Get("cashSession.amount");
-    public string Approve => _localizer.Get("cashSession.approve");
-    public string Approved => _localizer.Get("cashSession.approved");
-    public string ApproveHandover => _localizer.Get("cashSession.approveHandover");
-    public string ApproveHandoverConfirm => _localizer.Get("cashSession.approveHandoverConfirm");
-    public string Balance => _localizer.Get("cashSession.balance");
-    public string CloseCashSessionTitle => _localizer.Get("cashSession.closeCashSessionTitle");
-    public string ClosedAt => _localizer.Get("cashSession.closedAt");
-    public string ClosedBy => _localizer.Get("cashSession.closedBy");
-    public string CloseSession => _localizer.Get("cashSession.closeSession");
-    public string Counted => _localizer.Get("cashSession.counted");
-    public string Description => _localizer.Get("cashSession.description");
-    public string Direction => _localizer.Get("cashSession.direction");
-    public string EntriesCount => _localizer.Get("cashSession.entriesCount");
-    public string Expected => _localizer.Get("cashSession.expected");
-    public string Handover => _localizer.Get("cashSession.handover");
-    public string HandoverApproved => _localizer.Get("cashSession.handoverApproved");
-    public string NoEntries => _localizer.Get("cashSession.noEntries");
-    public string NoEntriesToDisplay => _localizer.Get("cashSession.noEntriesToDisplay");
-    public string NotApproved => _localizer.Get("cashSession.notApproved");
-    public string NotClosed => _localizer.Get("cashSession.notClosed");
-    public string OpenedAt => _localizer.Get("cashSession.openedAt");
-    public string OpeningFloat => _localizer.Get("cashSession.openingFloat");
-    public string OverShort => _localizer.Get("cashSession.overShort");
-    public string Reason => _localizer.Get("cashSession.reason");
-    public string ReceivingSession => _localizer.Get("cashSession.receivingSession");
-    public string Reference => _localizer.Get("cashSession.reference");
-    public string Title => _localizer.Get("cashSession.title");
-    public string TitleWithId => _localizer.Get("cashSession.titleWithId");
-    public string Unreachable => _localizer.Get("cashSession.unreachable");
-    public string User => _localizer.Get("cashSession.user");
+    internal CashEntryGroup(AppLocalizer localizer) : base(localizer) { }
+    public string Added => Get("cashEntry.added");
+    public string Amount => Get("cashEntry.amount");
+    public string Description => Get("cashEntry.description");
+    public string Direction => Get("cashEntry.direction");
+    public string DirectionIn => Get("cashEntry.directionIn");
+    public string DirectionOut => Get("cashEntry.directionOut");
+    public string Reason => Get("cashEntry.reason");
+    public string ReasonAdjustment => Get("cashEntry.reasonAdjustment");
+    public string ReasonDeposit => Get("cashEntry.reasonDeposit");
+    public string ReasonPayment => Get("cashEntry.reasonPayment");
+    public string ReasonPayout => Get("cashEntry.reasonPayout");
+    public string ReasonRefund => Get("cashEntry.reasonRefund");
+    public string Reference => Get("cashEntry.reference");
+    public string Submit => Get("cashEntry.submit");
+    public string Title => Get("cashEntry.title");
+    public string UnreachableRetry => Get("cashEntry.unreachableRetry");
 }
 
-public sealed class ChangePasswordGroup
+public sealed class CashSessionGroup : LocalizerGroup
 {
-    private readonly AppLocalizer _localizer;
-    internal ChangePasswordGroup(AppLocalizer localizer) => _localizer = localizer;
-    public string AdminWarning => _localizer.Get("changePassword.adminWarning");
-    public string Cancel => _localizer.Get("changePassword.cancel");
-    public string Confirm => _localizer.Get("changePassword.confirm");
-    public string Current => _localizer.Get("changePassword.current");
-    public string EnterCurrent => _localizer.Get("changePassword.enterCurrent");
-    public string Helper => _localizer.Get("changePassword.helper");
-    public string InvalidNew => _localizer.Get("changePassword.invalidNew");
-    public string Mismatch => _localizer.Get("changePassword.mismatch");
-    public string New => _localizer.Get("changePassword.new");
-    public string RequiredTitle => _localizer.Get("changePassword.requiredTitle");
-    public string Success => _localizer.Get("changePassword.success");
-    public string Title => _localizer.Get("changePassword.title");
-    public string Unreachable => _localizer.Get("changePassword.unreachable");
-    public string Update => _localizer.Get("changePassword.update");
+    internal CashSessionGroup(AppLocalizer localizer) : base(localizer) { }
+    public string AddCashEntryTitle => Get("cashSession.addCashEntryTitle");
+    public string AddEntry => Get("cashSession.addEntry");
+    public string Amount => Get("cashSession.amount");
+    public string Approve => Get("cashSession.approve");
+    public string Approved => Get("cashSession.approved");
+    public string ApproveHandover => Get("cashSession.approveHandover");
+    public string ApproveHandoverConfirm => Get("cashSession.approveHandoverConfirm");
+    public string Balance => Get("cashSession.balance");
+    public string CloseCashSessionTitle => Get("cashSession.closeCashSessionTitle");
+    public string ClosedAt => Get("cashSession.closedAt");
+    public string ClosedBy => Get("cashSession.closedBy");
+    public string CloseSession => Get("cashSession.closeSession");
+    public string Counted => Get("cashSession.counted");
+    public string Description => Get("cashSession.description");
+    public string Direction => Get("cashSession.direction");
+    public string EntriesCount => Get("cashSession.entriesCount");
+    public string Expected => Get("cashSession.expected");
+    public string Handover => Get("cashSession.handover");
+    public string HandoverApproved => Get("cashSession.handoverApproved");
+    public string NoEntries => Get("cashSession.noEntries");
+    public string NoEntriesToDisplay => Get("cashSession.noEntriesToDisplay");
+    public string NotApproved => Get("cashSession.notApproved");
+    public string NotClosed => Get("cashSession.notClosed");
+    public string OpenedAt => Get("cashSession.openedAt");
+    public string OpeningFloat => Get("cashSession.openingFloat");
+    public string OverShort => Get("cashSession.overShort");
+    public string Reason => Get("cashSession.reason");
+    public string ReceivingSession => Get("cashSession.receivingSession");
+    public string Reference => Get("cashSession.reference");
+    public string Title => Get("cashSession.title");
+    public string TitleWithId => Get("cashSession.titleWithId");
+    public string Unreachable => Get("cashSession.unreachable");
+    public string User => Get("cashSession.user");
 }
 
-public sealed class ClaimGroup
+public sealed class ChangePasswordGroup : LocalizerGroup
 {
-    private readonly AppLocalizer _localizer;
-    internal ClaimGroup(AppLocalizer localizer) => _localizer = localizer;
-    public string Billed => _localizer.Get("claim.billed");
-    public string CreateClaim => _localizer.Get("claim.createClaim");
-    public string CreateTitle => _localizer.Get("claim.createTitle");
-    public string EmptyActionLabel => _localizer.Get("claim.emptyActionLabel");
-    public string EmptyMessage => _localizer.Get("claim.emptyMessage");
-    public string EmptyTitle => _localizer.Get("claim.emptyTitle");
-    public string Examination => _localizer.Get("claim.examination");
-    public string LoadErrorTitle => _localizer.Get("claim.loadErrorTitle");
-    public string Patient => _localizer.Get("claim.patient");
-    public string PayerShare => _localizer.Get("claim.payerShare");
-    public string PolicyNumber => _localizer.Get("claim.policyNumber");
-    public string SearchPlaceholder => _localizer.Get("claim.searchPlaceholder");
-    public string Subtitle => _localizer.Get("claim.subtitle");
-    public string Title => _localizer.Get("claim.title");
-    public string Unreachable => _localizer.Get("claim.unreachable");
-    public string View => _localizer.Get("claim.view");
+    internal ChangePasswordGroup(AppLocalizer localizer) : base(localizer) { }
+    public string AdminWarning => Get("changePassword.adminWarning");
+    public string Cancel => Get("changePassword.cancel");
+    public string Confirm => Get("changePassword.confirm");
+    public string Current => Get("changePassword.current");
+    public string EnterCurrent => Get("changePassword.enterCurrent");
+    public string Helper => Get("changePassword.helper");
+    public string InvalidNew => Get("changePassword.invalidNew");
+    public string Mismatch => Get("changePassword.mismatch");
+    public string New => Get("changePassword.new");
+    public string RequiredTitle => Get("changePassword.requiredTitle");
+    public string Success => Get("changePassword.success");
+    public string Title => Get("changePassword.title");
+    public string Unreachable => Get("changePassword.unreachable");
+    public string Update => Get("changePassword.update");
 }
 
-public sealed class ClaimDialogGroup
+public sealed class ClaimGroup : LocalizerGroup
 {
-    private readonly AppLocalizer _localizer;
-    internal ClaimDialogGroup(AppLocalizer localizer) => _localizer = localizer;
-    public string Adjudication => _localizer.Get("claimDialog.adjudication");
-    public string AllRequired => _localizer.Get("claimDialog.allRequired");
-    public string Amount => _localizer.Get("claimDialog.amount");
-    public string Approve => _localizer.Get("claimDialog.approve");
-    public string Approved => _localizer.Get("claimDialog.approved");
-    public string ApprovedAmount => _localizer.Get("claimDialog.approvedAmount");
-    public string BilledAmount => _localizer.Get("claimDialog.billedAmount");
-    public string CreateClaim => _localizer.Get("claimDialog.createClaim");
-    public string Created => _localizer.Get("claimDialog.created");
-    public string DetailsTitle => _localizer.Get("claimDialog.detailsTitle");
-    public string Examination => _localizer.Get("claimDialog.examination");
-    public string ExaminationSearchLabel => _localizer.Get("claimDialog.examinationSearchLabel");
-    public string LoadErrorTitle => _localizer.Get("claimDialog.loadErrorTitle");
-    public string Method => _localizer.Get("claimDialog.method");
-    public string Patient => _localizer.Get("claimDialog.patient");
-    public string PatientSearchLabel => _localizer.Get("claimDialog.patientSearchLabel");
-    public string PatientShare => _localizer.Get("claimDialog.patientShare");
-    public string PayerShare => _localizer.Get("claimDialog.payerShare");
-    public string Policy => _localizer.Get("claimDialog.policy");
-    public string PolicySearchLabel => _localizer.Get("claimDialog.policySearchLabel");
-    public string PreAuthorizationLabel => _localizer.Get("claimDialog.preAuthorizationLabel");
-    public string PriorRejections => _localizer.Get("claimDialog.priorRejections");
-    public string RecordSettlement => _localizer.Get("claimDialog.recordSettlement");
-    public string ReferenceOptional => _localizer.Get("claimDialog.referenceOptional");
-    public string Reject => _localizer.Get("claimDialog.reject");
-    public string Rejected => _localizer.Get("claimDialog.rejected");
-    public string RejectionCodeForReject => _localizer.Get("claimDialog.rejectionCodeForReject");
-    public string RejectionReasonForReject => _localizer.Get("claimDialog.rejectionReasonForReject");
-    public string Rejections => _localizer.Get("claimDialog.rejections");
-    public string RemainingOwed => _localizer.Get("claimDialog.remainingOwed");
-    public string ResubmitClaim => _localizer.Get("claimDialog.resubmitClaim");
-    public string Resubmitted => _localizer.Get("claimDialog.resubmitted");
-    public string SelectExaminationFirst => _localizer.Get("claimDialog.selectExaminationFirst");
-    public string SelectPatientFirst => _localizer.Get("claimDialog.selectPatientFirst");
-    public string SettlementRecorded => _localizer.Get("claimDialog.settlementRecorded");
-    public string Settlements => _localizer.Get("claimDialog.settlements");
-    public string SubmitClaim => _localizer.Get("claimDialog.submitClaim");
-    public string Submitted => _localizer.Get("claimDialog.submitted");
-    public string Title => _localizer.Get("claimDialog.title");
-    public string TotalSettled => _localizer.Get("claimDialog.totalSettled");
-    public string UnableSearchExaminations => _localizer.Get("claimDialog.unableSearchExaminations");
-    public string UnableSearchPatients => _localizer.Get("claimDialog.unableSearchPatients");
-    public string UnableSearchPolicies => _localizer.Get("claimDialog.unableSearchPolicies");
-    public string UnableSearchPreAuthorizations => _localizer.Get("claimDialog.unableSearchPreAuthorizations");
-    public string Unreachable => _localizer.Get("claimDialog.unreachable");
-    public string UnreachableRetry => _localizer.Get("claimDialog.unreachableRetry");
+    internal ClaimGroup(AppLocalizer localizer) : base(localizer) { }
+    public string Billed => Get("claim.billed");
+    public string CreateClaim => Get("claim.createClaim");
+    public string CreateTitle => Get("claim.createTitle");
+    public string EmptyActionLabel => Get("claim.emptyActionLabel");
+    public string EmptyMessage => Get("claim.emptyMessage");
+    public string EmptyTitle => Get("claim.emptyTitle");
+    public string Examination => Get("claim.examination");
+    public string LoadErrorTitle => Get("claim.loadErrorTitle");
+    public string Patient => Get("claim.patient");
+    public string PayerShare => Get("claim.payerShare");
+    public string PolicyNumber => Get("claim.policyNumber");
+    public string SearchPlaceholder => Get("claim.searchPlaceholder");
+    public string Subtitle => Get("claim.subtitle");
+    public string Title => Get("claim.title");
+    public string Unreachable => Get("claim.unreachable");
+    public string View => Get("claim.view");
 }
 
-public sealed class CloseCashGroup
+public sealed class ClaimDialogGroup : LocalizerGroup
 {
-    private readonly AppLocalizer _localizer;
-    internal CloseCashGroup(AppLocalizer localizer) => _localizer = localizer;
-    public string Closed => _localizer.Get("closeCash.closed");
-    public string CountedTotal => _localizer.Get("closeCash.countedTotal");
-    public string ExpectedTotalHint => _localizer.Get("closeCash.expectedTotalHint");
-    public string HandoverHint => _localizer.Get("closeCash.handoverHint");
-    public string Notes => _localizer.Get("closeCash.notes");
-    public string ReceivingOpeningFloat => _localizer.Get("closeCash.receivingOpeningFloat");
-    public string ReceivingUserId => _localizer.Get("closeCash.receivingUserId");
-    public string Submit => _localizer.Get("closeCash.submit");
-    public string Title => _localizer.Get("closeCash.title");
-    public string UnreachableRetry => _localizer.Get("closeCash.unreachableRetry");
+    internal ClaimDialogGroup(AppLocalizer localizer) : base(localizer) { }
+    public string Adjudication => Get("claimDialog.adjudication");
+    public string AllRequired => Get("claimDialog.allRequired");
+    public string Amount => Get("claimDialog.amount");
+    public string Approve => Get("claimDialog.approve");
+    public string Approved => Get("claimDialog.approved");
+    public string ApprovedAmount => Get("claimDialog.approvedAmount");
+    public string BilledAmount => Get("claimDialog.billedAmount");
+    public string CreateClaim => Get("claimDialog.createClaim");
+    public string Created => Get("claimDialog.created");
+    public string DetailsTitle => Get("claimDialog.detailsTitle");
+    public string Examination => Get("claimDialog.examination");
+    public string ExaminationSearchLabel => Get("claimDialog.examinationSearchLabel");
+    public string LoadErrorTitle => Get("claimDialog.loadErrorTitle");
+    public string Method => Get("claimDialog.method");
+    public string Patient => Get("claimDialog.patient");
+    public string PatientSearchLabel => Get("claimDialog.patientSearchLabel");
+    public string PatientShare => Get("claimDialog.patientShare");
+    public string PayerShare => Get("claimDialog.payerShare");
+    public string Policy => Get("claimDialog.policy");
+    public string PolicySearchLabel => Get("claimDialog.policySearchLabel");
+    public string PreAuthorizationLabel => Get("claimDialog.preAuthorizationLabel");
+    public string PriorRejections => Get("claimDialog.priorRejections");
+    public string RecordSettlement => Get("claimDialog.recordSettlement");
+    public string ReferenceOptional => Get("claimDialog.referenceOptional");
+    public string Reject => Get("claimDialog.reject");
+    public string Rejected => Get("claimDialog.rejected");
+    public string RejectionCodeForReject => Get("claimDialog.rejectionCodeForReject");
+    public string RejectionReasonForReject => Get("claimDialog.rejectionReasonForReject");
+    public string Rejections => Get("claimDialog.rejections");
+    public string RemainingOwed => Get("claimDialog.remainingOwed");
+    public string ResubmitClaim => Get("claimDialog.resubmitClaim");
+    public string Resubmitted => Get("claimDialog.resubmitted");
+    public string SelectExaminationFirst => Get("claimDialog.selectExaminationFirst");
+    public string SelectPatientFirst => Get("claimDialog.selectPatientFirst");
+    public string SettlementRecorded => Get("claimDialog.settlementRecorded");
+    public string Settlements => Get("claimDialog.settlements");
+    public string SubmitClaim => Get("claimDialog.submitClaim");
+    public string Submitted => Get("claimDialog.submitted");
+    public string Title => Get("claimDialog.title");
+    public string TotalSettled => Get("claimDialog.totalSettled");
+    public string UnableSearchExaminations => Get("claimDialog.unableSearchExaminations");
+    public string UnableSearchPatients => Get("claimDialog.unableSearchPatients");
+    public string UnableSearchPolicies => Get("claimDialog.unableSearchPolicies");
+    public string UnableSearchPreAuthorizations => Get("claimDialog.unableSearchPreAuthorizations");
+    public string Unreachable => Get("claimDialog.unreachable");
+    public string UnreachableRetry => Get("claimDialog.unreachableRetry");
 }
 
-public sealed class CommonGroup
+public sealed class CloseCashGroup : LocalizerGroup
 {
-    private readonly AppLocalizer _localizer;
-    internal CommonGroup(AppLocalizer localizer) => _localizer = localizer;
-    public string Actions => _localizer.Get("common.actions");
-    public string Active => _localizer.Get("common.active");
-    public string Add => _localizer.Get("common.add");
-    public string All => _localizer.Get("common.all");
-    public string Apply => _localizer.Get("common.apply");
-    public string Cancel => _localizer.Get("common.cancel");
-    public string Close => _localizer.Get("common.close");
-    public string Confirm => _localizer.Get("common.confirm");
-    public string Date => _localizer.Get("common.date");
-    public string Delete => _localizer.Get("common.delete");
-    public string Edit => _localizer.Get("common.edit");
-    public string EmptyTitle => _localizer.Get("common.emptyTitle");
-    public string ErrorTitle => _localizer.Get("common.errorTitle");
-    public string Inactive => _localizer.Get("common.inactive");
-    public string Loading => _localizer.Get("common.loading");
-    public string Name => _localizer.Get("common.name");
-    public string No => _localizer.Get("common.no");
-    public string None => _localizer.Get("common.none");
-    public string NotApplicable => _localizer.Get("common.notApplicable");
-    public string Ok => _localizer.Get("common.ok");
-    public string Required => _localizer.Get("common.required");
-    public string Retry => _localizer.Get("common.retry");
-    public string Save => _localizer.Get("common.save");
-    public string Search => _localizer.Get("common.search");
-    public string SearchPlaceholder => _localizer.Get("common.searchPlaceholder");
-    public string Status => _localizer.Get("common.status");
-    public string Today => _localizer.Get("common.today");
-    public string Type => _localizer.Get("common.type");
-    public string Yes => _localizer.Get("common.yes");
+    internal CloseCashGroup(AppLocalizer localizer) : base(localizer) { }
+    public string Closed => Get("closeCash.closed");
+    public string CountedTotal => Get("closeCash.countedTotal");
+    public string ExpectedTotalHint => Get("closeCash.expectedTotalHint");
+    public string HandoverHint => Get("closeCash.handoverHint");
+    public string Notes => Get("closeCash.notes");
+    public string ReceivingOpeningFloat => Get("closeCash.receivingOpeningFloat");
+    public string ReceivingUserId => Get("closeCash.receivingUserId");
+    public string Submit => Get("closeCash.submit");
+    public string Title => Get("closeCash.title");
+    public string UnreachableRetry => Get("closeCash.unreachableRetry");
 }
 
-public sealed class CompanyDialogGroup
+public sealed class CommonGroup : LocalizerGroup
 {
-    private readonly AppLocalizer _localizer;
-    internal CompanyDialogGroup(AppLocalizer localizer) => _localizer = localizer;
-    public string Address => _localizer.Get("companyDialog.address");
-    public string Create => _localizer.Get("companyDialog.create");
-    public string Created => _localizer.Get("companyDialog.created");
-    public string EditTitle => _localizer.Get("companyDialog.editTitle");
-    public string Email => _localizer.Get("companyDialog.email");
-    public string Phone => _localizer.Get("companyDialog.phone");
-    public string SaveChanges => _localizer.Get("companyDialog.saveChanges");
-    public string TaxNumber => _localizer.Get("companyDialog.taxNumber");
-    public string Title => _localizer.Get("companyDialog.title");
-    public string Unreachable => _localizer.Get("companyDialog.unreachable");
-    public string Updated => _localizer.Get("companyDialog.updated");
+    internal CommonGroup(AppLocalizer localizer) : base(localizer) { }
+    public string Actions => Get("common.actions");
+    public string Active => Get("common.active");
+    public string Add => Get("common.add");
+    public string All => Get("common.all");
+    public string Apply => Get("common.apply");
+    public string Cancel => Get("common.cancel");
+    public string Close => Get("common.close");
+    public string Confirm => Get("common.confirm");
+    public string Date => Get("common.date");
+    public string Delete => Get("common.delete");
+    public string Edit => Get("common.edit");
+    public string EmptyTitle => Get("common.emptyTitle");
+    public string ErrorTitle => Get("common.errorTitle");
+    public string Inactive => Get("common.inactive");
+    public string Loading => Get("common.loading");
+    public string Name => Get("common.name");
+    public string No => Get("common.no");
+    public string None => Get("common.none");
+    public string NotApplicable => Get("common.notApplicable");
+    public string Ok => Get("common.ok");
+    public string Required => Get("common.required");
+    public string Retry => Get("common.retry");
+    public string Save => Get("common.save");
+    public string Search => Get("common.search");
+    public string SearchPlaceholder => Get("common.searchPlaceholder");
+    public string Status => Get("common.status");
+    public string Today => Get("common.today");
+    public string Type => Get("common.type");
+    public string Yes => Get("common.yes");
 }
 
-public sealed class DashboardGroup
+public sealed class CompanyDialogGroup : LocalizerGroup
 {
-    private readonly AppLocalizer _localizer;
-    internal DashboardGroup(AppLocalizer localizer) => _localizer = localizer;
-    public string ActivePolicies => _localizer.Get("dashboard.activePolicies");
-    public string Approved => _localizer.Get("dashboard.approved");
-    public string Available => _localizer.Get("dashboard.available");
-    public string Busy => _localizer.Get("dashboard.busy");
-    public string DoctorAvailability => _localizer.Get("dashboard.doctorAvailability");
-    public string DraftClaims => _localizer.Get("dashboard.draftClaims");
-    public string ExamPriority => _localizer.Get("dashboard.examPriority");
-    public string ExamsInProgress => _localizer.Get("dashboard.examsInProgress");
-    public string ExamStatus => _localizer.Get("dashboard.examStatus");
-    public string ExamsWillAppear => _localizer.Get("dashboard.examsWillAppear");
-    public string ExamType => _localizer.Get("dashboard.examType");
-    public string Insurance => _localizer.Get("dashboard.insurance");
-    public string InsuranceCompanies => _localizer.Get("dashboard.insuranceCompanies");
-    public string InventoryItems => _localizer.Get("dashboard.inventoryItems");
-    public string LoadErrorMsg => _localizer.Get("dashboard.loadErrorMsg");
-    public string LoadErrorTitle => _localizer.Get("dashboard.loadErrorTitle");
-    public string MonthlyRevenue => _localizer.Get("dashboard.monthlyRevenue");
-    public string NextSlot => _localizer.Get("dashboard.nextSlot");
-    public string NoRecentExams => _localizer.Get("dashboard.noRecentExams");
-    public string OutstandingClaims => _localizer.Get("dashboard.outstandingClaims");
-    public string PendingAuthorizations => _localizer.Get("dashboard.pendingAuthorizations");
-    public string Rating => _localizer.Get("dashboard.rating");
-    public string RecentExaminations => _localizer.Get("dashboard.recentExaminations");
-    public string Referrals => _localizer.Get("dashboard.referrals");
-    public string ReferringDoctor => _localizer.Get("dashboard.referringDoctor");
-    public string Revenue => _localizer.Get("dashboard.revenue");
-    public string RevenueOverview => _localizer.Get("dashboard.revenueOverview");
-    public string SampleBadge => _localizer.Get("dashboard.sampleBadge");
-    public string Submitted => _localizer.Get("dashboard.submitted");
-    public string Subtitle => _localizer.Get("dashboard.subtitle");
-    public string Title => _localizer.Get("dashboard.title");
-    public string TopDoctor => _localizer.Get("dashboard.topDoctor");
-    public string Total => _localizer.Get("dashboard.total");
-    public string TotalExaminations => _localizer.Get("dashboard.totalExaminations");
-    public string TotalPatients => _localizer.Get("dashboard.totalPatients");
+    internal CompanyDialogGroup(AppLocalizer localizer) : base(localizer) { }
+    public string Address => Get("companyDialog.address");
+    public string Create => Get("companyDialog.create");
+    public string Created => Get("companyDialog.created");
+    public string EditTitle => Get("companyDialog.editTitle");
+    public string Email => Get("companyDialog.email");
+    public string Phone => Get("companyDialog.phone");
+    public string SaveChanges => Get("companyDialog.saveChanges");
+    public string TaxNumber => Get("companyDialog.taxNumber");
+    public string Title => Get("companyDialog.title");
+    public string Unreachable => Get("companyDialog.unreachable");
+    public string Updated => Get("companyDialog.updated");
 }
 
-public sealed class EquipmentGroup
+public sealed class DashboardGroup : LocalizerGroup
 {
-    private readonly AppLocalizer _localizer;
-    internal EquipmentGroup(AppLocalizer localizer) => _localizer = localizer;
-    public string Activated => _localizer.Get("equipment.activated");
-    public string Add => _localizer.Get("equipment.add");
-    public string CurrentStatus => _localizer.Get("equipment.currentStatus");
-    public string Deactivated => _localizer.Get("equipment.deactivated");
-    public string DeleteConfirm => _localizer.Get("equipment.deleteConfirm");
-    public string Deleted => _localizer.Get("equipment.deleted");
-    public string DeleteTitle => _localizer.Get("equipment.deleteTitle");
-    public string Edit => _localizer.Get("equipment.edit");
-    public string EmptyActionLabel => _localizer.Get("equipment.emptyActionLabel");
-    public string EmptyMessage => _localizer.Get("equipment.emptyMessage");
-    public string EmptyTitle => _localizer.Get("equipment.emptyTitle");
-    public string LoadErrorTitle => _localizer.Get("equipment.loadErrorTitle");
-    public string Modality => _localizer.Get("equipment.modality");
-    public string NewEquipment => _localizer.Get("equipment.newEquipment");
-    public string PurchaseDate => _localizer.Get("equipment.purchaseDate");
-    public string SearchPlaceholder => _localizer.Get("equipment.searchPlaceholder");
-    public string SerialNumber => _localizer.Get("equipment.serialNumber");
-    public string SetStatus => _localizer.Get("equipment.setStatus");
-    public string SetStatusTitle => _localizer.Get("equipment.setStatusTitle");
-    public string Subtitle => _localizer.Get("equipment.subtitle");
-    public string Title => _localizer.Get("equipment.title");
-    public string ToggleStatus => _localizer.Get("equipment.toggleStatus");
-    public string Unreachable => _localizer.Get("equipment.unreachable");
+    internal DashboardGroup(AppLocalizer localizer) : base(localizer) { }
+    public string ActivePolicies => Get("dashboard.activePolicies");
+    public string Approved => Get("dashboard.approved");
+    public string Available => Get("dashboard.available");
+    public string Busy => Get("dashboard.busy");
+    public string DoctorAvailability => Get("dashboard.doctorAvailability");
+    public string DraftClaims => Get("dashboard.draftClaims");
+    public string ExamPriority => Get("dashboard.examPriority");
+    public string ExamsInProgress => Get("dashboard.examsInProgress");
+    public string ExamStatus => Get("dashboard.examStatus");
+    public string ExamsWillAppear => Get("dashboard.examsWillAppear");
+    public string ExamType => Get("dashboard.examType");
+    public string Insurance => Get("dashboard.insurance");
+    public string InsuranceCompanies => Get("dashboard.insuranceCompanies");
+    public string InventoryItems => Get("dashboard.inventoryItems");
+    public string LoadErrorMsg => Get("dashboard.loadErrorMsg");
+    public string LoadErrorTitle => Get("dashboard.loadErrorTitle");
+    public string MonthlyRevenue => Get("dashboard.monthlyRevenue");
+    public string NextSlot => Get("dashboard.nextSlot");
+    public string NoRecentExams => Get("dashboard.noRecentExams");
+    public string OutstandingClaims => Get("dashboard.outstandingClaims");
+    public string PendingAuthorizations => Get("dashboard.pendingAuthorizations");
+    public string Rating => Get("dashboard.rating");
+    public string RecentExaminations => Get("dashboard.recentExaminations");
+    public string Referrals => Get("dashboard.referrals");
+    public string ReferringDoctor => Get("dashboard.referringDoctor");
+    public string Revenue => Get("dashboard.revenue");
+    public string RevenueOverview => Get("dashboard.revenueOverview");
+    public string SampleBadge => Get("dashboard.sampleBadge");
+    public string Submitted => Get("dashboard.submitted");
+    public string Subtitle => Get("dashboard.subtitle");
+    public string Title => Get("dashboard.title");
+    public string TopDoctor => Get("dashboard.topDoctor");
+    public string Total => Get("dashboard.total");
+    public string TotalExaminations => Get("dashboard.totalExaminations");
+    public string TotalPatients => Get("dashboard.totalPatients");
 }
 
-public sealed class EquipmentDialogGroup
+public sealed class EquipmentGroup : LocalizerGroup
 {
-    private readonly AppLocalizer _localizer;
-    internal EquipmentDialogGroup(AppLocalizer localizer) => _localizer = localizer;
-    public string Created => _localizer.Get("equipmentDialog.created");
-    public string CreateEquipment => _localizer.Get("equipmentDialog.createEquipment");
-    public string SaveChanges => _localizer.Get("equipmentDialog.saveChanges");
-    public string SaveStatus => _localizer.Get("equipmentDialog.saveStatus");
-    public string SelectStatus => _localizer.Get("equipmentDialog.selectStatus");
-    public string StatusUpdated => _localizer.Get("equipmentDialog.statusUpdated");
-    public string Unreachable => _localizer.Get("equipmentDialog.unreachable");
-    public string Updated => _localizer.Get("equipmentDialog.updated");
+    internal EquipmentGroup(AppLocalizer localizer) : base(localizer) { }
+    public string Activated => Get("equipment.activated");
+    public string Add => Get("equipment.add");
+    public string CurrentStatus => Get("equipment.currentStatus");
+    public string Deactivated => Get("equipment.deactivated");
+    public string DeleteConfirm => Get("equipment.deleteConfirm");
+    public string Deleted => Get("equipment.deleted");
+    public string DeleteTitle => Get("equipment.deleteTitle");
+    public string Edit => Get("equipment.edit");
+    public string EmptyActionLabel => Get("equipment.emptyActionLabel");
+    public string EmptyMessage => Get("equipment.emptyMessage");
+    public string EmptyTitle => Get("equipment.emptyTitle");
+    public string LoadErrorTitle => Get("equipment.loadErrorTitle");
+    public string Modality => Get("equipment.modality");
+    public string NewEquipment => Get("equipment.newEquipment");
+    public string PurchaseDate => Get("equipment.purchaseDate");
+    public string SearchPlaceholder => Get("equipment.searchPlaceholder");
+    public string SerialNumber => Get("equipment.serialNumber");
+    public string SetStatus => Get("equipment.setStatus");
+    public string SetStatusTitle => Get("equipment.setStatusTitle");
+    public string Subtitle => Get("equipment.subtitle");
+    public string Title => Get("equipment.title");
+    public string ToggleStatus => Get("equipment.toggleStatus");
+    public string Unreachable => Get("equipment.unreachable");
 }
 
-public sealed class ErrorGroup
+public sealed class EquipmentDialogGroup : LocalizerGroup
 {
-    private readonly AppLocalizer _localizer;
-    internal ErrorGroup(AppLocalizer localizer) => _localizer = localizer;
-    public string Details => _localizer.Get("error.details");
-    public string GoHome => _localizer.Get("error.goHome");
-    public string Message => _localizer.Get("error.message");
-    public string Reload => _localizer.Get("error.reload");
-    public string SignOut => _localizer.Get("error.signOut");
-    public string Title => _localizer.Get("error.title");
+    internal EquipmentDialogGroup(AppLocalizer localizer) : base(localizer) { }
+    public string Created => Get("equipmentDialog.created");
+    public string CreateEquipment => Get("equipmentDialog.createEquipment");
+    public string SaveChanges => Get("equipmentDialog.saveChanges");
+    public string SaveStatus => Get("equipmentDialog.saveStatus");
+    public string SelectStatus => Get("equipmentDialog.selectStatus");
+    public string StatusUpdated => Get("equipmentDialog.statusUpdated");
+    public string Unreachable => Get("equipmentDialog.unreachable");
+    public string Updated => Get("equipmentDialog.updated");
 }
 
-public sealed class ExamDialogGroup
+public sealed class ErrorGroup : LocalizerGroup
 {
-    private readonly AppLocalizer _localizer;
-    internal ExamDialogGroup(AppLocalizer localizer) => _localizer = localizer;
-    public string AddItem => _localizer.Get("examDialog.addItem");
-    public string BodyPart => _localizer.Get("examDialog.bodyPart");
-    public string Code => _localizer.Get("examDialog.code");
-    public string Contrast => _localizer.Get("examDialog.contrast");
-    public string Created => _localizer.Get("examDialog.created");
-    public string CreateType => _localizer.Get("examDialog.createType");
-    public string EditTitle => _localizer.Get("examDialog.editTitle");
-    public string InventoryItem => _localizer.Get("examDialog.inventoryItem");
-    public string ItemsInvalid => _localizer.Get("examDialog.itemsInvalid");
-    public string ItemsTitle => _localizer.Get("examDialog.itemsTitle");
-    public string LoadItemsError => _localizer.Get("examDialog.loadItemsError");
-    public string Modality => _localizer.Get("examDialog.modality");
-    public string NewTitle => _localizer.Get("examDialog.newTitle");
-    public string NoItems => _localizer.Get("examDialog.noItems");
-    public string Price => _localizer.Get("examDialog.price");
-    public string Qty => _localizer.Get("examDialog.qty");
-    public string RemoveItem => _localizer.Get("examDialog.removeItem");
-    public string Required => _localizer.Get("examDialog.required");
-    public string RequiresConsent => _localizer.Get("examDialog.requiresConsent");
-    public string RequiresPreparation => _localizer.Get("examDialog.requiresPreparation");
-    public string SaveChanges => _localizer.Get("examDialog.saveChanges");
-    public string StandardDuration => _localizer.Get("examDialog.standardDuration");
-    public string Unreachable => _localizer.Get("examDialog.unreachable");
-    public string Updated => _localizer.Get("examDialog.updated");
+    internal ErrorGroup(AppLocalizer localizer) : base(localizer) { }
+    public string Details => Get("error.details");
+    public string GoHome => Get("error.goHome");
+    public string Message => Get("error.message");
+    public string Reload => Get("error.reload");
+    public string SignOut => Get("error.signOut");
+    public string Title => Get("error.title");
 }
 
-public sealed class ExamFeeGroup
+public sealed class ExamDialogGroup : LocalizerGroup
 {
-    private readonly AppLocalizer _localizer;
-    internal ExamFeeGroup(AppLocalizer localizer) => _localizer = localizer;
-    public string Activated => _localizer.Get("examFee.activated");
-    public string Amount => _localizer.Get("examFee.amount");
-    public string AmountIsPercentage => _localizer.Get("examFee.amountIsPercentage");
-    public string Created => _localizer.Get("examFee.created");
-    public string CreateFee => _localizer.Get("examFee.createFee");
-    public string Deactivated => _localizer.Get("examFee.deactivated");
-    public string DeleteConfirm => _localizer.Get("examFee.deleteConfirm");
-    public string Deleted => _localizer.Get("examFee.deleted");
-    public string DeleteTitle => _localizer.Get("examFee.deleteTitle");
-    public string EditExaminationFee => _localizer.Get("examFee.editExaminationFee");
-    public string EmptyActionLabel => _localizer.Get("examFee.emptyActionLabel");
-    public string EmptyMessage => _localizer.Get("examFee.emptyMessage");
-    public string EmptyTitle => _localizer.Get("examFee.emptyTitle");
-    public string ExaminationType => _localizer.Get("examFee.examinationType");
-    public string ExamTypeSearch => _localizer.Get("examFee.examTypeSearch");
-    public string Flat => _localizer.Get("examFee.flat");
-    public string FlatAmount => _localizer.Get("examFee.flatAmount");
-    public string LoadErrorTitle => _localizer.Get("examFee.loadErrorTitle");
-    public string NewExaminationFee => _localizer.Get("examFee.newExaminationFee");
-    public string NewFee => _localizer.Get("examFee.newFee");
-    public string Percentage => _localizer.Get("examFee.percentage");
-    public string PercentageLimit => _localizer.Get("examFee.percentageLimit");
-    public string PercentagePercent => _localizer.Get("examFee.percentagePercent");
-    public string Role => _localizer.Get("examFee.role");
-    public string SaveChanges => _localizer.Get("examFee.saveChanges");
-    public string SearchPlaceholder => _localizer.Get("examFee.searchPlaceholder");
-    public string SelectExamType => _localizer.Get("examFee.selectExamType");
-    public string Subtitle => _localizer.Get("examFee.subtitle");
-    public string Title => _localizer.Get("examFee.title");
-    public string ToggleStatus => _localizer.Get("examFee.toggleStatus");
-    public string Unreachable => _localizer.Get("examFee.unreachable");
-    public string UnreachableTryAgain => _localizer.Get("examFee.unreachableTryAgain");
-    public string Updated => _localizer.Get("examFee.updated");
+    internal ExamDialogGroup(AppLocalizer localizer) : base(localizer) { }
+    public string AddItem => Get("examDialog.addItem");
+    public string BodyPart => Get("examDialog.bodyPart");
+    public string Code => Get("examDialog.code");
+    public string Contrast => Get("examDialog.contrast");
+    public string Created => Get("examDialog.created");
+    public string CreateType => Get("examDialog.createType");
+    public string EditTitle => Get("examDialog.editTitle");
+    public string InventoryItem => Get("examDialog.inventoryItem");
+    public string ItemsInvalid => Get("examDialog.itemsInvalid");
+    public string ItemsTitle => Get("examDialog.itemsTitle");
+    public string LoadItemsError => Get("examDialog.loadItemsError");
+    public string Modality => Get("examDialog.modality");
+    public string NewTitle => Get("examDialog.newTitle");
+    public string NoItems => Get("examDialog.noItems");
+    public string Price => Get("examDialog.price");
+    public string Qty => Get("examDialog.qty");
+    public string RemoveItem => Get("examDialog.removeItem");
+    public string Required => Get("examDialog.required");
+    public string RequiresConsent => Get("examDialog.requiresConsent");
+    public string RequiresPreparation => Get("examDialog.requiresPreparation");
+    public string SaveChanges => Get("examDialog.saveChanges");
+    public string StandardDuration => Get("examDialog.standardDuration");
+    public string Unreachable => Get("examDialog.unreachable");
+    public string Updated => Get("examDialog.updated");
 }
 
-public sealed class ExaminationsGroup
+public sealed class ExamFeeGroup : LocalizerGroup
 {
-    private readonly AppLocalizer _localizer;
-    internal ExaminationsGroup(AppLocalizer localizer) => _localizer = localizer;
-    public string Activated => _localizer.Get("examinations.activated");
-    public string AddType => _localizer.Get("examinations.addType");
-    public string BodyPart => _localizer.Get("examinations.bodyPart");
-    public string Code => _localizer.Get("examinations.code");
-    public string Consent => _localizer.Get("examinations.consent");
-    public string Contrast => _localizer.Get("examinations.contrast");
-    public string Deactivated => _localizer.Get("examinations.deactivated");
-    public string DeleteConfirm => _localizer.Get("examinations.deleteConfirm");
-    public string Deleted => _localizer.Get("examinations.deleted");
-    public string DeleteTitle => _localizer.Get("examinations.deleteTitle");
-    public string Duration => _localizer.Get("examinations.duration");
-    public string EditType => _localizer.Get("examinations.editType");
-    public string EmptyAction => _localizer.Get("examinations.emptyAction");
-    public string EmptyMessage => _localizer.Get("examinations.emptyMessage");
-    public string EmptyTitle => _localizer.Get("examinations.emptyTitle");
-    public string ItemCount => _localizer.Get("examinations.itemCount");
-    public string LoadErrorTitle => _localizer.Get("examinations.loadErrorTitle");
-    public string Minutes => _localizer.Get("examinations.minutes");
-    public string Modality => _localizer.Get("examinations.modality");
-    public string NewType => _localizer.Get("examinations.newType");
-    public string Prep => _localizer.Get("examinations.prep");
-    public string Price => _localizer.Get("examinations.price");
-    public string Requirements => _localizer.Get("examinations.requirements");
-    public string SearchPlaceholder => _localizer.Get("examinations.searchPlaceholder");
-    public string Subtitle => _localizer.Get("examinations.subtitle");
-    public string Title => _localizer.Get("examinations.title");
-    public string ToggleStatus => _localizer.Get("examinations.toggleStatus");
-    public string Unreachable => _localizer.Get("examinations.unreachable");
+    internal ExamFeeGroup(AppLocalizer localizer) : base(localizer) { }
+    public string Activated => Get("examFee.activated");
+    public string Amount => Get("examFee.amount");
+    public string AmountIsPercentage => Get("examFee.amountIsPercentage");
+    public string Created => Get("examFee.created");
+    public string CreateFee => Get("examFee.createFee");
+    public string Deactivated => Get("examFee.deactivated");
+    public string DeleteConfirm => Get("examFee.deleteConfirm");
+    public string Deleted => Get("examFee.deleted");
+    public string DeleteTitle => Get("examFee.deleteTitle");
+    public string EditExaminationFee => Get("examFee.editExaminationFee");
+    public string EmptyActionLabel => Get("examFee.emptyActionLabel");
+    public string EmptyMessage => Get("examFee.emptyMessage");
+    public string EmptyTitle => Get("examFee.emptyTitle");
+    public string ExaminationType => Get("examFee.examinationType");
+    public string ExamTypeSearch => Get("examFee.examTypeSearch");
+    public string Flat => Get("examFee.flat");
+    public string FlatAmount => Get("examFee.flatAmount");
+    public string LoadErrorTitle => Get("examFee.loadErrorTitle");
+    public string NewExaminationFee => Get("examFee.newExaminationFee");
+    public string NewFee => Get("examFee.newFee");
+    public string Percentage => Get("examFee.percentage");
+    public string PercentageLimit => Get("examFee.percentageLimit");
+    public string PercentagePercent => Get("examFee.percentagePercent");
+    public string Role => Get("examFee.role");
+    public string SaveChanges => Get("examFee.saveChanges");
+    public string SearchPlaceholder => Get("examFee.searchPlaceholder");
+    public string SelectExamType => Get("examFee.selectExamType");
+    public string Subtitle => Get("examFee.subtitle");
+    public string Title => Get("examFee.title");
+    public string ToggleStatus => Get("examFee.toggleStatus");
+    public string Unreachable => Get("examFee.unreachable");
+    public string UnreachableTryAgain => Get("examFee.unreachableTryAgain");
+    public string Updated => Get("examFee.updated");
 }
 
-public sealed class FinancialGroup
+public sealed class ExaminationsGroup : LocalizerGroup
 {
-    private readonly AppLocalizer _localizer;
-    internal FinancialGroup(AppLocalizer localizer) => _localizer = localizer;
-    public string Approved => _localizer.Get("financial.approved");
-    public string ApprovedClaims => _localizer.Get("financial.approvedClaims");
-    public string AveragePerExam => _localizer.Get("financial.averagePerExam");
-    public string Billed => _localizer.Get("financial.billed");
-    public string BillingPerCompletedExam => _localizer.Get("financial.billingPerCompletedExam");
-    public string CashIn => _localizer.Get("financial.cashIn");
-    public string ClaimsInFlight => _localizer.Get("financial.claimsInFlight");
-    public string Collected => _localizer.Get("financial.collected");
-    public string CollectedContribution => _localizer.Get("financial.collectedContribution");
-    public string CollectedOverExams => _localizer.Get("financial.collectedOverExams");
-    public string CollectedVsBilledByMonth => _localizer.Get("financial.collectedVsBilledByMonth");
-    public string CollectionRate => _localizer.Get("financial.collectionRate");
-    public string Completed => _localizer.Get("financial.completed");
-    public string CompletedInPeriod => _localizer.Get("financial.completedInPeriod");
-    public string Discount => _localizer.Get("financial.discount");
-    public string Discounts => _localizer.Get("financial.discounts");
-    public string DraftClaims => _localizer.Get("financial.draftClaims");
-    public string Exam => _localizer.Get("financial.exam");
-    public string ExamRevenueDetail => _localizer.Get("financial.examRevenueDetail");
-    public string Exams => _localizer.Get("financial.exams");
-    public string GivenThisPeriod => _localizer.Get("financial.givenThisPeriod");
-    public string GrossInvoices => _localizer.Get("financial.grossInvoices");
-    public string Insurance => _localizer.Get("financial.insurance");
-    public string LoadErrorMsg => _localizer.Get("financial.loadErrorMsg");
-    public string LoadErrorTitle => _localizer.Get("financial.loadErrorTitle");
-    public string OfTotalBilled => _localizer.Get("financial.ofTotalBilled");
-    public string Outstanding => _localizer.Get("financial.outstanding");
-    public string OutstandingBalancesByBucket => _localizer.Get("financial.outstandingBalancesByBucket");
-    public string OutstandingFromInsurers => _localizer.Get("financial.outstandingFromInsurers");
-    public string Paid => _localizer.Get("financial.paid");
-    public string PendingAuthorizations => _localizer.Get("financial.pendingAuthorizations");
-    public string ReceivableAging => _localizer.Get("financial.receivableAging");
-    public string Remaining => _localizer.Get("financial.remaining");
-    public string Retry => _localizer.Get("financial.retry");
-    public string RevenueByModality => _localizer.Get("financial.revenueByModality");
-    public string RevenueTrend => _localizer.Get("financial.revenueTrend");
-    public string StillToCollect => _localizer.Get("financial.stillToCollect");
-    public string Subtitle => _localizer.Get("financial.subtitle");
-    public string Title => _localizer.Get("financial.title");
+    internal ExaminationsGroup(AppLocalizer localizer) : base(localizer) { }
+    public string Activated => Get("examinations.activated");
+    public string AddType => Get("examinations.addType");
+    public string BodyPart => Get("examinations.bodyPart");
+    public string Code => Get("examinations.code");
+    public string Consent => Get("examinations.consent");
+    public string Contrast => Get("examinations.contrast");
+    public string Deactivated => Get("examinations.deactivated");
+    public string DeleteConfirm => Get("examinations.deleteConfirm");
+    public string Deleted => Get("examinations.deleted");
+    public string DeleteTitle => Get("examinations.deleteTitle");
+    public string Duration => Get("examinations.duration");
+    public string EditType => Get("examinations.editType");
+    public string EmptyAction => Get("examinations.emptyAction");
+    public string EmptyMessage => Get("examinations.emptyMessage");
+    public string EmptyTitle => Get("examinations.emptyTitle");
+    public string ItemCount => Get("examinations.itemCount");
+    public string LoadErrorTitle => Get("examinations.loadErrorTitle");
+    public string Minutes => Get("examinations.minutes");
+    public string Modality => Get("examinations.modality");
+    public string NewType => Get("examinations.newType");
+    public string Prep => Get("examinations.prep");
+    public string Price => Get("examinations.price");
+    public string Requirements => Get("examinations.requirements");
+    public string SearchPlaceholder => Get("examinations.searchPlaceholder");
+    public string Subtitle => Get("examinations.subtitle");
+    public string Title => Get("examinations.title");
+    public string ToggleStatus => Get("examinations.toggleStatus");
+    public string Unreachable => Get("examinations.unreachable");
 }
 
-public sealed class InsuranceGroup
+public sealed class FinancialGroup : LocalizerGroup
 {
-    private readonly AppLocalizer _localizer;
-    internal InsuranceGroup(AppLocalizer localizer) => _localizer = localizer;
-    public string AddCompany => _localizer.Get("insurance.addCompany");
-    public string Address => _localizer.Get("insurance.address");
-    public string CompaniesSearchPlaceholder => _localizer.Get("insurance.companiesSearchPlaceholder");
-    public string CompaniesSubtitle => _localizer.Get("insurance.companiesSubtitle");
-    public string CompaniesTitle => _localizer.Get("insurance.companiesTitle");
-    public string CompanyDeleted => _localizer.Get("insurance.companyDeleted");
-    public string DeleteCompanyConfirm => _localizer.Get("insurance.deleteCompanyConfirm");
-    public string DeleteCompanyTitle => _localizer.Get("insurance.deleteCompanyTitle");
-    public string EditCompanyTitle => _localizer.Get("insurance.editCompanyTitle");
-    public string Email => _localizer.Get("insurance.email");
-    public string EmptyActionLabel => _localizer.Get("insurance.emptyActionLabel");
-    public string EmptyMessage => _localizer.Get("insurance.emptyMessage");
-    public string EmptyTitle => _localizer.Get("insurance.emptyTitle");
-    public string LoadErrorTitle => _localizer.Get("insurance.loadErrorTitle");
-    public string NewCompanyTitle => _localizer.Get("insurance.newCompanyTitle");
-    public string Phone => _localizer.Get("insurance.phone");
-    public string TaxNumber => _localizer.Get("insurance.taxNumber");
-    public string Unreachable => _localizer.Get("insurance.unreachable");
+    internal FinancialGroup(AppLocalizer localizer) : base(localizer) { }
+    public string Approved => Get("financial.approved");
+    public string ApprovedClaims => Get("financial.approvedClaims");
+    public string AveragePerExam => Get("financial.averagePerExam");
+    public string Billed => Get("financial.billed");
+    public string BillingPerCompletedExam => Get("financial.billingPerCompletedExam");
+    public string CashIn => Get("financial.cashIn");
+    public string ClaimsInFlight => Get("financial.claimsInFlight");
+    public string Collected => Get("financial.collected");
+    public string CollectedContribution => Get("financial.collectedContribution");
+    public string CollectedOverExams => Get("financial.collectedOverExams");
+    public string CollectedVsBilledByMonth => Get("financial.collectedVsBilledByMonth");
+    public string CollectionRate => Get("financial.collectionRate");
+    public string Completed => Get("financial.completed");
+    public string CompletedInPeriod => Get("financial.completedInPeriod");
+    public string Discount => Get("financial.discount");
+    public string Discounts => Get("financial.discounts");
+    public string DraftClaims => Get("financial.draftClaims");
+    public string Exam => Get("financial.exam");
+    public string ExamRevenueDetail => Get("financial.examRevenueDetail");
+    public string Exams => Get("financial.exams");
+    public string GivenThisPeriod => Get("financial.givenThisPeriod");
+    public string GrossInvoices => Get("financial.grossInvoices");
+    public string Insurance => Get("financial.insurance");
+    public string LoadErrorMsg => Get("financial.loadErrorMsg");
+    public string LoadErrorTitle => Get("financial.loadErrorTitle");
+    public string OfTotalBilled => Get("financial.ofTotalBilled");
+    public string Outstanding => Get("financial.outstanding");
+    public string OutstandingBalancesByBucket => Get("financial.outstandingBalancesByBucket");
+    public string OutstandingFromInsurers => Get("financial.outstandingFromInsurers");
+    public string Paid => Get("financial.paid");
+    public string PendingAuthorizations => Get("financial.pendingAuthorizations");
+    public string ReceivableAging => Get("financial.receivableAging");
+    public string Remaining => Get("financial.remaining");
+    public string Retry => Get("financial.retry");
+    public string RevenueByModality => Get("financial.revenueByModality");
+    public string RevenueTrend => Get("financial.revenueTrend");
+    public string StillToCollect => Get("financial.stillToCollect");
+    public string Subtitle => Get("financial.subtitle");
+    public string Title => Get("financial.title");
 }
 
-public sealed class InventoryGroup
+public sealed class InsuranceGroup : LocalizerGroup
 {
-    private readonly AppLocalizer _localizer;
-    internal InventoryGroup(AppLocalizer localizer) => _localizer = localizer;
-    public string AddFirstItem => _localizer.Get("inventory.addFirstItem");
-    public string AddItem => _localizer.Get("inventory.addItem");
-    public string Category => _localizer.Get("inventory.category");
-    public string DeleteConfirm => _localizer.Get("inventory.deleteConfirm");
-    public string DeleteItemTitle => _localizer.Get("inventory.deleteItemTitle");
-    public string EmptyMessage => _localizer.Get("inventory.emptyMessage");
-    public string ItemActivated => _localizer.Get("inventory.itemActivated");
-    public string ItemDeactivated => _localizer.Get("inventory.itemDeactivated");
-    public string ItemDeleted => _localizer.Get("inventory.itemDeleted");
-    public string LoadErrorTitle => _localizer.Get("inventory.loadErrorTitle");
-    public string LotTracked => _localizer.Get("inventory.lotTracked");
-    public string NoItemsTitle => _localizer.Get("inventory.noItemsTitle");
-    public string ReorderLevel => _localizer.Get("inventory.reorderLevel");
-    public string ReorderQty => _localizer.Get("inventory.reorderQty");
-    public string SearchPlaceholder => _localizer.Get("inventory.searchPlaceholder");
-    public string Stock => _localizer.Get("inventory.stock");
-    public string Subtitle => _localizer.Get("inventory.subtitle");
-    public string Title => _localizer.Get("inventory.title");
-    public string ToggleStatus => _localizer.Get("inventory.toggleStatus");
-    public string Unit => _localizer.Get("inventory.unit");
-    public string Unreachable => _localizer.Get("inventory.unreachable");
+    internal InsuranceGroup(AppLocalizer localizer) : base(localizer) { }
+    public string AddCompany => Get("insurance.addCompany");
+    public string Address => Get("insurance.address");
+    public string CompaniesSearchPlaceholder => Get("insurance.companiesSearchPlaceholder");
+    public string CompaniesSubtitle => Get("insurance.companiesSubtitle");
+    public string CompaniesTitle => Get("insurance.companiesTitle");
+    public string CompanyDeleted => Get("insurance.companyDeleted");
+    public string DeleteCompanyConfirm => Get("insurance.deleteCompanyConfirm");
+    public string DeleteCompanyTitle => Get("insurance.deleteCompanyTitle");
+    public string EditCompanyTitle => Get("insurance.editCompanyTitle");
+    public string Email => Get("insurance.email");
+    public string EmptyActionLabel => Get("insurance.emptyActionLabel");
+    public string EmptyMessage => Get("insurance.emptyMessage");
+    public string EmptyTitle => Get("insurance.emptyTitle");
+    public string LoadErrorTitle => Get("insurance.loadErrorTitle");
+    public string NewCompanyTitle => Get("insurance.newCompanyTitle");
+    public string Phone => Get("insurance.phone");
+    public string TaxNumber => Get("insurance.taxNumber");
+    public string Unreachable => Get("insurance.unreachable");
 }
 
-public sealed class ItemDialogGroup
+public sealed class InventoryGroup : LocalizerGroup
 {
-    private readonly AppLocalizer _localizer;
-    internal ItemDialogGroup(AppLocalizer localizer) => _localizer = localizer;
-    public string Batches => _localizer.Get("itemDialog.batches");
-    public string Brand => _localizer.Get("itemDialog.brand");
-    public string Category => _localizer.Get("itemDialog.category");
-    public string CreateItem => _localizer.Get("itemDialog.createItem");
-    public string EditItem => _localizer.Get("itemDialog.editItem");
-    public string Expired => _localizer.Get("itemDialog.expired");
-    public string Expiry => _localizer.Get("itemDialog.expiry");
-    public string IssuedUnits => _localizer.Get("itemDialog.issuedUnits");
-    public string IssueQuantityWarning => _localizer.Get("itemDialog.issueQuantityWarning");
-    public string IssueStock => _localizer.Get("itemDialog.issueStock");
-    public string ItemCreated => _localizer.Get("itemDialog.itemCreated");
-    public string ItemStockTitle => _localizer.Get("itemDialog.itemStockTitle");
-    public string ItemUpdated => _localizer.Get("itemDialog.itemUpdated");
-    public string LoadStockErrorTitle => _localizer.Get("itemDialog.loadStockErrorTitle");
-    public string Lot => _localizer.Get("itemDialog.lot");
-    public string LotsHint => _localizer.Get("itemDialog.lotsHint");
-    public string LotTracking => _localizer.Get("itemDialog.lotTracking");
-    public string NewItem => _localizer.Get("itemDialog.newItem");
-    public string NoBatches => _localizer.Get("itemDialog.noBatches");
-    public string Notes => _localizer.Get("itemDialog.notes");
-    public string Quantity => _localizer.Get("itemDialog.quantity");
-    public string Reference => _localizer.Get("itemDialog.reference");
-    public string Remaining => _localizer.Get("itemDialog.remaining");
-    public string ReorderLevel => _localizer.Get("itemDialog.reorderLevel");
-    public string ReorderQuantity => _localizer.Get("itemDialog.reorderQuantity");
-    public string SaveChanges => _localizer.Get("itemDialog.saveChanges");
-    public string StockOnHand => _localizer.Get("itemDialog.stockOnHand");
-    public string StorageInstructions => _localizer.Get("itemDialog.storageInstructions");
-    public string Unit => _localizer.Get("itemDialog.unit");
-    public string Unreachable => _localizer.Get("itemDialog.unreachable");
+    internal InventoryGroup(AppLocalizer localizer) : base(localizer) { }
+    public string AddFirstItem => Get("inventory.addFirstItem");
+    public string AddItem => Get("inventory.addItem");
+    public string Category => Get("inventory.category");
+    public string DeleteConfirm => Get("inventory.deleteConfirm");
+    public string DeleteItemTitle => Get("inventory.deleteItemTitle");
+    public string EmptyMessage => Get("inventory.emptyMessage");
+    public string ItemActivated => Get("inventory.itemActivated");
+    public string ItemDeactivated => Get("inventory.itemDeactivated");
+    public string ItemDeleted => Get("inventory.itemDeleted");
+    public string LoadErrorTitle => Get("inventory.loadErrorTitle");
+    public string LotTracked => Get("inventory.lotTracked");
+    public string NoItemsTitle => Get("inventory.noItemsTitle");
+    public string ReorderLevel => Get("inventory.reorderLevel");
+    public string ReorderQty => Get("inventory.reorderQty");
+    public string SearchPlaceholder => Get("inventory.searchPlaceholder");
+    public string Stock => Get("inventory.stock");
+    public string Subtitle => Get("inventory.subtitle");
+    public string Title => Get("inventory.title");
+    public string ToggleStatus => Get("inventory.toggleStatus");
+    public string Unit => Get("inventory.unit");
+    public string Unreachable => Get("inventory.unreachable");
 }
 
-public sealed class LandingGroup
+public sealed class ItemDialogGroup : LocalizerGroup
 {
-    private readonly AppLocalizer _localizer;
-    internal LandingGroup(AppLocalizer localizer) => _localizer = localizer;
-    public string Badge => _localizer.Get("landing.badge");
-    public string Footer => _localizer.Get("landing.footer");
-    public string Hint => _localizer.Get("landing.hint");
-    public string SignIn => _localizer.Get("landing.signIn");
-    public string Subtitle => _localizer.Get("landing.subtitle");
-    public string TitleLine1 => _localizer.Get("landing.titleLine1");
-    public string TitleLine2 => _localizer.Get("landing.titleLine2");
+    internal ItemDialogGroup(AppLocalizer localizer) : base(localizer) { }
+    public string Batches => Get("itemDialog.batches");
+    public string Brand => Get("itemDialog.brand");
+    public string Category => Get("itemDialog.category");
+    public string CreateItem => Get("itemDialog.createItem");
+    public string EditItem => Get("itemDialog.editItem");
+    public string Expired => Get("itemDialog.expired");
+    public string Expiry => Get("itemDialog.expiry");
+    public string IssuedUnits => Get("itemDialog.issuedUnits");
+    public string IssueQuantityWarning => Get("itemDialog.issueQuantityWarning");
+    public string IssueStock => Get("itemDialog.issueStock");
+    public string ItemCreated => Get("itemDialog.itemCreated");
+    public string ItemStockTitle => Get("itemDialog.itemStockTitle");
+    public string ItemUpdated => Get("itemDialog.itemUpdated");
+    public string LoadStockErrorTitle => Get("itemDialog.loadStockErrorTitle");
+    public string Lot => Get("itemDialog.lot");
+    public string LotsHint => Get("itemDialog.lotsHint");
+    public string LotTracking => Get("itemDialog.lotTracking");
+    public string NewItem => Get("itemDialog.newItem");
+    public string NoBatches => Get("itemDialog.noBatches");
+    public string Notes => Get("itemDialog.notes");
+    public string Quantity => Get("itemDialog.quantity");
+    public string Reference => Get("itemDialog.reference");
+    public string Remaining => Get("itemDialog.remaining");
+    public string ReorderLevel => Get("itemDialog.reorderLevel");
+    public string ReorderQuantity => Get("itemDialog.reorderQuantity");
+    public string SaveChanges => Get("itemDialog.saveChanges");
+    public string StockOnHand => Get("itemDialog.stockOnHand");
+    public string StorageInstructions => Get("itemDialog.storageInstructions");
+    public string Unit => Get("itemDialog.unit");
+    public string Unreachable => Get("itemDialog.unreachable");
+}
+
+public sealed class LandingGroup : LocalizerGroup
+{
+    internal LandingGroup(AppLocalizer localizer) : base(localizer) { }
+    public string Badge => Get("landing.badge");
+    public string Footer => Get("landing.footer");
+    public string Hint => Get("landing.hint");
+    public string SignIn => Get("landing.signIn");
+    public string Subtitle => Get("landing.subtitle");
+    public string TitleLine1 => Get("landing.titleLine1");
+    public string TitleLine2 => Get("landing.titleLine2");
 
     private FeatureGroup? _feature;
-    public FeatureGroup Feature => _feature ??= new FeatureGroup(_localizer);
+    public FeatureGroup Feature => _feature ??= new FeatureGroup(Localizer);
 
-    public sealed class FeatureGroup
+    public sealed class FeatureGroup : LocalizerGroup
     {
-        private readonly AppLocalizer _localizer;
-        internal FeatureGroup(AppLocalizer localizer) => _localizer = localizer;
-        public string Exams => _localizer.Get("landing.feature.exams");
-        public string Operations => _localizer.Get("landing.feature.operations");
-        public string Patients => _localizer.Get("landing.feature.patients");
+        internal FeatureGroup(AppLocalizer localizer) : base(localizer) { }
+        public string Exams => Get("landing.feature.exams");
+        public string Operations => Get("landing.feature.operations");
+        public string Patients => Get("landing.feature.patients");
     }
 }
 
-public sealed class LanguageGroup
+public sealed class LanguageGroup : LocalizerGroup
 {
-    private readonly AppLocalizer _localizer;
-    internal LanguageGroup(AppLocalizer localizer) => _localizer = localizer;
-    public string Arabic => _localizer.Get("language.arabic");
-    public string ArabicFlag => _localizer.Get("language.arabicFlag");
-    public string DialogTitle => _localizer.Get("language.dialogTitle");
-    public string English => _localizer.Get("language.english");
-    public string EnglishFlag => _localizer.Get("language.englishFlag");
-    public string Language => _localizer.Get("language.language");
+    internal LanguageGroup(AppLocalizer localizer) : base(localizer) { }
+    public string Arabic => Get("language.arabic");
+    public string ArabicFlag => Get("language.arabicFlag");
+    public string DialogTitle => Get("language.dialogTitle");
+    public string English => Get("language.english");
+    public string EnglishFlag => Get("language.englishFlag");
+    public string Language => Get("language.language");
 }
 
-public sealed class LayoutGroup
+public sealed class LayoutGroup : LocalizerGroup
 {
-    private readonly AppLocalizer _localizer;
-    internal LayoutGroup(AppLocalizer localizer) => _localizer = localizer;
-    public string ChangePassword => _localizer.Get("layout.changePassword");
-    public string NoNotifications => _localizer.Get("layout.noNotifications");
-    public string Notifications => _localizer.Get("layout.notifications");
-    public string SearchPlaceholder => _localizer.Get("layout.searchPlaceholder");
-    public string SignedOut => _localizer.Get("layout.signedOut");
-    public string SignOut => _localizer.Get("layout.signOut");
-    public string ToggleNav => _localizer.Get("layout.toggleNav");
+    internal LayoutGroup(AppLocalizer localizer) : base(localizer) { }
+    public string ChangePassword => Get("layout.changePassword");
+    public string NoNotifications => Get("layout.noNotifications");
+    public string Notifications => Get("layout.notifications");
+    public string SearchPlaceholder => Get("layout.searchPlaceholder");
+    public string SignedOut => Get("layout.signedOut");
+    public string SignOut => Get("layout.signOut");
+    public string ToggleNav => Get("layout.toggleNav");
 }
 
-public sealed class LeaveGroup
+public sealed class LeaveGroup : LocalizerGroup
 {
-    private readonly AppLocalizer _localizer;
-    internal LeaveGroup(AppLocalizer localizer) => _localizer = localizer;
-    public string Add => _localizer.Get("leave.add");
-    public string DeleteConfirm => _localizer.Get("leave.deleteConfirm");
-    public string Deleted => _localizer.Get("leave.deleted");
-    public string DeleteTitle => _localizer.Get("leave.deleteTitle");
-    public string Duration => _localizer.Get("leave.duration");
-    public string DurationDays => _localizer.Get("leave.durationDays");
-    public string EditLeave => _localizer.Get("leave.editLeave");
-    public string EmptyActionLabel => _localizer.Get("leave.emptyActionLabel");
-    public string EmptyMessage => _localizer.Get("leave.emptyMessage");
-    public string EmptyTitle => _localizer.Get("leave.emptyTitle");
-    public string EndDate => _localizer.Get("leave.endDate");
-    public string LoadErrorTitle => _localizer.Get("leave.loadErrorTitle");
-    public string NewLeave => _localizer.Get("leave.newLeave");
-    public string Reason => _localizer.Get("leave.reason");
-    public string SearchPlaceholder => _localizer.Get("leave.searchPlaceholder");
-    public string Staff => _localizer.Get("leave.staff");
-    public string StartDate => _localizer.Get("leave.startDate");
-    public string Subtitle => _localizer.Get("leave.subtitle");
-    public string Title => _localizer.Get("leave.title");
-    public string Unreachable => _localizer.Get("leave.unreachable");
+    internal LeaveGroup(AppLocalizer localizer) : base(localizer) { }
+    public string Add => Get("leave.add");
+    public string DeleteConfirm => Get("leave.deleteConfirm");
+    public string Deleted => Get("leave.deleted");
+    public string DeleteTitle => Get("leave.deleteTitle");
+    public string Duration => Get("leave.duration");
+    public string DurationDays => Get("leave.durationDays");
+    public string EditLeave => Get("leave.editLeave");
+    public string EmptyActionLabel => Get("leave.emptyActionLabel");
+    public string EmptyMessage => Get("leave.emptyMessage");
+    public string EmptyTitle => Get("leave.emptyTitle");
+    public string EndDate => Get("leave.endDate");
+    public string LoadErrorTitle => Get("leave.loadErrorTitle");
+    public string NewLeave => Get("leave.newLeave");
+    public string Reason => Get("leave.reason");
+    public string SearchPlaceholder => Get("leave.searchPlaceholder");
+    public string Staff => Get("leave.staff");
+    public string StartDate => Get("leave.startDate");
+    public string Subtitle => Get("leave.subtitle");
+    public string Title => Get("leave.title");
+    public string Unreachable => Get("leave.unreachable");
 }
 
-public sealed class LeaveDialogGroup
+public sealed class LeaveDialogGroup : LocalizerGroup
 {
-    private readonly AppLocalizer _localizer;
-    internal LeaveDialogGroup(AppLocalizer localizer) => _localizer = localizer;
-    public string Created => _localizer.Get("leaveDialog.created");
-    public string CreateLeave => _localizer.Get("leaveDialog.createLeave");
-    public string EndAfterStart => _localizer.Get("leaveDialog.endAfterStart");
-    public string LeaveType => _localizer.Get("leaveDialog.leaveType");
-    public string SaveChanges => _localizer.Get("leaveDialog.saveChanges");
-    public string SearchStaffError => _localizer.Get("leaveDialog.searchStaffError");
-    public string SelectDates => _localizer.Get("leaveDialog.selectDates");
-    public string SelectStaff => _localizer.Get("leaveDialog.selectStaff");
-    public string StaffSearch => _localizer.Get("leaveDialog.staffSearch");
-    public string Unreachable => _localizer.Get("leaveDialog.unreachable");
-    public string Updated => _localizer.Get("leaveDialog.updated");
+    internal LeaveDialogGroup(AppLocalizer localizer) : base(localizer) { }
+    public string Created => Get("leaveDialog.created");
+    public string CreateLeave => Get("leaveDialog.createLeave");
+    public string EndAfterStart => Get("leaveDialog.endAfterStart");
+    public string LeaveType => Get("leaveDialog.leaveType");
+    public string SaveChanges => Get("leaveDialog.saveChanges");
+    public string SearchStaffError => Get("leaveDialog.searchStaffError");
+    public string SelectDates => Get("leaveDialog.selectDates");
+    public string SelectStaff => Get("leaveDialog.selectStaff");
+    public string StaffSearch => Get("leaveDialog.staffSearch");
+    public string Unreachable => Get("leaveDialog.unreachable");
+    public string Updated => Get("leaveDialog.updated");
 }
 
-public sealed class LoginGroup
+public sealed class LoginGroup : LocalizerGroup
 {
-    private readonly AppLocalizer _localizer;
-    internal LoginGroup(AppLocalizer localizer) => _localizer = localizer;
-    public string DialogTitle => _localizer.Get("login.dialogTitle");
-    public string MustChangePassword => _localizer.Get("login.mustChangePassword");
-    public string Password => _localizer.Get("login.password");
-    public string Submit => _localizer.Get("login.submit");
-    public string Subtitle => _localizer.Get("login.subtitle");
-    public string Title => _localizer.Get("login.title");
-    public string Unreachable => _localizer.Get("login.unreachable");
-    public string Username => _localizer.Get("login.username");
-    public string Welcome => _localizer.Get("login.welcome");
+    internal LoginGroup(AppLocalizer localizer) : base(localizer) { }
+    public string DialogTitle => Get("login.dialogTitle");
+    public string MustChangePassword => Get("login.mustChangePassword");
+    public string Password => Get("login.password");
+    public string Submit => Get("login.submit");
+    public string Subtitle => Get("login.subtitle");
+    public string Title => Get("login.title");
+    public string Unreachable => Get("login.unreachable");
+    public string Username => Get("login.username");
+    public string Welcome => Get("login.welcome");
 }
 
-public sealed class MessageDialogGroup
+public sealed class MessageDialogGroup : LocalizerGroup
 {
-    private readonly AppLocalizer _localizer;
-    internal MessageDialogGroup(AppLocalizer localizer) => _localizer = localizer;
-    public string Attempts => _localizer.Get("messageDialog.attempts");
-    public string Body => _localizer.Get("messageDialog.body");
-    public string Channel => _localizer.Get("messageDialog.channel");
-    public string FailureReason => _localizer.Get("messageDialog.failureReason");
-    public string Recipient => _localizer.Get("messageDialog.recipient");
-    public string Reference => _localizer.Get("messageDialog.reference");
-    public string SentAt => _localizer.Get("messageDialog.sentAt");
-    public string Subject => _localizer.Get("messageDialog.subject");
-    public string Template => _localizer.Get("messageDialog.template");
-    public string Title => _localizer.Get("messageDialog.title");
+    internal MessageDialogGroup(AppLocalizer localizer) : base(localizer) { }
+    public string Attempts => Get("messageDialog.attempts");
+    public string Body => Get("messageDialog.body");
+    public string Channel => Get("messageDialog.channel");
+    public string FailureReason => Get("messageDialog.failureReason");
+    public string Recipient => Get("messageDialog.recipient");
+    public string Reference => Get("messageDialog.reference");
+    public string SentAt => Get("messageDialog.sentAt");
+    public string Subject => Get("messageDialog.subject");
+    public string Template => Get("messageDialog.template");
+    public string Title => Get("messageDialog.title");
 }
 
-public sealed class NavGroup
+public sealed class NavGroup : LocalizerGroup
 {
-    private readonly AppLocalizer _localizer;
-    internal NavGroup(AppLocalizer localizer) => _localizer = localizer;
-    public string Administration => _localizer.Get("nav.administration");
-    public string Allowances => _localizer.Get("nav.allowances");
-    public string Analytics => _localizer.Get("nav.analytics");
-    public string Cash => _localizer.Get("nav.cash");
-    public string CashSessions => _localizer.Get("nav.cashSessions");
-    public string Claims => _localizer.Get("nav.claims");
-    public string Companies => _localizer.Get("nav.companies");
-    public string Dashboard => _localizer.Get("nav.dashboard");
-    public string Equipment => _localizer.Get("nav.equipment");
-    public string ExaminationFees => _localizer.Get("nav.examinationFees");
-    public string Examinations => _localizer.Get("nav.examinations");
-    public string Financials => _localizer.Get("nav.financials");
-    public string Insurance => _localizer.Get("nav.insurance");
-    public string Inventory => _localizer.Get("nav.inventory");
-    public string Leave => _localizer.Get("nav.leave");
-    public string Messages => _localizer.Get("nav.messages");
-    public string Notifications => _localizer.Get("nav.notifications");
-    public string Operations => _localizer.Get("nav.operations");
-    public string Overview => _localizer.Get("nav.overview");
-    public string Patients => _localizer.Get("nav.patients");
-    public string Payroll => _localizer.Get("nav.payroll");
-    public string PayRuns => _localizer.Get("nav.payRuns");
-    public string Policies => _localizer.Get("nav.policies");
-    public string PreAuthorizations => _localizer.Get("nav.preAuthorizations");
-    public string PurchaseOrders => _localizer.Get("nav.purchaseOrders");
-    public string ReadingRoom => _localizer.Get("nav.readingRoom");
-    public string ReferralDoctors => _localizer.Get("nav.referralDoctors");
-    public string ReferralFees => _localizer.Get("nav.referralFees");
-    public string Resources => _localizer.Get("nav.resources");
-    public string Roles => _localizer.Get("nav.roles");
-    public string Salaries => _localizer.Get("nav.salaries");
-    public string SalaryComponents => _localizer.Get("nav.salaryComponents");
-    public string Staff => _localizer.Get("nav.staff");
-    public string StaffMachines => _localizer.Get("nav.staffMachines");
-    public string StockMovements => _localizer.Get("nav.stockMovements");
-    public string Suppliers => _localizer.Get("nav.suppliers");
-    public string Templates => _localizer.Get("nav.templates");
-    public string Users => _localizer.Get("nav.users");
-    public string Visits => _localizer.Get("nav.visits");
-    public string WorkShifts => _localizer.Get("nav.workShifts");
+    internal NavGroup(AppLocalizer localizer) : base(localizer) { }
+    public string Administration => Get("nav.administration");
+    public string Allowances => Get("nav.allowances");
+    public string Analytics => Get("nav.analytics");
+    public string Cash => Get("nav.cash");
+    public string CashSessions => Get("nav.cashSessions");
+    public string Claims => Get("nav.claims");
+    public string Companies => Get("nav.companies");
+    public string Dashboard => Get("nav.dashboard");
+    public string Equipment => Get("nav.equipment");
+    public string ExaminationFees => Get("nav.examinationFees");
+    public string Examinations => Get("nav.examinations");
+    public string Financials => Get("nav.financials");
+    public string Insurance => Get("nav.insurance");
+    public string Inventory => Get("nav.inventory");
+    public string Leave => Get("nav.leave");
+    public string Messages => Get("nav.messages");
+    public string Notifications => Get("nav.notifications");
+    public string Operations => Get("nav.operations");
+    public string Overview => Get("nav.overview");
+    public string Patients => Get("nav.patients");
+    public string Payroll => Get("nav.payroll");
+    public string PayRuns => Get("nav.payRuns");
+    public string Policies => Get("nav.policies");
+    public string PreAuthorizations => Get("nav.preAuthorizations");
+    public string PurchaseOrders => Get("nav.purchaseOrders");
+    public string ReadingRoom => Get("nav.readingRoom");
+    public string ReferralDoctors => Get("nav.referralDoctors");
+    public string ReferralFees => Get("nav.referralFees");
+    public string Resources => Get("nav.resources");
+    public string Roles => Get("nav.roles");
+    public string Salaries => Get("nav.salaries");
+    public string SalaryComponents => Get("nav.salaryComponents");
+    public string Staff => Get("nav.staff");
+    public string StaffMachines => Get("nav.staffMachines");
+    public string StockMovements => Get("nav.stockMovements");
+    public string Suppliers => Get("nav.suppliers");
+    public string Templates => Get("nav.templates");
+    public string Users => Get("nav.users");
+    public string Visits => Get("nav.visits");
+    public string WorkShifts => Get("nav.workShifts");
 }
 
-public sealed class NotFoundGroup
+public sealed class NotFoundGroup : LocalizerGroup
 {
-    private readonly AppLocalizer _localizer;
-    internal NotFoundGroup(AppLocalizer localizer) => _localizer = localizer;
-    public string Action => _localizer.Get("notFound.action");
-    public string Message => _localizer.Get("notFound.message");
-    public string Title => _localizer.Get("notFound.title");
+    internal NotFoundGroup(AppLocalizer localizer) : base(localizer) { }
+    public string Action => Get("notFound.action");
+    public string Message => Get("notFound.message");
+    public string Title => Get("notFound.title");
 }
 
-public sealed class NotificationsGroup
+public sealed class NotificationsGroup : LocalizerGroup
 {
-    private readonly AppLocalizer _localizer;
-    internal NotificationsGroup(AppLocalizer localizer) => _localizer = localizer;
-    public string Activated => _localizer.Get("notifications.activated");
-    public string Attempts => _localizer.Get("notifications.attempts");
-    public string Body => _localizer.Get("notifications.body");
-    public string Channel => _localizer.Get("notifications.channel");
-    public string Code => _localizer.Get("notifications.code");
-    public string Deactivated => _localizer.Get("notifications.deactivated");
-    public string DeleteConfirm => _localizer.Get("notifications.deleteConfirm");
-    public string Deleted => _localizer.Get("notifications.deleted");
-    public string DeleteTitle => _localizer.Get("notifications.deleteTitle");
-    public string EditTemplateTitle => _localizer.Get("notifications.editTemplateTitle");
-    public string EmptyActionLabel => _localizer.Get("notifications.emptyActionLabel");
-    public string EmptyMessage => _localizer.Get("notifications.emptyMessage");
-    public string EmptyTitle => _localizer.Get("notifications.emptyTitle");
-    public string LoadErrorTitle => _localizer.Get("notifications.loadErrorTitle");
-    public string MessagesEmptyActionLabel => _localizer.Get("notifications.messagesEmptyActionLabel");
-    public string MessagesEmptyMessage => _localizer.Get("notifications.messagesEmptyMessage");
-    public string MessagesEmptyTitle => _localizer.Get("notifications.messagesEmptyTitle");
-    public string MessagesSearchPlaceholder => _localizer.Get("notifications.messagesSearchPlaceholder");
-    public string MessagesSubtitle => _localizer.Get("notifications.messagesSubtitle");
-    public string MessagesTitle => _localizer.Get("notifications.messagesTitle");
-    public string NewTemplate => _localizer.Get("notifications.newTemplate");
-    public string NewTemplateDialogTitle => _localizer.Get("notifications.newTemplateDialogTitle");
-    public string Recipient => _localizer.Get("notifications.recipient");
-    public string Reference => _localizer.Get("notifications.reference");
-    public string SearchPlaceholder => _localizer.Get("notifications.searchPlaceholder");
-    public string SentAt => _localizer.Get("notifications.sentAt");
-    public string Subject => _localizer.Get("notifications.subject");
-    public string Subtitle => _localizer.Get("notifications.subtitle");
-    public string Title => _localizer.Get("notifications.title");
-    public string ToggleStatus => _localizer.Get("notifications.toggleStatus");
-    public string Unreachable => _localizer.Get("notifications.unreachable");
-    public string View => _localizer.Get("notifications.view");
+    internal NotificationsGroup(AppLocalizer localizer) : base(localizer) { }
+    public string Activated => Get("notifications.activated");
+    public string Attempts => Get("notifications.attempts");
+    public string Body => Get("notifications.body");
+    public string Channel => Get("notifications.channel");
+    public string Code => Get("notifications.code");
+    public string Deactivated => Get("notifications.deactivated");
+    public string DeleteConfirm => Get("notifications.deleteConfirm");
+    public string Deleted => Get("notifications.deleted");
+    public string DeleteTitle => Get("notifications.deleteTitle");
+    public string EditTemplateTitle => Get("notifications.editTemplateTitle");
+    public string EmptyActionLabel => Get("notifications.emptyActionLabel");
+    public string EmptyMessage => Get("notifications.emptyMessage");
+    public string EmptyTitle => Get("notifications.emptyTitle");
+    public string LoadErrorTitle => Get("notifications.loadErrorTitle");
+    public string MessagesEmptyActionLabel => Get("notifications.messagesEmptyActionLabel");
+    public string MessagesEmptyMessage => Get("notifications.messagesEmptyMessage");
+    public string MessagesEmptyTitle => Get("notifications.messagesEmptyTitle");
+    public string MessagesSearchPlaceholder => Get("notifications.messagesSearchPlaceholder");
+    public string MessagesSubtitle => Get("notifications.messagesSubtitle");
+    public string MessagesTitle => Get("notifications.messagesTitle");
+    public string NewTemplate => Get("notifications.newTemplate");
+    public string NewTemplateDialogTitle => Get("notifications.newTemplateDialogTitle");
+    public string Recipient => Get("notifications.recipient");
+    public string Reference => Get("notifications.reference");
+    public string SearchPlaceholder => Get("notifications.searchPlaceholder");
+    public string SentAt => Get("notifications.sentAt");
+    public string Subject => Get("notifications.subject");
+    public string Subtitle => Get("notifications.subtitle");
+    public string Title => Get("notifications.title");
+    public string ToggleStatus => Get("notifications.toggleStatus");
+    public string Unreachable => Get("notifications.unreachable");
+    public string View => Get("notifications.view");
 }
 
-public sealed class OpenCashGroup
+public sealed class OpenCashGroup : LocalizerGroup
 {
-    private readonly AppLocalizer _localizer;
-    internal OpenCashGroup(AppLocalizer localizer) => _localizer = localizer;
-    public string Notes => _localizer.Get("openCash.notes");
-    public string Opened => _localizer.Get("openCash.opened");
-    public string OpeningFloat => _localizer.Get("openCash.openingFloat");
-    public string OpeningFloatHint => _localizer.Get("openCash.openingFloatHint");
-    public string Submit => _localizer.Get("openCash.submit");
-    public string Title => _localizer.Get("openCash.title");
-    public string UnreachableRetry => _localizer.Get("openCash.unreachableRetry");
+    internal OpenCashGroup(AppLocalizer localizer) : base(localizer) { }
+    public string Notes => Get("openCash.notes");
+    public string Opened => Get("openCash.opened");
+    public string OpeningFloat => Get("openCash.openingFloat");
+    public string OpeningFloatHint => Get("openCash.openingFloatHint");
+    public string Submit => Get("openCash.submit");
+    public string Title => Get("openCash.title");
+    public string UnreachableRetry => Get("openCash.unreachableRetry");
 }
 
-public sealed class OperationalGroup
+public sealed class OperationalGroup : LocalizerGroup
 {
-    private readonly AppLocalizer _localizer;
-    internal OperationalGroup(AppLocalizer localizer) => _localizer = localizer;
-    public string AvgDuration => _localizer.Get("operational.avgDuration");
-    public string AvgTimeToStart => _localizer.Get("operational.avgTimeToStart");
-    public string Cancelled => _localizer.Get("operational.cancelled");
-    public string Completed => _localizer.Get("operational.completed");
-    public string CompletedOverTerminal => _localizer.Get("operational.completedOverTerminal");
-    public string CompletionRate => _localizer.Get("operational.completionRate");
-    public string Count => _localizer.Get("operational.count");
-    public string DidNotComplete => _localizer.Get("operational.didNotComplete");
-    public string DistributionOfExamPriority => _localizer.Get("operational.distributionOfExamPriority");
-    public string ExamsInEachState => _localizer.Get("operational.examsInEachState");
-    public string ExamToCompletion => _localizer.Get("operational.examToCompletion");
-    public string FinishedReading => _localizer.Get("operational.finishedReading");
-    public string LoadErrorMsg => _localizer.Get("operational.loadErrorMsg");
-    public string LoadErrorTitle => _localizer.Get("operational.loadErrorTitle");
-    public string Registered => _localizer.Get("operational.registered");
-    public string Retry => _localizer.Get("operational.retry");
-    public string ScheduledToStarted => _localizer.Get("operational.scheduledToStarted");
-    public string StatusFunnel => _localizer.Get("operational.statusFunnel");
-    public string Subtitle => _localizer.Get("operational.subtitle");
-    public string Title => _localizer.Get("operational.title");
-    public string TotalExams => _localizer.Get("operational.totalExams");
-    public string TotalVsCompleted => _localizer.Get("operational.totalVsCompleted");
-    public string TotalVsCompletedExams => _localizer.Get("operational.totalVsCompletedExams");
-    public string VolumeByModality => _localizer.Get("operational.volumeByModality");
-    public string VolumeByMonth => _localizer.Get("operational.volumeByMonth");
-    public string WorkloadByPriority => _localizer.Get("operational.workloadByPriority");
+    internal OperationalGroup(AppLocalizer localizer) : base(localizer) { }
+    public string AvgDuration => Get("operational.avgDuration");
+    public string AvgTimeToStart => Get("operational.avgTimeToStart");
+    public string Cancelled => Get("operational.cancelled");
+    public string Completed => Get("operational.completed");
+    public string CompletedOverTerminal => Get("operational.completedOverTerminal");
+    public string CompletionRate => Get("operational.completionRate");
+    public string Count => Get("operational.count");
+    public string DidNotComplete => Get("operational.didNotComplete");
+    public string DistributionOfExamPriority => Get("operational.distributionOfExamPriority");
+    public string ExamsInEachState => Get("operational.examsInEachState");
+    public string ExamToCompletion => Get("operational.examToCompletion");
+    public string FinishedReading => Get("operational.finishedReading");
+    public string LoadErrorMsg => Get("operational.loadErrorMsg");
+    public string LoadErrorTitle => Get("operational.loadErrorTitle");
+    public string Registered => Get("operational.registered");
+    public string Retry => Get("operational.retry");
+    public string ScheduledToStarted => Get("operational.scheduledToStarted");
+    public string StatusFunnel => Get("operational.statusFunnel");
+    public string Subtitle => Get("operational.subtitle");
+    public string Title => Get("operational.title");
+    public string TotalExams => Get("operational.totalExams");
+    public string TotalVsCompleted => Get("operational.totalVsCompleted");
+    public string TotalVsCompletedExams => Get("operational.totalVsCompletedExams");
+    public string VolumeByModality => Get("operational.volumeByModality");
+    public string VolumeByMonth => Get("operational.volumeByMonth");
+    public string WorkloadByPriority => Get("operational.workloadByPriority");
 }
 
-public sealed class OverviewGroup
+public sealed class OverviewGroup : LocalizerGroup
 {
-    private readonly AppLocalizer _localizer;
-    internal OverviewGroup(AppLocalizer localizer) => _localizer = localizer;
-    public string AvgPerExam => _localizer.Get("overview.avgPerExam");
-    public string Billed => _localizer.Get("overview.billed");
-    public string CollectedVsBilledByMonth => _localizer.Get("overview.collectedVsBilledByMonth");
-    public string CostStructure => _localizer.Get("overview.costStructure");
-    public string DiscountsGiven => _localizer.Get("overview.discountsGiven");
-    public string ExamCount => _localizer.Get("overview.examCount");
-    public string FormatMillion => _localizer.Get("overview.formatMillion");
-    public string FormatThousand => _localizer.Get("overview.formatThousand");
-    public string FromRevenueToProfit => _localizer.Get("overview.fromRevenueToProfit");
-    public string GeneratedRevenue => _localizer.Get("overview.generatedRevenue");
-    public string Labor => _localizer.Get("overview.labor");
-    public string LaborPayroll => _localizer.Get("overview.laborPayroll");
-    public string LoadErrorMsg => _localizer.Get("overview.loadErrorMsg");
-    public string LoadErrorTitle => _localizer.Get("overview.loadErrorTitle");
-    public string Margin => _localizer.Get("overview.margin");
-    public string Materials => _localizer.Get("overview.materials");
-    public string NetIncomeWaterfall => _localizer.Get("overview.netIncomeWaterfall");
-    public string NetInvoicesPayments => _localizer.Get("overview.netInvoicesPayments");
-    public string NetProfit => _localizer.Get("overview.netProfit");
-    public string NoCosts => _localizer.Get("overview.noCosts");
-    public string OutstandingBalances => _localizer.Get("overview.outstandingBalances");
-    public string OutstandingReceivable => _localizer.Get("overview.outstandingReceivable");
-    public string ReceivableAging => _localizer.Get("overview.receivableAging");
-    public string ReferralFees => _localizer.Get("overview.referralFees");
-    public string Retry => _localizer.Get("overview.retry");
-    public string Revenue => _localizer.Get("overview.revenue");
-    public string RevenueCollected => _localizer.Get("overview.revenueCollected");
-    public string RevenueStream => _localizer.Get("overview.revenueStream");
-    public string RevenueTrend => _localizer.Get("overview.revenueTrend");
-    public string StaffCaseFees => _localizer.Get("overview.staffCaseFees");
-    public string StaffFees => _localizer.Get("overview.staffFees");
-    public string Subtitle => _localizer.Get("overview.subtitle");
-    public string Title => _localizer.Get("overview.title");
-    public string TotalBilled => _localizer.Get("overview.totalBilled");
-    public string TotalCosts => _localizer.Get("overview.totalCosts");
-    public string WhereTheMoneyGoes => _localizer.Get("overview.whereTheMoneyGoes");
+    internal OverviewGroup(AppLocalizer localizer) : base(localizer) { }
+    public string AvgPerExam => Get("overview.avgPerExam");
+    public string Billed => Get("overview.billed");
+    public string CollectedVsBilledByMonth => Get("overview.collectedVsBilledByMonth");
+    public string CostStructure => Get("overview.costStructure");
+    public string DiscountsGiven => Get("overview.discountsGiven");
+    public string ExamCount => Get("overview.examCount");
+    public string FormatMillion => Get("overview.formatMillion");
+    public string FormatThousand => Get("overview.formatThousand");
+    public string FromRevenueToProfit => Get("overview.fromRevenueToProfit");
+    public string GeneratedRevenue => Get("overview.generatedRevenue");
+    public string Labor => Get("overview.labor");
+    public string LaborPayroll => Get("overview.laborPayroll");
+    public string LoadErrorMsg => Get("overview.loadErrorMsg");
+    public string LoadErrorTitle => Get("overview.loadErrorTitle");
+    public string Margin => Get("overview.margin");
+    public string Materials => Get("overview.materials");
+    public string NetIncomeWaterfall => Get("overview.netIncomeWaterfall");
+    public string NetInvoicesPayments => Get("overview.netInvoicesPayments");
+    public string NetProfit => Get("overview.netProfit");
+    public string NoCosts => Get("overview.noCosts");
+    public string OutstandingBalances => Get("overview.outstandingBalances");
+    public string OutstandingReceivable => Get("overview.outstandingReceivable");
+    public string ReceivableAging => Get("overview.receivableAging");
+    public string ReferralFees => Get("overview.referralFees");
+    public string Retry => Get("overview.retry");
+    public string Revenue => Get("overview.revenue");
+    public string RevenueCollected => Get("overview.revenueCollected");
+    public string RevenueStream => Get("overview.revenueStream");
+    public string RevenueTrend => Get("overview.revenueTrend");
+    public string StaffCaseFees => Get("overview.staffCaseFees");
+    public string StaffFees => Get("overview.staffFees");
+    public string Subtitle => Get("overview.subtitle");
+    public string Title => Get("overview.title");
+    public string TotalBilled => Get("overview.totalBilled");
+    public string TotalCosts => Get("overview.totalCosts");
+    public string WhereTheMoneyGoes => Get("overview.whereTheMoneyGoes");
 }
 
-public sealed class PatientDialogGroup
+public sealed class PatientDialogGroup : LocalizerGroup
 {
-    private readonly AppLocalizer _localizer;
-    internal PatientDialogGroup(AppLocalizer localizer) => _localizer = localizer;
-    public string Address => _localizer.Get("patientDialog.address");
-    public string Age => _localizer.Get("patientDialog.age");
-    public string Allergies => _localizer.Get("patientDialog.allergies");
-    public string BloodType => _localizer.Get("patientDialog.bloodType");
-    public string Created => _localizer.Get("patientDialog.created");
-    public string CreatePatient => _localizer.Get("patientDialog.createPatient");
-    public string DateOfBirth => _localizer.Get("patientDialog.dateOfBirth");
-    public string EditTitle => _localizer.Get("patientDialog.editTitle");
-    public string Email => _localizer.Get("patientDialog.email");
-    public string FullName => _localizer.Get("patientDialog.fullName");
-    public string Gender => _localizer.Get("patientDialog.gender");
-    public string MedicalHistory => _localizer.Get("patientDialog.medicalHistory");
-    public string NationalId => _localizer.Get("patientDialog.nationalId");
-    public string NewTitle => _localizer.Get("patientDialog.newTitle");
-    public string PhoneNumber => _localizer.Get("patientDialog.phoneNumber");
-    public string ReferringPhysician => _localizer.Get("patientDialog.referringPhysician");
-    public string SaveChanges => _localizer.Get("patientDialog.saveChanges");
-    public string Unreachable => _localizer.Get("patientDialog.unreachable");
-    public string Updated => _localizer.Get("patientDialog.updated");
+    internal PatientDialogGroup(AppLocalizer localizer) : base(localizer) { }
+    public string Address => Get("patientDialog.address");
+    public string Age => Get("patientDialog.age");
+    public string Allergies => Get("patientDialog.allergies");
+    public string BloodType => Get("patientDialog.bloodType");
+    public string Created => Get("patientDialog.created");
+    public string CreatePatient => Get("patientDialog.createPatient");
+    public string DateOfBirth => Get("patientDialog.dateOfBirth");
+    public string EditTitle => Get("patientDialog.editTitle");
+    public string Email => Get("patientDialog.email");
+    public string FullName => Get("patientDialog.fullName");
+    public string Gender => Get("patientDialog.gender");
+    public string MedicalHistory => Get("patientDialog.medicalHistory");
+    public string NationalId => Get("patientDialog.nationalId");
+    public string NewTitle => Get("patientDialog.newTitle");
+    public string PhoneNumber => Get("patientDialog.phoneNumber");
+    public string ReferringPhysician => Get("patientDialog.referringPhysician");
+    public string SaveChanges => Get("patientDialog.saveChanges");
+    public string Unreachable => Get("patientDialog.unreachable");
+    public string Updated => Get("patientDialog.updated");
 }
 
-public sealed class PatientsGroup
+public sealed class PatientsGroup : LocalizerGroup
 {
-    private readonly AppLocalizer _localizer;
-    internal PatientsGroup(AppLocalizer localizer) => _localizer = localizer;
-    public string Activated => _localizer.Get("patients.activated");
-    public string AddPatient => _localizer.Get("patients.addPatient");
-    public string Age => _localizer.Get("patients.age");
-    public string Code => _localizer.Get("patients.code");
-    public string Deactivated => _localizer.Get("patients.deactivated");
-    public string DeleteConfirm => _localizer.Get("patients.deleteConfirm");
-    public string Deleted => _localizer.Get("patients.deleted");
-    public string DeleteTitle => _localizer.Get("patients.deleteTitle");
-    public string EditPatient => _localizer.Get("patients.editPatient");
-    public string EmptyAction => _localizer.Get("patients.emptyAction");
-    public string EmptyMessage => _localizer.Get("patients.emptyMessage");
-    public string EmptyTitle => _localizer.Get("patients.emptyTitle");
-    public string Gender => _localizer.Get("patients.gender");
-    public string LoadErrorTitle => _localizer.Get("patients.loadErrorTitle");
-    public string NewPatient => _localizer.Get("patients.newPatient");
-    public string Phone => _localizer.Get("patients.phone");
-    public string Registered => _localizer.Get("patients.registered");
-    public string SearchPlaceholder => _localizer.Get("patients.searchPlaceholder");
-    public string Subtitle => _localizer.Get("patients.subtitle");
-    public string Title => _localizer.Get("patients.title");
-    public string ToggleStatus => _localizer.Get("patients.toggleStatus");
-    public string Unreachable => _localizer.Get("patients.unreachable");
+    internal PatientsGroup(AppLocalizer localizer) : base(localizer) { }
+    public string Activated => Get("patients.activated");
+    public string AddPatient => Get("patients.addPatient");
+    public string Age => Get("patients.age");
+    public string Code => Get("patients.code");
+    public string Deactivated => Get("patients.deactivated");
+    public string DeleteConfirm => Get("patients.deleteConfirm");
+    public string Deleted => Get("patients.deleted");
+    public string DeleteTitle => Get("patients.deleteTitle");
+    public string EditPatient => Get("patients.editPatient");
+    public string EmptyAction => Get("patients.emptyAction");
+    public string EmptyMessage => Get("patients.emptyMessage");
+    public string EmptyTitle => Get("patients.emptyTitle");
+    public string Gender => Get("patients.gender");
+    public string LoadErrorTitle => Get("patients.loadErrorTitle");
+    public string NewPatient => Get("patients.newPatient");
+    public string Phone => Get("patients.phone");
+    public string Registered => Get("patients.registered");
+    public string SearchPlaceholder => Get("patients.searchPlaceholder");
+    public string Subtitle => Get("patients.subtitle");
+    public string Title => Get("patients.title");
+    public string ToggleStatus => Get("patients.toggleStatus");
+    public string Unreachable => Get("patients.unreachable");
 }
 
-public sealed class PayrollGroup
+public sealed class PayrollGroup : LocalizerGroup
 {
-    private readonly AppLocalizer _localizer;
-    internal PayrollGroup(AppLocalizer localizer) => _localizer = localizer;
-    public string Approved => _localizer.Get("payroll.approved");
-    public string Computed => _localizer.Get("payroll.computed");
-    public string DeleteConfirm => _localizer.Get("payroll.deleteConfirm");
-    public string Deleted => _localizer.Get("payroll.deleted");
-    public string DeleteTitle => _localizer.Get("payroll.deleteTitle");
-    public string Draft => _localizer.Get("payroll.draft");
-    public string Employees => _localizer.Get("payroll.employees");
-    public string EmptyActionLabel => _localizer.Get("payroll.emptyActionLabel");
-    public string EmptyMessage => _localizer.Get("payroll.emptyMessage");
-    public string EmptyTitle => _localizer.Get("payroll.emptyTitle");
-    public string LoadErrorTitle => _localizer.Get("payroll.loadErrorTitle");
-    public string NetPay => _localizer.Get("payroll.netPay");
-    public string NewPayRun => _localizer.Get("payroll.newPayRun");
-    public string Notes => _localizer.Get("payroll.notes");
-    public string OnPage => _localizer.Get("payroll.onPage");
-    public string Paid => _localizer.Get("payroll.paid");
-    public string PayRunDetailTitle => _localizer.Get("payroll.payRunDetailTitle");
-    public string PayRunsTitle => _localizer.Get("payroll.payRunsTitle");
-    public string Period => _localizer.Get("payroll.period");
-    public string Processed => _localizer.Get("payroll.processed");
-    public string Rejected => _localizer.Get("payroll.rejected");
-    public string SearchPlaceholder => _localizer.Get("payroll.searchPlaceholder");
-    public string Subtitle => _localizer.Get("payroll.subtitle");
-    public string Unreachable => _localizer.Get("payroll.unreachable");
-    public string View => _localizer.Get("payroll.view");
+    internal PayrollGroup(AppLocalizer localizer) : base(localizer) { }
+    public string Approved => Get("payroll.approved");
+    public string Computed => Get("payroll.computed");
+    public string DeleteConfirm => Get("payroll.deleteConfirm");
+    public string Deleted => Get("payroll.deleted");
+    public string DeleteTitle => Get("payroll.deleteTitle");
+    public string Draft => Get("payroll.draft");
+    public string Employees => Get("payroll.employees");
+    public string EmptyActionLabel => Get("payroll.emptyActionLabel");
+    public string EmptyMessage => Get("payroll.emptyMessage");
+    public string EmptyTitle => Get("payroll.emptyTitle");
+    public string LoadErrorTitle => Get("payroll.loadErrorTitle");
+    public string NetPay => Get("payroll.netPay");
+    public string NewPayRun => Get("payroll.newPayRun");
+    public string Notes => Get("payroll.notes");
+    public string OnPage => Get("payroll.onPage");
+    public string Paid => Get("payroll.paid");
+    public string PayRunDetailTitle => Get("payroll.payRunDetailTitle");
+    public string PayRunsTitle => Get("payroll.payRunsTitle");
+    public string Period => Get("payroll.period");
+    public string Processed => Get("payroll.processed");
+    public string Rejected => Get("payroll.rejected");
+    public string SearchPlaceholder => Get("payroll.searchPlaceholder");
+    public string Subtitle => Get("payroll.subtitle");
+    public string Unreachable => Get("payroll.unreachable");
+    public string View => Get("payroll.view");
 }
 
-public sealed class PayRunDialogGroup
+public sealed class PayRunDialogGroup : LocalizerGroup
 {
-    private readonly AppLocalizer _localizer;
-    internal PayRunDialogGroup(AppLocalizer localizer) => _localizer = localizer;
-    public string AddError => _localizer.Get("payRunDialog.addError");
-    public string Amount => _localizer.Get("payRunDialog.amount");
-    public string Approve => _localizer.Get("payRunDialog.approve");
-    public string ApproveConfirm => _localizer.Get("payRunDialog.approveConfirm");
-    public string ApproveTitle => _localizer.Get("payRunDialog.approveTitle");
-    public string Breakdown => _localizer.Get("payRunDialog.breakdown");
-    public string By => _localizer.Get("payRunDialog.by");
-    public string Component => _localizer.Get("payRunDialog.component");
-    public string Compute => _localizer.Get("payRunDialog.compute");
-    public string ComputeConfirm => _localizer.Get("payRunDialog.computeConfirm");
-    public string ComputeTitle => _localizer.Get("payRunDialog.computeTitle");
-    public string Create => _localizer.Get("payRunDialog.create");
-    public string Created => _localizer.Get("payRunDialog.created");
-    public string CreateTitle => _localizer.Get("payRunDialog.createTitle");
-    public string Deduction => _localizer.Get("payRunDialog.deduction");
-    public string Deductions => _localizer.Get("payRunDialog.deductions");
-    public string DetailTitle => _localizer.Get("payRunDialog.detailTitle");
-    public string Earning => _localizer.Get("payRunDialog.earning");
-    public string Earnings => _localizer.Get("payRunDialog.earnings");
-    public string Employee => _localizer.Get("payRunDialog.employee");
-    public string Employees => _localizer.Get("payRunDialog.employees");
-    public string Gross => _localizer.Get("payRunDialog.gross");
-    public string LifecycleDone => _localizer.Get("payRunDialog.lifecycleDone");
-    public string LoadError => _localizer.Get("payRunDialog.loadError");
-    public string Net => _localizer.Get("payRunDialog.net");
-    public string NoComponents => _localizer.Get("payRunDialog.noComponents");
-    public string NoPayslips => _localizer.Get("payRunDialog.noPayslips");
-    public string Notes => _localizer.Get("payRunDialog.notes");
-    public string NotProcessed => _localizer.Get("payRunDialog.notProcessed");
-    public string Pay => _localizer.Get("payRunDialog.pay");
-    public string PayConfirm => _localizer.Get("payRunDialog.payConfirm");
-    public string PayslipAdded => _localizer.Get("payRunDialog.payslipAdded");
-    public string PayslipRemoved => _localizer.Get("payRunDialog.payslipRemoved");
-    public string Payslips => _localizer.Get("payRunDialog.payslips");
-    public string PayTitle => _localizer.Get("payRunDialog.payTitle");
-    public string Period => _localizer.Get("payRunDialog.period");
-    public string PeriodFrom => _localizer.Get("payRunDialog.periodFrom");
-    public string PeriodTo => _localizer.Get("payRunDialog.periodTo");
-    public string PeriodToAfterFrom => _localizer.Get("payRunDialog.periodToAfterFrom");
-    public string Processed => _localizer.Get("payRunDialog.processed");
-    public string Reject => _localizer.Get("payRunDialog.reject");
-    public string RejectConfirm => _localizer.Get("payRunDialog.rejectConfirm");
-    public string RejectTitle => _localizer.Get("payRunDialog.rejectTitle");
-    public string ReloadError => _localizer.Get("payRunDialog.reloadError");
-    public string Remove => _localizer.Get("payRunDialog.remove");
-    public string RemoveConfirm => _localizer.Get("payRunDialog.removeConfirm");
-    public string RemoveError => _localizer.Get("payRunDialog.removeError");
-    public string RemovePayslip => _localizer.Get("payRunDialog.removePayslip");
-    public string RemovePayslipTitle => _localizer.Get("payRunDialog.removePayslipTitle");
-    public string Restart => _localizer.Get("payRunDialog.restart");
-    public string RestartConfirm => _localizer.Get("payRunDialog.restartConfirm");
-    public string RestartTitle => _localizer.Get("payRunDialog.restartTitle");
-    public string SelectBothDates => _localizer.Get("payRunDialog.selectBothDates");
-    public string ServerError => _localizer.Get("payRunDialog.serverError");
-    public string Title => _localizer.Get("payRunDialog.title");
-    public string ToggleBreakdown => _localizer.Get("payRunDialog.toggleBreakdown");
-    public string UnpaidDays => _localizer.Get("payRunDialog.unpaidDays");
-    public string Unreachable => _localizer.Get("payRunDialog.unreachable");
-    public string Workflow => _localizer.Get("payRunDialog.workflow");
+    internal PayRunDialogGroup(AppLocalizer localizer) : base(localizer) { }
+    public string AddError => Get("payRunDialog.addError");
+    public string Amount => Get("payRunDialog.amount");
+    public string Approve => Get("payRunDialog.approve");
+    public string ApproveConfirm => Get("payRunDialog.approveConfirm");
+    public string ApproveTitle => Get("payRunDialog.approveTitle");
+    public string Breakdown => Get("payRunDialog.breakdown");
+    public string By => Get("payRunDialog.by");
+    public string Component => Get("payRunDialog.component");
+    public string Compute => Get("payRunDialog.compute");
+    public string ComputeConfirm => Get("payRunDialog.computeConfirm");
+    public string ComputeTitle => Get("payRunDialog.computeTitle");
+    public string Create => Get("payRunDialog.create");
+    public string Created => Get("payRunDialog.created");
+    public string CreateTitle => Get("payRunDialog.createTitle");
+    public string Deduction => Get("payRunDialog.deduction");
+    public string Deductions => Get("payRunDialog.deductions");
+    public string DetailTitle => Get("payRunDialog.detailTitle");
+    public string Earning => Get("payRunDialog.earning");
+    public string Earnings => Get("payRunDialog.earnings");
+    public string Employee => Get("payRunDialog.employee");
+    public string Employees => Get("payRunDialog.employees");
+    public string Gross => Get("payRunDialog.gross");
+    public string LifecycleDone => Get("payRunDialog.lifecycleDone");
+    public string LoadError => Get("payRunDialog.loadError");
+    public string Net => Get("payRunDialog.net");
+    public string NoComponents => Get("payRunDialog.noComponents");
+    public string NoPayslips => Get("payRunDialog.noPayslips");
+    public string Notes => Get("payRunDialog.notes");
+    public string NotProcessed => Get("payRunDialog.notProcessed");
+    public string Pay => Get("payRunDialog.pay");
+    public string PayConfirm => Get("payRunDialog.payConfirm");
+    public string PayslipAdded => Get("payRunDialog.payslipAdded");
+    public string PayslipRemoved => Get("payRunDialog.payslipRemoved");
+    public string Payslips => Get("payRunDialog.payslips");
+    public string PayTitle => Get("payRunDialog.payTitle");
+    public string Period => Get("payRunDialog.period");
+    public string PeriodFrom => Get("payRunDialog.periodFrom");
+    public string PeriodTo => Get("payRunDialog.periodTo");
+    public string PeriodToAfterFrom => Get("payRunDialog.periodToAfterFrom");
+    public string Processed => Get("payRunDialog.processed");
+    public string Reject => Get("payRunDialog.reject");
+    public string RejectConfirm => Get("payRunDialog.rejectConfirm");
+    public string RejectTitle => Get("payRunDialog.rejectTitle");
+    public string ReloadError => Get("payRunDialog.reloadError");
+    public string Remove => Get("payRunDialog.remove");
+    public string RemoveConfirm => Get("payRunDialog.removeConfirm");
+    public string RemoveError => Get("payRunDialog.removeError");
+    public string RemovePayslip => Get("payRunDialog.removePayslip");
+    public string RemovePayslipTitle => Get("payRunDialog.removePayslipTitle");
+    public string Restart => Get("payRunDialog.restart");
+    public string RestartConfirm => Get("payRunDialog.restartConfirm");
+    public string RestartTitle => Get("payRunDialog.restartTitle");
+    public string SelectBothDates => Get("payRunDialog.selectBothDates");
+    public string ServerError => Get("payRunDialog.serverError");
+    public string Title => Get("payRunDialog.title");
+    public string ToggleBreakdown => Get("payRunDialog.toggleBreakdown");
+    public string UnpaidDays => Get("payRunDialog.unpaidDays");
+    public string Unreachable => Get("payRunDialog.unreachable");
+    public string Workflow => Get("payRunDialog.workflow");
 }
 
-public sealed class PayslipGroup
+public sealed class PayslipGroup : LocalizerGroup
 {
-    private readonly AppLocalizer _localizer;
-    internal PayslipGroup(AppLocalizer localizer) => _localizer = localizer;
-    public string AddTitle => _localizer.Get("payslip.addTitle");
-    public string EmployeeSearch => _localizer.Get("payslip.employeeSearch");
-    public string SelectEmployee => _localizer.Get("payslip.selectEmployee");
+    internal PayslipGroup(AppLocalizer localizer) : base(localizer) { }
+    public string AddTitle => Get("payslip.addTitle");
+    public string EmployeeSearch => Get("payslip.employeeSearch");
+    public string SelectEmployee => Get("payslip.selectEmployee");
 }
 
-public sealed class PoDialogGroup
+public sealed class PoDialogGroup : LocalizerGroup
 {
-    private readonly AppLocalizer _localizer;
-    internal PoDialogGroup(AppLocalizer localizer) => _localizer = localizer;
-    public string AddAtLeastOneItem => _localizer.Get("poDialog.addAtLeastOneItem");
-    public string AddItem => _localizer.Get("poDialog.addItem");
-    public string CreateOrder => _localizer.Get("poDialog.createOrder");
-    public string ExpectedDelivery => _localizer.Get("poDialog.expectedDelivery");
-    public string ExpectedDeliveryLabel => _localizer.Get("poDialog.expectedDeliveryLabel");
-    public string ExpiryDate => _localizer.Get("poDialog.expiryDate");
-    public string ExpiryInPast => _localizer.Get("poDialog.expiryInPast");
-    public string Item => _localizer.Get("poDialog.item");
-    public string Items => _localizer.Get("poDialog.items");
-    public string ItemsReceived => _localizer.Get("poDialog.itemsReceived");
-    public string LineValidationError => _localizer.Get("poDialog.lineValidationError");
-    public string LoadErrorTitle => _localizer.Get("poDialog.loadErrorTitle");
-    public string LoadOptionsError => _localizer.Get("poDialog.loadOptionsError");
-    public string LotNumber => _localizer.Get("poDialog.lotNumber");
-    public string LotRequired => _localizer.Get("poDialog.lotRequired");
-    public string NewPurchaseOrder => _localizer.Get("poDialog.newPurchaseOrder");
-    public string Notes => _localizer.Get("poDialog.notes");
-    public string NotSet => _localizer.Get("poDialog.notSet");
-    public string OrderDetails => _localizer.Get("poDialog.orderDetails");
-    public string Ordered => _localizer.Get("poDialog.ordered");
-    public string OrderTitle => _localizer.Get("poDialog.orderTitle");
-    public string PurchaseOrderCreated => _localizer.Get("poDialog.purchaseOrderCreated");
-    public string Qty => _localizer.Get("poDialog.qty");
-    public string QtyWarning => _localizer.Get("poDialog.qtyWarning");
-    public string Received => _localizer.Get("poDialog.received");
-    public string ReceivedAt => _localizer.Get("poDialog.receivedAt");
-    public string ReceiveItems => _localizer.Get("poDialog.receiveItems");
-    public string ReceiveOrder => _localizer.Get("poDialog.receiveOrder");
-    public string ReceiveOrderTitle => _localizer.Get("poDialog.receiveOrderTitle");
-    public string ReceiveQty => _localizer.Get("poDialog.receiveQty");
-    public string Remaining => _localizer.Get("poDialog.remaining");
-    public string RemoveItem => _localizer.Get("poDialog.removeItem");
-    public string Supplier => _localizer.Get("poDialog.supplier");
-    public string Total => _localizer.Get("poDialog.total");
-    public string UnitCost => _localizer.Get("poDialog.unitCost");
-    public string Unreachable => _localizer.Get("poDialog.unreachable");
-    public string UnreachableRetry => _localizer.Get("poDialog.unreachableRetry");
+    internal PoDialogGroup(AppLocalizer localizer) : base(localizer) { }
+    public string AddAtLeastOneItem => Get("poDialog.addAtLeastOneItem");
+    public string AddItem => Get("poDialog.addItem");
+    public string CreateOrder => Get("poDialog.createOrder");
+    public string ExpectedDelivery => Get("poDialog.expectedDelivery");
+    public string ExpectedDeliveryLabel => Get("poDialog.expectedDeliveryLabel");
+    public string ExpiryDate => Get("poDialog.expiryDate");
+    public string ExpiryInPast => Get("poDialog.expiryInPast");
+    public string Item => Get("poDialog.item");
+    public string Items => Get("poDialog.items");
+    public string ItemsReceived => Get("poDialog.itemsReceived");
+    public string LineValidationError => Get("poDialog.lineValidationError");
+    public string LoadErrorTitle => Get("poDialog.loadErrorTitle");
+    public string LoadOptionsError => Get("poDialog.loadOptionsError");
+    public string LotNumber => Get("poDialog.lotNumber");
+    public string LotRequired => Get("poDialog.lotRequired");
+    public string NewPurchaseOrder => Get("poDialog.newPurchaseOrder");
+    public string Notes => Get("poDialog.notes");
+    public string NotSet => Get("poDialog.notSet");
+    public string OrderDetails => Get("poDialog.orderDetails");
+    public string Ordered => Get("poDialog.ordered");
+    public string OrderTitle => Get("poDialog.orderTitle");
+    public string PurchaseOrderCreated => Get("poDialog.purchaseOrderCreated");
+    public string Qty => Get("poDialog.qty");
+    public string QtyWarning => Get("poDialog.qtyWarning");
+    public string Received => Get("poDialog.received");
+    public string ReceivedAt => Get("poDialog.receivedAt");
+    public string ReceiveItems => Get("poDialog.receiveItems");
+    public string ReceiveOrder => Get("poDialog.receiveOrder");
+    public string ReceiveOrderTitle => Get("poDialog.receiveOrderTitle");
+    public string ReceiveQty => Get("poDialog.receiveQty");
+    public string Remaining => Get("poDialog.remaining");
+    public string RemoveItem => Get("poDialog.removeItem");
+    public string Supplier => Get("poDialog.supplier");
+    public string Total => Get("poDialog.total");
+    public string UnitCost => Get("poDialog.unitCost");
+    public string Unreachable => Get("poDialog.unreachable");
+    public string UnreachableRetry => Get("poDialog.unreachableRetry");
 }
 
-public sealed class PolicyGroup
+public sealed class PolicyGroup : LocalizerGroup
 {
-    private readonly AppLocalizer _localizer;
-    internal PolicyGroup(AppLocalizer localizer) => _localizer = localizer;
-    public string AddPolicy => _localizer.Get("policy.addPolicy");
-    public string Company => _localizer.Get("policy.company");
-    public string Coverage => _localizer.Get("policy.coverage");
-    public string Deactivated => _localizer.Get("policy.deactivated");
-    public string Effective => _localizer.Get("policy.effective");
-    public string EffectiveTo => _localizer.Get("policy.effectiveTo");
-    public string EmptyActionLabel => _localizer.Get("policy.emptyActionLabel");
-    public string EmptyMessage => _localizer.Get("policy.emptyMessage");
-    public string EmptyTitle => _localizer.Get("policy.emptyTitle");
-    public string Government => _localizer.Get("policy.government");
-    public string LoadErrorTitle => _localizer.Get("policy.loadErrorTitle");
-    public string NewTitle => _localizer.Get("policy.newTitle");
-    public string Number => _localizer.Get("policy.number");
-    public string Patient => _localizer.Get("policy.patient");
-    public string Reactivated => _localizer.Get("policy.reactivated");
-    public string SearchPlaceholder => _localizer.Get("policy.searchPlaceholder");
-    public string Subtitle => _localizer.Get("policy.subtitle");
-    public string Title => _localizer.Get("policy.title");
-    public string ToggleStatus => _localizer.Get("policy.toggleStatus");
-    public string Unreachable => _localizer.Get("policy.unreachable");
-    public string View => _localizer.Get("policy.view");
+    internal PolicyGroup(AppLocalizer localizer) : base(localizer) { }
+    public string AddPolicy => Get("policy.addPolicy");
+    public string Company => Get("policy.company");
+    public string Coverage => Get("policy.coverage");
+    public string Deactivated => Get("policy.deactivated");
+    public string Effective => Get("policy.effective");
+    public string EffectiveTo => Get("policy.effectiveTo");
+    public string EmptyActionLabel => Get("policy.emptyActionLabel");
+    public string EmptyMessage => Get("policy.emptyMessage");
+    public string EmptyTitle => Get("policy.emptyTitle");
+    public string Government => Get("policy.government");
+    public string LoadErrorTitle => Get("policy.loadErrorTitle");
+    public string NewTitle => Get("policy.newTitle");
+    public string Number => Get("policy.number");
+    public string Patient => Get("policy.patient");
+    public string Reactivated => Get("policy.reactivated");
+    public string SearchPlaceholder => Get("policy.searchPlaceholder");
+    public string Subtitle => Get("policy.subtitle");
+    public string Title => Get("policy.title");
+    public string ToggleStatus => Get("policy.toggleStatus");
+    public string Unreachable => Get("policy.unreachable");
+    public string View => Get("policy.view");
 }
 
-public sealed class PolicyDialogGroup
+public sealed class PolicyDialogGroup : LocalizerGroup
 {
-    private readonly AppLocalizer _localizer;
-    internal PolicyDialogGroup(AppLocalizer localizer) => _localizer = localizer;
-    public string Company => _localizer.Get("policyDialog.company");
-    public string CompanyLabel => _localizer.Get("policyDialog.companyLabel");
-    public string CoveragePercent => _localizer.Get("policyDialog.coveragePercent");
-    public string Create => _localizer.Get("policyDialog.create");
-    public string Created => _localizer.Get("policyDialog.created");
-    public string DeleteDocumentConfirm => _localizer.Get("policyDialog.deleteDocumentConfirm");
-    public string DeleteDocumentTitle => _localizer.Get("policyDialog.deleteDocumentTitle");
-    public string DetailsTitle => _localizer.Get("policyDialog.detailsTitle");
-    public string DocumentDeleted => _localizer.Get("policyDialog.documentDeleted");
-    public string DocumentDownloaded => _localizer.Get("policyDialog.documentDownloaded");
-    public string Documents => _localizer.Get("policyDialog.documents");
-    public string DocumentsHint => _localizer.Get("policyDialog.documentsHint");
-    public string DocumentUploaded => _localizer.Get("policyDialog.documentUploaded");
-    public string Download => _localizer.Get("policyDialog.download");
-    public string EffectiveFrom => _localizer.Get("policyDialog.effectiveFrom");
-    public string EffectiveTo => _localizer.Get("policyDialog.effectiveTo");
-    public string EffectiveToLabel => _localizer.Get("policyDialog.effectiveToLabel");
-    public string GovernmentPolicy => _localizer.Get("policyDialog.governmentPolicy");
-    public string LoadErrorTitle => _localizer.Get("policyDialog.loadErrorTitle");
-    public string NoDocuments => _localizer.Get("policyDialog.noDocuments");
-    public string Patient => _localizer.Get("policyDialog.patient");
-    public string PatientSearchLabel => _localizer.Get("policyDialog.patientSearchLabel");
-    public string PolicyNumber => _localizer.Get("policyDialog.policyNumber");
-    public string Title => _localizer.Get("policyDialog.title");
-    public string UnableDownloadDocument => _localizer.Get("policyDialog.unableDownloadDocument");
-    public string UnableSearchCompanies => _localizer.Get("policyDialog.unableSearchCompanies");
-    public string UnableSearchPatients => _localizer.Get("policyDialog.unableSearchPatients");
-    public string Unreachable => _localizer.Get("policyDialog.unreachable");
-    public string UnreachableRetry => _localizer.Get("policyDialog.unreachableRetry");
-    public string UploadDocument => _localizer.Get("policyDialog.uploadDocument");
-    public string Uploading => _localizer.Get("policyDialog.uploading");
+    internal PolicyDialogGroup(AppLocalizer localizer) : base(localizer) { }
+    public string Company => Get("policyDialog.company");
+    public string CompanyLabel => Get("policyDialog.companyLabel");
+    public string CoveragePercent => Get("policyDialog.coveragePercent");
+    public string Create => Get("policyDialog.create");
+    public string Created => Get("policyDialog.created");
+    public string DeleteDocumentConfirm => Get("policyDialog.deleteDocumentConfirm");
+    public string DeleteDocumentTitle => Get("policyDialog.deleteDocumentTitle");
+    public string DetailsTitle => Get("policyDialog.detailsTitle");
+    public string DocumentDeleted => Get("policyDialog.documentDeleted");
+    public string DocumentDownloaded => Get("policyDialog.documentDownloaded");
+    public string Documents => Get("policyDialog.documents");
+    public string DocumentsHint => Get("policyDialog.documentsHint");
+    public string DocumentUploaded => Get("policyDialog.documentUploaded");
+    public string Download => Get("policyDialog.download");
+    public string EffectiveFrom => Get("policyDialog.effectiveFrom");
+    public string EffectiveTo => Get("policyDialog.effectiveTo");
+    public string EffectiveToLabel => Get("policyDialog.effectiveToLabel");
+    public string GovernmentPolicy => Get("policyDialog.governmentPolicy");
+    public string LoadErrorTitle => Get("policyDialog.loadErrorTitle");
+    public string NoDocuments => Get("policyDialog.noDocuments");
+    public string Patient => Get("policyDialog.patient");
+    public string PatientSearchLabel => Get("policyDialog.patientSearchLabel");
+    public string PolicyNumber => Get("policyDialog.policyNumber");
+    public string Title => Get("policyDialog.title");
+    public string UnableDownloadDocument => Get("policyDialog.unableDownloadDocument");
+    public string UnableSearchCompanies => Get("policyDialog.unableSearchCompanies");
+    public string UnableSearchPatients => Get("policyDialog.unableSearchPatients");
+    public string Unreachable => Get("policyDialog.unreachable");
+    public string UnreachableRetry => Get("policyDialog.unreachableRetry");
+    public string UploadDocument => Get("policyDialog.uploadDocument");
+    public string Uploading => Get("policyDialog.uploading");
 }
 
-public sealed class PreAuthGroup
+public sealed class PreAuthGroup : LocalizerGroup
 {
-    private readonly AppLocalizer _localizer;
-    internal PreAuthGroup(AppLocalizer localizer) => _localizer = localizer;
-    public string EmptyActionLabel => _localizer.Get("preAuth.emptyActionLabel");
-    public string EmptyMessage => _localizer.Get("preAuth.emptyMessage");
-    public string EmptyTitle => _localizer.Get("preAuth.emptyTitle");
-    public string Estimated => _localizer.Get("preAuth.estimated");
-    public string Examination => _localizer.Get("preAuth.examination");
-    public string LoadErrorTitle => _localizer.Get("preAuth.loadErrorTitle");
-    public string Patient => _localizer.Get("preAuth.patient");
-    public string PolicyNumber => _localizer.Get("preAuth.policyNumber");
-    public string RequestAuthorization => _localizer.Get("preAuth.requestAuthorization");
-    public string Requested => _localizer.Get("preAuth.requested");
-    public string RequestTitle => _localizer.Get("preAuth.requestTitle");
-    public string SearchPlaceholder => _localizer.Get("preAuth.searchPlaceholder");
-    public string Subtitle => _localizer.Get("preAuth.subtitle");
-    public string Title => _localizer.Get("preAuth.title");
-    public string Unreachable => _localizer.Get("preAuth.unreachable");
-    public string View => _localizer.Get("preAuth.view");
+    internal PreAuthGroup(AppLocalizer localizer) : base(localizer) { }
+    public string EmptyActionLabel => Get("preAuth.emptyActionLabel");
+    public string EmptyMessage => Get("preAuth.emptyMessage");
+    public string EmptyTitle => Get("preAuth.emptyTitle");
+    public string Estimated => Get("preAuth.estimated");
+    public string Examination => Get("preAuth.examination");
+    public string LoadErrorTitle => Get("preAuth.loadErrorTitle");
+    public string Patient => Get("preAuth.patient");
+    public string PolicyNumber => Get("preAuth.policyNumber");
+    public string RequestAuthorization => Get("preAuth.requestAuthorization");
+    public string Requested => Get("preAuth.requested");
+    public string RequestTitle => Get("preAuth.requestTitle");
+    public string SearchPlaceholder => Get("preAuth.searchPlaceholder");
+    public string Subtitle => Get("preAuth.subtitle");
+    public string Title => Get("preAuth.title");
+    public string Unreachable => Get("preAuth.unreachable");
+    public string View => Get("preAuth.view");
 }
 
-public sealed class PreAuthDialogGroup
+public sealed class PreAuthDialogGroup : LocalizerGroup
 {
-    private readonly AppLocalizer _localizer;
-    internal PreAuthDialogGroup(AppLocalizer localizer) => _localizer = localizer;
-    public string AllRequired => _localizer.Get("preAuthDialog.allRequired");
-    public string Approve => _localizer.Get("preAuthDialog.approve");
-    public string Approved => _localizer.Get("preAuthDialog.approved");
-    public string ApprovedAmount => _localizer.Get("preAuthDialog.approvedAmount");
-    public string Decision => _localizer.Get("preAuthDialog.decision");
-    public string DeleteDocumentConfirm => _localizer.Get("preAuthDialog.deleteDocumentConfirm");
-    public string DeleteDocumentTitle => _localizer.Get("preAuthDialog.deleteDocumentTitle");
-    public string Denied => _localizer.Get("preAuthDialog.denied");
-    public string Deny => _localizer.Get("preAuthDialog.deny");
-    public string DetailsTitle => _localizer.Get("preAuthDialog.detailsTitle");
-    public string DocumentDeleted => _localizer.Get("preAuthDialog.documentDeleted");
-    public string DocumentDownloaded => _localizer.Get("preAuthDialog.documentDownloaded");
-    public string Documents => _localizer.Get("preAuthDialog.documents");
-    public string DocumentUploaded => _localizer.Get("preAuthDialog.documentUploaded");
-    public string Download => _localizer.Get("preAuthDialog.download");
-    public string EstimatedAmount => _localizer.Get("preAuthDialog.estimatedAmount");
-    public string Examination => _localizer.Get("preAuthDialog.examination");
-    public string ExaminationSearchLabel => _localizer.Get("preAuthDialog.examinationSearchLabel");
-    public string LoadErrorTitle => _localizer.Get("preAuthDialog.loadErrorTitle");
-    public string NoDocuments => _localizer.Get("preAuthDialog.noDocuments");
-    public string Patient => _localizer.Get("preAuthDialog.patient");
-    public string PatientSearchLabel => _localizer.Get("preAuthDialog.patientSearchLabel");
-    public string Policy => _localizer.Get("preAuthDialog.policy");
-    public string PolicySearchLabel => _localizer.Get("preAuthDialog.policySearchLabel");
-    public string RejectionReason => _localizer.Get("preAuthDialog.rejectionReason");
-    public string RejectionReasonForDeny => _localizer.Get("preAuthDialog.rejectionReasonForDeny");
-    public string RequestAuthorization => _localizer.Get("preAuthDialog.requestAuthorization");
-    public string Requested => _localizer.Get("preAuthDialog.requested");
-    public string RequestedAt => _localizer.Get("preAuthDialog.requestedAt");
-    public string SelectPatientFirst => _localizer.Get("preAuthDialog.selectPatientFirst");
-    public string Title => _localizer.Get("preAuthDialog.title");
-    public string UnableDownloadDocument => _localizer.Get("preAuthDialog.unableDownloadDocument");
-    public string UnableSearchExaminations => _localizer.Get("preAuthDialog.unableSearchExaminations");
-    public string UnableSearchPatients => _localizer.Get("preAuthDialog.unableSearchPatients");
-    public string UnableSearchPolicies => _localizer.Get("preAuthDialog.unableSearchPolicies");
-    public string Unreachable => _localizer.Get("preAuthDialog.unreachable");
-    public string UnreachableRetry => _localizer.Get("preAuthDialog.unreachableRetry");
-    public string UploadDocument => _localizer.Get("preAuthDialog.uploadDocument");
-    public string UploadHint => _localizer.Get("preAuthDialog.uploadHint");
-    public string Uploading => _localizer.Get("preAuthDialog.uploading");
+    internal PreAuthDialogGroup(AppLocalizer localizer) : base(localizer) { }
+    public string AllRequired => Get("preAuthDialog.allRequired");
+    public string Approve => Get("preAuthDialog.approve");
+    public string Approved => Get("preAuthDialog.approved");
+    public string ApprovedAmount => Get("preAuthDialog.approvedAmount");
+    public string Decision => Get("preAuthDialog.decision");
+    public string DeleteDocumentConfirm => Get("preAuthDialog.deleteDocumentConfirm");
+    public string DeleteDocumentTitle => Get("preAuthDialog.deleteDocumentTitle");
+    public string Denied => Get("preAuthDialog.denied");
+    public string Deny => Get("preAuthDialog.deny");
+    public string DetailsTitle => Get("preAuthDialog.detailsTitle");
+    public string DocumentDeleted => Get("preAuthDialog.documentDeleted");
+    public string DocumentDownloaded => Get("preAuthDialog.documentDownloaded");
+    public string Documents => Get("preAuthDialog.documents");
+    public string DocumentUploaded => Get("preAuthDialog.documentUploaded");
+    public string Download => Get("preAuthDialog.download");
+    public string EstimatedAmount => Get("preAuthDialog.estimatedAmount");
+    public string Examination => Get("preAuthDialog.examination");
+    public string ExaminationSearchLabel => Get("preAuthDialog.examinationSearchLabel");
+    public string LoadErrorTitle => Get("preAuthDialog.loadErrorTitle");
+    public string NoDocuments => Get("preAuthDialog.noDocuments");
+    public string Patient => Get("preAuthDialog.patient");
+    public string PatientSearchLabel => Get("preAuthDialog.patientSearchLabel");
+    public string Policy => Get("preAuthDialog.policy");
+    public string PolicySearchLabel => Get("preAuthDialog.policySearchLabel");
+    public string RejectionReason => Get("preAuthDialog.rejectionReason");
+    public string RejectionReasonForDeny => Get("preAuthDialog.rejectionReasonForDeny");
+    public string RequestAuthorization => Get("preAuthDialog.requestAuthorization");
+    public string Requested => Get("preAuthDialog.requested");
+    public string RequestedAt => Get("preAuthDialog.requestedAt");
+    public string SelectPatientFirst => Get("preAuthDialog.selectPatientFirst");
+    public string Title => Get("preAuthDialog.title");
+    public string UnableDownloadDocument => Get("preAuthDialog.unableDownloadDocument");
+    public string UnableSearchExaminations => Get("preAuthDialog.unableSearchExaminations");
+    public string UnableSearchPatients => Get("preAuthDialog.unableSearchPatients");
+    public string UnableSearchPolicies => Get("preAuthDialog.unableSearchPolicies");
+    public string Unreachable => Get("preAuthDialog.unreachable");
+    public string UnreachableRetry => Get("preAuthDialog.unreachableRetry");
+    public string UploadDocument => Get("preAuthDialog.uploadDocument");
+    public string UploadHint => Get("preAuthDialog.uploadHint");
+    public string Uploading => Get("preAuthDialog.uploading");
 }
 
-public sealed class PurchaseOrdersGroup
+public sealed class PurchaseOrdersGroup : LocalizerGroup
 {
-    private readonly AppLocalizer _localizer;
-    internal PurchaseOrdersGroup(AppLocalizer localizer) => _localizer = localizer;
-    public string CancelOrder => _localizer.Get("purchaseOrders.cancelOrder");
-    public string CancelOrderConfirm => _localizer.Get("purchaseOrders.cancelOrderConfirm");
-    public string CancelOrderTitle => _localizer.Get("purchaseOrders.cancelOrderTitle");
-    public string CreateFirstOrder => _localizer.Get("purchaseOrders.createFirstOrder");
-    public string EmptyMessage => _localizer.Get("purchaseOrders.emptyMessage");
-    public string Expected => _localizer.Get("purchaseOrders.expected");
-    public string KeepOrder => _localizer.Get("purchaseOrders.keepOrder");
-    public string LoadErrorTitle => _localizer.Get("purchaseOrders.loadErrorTitle");
-    public string NewOrder => _localizer.Get("purchaseOrders.newOrder");
-    public string NoOrdersTitle => _localizer.Get("purchaseOrders.noOrdersTitle");
-    public string Order => _localizer.Get("purchaseOrders.order");
-    public string OrderCancelled => _localizer.Get("purchaseOrders.orderCancelled");
-    public string OrderPlaced => _localizer.Get("purchaseOrders.orderPlaced");
-    public string PlaceOrder => _localizer.Get("purchaseOrders.placeOrder");
-    public string PlaceOrderConfirm => _localizer.Get("purchaseOrders.placeOrderConfirm");
-    public string PlaceOrderTitle => _localizer.Get("purchaseOrders.placeOrderTitle");
-    public string Receive => _localizer.Get("purchaseOrders.receive");
-    public string SearchPlaceholder => _localizer.Get("purchaseOrders.searchPlaceholder");
-    public string Subtitle => _localizer.Get("purchaseOrders.subtitle");
-    public string Supplier => _localizer.Get("purchaseOrders.supplier");
-    public string Title => _localizer.Get("purchaseOrders.title");
-    public string Unreachable => _localizer.Get("purchaseOrders.unreachable");
-    public string View => _localizer.Get("purchaseOrders.view");
+    internal PurchaseOrdersGroup(AppLocalizer localizer) : base(localizer) { }
+    public string CancelOrder => Get("purchaseOrders.cancelOrder");
+    public string CancelOrderConfirm => Get("purchaseOrders.cancelOrderConfirm");
+    public string CancelOrderTitle => Get("purchaseOrders.cancelOrderTitle");
+    public string CreateFirstOrder => Get("purchaseOrders.createFirstOrder");
+    public string EmptyMessage => Get("purchaseOrders.emptyMessage");
+    public string Expected => Get("purchaseOrders.expected");
+    public string KeepOrder => Get("purchaseOrders.keepOrder");
+    public string LoadErrorTitle => Get("purchaseOrders.loadErrorTitle");
+    public string NewOrder => Get("purchaseOrders.newOrder");
+    public string NoOrdersTitle => Get("purchaseOrders.noOrdersTitle");
+    public string Order => Get("purchaseOrders.order");
+    public string OrderCancelled => Get("purchaseOrders.orderCancelled");
+    public string OrderPlaced => Get("purchaseOrders.orderPlaced");
+    public string PlaceOrder => Get("purchaseOrders.placeOrder");
+    public string PlaceOrderConfirm => Get("purchaseOrders.placeOrderConfirm");
+    public string PlaceOrderTitle => Get("purchaseOrders.placeOrderTitle");
+    public string Receive => Get("purchaseOrders.receive");
+    public string SearchPlaceholder => Get("purchaseOrders.searchPlaceholder");
+    public string Subtitle => Get("purchaseOrders.subtitle");
+    public string Supplier => Get("purchaseOrders.supplier");
+    public string Title => Get("purchaseOrders.title");
+    public string Unreachable => Get("purchaseOrders.unreachable");
+    public string View => Get("purchaseOrders.view");
 }
 
-public sealed class ReadingRoomGroup
+public sealed class ReadingRoomGroup : LocalizerGroup
 {
-    private readonly AppLocalizer _localizer;
-    internal ReadingRoomGroup(AppLocalizer localizer) => _localizer = localizer;
-    public string AddFinding => _localizer.Get("readingRoom.addFinding");
-    public string Amend => _localizer.Get("readingRoom.amend");
-    public string Back => _localizer.Get("readingRoom.back");
-    public string Cancelled => _localizer.Get("readingRoom.cancelled");
-    public string CancelledWithReason => _localizer.Get("readingRoom.cancelledWithReason");
-    public string ClinicalIndication => _localizer.Get("readingRoom.clinicalIndication");
-    public string ComingSoon => _localizer.Get("readingRoom.comingSoon");
-    public string Description => _localizer.Get("readingRoom.description");
-    public string DraftSaved => _localizer.Get("readingRoom.draftSaved");
-    public string Exam => _localizer.Get("readingRoom.exam");
-    public string FilterPlaceholder => _localizer.Get("readingRoom.filterPlaceholder");
-    public string FinalizeConfirm => _localizer.Get("readingRoom.finalizeConfirm");
-    public string FindingAdded => _localizer.Get("readingRoom.findingAdded");
-    public string FindingRemoved => _localizer.Get("readingRoom.findingRemoved");
-    public string Findings => _localizer.Get("readingRoom.findings");
-    public string FindingUpdated => _localizer.Get("readingRoom.findingUpdated");
-    public string HideReport => _localizer.Get("readingRoom.hideReport");
-    public string HideWorklist => _localizer.Get("readingRoom.hideWorklist");
-    public string Imaged => _localizer.Get("readingRoom.imaged");
-    public string ImagesLinked => _localizer.Get("readingRoom.imagesLinked");
-    public string ImageViewer => _localizer.Get("readingRoom.imageViewer");
-    public string Keep => _localizer.Get("readingRoom.keep");
-    public string LoadImages => _localizer.Get("readingRoom.loadImages");
-    public string NoDraftMessage => _localizer.Get("readingRoom.noDraftMessage");
-    public string NoFindings => _localizer.Get("readingRoom.noFindings");
-    public string NoImagedStudies => _localizer.Get("readingRoom.noImagedStudies");
-    public string NoImagedStudiesMessage => _localizer.Get("readingRoom.noImagedStudiesMessage");
-    public string NoMatchingStudy => _localizer.Get("readingRoom.noMatchingStudy");
-    public string NoReport => _localizer.Get("readingRoom.noReport");
-    public string NoStudySelected => _localizer.Get("readingRoom.noStudySelected");
-    public string Pending => _localizer.Get("readingRoom.pending");
-    public string Priority => _localizer.Get("readingRoom.priority");
-    public string QueueLoadErrorTitle => _localizer.Get("readingRoom.queueLoadErrorTitle");
-    public string ReadingQueue => _localizer.Get("readingRoom.readingQueue");
-    public string RegionAnatomy => _localizer.Get("readingRoom.regionAnatomy");
-    public string Remove => _localizer.Get("readingRoom.remove");
-    public string RemoveFinding => _localizer.Get("readingRoom.removeFinding");
-    public string RemoveFindingConfirm => _localizer.Get("readingRoom.removeFindingConfirm");
-    public string ReopenedForAmendment => _localizer.Get("readingRoom.reopenedForAmendment");
-    public string ReportLoadError => _localizer.Get("readingRoom.reportLoadError");
-    public string ReportLoadErrorTitle => _localizer.Get("readingRoom.reportLoadErrorTitle");
-    public string ReportSigned => _localizer.Get("readingRoom.reportSigned");
-    public string SaveDraft => _localizer.Get("readingRoom.saveDraft");
-    public string Sections => _localizer.Get("readingRoom.sections");
-    public string SelectStudyMessage => _localizer.Get("readingRoom.selectStudyMessage");
-    public string SelectStudyToRead => _localizer.Get("readingRoom.selectStudyToRead");
-    public string Series => _localizer.Get("readingRoom.series");
-    public string SeriesProgress => _localizer.Get("readingRoom.seriesProgress");
-    public string SeriesThumbTitle => _localizer.Get("readingRoom.seriesThumbTitle");
-    public string Severity => _localizer.Get("readingRoom.severity");
-    public string ShowReport => _localizer.Get("readingRoom.showReport");
-    public string ShowWorklist => _localizer.Get("readingRoom.showWorklist");
-    public string SignAndFinalize => _localizer.Get("readingRoom.signAndFinalize");
-    public string SignedAt => _localizer.Get("readingRoom.signedAt");
-    public string SignReport => _localizer.Get("readingRoom.signReport");
-    public string StartReport => _localizer.Get("readingRoom.startReport");
-    public string Subtitle => _localizer.Get("readingRoom.subtitle");
-    public string TemplateApplied => _localizer.Get("readingRoom.templateApplied");
-    public string Title => _localizer.Get("readingRoom.title");
-    public string Unreachable => _localizer.Get("readingRoom.unreachable");
+    internal ReadingRoomGroup(AppLocalizer localizer) : base(localizer) { }
+    public string AddFinding => Get("readingRoom.addFinding");
+    public string Amend => Get("readingRoom.amend");
+    public string Back => Get("readingRoom.back");
+    public string Cancelled => Get("readingRoom.cancelled");
+    public string CancelledWithReason => Get("readingRoom.cancelledWithReason");
+    public string ClinicalIndication => Get("readingRoom.clinicalIndication");
+    public string ComingSoon => Get("readingRoom.comingSoon");
+    public string Description => Get("readingRoom.description");
+    public string DraftSaved => Get("readingRoom.draftSaved");
+    public string Exam => Get("readingRoom.exam");
+    public string FilterPlaceholder => Get("readingRoom.filterPlaceholder");
+    public string FinalizeConfirm => Get("readingRoom.finalizeConfirm");
+    public string FindingAdded => Get("readingRoom.findingAdded");
+    public string FindingRemoved => Get("readingRoom.findingRemoved");
+    public string Findings => Get("readingRoom.findings");
+    public string FindingUpdated => Get("readingRoom.findingUpdated");
+    public string HideReport => Get("readingRoom.hideReport");
+    public string HideWorklist => Get("readingRoom.hideWorklist");
+    public string Imaged => Get("readingRoom.imaged");
+    public string ImagesLinked => Get("readingRoom.imagesLinked");
+    public string ImageViewer => Get("readingRoom.imageViewer");
+    public string Keep => Get("readingRoom.keep");
+    public string LoadImages => Get("readingRoom.loadImages");
+    public string NoDraftMessage => Get("readingRoom.noDraftMessage");
+    public string NoFindings => Get("readingRoom.noFindings");
+    public string NoImagedStudies => Get("readingRoom.noImagedStudies");
+    public string NoImagedStudiesMessage => Get("readingRoom.noImagedStudiesMessage");
+    public string NoMatchingStudy => Get("readingRoom.noMatchingStudy");
+    public string NoReport => Get("readingRoom.noReport");
+    public string NoStudySelected => Get("readingRoom.noStudySelected");
+    public string Pending => Get("readingRoom.pending");
+    public string Priority => Get("readingRoom.priority");
+    public string QueueLoadErrorTitle => Get("readingRoom.queueLoadErrorTitle");
+    public string ReadingQueue => Get("readingRoom.readingQueue");
+    public string RegionAnatomy => Get("readingRoom.regionAnatomy");
+    public string Remove => Get("readingRoom.remove");
+    public string RemoveFinding => Get("readingRoom.removeFinding");
+    public string RemoveFindingConfirm => Get("readingRoom.removeFindingConfirm");
+    public string ReopenedForAmendment => Get("readingRoom.reopenedForAmendment");
+    public string ReportLoadError => Get("readingRoom.reportLoadError");
+    public string ReportLoadErrorTitle => Get("readingRoom.reportLoadErrorTitle");
+    public string ReportSigned => Get("readingRoom.reportSigned");
+    public string SaveDraft => Get("readingRoom.saveDraft");
+    public string Sections => Get("readingRoom.sections");
+    public string SelectStudyMessage => Get("readingRoom.selectStudyMessage");
+    public string SelectStudyToRead => Get("readingRoom.selectStudyToRead");
+    public string Series => Get("readingRoom.series");
+    public string SeriesProgress => Get("readingRoom.seriesProgress");
+    public string SeriesThumbTitle => Get("readingRoom.seriesThumbTitle");
+    public string Severity => Get("readingRoom.severity");
+    public string ShowReport => Get("readingRoom.showReport");
+    public string ShowWorklist => Get("readingRoom.showWorklist");
+    public string SignAndFinalize => Get("readingRoom.signAndFinalize");
+    public string SignedAt => Get("readingRoom.signedAt");
+    public string SignReport => Get("readingRoom.signReport");
+    public string StartReport => Get("readingRoom.startReport");
+    public string Subtitle => Get("readingRoom.subtitle");
+    public string TemplateApplied => Get("readingRoom.templateApplied");
+    public string Title => Get("readingRoom.title");
+    public string Unreachable => Get("readingRoom.unreachable");
 }
 
-public sealed class ReferralDoctorGroup
+public sealed class ReferralDoctorGroup : LocalizerGroup
 {
-    private readonly AppLocalizer _localizer;
-    internal ReferralDoctorGroup(AppLocalizer localizer) => _localizer = localizer;
-    public string Activated => _localizer.Get("referralDoctor.activated");
-    public string Add => _localizer.Get("referralDoctor.add");
-    public string Deactivated => _localizer.Get("referralDoctor.deactivated");
-    public string DeleteConfirm => _localizer.Get("referralDoctor.deleteConfirm");
-    public string Deleted => _localizer.Get("referralDoctor.deleted");
-    public string DeleteTitle => _localizer.Get("referralDoctor.deleteTitle");
-    public string Edit => _localizer.Get("referralDoctor.edit");
-    public string Email => _localizer.Get("referralDoctor.email");
-    public string EmptyActionLabel => _localizer.Get("referralDoctor.emptyActionLabel");
-    public string EmptyMessage => _localizer.Get("referralDoctor.emptyMessage");
-    public string EmptyTitle => _localizer.Get("referralDoctor.emptyTitle");
-    public string Hospital => _localizer.Get("referralDoctor.hospital");
-    public string LoadErrorTitle => _localizer.Get("referralDoctor.loadErrorTitle");
-    public string NewReferralDoctor => _localizer.Get("referralDoctor.newReferralDoctor");
-    public string Phone => _localizer.Get("referralDoctor.phone");
-    public string SearchPlaceholder => _localizer.Get("referralDoctor.searchPlaceholder");
-    public string Specialization => _localizer.Get("referralDoctor.specialization");
-    public string Subtitle => _localizer.Get("referralDoctor.subtitle");
-    public string Title => _localizer.Get("referralDoctor.title");
-    public string ToggleStatus => _localizer.Get("referralDoctor.toggleStatus");
-    public string Unreachable => _localizer.Get("referralDoctor.unreachable");
+    internal ReferralDoctorGroup(AppLocalizer localizer) : base(localizer) { }
+    public string Activated => Get("referralDoctor.activated");
+    public string Add => Get("referralDoctor.add");
+    public string Deactivated => Get("referralDoctor.deactivated");
+    public string DeleteConfirm => Get("referralDoctor.deleteConfirm");
+    public string Deleted => Get("referralDoctor.deleted");
+    public string DeleteTitle => Get("referralDoctor.deleteTitle");
+    public string Edit => Get("referralDoctor.edit");
+    public string Email => Get("referralDoctor.email");
+    public string EmptyActionLabel => Get("referralDoctor.emptyActionLabel");
+    public string EmptyMessage => Get("referralDoctor.emptyMessage");
+    public string EmptyTitle => Get("referralDoctor.emptyTitle");
+    public string Hospital => Get("referralDoctor.hospital");
+    public string LoadErrorTitle => Get("referralDoctor.loadErrorTitle");
+    public string NewReferralDoctor => Get("referralDoctor.newReferralDoctor");
+    public string Phone => Get("referralDoctor.phone");
+    public string SearchPlaceholder => Get("referralDoctor.searchPlaceholder");
+    public string Specialization => Get("referralDoctor.specialization");
+    public string Subtitle => Get("referralDoctor.subtitle");
+    public string Title => Get("referralDoctor.title");
+    public string ToggleStatus => Get("referralDoctor.toggleStatus");
+    public string Unreachable => Get("referralDoctor.unreachable");
 }
 
-public sealed class ReferralDoctorDialogGroup
+public sealed class ReferralDoctorDialogGroup : LocalizerGroup
 {
-    private readonly AppLocalizer _localizer;
-    internal ReferralDoctorDialogGroup(AppLocalizer localizer) => _localizer = localizer;
-    public string Created => _localizer.Get("referralDoctorDialog.created");
-    public string CreateDoctor => _localizer.Get("referralDoctorDialog.createDoctor");
-    public string FullName => _localizer.Get("referralDoctorDialog.fullName");
-    public string HospitalClinic => _localizer.Get("referralDoctorDialog.hospitalClinic");
-    public string PhoneNumber => _localizer.Get("referralDoctorDialog.phoneNumber");
-    public string SaveChanges => _localizer.Get("referralDoctorDialog.saveChanges");
-    public string Unreachable => _localizer.Get("referralDoctorDialog.unreachable");
-    public string Updated => _localizer.Get("referralDoctorDialog.updated");
+    internal ReferralDoctorDialogGroup(AppLocalizer localizer) : base(localizer) { }
+    public string Created => Get("referralDoctorDialog.created");
+    public string CreateDoctor => Get("referralDoctorDialog.createDoctor");
+    public string FullName => Get("referralDoctorDialog.fullName");
+    public string HospitalClinic => Get("referralDoctorDialog.hospitalClinic");
+    public string PhoneNumber => Get("referralDoctorDialog.phoneNumber");
+    public string SaveChanges => Get("referralDoctorDialog.saveChanges");
+    public string Unreachable => Get("referralDoctorDialog.unreachable");
+    public string Updated => Get("referralDoctorDialog.updated");
 }
 
-public sealed class ReferralFeeGroup
+public sealed class ReferralFeeGroup : LocalizerGroup
 {
-    private readonly AppLocalizer _localizer;
-    internal ReferralFeeGroup(AppLocalizer localizer) => _localizer = localizer;
-    public string Activated => _localizer.Get("referralFee.activated");
-    public string Amount => _localizer.Get("referralFee.amount");
-    public string AmountIsPercentage => _localizer.Get("referralFee.amountIsPercentage");
-    public string Created => _localizer.Get("referralFee.created");
-    public string CreateFee => _localizer.Get("referralFee.createFee");
-    public string Deactivated => _localizer.Get("referralFee.deactivated");
-    public string DeleteConfirm => _localizer.Get("referralFee.deleteConfirm");
-    public string Deleted => _localizer.Get("referralFee.deleted");
-    public string DeleteTitle => _localizer.Get("referralFee.deleteTitle");
-    public string Doctor => _localizer.Get("referralFee.doctor");
-    public string DoctorSearch => _localizer.Get("referralFee.doctorSearch");
-    public string EditReferralFee => _localizer.Get("referralFee.editReferralFee");
-    public string EmptyActionLabel => _localizer.Get("referralFee.emptyActionLabel");
-    public string EmptyMessage => _localizer.Get("referralFee.emptyMessage");
-    public string EmptyTitle => _localizer.Get("referralFee.emptyTitle");
-    public string ExaminationType => _localizer.Get("referralFee.examinationType");
-    public string ExamTypeSearch => _localizer.Get("referralFee.examTypeSearch");
-    public string Flat => _localizer.Get("referralFee.flat");
-    public string FlatAmount => _localizer.Get("referralFee.flatAmount");
-    public string LoadErrorTitle => _localizer.Get("referralFee.loadErrorTitle");
-    public string NewFee => _localizer.Get("referralFee.newFee");
-    public string NewReferralFee => _localizer.Get("referralFee.newReferralFee");
-    public string Percentage => _localizer.Get("referralFee.percentage");
-    public string PercentageLimit => _localizer.Get("referralFee.percentageLimit");
-    public string PercentagePercent => _localizer.Get("referralFee.percentagePercent");
-    public string ReferralDoctor => _localizer.Get("referralFee.referralDoctor");
-    public string SaveChanges => _localizer.Get("referralFee.saveChanges");
-    public string SearchPlaceholder => _localizer.Get("referralFee.searchPlaceholder");
-    public string SelectDoctor => _localizer.Get("referralFee.selectDoctor");
-    public string SelectExamType => _localizer.Get("referralFee.selectExamType");
-    public string Subtitle => _localizer.Get("referralFee.subtitle");
-    public string Title => _localizer.Get("referralFee.title");
-    public string ToggleStatus => _localizer.Get("referralFee.toggleStatus");
-    public string Unreachable => _localizer.Get("referralFee.unreachable");
-    public string UnreachableTryAgain => _localizer.Get("referralFee.unreachableTryAgain");
-    public string Updated => _localizer.Get("referralFee.updated");
+    internal ReferralFeeGroup(AppLocalizer localizer) : base(localizer) { }
+    public string Activated => Get("referralFee.activated");
+    public string Amount => Get("referralFee.amount");
+    public string AmountIsPercentage => Get("referralFee.amountIsPercentage");
+    public string Created => Get("referralFee.created");
+    public string CreateFee => Get("referralFee.createFee");
+    public string Deactivated => Get("referralFee.deactivated");
+    public string DeleteConfirm => Get("referralFee.deleteConfirm");
+    public string Deleted => Get("referralFee.deleted");
+    public string DeleteTitle => Get("referralFee.deleteTitle");
+    public string Doctor => Get("referralFee.doctor");
+    public string DoctorSearch => Get("referralFee.doctorSearch");
+    public string EditReferralFee => Get("referralFee.editReferralFee");
+    public string EmptyActionLabel => Get("referralFee.emptyActionLabel");
+    public string EmptyMessage => Get("referralFee.emptyMessage");
+    public string EmptyTitle => Get("referralFee.emptyTitle");
+    public string ExaminationType => Get("referralFee.examinationType");
+    public string ExamTypeSearch => Get("referralFee.examTypeSearch");
+    public string Flat => Get("referralFee.flat");
+    public string FlatAmount => Get("referralFee.flatAmount");
+    public string LoadErrorTitle => Get("referralFee.loadErrorTitle");
+    public string NewFee => Get("referralFee.newFee");
+    public string NewReferralFee => Get("referralFee.newReferralFee");
+    public string Percentage => Get("referralFee.percentage");
+    public string PercentageLimit => Get("referralFee.percentageLimit");
+    public string PercentagePercent => Get("referralFee.percentagePercent");
+    public string ReferralDoctor => Get("referralFee.referralDoctor");
+    public string SaveChanges => Get("referralFee.saveChanges");
+    public string SearchPlaceholder => Get("referralFee.searchPlaceholder");
+    public string SelectDoctor => Get("referralFee.selectDoctor");
+    public string SelectExamType => Get("referralFee.selectExamType");
+    public string Subtitle => Get("referralFee.subtitle");
+    public string Title => Get("referralFee.title");
+    public string ToggleStatus => Get("referralFee.toggleStatus");
+    public string Unreachable => Get("referralFee.unreachable");
+    public string UnreachableTryAgain => Get("referralFee.unreachableTryAgain");
+    public string Updated => Get("referralFee.updated");
 }
 
-public sealed class ReportTemplateGroup
+public sealed class ReportTemplateGroup : LocalizerGroup
 {
-    private readonly AppLocalizer _localizer;
-    internal ReportTemplateGroup(AppLocalizer localizer) => _localizer = localizer;
-    public string ApplyTitle => _localizer.Get("reportTemplate.applyTitle");
-    public string Description => _localizer.Get("reportTemplate.description");
-    public string LoadErrorMessage => _localizer.Get("reportTemplate.loadErrorMessage");
-    public string LoadErrorTitle => _localizer.Get("reportTemplate.loadErrorTitle");
-    public string LoadFailed => _localizer.Get("reportTemplate.loadFailed");
-    public string NoTemplates => _localizer.Get("reportTemplate.noTemplates");
-    public string NoTemplatesMessage => _localizer.Get("reportTemplate.noTemplatesMessage");
-    public string SearchPlaceholder => _localizer.Get("reportTemplate.searchPlaceholder");
-    public string SectionCount => _localizer.Get("reportTemplate.sectionCount");
-    public string System => _localizer.Get("reportTemplate.system");
-    public string Title => _localizer.Get("reportTemplate.title");
+    internal ReportTemplateGroup(AppLocalizer localizer) : base(localizer) { }
+    public string ApplyTitle => Get("reportTemplate.applyTitle");
+    public string Description => Get("reportTemplate.description");
+    public string LoadErrorMessage => Get("reportTemplate.loadErrorMessage");
+    public string LoadErrorTitle => Get("reportTemplate.loadErrorTitle");
+    public string LoadFailed => Get("reportTemplate.loadFailed");
+    public string NoTemplates => Get("reportTemplate.noTemplates");
+    public string NoTemplatesMessage => Get("reportTemplate.noTemplatesMessage");
+    public string SearchPlaceholder => Get("reportTemplate.searchPlaceholder");
+    public string SectionCount => Get("reportTemplate.sectionCount");
+    public string System => Get("reportTemplate.system");
+    public string Title => Get("reportTemplate.title");
 }
 
-public sealed class ReportVersionsGroup
+public sealed class ReportVersionsGroup : LocalizerGroup
 {
-    private readonly AppLocalizer _localizer;
-    internal ReportVersionsGroup(AppLocalizer localizer) => _localizer = localizer;
-    public string Amended => _localizer.Get("reportVersions.amended");
-    public string Findings => _localizer.Get("reportVersions.findings");
-    public string LoadErrorTitle => _localizer.Get("reportVersions.loadErrorTitle");
-    public string NoVersions => _localizer.Get("reportVersions.noVersions");
-    public string NoVersionsMessage => _localizer.Get("reportVersions.noVersionsMessage");
-    public string Title => _localizer.Get("reportVersions.title");
+    internal ReportVersionsGroup(AppLocalizer localizer) : base(localizer) { }
+    public string Amended => Get("reportVersions.amended");
+    public string Findings => Get("reportVersions.findings");
+    public string LoadErrorTitle => Get("reportVersions.loadErrorTitle");
+    public string NoVersions => Get("reportVersions.noVersions");
+    public string NoVersionsMessage => Get("reportVersions.noVersionsMessage");
+    public string Title => Get("reportVersions.title");
 }
 
-public sealed class RoleDialogGroup
+public sealed class RoleDialogGroup : LocalizerGroup
 {
-    private readonly AppLocalizer _localizer;
-    internal RoleDialogGroup(AppLocalizer localizer) => _localizer = localizer;
-    public string Created => _localizer.Get("roleDialog.created");
-    public string CreateRole => _localizer.Get("roleDialog.createRole");
-    public string EditTitle => _localizer.Get("roleDialog.editTitle");
-    public string NewRole => _localizer.Get("roleDialog.newRole");
-    public string PermissionsDescription => _localizer.Get("roleDialog.permissionsDescription");
-    public string PermissionsTitle => _localizer.Get("roleDialog.permissionsTitle");
-    public string PermissionsUpdated => _localizer.Get("roleDialog.permissionsUpdated");
-    public string RoleName => _localizer.Get("roleDialog.roleName");
-    public string SaveChanges => _localizer.Get("roleDialog.saveChanges");
-    public string SavePermissions => _localizer.Get("roleDialog.savePermissions");
-    public string Unreachable => _localizer.Get("roleDialog.unreachable");
-    public string UnreachableRetry => _localizer.Get("roleDialog.unreachableRetry");
-    public string Updated => _localizer.Get("roleDialog.updated");
+    internal RoleDialogGroup(AppLocalizer localizer) : base(localizer) { }
+    public string Created => Get("roleDialog.created");
+    public string CreateRole => Get("roleDialog.createRole");
+    public string EditTitle => Get("roleDialog.editTitle");
+    public string NewRole => Get("roleDialog.newRole");
+    public string PermissionsDescription => Get("roleDialog.permissionsDescription");
+    public string PermissionsTitle => Get("roleDialog.permissionsTitle");
+    public string PermissionsUpdated => Get("roleDialog.permissionsUpdated");
+    public string RoleName => Get("roleDialog.roleName");
+    public string SaveChanges => Get("roleDialog.saveChanges");
+    public string SavePermissions => Get("roleDialog.savePermissions");
+    public string Unreachable => Get("roleDialog.unreachable");
+    public string UnreachableRetry => Get("roleDialog.unreachableRetry");
+    public string Updated => Get("roleDialog.updated");
 }
 
-public sealed class RolesGroup
+public sealed class RolesGroup : LocalizerGroup
 {
-    private readonly AppLocalizer _localizer;
-    internal RolesGroup(AppLocalizer localizer) => _localizer = localizer;
-    public string Created => _localizer.Get("roles.created");
-    public string Description => _localizer.Get("roles.description");
-    public string EditRole => _localizer.Get("roles.editRole");
-    public string EditTitle => _localizer.Get("roles.editTitle");
-    public string EmptyAction => _localizer.Get("roles.emptyAction");
-    public string EmptyMessage => _localizer.Get("roles.emptyMessage");
-    public string EmptyTitle => _localizer.Get("roles.emptyTitle");
-    public string LoadErrorTitle => _localizer.Get("roles.loadErrorTitle");
-    public string ManagePermissions => _localizer.Get("roles.managePermissions");
-    public string NewRole => _localizer.Get("roles.newRole");
-    public string PermissionCount => _localizer.Get("roles.permissionCount");
-    public string Permissions => _localizer.Get("roles.permissions");
-    public string SearchPlaceholder => _localizer.Get("roles.searchPlaceholder");
-    public string Subtitle => _localizer.Get("roles.subtitle");
-    public string System => _localizer.Get("roles.system");
-    public string Title => _localizer.Get("roles.title");
-    public string Unreachable => _localizer.Get("roles.unreachable");
+    internal RolesGroup(AppLocalizer localizer) : base(localizer) { }
+    public string Created => Get("roles.created");
+    public string Description => Get("roles.description");
+    public string EditRole => Get("roles.editRole");
+    public string EditTitle => Get("roles.editTitle");
+    public string EmptyAction => Get("roles.emptyAction");
+    public string EmptyMessage => Get("roles.emptyMessage");
+    public string EmptyTitle => Get("roles.emptyTitle");
+    public string LoadErrorTitle => Get("roles.loadErrorTitle");
+    public string ManagePermissions => Get("roles.managePermissions");
+    public string NewRole => Get("roles.newRole");
+    public string PermissionCount => Get("roles.permissionCount");
+    public string Permissions => Get("roles.permissions");
+    public string SearchPlaceholder => Get("roles.searchPlaceholder");
+    public string Subtitle => Get("roles.subtitle");
+    public string System => Get("roles.system");
+    public string Title => Get("roles.title");
+    public string Unreachable => Get("roles.unreachable");
 
     private PermissionGroup? _permission;
-    public PermissionGroup Permission => _permission ??= new PermissionGroup(_localizer);
+    public PermissionGroup Permission => _permission ??= new PermissionGroup(Localizer);
     private PermissiongroupGroup? _permissiongroup;
-    public PermissiongroupGroup Permissiongroup => _permissiongroup ??= new PermissiongroupGroup(_localizer);
+    public PermissiongroupGroup Permissiongroup => _permissiongroup ??= new PermissiongroupGroup(Localizer);
 
-    public sealed class PermissionGroup
+    public sealed class PermissionGroup : LocalizerGroup
     {
-        private readonly AppLocalizer _localizer;
-        internal PermissionGroup(AppLocalizer localizer) => _localizer = localizer;
-        public string Appointmentsconfirm => _localizer.Get("roles.permission.appointmentsconfirm");
-        public string Appointmentscreate => _localizer.Get("roles.permission.appointmentscreate");
-        public string Appointmentsdelete => _localizer.Get("roles.permission.appointmentsdelete");
-        public string Appointmentsread => _localizer.Get("roles.permission.appointmentsread");
-        public string Appointmentsupdate => _localizer.Get("roles.permission.appointmentsupdate");
-        public string Cashentriesadd => _localizer.Get("roles.permission.cashentriesadd");
-        public string Cashhandoversapprove => _localizer.Get("roles.permission.cashhandoversapprove");
-        public string Cashhandoversread => _localizer.Get("roles.permission.cashhandoversread");
-        public string Cashsessionsclose => _localizer.Get("roles.permission.cashsessionsclose");
-        public string Cashsessionsopen => _localizer.Get("roles.permission.cashsessionsopen");
-        public string Cashsessionsread => _localizer.Get("roles.permission.cashsessionsread");
-        public string Examinationscancel => _localizer.Get("roles.permission.examinationscancel");
-        public string Examinationscreate => _localizer.Get("roles.permission.examinationscreate");
-        public string Examinationsdelete => _localizer.Get("roles.permission.examinationsdelete");
-        public string Examinationsperform => _localizer.Get("roles.permission.examinationsperform");
-        public string Examinationsread => _localizer.Get("roles.permission.examinationsread");
-        public string Examinationstypesmanage => _localizer.Get("roles.permission.examinationstypesmanage");
-        public string Examinationsupdate => _localizer.Get("roles.permission.examinationsupdate");
-        public string Insuranceclaimscreate => _localizer.Get("roles.permission.insuranceclaimscreate");
-        public string Insuranceclaimsread => _localizer.Get("roles.permission.insuranceclaimsread");
-        public string Insuranceclaimssettle => _localizer.Get("roles.permission.insuranceclaimssettle");
-        public string Insuranceclaimsupdate => _localizer.Get("roles.permission.insuranceclaimsupdate");
-        public string Insurancecompaniescreate => _localizer.Get("roles.permission.insurancecompaniescreate");
-        public string Insurancecompaniesdelete => _localizer.Get("roles.permission.insurancecompaniesdelete");
-        public string Insurancecompaniesread => _localizer.Get("roles.permission.insurancecompaniesread");
-        public string Insurancecompaniesupdate => _localizer.Get("roles.permission.insurancecompaniesupdate");
-        public string Insurancepoliciescreate => _localizer.Get("roles.permission.insurancepoliciescreate");
-        public string Insurancepoliciesdelete => _localizer.Get("roles.permission.insurancepoliciesdelete");
-        public string Insurancepoliciesread => _localizer.Get("roles.permission.insurancepoliciesread");
-        public string Insurancepoliciesupdate => _localizer.Get("roles.permission.insurancepoliciesupdate");
-        public string Insurancepreauthorizationsattachdocument => _localizer.Get("roles.permission.insurancepreauthorizationsattachdocument");
-        public string Insurancepreauthorizationscreate => _localizer.Get("roles.permission.insurancepreauthorizationscreate");
-        public string Insurancepreauthorizationsread => _localizer.Get("roles.permission.insurancepreauthorizationsread");
-        public string Insurancepreauthorizationsupdate => _localizer.Get("roles.permission.insurancepreauthorizationsupdate");
-        public string Inventoryitemscreate => _localizer.Get("roles.permission.inventoryitemscreate");
-        public string Inventoryitemsdelete => _localizer.Get("roles.permission.inventoryitemsdelete");
-        public string Inventoryitemsread => _localizer.Get("roles.permission.inventoryitemsread");
-        public string Inventoryitemsupdate => _localizer.Get("roles.permission.inventoryitemsupdate");
-        public string Inventorypurchaseorderscreate => _localizer.Get("roles.permission.inventorypurchaseorderscreate");
-        public string Inventorypurchaseordersdelete => _localizer.Get("roles.permission.inventorypurchaseordersdelete");
-        public string Inventorypurchaseordersread => _localizer.Get("roles.permission.inventorypurchaseordersread");
-        public string Inventorypurchaseordersupdate => _localizer.Get("roles.permission.inventorypurchaseordersupdate");
-        public string Inventorystockissue => _localizer.Get("roles.permission.inventorystockissue");
-        public string Inventorystockread => _localizer.Get("roles.permission.inventorystockread");
-        public string Inventorysupplierscreate => _localizer.Get("roles.permission.inventorysupplierscreate");
-        public string Inventorysuppliersdelete => _localizer.Get("roles.permission.inventorysuppliersdelete");
-        public string Inventorysuppliersread => _localizer.Get("roles.permission.inventorysuppliersread");
-        public string Inventorysuppliersupdate => _localizer.Get("roles.permission.inventorysuppliersupdate");
-        public string Patientscreate => _localizer.Get("roles.permission.patientscreate");
-        public string Patientsdelete => _localizer.Get("roles.permission.patientsdelete");
-        public string Patientsread => _localizer.Get("roles.permission.patientsread");
-        public string Patientsupdate => _localizer.Get("roles.permission.patientsupdate");
-        public string Reportscreate => _localizer.Get("roles.permission.reportscreate");
-        public string Reportsdelete => _localizer.Get("roles.permission.reportsdelete");
-        public string Reportsexport => _localizer.Get("roles.permission.reportsexport");
-        public string Reportsread => _localizer.Get("roles.permission.reportsread");
-        public string Reportsupdate => _localizer.Get("roles.permission.reportsupdate");
-        public string Rolescreate => _localizer.Get("roles.permission.rolescreate");
-        public string Rolesdelete => _localizer.Get("roles.permission.rolesdelete");
-        public string Rolesmanagepermissions => _localizer.Get("roles.permission.rolesmanagepermissions");
-        public string Rolesread => _localizer.Get("roles.permission.rolesread");
-        public string Rolesupdate => _localizer.Get("roles.permission.rolesupdate");
-        public string Settingsread => _localizer.Get("roles.permission.settingsread");
-        public string Settingsupdate => _localizer.Get("roles.permission.settingsupdate");
-        public string Userscreate => _localizer.Get("roles.permission.userscreate");
-        public string Usersdelete => _localizer.Get("roles.permission.usersdelete");
-        public string Usersmanageroles => _localizer.Get("roles.permission.usersmanageroles");
-        public string Usersread => _localizer.Get("roles.permission.usersread");
-        public string Usersupdate => _localizer.Get("roles.permission.usersupdate");
+        internal PermissionGroup(AppLocalizer localizer) : base(localizer) { }
+        public string Appointmentsconfirm => Get("roles.permission.appointmentsconfirm");
+        public string Appointmentscreate => Get("roles.permission.appointmentscreate");
+        public string Appointmentsdelete => Get("roles.permission.appointmentsdelete");
+        public string Appointmentsread => Get("roles.permission.appointmentsread");
+        public string Appointmentsupdate => Get("roles.permission.appointmentsupdate");
+        public string Cashentriesadd => Get("roles.permission.cashentriesadd");
+        public string Cashhandoversapprove => Get("roles.permission.cashhandoversapprove");
+        public string Cashhandoversread => Get("roles.permission.cashhandoversread");
+        public string Cashsessionsclose => Get("roles.permission.cashsessionsclose");
+        public string Cashsessionsopen => Get("roles.permission.cashsessionsopen");
+        public string Cashsessionsread => Get("roles.permission.cashsessionsread");
+        public string Examinationscancel => Get("roles.permission.examinationscancel");
+        public string Examinationscreate => Get("roles.permission.examinationscreate");
+        public string Examinationsdelete => Get("roles.permission.examinationsdelete");
+        public string Examinationsperform => Get("roles.permission.examinationsperform");
+        public string Examinationsread => Get("roles.permission.examinationsread");
+        public string Examinationstypesmanage => Get("roles.permission.examinationstypesmanage");
+        public string Examinationsupdate => Get("roles.permission.examinationsupdate");
+        public string Insuranceclaimscreate => Get("roles.permission.insuranceclaimscreate");
+        public string Insuranceclaimsread => Get("roles.permission.insuranceclaimsread");
+        public string Insuranceclaimssettle => Get("roles.permission.insuranceclaimssettle");
+        public string Insuranceclaimsupdate => Get("roles.permission.insuranceclaimsupdate");
+        public string Insurancecompaniescreate => Get("roles.permission.insurancecompaniescreate");
+        public string Insurancecompaniesdelete => Get("roles.permission.insurancecompaniesdelete");
+        public string Insurancecompaniesread => Get("roles.permission.insurancecompaniesread");
+        public string Insurancecompaniesupdate => Get("roles.permission.insurancecompaniesupdate");
+        public string Insurancepoliciescreate => Get("roles.permission.insurancepoliciescreate");
+        public string Insurancepoliciesdelete => Get("roles.permission.insurancepoliciesdelete");
+        public string Insurancepoliciesread => Get("roles.permission.insurancepoliciesread");
+        public string Insurancepoliciesupdate => Get("roles.permission.insurancepoliciesupdate");
+        public string Insurancepreauthorizationsattachdocument => Get("roles.permission.insurancepreauthorizationsattachdocument");
+        public string Insurancepreauthorizationscreate => Get("roles.permission.insurancepreauthorizationscreate");
+        public string Insurancepreauthorizationsread => Get("roles.permission.insurancepreauthorizationsread");
+        public string Insurancepreauthorizationsupdate => Get("roles.permission.insurancepreauthorizationsupdate");
+        public string Inventoryitemscreate => Get("roles.permission.inventoryitemscreate");
+        public string Inventoryitemsdelete => Get("roles.permission.inventoryitemsdelete");
+        public string Inventoryitemsread => Get("roles.permission.inventoryitemsread");
+        public string Inventoryitemsupdate => Get("roles.permission.inventoryitemsupdate");
+        public string Inventorypurchaseorderscreate => Get("roles.permission.inventorypurchaseorderscreate");
+        public string Inventorypurchaseordersdelete => Get("roles.permission.inventorypurchaseordersdelete");
+        public string Inventorypurchaseordersread => Get("roles.permission.inventorypurchaseordersread");
+        public string Inventorypurchaseordersupdate => Get("roles.permission.inventorypurchaseordersupdate");
+        public string Inventorystockissue => Get("roles.permission.inventorystockissue");
+        public string Inventorystockread => Get("roles.permission.inventorystockread");
+        public string Inventorysupplierscreate => Get("roles.permission.inventorysupplierscreate");
+        public string Inventorysuppliersdelete => Get("roles.permission.inventorysuppliersdelete");
+        public string Inventorysuppliersread => Get("roles.permission.inventorysuppliersread");
+        public string Inventorysuppliersupdate => Get("roles.permission.inventorysuppliersupdate");
+        public string Patientscreate => Get("roles.permission.patientscreate");
+        public string Patientsdelete => Get("roles.permission.patientsdelete");
+        public string Patientsread => Get("roles.permission.patientsread");
+        public string Patientsupdate => Get("roles.permission.patientsupdate");
+        public string Reportscreate => Get("roles.permission.reportscreate");
+        public string Reportsdelete => Get("roles.permission.reportsdelete");
+        public string Reportsexport => Get("roles.permission.reportsexport");
+        public string Reportsread => Get("roles.permission.reportsread");
+        public string Reportsupdate => Get("roles.permission.reportsupdate");
+        public string Rolescreate => Get("roles.permission.rolescreate");
+        public string Rolesdelete => Get("roles.permission.rolesdelete");
+        public string Rolesmanagepermissions => Get("roles.permission.rolesmanagepermissions");
+        public string Rolesread => Get("roles.permission.rolesread");
+        public string Rolesupdate => Get("roles.permission.rolesupdate");
+        public string Settingsread => Get("roles.permission.settingsread");
+        public string Settingsupdate => Get("roles.permission.settingsupdate");
+        public string Userscreate => Get("roles.permission.userscreate");
+        public string Usersdelete => Get("roles.permission.usersdelete");
+        public string Usersmanageroles => Get("roles.permission.usersmanageroles");
+        public string Usersread => Get("roles.permission.usersread");
+        public string Usersupdate => Get("roles.permission.usersupdate");
     }
 
-    public sealed class PermissiongroupGroup
+    public sealed class PermissiongroupGroup : LocalizerGroup
     {
-        private readonly AppLocalizer _localizer;
-        internal PermissiongroupGroup(AppLocalizer localizer) => _localizer = localizer;
-        public string Appointments => _localizer.Get("roles.permissiongroup.appointments");
-        public string Cash => _localizer.Get("roles.permissiongroup.cash");
-        public string Examinations => _localizer.Get("roles.permissiongroup.examinations");
-        public string Identity => _localizer.Get("roles.permissiongroup.identity");
-        public string Insurance => _localizer.Get("roles.permissiongroup.insurance");
-        public string Inventory => _localizer.Get("roles.permissiongroup.inventory");
-        public string Patients => _localizer.Get("roles.permissiongroup.patients");
-        public string Reports => _localizer.Get("roles.permissiongroup.reports");
-        public string Settings => _localizer.Get("roles.permissiongroup.settings");
+        internal PermissiongroupGroup(AppLocalizer localizer) : base(localizer) { }
+        public string Appointments => Get("roles.permissiongroup.appointments");
+        public string Cash => Get("roles.permissiongroup.cash");
+        public string Examinations => Get("roles.permissiongroup.examinations");
+        public string Identity => Get("roles.permissiongroup.identity");
+        public string Insurance => Get("roles.permissiongroup.insurance");
+        public string Inventory => Get("roles.permissiongroup.inventory");
+        public string Patients => Get("roles.permissiongroup.patients");
+        public string Reports => Get("roles.permissiongroup.reports");
+        public string Settings => Get("roles.permissiongroup.settings");
     }
 }
 
-public sealed class SalaryGroup
+public sealed class SalaryGroup : LocalizerGroup
 {
-    private readonly AppLocalizer _localizer;
-    internal SalaryGroup(AppLocalizer localizer) => _localizer = localizer;
-    public string Activated => _localizer.Get("salary.activated");
-    public string BaseSalary => _localizer.Get("salary.baseSalary");
-    public string Deactivated => _localizer.Get("salary.deactivated");
-    public string DeleteConfirm => _localizer.Get("salary.deleteConfirm");
-    public string Deleted => _localizer.Get("salary.deleted");
-    public string DeleteTitle => _localizer.Get("salary.deleteTitle");
-    public string EditTitle => _localizer.Get("salary.editTitle");
-    public string Effective => _localizer.Get("salary.effective");
-    public string Employee => _localizer.Get("salary.employee");
-    public string EmptyActionLabel => _localizer.Get("salary.emptyActionLabel");
-    public string EmptyMessage => _localizer.Get("salary.emptyMessage");
-    public string EmptyTitle => _localizer.Get("salary.emptyTitle");
-    public string LoadErrorTitle => _localizer.Get("salary.loadErrorTitle");
-    public string NewSalary => _localizer.Get("salary.newSalary");
-    public string SearchPlaceholder => _localizer.Get("salary.searchPlaceholder");
-    public string Subtitle => _localizer.Get("salary.subtitle");
-    public string Title => _localizer.Get("salary.title");
-    public string ToggleStatus => _localizer.Get("salary.toggleStatus");
-    public string Unreachable => _localizer.Get("salary.unreachable");
+    internal SalaryGroup(AppLocalizer localizer) : base(localizer) { }
+    public string Activated => Get("salary.activated");
+    public string BaseSalary => Get("salary.baseSalary");
+    public string Deactivated => Get("salary.deactivated");
+    public string DeleteConfirm => Get("salary.deleteConfirm");
+    public string Deleted => Get("salary.deleted");
+    public string DeleteTitle => Get("salary.deleteTitle");
+    public string EditTitle => Get("salary.editTitle");
+    public string Effective => Get("salary.effective");
+    public string Employee => Get("salary.employee");
+    public string EmptyActionLabel => Get("salary.emptyActionLabel");
+    public string EmptyMessage => Get("salary.emptyMessage");
+    public string EmptyTitle => Get("salary.emptyTitle");
+    public string LoadErrorTitle => Get("salary.loadErrorTitle");
+    public string NewSalary => Get("salary.newSalary");
+    public string SearchPlaceholder => Get("salary.searchPlaceholder");
+    public string Subtitle => Get("salary.subtitle");
+    public string Title => Get("salary.title");
+    public string ToggleStatus => Get("salary.toggleStatus");
+    public string Unreachable => Get("salary.unreachable");
 }
 
-public sealed class SalaryComponentGroup
+public sealed class SalaryComponentGroup : LocalizerGroup
 {
-    private readonly AppLocalizer _localizer;
-    internal SalaryComponentGroup(AppLocalizer localizer) => _localizer = localizer;
-    public string Activated => _localizer.Get("salaryComponent.activated");
-    public string CreateComponent => _localizer.Get("salaryComponent.createComponent");
-    public string Created => _localizer.Get("salaryComponent.created");
-    public string Deactivated => _localizer.Get("salaryComponent.deactivated");
-    public string Default => _localizer.Get("salaryComponent.default");
-    public string DefaultPercent => _localizer.Get("salaryComponent.defaultPercent");
-    public string DefaultValue => _localizer.Get("salaryComponent.defaultValue");
-    public string DeleteConfirm => _localizer.Get("salaryComponent.deleteConfirm");
-    public string Deleted => _localizer.Get("salaryComponent.deleted");
-    public string DeleteTitle => _localizer.Get("salaryComponent.deleteTitle");
-    public string EditTitle => _localizer.Get("salaryComponent.editTitle");
-    public string EmptyActionLabel => _localizer.Get("salaryComponent.emptyActionLabel");
-    public string EmptyMessage => _localizer.Get("salaryComponent.emptyMessage");
-    public string EmptyTitle => _localizer.Get("salaryComponent.emptyTitle");
-    public string Fixed => _localizer.Get("salaryComponent.fixed");
-    public string Frequency => _localizer.Get("salaryComponent.frequency");
-    public string FrequencyOptional => _localizer.Get("salaryComponent.frequencyOptional");
-    public string Kind => _localizer.Get("salaryComponent.kind");
-    public string LoadErrorTitle => _localizer.Get("salaryComponent.loadErrorTitle");
-    public string NewComponent => _localizer.Get("salaryComponent.newComponent");
-    public string NewSalaryComponent => _localizer.Get("salaryComponent.newSalaryComponent");
-    public string NotSet => _localizer.Get("salaryComponent.notSet");
-    public string PaidPerWorkDay => _localizer.Get("salaryComponent.paidPerWorkDay");
-    public string Percentage => _localizer.Get("salaryComponent.percentage");
-    public string PerWorkDay => _localizer.Get("salaryComponent.perWorkDay");
-    public string SaveChanges => _localizer.Get("salaryComponent.saveChanges");
-    public string SearchPlaceholder => _localizer.Get("salaryComponent.searchPlaceholder");
-    public string Subtitle => _localizer.Get("salaryComponent.subtitle");
-    public string Title => _localizer.Get("salaryComponent.title");
-    public string ToggleStatus => _localizer.Get("salaryComponent.toggleStatus");
-    public string Unreachable => _localizer.Get("salaryComponent.unreachable");
-    public string UnreachableTryAgain => _localizer.Get("salaryComponent.unreachableTryAgain");
-    public string Updated => _localizer.Get("salaryComponent.updated");
-    public string ValueIsPercentage => _localizer.Get("salaryComponent.valueIsPercentage");
+    internal SalaryComponentGroup(AppLocalizer localizer) : base(localizer) { }
+    public string Activated => Get("salaryComponent.activated");
+    public string CreateComponent => Get("salaryComponent.createComponent");
+    public string Created => Get("salaryComponent.created");
+    public string Deactivated => Get("salaryComponent.deactivated");
+    public string Default => Get("salaryComponent.default");
+    public string DefaultPercent => Get("salaryComponent.defaultPercent");
+    public string DefaultValue => Get("salaryComponent.defaultValue");
+    public string DeleteConfirm => Get("salaryComponent.deleteConfirm");
+    public string Deleted => Get("salaryComponent.deleted");
+    public string DeleteTitle => Get("salaryComponent.deleteTitle");
+    public string EditTitle => Get("salaryComponent.editTitle");
+    public string EmptyActionLabel => Get("salaryComponent.emptyActionLabel");
+    public string EmptyMessage => Get("salaryComponent.emptyMessage");
+    public string EmptyTitle => Get("salaryComponent.emptyTitle");
+    public string Fixed => Get("salaryComponent.fixed");
+    public string Frequency => Get("salaryComponent.frequency");
+    public string FrequencyOptional => Get("salaryComponent.frequencyOptional");
+    public string Kind => Get("salaryComponent.kind");
+    public string LoadErrorTitle => Get("salaryComponent.loadErrorTitle");
+    public string NewComponent => Get("salaryComponent.newComponent");
+    public string NewSalaryComponent => Get("salaryComponent.newSalaryComponent");
+    public string NotSet => Get("salaryComponent.notSet");
+    public string PaidPerWorkDay => Get("salaryComponent.paidPerWorkDay");
+    public string Percentage => Get("salaryComponent.percentage");
+    public string PerWorkDay => Get("salaryComponent.perWorkDay");
+    public string SaveChanges => Get("salaryComponent.saveChanges");
+    public string SearchPlaceholder => Get("salaryComponent.searchPlaceholder");
+    public string Subtitle => Get("salaryComponent.subtitle");
+    public string Title => Get("salaryComponent.title");
+    public string ToggleStatus => Get("salaryComponent.toggleStatus");
+    public string Unreachable => Get("salaryComponent.unreachable");
+    public string UnreachableTryAgain => Get("salaryComponent.unreachableTryAgain");
+    public string Updated => Get("salaryComponent.updated");
+    public string ValueIsPercentage => Get("salaryComponent.valueIsPercentage");
 }
 
-public sealed class SalaryDialogGroup
+public sealed class SalaryDialogGroup : LocalizerGroup
 {
-    private readonly AppLocalizer _localizer;
-    internal SalaryDialogGroup(AppLocalizer localizer) => _localizer = localizer;
-    public string Created => _localizer.Get("salaryDialog.created");
-    public string CreateSalary => _localizer.Get("salaryDialog.createSalary");
-    public string EffectiveDate => _localizer.Get("salaryDialog.effectiveDate");
-    public string EmployeeSearch => _localizer.Get("salaryDialog.employeeSearch");
-    public string SalaryType => _localizer.Get("salaryDialog.salaryType");
-    public string SaveChanges => _localizer.Get("salaryDialog.saveChanges");
-    public string SearchError => _localizer.Get("salaryDialog.searchError");
-    public string SelectEffectiveDate => _localizer.Get("salaryDialog.selectEffectiveDate");
-    public string SelectEmployee => _localizer.Get("salaryDialog.selectEmployee");
-    public string Unreachable => _localizer.Get("salaryDialog.unreachable");
-    public string Updated => _localizer.Get("salaryDialog.updated");
+    internal SalaryDialogGroup(AppLocalizer localizer) : base(localizer) { }
+    public string Created => Get("salaryDialog.created");
+    public string CreateSalary => Get("salaryDialog.createSalary");
+    public string EffectiveDate => Get("salaryDialog.effectiveDate");
+    public string EmployeeSearch => Get("salaryDialog.employeeSearch");
+    public string SalaryType => Get("salaryDialog.salaryType");
+    public string SaveChanges => Get("salaryDialog.saveChanges");
+    public string SearchError => Get("salaryDialog.searchError");
+    public string SelectEffectiveDate => Get("salaryDialog.selectEffectiveDate");
+    public string SelectEmployee => Get("salaryDialog.selectEmployee");
+    public string Unreachable => Get("salaryDialog.unreachable");
+    public string Updated => Get("salaryDialog.updated");
 }
 
-public sealed class SearchGroup
+public sealed class SearchGroup : LocalizerGroup
 {
-    private readonly AppLocalizer _localizer;
-    internal SearchGroup(AppLocalizer localizer) => _localizer = localizer;
-    public string Error => _localizer.Get("search.error");
-    public string NoResults => _localizer.Get("search.noResults");
-    public string Recents => _localizer.Get("search.recents");
-    public string Retry => _localizer.Get("search.retry");
-    public string TypeHint => _localizer.Get("search.typeHint");
-    public string ViewAll => _localizer.Get("search.viewAll");
+    internal SearchGroup(AppLocalizer localizer) : base(localizer) { }
+    public string Error => Get("search.error");
+    public string NoResults => Get("search.noResults");
+    public string Recents => Get("search.recents");
+    public string Retry => Get("search.retry");
+    public string TypeHint => Get("search.typeHint");
+    public string ViewAll => Get("search.viewAll");
 
     private GroupGroup? _group;
-    public GroupGroup Group => _group ??= new GroupGroup(_localizer);
+    public GroupGroup Group => _group ??= new GroupGroup(Localizer);
 
-    public sealed class GroupGroup
+    public sealed class GroupGroup : LocalizerGroup
     {
-        private readonly AppLocalizer _localizer;
-        internal GroupGroup(AppLocalizer localizer) => _localizer = localizer;
-        public string ExaminationTypes => _localizer.Get("search.group.examinationTypes");
-        public string InsuranceCompanies => _localizer.Get("search.group.insuranceCompanies");
-        public string InsurancePolicies => _localizer.Get("search.group.insurancePolicies");
-        public string Items => _localizer.Get("search.group.items");
-        public string Patients => _localizer.Get("search.group.patients");
-        public string ReferralDoctors => _localizer.Get("search.group.referralDoctors");
-        public string Staff => _localizer.Get("search.group.staff");
-        public string Suppliers => _localizer.Get("search.group.suppliers");
-        public string Users => _localizer.Get("search.group.users");
+        internal GroupGroup(AppLocalizer localizer) : base(localizer) { }
+        public string ExaminationTypes => Get("search.group.examinationTypes");
+        public string InsuranceCompanies => Get("search.group.insuranceCompanies");
+        public string InsurancePolicies => Get("search.group.insurancePolicies");
+        public string Items => Get("search.group.items");
+        public string Patients => Get("search.group.patients");
+        public string ReferralDoctors => Get("search.group.referralDoctors");
+        public string Staff => Get("search.group.staff");
+        public string Suppliers => Get("search.group.suppliers");
+        public string Users => Get("search.group.users");
     }
 }
 
-public sealed class SendDialogGroup
+public sealed class SendDialogGroup : LocalizerGroup
 {
-    private readonly AppLocalizer _localizer;
-    internal SendDialogGroup(AppLocalizer localizer) => _localizer = localizer;
-    public string Body => _localizer.Get("sendDialog.body");
-    public string Channel => _localizer.Get("sendDialog.channel");
-    public string LogOnlyAlert => _localizer.Get("sendDialog.logOnlyAlert");
-    public string NoTemplate => _localizer.Get("sendDialog.noTemplate");
-    public string PlaceholdersLabel => _localizer.Get("sendDialog.placeholdersLabel");
-    public string Preview => _localizer.Get("sendDialog.preview");
-    public string PreviewSubject => _localizer.Get("sendDialog.previewSubject");
-    public string RecipientLabel => _localizer.Get("sendDialog.recipientLabel");
-    public string ReferenceOptional => _localizer.Get("sendDialog.referenceOptional");
-    public string Send => _localizer.Get("sendDialog.send");
-    public string Sent => _localizer.Get("sendDialog.sent");
-    public string Subject => _localizer.Get("sendDialog.subject");
-    public string Template => _localizer.Get("sendDialog.template");
-    public string TemplateHelper => _localizer.Get("sendDialog.templateHelper");
-    public string Title => _localizer.Get("sendDialog.title");
-    public string Unreachable => _localizer.Get("sendDialog.unreachable");
-    public string UnreachableRetry => _localizer.Get("sendDialog.unreachableRetry");
+    internal SendDialogGroup(AppLocalizer localizer) : base(localizer) { }
+    public string Body => Get("sendDialog.body");
+    public string Channel => Get("sendDialog.channel");
+    public string LogOnlyAlert => Get("sendDialog.logOnlyAlert");
+    public string NoTemplate => Get("sendDialog.noTemplate");
+    public string PlaceholdersLabel => Get("sendDialog.placeholdersLabel");
+    public string Preview => Get("sendDialog.preview");
+    public string PreviewSubject => Get("sendDialog.previewSubject");
+    public string RecipientLabel => Get("sendDialog.recipientLabel");
+    public string ReferenceOptional => Get("sendDialog.referenceOptional");
+    public string Send => Get("sendDialog.send");
+    public string Sent => Get("sendDialog.sent");
+    public string Subject => Get("sendDialog.subject");
+    public string Template => Get("sendDialog.template");
+    public string TemplateHelper => Get("sendDialog.templateHelper");
+    public string Title => Get("sendDialog.title");
+    public string Unreachable => Get("sendDialog.unreachable");
+    public string UnreachableRetry => Get("sendDialog.unreachableRetry");
 }
 
-public sealed class StaffGroup
+public sealed class StaffGroup : LocalizerGroup
 {
-    private readonly AppLocalizer _localizer;
-    internal StaffGroup(AppLocalizer localizer) => _localizer = localizer;
-    public string Activated => _localizer.Get("staff.activated");
-    public string Add => _localizer.Get("staff.add");
-    public string Deactivated => _localizer.Get("staff.deactivated");
-    public string DeleteConfirm => _localizer.Get("staff.deleteConfirm");
-    public string Deleted => _localizer.Get("staff.deleted");
-    public string DeleteTitle => _localizer.Get("staff.deleteTitle");
-    public string Department => _localizer.Get("staff.department");
-    public string Edit => _localizer.Get("staff.edit");
-    public string EmptyActionLabel => _localizer.Get("staff.emptyActionLabel");
-    public string EmptyMessage => _localizer.Get("staff.emptyMessage");
-    public string EmptyTitle => _localizer.Get("staff.emptyTitle");
-    public string HireDate => _localizer.Get("staff.hireDate");
-    public string LoadErrorTitle => _localizer.Get("staff.loadErrorTitle");
-    public string NewStaff => _localizer.Get("staff.newStaff");
-    public string Phone => _localizer.Get("staff.phone");
-    public string Position => _localizer.Get("staff.position");
-    public string SearchPlaceholder => _localizer.Get("staff.searchPlaceholder");
-    public string Specialization => _localizer.Get("staff.specialization");
-    public string Subtitle => _localizer.Get("staff.subtitle");
-    public string Title => _localizer.Get("staff.title");
-    public string ToggleStatus => _localizer.Get("staff.toggleStatus");
-    public string Unreachable => _localizer.Get("staff.unreachable");
+    internal StaffGroup(AppLocalizer localizer) : base(localizer) { }
+    public string Activated => Get("staff.activated");
+    public string Add => Get("staff.add");
+    public string Deactivated => Get("staff.deactivated");
+    public string DeleteConfirm => Get("staff.deleteConfirm");
+    public string Deleted => Get("staff.deleted");
+    public string DeleteTitle => Get("staff.deleteTitle");
+    public string Department => Get("staff.department");
+    public string Edit => Get("staff.edit");
+    public string EmptyActionLabel => Get("staff.emptyActionLabel");
+    public string EmptyMessage => Get("staff.emptyMessage");
+    public string EmptyTitle => Get("staff.emptyTitle");
+    public string HireDate => Get("staff.hireDate");
+    public string LoadErrorTitle => Get("staff.loadErrorTitle");
+    public string NewStaff => Get("staff.newStaff");
+    public string Phone => Get("staff.phone");
+    public string Position => Get("staff.position");
+    public string SearchPlaceholder => Get("staff.searchPlaceholder");
+    public string Specialization => Get("staff.specialization");
+    public string Subtitle => Get("staff.subtitle");
+    public string Title => Get("staff.title");
+    public string ToggleStatus => Get("staff.toggleStatus");
+    public string Unreachable => Get("staff.unreachable");
 }
 
-public sealed class StaffDialogGroup
+public sealed class StaffDialogGroup : LocalizerGroup
 {
-    private readonly AppLocalizer _localizer;
-    internal StaffDialogGroup(AppLocalizer localizer) => _localizer = localizer;
-    public string Created => _localizer.Get("staffDialog.created");
-    public string CreateStaff => _localizer.Get("staffDialog.createStaff");
-    public string FullName => _localizer.Get("staffDialog.fullName");
-    public string LicenseNumber => _localizer.Get("staffDialog.licenseNumber");
-    public string PhoneNumber => _localizer.Get("staffDialog.phoneNumber");
-    public string SaveChanges => _localizer.Get("staffDialog.saveChanges");
-    public string SearchError => _localizer.Get("staffDialog.searchError");
-    public string SelectUser => _localizer.Get("staffDialog.selectUser");
-    public string Unreachable => _localizer.Get("staffDialog.unreachable");
-    public string Updated => _localizer.Get("staffDialog.updated");
-    public string UserSearch => _localizer.Get("staffDialog.userSearch");
+    internal StaffDialogGroup(AppLocalizer localizer) : base(localizer) { }
+    public string Created => Get("staffDialog.created");
+    public string CreateStaff => Get("staffDialog.createStaff");
+    public string FullName => Get("staffDialog.fullName");
+    public string LicenseNumber => Get("staffDialog.licenseNumber");
+    public string PhoneNumber => Get("staffDialog.phoneNumber");
+    public string SaveChanges => Get("staffDialog.saveChanges");
+    public string SearchError => Get("staffDialog.searchError");
+    public string SelectUser => Get("staffDialog.selectUser");
+    public string Unreachable => Get("staffDialog.unreachable");
+    public string Updated => Get("staffDialog.updated");
+    public string UserSearch => Get("staffDialog.userSearch");
 }
 
-public sealed class StaffMachineGroup
+public sealed class StaffMachineGroup : LocalizerGroup
 {
-    private readonly AppLocalizer _localizer;
-    internal StaffMachineGroup(AppLocalizer localizer) => _localizer = localizer;
-    public string ActiveInPeriod => _localizer.Get("staffMachine.activeInPeriod");
-    public string CasesReferredToYourCenter => _localizer.Get("staffMachine.casesReferredToYourCenter");
-    public string CompletedExamsByCaseLoad => _localizer.Get("staffMachine.completedExamsByCaseLoad");
-    public string CompletedExamsSupported => _localizer.Get("staffMachine.completedExamsSupported");
-    public string Exams => _localizer.Get("staffMachine.exams");
-    public string ExamsPerMachineByModality => _localizer.Get("staffMachine.examsPerMachineByModality");
-    public string LoadErrorMsg => _localizer.Get("staffMachine.loadErrorMsg");
-    public string LoadErrorTitle => _localizer.Get("staffMachine.loadErrorTitle");
-    public string MachineUtilization => _localizer.Get("staffMachine.machineUtilization");
-    public string Modalities => _localizer.Get("staffMachine.modalities");
-    public string PerformedExams => _localizer.Get("staffMachine.performedExams");
-    public string Radiologists => _localizer.Get("staffMachine.radiologists");
-    public string ReferralDoctors => _localizer.Get("staffMachine.referralDoctors");
-    public string ReferralPerformance => _localizer.Get("staffMachine.referralPerformance");
-    public string Referrals => _localizer.Get("staffMachine.referrals");
-    public string ReferredCases => _localizer.Get("staffMachine.referredCases");
-    public string Retry => _localizer.Get("staffMachine.retry");
-    public string Subtitle => _localizer.Get("staffMachine.subtitle");
-    public string Technicians => _localizer.Get("staffMachine.technicians");
-    public string Title => _localizer.Get("staffMachine.title");
-    public string TopRadiologists => _localizer.Get("staffMachine.topRadiologists");
-    public string TopTechnicians => _localizer.Get("staffMachine.topTechnicians");
-    public string WithCaseActivity => _localizer.Get("staffMachine.withCaseActivity");
+    internal StaffMachineGroup(AppLocalizer localizer) : base(localizer) { }
+    public string ActiveInPeriod => Get("staffMachine.activeInPeriod");
+    public string CasesReferredToYourCenter => Get("staffMachine.casesReferredToYourCenter");
+    public string CompletedExamsByCaseLoad => Get("staffMachine.completedExamsByCaseLoad");
+    public string CompletedExamsSupported => Get("staffMachine.completedExamsSupported");
+    public string Exams => Get("staffMachine.exams");
+    public string ExamsPerMachineByModality => Get("staffMachine.examsPerMachineByModality");
+    public string LoadErrorMsg => Get("staffMachine.loadErrorMsg");
+    public string LoadErrorTitle => Get("staffMachine.loadErrorTitle");
+    public string MachineUtilization => Get("staffMachine.machineUtilization");
+    public string Modalities => Get("staffMachine.modalities");
+    public string PerformedExams => Get("staffMachine.performedExams");
+    public string Radiologists => Get("staffMachine.radiologists");
+    public string ReferralDoctors => Get("staffMachine.referralDoctors");
+    public string ReferralPerformance => Get("staffMachine.referralPerformance");
+    public string Referrals => Get("staffMachine.referrals");
+    public string ReferredCases => Get("staffMachine.referredCases");
+    public string Retry => Get("staffMachine.retry");
+    public string Subtitle => Get("staffMachine.subtitle");
+    public string Technicians => Get("staffMachine.technicians");
+    public string Title => Get("staffMachine.title");
+    public string TopRadiologists => Get("staffMachine.topRadiologists");
+    public string TopTechnicians => Get("staffMachine.topTechnicians");
+    public string WithCaseActivity => Get("staffMachine.withCaseActivity");
 }
 
-public sealed class StockMovementsGroup
+public sealed class StockMovementsGroup : LocalizerGroup
 {
-    private readonly AppLocalizer _localizer;
-    internal StockMovementsGroup(AppLocalizer localizer) => _localizer = localizer;
-    public string EmptyMessage => _localizer.Get("stockMovements.emptyMessage");
-    public string Item => _localizer.Get("stockMovements.item");
-    public string LoadErrorTitle => _localizer.Get("stockMovements.loadErrorTitle");
-    public string NoMovementsTitle => _localizer.Get("stockMovements.noMovementsTitle");
-    public string Notes => _localizer.Get("stockMovements.notes");
-    public string Quantity => _localizer.Get("stockMovements.quantity");
-    public string Reference => _localizer.Get("stockMovements.reference");
-    public string SearchPlaceholder => _localizer.Get("stockMovements.searchPlaceholder");
-    public string Subtitle => _localizer.Get("stockMovements.subtitle");
-    public string Title => _localizer.Get("stockMovements.title");
-    public string UnitCost => _localizer.Get("stockMovements.unitCost");
-    public string Unreachable => _localizer.Get("stockMovements.unreachable");
+    internal StockMovementsGroup(AppLocalizer localizer) : base(localizer) { }
+    public string EmptyMessage => Get("stockMovements.emptyMessage");
+    public string Item => Get("stockMovements.item");
+    public string LoadErrorTitle => Get("stockMovements.loadErrorTitle");
+    public string NoMovementsTitle => Get("stockMovements.noMovementsTitle");
+    public string Notes => Get("stockMovements.notes");
+    public string Quantity => Get("stockMovements.quantity");
+    public string Reference => Get("stockMovements.reference");
+    public string SearchPlaceholder => Get("stockMovements.searchPlaceholder");
+    public string Subtitle => Get("stockMovements.subtitle");
+    public string Title => Get("stockMovements.title");
+    public string UnitCost => Get("stockMovements.unitCost");
+    public string Unreachable => Get("stockMovements.unreachable");
 }
 
-public sealed class SupplierDialogGroup
+public sealed class SupplierDialogGroup : LocalizerGroup
 {
-    private readonly AppLocalizer _localizer;
-    internal SupplierDialogGroup(AppLocalizer localizer) => _localizer = localizer;
-    public string Address => _localizer.Get("supplierDialog.address");
-    public string ContactPerson => _localizer.Get("supplierDialog.contactPerson");
-    public string CreateSupplier => _localizer.Get("supplierDialog.createSupplier");
-    public string EditSupplier => _localizer.Get("supplierDialog.editSupplier");
-    public string Email => _localizer.Get("supplierDialog.email");
-    public string NewSupplier => _localizer.Get("supplierDialog.newSupplier");
-    public string PaymentTerms => _localizer.Get("supplierDialog.paymentTerms");
-    public string Phone => _localizer.Get("supplierDialog.phone");
-    public string SaveChanges => _localizer.Get("supplierDialog.saveChanges");
-    public string SupplierCreated => _localizer.Get("supplierDialog.supplierCreated");
-    public string SupplierUpdated => _localizer.Get("supplierDialog.supplierUpdated");
-    public string TaxNumber => _localizer.Get("supplierDialog.taxNumber");
-    public string Unreachable => _localizer.Get("supplierDialog.unreachable");
+    internal SupplierDialogGroup(AppLocalizer localizer) : base(localizer) { }
+    public string Address => Get("supplierDialog.address");
+    public string ContactPerson => Get("supplierDialog.contactPerson");
+    public string CreateSupplier => Get("supplierDialog.createSupplier");
+    public string EditSupplier => Get("supplierDialog.editSupplier");
+    public string Email => Get("supplierDialog.email");
+    public string NewSupplier => Get("supplierDialog.newSupplier");
+    public string PaymentTerms => Get("supplierDialog.paymentTerms");
+    public string Phone => Get("supplierDialog.phone");
+    public string SaveChanges => Get("supplierDialog.saveChanges");
+    public string SupplierCreated => Get("supplierDialog.supplierCreated");
+    public string SupplierUpdated => Get("supplierDialog.supplierUpdated");
+    public string TaxNumber => Get("supplierDialog.taxNumber");
+    public string Unreachable => Get("supplierDialog.unreachable");
 }
 
-public sealed class SuppliersGroup
+public sealed class SuppliersGroup : LocalizerGroup
 {
-    private readonly AppLocalizer _localizer;
-    internal SuppliersGroup(AppLocalizer localizer) => _localizer = localizer;
-    public string AddFirstSupplier => _localizer.Get("suppliers.addFirstSupplier");
-    public string AddSupplier => _localizer.Get("suppliers.addSupplier");
-    public string Contact => _localizer.Get("suppliers.contact");
-    public string DeleteConfirm => _localizer.Get("suppliers.deleteConfirm");
-    public string DeleteSupplierTitle => _localizer.Get("suppliers.deleteSupplierTitle");
-    public string Email => _localizer.Get("suppliers.email");
-    public string EmptyMessage => _localizer.Get("suppliers.emptyMessage");
-    public string LoadErrorTitle => _localizer.Get("suppliers.loadErrorTitle");
-    public string NoSuppliersTitle => _localizer.Get("suppliers.noSuppliersTitle");
-    public string PaymentTerms => _localizer.Get("suppliers.paymentTerms");
-    public string Phone => _localizer.Get("suppliers.phone");
-    public string SearchPlaceholder => _localizer.Get("suppliers.searchPlaceholder");
-    public string Subtitle => _localizer.Get("suppliers.subtitle");
-    public string SupplierActivated => _localizer.Get("suppliers.supplierActivated");
-    public string SupplierDeactivated => _localizer.Get("suppliers.supplierDeactivated");
-    public string SupplierDeleted => _localizer.Get("suppliers.supplierDeleted");
-    public string Tax => _localizer.Get("suppliers.tax");
-    public string Title => _localizer.Get("suppliers.title");
-    public string ToggleStatus => _localizer.Get("suppliers.toggleStatus");
-    public string Unreachable => _localizer.Get("suppliers.unreachable");
+    internal SuppliersGroup(AppLocalizer localizer) : base(localizer) { }
+    public string AddFirstSupplier => Get("suppliers.addFirstSupplier");
+    public string AddSupplier => Get("suppliers.addSupplier");
+    public string Contact => Get("suppliers.contact");
+    public string DeleteConfirm => Get("suppliers.deleteConfirm");
+    public string DeleteSupplierTitle => Get("suppliers.deleteSupplierTitle");
+    public string Email => Get("suppliers.email");
+    public string EmptyMessage => Get("suppliers.emptyMessage");
+    public string LoadErrorTitle => Get("suppliers.loadErrorTitle");
+    public string NoSuppliersTitle => Get("suppliers.noSuppliersTitle");
+    public string PaymentTerms => Get("suppliers.paymentTerms");
+    public string Phone => Get("suppliers.phone");
+    public string SearchPlaceholder => Get("suppliers.searchPlaceholder");
+    public string Subtitle => Get("suppliers.subtitle");
+    public string SupplierActivated => Get("suppliers.supplierActivated");
+    public string SupplierDeactivated => Get("suppliers.supplierDeactivated");
+    public string SupplierDeleted => Get("suppliers.supplierDeleted");
+    public string Tax => Get("suppliers.tax");
+    public string Title => Get("suppliers.title");
+    public string ToggleStatus => Get("suppliers.toggleStatus");
+    public string Unreachable => Get("suppliers.unreachable");
 }
 
-public sealed class TemplateDialogGroup
+public sealed class TemplateDialogGroup : LocalizerGroup
 {
-    private readonly AppLocalizer _localizer;
-    internal TemplateDialogGroup(AppLocalizer localizer) => _localizer = localizer;
-    public string Body => _localizer.Get("templateDialog.body");
-    public string BodyHelper => _localizer.Get("templateDialog.bodyHelper");
-    public string Code => _localizer.Get("templateDialog.code");
-    public string CodeHelper => _localizer.Get("templateDialog.codeHelper");
-    public string Created => _localizer.Get("templateDialog.created");
-    public string CreateTemplate => _localizer.Get("templateDialog.createTemplate");
-    public string EditTitle => _localizer.Get("templateDialog.editTitle");
-    public string NewTitle => _localizer.Get("templateDialog.newTitle");
-    public string SaveChanges => _localizer.Get("templateDialog.saveChanges");
-    public string Subject => _localizer.Get("templateDialog.subject");
-    public string SubjectHelper => _localizer.Get("templateDialog.subjectHelper");
-    public string Unreachable => _localizer.Get("templateDialog.unreachable");
-    public string Updated => _localizer.Get("templateDialog.updated");
+    internal TemplateDialogGroup(AppLocalizer localizer) : base(localizer) { }
+    public string Body => Get("templateDialog.body");
+    public string BodyHelper => Get("templateDialog.bodyHelper");
+    public string Code => Get("templateDialog.code");
+    public string CodeHelper => Get("templateDialog.codeHelper");
+    public string Created => Get("templateDialog.created");
+    public string CreateTemplate => Get("templateDialog.createTemplate");
+    public string EditTitle => Get("templateDialog.editTitle");
+    public string NewTitle => Get("templateDialog.newTitle");
+    public string SaveChanges => Get("templateDialog.saveChanges");
+    public string Subject => Get("templateDialog.subject");
+    public string SubjectHelper => Get("templateDialog.subjectHelper");
+    public string Unreachable => Get("templateDialog.unreachable");
+    public string Updated => Get("templateDialog.updated");
 }
 
-public sealed class UserDialogGroup
+public sealed class UserDialogGroup : LocalizerGroup
 {
-    private readonly AppLocalizer _localizer;
-    internal UserDialogGroup(AppLocalizer localizer) => _localizer = localizer;
-    public string ConfirmPassword => _localizer.Get("userDialog.confirmPassword");
-    public string Created => _localizer.Get("userDialog.created");
-    public string CreateUser => _localizer.Get("userDialog.createUser");
-    public string EditTitle => _localizer.Get("userDialog.editTitle");
-    public string Email => _localizer.Get("userDialog.email");
-    public string FirstName => _localizer.Get("userDialog.firstName");
-    public string InvalidNewPassword => _localizer.Get("userDialog.invalidNewPassword");
-    public string LastName => _localizer.Get("userDialog.lastName");
-    public string LoadRolesError => _localizer.Get("userDialog.loadRolesError");
-    public string LoadRolesErrorTitle => _localizer.Get("userDialog.loadRolesErrorTitle");
-    public string LockDescription => _localizer.Get("userDialog.lockDescription");
-    public string LockedUntil => _localizer.Get("userDialog.lockedUntil");
-    public string LockFuture => _localizer.Get("userDialog.lockFuture");
-    public string LockTitle => _localizer.Get("userDialog.lockTitle");
-    public string LockUntil => _localizer.Get("userDialog.lockUntil");
-    public string LockUntilTime => _localizer.Get("userDialog.lockUntilTime");
-    public string LockUser => _localizer.Get("userDialog.lockUser");
-    public string NewPassword => _localizer.Get("userDialog.newPassword");
-    public string NewTitle => _localizer.Get("userDialog.newTitle");
-    public string Password => _localizer.Get("userDialog.password");
-    public string PasswordHelper => _localizer.Get("userDialog.passwordHelper");
-    public string PasswordMismatch => _localizer.Get("userDialog.passwordMismatch");
-    public string PasswordRequired => _localizer.Get("userDialog.passwordRequired");
-    public string PasswordReset => _localizer.Get("userDialog.passwordReset");
-    public string Phone => _localizer.Get("userDialog.phone");
-    public string ProfileUpdated => _localizer.Get("userDialog.profileUpdated");
-    public string ResetPasswordButton => _localizer.Get("userDialog.resetPasswordButton");
-    public string ResetPasswordDescription => _localizer.Get("userDialog.resetPasswordDescription");
-    public string ResetPasswordTitle => _localizer.Get("userDialog.resetPasswordTitle");
-    public string Roles => _localizer.Get("userDialog.roles");
-    public string RolesDescription => _localizer.Get("userDialog.rolesDescription");
-    public string RolesTitle => _localizer.Get("userDialog.rolesTitle");
-    public string RolesUpdated => _localizer.Get("userDialog.rolesUpdated");
-    public string SaveChanges => _localizer.Get("userDialog.saveChanges");
-    public string SaveRoles => _localizer.Get("userDialog.saveRoles");
-    public string SelectDateTime => _localizer.Get("userDialog.selectDateTime");
-    public string SelectRole => _localizer.Get("userDialog.selectRole");
-    public string SystemRole => _localizer.Get("userDialog.systemRole");
-    public string Unreachable => _localizer.Get("userDialog.unreachable");
-    public string UnreachableRetry => _localizer.Get("userDialog.unreachableRetry");
-    public string Username => _localizer.Get("userDialog.username");
+    internal UserDialogGroup(AppLocalizer localizer) : base(localizer) { }
+    public string ConfirmPassword => Get("userDialog.confirmPassword");
+    public string Created => Get("userDialog.created");
+    public string CreateUser => Get("userDialog.createUser");
+    public string EditTitle => Get("userDialog.editTitle");
+    public string Email => Get("userDialog.email");
+    public string FirstName => Get("userDialog.firstName");
+    public string InvalidNewPassword => Get("userDialog.invalidNewPassword");
+    public string LastName => Get("userDialog.lastName");
+    public string LoadRolesError => Get("userDialog.loadRolesError");
+    public string LoadRolesErrorTitle => Get("userDialog.loadRolesErrorTitle");
+    public string LockDescription => Get("userDialog.lockDescription");
+    public string LockedUntil => Get("userDialog.lockedUntil");
+    public string LockFuture => Get("userDialog.lockFuture");
+    public string LockTitle => Get("userDialog.lockTitle");
+    public string LockUntil => Get("userDialog.lockUntil");
+    public string LockUntilTime => Get("userDialog.lockUntilTime");
+    public string LockUser => Get("userDialog.lockUser");
+    public string NewPassword => Get("userDialog.newPassword");
+    public string NewTitle => Get("userDialog.newTitle");
+    public string Password => Get("userDialog.password");
+    public string PasswordHelper => Get("userDialog.passwordHelper");
+    public string PasswordMismatch => Get("userDialog.passwordMismatch");
+    public string PasswordRequired => Get("userDialog.passwordRequired");
+    public string PasswordReset => Get("userDialog.passwordReset");
+    public string Phone => Get("userDialog.phone");
+    public string ProfileUpdated => Get("userDialog.profileUpdated");
+    public string ResetPasswordButton => Get("userDialog.resetPasswordButton");
+    public string ResetPasswordDescription => Get("userDialog.resetPasswordDescription");
+    public string ResetPasswordTitle => Get("userDialog.resetPasswordTitle");
+    public string Roles => Get("userDialog.roles");
+    public string RolesDescription => Get("userDialog.rolesDescription");
+    public string RolesTitle => Get("userDialog.rolesTitle");
+    public string RolesUpdated => Get("userDialog.rolesUpdated");
+    public string SaveChanges => Get("userDialog.saveChanges");
+    public string SaveRoles => Get("userDialog.saveRoles");
+    public string SelectDateTime => Get("userDialog.selectDateTime");
+    public string SelectRole => Get("userDialog.selectRole");
+    public string SystemRole => Get("userDialog.systemRole");
+    public string Unreachable => Get("userDialog.unreachable");
+    public string UnreachableRetry => Get("userDialog.unreachableRetry");
+    public string Username => Get("userDialog.username");
 }
 
-public sealed class UsersGroup
+public sealed class UsersGroup : LocalizerGroup
 {
-    private readonly AppLocalizer _localizer;
-    internal UsersGroup(AppLocalizer localizer) => _localizer = localizer;
-    public string Activate => _localizer.Get("users.activate");
-    public string Activated => _localizer.Get("users.activated");
-    public string Deactivate => _localizer.Get("users.deactivate");
-    public string DeactivateConfirm => _localizer.Get("users.deactivateConfirm");
-    public string Deactivated => _localizer.Get("users.deactivated");
-    public string DeactivateTitle => _localizer.Get("users.deactivateTitle");
-    public string EditProfile => _localizer.Get("users.editProfile");
-    public string Email => _localizer.Get("users.email");
-    public string EmptyAction => _localizer.Get("users.emptyAction");
-    public string EmptyMessage => _localizer.Get("users.emptyMessage");
-    public string EmptyTitle => _localizer.Get("users.emptyTitle");
-    public string LastLogin => _localizer.Get("users.lastLogin");
-    public string LoadErrorTitle => _localizer.Get("users.loadErrorTitle");
-    public string Lock => _localizer.Get("users.lock");
-    public string Locked => _localizer.Get("users.locked");
-    public string ManageRoles => _localizer.Get("users.manageRoles");
-    public string NewUser => _localizer.Get("users.newUser");
-    public string Phone => _localizer.Get("users.phone");
-    public string ResetPassword => _localizer.Get("users.resetPassword");
-    public string SearchPlaceholder => _localizer.Get("users.searchPlaceholder");
-    public string Subtitle => _localizer.Get("users.subtitle");
-    public string Title => _localizer.Get("users.title");
-    public string Unlock => _localizer.Get("users.unlock");
-    public string Unlocked => _localizer.Get("users.unlocked");
-    public string Unreachable => _localizer.Get("users.unreachable");
-    public string Username => _localizer.Get("users.username");
-    public string You => _localizer.Get("users.you");
+    internal UsersGroup(AppLocalizer localizer) : base(localizer) { }
+    public string Activate => Get("users.activate");
+    public string Activated => Get("users.activated");
+    public string Deactivate => Get("users.deactivate");
+    public string DeactivateConfirm => Get("users.deactivateConfirm");
+    public string Deactivated => Get("users.deactivated");
+    public string DeactivateTitle => Get("users.deactivateTitle");
+    public string EditProfile => Get("users.editProfile");
+    public string Email => Get("users.email");
+    public string EmptyAction => Get("users.emptyAction");
+    public string EmptyMessage => Get("users.emptyMessage");
+    public string EmptyTitle => Get("users.emptyTitle");
+    public string LastLogin => Get("users.lastLogin");
+    public string LoadErrorTitle => Get("users.loadErrorTitle");
+    public string Lock => Get("users.lock");
+    public string Locked => Get("users.locked");
+    public string ManageRoles => Get("users.manageRoles");
+    public string NewUser => Get("users.newUser");
+    public string Phone => Get("users.phone");
+    public string ResetPassword => Get("users.resetPassword");
+    public string SearchPlaceholder => Get("users.searchPlaceholder");
+    public string Subtitle => Get("users.subtitle");
+    public string Title => Get("users.title");
+    public string Unlock => Get("users.unlock");
+    public string Unlocked => Get("users.unlocked");
+    public string Unreachable => Get("users.unreachable");
+    public string Username => Get("users.username");
+    public string You => Get("users.you");
 }
 
-public sealed class ValidationGroup
+public sealed class ValidationGroup : LocalizerGroup
 {
-    private readonly AppLocalizer _localizer;
-    internal ValidationGroup(AppLocalizer localizer) => _localizer = localizer;
-    public string AddressMaxLength => _localizer.Get("validation.addressMaxLength");
-    public string AllowanceNameMaxLength => _localizer.Get("validation.allowanceNameMaxLength");
-    public string AllowanceNameRequired => _localizer.Get("validation.allowanceNameRequired");
-    public string AmountGreaterThanZero => _localizer.Get("validation.amountGreaterThanZero");
-    public string BilledAmountNonNegative => _localizer.Get("validation.billedAmountNonNegative");
-    public string BodyPartMaxLength => _localizer.Get("validation.bodyPartMaxLength");
-    public string BodyPartRequired => _localizer.Get("validation.bodyPartRequired");
-    public string BodyRequired => _localizer.Get("validation.bodyRequired");
-    public string CategoryRequired => _localizer.Get("validation.categoryRequired");
-    public string ChannelRequired => _localizer.Get("validation.channelRequired");
-    public string ClinicalIndicationMaxLength => _localizer.Get("validation.clinicalIndicationMaxLength");
-    public string ClinicalIndicationRequired => _localizer.Get("validation.clinicalIndicationRequired");
-    public string CodeMaxLength100 => _localizer.Get("validation.codeMaxLength100");
-    public string CodeMaxLength20 => _localizer.Get("validation.codeMaxLength20");
-    public string CodeRequired => _localizer.Get("validation.codeRequired");
-    public string ContactPersonMaxLength => _localizer.Get("validation.contactPersonMaxLength");
-    public string CountedTotalInvalid => _localizer.Get("validation.countedTotalInvalid");
-    public string CoverageRange => _localizer.Get("validation.coverageRange");
-    public string CurrentPasswordRequired => _localizer.Get("validation.currentPasswordRequired");
-    public string DepartmentMaxLength => _localizer.Get("validation.departmentMaxLength");
-    public string DescriptionMaxLength => _localizer.Get("validation.descriptionMaxLength");
-    public string EffectiveFromRequired => _localizer.Get("validation.effectiveFromRequired");
-    public string EmailInvalid => _localizer.Get("validation.emailInvalid");
-    public string EmailMaxLength => _localizer.Get("validation.emailMaxLength");
-    public string EmailRequired => _localizer.Get("validation.emailRequired");
-    public string EstimatedAmountNonNegative => _localizer.Get("validation.estimatedAmountNonNegative");
-    public string FirstNameMaxLength => _localizer.Get("validation.firstNameMaxLength");
-    public string FirstNameRequired => _localizer.Get("validation.firstNameRequired");
-    public string FullNameFirstAndLast => _localizer.Get("validation.fullNameFirstAndLast");
-    public string FullNameMaxLength => _localizer.Get("validation.fullNameMaxLength");
-    public string FullNameRequired => _localizer.Get("validation.fullNameRequired");
-    public string GenderRequired => _localizer.Get("validation.genderRequired");
-    public string HireDateRequired => _localizer.Get("validation.hireDateRequired");
-    public string HospitalMaxLength => _localizer.Get("validation.hospitalMaxLength");
-    public string InsuranceCompanyRequired => _localizer.Get("validation.insuranceCompanyRequired");
-    public string KindRequired => _localizer.Get("validation.kindRequired");
-    public string LastNameMaxLength => _localizer.Get("validation.lastNameMaxLength");
-    public string LastNameRequired => _localizer.Get("validation.lastNameRequired");
-    public string LeaveTypeRequired => _localizer.Get("validation.leaveTypeRequired");
-    public string LicenseNumberMaxLength => _localizer.Get("validation.licenseNumberMaxLength");
-    public string LockUntilDateRequired => _localizer.Get("validation.lockUntilDateRequired");
-    public string LockUntilTimeRequired => _localizer.Get("validation.lockUntilTimeRequired");
-    public string ModalityRequired => _localizer.Get("validation.modalityRequired");
-    public string NameMaxLength100 => _localizer.Get("validation.nameMaxLength100");
-    public string NameMaxLength200 => _localizer.Get("validation.nameMaxLength200");
-    public string NameRequired => _localizer.Get("validation.nameRequired");
-    public string NotesMaxLength1000 => _localizer.Get("validation.notesMaxLength1000");
-    public string NotesMaxLength500 => _localizer.Get("validation.notesMaxLength500");
-    public string OpeningFloatInvalid => _localizer.Get("validation.openingFloatInvalid");
-    public string PasswordLettersDigits => _localizer.Get("validation.passwordLettersDigits");
-    public string PasswordMinLength => _localizer.Get("validation.passwordMinLength");
-    public string PasswordMismatch => _localizer.Get("validation.passwordMismatch");
-    public string PasswordRequired => _localizer.Get("validation.passwordRequired");
-    public string PatientRequired => _localizer.Get("validation.patientRequired");
-    public string PaymentTermsMaxLength => _localizer.Get("validation.paymentTermsMaxLength");
-    public string PhoneEgyptian => _localizer.Get("validation.phoneEgyptian");
-    public string PhoneMaxLength => _localizer.Get("validation.phoneMaxLength");
-    public string PhoneNumberMaxLength => _localizer.Get("validation.phoneNumberMaxLength");
-    public string PhoneNumberRequired => _localizer.Get("validation.phoneNumberRequired");
-    public string PhoneRequired => _localizer.Get("validation.phoneRequired");
-    public string PolicyNumberMaxLength => _localizer.Get("validation.policyNumberMaxLength");
-    public string PolicyNumberRequired => _localizer.Get("validation.policyNumberRequired");
-    public string PositionRequired => _localizer.Get("validation.positionRequired");
-    public string QuantityMinOne => _localizer.Get("validation.quantityMinOne");
-    public string RadiologistRequired => _localizer.Get("validation.radiologistRequired");
-    public string ReasonMaxLength => _localizer.Get("validation.reasonMaxLength");
-    public string ReceivingOpeningFloatInvalid => _localizer.Get("validation.receivingOpeningFloatInvalid");
-    public string ReceivingUserIdMaxLength => _localizer.Get("validation.receivingUserIdMaxLength");
-    public string RecipientMaxLength => _localizer.Get("validation.recipientMaxLength");
-    public string RecipientRequired => _localizer.Get("validation.recipientRequired");
-    public string ReferenceMaxLength => _localizer.Get("validation.referenceMaxLength");
-    public string ReorderLevelNonNegative => _localizer.Get("validation.reorderLevelNonNegative");
-    public string ReorderQuantityNonNegative => _localizer.Get("validation.reorderQuantityNonNegative");
-    public string RoleNameMaxLength => _localizer.Get("validation.roleNameMaxLength");
-    public string RoleNameRequired => _localizer.Get("validation.roleNameRequired");
-    public string RoleRequired => _localizer.Get("validation.roleRequired");
-    public string SalaryTypeRequired => _localizer.Get("validation.salaryTypeRequired");
-    public string ScheduledDateRequired => _localizer.Get("validation.scheduledDateRequired");
-    public string ScheduledTimeRequired => _localizer.Get("validation.scheduledTimeRequired");
-    public string SerialNumberMaxLength => _localizer.Get("validation.serialNumberMaxLength");
-    public string SpecializationMaxLength => _localizer.Get("validation.specializationMaxLength");
-    public string StatusRequired => _localizer.Get("validation.statusRequired");
-    public string SubjectMaxLength => _localizer.Get("validation.subjectMaxLength");
-    public string SupplierRequired => _localizer.Get("validation.supplierRequired");
-    public string TaxNumberMaxLength => _localizer.Get("validation.taxNumberMaxLength");
-    public string TechnicianRequired => _localizer.Get("validation.technicianRequired");
-    public string UnitRequired => _localizer.Get("validation.unitRequired");
-    public string UsernameMaxLength => _localizer.Get("validation.usernameMaxLength");
-    public string UsernameRequired => _localizer.Get("validation.usernameRequired");
+    internal ValidationGroup(AppLocalizer localizer) : base(localizer) { }
+    public string AddressMaxLength => Get("validation.addressMaxLength");
+    public string AllowanceNameMaxLength => Get("validation.allowanceNameMaxLength");
+    public string AllowanceNameRequired => Get("validation.allowanceNameRequired");
+    public string AmountGreaterThanZero => Get("validation.amountGreaterThanZero");
+    public string BilledAmountNonNegative => Get("validation.billedAmountNonNegative");
+    public string BodyPartMaxLength => Get("validation.bodyPartMaxLength");
+    public string BodyPartRequired => Get("validation.bodyPartRequired");
+    public string BodyRequired => Get("validation.bodyRequired");
+    public string CategoryRequired => Get("validation.categoryRequired");
+    public string ChannelRequired => Get("validation.channelRequired");
+    public string ClinicalIndicationMaxLength => Get("validation.clinicalIndicationMaxLength");
+    public string ClinicalIndicationRequired => Get("validation.clinicalIndicationRequired");
+    public string CodeMaxLength100 => Get("validation.codeMaxLength100");
+    public string CodeMaxLength20 => Get("validation.codeMaxLength20");
+    public string CodeRequired => Get("validation.codeRequired");
+    public string ContactPersonMaxLength => Get("validation.contactPersonMaxLength");
+    public string CountedTotalInvalid => Get("validation.countedTotalInvalid");
+    public string CoverageRange => Get("validation.coverageRange");
+    public string CurrentPasswordRequired => Get("validation.currentPasswordRequired");
+    public string DepartmentMaxLength => Get("validation.departmentMaxLength");
+    public string DescriptionMaxLength => Get("validation.descriptionMaxLength");
+    public string EffectiveFromRequired => Get("validation.effectiveFromRequired");
+    public string EmailInvalid => Get("validation.emailInvalid");
+    public string EmailMaxLength => Get("validation.emailMaxLength");
+    public string EmailRequired => Get("validation.emailRequired");
+    public string EstimatedAmountNonNegative => Get("validation.estimatedAmountNonNegative");
+    public string FirstNameMaxLength => Get("validation.firstNameMaxLength");
+    public string FirstNameRequired => Get("validation.firstNameRequired");
+    public string FullNameFirstAndLast => Get("validation.fullNameFirstAndLast");
+    public string FullNameMaxLength => Get("validation.fullNameMaxLength");
+    public string FullNameRequired => Get("validation.fullNameRequired");
+    public string GenderRequired => Get("validation.genderRequired");
+    public string HireDateRequired => Get("validation.hireDateRequired");
+    public string HospitalMaxLength => Get("validation.hospitalMaxLength");
+    public string InsuranceCompanyRequired => Get("validation.insuranceCompanyRequired");
+    public string KindRequired => Get("validation.kindRequired");
+    public string LastNameMaxLength => Get("validation.lastNameMaxLength");
+    public string LastNameRequired => Get("validation.lastNameRequired");
+    public string LeaveTypeRequired => Get("validation.leaveTypeRequired");
+    public string LicenseNumberMaxLength => Get("validation.licenseNumberMaxLength");
+    public string LockUntilDateRequired => Get("validation.lockUntilDateRequired");
+    public string LockUntilTimeRequired => Get("validation.lockUntilTimeRequired");
+    public string ModalityRequired => Get("validation.modalityRequired");
+    public string NameMaxLength100 => Get("validation.nameMaxLength100");
+    public string NameMaxLength200 => Get("validation.nameMaxLength200");
+    public string NameRequired => Get("validation.nameRequired");
+    public string NotesMaxLength1000 => Get("validation.notesMaxLength1000");
+    public string NotesMaxLength500 => Get("validation.notesMaxLength500");
+    public string OpeningFloatInvalid => Get("validation.openingFloatInvalid");
+    public string PasswordLettersDigits => Get("validation.passwordLettersDigits");
+    public string PasswordMinLength => Get("validation.passwordMinLength");
+    public string PasswordMismatch => Get("validation.passwordMismatch");
+    public string PasswordRequired => Get("validation.passwordRequired");
+    public string PatientRequired => Get("validation.patientRequired");
+    public string PaymentTermsMaxLength => Get("validation.paymentTermsMaxLength");
+    public string PhoneEgyptian => Get("validation.phoneEgyptian");
+    public string PhoneMaxLength => Get("validation.phoneMaxLength");
+    public string PhoneNumberMaxLength => Get("validation.phoneNumberMaxLength");
+    public string PhoneNumberRequired => Get("validation.phoneNumberRequired");
+    public string PhoneRequired => Get("validation.phoneRequired");
+    public string PolicyNumberMaxLength => Get("validation.policyNumberMaxLength");
+    public string PolicyNumberRequired => Get("validation.policyNumberRequired");
+    public string PositionRequired => Get("validation.positionRequired");
+    public string QuantityMinOne => Get("validation.quantityMinOne");
+    public string RadiologistRequired => Get("validation.radiologistRequired");
+    public string ReasonMaxLength => Get("validation.reasonMaxLength");
+    public string ReceivingOpeningFloatInvalid => Get("validation.receivingOpeningFloatInvalid");
+    public string ReceivingUserIdMaxLength => Get("validation.receivingUserIdMaxLength");
+    public string RecipientMaxLength => Get("validation.recipientMaxLength");
+    public string RecipientRequired => Get("validation.recipientRequired");
+    public string ReferenceMaxLength => Get("validation.referenceMaxLength");
+    public string ReorderLevelNonNegative => Get("validation.reorderLevelNonNegative");
+    public string ReorderQuantityNonNegative => Get("validation.reorderQuantityNonNegative");
+    public string RoleNameMaxLength => Get("validation.roleNameMaxLength");
+    public string RoleNameRequired => Get("validation.roleNameRequired");
+    public string RoleRequired => Get("validation.roleRequired");
+    public string SalaryTypeRequired => Get("validation.salaryTypeRequired");
+    public string ScheduledDateRequired => Get("validation.scheduledDateRequired");
+    public string ScheduledTimeRequired => Get("validation.scheduledTimeRequired");
+    public string SerialNumberMaxLength => Get("validation.serialNumberMaxLength");
+    public string SpecializationMaxLength => Get("validation.specializationMaxLength");
+    public string StatusRequired => Get("validation.statusRequired");
+    public string SubjectMaxLength => Get("validation.subjectMaxLength");
+    public string SupplierRequired => Get("validation.supplierRequired");
+    public string TaxNumberMaxLength => Get("validation.taxNumberMaxLength");
+    public string TechnicianRequired => Get("validation.technicianRequired");
+    public string UnitRequired => Get("validation.unitRequired");
+    public string UsernameMaxLength => Get("validation.usernameMaxLength");
+    public string UsernameRequired => Get("validation.usernameRequired");
 }
 
-public sealed class VisitDialogGroup
+public sealed class VisitDialogGroup : LocalizerGroup
 {
-    private readonly AppLocalizer _localizer;
-    internal VisitDialogGroup(AppLocalizer localizer) => _localizer = localizer;
-    public string AmountPaid => _localizer.Get("visitDialog.amountPaid");
-    public string Billing => _localizer.Get("visitDialog.billing");
-    public string CancellationReason => _localizer.Get("visitDialog.cancellationReason");
-    public string ClinicalIndication => _localizer.Get("visitDialog.clinicalIndication");
-    public string Completed => _localizer.Get("visitDialog.completed");
-    public string Consumable => _localizer.Get("visitDialog.consumable");
-    public string Contrast => _localizer.Get("visitDialog.contrast");
-    public string Created => _localizer.Get("visitDialog.created");
-    public string CreateVisit => _localizer.Get("visitDialog.createVisit");
-    public string DetailsTitle => _localizer.Get("visitDialog.detailsTitle");
-    public string Discount => _localizer.Get("visitDialog.discount");
-    public string DiscountIsPercentage => _localizer.Get("visitDialog.discountIsPercentage");
-    public string EditTitle => _localizer.Get("visitDialog.editTitle");
-    public string Examination => _localizer.Get("visitDialog.examination");
-    public string ExaminationType => _localizer.Get("visitDialog.examinationType");
-    public string Item => _localizer.Get("visitDialog.item");
-    public string Items => _localizer.Get("visitDialog.items");
-    public string LoadErrorTitle => _localizer.Get("visitDialog.loadErrorTitle");
-    public string NewTitle => _localizer.Get("visitDialog.newTitle");
-    public string NoItems => _localizer.Get("visitDialog.noItems");
-    public string Notes => _localizer.Get("visitDialog.notes");
-    public string Paid => _localizer.Get("visitDialog.paid");
-    public string Patient => _localizer.Get("visitDialog.patient");
-    public string PatientSearch => _localizer.Get("visitDialog.patientSearch");
-    public string Price => _localizer.Get("visitDialog.price");
-    public string Priority => _localizer.Get("visitDialog.priority");
-    public string Qty => _localizer.Get("visitDialog.qty");
-    public string Radiologist => _localizer.Get("visitDialog.radiologist");
-    public string RadiologistId => _localizer.Get("visitDialog.radiologistId");
-    public string ReferralDoctor => _localizer.Get("visitDialog.referralDoctor");
-    public string ReferralDoctorId => _localizer.Get("visitDialog.referralDoctorId");
-    public string Remaining => _localizer.Get("visitDialog.remaining");
-    public string Required => _localizer.Get("visitDialog.required");
-    public string SaveChanges => _localizer.Get("visitDialog.saveChanges");
-    public string Scheduled => _localizer.Get("visitDialog.scheduled");
-    public string SearchPatientsError => _localizer.Get("visitDialog.searchPatientsError");
-    public string SearchTypesError => _localizer.Get("visitDialog.searchTypesError");
-    public string SelectPatient => _localizer.Get("visitDialog.selectPatient");
-    public string SelectType => _localizer.Get("visitDialog.selectType");
-    public string Started => _localizer.Get("visitDialog.started");
-    public string Technician => _localizer.Get("visitDialog.technician");
-    public string TechnicianId => _localizer.Get("visitDialog.technicianId");
-    public string TypeSearch => _localizer.Get("visitDialog.typeSearch");
-    public string Unreachable => _localizer.Get("visitDialog.unreachable");
-    public string Updated => _localizer.Get("visitDialog.updated");
+    internal VisitDialogGroup(AppLocalizer localizer) : base(localizer) { }
+    public string AmountPaid => Get("visitDialog.amountPaid");
+    public string Billing => Get("visitDialog.billing");
+    public string CancellationReason => Get("visitDialog.cancellationReason");
+    public string ClinicalIndication => Get("visitDialog.clinicalIndication");
+    public string Completed => Get("visitDialog.completed");
+    public string Consumable => Get("visitDialog.consumable");
+    public string Contrast => Get("visitDialog.contrast");
+    public string Created => Get("visitDialog.created");
+    public string CreateVisit => Get("visitDialog.createVisit");
+    public string DetailsTitle => Get("visitDialog.detailsTitle");
+    public string Discount => Get("visitDialog.discount");
+    public string DiscountIsPercentage => Get("visitDialog.discountIsPercentage");
+    public string EditTitle => Get("visitDialog.editTitle");
+    public string Examination => Get("visitDialog.examination");
+    public string ExaminationType => Get("visitDialog.examinationType");
+    public string Item => Get("visitDialog.item");
+    public string Items => Get("visitDialog.items");
+    public string LoadErrorTitle => Get("visitDialog.loadErrorTitle");
+    public string NewTitle => Get("visitDialog.newTitle");
+    public string NoItems => Get("visitDialog.noItems");
+    public string Notes => Get("visitDialog.notes");
+    public string Paid => Get("visitDialog.paid");
+    public string Patient => Get("visitDialog.patient");
+    public string PatientSearch => Get("visitDialog.patientSearch");
+    public string Price => Get("visitDialog.price");
+    public string Priority => Get("visitDialog.priority");
+    public string Qty => Get("visitDialog.qty");
+    public string Radiologist => Get("visitDialog.radiologist");
+    public string RadiologistId => Get("visitDialog.radiologistId");
+    public string ReferralDoctor => Get("visitDialog.referralDoctor");
+    public string ReferralDoctorId => Get("visitDialog.referralDoctorId");
+    public string Remaining => Get("visitDialog.remaining");
+    public string Required => Get("visitDialog.required");
+    public string SaveChanges => Get("visitDialog.saveChanges");
+    public string Scheduled => Get("visitDialog.scheduled");
+    public string SearchPatientsError => Get("visitDialog.searchPatientsError");
+    public string SearchTypesError => Get("visitDialog.searchTypesError");
+    public string SelectPatient => Get("visitDialog.selectPatient");
+    public string SelectType => Get("visitDialog.selectType");
+    public string Started => Get("visitDialog.started");
+    public string Technician => Get("visitDialog.technician");
+    public string TechnicianId => Get("visitDialog.technicianId");
+    public string TypeSearch => Get("visitDialog.typeSearch");
+    public string Unreachable => Get("visitDialog.unreachable");
+    public string Updated => Get("visitDialog.updated");
 }
 
-public sealed class VisitsGroup
+public sealed class VisitsGroup : LocalizerGroup
 {
-    private readonly AppLocalizer _localizer;
-    internal VisitsGroup(AppLocalizer localizer) => _localizer = localizer;
-    public string Back => _localizer.Get("visits.back");
-    public string Balance => _localizer.Get("visits.balance");
-    public string CancellationReasonOptional => _localizer.Get("visits.cancellationReasonOptional");
-    public string Cancelled => _localizer.Get("visits.cancelled");
-    public string CancelVisit => _localizer.Get("visits.cancelVisit");
-    public string CancelVisitTitle => _localizer.Get("visits.cancelVisitTitle");
-    public string CheckedIn => _localizer.Get("visits.checkedIn");
-    public string CheckIn => _localizer.Get("visits.checkIn");
-    public string Complete => _localizer.Get("visits.complete");
-    public string Completed => _localizer.Get("visits.completed");
-    public string EditVisit => _localizer.Get("visits.editVisit");
-    public string EmptyAction => _localizer.Get("visits.emptyAction");
-    public string EmptyMessage => _localizer.Get("visits.emptyMessage");
-    public string EmptyTitle => _localizer.Get("visits.emptyTitle");
-    public string Examination => _localizer.Get("visits.examination");
-    public string Insurance => _localizer.Get("visits.insurance");
-    public string LoadErrorTitle => _localizer.Get("visits.loadErrorTitle");
-    public string NewVisit => _localizer.Get("visits.newVisit");
-    public string Paid => _localizer.Get("visits.paid");
-    public string Patient => _localizer.Get("visits.patient");
-    public string Priority => _localizer.Get("visits.priority");
-    public string Schedule => _localizer.Get("visits.schedule");
-    public string Scheduled => _localizer.Get("visits.scheduled");
-    public string ScheduleVisit => _localizer.Get("visits.scheduleVisit");
-    public string SearchPlaceholder => _localizer.Get("visits.searchPlaceholder");
-    public string Start => _localizer.Get("visits.start");
-    public string Started => _localizer.Get("visits.started");
-    public string Subtitle => _localizer.Get("visits.subtitle");
-    public string Title => _localizer.Get("visits.title");
-    public string Unreachable => _localizer.Get("visits.unreachable");
-    public string View => _localizer.Get("visits.view");
-    public string VisitDetails => _localizer.Get("visits.visitDetails");
+    internal VisitsGroup(AppLocalizer localizer) : base(localizer) { }
+    public string Back => Get("visits.back");
+    public string Balance => Get("visits.balance");
+    public string CancellationReasonOptional => Get("visits.cancellationReasonOptional");
+    public string Cancelled => Get("visits.cancelled");
+    public string CancelVisit => Get("visits.cancelVisit");
+    public string CancelVisitTitle => Get("visits.cancelVisitTitle");
+    public string CheckedIn => Get("visits.checkedIn");
+    public string CheckIn => Get("visits.checkIn");
+    public string Complete => Get("visits.complete");
+    public string Completed => Get("visits.completed");
+    public string EditVisit => Get("visits.editVisit");
+    public string EmptyAction => Get("visits.emptyAction");
+    public string EmptyMessage => Get("visits.emptyMessage");
+    public string EmptyTitle => Get("visits.emptyTitle");
+    public string Examination => Get("visits.examination");
+    public string Insurance => Get("visits.insurance");
+    public string LoadErrorTitle => Get("visits.loadErrorTitle");
+    public string NewVisit => Get("visits.newVisit");
+    public string Paid => Get("visits.paid");
+    public string Patient => Get("visits.patient");
+    public string Priority => Get("visits.priority");
+    public string Schedule => Get("visits.schedule");
+    public string Scheduled => Get("visits.scheduled");
+    public string ScheduleVisit => Get("visits.scheduleVisit");
+    public string SearchPlaceholder => Get("visits.searchPlaceholder");
+    public string Start => Get("visits.start");
+    public string Started => Get("visits.started");
+    public string Subtitle => Get("visits.subtitle");
+    public string Title => Get("visits.title");
+    public string Unreachable => Get("visits.unreachable");
+    public string View => Get("visits.view");
+    public string VisitDetails => Get("visits.visitDetails");
 }
 
-public sealed class VisitScheduleGroup
+public sealed class VisitScheduleGroup : LocalizerGroup
 {
-    private readonly AppLocalizer _localizer;
-    internal VisitScheduleGroup(AppLocalizer localizer) => _localizer = localizer;
-    public string Schedule => _localizer.Get("visitSchedule.schedule");
-    public string Scheduled => _localizer.Get("visitSchedule.scheduled");
-    public string ScheduledDate => _localizer.Get("visitSchedule.scheduledDate");
-    public string ScheduledTime => _localizer.Get("visitSchedule.scheduledTime");
-    public string SelectDateTime => _localizer.Get("visitSchedule.selectDateTime");
-    public string Title => _localizer.Get("visitSchedule.title");
-    public string Unreachable => _localizer.Get("visitSchedule.unreachable");
+    internal VisitScheduleGroup(AppLocalizer localizer) : base(localizer) { }
+    public string Schedule => Get("visitSchedule.schedule");
+    public string Scheduled => Get("visitSchedule.scheduled");
+    public string ScheduledDate => Get("visitSchedule.scheduledDate");
+    public string ScheduledTime => Get("visitSchedule.scheduledTime");
+    public string SelectDateTime => Get("visitSchedule.selectDateTime");
+    public string Title => Get("visitSchedule.title");
+    public string Unreachable => Get("visitSchedule.unreachable");
 }
 
-public sealed class WorkShiftGroup
+public sealed class WorkShiftGroup : LocalizerGroup
 {
-    private readonly AppLocalizer _localizer;
-    internal WorkShiftGroup(AppLocalizer localizer) => _localizer = localizer;
-    public string Add => _localizer.Get("workShift.add");
-    public string DeleteConfirm => _localizer.Get("workShift.deleteConfirm");
-    public string Deleted => _localizer.Get("workShift.deleted");
-    public string DeleteTitle => _localizer.Get("workShift.deleteTitle");
-    public string EditWorkShift => _localizer.Get("workShift.editWorkShift");
-    public string EmptyActionLabel => _localizer.Get("workShift.emptyActionLabel");
-    public string EmptyMessage => _localizer.Get("workShift.emptyMessage");
-    public string EmptyTitle => _localizer.Get("workShift.emptyTitle");
-    public string End => _localizer.Get("workShift.end");
-    public string Equipment => _localizer.Get("workShift.equipment");
-    public string LoadErrorTitle => _localizer.Get("workShift.loadErrorTitle");
-    public string NewWorkShift => _localizer.Get("workShift.newWorkShift");
-    public string Notes => _localizer.Get("workShift.notes");
-    public string SearchPlaceholder => _localizer.Get("workShift.searchPlaceholder");
-    public string Staff => _localizer.Get("workShift.staff");
-    public string Start => _localizer.Get("workShift.start");
-    public string Subtitle => _localizer.Get("workShift.subtitle");
-    public string Title => _localizer.Get("workShift.title");
-    public string Unreachable => _localizer.Get("workShift.unreachable");
+    internal WorkShiftGroup(AppLocalizer localizer) : base(localizer) { }
+    public string Add => Get("workShift.add");
+    public string DeleteConfirm => Get("workShift.deleteConfirm");
+    public string Deleted => Get("workShift.deleted");
+    public string DeleteTitle => Get("workShift.deleteTitle");
+    public string EditWorkShift => Get("workShift.editWorkShift");
+    public string EmptyActionLabel => Get("workShift.emptyActionLabel");
+    public string EmptyMessage => Get("workShift.emptyMessage");
+    public string EmptyTitle => Get("workShift.emptyTitle");
+    public string End => Get("workShift.end");
+    public string Equipment => Get("workShift.equipment");
+    public string LoadErrorTitle => Get("workShift.loadErrorTitle");
+    public string NewWorkShift => Get("workShift.newWorkShift");
+    public string Notes => Get("workShift.notes");
+    public string SearchPlaceholder => Get("workShift.searchPlaceholder");
+    public string Staff => Get("workShift.staff");
+    public string Start => Get("workShift.start");
+    public string Subtitle => Get("workShift.subtitle");
+    public string Title => Get("workShift.title");
+    public string Unreachable => Get("workShift.unreachable");
 }
 
-public sealed class WorkShiftDialogGroup
+public sealed class WorkShiftDialogGroup : LocalizerGroup
 {
-    private readonly AppLocalizer _localizer;
-    internal WorkShiftDialogGroup(AppLocalizer localizer) => _localizer = localizer;
-    public string Created => _localizer.Get("workShiftDialog.created");
-    public string CreateWorkShift => _localizer.Get("workShiftDialog.createWorkShift");
-    public string EndAfterStart => _localizer.Get("workShiftDialog.endAfterStart");
-    public string EndTime => _localizer.Get("workShiftDialog.endTime");
-    public string EquipmentOptional => _localizer.Get("workShiftDialog.equipmentOptional");
-    public string SaveChanges => _localizer.Get("workShiftDialog.saveChanges");
-    public string SearchEquipmentError => _localizer.Get("workShiftDialog.searchEquipmentError");
-    public string SearchStaffError => _localizer.Get("workShiftDialog.searchStaffError");
-    public string SelectDate => _localizer.Get("workShiftDialog.selectDate");
-    public string SelectStaff => _localizer.Get("workShiftDialog.selectStaff");
-    public string SelectTimes => _localizer.Get("workShiftDialog.selectTimes");
-    public string ShiftDate => _localizer.Get("workShiftDialog.shiftDate");
-    public string StaffSearch => _localizer.Get("workShiftDialog.staffSearch");
-    public string StartTime => _localizer.Get("workShiftDialog.startTime");
-    public string Unreachable => _localizer.Get("workShiftDialog.unreachable");
-    public string Updated => _localizer.Get("workShiftDialog.updated");
+    internal WorkShiftDialogGroup(AppLocalizer localizer) : base(localizer) { }
+    public string Created => Get("workShiftDialog.created");
+    public string CreateWorkShift => Get("workShiftDialog.createWorkShift");
+    public string EndAfterStart => Get("workShiftDialog.endAfterStart");
+    public string EndTime => Get("workShiftDialog.endTime");
+    public string EquipmentOptional => Get("workShiftDialog.equipmentOptional");
+    public string SaveChanges => Get("workShiftDialog.saveChanges");
+    public string SearchEquipmentError => Get("workShiftDialog.searchEquipmentError");
+    public string SearchStaffError => Get("workShiftDialog.searchStaffError");
+    public string SelectDate => Get("workShiftDialog.selectDate");
+    public string SelectStaff => Get("workShiftDialog.selectStaff");
+    public string SelectTimes => Get("workShiftDialog.selectTimes");
+    public string ShiftDate => Get("workShiftDialog.shiftDate");
+    public string StaffSearch => Get("workShiftDialog.staffSearch");
+    public string StartTime => Get("workShiftDialog.startTime");
+    public string Unreachable => Get("workShiftDialog.unreachable");
+    public string Updated => Get("workShiftDialog.updated");
 }

@@ -18,11 +18,9 @@ using RadiologyCenter.Desktop.Services;
 
 namespace RadiologyCenter.Desktop.Components.Pages.Resources;
 
-public partial class LeaveEditorDialog : ComponentBase
+public partial class LeaveEditorDialog : EditorDialogBase
 {
-[Parameter] public LeaveDto? Leave { get; set; }
-
-    [CascadingParameter] public IMudDialogInstance MudDialog { get; set; } = default!;
+    [Parameter] public LeaveDto? Leave { get; set; }
 
     private static readonly Dictionary<string, string> LeaveTypes = new()
     {
@@ -36,7 +34,6 @@ public partial class LeaveEditorDialog : ComponentBase
     private readonly LeaveFormModel _model = new();
     private EditContext _editContext = default!;
     private StaffDto? _selectedStaff;
-    private bool _busy;
 
     private bool IsEdit => Leave is not null;
 
@@ -111,32 +108,25 @@ public partial class LeaveEditorDialog : ComponentBase
             return;
         }
 
-        await SafeExecute.RunAsync(async () =>
-            {
-                var input = new LeaveInput
-                {
-                    StaffId = _selectedStaff.Id,
-                    LeaveType = _model.LeaveType,
-                    StartDate = _model.StartDate.Value.Date,
-                    EndDate = _model.EndDate.Value.Date,
-                    Reason = _model.Reason,
-                };
+        var input = new LeaveInput
+        {
+            StaffId = _selectedStaff.Id,
+            LeaveType = _model.LeaveType,
+            StartDate = _model.StartDate.Value.Date,
+            EndDate = _model.EndDate.Value.Date,
+            Reason = _model.Reason,
+        };
 
-                if (IsEdit)
-                    await ResourceService.UpdateLeaveAsync(Leave!.Id, input);
-                else
-                    await ResourceService.CreateLeaveAsync(input);
-
-                Snackbar.Add(IsEdit ? T.LeaveDialog.Updated : T.LeaveDialog.Created, Severity.Success);
-                MudDialog.Close(DialogResult.Ok(true));
-            },
-            Snackbar,
-            () => T.LeaveDialog.Unreachable,
-            busy => _busy = busy);
+        if (await TrySaveAsync(
+                () => IsEdit
+                    ? ResourceService.UpdateLeaveAsync(Leave!.Id, input)
+                    : ResourceService.CreateLeaveAsync(input),
+                () => T.LeaveDialog.Unreachable))
+        {
+            Snackbar.Add(IsEdit ? T.LeaveDialog.Updated : T.LeaveDialog.Created, Severity.Success);
+            MudDialog.Close(DialogResult.Ok(true));
+        }
     }
-
-    private void CancelAsync()
-        => MudDialog.Cancel();
 
     private sealed class LeaveFormModel
     {

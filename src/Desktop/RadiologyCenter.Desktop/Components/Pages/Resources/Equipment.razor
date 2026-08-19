@@ -1,10 +1,7 @@
 @page "/resources/equipment"
 @attribute [Authorize]
+@inherits ListPageBase<EquipmentDto>
 @inject ResourceService ResourceService
-@inject IDialogService DialogService
-@inject ISnackbar Snackbar
-@inject AppLocalizer T
-@implements IDisposable
 
 <PageHeader Icon="@Icons.Material.Filled.Biotech" Title="@T.Equipment.Title"
             Subtitle="@T.Equipment.Subtitle"
@@ -14,7 +11,7 @@
     <MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Add" OnClick="OpenCreateDialogAsync">@T.Equipment.Add</MudButton>
 </PageHeader>
 
-<MudTable T="EquipmentDto" @ref="_table" ServerData="LoadServerData" Dense="true" Hover="true" Striped="true" Elevation="1" RowsPerPage="10" FixedHeader="true" Class="table-scroll">
+<MudTable T="EquipmentDto" @ref="Table" ServerData="LoadServerData" Dense="true" Hover="true" Striped="true" Elevation="1" RowsPerPage="10" FixedHeader="true" Class="table-scroll">
     <HeaderContent>
         <MudTh><MudTableSortLabel T="EquipmentDto" SortLabel="@("Name")">@T.Common.Name</MudTableSortLabel></MudTh>
         <MudTh><MudTableSortLabel T="EquipmentDto" SortLabel="@("SerialNumber")">@T.Equipment.SerialNumber</MudTableSortLabel></MudTh>
@@ -35,7 +32,7 @@
         </MudTd>
         <MudTd DataLabel="@T.Equipment.PurchaseDate">@(context.PurchaseDate?.ToString("yyyy-MM-dd") ?? "-")</MudTd>
         <MudTd DataLabel="@T.Common.Active">
-            <MudChip T="string" Size="Size.Small" Color="@(context.IsActive ? Color.Success : Color.Default)">@(context.IsActive ? T.Common.Active : T.Common.Inactive)</MudChip>
+            <ActiveStatusChip IsActive="context.IsActive" ActiveLabel="@T.Common.Active" InactiveLabel="@T.Common.Inactive" />
         </MudTd>
         <MudTd DataLabel="@T.Common.Actions">
             <MudIconButton Icon="@Icons.Material.Filled.Edit" Size="Size.Small" Color="Color.Default" aria-label="@T.Common.Edit" OnClick="@(() => OpenEditDialogAsync(context))" />
@@ -49,25 +46,17 @@
         </MudTd>
     </RowTemplate>
     <NoRecordsContent>
-        @if (_loadError is not null)
-        {
-            <ErrorState Icon="@(_offline ? Icons.Material.Filled.CloudOff : Icons.Material.Filled.ErrorOutline)"
-                        Title="@T.Equipment.LoadErrorTitle"
-                        Message="@_loadError"
-                        Action="ReloadAsync" />
-        }
-        else
-        {
-        <EmptyState Icon="@Icons.Material.Filled.Biotech"
-                    Title="@T.Equipment.EmptyTitle"
-                    Message="@T.Equipment.EmptyMessage"
-                    ActionLabel="@T.Equipment.EmptyActionLabel"
-                    Action="OpenCreateDialogAsync" />
-        }
+        <TableNoRecords LoadError="@LoadError"
+                        Offline="@Offline"
+                        ErrorTitle="@T.Equipment.LoadErrorTitle"
+                        EmptyIcon="@Icons.Material.Filled.Biotech"
+                        EmptyTitle="@T.Equipment.EmptyTitle"
+                        EmptyMessage="@T.Equipment.EmptyMessage"
+                        EmptyActionLabel="@T.Equipment.EmptyActionLabel"
+                        OnReload="ReloadAsync"
+                        OnEmptyAction="OpenCreateDialogAsync" />
     </NoRecordsContent>
     <PagerContent>
         <MudTablePager PageSizeOptions="@(new[] { 10, 25, 50 })" />
     </PagerContent>
 </MudTable>
-
-

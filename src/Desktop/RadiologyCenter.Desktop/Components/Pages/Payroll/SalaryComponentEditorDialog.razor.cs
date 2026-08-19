@@ -18,17 +18,14 @@ using RadiologyCenter.Desktop.Services;
 
 namespace RadiologyCenter.Desktop.Components.Pages.Payroll;
 
-public partial class SalaryComponentEditorDialog : ComponentBase
+public partial class SalaryComponentEditorDialog : EditorDialogBase
 {
-[Parameter] public SalaryComponentDto? Component { get; set; }
-
-    [CascadingParameter] public IMudDialogInstance MudDialog { get; set; } = default!;
+    [Parameter] public SalaryComponentDto? Component { get; set; }
 
     private static readonly string[] Frequencies = { "OneTime", "Monthly", "Quarterly", "Annual" };
 
     private readonly SalaryComponentFormModel _model = new();
     private EditContext _editContext = default!;
-    private bool _busy;
 
     private bool IsEdit => Component is not null;
 
@@ -52,42 +49,26 @@ public partial class SalaryComponentEditorDialog : ComponentBase
         if (!_editContext.Validate())
             return;
 
-        await SafeExecute.RunAsync(async () =>
-            {
-                var input = new SalaryComponentInput
-                {
-                    Name = _model.Name,
-                    Kind = _model.Kind,
-                    Frequency = string.IsNullOrWhiteSpace(_model.Frequency) ? null : _model.Frequency,
-                    IsPercentage = _model.IsPercentage,
-                    IsPerWorkDay = _model.IsPerWorkDay,
-                    DefaultValue = _model.DefaultValue,
-                };
+        var input = new SalaryComponentInput
+        {
+            Name = _model.Name,
+            Kind = _model.Kind,
+            Frequency = string.IsNullOrWhiteSpace(_model.Frequency) ? null : _model.Frequency,
+            IsPercentage = _model.IsPercentage,
+            IsPerWorkDay = _model.IsPerWorkDay,
+            DefaultValue = _model.DefaultValue,
+        };
 
-                if (IsEdit)
-                    await PayrollService.UpdateSalaryComponentAsync(Component!.Id, input);
-                else
-                    await PayrollService.CreateSalaryComponentAsync(input);
-
-                Snackbar.Add(IsEdit ? T.SalaryComponent.Updated : T.SalaryComponent.Created, Severity.Success);
-                MudDialog.Close(DialogResult.Ok(true));
-            },
-            Snackbar,
-            () => T.SalaryComponent.UnreachableTryAgain,
-            busy => _busy = busy);
+        if (await TrySaveAsync(
+                () => IsEdit
+                    ? PayrollService.UpdateSalaryComponentAsync(Component!.Id, input)
+                    : PayrollService.CreateSalaryComponentAsync(input),
+                () => T.SalaryComponent.UnreachableTryAgain))
+        {
+            Snackbar.Add(IsEdit ? T.SalaryComponent.Updated : T.SalaryComponent.Created, Severity.Success);
+            MudDialog.Close(DialogResult.Ok(true));
+        }
     }
-
-    private void CancelAsync()
-        => MudDialog.Cancel();
-
-    private static string FormatFrequency(string frequency) => frequency switch
-    {
-        "OneTime" => "One Time",
-        "Monthly" => "Monthly",
-        "Quarterly" => "Quarterly",
-        "Annual" => "Annual",
-        _ => frequency,
-    };
 
     private sealed class SalaryComponentFormModel
     {

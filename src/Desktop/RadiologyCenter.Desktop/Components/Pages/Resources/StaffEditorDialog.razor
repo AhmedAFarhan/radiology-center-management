@@ -1,7 +1,6 @@
+@inherits EditorDialogBase
 @inject ResourceService ResourceService
 @inject IdentityService IdentityService
-@inject ISnackbar Snackbar
-@inject AppLocalizer T
 
 <MudDialog>
     <DialogContent>
@@ -20,7 +19,7 @@
                                      SearchFunc="SearchUsersAsync"
                                      ToStringFunc="@(u => u is null ? string.Empty : $"{u.FullName} ({u.UserName})")"
                                      Clearable="true"
-                                     Disabled="_busy" />
+                                     Disabled="Busy" />
                 </MudItem>
                 <MudItem xs="12">
                     <MudTextField @bind-Value="_model.FullName"
@@ -83,18 +82,10 @@
         </EditForm>
     </DialogContent>
     <DialogActions>
-        <MudButton Color="Color.Default" OnClick="CancelAsync" Disabled="_busy">@T.Common.Cancel</MudButton>
-        <MudButton Color="Color.Primary" Variant="Variant.Filled" OnClick="SubmitAsync" Disabled="_busy">
-            @if (_busy)
-            {
-                <MudProgressCircular Size="Size.Small" Indeterminate="true" Class="mx-1" />
-            }
-            else
-            {
-                <text>@(IsEdit ? T.StaffDialog.SaveChanges : T.StaffDialog.CreateStaff)</text>
-            }
-        </MudButton>
+        <DialogButtons Busy="Busy"
+                       CancelLabel="@T.Common.Cancel"
+                       SaveLabel="@(IsEdit ? T.StaffDialog.SaveChanges : T.StaffDialog.CreateStaff)"
+                       OnCancel="CancelAsync"
+                       OnSave="SubmitAsync" />
     </DialogActions>
 </MudDialog>
-
-

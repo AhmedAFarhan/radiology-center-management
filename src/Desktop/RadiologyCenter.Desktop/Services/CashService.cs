@@ -2,20 +2,21 @@ using RadiologyCenter.Desktop.Models;
 
 namespace RadiologyCenter.Desktop.Services;
 
-public sealed class CashService
+public sealed class CashService : CrudServiceBase
 {
-    private readonly ApiClient _api;
+    private const string SessionsRes = "api/cash/sessions";
+    private const string HandoversRes = "api/cash/handovers";
 
-    public CashService(ApiClient api) => _api = api;
+    public CashService(ApiClient api) : base(api) { }
 
     public Task<CashSessionDto> OpenAsync(OpenCashSessionInput input, CancellationToken ct = default)
-        => _api.PostAsync<CashSessionDto>("api/cash/sessions", input, ct);
+        => Api.PostAsync<CashSessionDto>(SessionsRes, input, ct);
 
     public Task<CashSessionDto?> GetMyOpenAsync(CancellationToken ct = default)
-        => _api.GetAsync<CashSessionDto>("api/cash/sessions/my-open", ct);
+        => Api.GetAsync<CashSessionDto>($"{SessionsRes}/my-open", ct);
 
     public Task<CashSessionDto> GetByIdAsync(string id, CancellationToken ct = default)
-        => _api.GetAsync<CashSessionDto>($"api/cash/sessions/{id}", ct);
+        => FetchByIdAsync<CashSessionDto>(SessionsRes, id, ct);
 
     public Task<PagedResult<CashSessionDto>> GetSessionsPagedAsync(
         string? searchTerm,
@@ -26,29 +27,21 @@ public sealed class CashService
         string? status,
         CancellationToken ct = default)
     {
-        var query = new
-        {
-            pagination = new { pageNumber, pageSize },
-            sortBy,
-            sortDescending,
-            searchTerm,
-        };
-
         var url = string.IsNullOrWhiteSpace(status)
-            ? "api/cash/sessions/all"
-            : $"api/cash/sessions/all?status={Uri.EscapeDataString(status)}";
+            ? $"{SessionsRes}/all"
+            : $"{SessionsRes}/all?status={Uri.EscapeDataString(status)}";
 
-        return _api.PostAsync<PagedResult<CashSessionDto>>(url, query, ct);
+        return Api.PostAsync<PagedResult<CashSessionDto>>(url, PagedQuery(searchTerm, sortBy, sortDescending, pageNumber, pageSize), ct);
     }
 
     public Task<IReadOnlyList<CashEntryDto>> GetEntriesAsync(string sessionId, CancellationToken ct = default)
-        => _api.GetAsync<IReadOnlyList<CashEntryDto>>($"api/cash/sessions/{sessionId}/entries", ct);
+        => Api.GetAsync<IReadOnlyList<CashEntryDto>>($"{SessionsRes}/{sessionId}/entries", ct);
 
     public Task<CashEntryDto> AddEntryAsync(string sessionId, AddCashEntryInput input, CancellationToken ct = default)
-        => _api.PostAsync<CashEntryDto>($"api/cash/sessions/{sessionId}/entries", input, ct);
+        => Api.PostAsync<CashEntryDto>($"{SessionsRes}/{sessionId}/entries", input, ct);
 
     public Task<CashHandoverDto> CloseAsync(string sessionId, CloseCashSessionInput input, CancellationToken ct = default)
-        => _api.PostAsync<CashHandoverDto>($"api/cash/sessions/{sessionId}/close", input, ct);
+        => Api.PostAsync<CashHandoverDto>($"{SessionsRes}/{sessionId}/close", input, ct);
 
     public Task<PagedResult<CashHandoverDto>> GetHandoversPagedAsync(
         string? searchTerm,
@@ -57,21 +50,11 @@ public sealed class CashService
         int pageNumber,
         int pageSize,
         CancellationToken ct = default)
-    {
-        var query = new
-        {
-            pagination = new { pageNumber, pageSize },
-            sortBy,
-            sortDescending,
-            searchTerm,
-        };
-
-        return _api.PostAsync<PagedResult<CashHandoverDto>>("api/cash/handovers/all", query, ct);
-    }
+        => FetchPageAsync<CashHandoverDto>(HandoversRes, searchTerm, sortBy, sortDescending, pageNumber, pageSize, ct);
 
     public Task<CashHandoverDto?> GetHandoverBySessionAsync(string sessionId, CancellationToken ct = default)
-        => _api.GetAsync<CashHandoverDto>($"api/cash/handovers/{sessionId}", ct);
+        => Api.GetAsync<CashHandoverDto>($"{HandoversRes}/{sessionId}", ct);
 
     public Task<CashHandoverDto> ApproveHandoverAsync(string sessionId, CancellationToken ct = default)
-        => _api.PostAsync<CashHandoverDto>($"api/cash/handovers/{sessionId}/approve", null, ct);
+        => Api.PostAsync<CashHandoverDto>($"{HandoversRes}/{sessionId}/approve", null, ct);
 }

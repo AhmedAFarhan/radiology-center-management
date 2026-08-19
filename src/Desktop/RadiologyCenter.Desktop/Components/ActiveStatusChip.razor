@@ -1,0 +1,3 @@
+@using Microsoft.AspNetCore.Components
+
+<MudChip T="string" Size="Size.Small" Color="@(IsActive ? Color.Success : Color.Default)">@(IsActive ? ActiveLabel : InactiveLabel)</MudChip>

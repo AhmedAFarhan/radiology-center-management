@@ -18,11 +18,9 @@ using RadiologyCenter.Desktop.Services;
 
 namespace RadiologyCenter.Desktop.Components.Pages.Resources;
 
-public partial class StaffEditorDialog : ComponentBase
+public partial class StaffEditorDialog : EditorDialogBase
 {
-[Parameter] public StaffDto? Staff { get; set; }
-
-    [CascadingParameter] public IMudDialogInstance MudDialog { get; set; } = default!;
+    [Parameter] public StaffDto? Staff { get; set; }
 
     private static readonly Dictionary<string, string> Positions = new()
     {
@@ -36,7 +34,6 @@ public partial class StaffEditorDialog : ComponentBase
     private readonly StaffFormModel _model = new();
     private EditContext _editContext = default!;
     private UserDto? _selectedUser;
-    private bool _busy;
 
     private bool IsEdit => Staff is not null;
 
@@ -111,35 +108,28 @@ public partial class StaffEditorDialog : ComponentBase
             return;
         }
 
-        await SafeExecute.RunAsync(async () =>
-            {
-                var input = new StaffInput
-                {
-                    UserId = _selectedUser.Id,
-                    FullName = _model.FullName,
-                    PhoneNumber = _model.PhoneNumber,
-                    Position = _model.Position,
-                    HireDate = _model.HireDate ?? DateTime.Today,
-                    Department = _model.Department,
-                    Specialization = _model.Specialization,
-                    LicenseNumber = _model.LicenseNumber,
-                };
+        var input = new StaffInput
+        {
+            UserId = _selectedUser.Id,
+            FullName = _model.FullName,
+            PhoneNumber = _model.PhoneNumber,
+            Position = _model.Position,
+            HireDate = _model.HireDate ?? DateTime.Today,
+            Department = _model.Department,
+            Specialization = _model.Specialization,
+            LicenseNumber = _model.LicenseNumber,
+        };
 
-                if (IsEdit)
-                    await ResourceService.UpdateStaffAsync(Staff!.Id, input);
-                else
-                    await ResourceService.CreateStaffAsync(input);
-
-                Snackbar.Add(IsEdit ? T.StaffDialog.Updated : T.StaffDialog.Created, Severity.Success);
-                MudDialog.Close(DialogResult.Ok(true));
-            },
-            Snackbar,
-            () => T.StaffDialog.Unreachable,
-            busy => _busy = busy);
+        if (await TrySaveAsync(
+                () => IsEdit
+                    ? ResourceService.UpdateStaffAsync(Staff!.Id, input)
+                    : ResourceService.CreateStaffAsync(input),
+                () => T.StaffDialog.Unreachable))
+        {
+            Snackbar.Add(IsEdit ? T.StaffDialog.Updated : T.StaffDialog.Created, Severity.Success);
+            MudDialog.Close(DialogResult.Ok(true));
+        }
     }
-
-    private void CancelAsync()
-        => MudDialog.Cancel();
 
     private sealed class StaffFormModel : IValidatableObject
     {

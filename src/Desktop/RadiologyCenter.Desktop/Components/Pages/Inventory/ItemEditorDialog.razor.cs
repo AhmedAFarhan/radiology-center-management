@@ -18,11 +18,9 @@ using RadiologyCenter.Desktop.Services;
 
 namespace RadiologyCenter.Desktop.Components.Pages.Inventory;
 
-public partial class ItemEditorDialog : ComponentBase
+public partial class ItemEditorDialog : EditorDialogBase
 {
-[Parameter] public ItemDto? Item { get; set; }
-
-    [CascadingParameter] public IMudDialogInstance MudDialog { get; set; } = default!;
+    [Parameter] public ItemDto? Item { get; set; }
 
     private static readonly Dictionary<string, string> Categories = new()
     {
@@ -37,7 +35,6 @@ public partial class ItemEditorDialog : ComponentBase
 
     private readonly ItemFormModel _model = new();
     private EditContext _editContext = default!;
-    private bool _busy;
 
     private bool IsEdit => Item is not null;
 
@@ -75,21 +72,16 @@ public partial class ItemEditorDialog : ComponentBase
             StorageInstructions = _model.StorageInstructions,
         };
 
-        if (await SafeExecute.RunAsync(
+        if (await TrySaveAsync(
                 () => IsEdit
                     ? InventoryService.UpdateItemAsync(Item!.Id, input)
                     : InventoryService.CreateItemAsync(input),
-                Snackbar,
-                () => T.ItemDialog.Unreachable,
-                busy => _busy = busy))
+                () => T.ItemDialog.Unreachable))
         {
             Snackbar.Add(IsEdit ? T.ItemDialog.ItemUpdated : T.ItemDialog.ItemCreated, Severity.Success);
             MudDialog.Close(DialogResult.Ok(true));
         }
     }
-
-    private void CancelAsync()
-        => MudDialog.Cancel();
 
     private sealed class ItemFormModel : IValidatableObject
     {

@@ -1,10 +1,8 @@
+@using static RadiologyCenter.Desktop.Services.Formatting
 @page "/notifications/messages"
 @attribute [Authorize]
+@inherits ListPageBase<NotificationMessageDto>
 @inject NotificationService NotificationService
-@inject IDialogService DialogService
-@inject ISnackbar Snackbar
-@inject AppLocalizer T
-@implements IDisposable
 
 <PageHeader Icon="@Icons.Material.Filled.Notifications" Title="@T.Notifications.MessagesTitle"
             Subtitle="@T.Notifications.MessagesSubtitle"
@@ -28,7 +26,7 @@
     <MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Send" OnClick="OpenSendDialogAsync">@T.SendDialog.Title</MudButton>
 </PageHeader>
 
-<MudTable T="NotificationMessageDto" @ref="_table" ServerData="LoadServerData" Dense="true" Hover="true" Striped="true" Elevation="1" RowsPerPage="10" FixedHeader="true" Class="table-scroll">
+<MudTable T="NotificationMessageDto" @ref="Table" ServerData="LoadServerData" Dense="true" Hover="true" Striped="true" Elevation="1" RowsPerPage="10" FixedHeader="true" Class="table-scroll">
     <HeaderContent>
         <MudTh><MudTableSortLabel T="NotificationMessageDto" SortLabel="@("CreatedAt")">@T.Notifications.SentAt</MudTableSortLabel></MudTh>
         <MudTh>@T.Notifications.Channel</MudTh>
@@ -47,7 +45,7 @@
         <MudTd DataLabel="@T.Notifications.Recipient">
             <MudText Class="font-weight-medium">@context.Recipient</MudText>
         </MudTd>
-        <MudTd DataLabel="@T.Notifications.Subject">@(string.IsNullOrWhiteSpace(context.Subject) ? "-" : Truncate(context.Subject))</MudTd>
+        <MudTd DataLabel="@T.Notifications.Subject">@(string.IsNullOrWhiteSpace(context.Subject) ? "-" : Truncate(context.Subject, 55))</MudTd>
         <MudTd DataLabel="@T.Common.Status">
             <StatusChip Token="@context.Status">@context.Status</StatusChip>
         </MudTd>
@@ -58,24 +56,17 @@
         </MudTd>
     </RowTemplate>
     <NoRecordsContent>
-        @if (_loadError is not null)
-        {
-            <ErrorState Icon="@(_offline ? Icons.Material.Filled.CloudOff : Icons.Material.Filled.ErrorOutline)"
-                        Title="@T.Notifications.LoadErrorTitle"
-                        Message="@_loadError"
-                        Action="ReloadAsync" />
-        }
-        else
-        {
-            <EmptyState Icon="@Icons.Material.Filled.Notifications"
-                        Title="@T.Notifications.MessagesEmptyTitle"
-                        Message="@T.Notifications.MessagesEmptyMessage"
-                        ActionLabel="@T.Notifications.MessagesEmptyActionLabel"
-                        Action="OpenSendDialogAsync" />
-        }
+        <TableNoRecords LoadError="@LoadError"
+                        Offline="@Offline"
+                        ErrorTitle="@T.Notifications.LoadErrorTitle"
+                        EmptyIcon="@Icons.Material.Filled.Notifications"
+                        EmptyTitle="@T.Notifications.MessagesEmptyTitle"
+                        EmptyMessage="@T.Notifications.MessagesEmptyMessage"
+                        EmptyActionLabel="@T.Notifications.MessagesEmptyActionLabel"
+                        OnReload="ReloadAsync"
+                        OnEmptyAction="OpenSendDialogAsync" />
     </NoRecordsContent>
     <PagerContent>
         <MudTablePager PageSizeOptions="@(new[] { 10, 25, 50 })" />
     </PagerContent>
 </MudTable>
-

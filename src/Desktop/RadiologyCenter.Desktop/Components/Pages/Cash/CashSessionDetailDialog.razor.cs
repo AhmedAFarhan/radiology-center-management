@@ -109,11 +109,8 @@ public partial class CashSessionDetailDialog : ComponentBase
     {
         > 0 => Color.Success,
         < 0 => Color.Error,
-        _ => Color.Default,
+_ => Color.Default,
     };
-
-    private static string ShortId(string id)
-        => id.Length > 8 ? id[..8] : id;
 
     private void CloseDialogAsync()
         => MudDialog.Close(DialogResult.Ok(!_loadFailed));

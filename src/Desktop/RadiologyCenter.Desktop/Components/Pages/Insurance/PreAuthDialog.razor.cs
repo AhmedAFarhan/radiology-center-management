@@ -1,33 +1,19 @@
-using System.Net.Http;
-using System.Net.Http.Json;
 using System.ComponentModel.DataAnnotations;
-using System.Security.Claims;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Components;
-using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Components.Forms;
-using Microsoft.AspNetCore.Components.Routing;
-using Microsoft.AspNetCore.Components.Web;
-using Microsoft.AspNetCore.Components.Web.Virtualization;
-using Microsoft.JSInterop;
 using MudBlazor;
-using RadiologyCenter.Desktop;
-using RadiologyCenter.Desktop.Components;
 using RadiologyCenter.Desktop.Models;
 using RadiologyCenter.Desktop.Services;
 
 namespace RadiologyCenter.Desktop.Components.Pages.Insurance;
 
-public partial class PreAuthDialog : ComponentBase
+public partial class PreAuthDialog : EditorDialogBase
 {
-[CascadingParameter] public IMudDialogInstance MudDialog { get; set; } = default!;
-
     private readonly PreAuthFormModel _model = new();
     private EditContext _editContext = default!;
     private PatientDto? _selectedPatient;
     private InsurancePolicyDto? _selectedPolicy;
     private ExaminationDto? _selectedExamination;
-    private bool _busy;
 
     protected override void OnInitialized()
         => _editContext = new EditContext(_model);
@@ -118,27 +104,22 @@ public partial class PreAuthDialog : ComponentBase
         if (!_editContext.Validate())
             return;
 
-        await SafeExecute.RunAsync(async () =>
-            {
-                var input = new CreatePreAuthorizationInput
-                {
-                    ExaminationId = _selectedExamination.Id,
-                    PatientId = _selectedPatient.Id,
-                    PolicyId = _selectedPolicy.Id,
-                    EstimatedAmount = _model.EstimatedAmount,
-                };
+        var input = new CreatePreAuthorizationInput
+        {
+            ExaminationId = _selectedExamination.Id,
+            PatientId = _selectedPatient.Id,
+            PolicyId = _selectedPolicy.Id,
+            EstimatedAmount = _model.EstimatedAmount,
+        };
 
-                await InsuranceService.CreatePreAuthorizationAsync(input);
-                Snackbar.Add(T.PreAuthDialog.Requested, Severity.Success);
-                MudDialog.Close(DialogResult.Ok(true));
-            },
-            Snackbar,
-            () => T.PreAuthDialog.UnreachableRetry,
-            busy => _busy = busy);
+        if (await TrySaveAsync(
+                () => InsuranceService.CreatePreAuthorizationAsync(input),
+                () => T.PreAuthDialog.UnreachableRetry))
+        {
+            Snackbar.Add(T.PreAuthDialog.Requested, Severity.Success);
+            MudDialog.Close(DialogResult.Ok(true));
+        }
     }
-
-    private void CancelAsync()
-        => MudDialog.Cancel();
 
     private sealed class PreAuthFormModel
     {

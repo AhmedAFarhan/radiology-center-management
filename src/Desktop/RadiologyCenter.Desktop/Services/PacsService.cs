@@ -1,16 +1,13 @@
 using System.Diagnostics;
 using System.Text.Json;
-using System.Text.RegularExpressions;
 
 namespace RadiologyCenter.Desktop.Services;
 
-public sealed class PacsService : IDisposable
+public sealed class PacsService : LocalProcessServiceBase, IDisposable
 {
     public const int HttpPort = 18042;
     public const int DicomPort = 14242;
     private const string DicomAet = "EGCAREPACS";
-    private const int StartupTimeoutMs = 20000;
-    private const int HealthCheckIntervalMs = 500;
 
     public sealed record PacsStudy(
         string StudyInstanceUid,
@@ -41,8 +38,23 @@ public sealed class PacsService : IDisposable
 
     public string HttpEndpoint => $"http://127.0.0.1:{HttpPort}";
     public string ViewerBaseUrl => $"{HttpEndpoint}/ohif";
-    public bool IsReady => _startupTask is { IsCompletedSuccessfully: true };
-    public string? StartupError { get; private set; }
+
+    protected override string StartFailureMessage
+        => $"PACS (Orthanc) failed to start within {StartupTimeoutMs}ms.";
+
+    protected override string HealthCheckUrl
+        => $"{HttpEndpoint}/system";
+
+    protected override IReadOnlyList<int> Ports => new[] { HttpPort, DicomPort };
+
+    protected override int StartupTimeoutMs => 20000;
+
+    protected override int HealthCheckIntervalMs => 500;
+
+    public PacsService()
+    {
+        Instance = this;
+    }
 
     public async Task<IReadOnlyList<PacsStudy>> GetStudiesAsync(CancellationToken ct = default)
         => await GetStudiesAsync(null, ct);
@@ -107,170 +119,29 @@ public sealed class PacsService : IDisposable
     private static string DataRoot =>
         Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData), "EGcare", "pacs");
 
-    private Process? _process;
-    private Task? _startupTask;
-
-    public PacsService()
+    protected override Process CreateProcess()
     {
-        Instance = this;
-        AppDomain.CurrentDomain.ProcessExit += (_, _) => Dispose();
-    }
+        var (root, exePath) = ResolveLocalCopy();
 
-    public Task StartAsync()
-    {
-        if (_startupTask is not null && !_startupTask.IsCanceled)
-            return _startupTask;
+        var dataDir = Path.Combine(DataRoot, "data");
+        Directory.CreateDirectory(dataDir);
+        var configPath = WriteConfig(root, dataDir);
 
-        _startupTask = StartCoreAsync();
-        return _startupTask;
-    }
-
-    public async Task RetryAsync()
-    {
-        KillProcess();
-        _startupTask = null;
-        await StartAsync();
-    }
-
-    private async Task StartCoreAsync()
-    {
-        try
+        return new Process
         {
-            var (root, exePath) = ResolveLocalCopy();
-            EnsurePortIsFree();
-
-            var dataDir = Path.Combine(DataRoot, "data");
-            Directory.CreateDirectory(dataDir);
-            var configPath = WriteConfig(root, dataDir);
-
-            var stderr = new StringWriter();
-
-            _process = new Process
+            StartInfo = new ProcessStartInfo
             {
-                StartInfo = new ProcessStartInfo
-                {
-                    FileName = exePath,
-                    Arguments = $"\"{configPath}\"",
-                    WorkingDirectory = root,
-                    UseShellExecute = false,
-                    CreateNoWindow = true,
-                    RedirectStandardError = true,
-                },
-                EnableRaisingEvents = true,
-            };
-
-            _process.ErrorDataReceived += (_, e) =>
-            {
-                if (e.Data is not null)
-                    stderr.WriteLine(e.Data);
-            };
-
-            _process.Start();
-            _process.BeginErrorReadLine();
-
-            var started = await WaitForStartupAsync();
-            if (!started)
-            {
-                KillProcess();
-                var error = stderr.ToString();
-                throw new InvalidOperationException(
-                    $"PACS (Orthanc) failed to start within {StartupTimeoutMs}ms.\nError output:\n{error}");
-            }
-        }
-        catch (Exception ex)
-        {
-            StartupError = ex.Message;
-            throw;
-        }
-    }
-
-    public void Stop()
-    {
-        KillProcess();
-        EnsurePortIsFree();
-    }
-
-    public void Dispose() => Stop();
-
-    private async Task<bool> WaitForStartupAsync()
-    {
-        var elapsed = 0;
-        while (elapsed < StartupTimeoutMs)
-        {
-            if (_process is null || _process.HasExited)
-                return false;
-
-            try
-            {
-                using var httpClient = new HttpClient { Timeout = TimeSpan.FromSeconds(2) };
-                var response = await httpClient.GetAsync($"{HttpEndpoint}/system");
-                if (response.IsSuccessStatusCode)
-                    return true;
-            }
-            catch
-            {
-                // not ready yet
-            }
-
-            await Task.Delay(HealthCheckIntervalMs);
-            elapsed += HealthCheckIntervalMs;
-        }
-        return false;
-    }
-
-    private void KillProcess()
-    {
-        if (_process is { HasExited: false })
-        {
-            try { _process.Kill(entireProcessTree: true); _process.WaitForExit(5000); }
-            catch { /* already gone */ }
-            finally { _process.Dispose(); _process = null; }
-        }
-    }
-
-    private static void EnsurePortIsFree()
-    {
-        try
-        {
-            using var proc = Process.Start(new ProcessStartInfo
-            {
-                FileName = "netstat.exe",
-                Arguments = "-ano",
+                FileName = exePath,
+                Arguments = $"\"{configPath}\"",
+                WorkingDirectory = root,
                 UseShellExecute = false,
                 CreateNoWindow = true,
-                RedirectStandardOutput = true,
-            });
-
-            if (proc is null) return;
-            var output = proc.StandardOutput.ReadToEnd();
-            proc.WaitForExit(2000);
-
-            foreach (var port in new[] { HttpPort, DicomPort })
-            {
-                foreach (Match match in Regex.Matches(output, $":{port}\\s+\\S+\\s+LISTENING\\s+(\\d+)"))
-                {
-                    var pid = int.Parse(match.Groups[1].Value);
-                    if (pid <= 0) continue;
-
-                    try
-                    {
-                        using var victim = Process.GetProcessById(pid);
-                        if (!IsOurOrthanc(victim))
-                            continue;
-                        victim.Kill(entireProcessTree: true);
-                        victim.WaitForExit(5000);
-                    }
-                    catch
-                    {
-                        // already gone or access denied
-                    }
-                }
-            }
-        }
-        catch { /* netstat failed */ }
+                RedirectStandardError = true,
+            },
+        };
     }
 
-    private static bool IsOurOrthanc(Process process)
+    protected override bool IsOwnProcess(Process process)
     {
         try
         {

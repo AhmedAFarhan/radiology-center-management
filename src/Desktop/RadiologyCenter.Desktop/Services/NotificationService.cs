@@ -2,20 +2,20 @@ using RadiologyCenter.Desktop.Models;
 
 namespace RadiologyCenter.Desktop.Services;
 
-public sealed class NotificationService
+public sealed class NotificationService : CrudServiceBase
 {
-    private readonly ApiClient _api;
+    private const string TemplatesRes = "api/notifications/templates";
 
-    public NotificationService(ApiClient api) => _api = api;
+    public NotificationService(ApiClient api) : base(api) { }
 
     public Task<NotificationTemplateDto> CreateTemplateAsync(NotificationTemplateInput input, CancellationToken ct = default)
-        => _api.PostAsync<NotificationTemplateDto>("api/notifications/templates", input, ct);
+        => CreateEntityAsync<NotificationTemplateDto>(TemplatesRes, input, ct);
 
     public Task<NotificationTemplateDto> UpdateTemplateAsync(string id, NotificationTemplateInput input, CancellationToken ct = default)
-        => _api.PutAsync<NotificationTemplateDto>($"api/notifications/templates/{id}", input, ct);
+        => Api.PutAsync<NotificationTemplateDto>($"{TemplatesRes}/{id}", input, ct);
 
     public Task<NotificationTemplateDto> GetTemplateByIdAsync(string id, CancellationToken ct = default)
-        => _api.GetAsync<NotificationTemplateDto>($"api/notifications/templates/{id}", ct);
+        => FetchByIdAsync<NotificationTemplateDto>(TemplatesRes, id, ct);
 
     public Task<PagedResult<NotificationTemplateDto>> GetTemplatesPagedAsync(
         string? searchTerm,
@@ -24,26 +24,16 @@ public sealed class NotificationService
         int pageNumber,
         int pageSize,
         CancellationToken ct = default)
-    {
-        var query = new
-        {
-            pagination = new { pageNumber, pageSize },
-            sortBy,
-            sortDescending,
-            searchTerm,
-        };
-
-        return _api.PostAsync<PagedResult<NotificationTemplateDto>>("api/notifications/templates/all", query, ct);
-    }
+        => FetchPageAsync<NotificationTemplateDto>(TemplatesRes, searchTerm, sortBy, sortDescending, pageNumber, pageSize, ct);
 
     public Task<NotificationTemplateDto> ActivateTemplateAsync(string id, CancellationToken ct = default)
-        => _api.PostAsync<NotificationTemplateDto>($"api/notifications/templates/{id}/activate", null, ct);
+        => Api.PostAsync<NotificationTemplateDto>($"{TemplatesRes}/{id}/activate", null, ct);
 
     public Task DeactivateTemplateAsync(string id, CancellationToken ct = default)
-        => _api.SendAsync($"api/notifications/templates/{id}/deactivate", null, ct);
+        => Api.SendAsync($"{TemplatesRes}/{id}/deactivate", null, ct);
 
     public Task DeleteTemplateAsync(string id, CancellationToken ct = default)
-        => _api.SendDeleteAsync($"api/notifications/templates/{id}", ct);
+        => DeleteEntityAsync(TemplatesRes, id, ct);
 
     public Task<PagedResult<NotificationMessageDto>> GetMessagesPagedAsync(
         string? searchTerm,
@@ -55,14 +45,6 @@ public sealed class NotificationService
         string? status,
         CancellationToken ct = default)
     {
-        var query = new
-        {
-            pagination = new { pageNumber, pageSize },
-            sortBy,
-            sortDescending,
-            searchTerm,
-        };
-
         var url = "api/notifications/messages/all";
         var separator = "?";
 
@@ -77,12 +59,12 @@ public sealed class NotificationService
             url += $"{separator}status={Uri.EscapeDataString(status)}";
         }
 
-        return _api.PostAsync<PagedResult<NotificationMessageDto>>(url, query, ct);
+        return Api.PostAsync<PagedResult<NotificationMessageDto>>(url, PagedQuery(searchTerm, sortBy, sortDescending, pageNumber, pageSize), ct);
     }
 
     public Task SendAsync(SendNotificationInput input, CancellationToken ct = default)
-        => _api.SendAsync("api/notifications/send", input, ct);
+        => Api.SendAsync("api/notifications/send", input, ct);
 
     public Task<NotificationPreviewDto> PreviewAsync(SendNotificationInput input, CancellationToken ct = default)
-        => _api.PostAsync<NotificationPreviewDto>("api/notifications/preview", input, ct);
+        => Api.PostAsync<NotificationPreviewDto>("api/notifications/preview", input, ct);
 }

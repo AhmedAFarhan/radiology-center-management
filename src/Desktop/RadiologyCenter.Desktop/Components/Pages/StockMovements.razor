@@ -1,9 +1,8 @@
+@using static RadiologyCenter.Desktop.Services.Formatting
 @page "/inventory/stock-movements"
 @attribute [Authorize]
+@inherits ListPageBase<StockMovementDto>
 @inject InventoryService InventoryService
-@inject ISnackbar Snackbar
-@inject AppLocalizer T
-@implements IDisposable
 
 <PageHeader Icon="@Icons.Material.Filled.SwapVert" Title="@T.StockMovements.Title"
             Subtitle="@T.StockMovements.Subtitle"
@@ -12,7 +11,7 @@
             OnRefresh="ReloadAsync">
 </PageHeader>
 
-<MudTable T="StockMovementDto" @ref="_table" ServerData="LoadServerData" Dense="true" Hover="true" Striped="true" Elevation="1" RowsPerPage="10" FixedHeader="true" Class="table-scroll">
+<MudTable T="StockMovementDto" @ref="Table" ServerData="LoadServerData" Dense="true" Hover="true" Striped="true" Elevation="1" RowsPerPage="10" FixedHeader="true" Class="table-scroll">
     <HeaderContent>
         <MudTh><MudTableSortLabel T="StockMovementDto" SortLabel="@("CreatedAt")">@T.Common.Date</MudTableSortLabel></MudTh>
         <MudTh><MudTableSortLabel T="StockMovementDto" SortLabel="@("MovementType")">@T.Common.Type</MudTableSortLabel></MudTh>
@@ -36,23 +35,15 @@
         <MudTd DataLabel="@T.StockMovements.Notes">@(context.Notes ?? "-")</MudTd>
     </RowTemplate>
     <NoRecordsContent>
-        @if (_loadError is not null)
-        {
-            <ErrorState Icon="@(_offline ? Icons.Material.Filled.CloudOff : Icons.Material.Filled.ErrorOutline)"
-                        Title="@T.StockMovements.LoadErrorTitle"
-                        Message="@_loadError"
-                        Action="ReloadAsync" />
-        }
-        else
-        {
-        <EmptyState Icon="@Icons.Material.Filled.SwapVert"
-                    Title="@T.StockMovements.NoMovementsTitle"
-                    Message="@T.StockMovements.EmptyMessage" />
-        }
+        <TableNoRecords LoadError="@LoadError"
+                        Offline="@Offline"
+                        ErrorTitle="@T.StockMovements.LoadErrorTitle"
+                        EmptyIcon="@Icons.Material.Filled.SwapVert"
+                        EmptyTitle="@T.StockMovements.NoMovementsTitle"
+                        EmptyMessage="@T.StockMovements.EmptyMessage"
+                        OnReload="ReloadAsync" />
     </NoRecordsContent>
     <PagerContent>
         <MudTablePager PageSizeOptions="@(new[] { 10, 25, 50 })" />
     </PagerContent>
 </MudTable>
-
-

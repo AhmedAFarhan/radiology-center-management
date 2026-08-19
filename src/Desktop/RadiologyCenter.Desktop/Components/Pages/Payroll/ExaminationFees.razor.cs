@@ -18,102 +18,45 @@ using RadiologyCenter.Desktop.Services;
 
 namespace RadiologyCenter.Desktop.Components.Pages.Payroll;
 
-public partial class ExaminationFees : ComponentBase, IDisposable
+public partial class ExaminationFees : ListPageBase<ExaminationFeeDto>
 {
-private MudTable<ExaminationFeeDto>? _table;
-    private string? _search;
-    private CancellationTokenSource? _searchCts;
-    private string? _loadError;
-    private bool _offline;
     private IReadOnlyDictionary<string, string> _examTypeNames = new Dictionary<string, string>();
 
-    private async Task<TableData<ExaminationFeeDto>> LoadServerData(TableState state, CancellationToken ct)
+    protected override string UnreachableMessage => T.ExamFee.Unreachable;
+
+    protected override async Task<PagedResult<ExaminationFeeDto>> LoadPageAsync(
+        string? search,
+        string? sortBy,
+        bool sortDescending,
+        int page,
+        int pageSize,
+        CancellationToken ct)
     {
-        try
-        {
-            var feesTask = PayrollService.GetExaminationFeesPagedAsync(
-                _search,
-                state.SortLabel,
-                state.SortDirection == SortDirection.Descending,
-                state.Page + 1,
-                state.PageSize,
-                ct);
-            var typesTask = ExaminationService.GetTypesPagedAsync(null, null, false, 1, 100, ct);
+        var feesTask = PayrollService.GetExaminationFeesPagedAsync(search, sortBy, sortDescending, page, pageSize, ct);
+        var typesTask = ExaminationService.GetTypesPagedAsync(null, null, false, 1, 100, ct);
 
-            await Task.WhenAll(feesTask, typesTask);
+        await Task.WhenAll(feesTask, typesTask);
 
-            var fees = await feesTask;
-            _examTypeNames = (await typesTask).Items.ToDictionary(t => t.Id, t => $"{t.Code} - {t.Name}");
+        var fees = await feesTask;
+        _examTypeNames = (await typesTask).Items.ToDictionary(t => t.Id, t => $"{t.Code} - {t.Name}");
 
-            return new TableData<ExaminationFeeDto> { Items = fees.Items, TotalItems = fees.TotalCount };
-        }
-        catch (OperationCanceledException)
-        {
-            if (ct.IsCancellationRequested)
-                return new TableData<ExaminationFeeDto> { Items = Array.Empty<ExaminationFeeDto>(), TotalItems = 0 };
-            throw;
-        }
-        catch (ApiException ex)
-        {
-            Snackbar.Add(ex.Message, Severity.Error);
-            _loadError = ex.Message;
-            _offline = false;
-            return new TableData<ExaminationFeeDto> { Items = Array.Empty<ExaminationFeeDto>(), TotalItems = 0 };
-        }
-        catch (Exception)
-        {
-            Snackbar.Add(T.ExamFee.Unreachable, Severity.Error);
-            _loadError = T.ExamFee.Unreachable;
-            _offline = true;
-            return new TableData<ExaminationFeeDto> { Items = Array.Empty<ExaminationFeeDto>(), TotalItems = 0 };
-        }
+        return fees;
     }
 
     private string ResolveExamType(string examTypeId)
         => _examTypeNames.TryGetValue(examTypeId, out var name) ? name : examTypeId;
 
-    private async Task OnSearchChanged(string? value)
-    {
-        _search = value;
-
-        _searchCts?.Cancel();
-        var cts = _searchCts = new CancellationTokenSource();
-        try
-        {
-            await Task.Delay(400, cts.Token);
-        }
-        catch (TaskCanceledException)
-        {
-            return;
-        }
-
-        if (_table is not null)
-            await _table.ReloadServerData();
-    }
-
-    private Task ReloadAsync()
-        => _table is null ? Task.CompletedTask : _table.ReloadServerData();
-
     private async Task OpenCreateDialogAsync()
     {
-        var options = new DialogOptions { MaxWidth = MaxWidth.Medium, FullWidth = true, NoHeader = true };
-        var dialog = await DialogService.ShowAsync<ExaminationFeeEditorDialog>(T.ExamFee.NewExaminationFee, options);
+        var dialog = await DialogService.ShowAsync<ExaminationFeeEditorDialog>(T.ExamFee.NewExaminationFee, EditorDialogOptions);
         await ReloadIfSavedAsync(dialog);
     }
 
     private async Task OpenEditDialogAsync(ExaminationFeeDto fee)
     {
         var parameters = new DialogParameters { ["Fee"] = fee };
-        var options = new DialogOptions { MaxWidth = MaxWidth.Medium, FullWidth = true, NoHeader = true };
-        var dialog = await DialogService.ShowAsync<ExaminationFeeEditorDialog>(T.ExamFee.EditExaminationFee, parameters, options);
+        var dialog = await DialogService.ShowAsync<ExaminationFeeEditorDialog>(T.ExamFee.EditExaminationFee, parameters, EditorDialogOptions);
         await ReloadIfSavedAsync(dialog);
-    }
-
-    private async Task ReloadIfSavedAsync(IDialogReference dialog)
-    {
-        var result = await dialog.Result;
-        if (result is { Canceled: false })
-            await ReloadAsync();
     }
 
     private async Task ToggleActiveAsync(ExaminationFeeDto fee)
@@ -152,6 +95,4 @@ private MudTable<ExaminationFeeDto>? _table;
             Snackbar,
             () => T.ExamFee.Unreachable);
     }
-
-    public void Dispose() => _searchCts?.Cancel();
 }

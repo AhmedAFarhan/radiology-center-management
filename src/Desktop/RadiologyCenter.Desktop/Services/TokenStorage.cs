@@ -1,12 +1,24 @@
 namespace RadiologyCenter.Desktop.Services;
 
+using RadiologyCenter.Desktop.Models;
+
 public sealed record AuthTokens(
     string AccessToken,
     string RefreshToken,
     DateTime ExpiresAt,
     DateTime RefreshTokenExpiresAt,
     string Username,
-    bool MustChangePassword = false);
+    bool MustChangePassword = false)
+{
+    public static AuthTokens From(TokenResult result, string username)
+        => new(
+            result.AccessToken,
+            result.RefreshToken,
+            result.ExpiresAt,
+            result.RefreshTokenExpiresAt,
+            username,
+            result.MustChangePassword);
+}
 
 public sealed class TokenStorage
 {

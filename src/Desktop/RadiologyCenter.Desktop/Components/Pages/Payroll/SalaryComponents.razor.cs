@@ -18,94 +18,30 @@ using RadiologyCenter.Desktop.Services;
 
 namespace RadiologyCenter.Desktop.Components.Pages.Payroll;
 
-public partial class SalaryComponents : ComponentBase, IDisposable
+public partial class SalaryComponents : ListPageBase<SalaryComponentDto>
 {
-private MudTable<SalaryComponentDto>? _table;
-    private string? _search;
-    private CancellationTokenSource? _searchCts;
-    private string? _loadError;
-    private bool _offline;
+    protected override string UnreachableMessage => T.SalaryComponent.Unreachable;
 
-    private async Task<TableData<SalaryComponentDto>> LoadServerData(TableState state, CancellationToken ct)
-    {
-        try
-        {
-            var page = await PayrollService.GetSalaryComponentsPagedAsync(
-                _search,
-                state.SortLabel,
-                state.SortDirection == SortDirection.Descending,
-                state.Page + 1,
-                state.PageSize,
-                ct);
-
-            _loadError = null;
-            _offline = false;
-            return new TableData<SalaryComponentDto> { Items = page.Items, TotalItems = page.TotalCount };
-        }
-        catch (OperationCanceledException)
-        {
-            if (ct.IsCancellationRequested)
-                return new TableData<SalaryComponentDto> { Items = Array.Empty<SalaryComponentDto>(), TotalItems = 0 };
-            throw;
-        }
-        catch (ApiException ex)
-        {
-            Snackbar.Add(ex.Message, Severity.Error);
-            _loadError = ex.Message;
-            _offline = false;
-            return new TableData<SalaryComponentDto> { Items = Array.Empty<SalaryComponentDto>(), TotalItems = 0 };
-        }
-        catch (Exception)
-        {
-            Snackbar.Add(T.SalaryComponent.Unreachable, Severity.Error);
-            _loadError = T.SalaryComponent.Unreachable;
-            _offline = true;
-            return new TableData<SalaryComponentDto> { Items = Array.Empty<SalaryComponentDto>(), TotalItems = 0 };
-        }
-    }
-
-    private async Task OnSearchChanged(string? value)
-    {
-        _search = value;
-
-        _searchCts?.Cancel();
-        var cts = _searchCts = new CancellationTokenSource();
-        try
-        {
-            await Task.Delay(400, cts.Token);
-        }
-        catch (TaskCanceledException)
-        {
-            return;
-        }
-
-        if (_table is not null)
-            await _table.ReloadServerData();
-    }
-
-    private Task ReloadAsync()
-        => _table is null ? Task.CompletedTask : _table.ReloadServerData();
+    protected override async Task<PagedResult<SalaryComponentDto>> LoadPageAsync(
+        string? search,
+        string? sortBy,
+        bool sortDescending,
+        int page,
+        int pageSize,
+        CancellationToken ct)
+        => await PayrollService.GetSalaryComponentsPagedAsync(search, sortBy, sortDescending, page, pageSize, ct);
 
     private async Task OpenCreateDialogAsync()
     {
-        var options = new DialogOptions { MaxWidth = MaxWidth.Medium, FullWidth = true, NoHeader = true };
-        var dialog = await DialogService.ShowAsync<SalaryComponentEditorDialog>(T.SalaryComponent.NewSalaryComponent, options);
+        var dialog = await DialogService.ShowAsync<SalaryComponentEditorDialog>(T.SalaryComponent.NewSalaryComponent, EditorDialogOptions);
         await ReloadIfSavedAsync(dialog);
     }
 
     private async Task OpenEditDialogAsync(SalaryComponentDto component)
     {
         var parameters = new DialogParameters { ["Component"] = component };
-        var options = new DialogOptions { MaxWidth = MaxWidth.Medium, FullWidth = true, NoHeader = true };
-        var dialog = await DialogService.ShowAsync<SalaryComponentEditorDialog>(T.FormatValue(T.SalaryComponent.EditTitle, component.Name), parameters, options);
+        var dialog = await DialogService.ShowAsync<SalaryComponentEditorDialog>(T.FormatValue(T.SalaryComponent.EditTitle, component.Name), parameters, EditorDialogOptions);
         await ReloadIfSavedAsync(dialog);
-    }
-
-    private async Task ReloadIfSavedAsync(IDialogReference dialog)
-    {
-        var result = await dialog.Result;
-        if (result is { Canceled: false })
-            await ReloadAsync();
     }
 
     private async Task ToggleActiveAsync(SalaryComponentDto component)
@@ -144,15 +80,4 @@ private MudTable<SalaryComponentDto>? _table;
             Snackbar,
             () => T.SalaryComponent.Unreachable);
     }
-
-    private static string FormatFrequency(string frequency) => frequency switch
-    {
-        "OneTime" => "One Time",
-        "Monthly" => "Monthly",
-        "Quarterly" => "Quarterly",
-        "Annual" => "Annual",
-        _ => frequency,
-    };
-
-    public void Dispose() => _searchCts?.Cancel();
 }

@@ -2,20 +2,16 @@ using RadiologyCenter.Desktop.Models;
 
 namespace RadiologyCenter.Desktop.Services;
 
-public sealed class PayrollService
+public sealed class PayrollService : CrudServiceBase
 {
-    private readonly ApiClient _api;
+    private const string PayRunsRes = "api/payroll/payruns";
+    private const string SalaryComponentsRes = "api/payroll/salary-components";
+    private const string SalariesRes = "api/payroll/salaries";
+    private const string AllowancesRes = "api/payroll/allowances";
+    private const string ExaminationFeesRes = "api/payroll/examination-fees";
+    private const string ReferralFeesRes = "api/payroll/referral-fees";
 
-    public PayrollService(ApiClient api) => _api = api;
-
-    private static object BuildQuery(string? searchTerm, string? sortBy, bool sortDescending, int pageNumber, int pageSize)
-        => new
-        {
-            pagination = new { pageNumber, pageSize },
-            sortBy,
-            sortDescending,
-            searchTerm,
-        };
+    public PayrollService(ApiClient api) : base(api) { }
 
     // ----- Pay Runs -----
     public Task<PagedResult<PayRunDto>> GetPayRunsPagedAsync(
@@ -25,37 +21,37 @@ public sealed class PayrollService
         int pageNumber,
         int pageSize,
         CancellationToken ct = default)
-        => _api.PostAsync<PagedResult<PayRunDto>>("api/payroll/payruns/all", BuildQuery(searchTerm, sortBy, sortDescending, pageNumber, pageSize), ct);
+        => FetchPageAsync<PayRunDto>(PayRunsRes, searchTerm, sortBy, sortDescending, pageNumber, pageSize, ct);
 
     public Task<PayRunDto> GetPayRunByIdAsync(string id, CancellationToken ct = default)
-        => _api.GetAsync<PayRunDto>($"api/payroll/payruns/{id}", ct);
+        => FetchByIdAsync<PayRunDto>(PayRunsRes, id, ct);
 
     public Task<PayRunDto> CreatePayRunAsync(CreatePayRunInput input, CancellationToken ct = default)
-        => _api.PostAsync<PayRunDto>("api/payroll/payruns", input, ct);
+        => CreateEntityAsync<PayRunDto>(PayRunsRes, input, ct);
 
     public Task<PayslipDto> AddPayslipAsync(string payRunId, string staffId, CancellationToken ct = default)
-        => _api.PostAsync<PayslipDto>($"api/payroll/payruns/{payRunId}/payslips", new { staffId }, ct);
+        => Api.PostAsync<PayslipDto>($"{PayRunsRes}/{payRunId}/payslips", new { staffId }, ct);
 
     public Task RemovePayslipAsync(string payRunId, string staffId, CancellationToken ct = default)
-        => _api.SendDeleteAsync($"api/payroll/payruns/{payRunId}/payslips/{staffId}", ct);
+        => Api.SendDeleteAsync($"{PayRunsRes}/{payRunId}/payslips/{staffId}", ct);
 
     public Task ComputePayRunAsync(string id, CancellationToken ct = default)
-        => _api.SendAsync($"api/payroll/payruns/{id}/compute", ct: ct);
+        => Api.SendAsync($"{PayRunsRes}/{id}/compute", ct: ct);
 
     public Task ApprovePayRunAsync(string id, CancellationToken ct = default)
-        => _api.SendAsync($"api/payroll/payruns/{id}/approve", ct: ct);
+        => Api.SendAsync($"{PayRunsRes}/{id}/approve", ct: ct);
 
     public Task RejectPayRunAsync(string id, CancellationToken ct = default)
-        => _api.SendAsync($"api/payroll/payruns/{id}/reject", ct: ct);
+        => Api.SendAsync($"{PayRunsRes}/{id}/reject", ct: ct);
 
     public Task RestartPayRunAsync(string id, CancellationToken ct = default)
-        => _api.SendAsync($"api/payroll/payruns/{id}/restart", ct: ct);
+        => Api.SendAsync($"{PayRunsRes}/{id}/restart", ct: ct);
 
     public Task PayPayRunAsync(string id, CancellationToken ct = default)
-        => _api.SendAsync($"api/payroll/payruns/{id}/pay", ct: ct);
+        => Api.SendAsync($"{PayRunsRes}/{id}/pay", ct: ct);
 
     public Task DeletePayRunAsync(string id, CancellationToken ct = default)
-        => _api.SendDeleteAsync($"api/payroll/payruns/{id}", ct);
+        => DeleteEntityAsync(PayRunsRes, id, ct);
 
     // ----- Salary Components -----
     public Task<PagedResult<SalaryComponentDto>> GetSalaryComponentsPagedAsync(
@@ -65,25 +61,25 @@ public sealed class PayrollService
         int pageNumber,
         int pageSize,
         CancellationToken ct = default)
-        => _api.PostAsync<PagedResult<SalaryComponentDto>>("api/payroll/salary-components/all", BuildQuery(searchTerm, sortBy, sortDescending, pageNumber, pageSize), ct);
+        => FetchPageAsync<SalaryComponentDto>(SalaryComponentsRes, searchTerm, sortBy, sortDescending, pageNumber, pageSize, ct);
 
     public Task<SalaryComponentDto> GetSalaryComponentByIdAsync(string id, CancellationToken ct = default)
-        => _api.GetAsync<SalaryComponentDto>($"api/payroll/salary-components/{id}", ct);
+        => FetchByIdAsync<SalaryComponentDto>(SalaryComponentsRes, id, ct);
 
     public Task<SalaryComponentDto> CreateSalaryComponentAsync(SalaryComponentInput input, CancellationToken ct = default)
-        => _api.PostAsync<SalaryComponentDto>("api/payroll/salary-components", input, ct);
+        => CreateEntityAsync<SalaryComponentDto>(SalaryComponentsRes, input, ct);
 
     public Task UpdateSalaryComponentAsync(string id, SalaryComponentInput input, CancellationToken ct = default)
-        => _api.PutAsync<object>($"api/payroll/salary-components/{id}", input, ct);
+        => UpdateEntityAsync(SalaryComponentsRes, id, input, ct);
 
     public Task ActivateSalaryComponentAsync(string id, CancellationToken ct = default)
-        => _api.SendAsync($"api/payroll/salary-components/{id}/activate", ct: ct);
+        => SetEntityActiveAsync(SalaryComponentsRes, id, true, ct);
 
     public Task DeactivateSalaryComponentAsync(string id, CancellationToken ct = default)
-        => _api.SendAsync($"api/payroll/salary-components/{id}/deactivate", ct: ct);
+        => SetEntityActiveAsync(SalaryComponentsRes, id, false, ct);
 
     public Task DeleteSalaryComponentAsync(string id, CancellationToken ct = default)
-        => _api.SendDeleteAsync($"api/payroll/salary-components/{id}", ct);
+        => DeleteEntityAsync(SalaryComponentsRes, id, ct);
 
     // ----- Salaries -----
     public Task<PagedResult<SalaryDto>> GetSalariesPagedAsync(
@@ -93,25 +89,25 @@ public sealed class PayrollService
         int pageNumber,
         int pageSize,
         CancellationToken ct = default)
-        => _api.PostAsync<PagedResult<SalaryDto>>("api/payroll/salaries/all", BuildQuery(searchTerm, sortBy, sortDescending, pageNumber, pageSize), ct);
+        => FetchPageAsync<SalaryDto>(SalariesRes, searchTerm, sortBy, sortDescending, pageNumber, pageSize, ct);
 
     public Task<SalaryDto> GetSalaryByIdAsync(string id, CancellationToken ct = default)
-        => _api.GetAsync<SalaryDto>($"api/payroll/salaries/{id}", ct);
+        => FetchByIdAsync<SalaryDto>(SalariesRes, id, ct);
 
     public Task<SalaryDto> CreateSalaryAsync(SalaryInput input, CancellationToken ct = default)
-        => _api.PostAsync<SalaryDto>("api/payroll/salaries", input, ct);
+        => CreateEntityAsync<SalaryDto>(SalariesRes, input, ct);
 
     public Task UpdateSalaryAsync(string id, SalaryInput input, CancellationToken ct = default)
-        => _api.PutAsync<object>($"api/payroll/salaries/{id}", input, ct);
+        => UpdateEntityAsync(SalariesRes, id, input, ct);
 
     public Task ActivateSalaryAsync(string id, CancellationToken ct = default)
-        => _api.SendAsync($"api/payroll/salaries/{id}/activate", ct: ct);
+        => SetEntityActiveAsync(SalariesRes, id, true, ct);
 
     public Task DeactivateSalaryAsync(string id, CancellationToken ct = default)
-        => _api.SendAsync($"api/payroll/salaries/{id}/deactivate", ct: ct);
+        => SetEntityActiveAsync(SalariesRes, id, false, ct);
 
     public Task DeleteSalaryAsync(string id, CancellationToken ct = default)
-        => _api.SendDeleteAsync($"api/payroll/salaries/{id}", ct);
+        => DeleteEntityAsync(SalariesRes, id, ct);
 
     // ----- Allowances -----
     public Task<PagedResult<AllowanceAssignmentDto>> GetAllowancesPagedAsync(
@@ -121,25 +117,25 @@ public sealed class PayrollService
         int pageNumber,
         int pageSize,
         CancellationToken ct = default)
-        => _api.PostAsync<PagedResult<AllowanceAssignmentDto>>("api/payroll/allowances/all", BuildQuery(searchTerm, sortBy, sortDescending, pageNumber, pageSize), ct);
+        => FetchPageAsync<AllowanceAssignmentDto>(AllowancesRes, searchTerm, sortBy, sortDescending, pageNumber, pageSize, ct);
 
     public Task<AllowanceAssignmentDto> GetAllowanceByIdAsync(string id, CancellationToken ct = default)
-        => _api.GetAsync<AllowanceAssignmentDto>($"api/payroll/allowances/{id}", ct);
+        => FetchByIdAsync<AllowanceAssignmentDto>(AllowancesRes, id, ct);
 
     public Task<AllowanceAssignmentDto> CreateAllowanceAsync(AllowanceAssignmentInput input, CancellationToken ct = default)
-        => _api.PostAsync<AllowanceAssignmentDto>("api/payroll/allowances", input, ct);
+        => CreateEntityAsync<AllowanceAssignmentDto>(AllowancesRes, input, ct);
 
     public Task UpdateAllowanceAsync(string id, AllowanceAssignmentInput input, CancellationToken ct = default)
-        => _api.PutAsync<object>($"api/payroll/allowances/{id}", input, ct);
+        => UpdateEntityAsync(AllowancesRes, id, input, ct);
 
     public Task ActivateAllowanceAsync(string id, CancellationToken ct = default)
-        => _api.SendAsync($"api/payroll/allowances/{id}/activate", ct: ct);
+        => SetEntityActiveAsync(AllowancesRes, id, true, ct);
 
     public Task DeactivateAllowanceAsync(string id, CancellationToken ct = default)
-        => _api.SendAsync($"api/payroll/allowances/{id}/deactivate", ct: ct);
+        => SetEntityActiveAsync(AllowancesRes, id, false, ct);
 
     public Task DeleteAllowanceAsync(string id, CancellationToken ct = default)
-        => _api.SendDeleteAsync($"api/payroll/allowances/{id}", ct);
+        => DeleteEntityAsync(AllowancesRes, id, ct);
 
     // ----- Examination Fees -----
     public Task<PagedResult<ExaminationFeeDto>> GetExaminationFeesPagedAsync(
@@ -149,25 +145,25 @@ public sealed class PayrollService
         int pageNumber,
         int pageSize,
         CancellationToken ct = default)
-        => _api.PostAsync<PagedResult<ExaminationFeeDto>>("api/payroll/examination-fees/all", BuildQuery(searchTerm, sortBy, sortDescending, pageNumber, pageSize), ct);
+        => FetchPageAsync<ExaminationFeeDto>(ExaminationFeesRes, searchTerm, sortBy, sortDescending, pageNumber, pageSize, ct);
 
     public Task<ExaminationFeeDto> GetExaminationFeeByIdAsync(string id, CancellationToken ct = default)
-        => _api.GetAsync<ExaminationFeeDto>($"api/payroll/examination-fees/{id}", ct);
+        => FetchByIdAsync<ExaminationFeeDto>(ExaminationFeesRes, id, ct);
 
     public Task<ExaminationFeeDto> CreateExaminationFeeAsync(ExaminationFeeInput input, CancellationToken ct = default)
-        => _api.PostAsync<ExaminationFeeDto>("api/payroll/examination-fees", input, ct);
+        => CreateEntityAsync<ExaminationFeeDto>(ExaminationFeesRes, input, ct);
 
     public Task UpdateExaminationFeeAsync(string id, ExaminationFeeInput input, CancellationToken ct = default)
-        => _api.PutAsync<object>($"api/payroll/examination-fees/{id}", input, ct);
+        => UpdateEntityAsync(ExaminationFeesRes, id, input, ct);
 
     public Task ActivateExaminationFeeAsync(string id, CancellationToken ct = default)
-        => _api.SendAsync($"api/payroll/examination-fees/{id}/activate", ct: ct);
+        => SetEntityActiveAsync(ExaminationFeesRes, id, true, ct);
 
     public Task DeactivateExaminationFeeAsync(string id, CancellationToken ct = default)
-        => _api.SendAsync($"api/payroll/examination-fees/{id}/deactivate", ct: ct);
+        => SetEntityActiveAsync(ExaminationFeesRes, id, false, ct);
 
     public Task DeleteExaminationFeeAsync(string id, CancellationToken ct = default)
-        => _api.SendDeleteAsync($"api/payroll/examination-fees/{id}", ct);
+        => DeleteEntityAsync(ExaminationFeesRes, id, ct);
 
     // ----- Referral Fees -----
     public Task<PagedResult<ReferralFeeDto>> GetReferralFeesPagedAsync(
@@ -177,23 +173,23 @@ public sealed class PayrollService
         int pageNumber,
         int pageSize,
         CancellationToken ct = default)
-        => _api.PostAsync<PagedResult<ReferralFeeDto>>("api/payroll/referral-fees/all", BuildQuery(searchTerm, sortBy, sortDescending, pageNumber, pageSize), ct);
+        => FetchPageAsync<ReferralFeeDto>(ReferralFeesRes, searchTerm, sortBy, sortDescending, pageNumber, pageSize, ct);
 
     public Task<ReferralFeeDto> GetReferralFeeByIdAsync(string id, CancellationToken ct = default)
-        => _api.GetAsync<ReferralFeeDto>($"api/payroll/referral-fees/{id}", ct);
+        => FetchByIdAsync<ReferralFeeDto>(ReferralFeesRes, id, ct);
 
     public Task<ReferralFeeDto> CreateReferralFeeAsync(ReferralFeeInput input, CancellationToken ct = default)
-        => _api.PostAsync<ReferralFeeDto>("api/payroll/referral-fees", input, ct);
+        => CreateEntityAsync<ReferralFeeDto>(ReferralFeesRes, input, ct);
 
     public Task UpdateReferralFeeAsync(string id, ReferralFeeInput input, CancellationToken ct = default)
-        => _api.PutAsync<object>($"api/payroll/referral-fees/{id}", input, ct);
+        => UpdateEntityAsync(ReferralFeesRes, id, input, ct);
 
     public Task ActivateReferralFeeAsync(string id, CancellationToken ct = default)
-        => _api.SendAsync($"api/payroll/referral-fees/{id}/activate", ct: ct);
+        => SetEntityActiveAsync(ReferralFeesRes, id, true, ct);
 
     public Task DeactivateReferralFeeAsync(string id, CancellationToken ct = default)
-        => _api.SendAsync($"api/payroll/referral-fees/{id}/deactivate", ct: ct);
+        => SetEntityActiveAsync(ReferralFeesRes, id, false, ct);
 
     public Task DeleteReferralFeeAsync(string id, CancellationToken ct = default)
-        => _api.SendDeleteAsync($"api/payroll/referral-fees/{id}", ct);
+        => DeleteEntityAsync(ReferralFeesRes, id, ct);
 }

@@ -107,21 +107,8 @@ public sealed class ApiClient
 
         if (!response.IsSuccessStatusCode)
         {
-            var content = await response.Content.ReadAsStringAsync(ct);
-            ApiError? error = null;
-            try
-            {
-                var envelope = JsonSerializer.Deserialize<ApiEnvelope>(content, JsonOptions);
-                error = envelope?.Error;
-                if (string.IsNullOrWhiteSpace(error?.Message))
-                    error = new ApiError { Message = envelope?.Message ?? "Request failed." };
-            }
-            catch
-            {
-                // non-JSON error body
-            }
-
-            throw new ApiException((int)response.StatusCode, error?.Message ?? $"Request failed ({(int)response.StatusCode}).", error);
+            var error = BuildError(await response.Content.ReadAsStringAsync(ct), (int)response.StatusCode);
+            throw new ApiException(error.StatusCode, error.Message, error.Error);
         }
 
         return await response.Content.ReadAsByteArrayAsync(ct);
@@ -198,13 +185,7 @@ public sealed class ApiClient
             if (envelope is not { Success: true } || envelope.Data is null)
                 return null;
 
-            await _authState.SignInAsync(new AuthTokens(
-                envelope.Data.AccessToken,
-                envelope.Data.RefreshToken,
-                envelope.Data.ExpiresAt,
-                envelope.Data.RefreshTokenExpiresAt,
-                tokens.Username,
-                envelope.Data.MustChangePassword));
+            await _authState.SignInAsync(AuthTokens.From(envelope.Data, tokens.Username));
 
             return envelope.Data;
         }
@@ -220,20 +201,8 @@ public sealed class ApiClient
 
         if (!response.IsSuccessStatusCode)
         {
-            ApiError? error = null;
-            try
-            {
-                var fail = JsonSerializer.Deserialize<ApiEnvelope>(content, JsonOptions);
-                error = fail?.Error;
-                if (string.IsNullOrWhiteSpace(error?.Message))
-                    error = new ApiError { Message = fail?.Message ?? "Request failed." };
-            }
-            catch
-            {
-                // non-JSON error body
-            }
-
-            throw new ApiException((int)response.StatusCode, error?.Message ?? $"Request failed ({(int)response.StatusCode}).", error);
+            var error = BuildError(content, (int)response.StatusCode);
+            throw new ApiException(error.StatusCode, error.Message, error.Error);
         }
 
         try
@@ -255,5 +224,23 @@ public sealed class ApiClient
         if (body is null)
             return null;
         return JsonContent.Create(body, options: JsonOptions);
+    }
+
+    private static ApiException BuildError(string content, int statusCode)
+    {
+        ApiError? error = null;
+        try
+        {
+            var envelope = JsonSerializer.Deserialize<ApiEnvelope>(content, JsonOptions);
+            error = envelope?.Error;
+            if (string.IsNullOrWhiteSpace(error?.Message))
+                error = new ApiError { Message = envelope?.Message ?? "Request failed." };
+        }
+        catch
+        {
+            // non-JSON error body
+        }
+
+        return new ApiException(statusCode, error?.Message ?? $"Request failed ({statusCode}).", error);
     }
 }

@@ -18,13 +18,10 @@ using RadiologyCenter.Desktop.Services;
 
 namespace RadiologyCenter.Desktop.Components.Pages.Payroll;
 
-public partial class PayRunEditorDialog : ComponentBase
+public partial class PayRunEditorDialog : EditorDialogBase
 {
-[CascadingParameter] public IMudDialogInstance MudDialog { get; set; } = default!;
-
     private readonly PayRunFormModel _model = new();
     private EditContext _editContext = default!;
-    private bool _busy;
 
     protected override void OnInitialized()
     {
@@ -50,25 +47,19 @@ public partial class PayRunEditorDialog : ComponentBase
             return;
         }
 
-        await SafeExecute.RunAsync(async () =>
-            {
-                await PayrollService.CreatePayRunAsync(new CreatePayRunInput
+        if (await TrySaveAsync(
+                () => PayrollService.CreatePayRunAsync(new CreatePayRunInput
                 {
                     RunFrom = _model.RunFrom.Value.Date,
                     RunTo = _model.RunTo.Value.Date,
                     Notes = _model.Notes,
-                });
-
-                Snackbar.Add(T.PayRunDialog.Created, Severity.Success);
-                MudDialog.Close(DialogResult.Ok(true));
-            },
-            Snackbar,
-            () => T.PayRunDialog.Unreachable,
-            busy => _busy = busy);
+                }),
+                () => T.PayRunDialog.Unreachable))
+        {
+            Snackbar.Add(T.PayRunDialog.Created, Severity.Success);
+            MudDialog.Close(DialogResult.Ok(true));
+        }
     }
-
-    private void CancelAsync()
-        => MudDialog.Cancel();
 
     private sealed class PayRunFormModel
     {

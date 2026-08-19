@@ -1,0 +1,13 @@
+@using Microsoft.AspNetCore.Components
+
+<MudButton Color="Color.Default" OnClick="OnCancel" Disabled="Busy || Disabled">@CancelLabel</MudButton>
+<MudButton Color="Color.Primary" Variant="Variant.Filled" OnClick="OnSave" Disabled="Busy || Disabled">
+    @if (Busy)
+    {
+        <MudProgressCircular Size="Size.Small" Indeterminate="true" Class="mx-1" />
+    }
+    else
+    {
+        <text>@SaveLabel</text>
+    }
+</MudButton>

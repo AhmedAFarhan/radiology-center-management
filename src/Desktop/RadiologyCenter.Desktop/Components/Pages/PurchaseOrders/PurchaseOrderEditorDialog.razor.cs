@@ -18,15 +18,12 @@ using RadiologyCenter.Desktop.Services;
 
 namespace RadiologyCenter.Desktop.Components.Pages.PurchaseOrders;
 
-public partial class PurchaseOrderEditorDialog : ComponentBase
+public partial class PurchaseOrderEditorDialog : EditorDialogBase
 {
-[CascadingParameter] public IMudDialogInstance MudDialog { get; set; } = default!;
-
     private readonly PurchaseOrderFormModel _model = new();
     private EditContext _editContext = default!;
     private List<SupplierDto> _suppliers = new();
     private List<ItemDto> _items = new();
-    private bool _busy;
 
     protected override async Task OnInitializedAsync()
     {
@@ -63,7 +60,7 @@ public partial class PurchaseOrderEditorDialog : ComponentBase
             return;
         }
 
-        await SafeExecute.RunAsync(async () =>
+        await TrySaveAsync(async () =>
             {
                 var input = new CreatePurchaseOrderInput
                 {
@@ -82,13 +79,8 @@ public partial class PurchaseOrderEditorDialog : ComponentBase
                 Snackbar.Add(T.PoDialog.PurchaseOrderCreated, Severity.Success);
                 MudDialog.Close(DialogResult.Ok(true));
             },
-            Snackbar,
-            () => T.PoDialog.UnreachableRetry,
-            busy => _busy = busy);
+            () => T.PoDialog.UnreachableRetry);
     }
-
-    private void CancelAsync()
-        => MudDialog.Cancel();
 
     private sealed class PurchaseOrderFormModel
     {

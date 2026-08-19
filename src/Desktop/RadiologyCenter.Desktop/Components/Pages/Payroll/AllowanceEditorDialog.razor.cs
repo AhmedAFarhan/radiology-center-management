@@ -18,11 +18,9 @@ using RadiologyCenter.Desktop.Services;
 
 namespace RadiologyCenter.Desktop.Components.Pages.Payroll;
 
-public partial class AllowanceEditorDialog : ComponentBase
+public partial class AllowanceEditorDialog : EditorDialogBase
 {
-[Parameter] public AllowanceAssignmentDto? Allowance { get; set; }
-
-    [CascadingParameter] public IMudDialogInstance MudDialog { get; set; } = default!;
+    [Parameter] public AllowanceAssignmentDto? Allowance { get; set; }
 
     private static readonly string[] Frequencies = { "OneTime", "Monthly", "Quarterly", "Annual" };
 
@@ -34,7 +32,6 @@ public partial class AllowanceEditorDialog : ComponentBase
     private string _componentId = string.Empty;
     private string _employeeName = string.Empty;
     private string _componentName = string.Empty;
-    private bool _busy;
 
     private bool IsEdit => Allowance is not null;
 
@@ -129,46 +126,30 @@ public partial class AllowanceEditorDialog : ComponentBase
             return;
         }
 
-        await SafeExecute.RunAsync(async () =>
-            {
-                var input = new AllowanceAssignmentInput
-                {
-                    StaffId = IsEdit ? _staffId : _selectedStaff!.Id,
-                    SalaryComponentId = IsEdit
-                        ? (string.IsNullOrWhiteSpace(_componentId) ? null : _componentId)
-                        : _selectedComponent?.Id,
-                    Name = _model.Name,
-                    Amount = _model.Amount,
-                    Frequency = string.IsNullOrWhiteSpace(_model.Frequency) ? null : _model.Frequency,
-                    IsPerWorkDay = _model.IsPerWorkDay,
-                    EffectiveDate = _model.EffectiveDate.Value.Date,
-                    EndDate = _model.EndDate?.Date,
-                };
+        var input = new AllowanceAssignmentInput
+        {
+            StaffId = IsEdit ? _staffId : _selectedStaff!.Id,
+            SalaryComponentId = IsEdit
+                ? (string.IsNullOrWhiteSpace(_componentId) ? null : _componentId)
+                : _selectedComponent?.Id,
+            Name = _model.Name,
+            Amount = _model.Amount,
+            Frequency = string.IsNullOrWhiteSpace(_model.Frequency) ? null : _model.Frequency,
+            IsPerWorkDay = _model.IsPerWorkDay,
+            EffectiveDate = _model.EffectiveDate.Value.Date,
+            EndDate = _model.EndDate?.Date,
+        };
 
-                if (IsEdit)
-                    await PayrollService.UpdateAllowanceAsync(Allowance!.Id, input);
-                else
-                    await PayrollService.CreateAllowanceAsync(input);
-
-                Snackbar.Add(IsEdit ? T.AllowanceDialog.Updated : T.AllowanceDialog.Created, Severity.Success);
-                MudDialog.Close(DialogResult.Ok(true));
-            },
-            Snackbar,
-            () => T.AllowanceDialog.Unreachable,
-            busy => _busy = busy);
+        if (await TrySaveAsync(
+                () => IsEdit
+                    ? PayrollService.UpdateAllowanceAsync(Allowance!.Id, input)
+                    : PayrollService.CreateAllowanceAsync(input),
+                () => T.AllowanceDialog.Unreachable))
+        {
+            Snackbar.Add(IsEdit ? T.AllowanceDialog.Updated : T.AllowanceDialog.Created, Severity.Success);
+            MudDialog.Close(DialogResult.Ok(true));
+        }
     }
-
-    private void CancelAsync()
-        => MudDialog.Cancel();
-
-    private static string FormatFrequency(string frequency) => frequency switch
-    {
-        "OneTime" => "One Time",
-        "Monthly" => "Monthly",
-        "Quarterly" => "Quarterly",
-        "Annual" => "Annual",
-        _ => frequency,
-    };
 
     private sealed class AllowanceFormModel
     {

@@ -18,16 +18,13 @@ using RadiologyCenter.Desktop.Services;
 
 namespace RadiologyCenter.Desktop.Components.Pages.Identity;
 
-public partial class UserEditorDialog : ComponentBase
+public partial class UserEditorDialog : EditorDialogBase
 {
 [Parameter] public UserDto? User { get; set; }
-
-    [CascadingParameter] public IMudDialogInstance MudDialog { get; set; } = default!;
 
     private readonly UserFormModel _model = new();
     private EditContext _editContext = default!;
     private List<RoleDto> _roles = new();
-    private bool _busy;
 
     private bool IsEdit => User is not null;
 
@@ -59,7 +56,7 @@ public partial class UserEditorDialog : ComponentBase
         if (!_editContext.Validate())
             return;
 
-        await SafeExecute.RunAsync(async () =>
+        await TrySaveAsync(async () =>
             {
                 if (IsEdit)
                 {
@@ -100,13 +97,8 @@ public partial class UserEditorDialog : ComponentBase
 
                 MudDialog.Close(DialogResult.Ok(true));
             },
-            Snackbar,
-            () => T.UserDialog.UnreachableRetry,
-            busy => _busy = busy);
+            () => T.UserDialog.UnreachableRetry);
     }
-
-    private void CancelAsync()
-        => MudDialog.Cancel();
 
     private sealed class UserFormModel
     {

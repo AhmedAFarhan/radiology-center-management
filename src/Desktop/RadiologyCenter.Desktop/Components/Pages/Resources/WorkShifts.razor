@@ -1,10 +1,7 @@
 @page "/resources/work-shifts"
 @attribute [Authorize]
+@inherits ListPageBase<WorkShiftDto>
 @inject ResourceService ResourceService
-@inject IDialogService DialogService
-@inject ISnackbar Snackbar
-@inject AppLocalizer T
-@implements IDisposable
 
 <PageHeader Icon="@Icons.Material.Filled.CalendarMonth" Title="@T.WorkShift.Title"
             Subtitle="@T.WorkShift.Subtitle"
@@ -14,7 +11,7 @@
     <MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Add" OnClick="OpenCreateDialogAsync">@T.WorkShift.Add</MudButton>
 </PageHeader>
 
-<MudTable T="WorkShiftDto" @ref="_table" ServerData="LoadServerData" Dense="true" Hover="true" Striped="true" Elevation="1" RowsPerPage="10" FixedHeader="true" Class="table-scroll">
+<MudTable T="WorkShiftDto" @ref="Table" ServerData="LoadServerData" Dense="true" Hover="true" Striped="true" Elevation="1" RowsPerPage="10" FixedHeader="true" Class="table-scroll">
     <HeaderContent>
         <MudTh><MudTableSortLabel T="WorkShiftDto" SortLabel="@("Date")">@T.Common.Date</MudTableSortLabel></MudTh>
         <MudTh>@T.WorkShift.Staff</MudTh>
@@ -40,25 +37,17 @@
         </MudTd>
     </RowTemplate>
     <NoRecordsContent>
-        @if (_loadError is not null)
-        {
-            <ErrorState Icon="@(_offline ? Icons.Material.Filled.CloudOff : Icons.Material.Filled.ErrorOutline)"
-                        Title="@T.WorkShift.LoadErrorTitle"
-                        Message="@_loadError"
-                        Action="ReloadAsync" />
-        }
-        else
-        {
-        <EmptyState Icon="@Icons.Material.Filled.CalendarMonth"
-                    Title="@T.WorkShift.EmptyTitle"
-                    Message="@T.WorkShift.EmptyMessage"
-                    ActionLabel="@T.WorkShift.EmptyActionLabel"
-                    Action="OpenCreateDialogAsync" />
-        }
+        <TableNoRecords LoadError="@LoadError"
+                        Offline="@Offline"
+                        ErrorTitle="@T.WorkShift.LoadErrorTitle"
+                        EmptyIcon="@Icons.Material.Filled.CalendarMonth"
+                        EmptyTitle="@T.WorkShift.EmptyTitle"
+                        EmptyMessage="@T.WorkShift.EmptyMessage"
+                        EmptyActionLabel="@T.WorkShift.EmptyActionLabel"
+                        OnReload="ReloadAsync"
+                        OnEmptyAction="OpenCreateDialogAsync" />
     </NoRecordsContent>
     <PagerContent>
         <MudTablePager PageSizeOptions="@(new[] { 10, 25, 50 })" />
     </PagerContent>
 </MudTable>
-
-

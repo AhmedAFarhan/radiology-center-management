@@ -19,13 +19,7 @@ public sealed class AuthService
     {
         var tokens = await _api.PostAsync<TokenResult>("api/auth/login", new { userName, password }, ct);
 
-        await _authState.SignInAsync(new AuthTokens(
-            tokens.AccessToken,
-            tokens.RefreshToken,
-            tokens.ExpiresAt,
-            tokens.RefreshTokenExpiresAt,
-            userName,
-            tokens.MustChangePassword));
+        await _authState.SignInAsync(AuthTokens.From(tokens, userName));
 
         return tokens.MustChangePassword;
     }
@@ -38,13 +32,7 @@ public sealed class AuthService
             ct);
 
         var current = _tokenStorage.GetTokens();
-        await _authState.SignInAsync(new AuthTokens(
-            tokens.AccessToken,
-            tokens.RefreshToken,
-            tokens.ExpiresAt,
-            tokens.RefreshTokenExpiresAt,
-            current?.Username ?? string.Empty,
-            tokens.MustChangePassword));
+        await _authState.SignInAsync(AuthTokens.From(tokens, current?.Username ?? string.Empty));
     }
 
     public async Task SignOutAsync(CancellationToken ct = default)

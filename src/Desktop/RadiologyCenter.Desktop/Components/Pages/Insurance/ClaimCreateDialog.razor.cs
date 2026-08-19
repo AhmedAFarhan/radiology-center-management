@@ -1,34 +1,20 @@
-using System.Net.Http;
-using System.Net.Http.Json;
 using System.ComponentModel.DataAnnotations;
-using System.Security.Claims;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Components;
-using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Components.Forms;
-using Microsoft.AspNetCore.Components.Routing;
-using Microsoft.AspNetCore.Components.Web;
-using Microsoft.AspNetCore.Components.Web.Virtualization;
-using Microsoft.JSInterop;
 using MudBlazor;
-using RadiologyCenter.Desktop;
-using RadiologyCenter.Desktop.Components;
 using RadiologyCenter.Desktop.Models;
 using RadiologyCenter.Desktop.Services;
 
 namespace RadiologyCenter.Desktop.Components.Pages.Insurance;
 
-public partial class ClaimCreateDialog : ComponentBase
+public partial class ClaimCreateDialog : EditorDialogBase
 {
-[CascadingParameter] public IMudDialogInstance MudDialog { get; set; } = default!;
-
     private readonly ClaimFormModel _model = new();
     private EditContext _editContext = default!;
     private PatientDto? _selectedPatient;
     private InsurancePolicyDto? _selectedPolicy;
     private ExaminationDto? _selectedExamination;
     private PreAuthorizationDto? _selectedPreAuthorization;
-    private bool _busy;
 
     protected override void OnInitialized()
         => _editContext = new EditContext(_model);
@@ -147,28 +133,23 @@ public partial class ClaimCreateDialog : ComponentBase
         if (!_editContext.Validate())
             return;
 
-        await SafeExecute.RunAsync(async () =>
-            {
-                var input = new CreateClaimInput
-                {
-                    ExaminationId = _selectedExamination.Id,
-                    PatientId = _selectedPatient.Id,
-                    PolicyId = _selectedPolicy.Id,
-                    PreAuthorizationId = _selectedPreAuthorization.Id,
-                    BilledAmount = _model.BilledAmount,
-                };
+        var input = new CreateClaimInput
+        {
+            ExaminationId = _selectedExamination.Id,
+            PatientId = _selectedPatient.Id,
+            PolicyId = _selectedPolicy.Id,
+            PreAuthorizationId = _selectedPreAuthorization.Id,
+            BilledAmount = _model.BilledAmount,
+        };
 
-                await InsuranceService.CreateClaimAsync(input);
-                Snackbar.Add(T.ClaimDialog.Created, Severity.Success);
-                MudDialog.Close(DialogResult.Ok(true));
-            },
-            Snackbar,
-            () => T.ClaimDialog.UnreachableRetry,
-            busy => _busy = busy);
+        if (await TrySaveAsync(
+                () => InsuranceService.CreateClaimAsync(input),
+                () => T.ClaimDialog.UnreachableRetry))
+        {
+            Snackbar.Add(T.ClaimDialog.Created, Severity.Success);
+            MudDialog.Close(DialogResult.Ok(true));
+        }
     }
-
-    private void CancelAsync()
-        => MudDialog.Cancel();
 
     private sealed class ClaimFormModel
     {

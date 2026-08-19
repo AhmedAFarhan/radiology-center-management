@@ -18,18 +18,15 @@ using RadiologyCenter.Desktop.Services;
 
 namespace RadiologyCenter.Desktop.Components.Pages.Payroll;
 
-public partial class SalaryEditorDialog : ComponentBase
+public partial class SalaryEditorDialog : EditorDialogBase
 {
-[Parameter] public SalaryDto? Salary { get; set; }
-
-    [CascadingParameter] public IMudDialogInstance MudDialog { get; set; } = default!;
+    [Parameter] public SalaryDto? Salary { get; set; }
 
     private readonly SalaryFormModel _model = new();
     private EditContext _editContext = default!;
     private StaffDto? _selectedStaff;
     private string _employeeName = string.Empty;
     private string _staffId = string.Empty;
-    private bool _busy;
 
     private bool IsEdit => Salary is not null;
 
@@ -98,31 +95,24 @@ public partial class SalaryEditorDialog : ComponentBase
             return;
         }
 
-        await SafeExecute.RunAsync(async () =>
-            {
-                var input = new SalaryInput
-                {
-                    StaffId = IsEdit ? _staffId : _selectedStaff!.Id,
-                    BaseSalary = _model.BaseSalary,
-                    SalaryType = _model.SalaryType,
-                    EffectiveDate = _model.EffectiveDate.Value.Date,
-                };
+        var input = new SalaryInput
+        {
+            StaffId = IsEdit ? _staffId : _selectedStaff!.Id,
+            BaseSalary = _model.BaseSalary,
+            SalaryType = _model.SalaryType,
+            EffectiveDate = _model.EffectiveDate.Value.Date,
+        };
 
-                if (IsEdit)
-                    await PayrollService.UpdateSalaryAsync(Salary!.Id, input);
-                else
-                    await PayrollService.CreateSalaryAsync(input);
-
-                Snackbar.Add(IsEdit ? T.SalaryDialog.Updated : T.SalaryDialog.Created, Severity.Success);
-                MudDialog.Close(DialogResult.Ok(true));
-            },
-            Snackbar,
-            () => T.SalaryDialog.Unreachable,
-            busy => _busy = busy);
+        if (await TrySaveAsync(
+                () => IsEdit
+                    ? PayrollService.UpdateSalaryAsync(Salary!.Id, input)
+                    : PayrollService.CreateSalaryAsync(input),
+                () => T.SalaryDialog.Unreachable))
+        {
+            Snackbar.Add(IsEdit ? T.SalaryDialog.Updated : T.SalaryDialog.Created, Severity.Success);
+            MudDialog.Close(DialogResult.Ok(true));
+        }
     }
-
-    private void CancelAsync()
-        => MudDialog.Cancel();
 
     private sealed class SalaryFormModel
     {

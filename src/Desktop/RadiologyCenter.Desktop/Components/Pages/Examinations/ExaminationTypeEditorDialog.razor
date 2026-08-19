@@ -1,7 +1,6 @@
+@inherits EditorDialogBase
 @inject ExaminationService ExaminationService
 @inject InventoryService InventoryService
-@inject ISnackbar Snackbar
-@inject AppLocalizer T
 
 <MudDialog>
     <DialogContent>
@@ -121,17 +120,11 @@
         </EditForm>
     </DialogContent>
     <DialogActions>
-        <MudButton Color="Color.Default" OnClick="CancelAsync" Disabled="_busy">@T.Common.Cancel</MudButton>
-        <MudButton Color="Color.Primary" Variant="Variant.Filled" OnClick="SubmitAsync" Disabled="_busy">
-            @if (_busy)
-            {
-                <MudProgressCircular Size="Size.Small" Indeterminate="true" Class="mx-1" />
-            }
-            else
-            {
-                <text>@(IsEdit ? T.ExamDialog.SaveChanges : T.ExamDialog.CreateType)</text>
-            }
-        </MudButton>
+        <DialogButtons Busy="Busy"
+                       CancelLabel="@T.Common.Cancel"
+                       SaveLabel="@(IsEdit ? T.ExamDialog.SaveChanges : T.ExamDialog.CreateType)"
+                       OnCancel="CancelAsync"
+                       OnSave="SubmitAsync" />
     </DialogActions>
 </MudDialog>
 

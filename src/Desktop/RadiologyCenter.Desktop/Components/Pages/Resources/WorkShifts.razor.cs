@@ -18,58 +18,31 @@ using RadiologyCenter.Desktop.Services;
 
 namespace RadiologyCenter.Desktop.Components.Pages.Resources;
 
-public partial class WorkShifts : ComponentBase, IDisposable
+public partial class WorkShifts : ListPageBase<WorkShiftDto>
 {
-private MudTable<WorkShiftDto>? _table;
-    private string? _search;
-    private CancellationTokenSource? _searchCts;
-    private string? _loadError;
-    private bool _offline;
+    protected override string UnreachableMessage => T.WorkShift.Unreachable;
+
     private IReadOnlyDictionary<string, string> _staffNames = new Dictionary<string, string>();
     private IReadOnlyDictionary<string, string> _equipmentNames = new Dictionary<string, string>();
 
-    private async Task<TableData<WorkShiftDto>> LoadServerData(TableState state, CancellationToken ct)
+    protected override async Task<PagedResult<WorkShiftDto>> LoadPageAsync(
+        string? search,
+        string? sortBy,
+        bool sortDescending,
+        int page,
+        int pageSize,
+        CancellationToken ct)
     {
-        try
-        {
-            var shiftsTask = ResourceService.GetWorkShiftsPagedAsync(
-                _search,
-                state.SortLabel,
-                state.SortDirection == SortDirection.Descending,
-                state.Page + 1,
-                state.PageSize,
-                ct);
-            var staffTask = ResourceService.GetStaffsPagedAsync(null, null, false, 1, 100, ct);
-            var equipmentTask = ResourceService.GetEquipmentPagedAsync(null, null, false, 1, 100, ct);
+        var shiftsTask = ResourceService.GetWorkShiftsPagedAsync(search, sortBy, sortDescending, page, pageSize, ct);
+        var staffTask = ResourceService.GetStaffsPagedAsync(null, null, false, 1, 100, ct);
+        var equipmentTask = ResourceService.GetEquipmentPagedAsync(null, null, false, 1, 100, ct);
 
-            await Task.WhenAll(shiftsTask, staffTask, equipmentTask);
+        await Task.WhenAll(shiftsTask, staffTask, equipmentTask);
 
-            var shifts = await shiftsTask;
-            _staffNames = (await staffTask).Items.ToDictionary(s => s.Id, s => s.FullName);
-            _equipmentNames = (await equipmentTask).Items.ToDictionary(e => e.Id, e => e.Name);
-
-            return new TableData<WorkShiftDto> { Items = shifts.Items, TotalItems = shifts.TotalCount };
-        }
-        catch (OperationCanceledException)
-        {
-            if (ct.IsCancellationRequested)
-                return new TableData<WorkShiftDto> { Items = Array.Empty<WorkShiftDto>(), TotalItems = 0 };
-            throw;
-        }
-        catch (ApiException ex)
-        {
-            Snackbar.Add(ex.Message, Severity.Error);
-            _loadError = ex.Message;
-            _offline = false;
-            return new TableData<WorkShiftDto> { Items = Array.Empty<WorkShiftDto>(), TotalItems = 0 };
-        }
-        catch (Exception)
-        {
-            Snackbar.Add(T.WorkShift.Unreachable, Severity.Error);
-            _loadError = T.WorkShift.Unreachable;
-            _offline = true;
-            return new TableData<WorkShiftDto> { Items = Array.Empty<WorkShiftDto>(), TotalItems = 0 };
-        }
+        var shifts = await shiftsTask;
+        _staffNames = (await staffTask).Items.ToDictionary(s => s.Id, s => s.FullName);
+        _equipmentNames = (await equipmentTask).Items.ToDictionary(e => e.Id, e => e.Name);
+        return shifts;
     }
 
     private string ResolveStaff(string staffId)
@@ -78,48 +51,17 @@ private MudTable<WorkShiftDto>? _table;
     private string ResolveEquipment(string equipmentId)
         => _equipmentNames.TryGetValue(equipmentId, out var name) ? name : equipmentId;
 
-    private async Task OnSearchChanged(string? value)
-    {
-        _search = value;
-
-        _searchCts?.Cancel();
-        var cts = _searchCts = new CancellationTokenSource();
-        try
-        {
-            await Task.Delay(400, cts.Token);
-        }
-        catch (TaskCanceledException)
-        {
-            return;
-        }
-
-        if (_table is not null)
-            await _table.ReloadServerData();
-    }
-
-    private Task ReloadAsync()
-        => _table is null ? Task.CompletedTask : _table.ReloadServerData();
-
     private async Task OpenCreateDialogAsync()
     {
-        var options = new DialogOptions { MaxWidth = MaxWidth.Medium, FullWidth = true, NoHeader = true };
-        var dialog = await DialogService.ShowAsync<WorkShiftEditorDialog>(T.WorkShift.NewWorkShift, options);
+        var dialog = await DialogService.ShowAsync<WorkShiftEditorDialog>(T.WorkShift.NewWorkShift, EditorDialogOptions);
         await ReloadIfSavedAsync(dialog);
     }
 
     private async Task OpenEditDialogAsync(WorkShiftDto shift)
     {
         var parameters = new DialogParameters { ["Shift"] = shift };
-        var options = new DialogOptions { MaxWidth = MaxWidth.Medium, FullWidth = true, NoHeader = true };
-        var dialog = await DialogService.ShowAsync<WorkShiftEditorDialog>(T.WorkShift.EditWorkShift, parameters, options);
+        var dialog = await DialogService.ShowAsync<WorkShiftEditorDialog>(T.WorkShift.EditWorkShift, parameters, EditorDialogOptions);
         await ReloadIfSavedAsync(dialog);
-    }
-
-    private async Task ReloadIfSavedAsync(IDialogReference dialog)
-    {
-        var result = await dialog.Result;
-        if (result is { Canceled: false })
-            await ReloadAsync();
     }
 
     private async Task DeleteShiftAsync(WorkShiftDto shift)
@@ -142,6 +84,4 @@ private MudTable<WorkShiftDto>? _table;
             Snackbar,
             () => T.WorkShift.Unreachable);
     }
-
-    public void Dispose() => _searchCts?.Cancel();
 }

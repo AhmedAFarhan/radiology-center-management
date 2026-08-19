@@ -2,11 +2,14 @@ using RadiologyCenter.Desktop.Models;
 
 namespace RadiologyCenter.Desktop.Services;
 
-public sealed class InventoryService
+public sealed class InventoryService : CrudServiceBase
 {
-    private readonly ApiClient _api;
+    private const string ItemsRes = "api/inventory/items";
+    private const string SuppliersRes = "api/inventory/suppliers";
+    private const string StockMovementsRes = "api/inventory/stock-movements";
+    private const string PurchaseOrdersRes = "api/inventory/purchase-orders";
 
-    public InventoryService(ApiClient api) => _api = api;
+    public InventoryService(ApiClient api) : base(api) { }
 
     public Task<PagedResult<ItemDto>> GetItemsPagedAsync(
         string? searchTerm,
@@ -15,41 +18,31 @@ public sealed class InventoryService
         int pageNumber,
         int pageSize,
         CancellationToken ct = default)
-    {
-        var query = new
-        {
-            pagination = new { pageNumber, pageSize },
-            sortBy,
-            sortDescending,
-            searchTerm,
-        };
-
-        return _api.PostAsync<PagedResult<ItemDto>>("api/inventory/items/all", query, ct);
-    }
+        => FetchPageAsync<ItemDto>(ItemsRes, searchTerm, sortBy, sortDescending, pageNumber, pageSize, ct);
 
     public Task<ItemDto> GetItemByIdAsync(string id, CancellationToken ct = default)
-        => _api.GetAsync<ItemDto>($"api/inventory/items/{id}", ct);
+        => FetchByIdAsync<ItemDto>(ItemsRes, id, ct);
 
     public Task<ItemDto> CreateItemAsync(ItemInput input, CancellationToken ct = default)
-        => _api.PostAsync<ItemDto>("api/inventory/items", input, ct);
+        => CreateEntityAsync<ItemDto>(ItemsRes, input, ct);
 
     public Task UpdateItemAsync(string id, ItemInput input, CancellationToken ct = default)
-        => _api.PutAsync<object>($"api/inventory/items/{id}", input, ct);
+        => UpdateEntityAsync(ItemsRes, id, input, ct);
 
     public Task ActivateItemAsync(string id, CancellationToken ct = default)
-        => _api.SendAsync($"api/inventory/items/{id}/activate", ct: ct);
+        => SetEntityActiveAsync(ItemsRes, id, true, ct);
 
     public Task DeactivateItemAsync(string id, CancellationToken ct = default)
-        => _api.SendAsync($"api/inventory/items/{id}/deactivate", ct: ct);
+        => SetEntityActiveAsync(ItemsRes, id, false, ct);
 
     public Task DeleteItemAsync(string id, CancellationToken ct = default)
-        => _api.SendDeleteAsync($"api/inventory/items/{id}", ct);
+        => DeleteEntityAsync(ItemsRes, id, ct);
 
     public Task<ItemStockDto> GetStockAsync(string id, CancellationToken ct = default)
-        => _api.GetAsync<ItemStockDto>($"api/inventory/items/{id}/stock", ct);
+        => Api.GetAsync<ItemStockDto>($"{ItemsRes}/{id}/stock", ct);
 
     public Task IssueStockAsync(string id, IssueStockInput input, CancellationToken ct = default)
-        => _api.PostAsync<object>($"api/inventory/items/{id}/issue", input, ct);
+        => Api.PostAsync<object>($"{ItemsRes}/{id}/issue", input, ct);
 
     public Task<PagedResult<SupplierDto>> GetSuppliersPagedAsync(
         string? searchTerm,
@@ -58,35 +51,25 @@ public sealed class InventoryService
         int pageNumber,
         int pageSize,
         CancellationToken ct = default)
-    {
-        var query = new
-        {
-            pagination = new { pageNumber, pageSize },
-            sortBy,
-            sortDescending,
-            searchTerm,
-        };
-
-        return _api.PostAsync<PagedResult<SupplierDto>>("api/inventory/suppliers/all", query, ct);
-    }
+        => FetchPageAsync<SupplierDto>(SuppliersRes, searchTerm, sortBy, sortDescending, pageNumber, pageSize, ct);
 
     public Task<SupplierDto> GetSupplierByIdAsync(string id, CancellationToken ct = default)
-        => _api.GetAsync<SupplierDto>($"api/inventory/suppliers/{id}", ct);
+        => FetchByIdAsync<SupplierDto>(SuppliersRes, id, ct);
 
     public Task<SupplierDto> CreateSupplierAsync(SupplierInput input, CancellationToken ct = default)
-        => _api.PostAsync<SupplierDto>("api/inventory/suppliers", input, ct);
+        => CreateEntityAsync<SupplierDto>(SuppliersRes, input, ct);
 
     public Task UpdateSupplierAsync(string id, SupplierInput input, CancellationToken ct = default)
-        => _api.PutAsync<object>($"api/inventory/suppliers/{id}", input, ct);
+        => UpdateEntityAsync(SuppliersRes, id, input, ct);
 
     public Task ActivateSupplierAsync(string id, CancellationToken ct = default)
-        => _api.SendAsync($"api/inventory/suppliers/{id}/activate", ct: ct);
+        => SetEntityActiveAsync(SuppliersRes, id, true, ct);
 
     public Task DeactivateSupplierAsync(string id, CancellationToken ct = default)
-        => _api.SendAsync($"api/inventory/suppliers/{id}/deactivate", ct: ct);
+        => SetEntityActiveAsync(SuppliersRes, id, false, ct);
 
     public Task DeleteSupplierAsync(string id, CancellationToken ct = default)
-        => _api.SendDeleteAsync($"api/inventory/suppliers/{id}", ct);
+        => DeleteEntityAsync(SuppliersRes, id, ct);
 
     public Task<PagedResult<StockMovementDto>> GetStockMovementsPagedAsync(
         string? searchTerm,
@@ -95,17 +78,7 @@ public sealed class InventoryService
         int pageNumber,
         int pageSize,
         CancellationToken ct = default)
-    {
-        var query = new
-        {
-            pagination = new { pageNumber, pageSize },
-            sortBy,
-            sortDescending,
-            searchTerm,
-        };
-
-        return _api.PostAsync<PagedResult<StockMovementDto>>("api/inventory/stock-movements/all", query, ct);
-    }
+        => FetchPageAsync<StockMovementDto>(StockMovementsRes, searchTerm, sortBy, sortDescending, pageNumber, pageSize, ct);
 
     public Task<PagedResult<PurchaseOrderDto>> GetPurchaseOrdersPagedAsync(
         string? searchTerm,
@@ -114,30 +87,20 @@ public sealed class InventoryService
         int pageNumber,
         int pageSize,
         CancellationToken ct = default)
-    {
-        var query = new
-        {
-            pagination = new { pageNumber, pageSize },
-            sortBy,
-            sortDescending,
-            searchTerm,
-        };
-
-        return _api.PostAsync<PagedResult<PurchaseOrderDto>>("api/inventory/purchase-orders/all", query, ct);
-    }
+        => FetchPageAsync<PurchaseOrderDto>(PurchaseOrdersRes, searchTerm, sortBy, sortDescending, pageNumber, pageSize, ct);
 
     public Task<PurchaseOrderDto> GetPurchaseOrderByIdAsync(string id, CancellationToken ct = default)
-        => _api.GetAsync<PurchaseOrderDto>($"api/inventory/purchase-orders/{id}", ct);
+        => FetchByIdAsync<PurchaseOrderDto>(PurchaseOrdersRes, id, ct);
 
     public Task<PurchaseOrderDto> CreatePurchaseOrderAsync(CreatePurchaseOrderInput input, CancellationToken ct = default)
-        => _api.PostAsync<PurchaseOrderDto>("api/inventory/purchase-orders", input, ct);
+        => CreateEntityAsync<PurchaseOrderDto>(PurchaseOrdersRes, input, ct);
 
     public Task PlacePurchaseOrderAsync(string id, CancellationToken ct = default)
-        => _api.SendAsync($"api/inventory/purchase-orders/{id}/place", ct: ct);
+        => Api.SendAsync($"{PurchaseOrdersRes}/{id}/place", ct: ct);
 
     public Task ReceivePurchaseOrderAsync(string id, ReceivePurchaseOrderInput input, CancellationToken ct = default)
-        => _api.PostAsync<object>($"api/inventory/purchase-orders/{id}/receive", input, ct);
+        => Api.PostAsync<object>($"{PurchaseOrdersRes}/{id}/receive", input, ct);
 
     public Task CancelPurchaseOrderAsync(string id, CancellationToken ct = default)
-        => _api.SendAsync($"api/inventory/purchase-orders/{id}/cancel", ct: ct);
+        => Api.SendAsync($"{PurchaseOrdersRes}/{id}/cancel", ct: ct);
 }

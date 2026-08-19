@@ -1,6 +1,5 @@
+@inherits EditorDialogBase
 @inject PayrollService PayrollService
-@inject ISnackbar Snackbar
-@inject AppLocalizer T
 
 <MudDialog>
     <DialogContent>
@@ -34,18 +33,10 @@
         </EditForm>
     </DialogContent>
     <DialogActions>
-        <MudButton Color="Color.Default" OnClick="CancelAsync" Disabled="_busy">@T.Common.Cancel</MudButton>
-        <MudButton Color="Color.Primary" Variant="Variant.Filled" OnClick="SubmitAsync" Disabled="_busy">
-            @if (_busy)
-            {
-                <MudProgressCircular Size="Size.Small" Indeterminate="true" Class="mx-1" />
-            }
-            else
-            {
-                <text>@T.PayRunDialog.Create</text>
-            }
-        </MudButton>
+        <DialogButtons Busy="Busy"
+                       CancelLabel="@T.Common.Cancel"
+                       SaveLabel="@T.PayRunDialog.Create"
+                       OnCancel="CancelAsync"
+                       OnSave="SubmitAsync" />
     </DialogActions>
 </MudDialog>
-
-

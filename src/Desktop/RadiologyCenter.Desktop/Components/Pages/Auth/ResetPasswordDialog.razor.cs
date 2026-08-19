@@ -18,15 +18,12 @@ using RadiologyCenter.Desktop.Services;
 
 namespace RadiologyCenter.Desktop.Components.Pages.Auth;
 
-public partial class ResetPasswordDialog : ComponentBase
+public partial class ResetPasswordDialog : EditorDialogBase
 {
 [Parameter] public UserDto User { get; set; } = default!;
 
-    [CascadingParameter] public IMudDialogInstance MudDialog { get; set; } = default!;
-
     private readonly ResetPasswordModel _model = new();
     private EditContext _editContext = default!;
-    private bool _busy;
 
     protected override void OnInitialized()
         => _editContext = new EditContext(_model);
@@ -36,19 +33,14 @@ public partial class ResetPasswordDialog : ComponentBase
         if (!_editContext.Validate())
             return;
 
-        await SafeExecute.RunAsync(async () =>
+        await TrySaveAsync(async () =>
             {
                 await IdentityService.ResetPasswordAsync(User.Id, _model.NewPassword);
                 Snackbar.Add(T.FormatValue(T.UserDialog.PasswordReset, User.UserName), Severity.Success);
                 MudDialog.Close(DialogResult.Ok(true));
             },
-            Snackbar,
-            () => T.UserDialog.Unreachable,
-            busy => _busy = busy);
+            () => T.UserDialog.Unreachable);
     }
-
-    private void CancelAsync()
-        => MudDialog.Cancel();
 
     private sealed class ResetPasswordModel
     {

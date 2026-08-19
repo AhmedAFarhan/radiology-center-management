@@ -18,99 +18,35 @@ using RadiologyCenter.Desktop.Services;
 
 namespace RadiologyCenter.Desktop.Components.Pages.Notification;
 
-public partial class NotificationTemplates : ComponentBase, IDisposable
+public partial class NotificationTemplates : ListPageBase<NotificationTemplateDto>
 {
-private MudTable<NotificationTemplateDto>? _table;
-    private string? _search;
-    private CancellationTokenSource? _searchCts;
-    private string? _loadError;
-    private bool _offline;
+    protected override string UnreachableMessage => T.Notifications.Unreachable;
 
-    private async Task<TableData<NotificationTemplateDto>> LoadServerData(TableState state, CancellationToken ct)
-    {
-        try
-        {
-            var page = await NotificationService.GetTemplatesPagedAsync(
-                _search,
-                state.SortLabel,
-                state.SortDirection == SortDirection.Descending,
-                state.Page + 1,
-                state.PageSize,
-                ct);
-
-            _loadError = null;
-            _offline = false;
-            return new TableData<NotificationTemplateDto> { Items = page.Items, TotalItems = page.TotalCount };
-        }
-        catch (OperationCanceledException)
-        {
-            if (ct.IsCancellationRequested)
-                return new TableData<NotificationTemplateDto> { Items = Array.Empty<NotificationTemplateDto>(), TotalItems = 0 };
-            throw;
-        }
-        catch (ApiException ex)
-        {
-            Snackbar.Add(ex.Message, Severity.Error);
-            _loadError = ex.Message;
-            _offline = false;
-            return new TableData<NotificationTemplateDto> { Items = Array.Empty<NotificationTemplateDto>(), TotalItems = 0 };
-        }
-        catch (Exception)
-        {
-            Snackbar.Add(T.Notifications.Unreachable, Severity.Error);
-            _loadError = T.Notifications.Unreachable;
-            _offline = true;
-            return new TableData<NotificationTemplateDto> { Items = Array.Empty<NotificationTemplateDto>(), TotalItems = 0 };
-        }
-    }
-
-    private async Task OnSearchChanged(string? value)
-    {
-        _search = value;
-
-        _searchCts?.Cancel();
-        var cts = _searchCts = new CancellationTokenSource();
-        try
-        {
-            await Task.Delay(400, cts.Token);
-        }
-        catch (TaskCanceledException)
-        {
-            return;
-        }
-
-        if (_table is not null)
-            await _table.ReloadServerData();
-    }
-
-    private Task ReloadAsync()
-        => _table is null ? Task.CompletedTask : _table.ReloadServerData();
+    protected override async Task<PagedResult<NotificationTemplateDto>> LoadPageAsync(
+        string? search,
+        string? sortBy,
+        bool sortDescending,
+        int page,
+        int pageSize,
+        CancellationToken ct)
+        => await NotificationService.GetTemplatesPagedAsync(search, sortBy, sortDescending, page, pageSize, ct);
 
     private async Task OpenCreateDialogAsync()
     {
-        var options = new DialogOptions { MaxWidth = MaxWidth.Medium, FullWidth = true, NoHeader = true };
-        var dialog = await DialogService.ShowAsync<NotificationTemplateEditorDialog>(T.Notifications.NewTemplateDialogTitle, options);
+        var dialog = await DialogService.ShowAsync<NotificationTemplateEditorDialog>(T.Notifications.NewTemplateDialogTitle, EditorDialogOptions);
         await ReloadIfSavedAsync(dialog);
     }
 
     private async Task OpenEditDialogAsync(NotificationTemplateDto template)
     {
         var parameters = new DialogParameters { ["Template"] = template };
-        var options = new DialogOptions { MaxWidth = MaxWidth.Medium, FullWidth = true, NoHeader = true };
-        var dialog = await DialogService.ShowAsync<NotificationTemplateEditorDialog>(T.FormatValue(T.Notifications.EditTemplateTitle, template.Name), parameters, options);
+        var dialog = await DialogService.ShowAsync<NotificationTemplateEditorDialog>(T.FormatValue(T.Notifications.EditTemplateTitle, template.Name), parameters, EditorDialogOptions);
         await ReloadIfSavedAsync(dialog);
-    }
-
-    private async Task ReloadIfSavedAsync(IDialogReference dialog)
-    {
-        var result = await dialog.Result;
-        if (result is { Canceled: false })
-            await ReloadAsync();
     }
 
     private async Task ToggleActiveAsync(NotificationTemplateDto template)
     {
-await SafeExecute.RunAsync(async () =>
+        await SafeExecute.RunAsync(async () =>
             {
                 if (template.IsActive)
                     await NotificationService.DeactivateTemplateAsync(template.Id);
@@ -135,7 +71,7 @@ await SafeExecute.RunAsync(async () =>
         if (confirmed != true)
             return;
 
-await SafeExecute.RunAsync(async () =>
+        await SafeExecute.RunAsync(async () =>
             {
                 await NotificationService.DeleteTemplateAsync(template.Id);
                 Snackbar.Add(T.Notifications.Deleted, Severity.Success);
@@ -144,9 +80,4 @@ await SafeExecute.RunAsync(async () =>
             Snackbar,
             () => T.Notifications.Unreachable);
     }
-
-    private static string Truncate(string value)
-        => value.Length > 60 ? value[..60] + "…" : value;
-
-    public void Dispose() => _searchCts?.Cancel();
 }

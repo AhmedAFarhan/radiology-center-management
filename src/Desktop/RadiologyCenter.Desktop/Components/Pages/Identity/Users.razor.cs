@@ -19,40 +19,24 @@ using RadiologyCenter.Desktop.Components.Pages.Auth;
 
 namespace RadiologyCenter.Desktop.Components.Pages.Identity;
 
-public partial class Users : ComponentBase, IDisposable
+public partial class Users : ListPageBase<UserDto>
 {
-private MudTable<UserDto>? _table;
-    private string? _search;
     private string? _currentUserName;
-    private CancellationTokenSource? _searchCts;
-    private string? _loadError;
-    private bool _offline;
-    private string? _openId;
 
-    [SupplyParameterFromQuery(Name = "q")]
-    public string? SearchQuery { get; set; }
+    protected override string BaseRoute => "/users";
 
-    [SupplyParameterFromQuery(Name = "open")]
-    public string? OpenId { get; set; }
+    protected override string UnreachableMessage => T.Users.Unreachable;
 
-    protected override void OnParametersSet()
-    {
-        base.OnParametersSet();
-        if (!string.IsNullOrWhiteSpace(OpenId) && Guid.TryParse(OpenId, out _))
-            _openId = OpenId;
-    }
+    protected override async Task<PagedResult<UserDto>> LoadPageAsync(
+        string? search,
+        string? sortBy,
+        bool sortDescending,
+        int page,
+        int pageSize,
+        CancellationToken ct)
+        => await IdentityService.GetUsersPagedAsync(search, sortBy, sortDescending, page, pageSize, ct);
 
-    protected override async Task OnAfterRenderAsync(bool firstRender)
-    {
-        if (_openId is not null)
-        {
-            var id = _openId;
-            _openId = null;
-            await OpenByDeepLinkAsync(id);
-        }
-    }
-
-    private async Task OpenByDeepLinkAsync(string id)
+    protected override async Task OpenByDeepLinkAsync(string id)
     {
         UserDto? user = null;
         var ok = await SafeExecute.RunAsync(
@@ -63,12 +47,11 @@ private MudTable<UserDto>? _table;
         if (ok && user is not null)
         {
             var parameters = new DialogParameters { ["User"] = user };
-            var options = new DialogOptions { MaxWidth = MaxWidth.Medium, FullWidth = true, NoHeader = true };
-            var dialog = await DialogService.ShowAsync<UserEditorDialog>(T.FormatValue(T.UserDialog.EditTitle, user.UserName), parameters, options);
+            var dialog = await DialogService.ShowAsync<UserEditorDialog>(T.FormatValue(T.UserDialog.EditTitle, user.UserName), parameters, EditorDialogOptions);
             await ReloadIfSavedAsync(dialog);
         }
 
-        NavigationManager.NavigateTo("/users", replace: true);
+        NavigationManager.NavigateTo(BaseRoute, replace: true);
     }
 
     protected override void OnInitialized()
@@ -76,66 +59,6 @@ private MudTable<UserDto>? _table;
 
     private bool IsCurrentUser(UserDto user)
         => string.Equals(user.UserName, _currentUserName, StringComparison.OrdinalIgnoreCase);
-
-    private async Task<TableData<UserDto>> LoadServerData(TableState state, CancellationToken ct)
-    {
-        try
-        {
-            var page = await IdentityService.GetUsersPagedAsync(
-                _search,
-                state.SortLabel,
-                state.SortDirection == SortDirection.Descending,
-                state.Page + 1,
-                state.PageSize,
-                ct);
-
-            _loadError = null;
-            _offline = false;
-            return new TableData<UserDto> { Items = page.Items, TotalItems = page.TotalCount };
-        }
-        catch (OperationCanceledException)
-        {
-            if (ct.IsCancellationRequested)
-                return new TableData<UserDto> { Items = Array.Empty<UserDto>(), TotalItems = 0 };
-            throw;
-        }
-        catch (ApiException ex)
-        {
-            Snackbar.Add(ex.Message, Severity.Error);
-            _loadError = ex.Message;
-            _offline = false;
-            return new TableData<UserDto> { Items = Array.Empty<UserDto>(), TotalItems = 0 };
-        }
-        catch (Exception)
-        {
-            Snackbar.Add(T.Users.Unreachable, Severity.Error);
-            _loadError = T.Users.Unreachable;
-            _offline = true;
-            return new TableData<UserDto> { Items = Array.Empty<UserDto>(), TotalItems = 0 };
-        }
-    }
-
-    private async Task OnSearchChanged(string? value)
-    {
-        _search = value;
-
-        _searchCts?.Cancel();
-        var cts = _searchCts = new CancellationTokenSource();
-        try
-        {
-            await Task.Delay(400, cts.Token);
-        }
-        catch (TaskCanceledException)
-        {
-            return;
-        }
-
-        if (_table is not null)
-            await _table.ReloadServerData();
-    }
-
-    private Task ReloadAsync()
-        => _table is null ? Task.CompletedTask : _table.ReloadServerData();
 
     private async Task OpenCreateDialogAsync()
     {
@@ -174,13 +97,6 @@ private MudTable<UserDto>? _table;
         var options = new DialogOptions { MaxWidth = MaxWidth.Small, FullWidth = true, NoHeader = true };
         var dialog = await DialogService.ShowAsync<ResetPasswordDialog>(T.FormatValue(T.UserDialog.ResetPasswordTitle, user.UserName), parameters, options);
         await ReloadIfSavedAsync(dialog);
-    }
-
-    private async Task ReloadIfSavedAsync(IDialogReference dialog)
-    {
-        var result = await dialog.Result;
-        if (result is { Canceled: false })
-            await ReloadAsync();
     }
 
     private async Task ActivateAsync(UserDto user)
@@ -234,6 +150,4 @@ private MudTable<UserDto>? _table;
             return T.Users.Locked;
         return user.IsActive ? T.Common.Active : T.Common.Inactive;
     }
-
-    public void Dispose() => _searchCts?.Cancel();
 }

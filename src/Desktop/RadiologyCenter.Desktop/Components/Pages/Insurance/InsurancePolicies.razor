@@ -1,11 +1,7 @@
 @page "/insurance/policies"
 @attribute [Authorize]
+@inherits ListPageBase<InsurancePolicyListItemDto>
 @inject InsuranceService InsuranceService
-@inject IDialogService DialogService
-@inject ISnackbar Snackbar
-@inject AppLocalizer T
-@inject NavigationManager NavigationManager
-@implements IDisposable
 
 <PageHeader Icon="@Icons.Material.Filled.Description" Title="@T.Policy.Title"
             Subtitle="@T.Policy.Subtitle"
@@ -16,7 +12,7 @@
     <MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Add" OnClick="OpenCreateDialogAsync">@T.Policy.AddPolicy</MudButton>
 </PageHeader>
 
-<MudTable T="InsurancePolicyListItemDto" @ref="_table" ServerData="LoadServerData" Dense="true" Hover="true" Striped="true" Elevation="1" RowsPerPage="10" FixedHeader="true" Class="table-scroll">
+<MudTable T="InsurancePolicyListItemDto" @ref="Table" ServerData="LoadServerData" Dense="true" Hover="true" Striped="true" Elevation="1" RowsPerPage="10" FixedHeader="true" Class="table-scroll">
     <HeaderContent>
         <MudTh><MudTableSortLabel T="InsurancePolicyListItemDto" SortLabel="@("PolicyNumber")">@T.Policy.Number</MudTableSortLabel></MudTh>
         <MudTh><MudTableSortLabel T="InsurancePolicyListItemDto" SortLabel="@("PatientName")">@T.Policy.Patient</MudTableSortLabel></MudTh>
@@ -51,7 +47,7 @@
             }
         </MudTd>
         <MudTd DataLabel="@T.Common.Status">
-            <MudChip T="string" Size="Size.Small" Color="@(context.IsActive ? Color.Success : Color.Default)">@(context.IsActive ? T.Common.Active : T.Common.Inactive)</MudChip>
+            <ActiveStatusChip IsActive="context.IsActive" ActiveLabel="@T.Common.Active" InactiveLabel="@T.Common.Inactive" />
         </MudTd>
         <MudTd DataLabel="@T.Common.Actions">
             <MudIconButton Icon="@Icons.Material.Filled.Visibility" Size="Size.Small" Color="Color.Default" aria-label="@T.Policy.View" OnClick="@(() => OpenDetailDialogAsync(context))" />
@@ -63,21 +59,15 @@
         </MudTd>
     </RowTemplate>
     <NoRecordsContent>
-        @if (_loadError is not null)
-        {
-            <ErrorState Icon="@(_offline ? Icons.Material.Filled.CloudOff : Icons.Material.Filled.ErrorOutline)"
-                        Title="@T.Policy.LoadErrorTitle"
-                        Message="@_loadError"
-                        Action="ReloadAsync" />
-        }
-        else
-        {
-        <EmptyState Icon="@Icons.Material.Filled.Description"
-                    Title="@T.Policy.EmptyTitle"
-                    Message="@T.Policy.EmptyMessage"
-                    ActionLabel="@T.Policy.EmptyActionLabel"
-                    Action="OpenCreateDialogAsync" />
-        }
+        <TableNoRecords LoadError="@LoadError"
+                        Offline="@Offline"
+                        ErrorTitle="@T.Policy.LoadErrorTitle"
+                        EmptyIcon="@Icons.Material.Filled.Description"
+                        EmptyTitle="@T.Policy.EmptyTitle"
+                        EmptyMessage="@T.Policy.EmptyMessage"
+                        EmptyActionLabel="@T.Policy.EmptyActionLabel"
+                        OnReload="ReloadAsync"
+                        OnEmptyAction="OpenCreateDialogAsync" />
     </NoRecordsContent>
     <PagerContent>
         <MudTablePager PageSizeOptions="@(new[] { 10, 25, 50 })" />

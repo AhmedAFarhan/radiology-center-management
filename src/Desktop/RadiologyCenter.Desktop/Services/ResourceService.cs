@@ -2,20 +2,16 @@ using RadiologyCenter.Desktop.Models;
 
 namespace RadiologyCenter.Desktop.Services;
 
-public sealed class ResourceService
+public sealed class ResourceService : CrudServiceBase
 {
-    private readonly ApiClient _api;
+    private const string Base = "api/resources";
+    private const string EquipmentRes = $"{Base}/equipment";
+    private const string StaffRes = $"{Base}/staff";
+    private const string WorkShiftsRes = $"{Base}/work-shifts";
+    private const string LeavesRes = $"{Base}/leaves";
+    private const string ReferralDoctorsRes = $"{Base}/referral-doctors";
 
-    public ResourceService(ApiClient api) => _api = api;
-
-    private static object BuildQuery(string? searchTerm, string? sortBy, bool sortDescending, int pageNumber, int pageSize)
-        => new
-        {
-            pagination = new { pageNumber, pageSize },
-            sortBy,
-            sortDescending,
-            searchTerm,
-        };
+    public ResourceService(ApiClient api) : base(api) { }
 
     // ----- Equipment -----
     public Task<PagedResult<EquipmentDto>> GetEquipmentPagedAsync(
@@ -25,28 +21,28 @@ public sealed class ResourceService
         int pageNumber,
         int pageSize,
         CancellationToken ct = default)
-        => _api.PostAsync<PagedResult<EquipmentDto>>("api/resources/equipment/all", BuildQuery(searchTerm, sortBy, sortDescending, pageNumber, pageSize), ct);
+        => FetchPageAsync<EquipmentDto>(EquipmentRes, searchTerm, sortBy, sortDescending, pageNumber, pageSize, ct);
 
     public Task<EquipmentDto> GetEquipmentByIdAsync(string id, CancellationToken ct = default)
-        => _api.GetAsync<EquipmentDto>($"api/resources/equipment/{id}", ct);
+        => FetchByIdAsync<EquipmentDto>(EquipmentRes, id, ct);
 
     public Task<EquipmentDto> CreateEquipmentAsync(EquipmentInput input, CancellationToken ct = default)
-        => _api.PostAsync<EquipmentDto>("api/resources/equipment", input, ct);
+        => CreateEntityAsync<EquipmentDto>(EquipmentRes, input, ct);
 
     public Task UpdateEquipmentAsync(string id, EquipmentInput input, CancellationToken ct = default)
-        => _api.PutAsync<object>($"api/resources/equipment/{id}", input, ct);
+        => UpdateEntityAsync(EquipmentRes, id, input, ct);
 
     public Task SetEquipmentStatusAsync(string id, string status, CancellationToken ct = default)
-        => _api.PostAsync<object>($"api/resources/equipment/{id}/status", new { status }, ct);
+        => Api.PostAsync<object>($"{EquipmentRes}/{id}/status", new { status }, ct);
 
     public Task ActivateEquipmentAsync(string id, CancellationToken ct = default)
-        => _api.SendAsync($"api/resources/equipment/{id}/activate", ct: ct);
+        => SetEntityActiveAsync(EquipmentRes, id, true, ct);
 
     public Task DeactivateEquipmentAsync(string id, CancellationToken ct = default)
-        => _api.SendAsync($"api/resources/equipment/{id}/deactivate", ct: ct);
+        => SetEntityActiveAsync(EquipmentRes, id, false, ct);
 
     public Task DeleteEquipmentAsync(string id, CancellationToken ct = default)
-        => _api.SendDeleteAsync($"api/resources/equipment/{id}", ct);
+        => DeleteEntityAsync(EquipmentRes, id, ct);
 
     // ----- Staff -----
     public Task<PagedResult<StaffDto>> GetStaffsPagedAsync(
@@ -56,25 +52,25 @@ public sealed class ResourceService
         int pageNumber,
         int pageSize,
         CancellationToken ct = default)
-        => _api.PostAsync<PagedResult<StaffDto>>("api/resources/staff/all", BuildQuery(searchTerm, sortBy, sortDescending, pageNumber, pageSize), ct);
+        => FetchPageAsync<StaffDto>(StaffRes, searchTerm, sortBy, sortDescending, pageNumber, pageSize, ct);
 
     public Task<StaffDto> GetStaffByIdAsync(string id, CancellationToken ct = default)
-        => _api.GetAsync<StaffDto>($"api/resources/staff/{id}", ct);
+        => FetchByIdAsync<StaffDto>(StaffRes, id, ct);
 
     public Task<StaffDto> CreateStaffAsync(StaffInput input, CancellationToken ct = default)
-        => _api.PostAsync<StaffDto>("api/resources/staff", input, ct);
+        => CreateEntityAsync<StaffDto>(StaffRes, input, ct);
 
     public Task UpdateStaffAsync(string id, StaffInput input, CancellationToken ct = default)
-        => _api.PutAsync<object>($"api/resources/staff/{id}", input, ct);
+        => UpdateEntityAsync(StaffRes, id, input, ct);
 
     public Task ActivateStaffAsync(string id, CancellationToken ct = default)
-        => _api.SendAsync($"api/resources/staff/{id}/activate", ct: ct);
+        => SetEntityActiveAsync(StaffRes, id, true, ct);
 
     public Task DeactivateStaffAsync(string id, CancellationToken ct = default)
-        => _api.SendAsync($"api/resources/staff/{id}/deactivate", ct: ct);
+        => SetEntityActiveAsync(StaffRes, id, false, ct);
 
     public Task DeleteStaffAsync(string id, CancellationToken ct = default)
-        => _api.SendDeleteAsync($"api/resources/staff/{id}", ct);
+        => DeleteEntityAsync(StaffRes, id, ct);
 
     // ----- WorkShifts -----
     public Task<PagedResult<WorkShiftDto>> GetWorkShiftsPagedAsync(
@@ -84,19 +80,19 @@ public sealed class ResourceService
         int pageNumber,
         int pageSize,
         CancellationToken ct = default)
-        => _api.PostAsync<PagedResult<WorkShiftDto>>("api/resources/work-shifts/all", BuildQuery(searchTerm, sortBy, sortDescending, pageNumber, pageSize), ct);
+        => FetchPageAsync<WorkShiftDto>(WorkShiftsRes, searchTerm, sortBy, sortDescending, pageNumber, pageSize, ct);
 
     public Task<WorkShiftDto> GetWorkShiftByIdAsync(string id, CancellationToken ct = default)
-        => _api.GetAsync<WorkShiftDto>($"api/resources/work-shifts/{id}", ct);
+        => FetchByIdAsync<WorkShiftDto>(WorkShiftsRes, id, ct);
 
     public Task<WorkShiftDto> CreateWorkShiftAsync(WorkShiftInput input, CancellationToken ct = default)
-        => _api.PostAsync<WorkShiftDto>("api/resources/work-shifts", input, ct);
+        => CreateEntityAsync<WorkShiftDto>(WorkShiftsRes, input, ct);
 
     public Task UpdateWorkShiftAsync(string id, WorkShiftInput input, CancellationToken ct = default)
-        => _api.PutAsync<object>($"api/resources/work-shifts/{id}", input, ct);
+        => UpdateEntityAsync(WorkShiftsRes, id, input, ct);
 
     public Task DeleteWorkShiftAsync(string id, CancellationToken ct = default)
-        => _api.SendDeleteAsync($"api/resources/work-shifts/{id}", ct);
+        => DeleteEntityAsync(WorkShiftsRes, id, ct);
 
     // ----- Leaves -----
     public Task<PagedResult<LeaveDto>> GetLeavesPagedAsync(
@@ -106,19 +102,19 @@ public sealed class ResourceService
         int pageNumber,
         int pageSize,
         CancellationToken ct = default)
-        => _api.PostAsync<PagedResult<LeaveDto>>("api/resources/leaves/all", BuildQuery(searchTerm, sortBy, sortDescending, pageNumber, pageSize), ct);
+        => FetchPageAsync<LeaveDto>(LeavesRes, searchTerm, sortBy, sortDescending, pageNumber, pageSize, ct);
 
     public Task<LeaveDto> GetLeaveByIdAsync(string id, CancellationToken ct = default)
-        => _api.GetAsync<LeaveDto>($"api/resources/leaves/{id}", ct);
+        => FetchByIdAsync<LeaveDto>(LeavesRes, id, ct);
 
     public Task<LeaveDto> CreateLeaveAsync(LeaveInput input, CancellationToken ct = default)
-        => _api.PostAsync<LeaveDto>("api/resources/leaves", input, ct);
+        => CreateEntityAsync<LeaveDto>(LeavesRes, input, ct);
 
     public Task UpdateLeaveAsync(string id, LeaveInput input, CancellationToken ct = default)
-        => _api.PutAsync<object>($"api/resources/leaves/{id}", input, ct);
+        => UpdateEntityAsync(LeavesRes, id, input, ct);
 
     public Task DeleteLeaveAsync(string id, CancellationToken ct = default)
-        => _api.SendDeleteAsync($"api/resources/leaves/{id}", ct);
+        => DeleteEntityAsync(LeavesRes, id, ct);
 
     // ----- Referral Doctors -----
     public Task<PagedResult<ReferralDoctorDto>> GetReferralDoctorsPagedAsync(
@@ -128,23 +124,23 @@ public sealed class ResourceService
         int pageNumber,
         int pageSize,
         CancellationToken ct = default)
-        => _api.PostAsync<PagedResult<ReferralDoctorDto>>("api/resources/referral-doctors/all", BuildQuery(searchTerm, sortBy, sortDescending, pageNumber, pageSize), ct);
+        => FetchPageAsync<ReferralDoctorDto>(ReferralDoctorsRes, searchTerm, sortBy, sortDescending, pageNumber, pageSize, ct);
 
     public Task<ReferralDoctorDto> GetReferralDoctorByIdAsync(string id, CancellationToken ct = default)
-        => _api.GetAsync<ReferralDoctorDto>($"api/resources/referral-doctors/{id}", ct);
+        => FetchByIdAsync<ReferralDoctorDto>(ReferralDoctorsRes, id, ct);
 
     public Task<ReferralDoctorDto> CreateReferralDoctorAsync(ReferralDoctorInput input, CancellationToken ct = default)
-        => _api.PostAsync<ReferralDoctorDto>("api/resources/referral-doctors", input, ct);
+        => CreateEntityAsync<ReferralDoctorDto>(ReferralDoctorsRes, input, ct);
 
     public Task UpdateReferralDoctorAsync(string id, ReferralDoctorInput input, CancellationToken ct = default)
-        => _api.PutAsync<object>($"api/resources/referral-doctors/{id}", input, ct);
+        => UpdateEntityAsync(ReferralDoctorsRes, id, input, ct);
 
     public Task ActivateReferralDoctorAsync(string id, CancellationToken ct = default)
-        => _api.SendAsync($"api/resources/referral-doctors/{id}/activate", ct: ct);
+        => SetEntityActiveAsync(ReferralDoctorsRes, id, true, ct);
 
     public Task DeactivateReferralDoctorAsync(string id, CancellationToken ct = default)
-        => _api.SendAsync($"api/resources/referral-doctors/{id}/deactivate", ct: ct);
+        => SetEntityActiveAsync(ReferralDoctorsRes, id, false, ct);
 
     public Task DeleteReferralDoctorAsync(string id, CancellationToken ct = default)
-        => _api.SendDeleteAsync($"api/resources/referral-doctors/{id}", ct);
+        => DeleteEntityAsync(ReferralDoctorsRes, id, ct);
 }

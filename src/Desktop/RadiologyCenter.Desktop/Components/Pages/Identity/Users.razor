@@ -1,13 +1,9 @@
 @page "/users"
 @attribute [Authorize]
 @using RadiologyCenter.Desktop.Components.Pages.Auth
+@inherits ListPageBase<UserDto>
 @inject IdentityService IdentityService
 @inject TokenStorage TokenStorage
-@inject IDialogService DialogService
-@inject ISnackbar Snackbar
-@inject AppLocalizer T
-@inject NavigationManager NavigationManager
-@implements IDisposable
 
 <PageHeader Icon="@Icons.Material.Filled.Person" Title="@T.Users.Title"
             Subtitle="@T.Users.Subtitle"
@@ -18,7 +14,7 @@
     <MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Add" OnClick="OpenCreateDialogAsync">@T.Users.NewUser</MudButton>
 </PageHeader>
 
-<MudTable T="UserDto" @ref="_table" ServerData="LoadServerData" Dense="true" Hover="true" Striped="true" Elevation="1" RowsPerPage="10" FixedHeader="true" Class="table-scroll">
+<MudTable T="UserDto" @ref="Table" ServerData="LoadServerData" Dense="true" Hover="true" Striped="true" Elevation="1" RowsPerPage="10" FixedHeader="true" Class="table-scroll">
     <HeaderContent>
         <MudTh><MudTableSortLabel T="UserDto" SortLabel="@("UserName")">@T.Users.Username</MudTableSortLabel></MudTh>
         <MudTh><MudTableSortLabel T="UserDto" SortLabel="@("LastName")">@T.Common.Name</MudTableSortLabel></MudTh>
@@ -66,21 +62,15 @@
         </MudTd>
     </RowTemplate>
     <NoRecordsContent>
-        @if (_loadError is not null)
-        {
-            <ErrorState Icon="@(_offline ? Icons.Material.Filled.CloudOff : Icons.Material.Filled.ErrorOutline)"
-                        Title="@T.Users.LoadErrorTitle"
-                        Message="@_loadError"
-                        Action="ReloadAsync" />
-        }
-        else
-        {
-        <EmptyState Icon="@Icons.Material.Filled.Person"
-                    Title="@T.Users.EmptyTitle"
-                    Message="@T.Users.EmptyMessage"
-                    ActionLabel="@T.Users.EmptyAction"
-                    Action="OpenCreateDialogAsync" />
-        }
+        <TableNoRecords LoadError="@LoadError"
+                        Offline="@Offline"
+                        ErrorTitle="@T.Users.LoadErrorTitle"
+                        EmptyIcon="@Icons.Material.Filled.Person"
+                        EmptyTitle="@T.Users.EmptyTitle"
+                        EmptyMessage="@T.Users.EmptyMessage"
+                        EmptyActionLabel="@T.Users.EmptyAction"
+                        OnReload="ReloadAsync"
+                        OnEmptyAction="OpenCreateDialogAsync" />
     </NoRecordsContent>
     <PagerContent>
         <MudTablePager PageSizeOptions="@(new[] { 10, 25, 50 })" />

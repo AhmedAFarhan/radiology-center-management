@@ -2,11 +2,12 @@ using RadiologyCenter.Desktop.Models;
 
 namespace RadiologyCenter.Desktop.Services;
 
-public sealed class IdentityService
+public sealed class IdentityService : CrudServiceBase
 {
-    private readonly ApiClient _api;
+    private const string UsersRes = "api/users";
+    private const string RolesRes = "api/roles";
 
-    public IdentityService(ApiClient api) => _api = api;
+    public IdentityService(ApiClient api) : base(api) { }
 
     public Task<PagedResult<UserDto>> GetUsersPagedAsync(
         string? searchTerm,
@@ -15,44 +16,34 @@ public sealed class IdentityService
         int pageNumber,
         int pageSize,
         CancellationToken ct = default)
-    {
-        var query = new
-        {
-            pagination = new { pageNumber, pageSize },
-            sortBy,
-            sortDescending,
-            searchTerm,
-        };
-
-        return _api.PostAsync<PagedResult<UserDto>>("api/users/all", query, ct);
-    }
+        => FetchPageAsync<UserDto>(UsersRes, searchTerm, sortBy, sortDescending, pageNumber, pageSize, ct);
 
     public Task<UserDto> GetUserByIdAsync(string id, CancellationToken ct = default)
-        => _api.GetAsync<UserDto>($"api/users/{id}", ct);
+        => FetchByIdAsync<UserDto>(UsersRes, id, ct);
 
     public Task CreateUserAsync(CreateUserInput input, CancellationToken ct = default)
-        => _api.PostAsync<object>("api/users", input, ct);
+        => CreateEntityAsync<object>(UsersRes, input, ct);
 
     public Task UpdateUserProfileAsync(string id, UpdateUserProfileInput input, CancellationToken ct = default)
-        => _api.PutAsync<object>($"api/users/{id}/profile", input, ct);
+        => Api.PutAsync<object>($"{UsersRes}/{id}/profile", input, ct);
 
     public Task ActivateUserAsync(string id, CancellationToken ct = default)
-        => _api.SendAsync($"api/users/{id}/activate", ct: ct);
+        => SetEntityActiveAsync(UsersRes, id, true, ct);
 
     public Task DeactivateUserAsync(string id, CancellationToken ct = default)
-        => _api.SendAsync($"api/users/{id}/deactivate", ct: ct);
+        => SetEntityActiveAsync(UsersRes, id, false, ct);
 
     public Task LockUserAsync(string id, DateTimeOffset lockoutEnd, CancellationToken ct = default)
-        => _api.SendAsync($"api/users/{id}/lock", new { lockoutEnd }, ct);
+        => Api.SendAsync($"{UsersRes}/{id}/lock", new { lockoutEnd }, ct);
 
     public Task UnlockUserAsync(string id, CancellationToken ct = default)
-        => _api.SendAsync($"api/users/{id}/unlock", ct: ct);
+        => Api.SendAsync($"{UsersRes}/{id}/unlock", ct: ct);
 
     public Task ResetPasswordAsync(string id, string newPassword, CancellationToken ct = default)
-        => _api.SendAsync($"api/users/{id}/reset-password", new { newPassword }, ct);
+        => Api.SendAsync($"{UsersRes}/{id}/reset-password", new { newPassword }, ct);
 
     public Task UpdateUserRolesAsync(string id, List<string> roleIds, CancellationToken ct = default)
-        => _api.PutAsync<object>($"api/users/{id}/roles", new UpdateUserRolesInput { RoleIds = roleIds }, ct);
+        => Api.PutAsync<object>($"{UsersRes}/{id}/roles", new UpdateUserRolesInput { RoleIds = roleIds }, ct);
 
     public Task<PagedResult<RoleDto>> GetRolesPagedAsync(
         string? searchTerm,
@@ -61,33 +52,23 @@ public sealed class IdentityService
         int pageNumber,
         int pageSize,
         CancellationToken ct = default)
-    {
-        var query = new
-        {
-            pagination = new { pageNumber, pageSize },
-            sortBy,
-            sortDescending,
-            searchTerm,
-        };
-
-        return _api.PostAsync<PagedResult<RoleDto>>("api/roles/all", query, ct);
-    }
+        => FetchPageAsync<RoleDto>(RolesRes, searchTerm, sortBy, sortDescending, pageNumber, pageSize, ct);
 
     public Task<RoleDto> GetRoleByIdAsync(string id, CancellationToken ct = default)
-        => _api.GetAsync<RoleDto>($"api/roles/{id}", ct);
+        => FetchByIdAsync<RoleDto>(RolesRes, id, ct);
 
     public Task CreateRoleAsync(CreateRoleInput input, CancellationToken ct = default)
-        => _api.PostAsync<object>("api/roles", input, ct);
+        => CreateEntityAsync<object>(RolesRes, input, ct);
 
     public Task UpdateRoleAsync(string id, UpdateRoleInput input, CancellationToken ct = default)
-        => _api.PutAsync<object>($"api/roles/{id}", input, ct);
+        => UpdateEntityAsync(RolesRes, id, input, ct);
 
     public Task AddPermissionToRoleAsync(string id, string permissionCode, CancellationToken ct = default)
-        => _api.SendAsync($"api/roles/{id}/permissions", new { permissionCode }, ct);
+        => Api.SendAsync($"{RolesRes}/{id}/permissions", new { permissionCode }, ct);
 
     public Task RemovePermissionFromRoleAsync(string id, string permissionCode, CancellationToken ct = default)
-        => _api.SendDeleteAsync($"api/roles/{id}/permissions/{permissionCode}", ct);
+        => Api.SendDeleteAsync($"{RolesRes}/{id}/permissions/{permissionCode}", ct);
 
     public Task<IReadOnlyList<PermissionDto>> GetPermissionsAsync(CancellationToken ct = default)
-        => _api.GetAsync<IReadOnlyList<PermissionDto>>("api/permissions", ct);
+        => Api.GetAsync<IReadOnlyList<PermissionDto>>("api/permissions", ct);
 }

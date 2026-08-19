@@ -1,11 +1,7 @@
 @page "/resources/referral-doctors"
 @attribute [Authorize]
+@inherits ListPageBase<ReferralDoctorDto>
 @inject ResourceService ResourceService
-@inject IDialogService DialogService
-@inject ISnackbar Snackbar
-@inject AppLocalizer T
-@inject NavigationManager NavigationManager
-@implements IDisposable
 
 <PageHeader Icon="@Icons.Material.Filled.LocalHospital" Title="@T.ReferralDoctor.Title"
             Subtitle="@T.ReferralDoctor.Subtitle"
@@ -16,7 +12,7 @@
     <MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Add" OnClick="OpenCreateDialogAsync">@T.ReferralDoctor.Add</MudButton>
 </PageHeader>
 
-<MudTable T="ReferralDoctorDto" @ref="_table" ServerData="LoadServerData" Dense="true" Hover="true" Striped="true" Elevation="1" RowsPerPage="10" FixedHeader="true" Class="table-scroll">
+<MudTable T="ReferralDoctorDto" @ref="Table" ServerData="LoadServerData" Dense="true" Hover="true" Striped="true" Elevation="1" RowsPerPage="10" FixedHeader="true" Class="table-scroll">
     <HeaderContent>
         <MudTh><MudTableSortLabel T="ReferralDoctorDto" SortLabel="@("LastName")">@T.Common.Name</MudTableSortLabel></MudTh>
         <MudTh><MudTableSortLabel T="ReferralDoctorDto" SortLabel="@("Phone")">@T.ReferralDoctor.Phone</MudTableSortLabel></MudTh>
@@ -35,38 +31,30 @@
         <MudTd DataLabel="@T.ReferralDoctor.Specialization">@(string.IsNullOrWhiteSpace(context.Specialization) ? "-" : context.Specialization)</MudTd>
         <MudTd DataLabel="@T.ReferralDoctor.Hospital">@(string.IsNullOrWhiteSpace(context.Hospital) ? "-" : context.Hospital)</MudTd>
         <MudTd DataLabel="@T.Common.Status">
-            <MudChip T="string" Size="Size.Small" Color="@(context.IsActive ? Color.Success : Color.Default)">@(context.IsActive ? T.Common.Active : T.Common.Inactive)</MudChip>
+            <ActiveStatusChip IsActive="context.IsActive" ActiveLabel="@T.Common.Active" InactiveLabel="@T.Common.Inactive" />
         </MudTd>
         <MudTd DataLabel="@T.Common.Actions">
-            <MudIconButton Icon="@Icons.Material.Filled.Edit" Size="Size.Small" Color="Color.Default" aria-label="@T.Common.Edit" OnClick="@(() => OpenEditDialogAsync(context))" />
-            <MudIconButton Icon="@(context.IsActive ? Icons.Material.Filled.Block : Icons.Material.Filled.CheckCircle)"
-                           Size="Size.Small"
-                           Color="@(context.IsActive ? Color.Default : Color.Success)"
-                           aria-label="@T.ReferralDoctor.ToggleStatus"
-                           OnClick="@(() => ToggleActiveAsync(context))" />
-            <MudIconButton Icon="@Icons.Material.Filled.Delete" Size="Size.Small" Color="Color.Error" aria-label="@T.Common.Delete" OnClick="@(() => DeleteDoctorAsync(context))" />
+            <RowActions IsActive="context.IsActive"
+                        EditLabel="@T.Common.Edit"
+                        ToggleLabel="@T.ReferralDoctor.ToggleStatus"
+                        DeleteLabel="@T.Common.Delete"
+                        OnEdit="@(() => OpenEditDialogAsync(context))"
+                        OnToggle="@(() => ToggleActiveAsync(context))"
+                        OnDelete="@(() => DeleteDoctorAsync(context))" />
         </MudTd>
     </RowTemplate>
     <NoRecordsContent>
-        @if (_loadError is not null)
-        {
-            <ErrorState Icon="@(_offline ? Icons.Material.Filled.CloudOff : Icons.Material.Filled.ErrorOutline)"
-                        Title="@T.ReferralDoctor.LoadErrorTitle"
-                        Message="@_loadError"
-                        Action="ReloadAsync" />
-        }
-        else
-        {
-        <EmptyState Icon="@Icons.Material.Filled.LocalHospital"
-                    Title="@T.ReferralDoctor.EmptyTitle"
-                    Message="@T.ReferralDoctor.EmptyMessage"
-                    ActionLabel="@T.ReferralDoctor.EmptyActionLabel"
-                    Action="OpenCreateDialogAsync" />
-        }
+        <TableNoRecords LoadError="@LoadError"
+                        Offline="@Offline"
+                        ErrorTitle="@T.ReferralDoctor.LoadErrorTitle"
+                        EmptyIcon="@Icons.Material.Filled.LocalHospital"
+                        EmptyTitle="@T.ReferralDoctor.EmptyTitle"
+                        EmptyMessage="@T.ReferralDoctor.EmptyMessage"
+                        EmptyActionLabel="@T.ReferralDoctor.EmptyActionLabel"
+                        OnReload="ReloadAsync"
+                        OnEmptyAction="OpenCreateDialogAsync" />
     </NoRecordsContent>
     <PagerContent>
         <MudTablePager PageSizeOptions="@(new[] { 10, 25, 50 })" />
     </PagerContent>
 </MudTable>
-
-

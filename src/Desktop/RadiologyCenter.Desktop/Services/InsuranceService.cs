@@ -2,26 +2,29 @@ using RadiologyCenter.Desktop.Models;
 
 namespace RadiologyCenter.Desktop.Services;
 
-public sealed class InsuranceService
+public sealed class InsuranceService : CrudServiceBase
 {
-    private readonly ApiClient _api;
+    private const string CompaniesRes = "api/insurance/companies";
+    private const string PoliciesRes = "api/insurance/policies";
+    private const string PreAuthsRes = "api/insurance/preauthorizations";
+    private const string ClaimsRes = "api/insurance/claims";
 
-    public InsuranceService(ApiClient api) => _api = api;
+    public InsuranceService(ApiClient api) : base(api) { }
 
     public Task<IReadOnlyList<InsuranceCompanyDto>> GetCompaniesAsync(CancellationToken ct = default)
-        => _api.GetAsync<IReadOnlyList<InsuranceCompanyDto>>("api/insurance/companies", ct);
+        => Api.GetAsync<IReadOnlyList<InsuranceCompanyDto>>(CompaniesRes, ct);
 
     public Task<InsuranceCompanyDto> GetCompanyByIdAsync(string id, CancellationToken ct = default)
-        => _api.GetAsync<InsuranceCompanyDto>($"api/insurance/companies/{id}", ct);
+        => FetchByIdAsync<InsuranceCompanyDto>(CompaniesRes, id, ct);
 
     public Task<InsuranceCompanyDto> CreateCompanyAsync(InsuranceCompanyInput input, CancellationToken ct = default)
-        => _api.PostAsync<InsuranceCompanyDto>("api/insurance/companies", input, ct);
+        => CreateEntityAsync<InsuranceCompanyDto>(CompaniesRes, input, ct);
 
     public Task UpdateCompanyAsync(string id, InsuranceCompanyInput input, CancellationToken ct = default)
-        => _api.PutAsync<object>($"api/insurance/companies/{id}", input, ct);
+        => UpdateEntityAsync(CompaniesRes, id, input, ct);
 
     public Task DeleteCompanyAsync(string id, CancellationToken ct = default)
-        => _api.SendDeleteAsync($"api/insurance/companies/{id}", ct);
+        => DeleteEntityAsync(CompaniesRes, id, ct);
 
     public Task<PagedResult<InsurancePolicyListItemDto>> GetPoliciesPagedAsync(
         string? searchTerm,
@@ -30,35 +33,25 @@ public sealed class InsuranceService
         int pageNumber,
         int pageSize,
         CancellationToken ct = default)
-    {
-        var query = new
-        {
-            pagination = new { pageNumber, pageSize },
-            sortBy,
-            sortDescending,
-            searchTerm,
-        };
-
-        return _api.PostAsync<PagedResult<InsurancePolicyListItemDto>>("api/insurance/policies/all", query, ct);
-    }
+        => FetchPageAsync<InsurancePolicyListItemDto>(PoliciesRes, searchTerm, sortBy, sortDescending, pageNumber, pageSize, ct);
 
     public Task<InsurancePolicyDto> GetPolicyByIdAsync(string id, CancellationToken ct = default)
-        => _api.GetAsync<InsurancePolicyDto>($"api/insurance/policies/{id}", ct);
+        => FetchByIdAsync<InsurancePolicyDto>(PoliciesRes, id, ct);
 
     public Task<IReadOnlyList<InsurancePolicyDto>> GetPoliciesByPatientAsync(string patientId, CancellationToken ct = default)
-        => _api.GetAsync<IReadOnlyList<InsurancePolicyDto>>($"api/insurance/policies/by-patient/{patientId}", ct);
+        => Api.GetAsync<IReadOnlyList<InsurancePolicyDto>>($"{PoliciesRes}/by-patient/{patientId}", ct);
 
     public Task<InsurancePolicyDto> CreatePolicyAsync(InsurancePolicyInput input, CancellationToken ct = default)
-        => _api.PostAsync<InsurancePolicyDto>("api/insurance/policies", input, ct);
+        => CreateEntityAsync<InsurancePolicyDto>(PoliciesRes, input, ct);
 
     public Task<InsurancePolicyDto> UpdateCoverageAsync(string id, UpdatePolicyCoverageInput input, CancellationToken ct = default)
-        => _api.PutAsync<InsurancePolicyDto>($"api/insurance/policies/{id}/coverage", input, ct);
+        => Api.PutAsync<InsurancePolicyDto>($"{PoliciesRes}/{id}/coverage", input, ct);
 
     public Task<InsurancePolicyDto> ChangePolicyStatusAsync(string id, string action, CancellationToken ct = default)
-        => _api.PostAsync<InsurancePolicyDto>($"api/insurance/policies/{id}/status", new ChangePolicyStatusInput { Action = action }, ct);
+        => Api.PostAsync<InsurancePolicyDto>($"{PoliciesRes}/{id}/status", new ChangePolicyStatusInput { Action = action }, ct);
 
     public Task<IReadOnlyList<PolicyDocumentDto>> GetPolicyDocumentsAsync(string policyId, CancellationToken ct = default)
-        => _api.GetAsync<IReadOnlyList<PolicyDocumentDto>>($"api/insurance/policies/{policyId}/documents", ct);
+        => Api.GetAsync<IReadOnlyList<PolicyDocumentDto>>($"{PoliciesRes}/{policyId}/documents", ct);
 
     public Task<PolicyDocumentDto> UploadPolicyDocumentAsync(
         string policyId,
@@ -69,18 +62,18 @@ public sealed class InsuranceService
         CancellationToken ct = default)
     {
         var fields = new Dictionary<string, string> { ["type"] = type };
-        return _api.PostFormAsync<PolicyDocumentDto>(
-            $"api/insurance/policies/{policyId}/documents",
+        return Api.PostFormAsync<PolicyDocumentDto>(
+            $"{PoliciesRes}/{policyId}/documents",
             fields,
             ("file", fileName, contentType, stream),
             ct);
     }
 
     public Task<byte[]> DownloadPolicyDocumentAsync(string policyId, string documentId, CancellationToken ct = default)
-        => _api.GetBytesAsync($"api/insurance/policies/{policyId}/documents/{documentId}/content", ct);
+        => Api.GetBytesAsync($"{PoliciesRes}/{policyId}/documents/{documentId}/content", ct);
 
     public Task DeletePolicyDocumentAsync(string policyId, string documentId, CancellationToken ct = default)
-        => _api.SendDeleteAsync($"api/insurance/policies/{policyId}/documents/{documentId}", ct);
+        => Api.SendDeleteAsync($"{PoliciesRes}/{policyId}/documents/{documentId}", ct);
 
     public Task<PagedResult<PreAuthorizationListItemDto>> GetPreAuthorizationsPagedAsync(
         string? searchTerm,
@@ -89,29 +82,19 @@ public sealed class InsuranceService
         int pageNumber,
         int pageSize,
         CancellationToken ct = default)
-    {
-        var query = new
-        {
-            pagination = new { pageNumber, pageSize },
-            sortBy,
-            sortDescending,
-            searchTerm,
-        };
-
-        return _api.PostAsync<PagedResult<PreAuthorizationListItemDto>>("api/insurance/preauthorizations/all", query, ct);
-    }
+        => FetchPageAsync<PreAuthorizationListItemDto>(PreAuthsRes, searchTerm, sortBy, sortDescending, pageNumber, pageSize, ct);
 
     public Task<PreAuthorizationDto> GetPreAuthorizationByExaminationAsync(string examinationId, CancellationToken ct = default)
-        => _api.GetAsync<PreAuthorizationDto>($"api/insurance/preauthorizations/by-examination/{examinationId}", ct);
+        => Api.GetAsync<PreAuthorizationDto>($"{PreAuthsRes}/by-examination/{examinationId}", ct);
 
     public Task<PreAuthorizationDto> CreatePreAuthorizationAsync(CreatePreAuthorizationInput input, CancellationToken ct = default)
-        => _api.PostAsync<PreAuthorizationDto>("api/insurance/preauthorizations", input, ct);
+        => CreateEntityAsync<PreAuthorizationDto>(PreAuthsRes, input, ct);
 
     public Task<PreAuthorizationDto> DecidePreAuthorizationAsync(string id, DecidePreAuthorizationInput input, CancellationToken ct = default)
-        => _api.PostAsync<PreAuthorizationDto>($"api/insurance/preauthorizations/{id}/decide", input, ct);
+        => Api.PostAsync<PreAuthorizationDto>($"{PreAuthsRes}/{id}/decide", input, ct);
 
     public Task<IReadOnlyList<PreAuthorizationDocumentDto>> GetPreAuthorizationDocumentsAsync(string id, CancellationToken ct = default)
-        => _api.GetAsync<IReadOnlyList<PreAuthorizationDocumentDto>>($"api/insurance/preauthorizations/{id}/documents", ct);
+        => Api.GetAsync<IReadOnlyList<PreAuthorizationDocumentDto>>($"{PreAuthsRes}/{id}/documents", ct);
 
     public Task<PreAuthorizationDocumentDto> UploadPreAuthorizationDocumentAsync(
         string id,
@@ -122,18 +105,18 @@ public sealed class InsuranceService
         CancellationToken ct = default)
     {
         var fields = new Dictionary<string, string> { ["type"] = type };
-        return _api.PostFormAsync<PreAuthorizationDocumentDto>(
-            $"api/insurance/preauthorizations/{id}/documents",
+        return Api.PostFormAsync<PreAuthorizationDocumentDto>(
+            $"{PreAuthsRes}/{id}/documents",
             fields,
             ("file", fileName, contentType, stream),
             ct);
     }
 
     public Task<byte[]> DownloadPreAuthorizationDocumentAsync(string id, string documentId, CancellationToken ct = default)
-        => _api.GetBytesAsync($"api/insurance/preauthorizations/{id}/documents/{documentId}/content", ct);
+        => Api.GetBytesAsync($"{PreAuthsRes}/{id}/documents/{documentId}/content", ct);
 
     public Task DeletePreAuthorizationDocumentAsync(string id, string documentId, CancellationToken ct = default)
-        => _api.SendDeleteAsync($"api/insurance/preauthorizations/{id}/documents/{documentId}", ct);
+        => Api.SendDeleteAsync($"{PreAuthsRes}/{id}/documents/{documentId}", ct);
 
     public Task<PagedResult<ClaimListItemDto>> GetClaimsPagedAsync(
         string? searchTerm,
@@ -142,39 +125,29 @@ public sealed class InsuranceService
         int pageNumber,
         int pageSize,
         CancellationToken ct = default)
-    {
-        var query = new
-        {
-            pagination = new { pageNumber, pageSize },
-            sortBy,
-            sortDescending,
-            searchTerm,
-        };
-
-        return _api.PostAsync<PagedResult<ClaimListItemDto>>("api/insurance/claims/all", query, ct);
-    }
+        => FetchPageAsync<ClaimListItemDto>(ClaimsRes, searchTerm, sortBy, sortDescending, pageNumber, pageSize, ct);
 
     public Task<ClaimDto> GetClaimByIdAsync(string id, CancellationToken ct = default)
-        => _api.GetAsync<ClaimDto>($"api/insurance/claims/{id}", ct);
+        => FetchByIdAsync<ClaimDto>(ClaimsRes, id, ct);
 
     public Task<ClaimDto> GetClaimByExaminationAsync(string examinationId, CancellationToken ct = default)
-        => _api.GetAsync<ClaimDto>($"api/insurance/claims/by-examination/{examinationId}", ct);
+        => Api.GetAsync<ClaimDto>($"{ClaimsRes}/by-examination/{examinationId}", ct);
 
     public Task<ClaimDto> CreateClaimAsync(CreateClaimInput input, CancellationToken ct = default)
-        => _api.PostAsync<ClaimDto>("api/insurance/claims", input, ct);
+        => CreateEntityAsync<ClaimDto>(ClaimsRes, input, ct);
 
     public Task<ClaimDto> SubmitClaimAsync(string id, CancellationToken ct = default)
-        => _api.PostAsync<ClaimDto>($"api/insurance/claims/{id}/submit", null, ct);
+        => Api.PostAsync<ClaimDto>($"{ClaimsRes}/{id}/submit", null, ct);
 
     public Task<ClaimDto> AdjudicateClaimAsync(string id, AdjudicateClaimInput input, CancellationToken ct = default)
-        => _api.PostAsync<ClaimDto>($"api/insurance/claims/{id}/adjudicate", input, ct);
+        => Api.PostAsync<ClaimDto>($"{ClaimsRes}/{id}/adjudicate", input, ct);
 
     public Task<ClaimDto> ResubmitClaimAsync(string id, CancellationToken ct = default)
-        => _api.PostAsync<ClaimDto>($"api/insurance/claims/{id}/resubmit", null, ct);
+        => Api.PostAsync<ClaimDto>($"{ClaimsRes}/{id}/resubmit", null, ct);
 
     public Task<ClaimDto> RecordSettlementAsync(string id, RecordSettlementInput input, CancellationToken ct = default)
-        => _api.PostAsync<ClaimDto>($"api/insurance/claims/{id}/settlements", input, ct);
+        => Api.PostAsync<ClaimDto>($"{ClaimsRes}/{id}/settlements", input, ct);
 
     public Task<InsuranceStatsDto> GetStatsAsync(CancellationToken ct = default)
-        => _api.GetAsync<InsuranceStatsDto>("api/insurance/stats", ct);
+        => Api.GetAsync<InsuranceStatsDto>("api/insurance/stats", ct);
 }

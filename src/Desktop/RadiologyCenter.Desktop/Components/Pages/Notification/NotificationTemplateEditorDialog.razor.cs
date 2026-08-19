@@ -18,15 +18,12 @@ using RadiologyCenter.Desktop.Services;
 
 namespace RadiologyCenter.Desktop.Components.Pages.Notification;
 
-public partial class NotificationTemplateEditorDialog : ComponentBase
+public partial class NotificationTemplateEditorDialog : EditorDialogBase
 {
-[Parameter] public NotificationTemplateDto? Template { get; set; }
-
-    [CascadingParameter] public IMudDialogInstance MudDialog { get; set; } = default!;
+    [Parameter] public NotificationTemplateDto? Template { get; set; }
 
     private readonly NotificationTemplateFormModel _model = new();
     private EditContext _editContext = default!;
-    private bool _busy;
     private bool _isEdit;
 
     protected override void OnInitialized()
@@ -48,31 +45,24 @@ public partial class NotificationTemplateEditorDialog : ComponentBase
         if (!_editContext.Validate())
             return;
 
-        await SafeExecute.RunAsync(async () =>
-            {
-                var input = new NotificationTemplateInput
-                {
-                    Code = _model.Code.Trim(),
-                    Name = _model.Name.Trim(),
-                    Subject = (_model.Subject ?? string.Empty).Trim(),
-                    Body = _model.Body.Trim(),
-                };
+        var input = new NotificationTemplateInput
+        {
+            Code = _model.Code.Trim(),
+            Name = _model.Name.Trim(),
+            Subject = (_model.Subject ?? string.Empty).Trim(),
+            Body = _model.Body.Trim(),
+        };
 
-                if (_isEdit)
-                    await NotificationService.UpdateTemplateAsync(Template!.Id, input);
-                else
-                    await NotificationService.CreateTemplateAsync(input);
-
-                Snackbar.Add(_isEdit ? T.TemplateDialog.Updated : T.TemplateDialog.Created, Severity.Success);
-                MudDialog.Close(DialogResult.Ok(true));
-            },
-            Snackbar,
-            () => T.TemplateDialog.Unreachable,
-            busy => _busy = busy);
+        if (await TrySaveAsync(
+                () => _isEdit
+                    ? NotificationService.UpdateTemplateAsync(Template!.Id, input)
+                    : NotificationService.CreateTemplateAsync(input),
+                () => T.TemplateDialog.Unreachable))
+        {
+            Snackbar.Add(_isEdit ? T.TemplateDialog.Updated : T.TemplateDialog.Created, Severity.Success);
+            MudDialog.Close(DialogResult.Ok(true));
+        }
     }
-
-    private void CancelAsync()
-        => MudDialog.Cancel();
 
     private sealed class NotificationTemplateFormModel
     {

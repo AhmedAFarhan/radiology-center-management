@@ -2,11 +2,12 @@ using RadiologyCenter.Desktop.Models;
 
 namespace RadiologyCenter.Desktop.Services;
 
-public sealed class ExaminationService
+public sealed class ExaminationService : CrudServiceBase
 {
-    private readonly ApiClient _api;
+    private const string TypesRes = "api/catalog/examination-types";
+    private const string Res = "api/examinations";
 
-    public ExaminationService(ApiClient api) => _api = api;
+    public ExaminationService(ApiClient api) : base(api) { }
 
     public Task<PagedResult<ExaminationTypeDto>> GetTypesPagedAsync(
         string? searchTerm,
@@ -15,35 +16,25 @@ public sealed class ExaminationService
         int pageNumber,
         int pageSize,
         CancellationToken ct = default)
-    {
-        var query = new
-        {
-            pagination = new { pageNumber, pageSize },
-            sortBy,
-            sortDescending,
-            searchTerm,
-        };
-
-        return _api.PostAsync<PagedResult<ExaminationTypeDto>>("api/catalog/examination-types/all", query, ct);
-    }
+        => FetchPageAsync<ExaminationTypeDto>(TypesRes, searchTerm, sortBy, sortDescending, pageNumber, pageSize, ct);
 
     public Task<ExaminationTypeDto> GetTypeByIdAsync(string id, CancellationToken ct = default)
-        => _api.GetAsync<ExaminationTypeDto>($"api/catalog/examination-types/{id}", ct);
+        => FetchByIdAsync<ExaminationTypeDto>(TypesRes, id, ct);
 
     public Task<ExaminationTypeDto> CreateTypeAsync(ExaminationTypeInput input, CancellationToken ct = default)
-        => _api.PostAsync<ExaminationTypeDto>("api/catalog/examination-types", input, ct);
+        => CreateEntityAsync<ExaminationTypeDto>(TypesRes, input, ct);
 
     public Task UpdateTypeAsync(string id, ExaminationTypeInput input, CancellationToken ct = default)
-        => _api.PutAsync<object>($"api/catalog/examination-types/{id}", input, ct);
+        => UpdateEntityAsync(TypesRes, id, input, ct);
 
     public Task ActivateTypeAsync(string id, CancellationToken ct = default)
-        => _api.SendAsync($"api/catalog/examination-types/{id}/activate", ct: ct);
+        => SetEntityActiveAsync(TypesRes, id, true, ct);
 
     public Task DeactivateTypeAsync(string id, CancellationToken ct = default)
-        => _api.SendAsync($"api/catalog/examination-types/{id}/deactivate", ct: ct);
+        => SetEntityActiveAsync(TypesRes, id, false, ct);
 
     public Task DeleteTypeAsync(string id, CancellationToken ct = default)
-        => _api.SendDeleteAsync($"api/catalog/examination-types/{id}", ct);
+        => DeleteEntityAsync(TypesRes, id, ct);
 
     public Task<PagedResult<ExaminationDto>> GetPagedAsync(
         string? searchTerm,
@@ -52,42 +43,32 @@ public sealed class ExaminationService
         int pageNumber,
         int pageSize,
         CancellationToken ct = default)
-    {
-        var query = new
-        {
-            pagination = new { pageNumber, pageSize },
-            sortBy,
-            sortDescending,
-            searchTerm,
-        };
-
-        return _api.PostAsync<PagedResult<ExaminationDto>>("api/examinations/all", query, ct);
-    }
+        => FetchPageAsync<ExaminationDto>(Res, searchTerm, sortBy, sortDescending, pageNumber, pageSize, ct);
 
     public Task<ExaminationDto> GetByIdAsync(string id, CancellationToken ct = default)
-        => _api.GetAsync<ExaminationDto>($"api/examinations/{id}", ct);
+        => FetchByIdAsync<ExaminationDto>(Res, id, ct);
 
     public Task<ExaminationDto> CreateAsync(ExaminationInput input, CancellationToken ct = default)
-        => _api.PostAsync<ExaminationDto>("api/examinations", input, ct);
+        => CreateEntityAsync<ExaminationDto>(Res, input, ct);
 
     public Task UpdateAsync(string id, ExaminationUpdateInput input, CancellationToken ct = default)
-        => _api.PutAsync<object>($"api/examinations/{id}", input, ct);
+        => UpdateEntityAsync(Res, id, input, ct);
 
     public Task ScheduleAsync(string id, DateTime scheduledAt, CancellationToken ct = default)
-        => _api.SendAsync($"api/examinations/{id}/schedule", new { scheduledAt }, ct);
+        => Api.SendAsync($"{Res}/{id}/schedule", new { scheduledAt }, ct);
 
     public Task CheckInAsync(string id, CancellationToken ct = default)
-        => _api.SendAsync($"api/examinations/{id}/check-in", ct: ct);
+        => Api.SendAsync($"{Res}/{id}/check-in", ct: ct);
 
     public Task StartAsync(string id, CancellationToken ct = default)
-        => _api.SendAsync($"api/examinations/{id}/start", ct: ct);
+        => Api.SendAsync($"{Res}/{id}/start", ct: ct);
 
     public Task CompleteAsync(string id, CancellationToken ct = default)
-        => _api.SendAsync($"api/examinations/{id}/complete", ct: ct);
+        => Api.SendAsync($"{Res}/{id}/complete", ct: ct);
 
     public Task RecordPacsImagesAsync(string id, string studyInstanceUID, string? accessionNumber = null, CancellationToken ct = default)
-        => _api.SendAsync($"api/examinations/{id}/pacs-images", new { studyInstanceUID, accessionNumber }, ct);
+        => Api.SendAsync($"{Res}/{id}/pacs-images", new { studyInstanceUID, accessionNumber }, ct);
 
     public Task CancelAsync(string id, string? reason = null, CancellationToken ct = default)
-        => _api.SendAsync($"api/examinations/{id}/cancel", new { reason }, ct);
+        => Api.SendAsync($"{Res}/{id}/cancel", new { reason }, ct);
 }

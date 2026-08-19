@@ -18,73 +18,18 @@ using RadiologyCenter.Desktop.Services;
 
 namespace RadiologyCenter.Desktop.Components.Pages.PurchaseOrders;
 
-public partial class PurchaseOrders : ComponentBase, IDisposable
+public partial class PurchaseOrders : ListPageBase<PurchaseOrderDto>
 {
-private MudTable<PurchaseOrderDto>? _table;
-    private string? _search;
-    private CancellationTokenSource? _searchCts;
-    private string? _loadError;
-    private bool _offline;
+    protected override string UnreachableMessage => T.PurchaseOrders.Unreachable;
 
-    private async Task<TableData<PurchaseOrderDto>> LoadServerData(TableState state, CancellationToken ct)
-    {
-        try
-        {
-            var page = await InventoryService.GetPurchaseOrdersPagedAsync(
-                _search,
-                state.SortLabel,
-                state.SortDirection == SortDirection.Descending,
-                state.Page + 1,
-                state.PageSize,
-                ct);
-
-            _loadError = null;
-            _offline = false;
-            return new TableData<PurchaseOrderDto> { Items = page.Items, TotalItems = page.TotalCount };
-        }
-        catch (OperationCanceledException)
-        {
-            if (ct.IsCancellationRequested)
-                return new TableData<PurchaseOrderDto> { Items = Array.Empty<PurchaseOrderDto>(), TotalItems = 0 };
-            throw;
-        }
-        catch (ApiException ex)
-        {
-            Snackbar.Add(ex.Message, Severity.Error);
-            _loadError = ex.Message;
-            _offline = false;
-            return new TableData<PurchaseOrderDto> { Items = Array.Empty<PurchaseOrderDto>(), TotalItems = 0 };
-        }
-        catch (Exception)
-        {
-            Snackbar.Add(T.PurchaseOrders.Unreachable, Severity.Error);
-            _loadError = T.PurchaseOrders.Unreachable;
-            _offline = true;
-            return new TableData<PurchaseOrderDto> { Items = Array.Empty<PurchaseOrderDto>(), TotalItems = 0 };
-        }
-    }
-
-    private async Task OnSearchChanged(string? value)
-    {
-        _search = value;
-
-        _searchCts?.Cancel();
-        var cts = _searchCts = new CancellationTokenSource();
-        try
-        {
-            await Task.Delay(400, cts.Token);
-        }
-        catch (TaskCanceledException)
-        {
-            return;
-        }
-
-        if (_table is not null)
-            await _table.ReloadServerData();
-    }
-
-    private Task ReloadAsync()
-        => _table is null ? Task.CompletedTask : _table.ReloadServerData();
+    protected override async Task<PagedResult<PurchaseOrderDto>> LoadPageAsync(
+        string? search,
+        string? sortBy,
+        bool sortDescending,
+        int page,
+        int pageSize,
+        CancellationToken ct)
+        => await InventoryService.GetPurchaseOrdersPagedAsync(search, sortBy, sortDescending, page, pageSize, ct);
 
     private async Task OpenCreateDialogAsync()
     {
@@ -106,13 +51,6 @@ private MudTable<PurchaseOrderDto>? _table;
         var parameters = new DialogParameters { ["PurchaseOrderId"] = po.Id };
         var options = new DialogOptions { MaxWidth = MaxWidth.Medium, FullWidth = true, NoHeader = true };
         await DialogService.ShowAsync<PurchaseOrderViewDialog>(T.FormatValue(T.PoDialog.OrderTitle, po.OrderNumber), parameters, options);
-    }
-
-    private async Task ReloadIfSavedAsync(IDialogReference dialog)
-    {
-        var result = await dialog.Result;
-        if (result is { Canceled: false })
-            await ReloadAsync();
     }
 
     private async Task PlaceAsync(PurchaseOrderDto po)
@@ -162,6 +100,4 @@ private MudTable<PurchaseOrderDto>? _table;
         "PartiallyReceived" => "Partially Received",
         _ => status,
     };
-
-    public void Dispose() => _searchCts?.Cancel();
 }

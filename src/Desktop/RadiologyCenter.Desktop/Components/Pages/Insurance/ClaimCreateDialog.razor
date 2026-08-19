@@ -1,8 +1,7 @@
+@inherits EditorDialogBase
 @inject InsuranceService InsuranceService
 @inject ExaminationService ExaminationService
 @inject PatientService PatientService
-@inject ISnackbar Snackbar
-@inject AppLocalizer T
 
 <MudDialog>
     <DialogContent>
@@ -71,17 +70,11 @@
         </EditForm>
     </DialogContent>
     <DialogActions>
-        <MudButton Color="Color.Default" OnClick="CancelAsync" Disabled="_busy">@T.Common.Cancel</MudButton>
-        <MudButton Color="Color.Primary" Variant="Variant.Filled" OnClick="SubmitAsync" Disabled="_busy">
-            @if (_busy)
-            {
-                <MudProgressCircular Size="Size.Small" Indeterminate="true" Class="mx-1" />
-            }
-            else
-            {
-                <text>@T.ClaimDialog.CreateClaim</text>
-            }
-        </MudButton>
+        <DialogButtons Busy="Busy"
+                       CancelLabel="@T.Common.Cancel"
+                       SaveLabel="@T.ClaimDialog.CreateClaim"
+                       OnCancel="CancelAsync"
+                       OnSave="SubmitAsync" />
     </DialogActions>
 </MudDialog>
 

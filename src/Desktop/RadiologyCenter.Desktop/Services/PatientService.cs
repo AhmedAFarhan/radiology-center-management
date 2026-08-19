@@ -2,11 +2,11 @@ using RadiologyCenter.Desktop.Models;
 
 namespace RadiologyCenter.Desktop.Services;
 
-public sealed class PatientService
+public sealed class PatientService : CrudServiceBase
 {
-    private readonly ApiClient _api;
+    private const string Res = "api/patients";
 
-    public PatientService(ApiClient api) => _api = api;
+    public PatientService(ApiClient api) : base(api) { }
 
     public Task<PagedResult<PatientDto>> GetPagedAsync(
         string? searchTerm,
@@ -15,33 +15,23 @@ public sealed class PatientService
         int pageNumber,
         int pageSize,
         CancellationToken ct = default)
-    {
-        var query = new
-        {
-            pagination = new { pageNumber, pageSize },
-            sortBy,
-            sortDescending,
-            searchTerm,
-        };
-
-        return _api.PostAsync<PagedResult<PatientDto>>("api/patients/all", query, ct);
-    }
+        => FetchPageAsync<PatientDto>(Res, searchTerm, sortBy, sortDescending, pageNumber, pageSize, ct);
 
     public Task<PatientDto> GetByIdAsync(string id, CancellationToken ct = default)
-        => _api.GetAsync<PatientDto>($"api/patients/{id}", ct);
+        => FetchByIdAsync<PatientDto>(Res, id, ct);
 
     public Task<PatientDto> CreateAsync(PatientInput input, CancellationToken ct = default)
-        => _api.PostAsync<PatientDto>("api/patients", input, ct);
+        => CreateEntityAsync<PatientDto>(Res, input, ct);
 
     public Task UpdateAsync(string id, PatientInput input, CancellationToken ct = default)
-        => _api.PutAsync<object>($"api/patients/{id}", input, ct);
+        => UpdateEntityAsync(Res, id, input, ct);
 
     public Task ActivateAsync(string id, CancellationToken ct = default)
-        => _api.SendAsync($"api/patients/{id}/activate", ct: ct);
+        => SetEntityActiveAsync(Res, id, true, ct);
 
     public Task DeactivateAsync(string id, CancellationToken ct = default)
-        => _api.SendAsync($"api/patients/{id}/deactivate", ct: ct);
+        => SetEntityActiveAsync(Res, id, false, ct);
 
     public Task DeleteAsync(string id, CancellationToken ct = default)
-        => _api.SendDeleteAsync($"api/patients/{id}", ct);
+        => DeleteEntityAsync(Res, id, ct);
 }

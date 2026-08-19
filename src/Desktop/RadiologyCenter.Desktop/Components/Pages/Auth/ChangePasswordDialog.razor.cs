@@ -18,15 +18,12 @@ using RadiologyCenter.Desktop.Services;
 
 namespace RadiologyCenter.Desktop.Components.Pages.Auth;
 
-public partial class ChangePasswordDialog : ComponentBase
+public partial class ChangePasswordDialog : EditorDialogBase
 {
 [Parameter] public bool Forced { get; set; }
 
-    [CascadingParameter] public IMudDialogInstance MudDialog { get; set; } = default!;
-
     private readonly ChangePasswordModel _model = new();
     private EditContext _editContext = default!;
-    private bool _busy;
 
     protected override void OnInitialized()
         => _editContext = new EditContext(_model);
@@ -36,19 +33,14 @@ public partial class ChangePasswordDialog : ComponentBase
         if (!_editContext.Validate())
             return;
 
-        await SafeExecute.RunAsync(async () =>
+        await TrySaveAsync(async () =>
             {
                 await AuthService.ChangePasswordAsync(_model.CurrentPassword, _model.NewPassword);
                 Snackbar.Add(T.ChangePassword.Success, Severity.Success);
                 MudDialog.Close(DialogResult.Ok(true));
             },
-            Snackbar,
-            () => T.ChangePassword.Unreachable,
-            busy => _busy = busy);
+            () => T.ChangePassword.Unreachable);
     }
-
-    private void CancelAsync()
-        => MudDialog.Cancel();
 
     private sealed class ChangePasswordModel
     {

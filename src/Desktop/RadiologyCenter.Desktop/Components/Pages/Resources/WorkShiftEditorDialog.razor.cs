@@ -18,17 +18,14 @@ using RadiologyCenter.Desktop.Services;
 
 namespace RadiologyCenter.Desktop.Components.Pages.Resources;
 
-public partial class WorkShiftEditorDialog : ComponentBase
+public partial class WorkShiftEditorDialog : EditorDialogBase
 {
-[Parameter] public WorkShiftDto? Shift { get; set; }
-
-    [CascadingParameter] public IMudDialogInstance MudDialog { get; set; } = default!;
+    [Parameter] public WorkShiftDto? Shift { get; set; }
 
     private readonly WorkShiftFormModel _model = new();
     private EditContext _editContext = default!;
     private StaffDto? _selectedStaff;
     private EquipmentDto? _selectedEquipment;
-    private bool _busy;
 
     private bool IsEdit => Shift is not null;
 
@@ -132,33 +129,26 @@ public partial class WorkShiftEditorDialog : ComponentBase
             return;
         }
 
-        await SafeExecute.RunAsync(async () =>
-            {
-                var input = new WorkShiftInput
-                {
-                    StaffId = _selectedStaff.Id,
-                    EquipmentId = _selectedEquipment?.Id,
-                    Date = _model.Date.Value.Date,
-                    StartTime = _model.StartTime.Value,
-                    EndTime = _model.EndTime.Value,
-                    Notes = _model.Notes,
-                };
+        var input = new WorkShiftInput
+        {
+            StaffId = _selectedStaff.Id,
+            EquipmentId = _selectedEquipment?.Id,
+            Date = _model.Date.Value.Date,
+            StartTime = _model.StartTime.Value,
+            EndTime = _model.EndTime.Value,
+            Notes = _model.Notes,
+        };
 
-                if (IsEdit)
-                    await ResourceService.UpdateWorkShiftAsync(Shift!.Id, input);
-                else
-                    await ResourceService.CreateWorkShiftAsync(input);
-
-                Snackbar.Add(IsEdit ? T.WorkShiftDialog.Updated : T.WorkShiftDialog.Created, Severity.Success);
-                MudDialog.Close(DialogResult.Ok(true));
-            },
-            Snackbar,
-            () => T.WorkShiftDialog.Unreachable,
-            busy => _busy = busy);
+        if (await TrySaveAsync(
+                () => IsEdit
+                    ? ResourceService.UpdateWorkShiftAsync(Shift!.Id, input)
+                    : ResourceService.CreateWorkShiftAsync(input),
+                () => T.WorkShiftDialog.Unreachable))
+        {
+            Snackbar.Add(IsEdit ? T.WorkShiftDialog.Updated : T.WorkShiftDialog.Created, Severity.Success);
+            MudDialog.Close(DialogResult.Ok(true));
+        }
     }
-
-    private void CancelAsync()
-        => MudDialog.Cancel();
 
     private sealed class WorkShiftFormModel
     {

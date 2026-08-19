@@ -18,11 +18,9 @@ using RadiologyCenter.Desktop.Services;
 
 namespace RadiologyCenter.Desktop.Components.Pages.Resources;
 
-public partial class EquipmentEditorDialog : ComponentBase
+public partial class EquipmentEditorDialog : EditorDialogBase
 {
-[Parameter] public EquipmentDto? Equipment { get; set; }
-
-    [CascadingParameter] public IMudDialogInstance MudDialog { get; set; } = default!;
+    [Parameter] public EquipmentDto? Equipment { get; set; }
 
     private static readonly Dictionary<string, string> Modalities = new()
     {
@@ -38,7 +36,6 @@ public partial class EquipmentEditorDialog : ComponentBase
 
     private readonly EquipmentFormModel _model = new();
     private EditContext _editContext = default!;
-    private bool _busy;
 
     private bool IsEdit => Equipment is not null;
 
@@ -60,31 +57,24 @@ public partial class EquipmentEditorDialog : ComponentBase
         if (!_editContext.Validate())
             return;
 
-        await SafeExecute.RunAsync(async () =>
-            {
-                var input = new EquipmentInput
-                {
-                    Name = _model.Name,
-                    Modality = _model.Modality,
-                    SerialNumber = _model.SerialNumber,
-                    PurchaseDate = _model.PurchaseDate,
-                };
+        var input = new EquipmentInput
+        {
+            Name = _model.Name,
+            Modality = _model.Modality,
+            SerialNumber = _model.SerialNumber,
+            PurchaseDate = _model.PurchaseDate,
+        };
 
-                if (IsEdit)
-                    await ResourceService.UpdateEquipmentAsync(Equipment!.Id, input);
-                else
-                    await ResourceService.CreateEquipmentAsync(input);
-
-                Snackbar.Add(IsEdit ? T.EquipmentDialog.Updated : T.EquipmentDialog.Created, Severity.Success);
-                MudDialog.Close(DialogResult.Ok(true));
-            },
-            Snackbar,
-            () => T.EquipmentDialog.Unreachable,
-            busy => _busy = busy);
+        if (await TrySaveAsync(
+                () => IsEdit
+                    ? ResourceService.UpdateEquipmentAsync(Equipment!.Id, input)
+                    : ResourceService.CreateEquipmentAsync(input),
+                () => T.EquipmentDialog.Unreachable))
+        {
+            Snackbar.Add(IsEdit ? T.EquipmentDialog.Updated : T.EquipmentDialog.Created, Severity.Success);
+            MudDialog.Close(DialogResult.Ok(true));
+        }
     }
-
-    private void CancelAsync()
-        => MudDialog.Cancel();
 
     private sealed class EquipmentFormModel
     {
