@@ -48,6 +48,7 @@ public partial class App : Application
                         {
                             Text = "EGcare",
                             TextColor = Colors.White,
+                            FontFamily = "RobotoSlab",
                             FontAttributes = FontAttributes.Bold,
                             FontSize = 14,
                             VerticalOptions = LayoutOptions.Center,

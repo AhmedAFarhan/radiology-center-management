@@ -19,6 +19,7 @@ public static class MauiProgram
             .ConfigureFonts(fonts =>
             {
                 fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
+                fonts.AddFont("RobotoSlab.ttf", "RobotoSlab");
             });
 
         builder.Services.AddMauiBlazorWebView();

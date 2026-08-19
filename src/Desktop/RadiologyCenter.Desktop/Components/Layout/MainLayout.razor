@@ -140,7 +140,7 @@
                      TransformOrigin="@(T.IsRTL ? Origin.TopLeft : Origin.TopRight)"
                      Class="profile-menu">
                 <ActivatorContent>
-                    <div class="d-flex align-center profile-trigger">
+                    <div class="d-flex align-center profile-trigger" @onclick="context.ToggleAsync">
                         <MudAvatar Size="Size.Small" Color="Color.Primary" Class="mx-2 app-bar-avatar">@GetInitial()</MudAvatar>
                         <MudText Typo="Typo.body2" Class="me-2 app-bar-user">@_userName</MudText>
                         <MudIcon Icon="@Icons.Material.Filled.ArrowDropDown" Size="Size.Small" Class="app-bar-chevron" />

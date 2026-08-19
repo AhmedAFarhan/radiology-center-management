@@ -14,6 +14,22 @@
     font-display: swap;
 }
 
+@font-face {
+    font-family: 'Roboto Slab';
+    src: url('fonts/RobotoSlab-600.ttf') format('truetype');
+    font-weight: 600;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Roboto Slab';
+    src: url('fonts/RobotoSlab-800.ttf') format('truetype');
+    font-weight: 800;
+    font-style: normal;
+    font-display: swap;
+}
+
 :root {
     --mud-typography-default-family: 'Montserrat', 'Cairo', sans-serif;
 }
@@ -118,7 +134,7 @@ h1:focus {
 
 .corner-circles {
     position: absolute;
-    left: 0;
+    inset-inline-start: 0;
     bottom: 0;
     width: 0;
     height: 0;
@@ -127,21 +143,27 @@ h1:focus {
 }
 
 .corner-circles.corner-right {
-    left: auto;
-    right: 0;
+    inset-inline-start: auto;
+    inset-inline-end: 0;
 }
 
 .corner-circle {
     position: absolute;
-    left: 0;
+    inset-inline-start: 0;
     bottom: 0;
-    border-radius: 0 100% 0 0;
+    border-start-start-radius: 0;
+    border-start-end-radius: 100%;
+    border-end-start-radius: 0;
+    border-end-end-radius: 0;
 }
 
 .corner-circles.corner-right .corner-circle {
-    left: auto;
-    right: 0;
-    border-radius: 100% 0 0 0;
+    inset-inline-start: auto;
+    inset-inline-end: 0;
+    border-start-start-radius: 100%;
+    border-start-end-radius: 0;
+    border-end-start-radius: 0;
+    border-end-end-radius: 0;
 }
 
 .circle-inner {
@@ -161,22 +183,22 @@ h1:focus {
 }
 
 .plus-symbol:nth-child(1) {
-    right: 55%;
+    inset-inline-end: 55%;
     bottom: 38%;
 }
 
 .plus-symbol:nth-child(2) {
-    right: 35%;
+    inset-inline-end: 35%;
     bottom: 20%;
 }
 
 .plus-symbol:nth-child(3) {
-    right: 58%;
+    inset-inline-end: 58%;
     bottom: 12%;
 }
 
 .plus-symbol:nth-child(4) {
-    right: 28%;
+    inset-inline-end: 28%;
     bottom: 48%;
 }
 
@@ -222,10 +244,13 @@ h1:focus {
 }
 
 .landing-brand-text {
+    font-family: 'Roboto Slab', 'Montserrat', 'Cairo', sans-serif;
     font-size: 1.6rem;
     font-weight: 700;
     color: #1F2937;
     letter-spacing: -0.02em;
+    direction: ltr;
+    unicode-bidi: isolate;
 }
 
 .landing-copy {
@@ -337,7 +362,7 @@ h1:focus {
     height: 75px;
     background: #4C58E0;
     top: 26px;
-    left: 28px;
+    inset-inline-start: 28px;
     animation-delay: 0s;
 }
 
@@ -346,7 +371,7 @@ h1:focus {
     height: 75px;
     background: #B30000;
     top: 96px;
-    right: -30px;
+    inset-inline-end: -30px;
     animation-delay: -1.5s;
 }
 
@@ -355,7 +380,7 @@ h1:focus {
     height: 75px;
     background: #25345F;
     bottom: 12px;
-    left: 52px;
+    inset-inline-start: 52px;
     animation-delay: -3s;
 }
 
@@ -364,7 +389,7 @@ h1:focus {
     height: 75px;
     background: #FE881C;
     top: -6px;
-    right: 86px;
+    inset-inline-end: 86px;
     animation-delay: -0.75s;
 }
 
@@ -474,10 +499,13 @@ h1:focus {
 }
 
 .app-brand-text {
+    font-family: 'Roboto Slab', 'Montserrat', 'Cairo', sans-serif;
     font-size: 1.125rem;
     font-weight: 600;
     letter-spacing: 0.2px;
     overflow: hidden;
+    direction: ltr;
+    unicode-bidi: isolate;
 }
 
 .app-nav {
@@ -990,6 +1018,16 @@ h1:focus {
     flex: 1;
 }
 
+/* Worklist loading spinner: the spinner must rotate around the visible circle's
+   center. The markup now uses margin (my-8) instead of padding (py-8) so the fixed
+   border-box size isn't shrunk by box-sizing:border-box, keeping the SVG centered.
+   This rule pins the transform-origin to that center as defense-in-depth. */
+.rr-worklist-items .mud-progress-circular,
+.rr-worklist-items .mud-progress-circular svg,
+.rr-worklist-items .mud-progress-circular-indeterminate-child {
+    transform-origin: center !important;
+}
+
 .rr-worklist-item {
     display: block;
     width: 100%;
@@ -1478,9 +1516,12 @@ h1:focus {
 .boot-splash-title {
   position: relative;
   display: inline-flex;
+  font-family: 'Roboto Slab', 'Montserrat', 'Cairo', sans-serif;
   font-size: 40px;
   font-weight: 800;
   letter-spacing: 6px;
+  direction: ltr;
+  unicode-bidi: isolate;
 }
 .boot-splash-letter {
   display: inline-block;
@@ -1603,5 +1644,8 @@ h1:focus {
 }
 .language-dialog .mud-dialog-content {
   padding-bottom: 8px;
+}
+.change-password-dialog .mud-dialog-content {
+  overflow: hidden;
 }
 
