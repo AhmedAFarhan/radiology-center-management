@@ -25,6 +25,7 @@ public partial class UserEditorDialog : EditorDialogBase
     private readonly UserFormModel _model = new();
     private EditContext _editContext = default!;
     private List<RoleDto> _roles = new();
+    private bool _showPassword;
 
     private bool IsEdit => User is not null;
 

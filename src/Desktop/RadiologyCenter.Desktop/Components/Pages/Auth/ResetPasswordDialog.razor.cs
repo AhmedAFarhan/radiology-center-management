@@ -24,6 +24,8 @@ public partial class ResetPasswordDialog : EditorDialogBase
 
     private readonly ResetPasswordModel _model = new();
     private EditContext _editContext = default!;
+    private bool _showNew;
+    private bool _showConfirm;
 
     protected override void OnInitialized()
         => _editContext = new EditContext(_model);

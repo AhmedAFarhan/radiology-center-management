@@ -32,9 +32,13 @@
                                   Label="@T.Login.Password"
                                   Variant="Variant.Outlined"
                                   Margin="Margin.Dense"
-                                  InputType="InputType.Password"
+                                  InputType="@(_showPassword ? InputType.Text : InputType.Password)"
                                   Immediate="true"
-                                  Autocomplete="current-password" />
+                                  Autocomplete="current-password"
+                                  Adornment="Adornment.End"
+                                  AdornmentIcon="@(_showPassword ? Icons.Material.Filled.VisibilityOff : Icons.Material.Filled.Visibility)"
+                                  AdornmentColor="Color.Default"
+                                  OnAdornmentClick="@(() => _showPassword = !_showPassword)" />
                 </MudItem>
             </MudGrid>
             <MudButton ButtonType="ButtonType.Submit"

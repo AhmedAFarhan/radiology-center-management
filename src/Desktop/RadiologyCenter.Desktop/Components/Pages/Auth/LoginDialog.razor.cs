@@ -24,6 +24,7 @@ public partial class LoginDialog : ComponentBase
 
     private readonly LoginModel _model = new();
     private bool _busy;
+    private bool _showPassword;
 
     private async Task SubmitAsync()
     {

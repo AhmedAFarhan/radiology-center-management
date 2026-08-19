@@ -24,6 +24,9 @@ public partial class ChangePasswordDialog : EditorDialogBase
 
     private readonly ChangePasswordModel _model = new();
     private EditContext _editContext = default!;
+    private bool _showCurrent;
+    private bool _showNew;
+    private bool _showConfirm;
 
     protected override void OnInitialized()
         => _editContext = new EditContext(_model);

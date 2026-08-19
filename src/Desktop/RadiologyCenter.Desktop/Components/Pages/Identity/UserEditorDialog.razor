@@ -73,8 +73,12 @@
                                       Label="@T.UserDialog.Password"
                                       Variant="Variant.Outlined"
                                       Margin="Margin.Dense"
-                                      InputType="InputType.Password"
-                                      For="@(() => _model.Password)" />
+                                      InputType="@(_showPassword ? InputType.Text : InputType.Password)"
+                                      For="@(() => _model.Password)"
+                                      Adornment="Adornment.End"
+                                      AdornmentIcon="@(_showPassword ? Icons.Material.Filled.VisibilityOff : Icons.Material.Filled.Visibility)"
+                                      AdornmentColor="Color.Default"
+                                      OnAdornmentClick="@(() => _showPassword = !_showPassword)" />
                     </MudItem>
                     <MudItem xs="12">
                         <MudSelect T="string"
