@@ -52,15 +52,24 @@ public sealed class AppAuthenticationStateProvider : AuthenticationStateProvider
 
         var claims = JwtClaimsParser.Parse(tokens.AccessToken);
 
-        var identity = new ClaimsIdentity(
-            new[]
-            {
-                new Claim(ClaimTypes.Name, tokens.Username),
-                new Claim(ClaimTypes.Email, claims.GetValueOrDefault("email") ?? string.Empty),
-                new Claim(ClaimTypes.GivenName, claims.GetValueOrDefault("firstName") ?? string.Empty),
-                new Claim(ClaimTypes.Surname, claims.GetValueOrDefault("lastName") ?? string.Empty),
-            },
-            authenticationType: "AppSession");
+        var identityClaims = new List<Claim>
+        {
+            new(ClaimTypes.Name, tokens.Username),
+            new(ClaimTypes.Email, claims.Get("email") ?? string.Empty),
+            new(ClaimTypes.GivenName, claims.Get("firstName") ?? string.Empty),
+            new(ClaimTypes.Surname, claims.Get("lastName") ?? string.Empty),
+        };
+
+        foreach (var permission in claims.GetAll(AppClaimTypes.Permission))
+            identityClaims.Add(new Claim(AppClaimTypes.Permission, permission));
+
+        foreach (var role in claims.GetAll("role"))
+            identityClaims.Add(new Claim(ClaimTypes.Role, role));
+
+        if (string.Equals(claims.Get(AppClaimTypes.IsAdmin), "true", StringComparison.OrdinalIgnoreCase))
+            identityClaims.Add(new Claim(AppClaimTypes.IsAdmin, "true"));
+
+        var identity = new ClaimsIdentity(identityClaims, authenticationType: "AppSession");
 
         return Task.FromResult(new AuthenticationState(new ClaimsPrincipal(identity)));
     }

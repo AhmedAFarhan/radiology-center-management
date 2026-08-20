@@ -9,7 +9,10 @@
             SearchValueChanged="OnSearchChanged"
             SearchPlaceholder="@T.ExamFee.SearchPlaceholder"
             OnRefresh="ReloadAsync">
-    <MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Add" OnClick="OpenCreateDialogAsync">@T.ExamFee.NewFee</MudButton>
+    @if (Can("payroll.fees.manage"))
+    {
+        <MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Add" OnClick="OpenCreateDialogAsync">@T.ExamFee.NewFee</MudButton>
+    }
 </PageHeader>
 
 <MudTable T="ExaminationFeeDto" @ref="Table" ServerData="LoadServerData" Dense="true" Hover="true" Striped="true" Elevation="1" RowsPerPage="10" FixedHeader="true" Class="table-scroll">
@@ -40,6 +43,9 @@
                         EditLabel="@T.Common.Edit"
                         ToggleLabel="@T.ExamFee.ToggleStatus"
                         DeleteLabel="@T.Common.Delete"
+                        CanEdit="@Can("payroll.fees.manage")"
+                        CanToggle="@Can("payroll.fees.manage")"
+                        CanDelete="@Can("payroll.fees.manage")"
                         OnEdit="@(() => OpenEditDialogAsync(context))"
                         OnToggle="@(() => ToggleActiveAsync(context))"
                         OnDelete="@(() => DeleteFeeAsync(context))" />
@@ -53,6 +59,7 @@
                         EmptyTitle="@T.ExamFee.EmptyTitle"
                         EmptyMessage="@T.ExamFee.EmptyMessage"
                         EmptyActionLabel="@T.ExamFee.EmptyActionLabel"
+                        ShowAction="@Can("payroll.fees.manage")"
                         OnReload="ReloadAsync"
                         OnEmptyAction="OpenCreateDialogAsync" />
     </NoRecordsContent>

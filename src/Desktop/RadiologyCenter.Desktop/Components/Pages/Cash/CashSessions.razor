@@ -15,7 +15,10 @@
         <MudSelectItem Value="@("Open")">@T.Cash.StatusOpen</MudSelectItem>
         <MudSelectItem Value="@("Closed")">@T.Cash.StatusClosed</MudSelectItem>
     </MudSelect>
-    <MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Add" OnClick="OpenSessionAsync">@T.Cash.OpenSession</MudButton>
+    @if (Can("cash.sessions.open"))
+    {
+        <MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Add" OnClick="OpenSessionAsync">@T.Cash.OpenSession</MudButton>
+    }
 </PageHeader>
 
 <MudTable T="CashSessionDto" @ref="Table" ServerData="LoadServerData" Dense="true" Hover="true" Striped="true" Elevation="1" RowsPerPage="10" FixedHeader="true" Class="table-scroll">
@@ -55,6 +58,7 @@
                         EmptyTitle="@T.Cash.EmptyTitle"
                         EmptyMessage="@T.Cash.EmptyMessage"
                         EmptyActionLabel="@T.Cash.EmptyActionLabel"
+                        ShowAction="@Can("cash.sessions.open")"
                         OnReload="ReloadAsync"
                         OnEmptyAction="OpenSessionAsync" />
     </NoRecordsContent>

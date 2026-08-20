@@ -10,7 +10,10 @@
             SearchValueChanged="OnSearchChanged"
             SearchPlaceholder="@T.ReferralFee.SearchPlaceholder"
             OnRefresh="ReloadAsync">
-    <MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Add" OnClick="OpenCreateDialogAsync">@T.ReferralFee.NewFee</MudButton>
+    @if (Can("payroll.fees.manage"))
+    {
+        <MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Add" OnClick="OpenCreateDialogAsync">@T.ReferralFee.NewFee</MudButton>
+    }
 </PageHeader>
 
 <MudTable T="ReferralFeeDto" @ref="Table" ServerData="LoadServerData" Dense="true" Hover="true" Striped="true" Elevation="1" RowsPerPage="10" FixedHeader="true" Class="table-scroll">
@@ -39,6 +42,9 @@
                         EditLabel="@T.Common.Edit"
                         ToggleLabel="@T.ReferralFee.ToggleStatus"
                         DeleteLabel="@T.Common.Delete"
+                        CanEdit="@Can("payroll.fees.manage")"
+                        CanToggle="@Can("payroll.fees.manage")"
+                        CanDelete="@Can("payroll.fees.manage")"
                         OnEdit="@(() => OpenEditDialogAsync(context))"
                         OnToggle="@(() => ToggleActiveAsync(context))"
                         OnDelete="@(() => DeleteFeeAsync(context))" />
@@ -52,6 +58,7 @@
                         EmptyTitle="@T.ReferralFee.EmptyTitle"
                         EmptyMessage="@T.ReferralFee.EmptyMessage"
                         EmptyActionLabel="@T.ReferralFee.EmptyActionLabel"
+                        ShowAction="@Can("payroll.fees.manage")"
                         OnReload="ReloadAsync"
                         OnEmptyAction="OpenCreateDialogAsync" />
     </NoRecordsContent>

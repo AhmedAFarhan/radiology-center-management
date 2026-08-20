@@ -9,7 +9,10 @@
             SearchValue="@SearchQuery"
             SearchPlaceholder="@T.Staff.SearchPlaceholder"
             OnRefresh="ReloadAsync">
-    <MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Add" OnClick="OpenCreateDialogAsync">@T.Staff.Add</MudButton>
+    @if (Can("resources.staff.create"))
+    {
+        <MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Add" OnClick="OpenCreateDialogAsync">@T.Staff.Add</MudButton>
+    }
 </PageHeader>
 
 <MudTable T="StaffDto" @ref="Table" ServerData="LoadServerData" Dense="true" Hover="true" Striped="true" Elevation="1" RowsPerPage="10" FixedHeader="true" Class="table-scroll">
@@ -40,6 +43,9 @@
                         EditLabel="@T.Common.Edit"
                         ToggleLabel="@T.Staff.ToggleStatus"
                         DeleteLabel="@T.Common.Delete"
+                        CanEdit="@Can("resources.staff.update")"
+                        CanToggle="@Can("resources.staff.update")"
+                        CanDelete="@Can("resources.staff.delete")"
                         OnEdit="@(() => OpenEditDialogAsync(context))"
                         OnToggle="@(() => ToggleActiveAsync(context))"
                         OnDelete="@(() => DeleteStaffAsync(context))" />
@@ -53,6 +59,7 @@
                         EmptyTitle="@T.Staff.EmptyTitle"
                         EmptyMessage="@T.Staff.EmptyMessage"
                         EmptyActionLabel="@T.Staff.EmptyActionLabel"
+                        ShowAction="@Can("resources.staff.create")"
                         OnReload="ReloadAsync"
                         OnEmptyAction="OpenCreateDialogAsync" />
     </NoRecordsContent>

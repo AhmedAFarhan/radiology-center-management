@@ -10,7 +10,10 @@
             SearchValueChanged="OnSearchChanged"
             SearchPlaceholder="@T.Allowance.SearchPlaceholder"
             OnRefresh="ReloadAsync">
-    <MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Add" OnClick="OpenCreateDialogAsync">@T.Allowance.NewAllowance</MudButton>
+    @if (Can("payroll.allowances.manage"))
+    {
+        <MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Add" OnClick="OpenCreateDialogAsync">@T.Allowance.NewAllowance</MudButton>
+    }
 </PageHeader>
 
 <MudTable T="AllowanceAssignmentDto" @ref="Table" ServerData="LoadServerData" Dense="true" Hover="true" Striped="true" Elevation="1" RowsPerPage="10" FixedHeader="true" Class="table-scroll">
@@ -52,6 +55,9 @@
                         EditLabel="@T.Common.Edit"
                         ToggleLabel="@T.Allowance.ToggleStatus"
                         DeleteLabel="@T.Common.Delete"
+                        CanEdit="@Can("payroll.allowances.manage")"
+                        CanToggle="@Can("payroll.allowances.manage")"
+                        CanDelete="@Can("payroll.allowances.manage")"
                         OnEdit="@(() => OpenEditDialogAsync(context))"
                         OnToggle="@(() => ToggleActiveAsync(context))"
                         OnDelete="@(() => DeleteAllowanceAsync(context))" />
@@ -65,6 +71,7 @@
                         EmptyTitle="@T.Allowance.EmptyTitle"
                         EmptyMessage="@T.Allowance.EmptyMessage"
                         EmptyActionLabel="@T.Allowance.EmptyActionLabel"
+                        ShowAction="@Can("payroll.allowances.manage")"
                         OnReload="ReloadAsync"
                         OnEmptyAction="OpenCreateDialogAsync" />
     </NoRecordsContent>

@@ -13,5 +13,5 @@ else
                 Title="@EmptyTitle"
                 Message="@EmptyMessage"
                 ActionLabel="@EmptyActionLabel"
-                Action="OnEmptyAction" />
+                Action="@(ShowAction ? OnEmptyAction : default(EventCallback))" />
 }

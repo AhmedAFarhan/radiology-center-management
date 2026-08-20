@@ -20,7 +20,11 @@ namespace RadiologyCenter.Desktop.Components.Pages.Insurance;
 
 public partial class Companies : ComponentBase, IDisposable
 {
-private MudTable<InsuranceCompanyDto>? _table;
+[Inject] private PermissionService Permissions { get; set; } = default!;
+
+    private bool Can(string code) => Permissions.HasPermission(code);
+
+    private MudTable<InsuranceCompanyDto>? _table;
     private List<InsuranceCompanyDto> _companies = new();
     private string? _search;
     private CancellationTokenSource? _searchCts;

@@ -2,35 +2,66 @@ using System.Text.Json;
 
 namespace RadiologyCenter.Desktop.Services;
 
+public sealed class JwtClaims
+{
+    private readonly IReadOnlyDictionary<string, IReadOnlyList<string>> _values;
+
+    public JwtClaims(IReadOnlyDictionary<string, IReadOnlyList<string>> values)
+    {
+        _values = values;
+    }
+
+    public string? Get(string key)
+        => _values.TryGetValue(key, out var values) && values.Count > 0 ? values[^1] : null;
+
+    public IReadOnlyList<string> GetAll(string key)
+        => _values.TryGetValue(key, out var values) ? values : Array.Empty<string>();
+}
+
 public static class JwtClaimsParser
 {
-    public static IReadOnlyDictionary<string, string> Parse(string? accessToken)
+    public static JwtClaims Parse(string? accessToken)
     {
+        var empty = new Dictionary<string, IReadOnlyList<string>>(StringComparer.OrdinalIgnoreCase);
         if (string.IsNullOrWhiteSpace(accessToken))
-            return new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+            return new JwtClaims(empty);
 
         var parts = accessToken.Split('.');
         if (parts.Length < 2)
-            return new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+            return new JwtClaims(empty);
 
         try
         {
             using var doc = JsonDocument.Parse(Base64UrlDecode(parts[1]));
             if (doc.RootElement.ValueKind != JsonValueKind.Object)
-                return new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+                return new JwtClaims(empty);
 
-            var result = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+            var values = new Dictionary<string, IReadOnlyList<string>>(StringComparer.OrdinalIgnoreCase);
             foreach (var prop in doc.RootElement.EnumerateObject())
             {
                 if (prop.Value.ValueKind == JsonValueKind.String)
-                    result[prop.Name] = prop.Value.GetString() ?? string.Empty;
+                    Add(values, prop.Name, prop.Value.GetString() ?? string.Empty);
             }
 
-            return result;
+            return new JwtClaims(values);
         }
         catch
         {
-            return new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+            return new JwtClaims(empty);
+        }
+    }
+
+    private static void Add(Dictionary<string, IReadOnlyList<string>> values, string key, string value)
+    {
+        if (values.TryGetValue(key, out var existing))
+        {
+            var list = existing as List<string> ?? new List<string>(existing);
+            list.Add(value);
+            values[key] = list;
+        }
+        else
+        {
+            values[key] = new List<string> { value };
         }
     }
 

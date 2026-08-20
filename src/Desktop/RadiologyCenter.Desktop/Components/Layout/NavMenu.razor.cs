@@ -18,10 +18,26 @@ using RadiologyCenter.Desktop.Services;
 
 namespace RadiologyCenter.Desktop.Components.Layout;
 
-public partial class NavMenu : ComponentBase
+public partial class NavMenu : ComponentBase, IDisposable
 {
 [Parameter]
     public bool IsCollapsed { get; set; }
 
+    protected override void OnInitialized()
+    {
+        Permissions.ReadyChanged += OnPermissionsChanged;
+    }
+
+    private void OnPermissionsChanged() => InvokeAsync(StateHasChanged);
+
+    private bool Can(string code) => Permissions.HasPermission(code);
+
+    private bool CanAny(params string[] codes) => Permissions.HasAny(codes);
+
     private void Go(string href) => Navigation.NavigateTo(href);
+
+    public void Dispose()
+    {
+        Permissions.ReadyChanged -= OnPermissionsChanged;
+    }
 }

@@ -9,7 +9,10 @@
             SearchValueChanged="OnSearchChanged"
             SearchPlaceholder="@T.SalaryComponent.SearchPlaceholder"
             OnRefresh="ReloadAsync">
-    <MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Add" OnClick="OpenCreateDialogAsync">@T.SalaryComponent.NewComponent</MudButton>
+    @if (Can("payroll.salary-components.manage"))
+    {
+        <MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Add" OnClick="OpenCreateDialogAsync">@T.SalaryComponent.NewComponent</MudButton>
+    }
 </PageHeader>
 
 <MudTable T="SalaryComponentDto" @ref="Table" ServerData="LoadServerData" Dense="true" Hover="true" Striped="true" Elevation="1" RowsPerPage="10" FixedHeader="true" Class="table-scroll">
@@ -53,6 +56,9 @@
                         EditLabel="@T.Common.Edit"
                         ToggleLabel="@T.SalaryComponent.ToggleStatus"
                         DeleteLabel="@T.Common.Delete"
+                        CanEdit="@Can("payroll.salary-components.manage")"
+                        CanToggle="@Can("payroll.salary-components.manage")"
+                        CanDelete="@Can("payroll.salary-components.manage")"
                         OnEdit="@(() => OpenEditDialogAsync(context))"
                         OnToggle="@(() => ToggleActiveAsync(context))"
                         OnDelete="@(() => DeleteComponentAsync(context))" />
@@ -66,6 +72,7 @@
                         EmptyTitle="@T.SalaryComponent.EmptyTitle"
                         EmptyMessage="@T.SalaryComponent.EmptyMessage"
                         EmptyActionLabel="@T.SalaryComponent.EmptyActionLabel"
+                        ShowAction="@Can("payroll.salary-components.manage")"
                         OnReload="ReloadAsync"
                         OnEmptyAction="OpenCreateDialogAsync" />
     </NoRecordsContent>

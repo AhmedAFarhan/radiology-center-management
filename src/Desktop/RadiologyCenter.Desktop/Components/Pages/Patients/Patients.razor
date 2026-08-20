@@ -13,7 +13,10 @@
             SearchValue="@SearchQuery"
             SearchPlaceholder="@T.Patients.SearchPlaceholder"
             OnRefresh="ReloadAsync">
-    <MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Add" OnClick="OpenCreateDialogAsync">@T.Patients.AddPatient</MudButton>
+    @if (Can("patients.create"))
+    {
+        <MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Add" OnClick="OpenCreateDialogAsync">@T.Patients.AddPatient</MudButton>
+    }
 </PageHeader>
 
 <MudTable T="PatientDto" @ref="_table" ServerData="LoadServerData" Dense="true" Hover="true" Striped="true" Elevation="1" RowsPerPage="10" FixedHeader="true" Class="table-scroll">
@@ -38,19 +41,25 @@
             <MudChip T="string" Size="Size.Small" Color="@(context.IsActive ? Color.Success : Color.Default)">@(context.IsActive ? T.Common.Active : T.Common.Inactive)</MudChip>
         </MudTd>
         <MudTd DataLabel="@T.Common.Actions">
-            <MudTooltip Placement="Placement.Bottom" Text="@T.Common.Edit">
-                <MudIconButton Icon="@Icons.Material.Filled.Edit" Size="Size.Small" Color="Color.Default" aria-label="@T.Common.Edit" OnClick="@(() => OpenEditDialogAsync(context))" />
-            </MudTooltip>
-            <MudTooltip Placement="Placement.Bottom" Text="@T.Patients.ToggleStatus">
-                <MudIconButton Icon="@(context.IsActive ? Icons.Material.Filled.Block : Icons.Material.Filled.CheckCircle)"
-                               Size="Size.Small"
-                               Color="@(context.IsActive ? Color.Default : Color.Success)"
-                               aria-label="@T.Patients.ToggleStatus"
-                               OnClick="@(() => ToggleActiveAsync(context))" />
-            </MudTooltip>
-            <MudTooltip Placement="Placement.Bottom" Text="@T.Common.Delete">
-                <MudIconButton Icon="@Icons.Material.Filled.Delete" Size="Size.Small" Color="Color.Error" aria-label="@T.Common.Delete" OnClick="@(() => DeletePatientAsync(context))" />
-            </MudTooltip>
+            @if (Can("patients.update"))
+            {
+                <MudTooltip Placement="Placement.Bottom" Text="@T.Common.Edit">
+                    <MudIconButton Icon="@Icons.Material.Filled.Edit" Size="Size.Small" Color="Color.Default" aria-label="@T.Common.Edit" OnClick="@(() => OpenEditDialogAsync(context))" />
+                </MudTooltip>
+                <MudTooltip Placement="Placement.Bottom" Text="@T.Patients.ToggleStatus">
+                    <MudIconButton Icon="@(context.IsActive ? Icons.Material.Filled.Block : Icons.Material.Filled.CheckCircle)"
+                                   Size="Size.Small"
+                                   Color="@(context.IsActive ? Color.Default : Color.Success)"
+                                   aria-label="@T.Patients.ToggleStatus"
+                                   OnClick="@(() => ToggleActiveAsync(context))" />
+                </MudTooltip>
+            }
+            @if (Can("patients.delete"))
+            {
+                <MudTooltip Placement="Placement.Bottom" Text="@T.Common.Delete">
+                    <MudIconButton Icon="@Icons.Material.Filled.Delete" Size="Size.Small" Color="Color.Error" aria-label="@T.Common.Delete" OnClick="@(() => DeletePatientAsync(context))" />
+                </MudTooltip>
+            }
         </MudTd>
     </RowTemplate>
     <NoRecordsContent>
@@ -63,11 +72,20 @@
         }
         else
         {
-        <EmptyState Icon="@Icons.Material.Filled.Person"
-                    Title="@T.Patients.EmptyTitle"
-                    Message="@T.Patients.EmptyMessage"
-                    ActionLabel="@T.Patients.EmptyAction"
-                    Action="OpenCreateDialogAsync" />
+        @if (Can("patients.create"))
+        {
+            <EmptyState Icon="@Icons.Material.Filled.Person"
+                        Title="@T.Patients.EmptyTitle"
+                        Message="@T.Patients.EmptyMessage"
+                        ActionLabel="@T.Patients.EmptyAction"
+                        Action="OpenCreateDialogAsync" />
+        }
+        else
+        {
+            <EmptyState Icon="@Icons.Material.Filled.Person"
+                        Title="@T.Patients.EmptyTitle"
+                        Message="@T.Patients.EmptyMessage" />
+        }
         }
     </NoRecordsContent>
     <PagerContent>
