@@ -10,9 +10,14 @@
 @inject SearchService SearchService
 @inject SearchHistoryService SearchHistory
 @inject ConnectionMonitorService Connection
+@inject IJSRuntime JS
 
-<div class="app-shell" @onkeydown="HandleGlobalKeyDown">
-    <aside class="app-sidebar @(_drawerOpen ? "open" : "collapsed")">
+<div class="app-shell @SidebarModeClass" @onkeydown="HandleGlobalKeyDown">
+    @if (ShowSidebarScrim)
+    {
+        <div class="app-sidebar-scrim" @onclick="CloseSidebarOverlay" aria-hidden="true"></div>
+    }
+    <aside class="app-sidebar @SidebarClass">
         <div class="app-brand">
             <img src="images/healthcare-logo-64.png" alt="EGcare" class="app-brand-logo" />
             <span class="app-brand-text">EGcare</span>
@@ -23,7 +28,7 @@
     <div class="app-main-col">
         <header class="app-topbar">
             <MudTooltip Placement="Placement.Bottom" Text="@T.Layout.ToggleNav">
-                <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" OnClick="@(() => _drawerOpen = !_drawerOpen)" aria-label="@T.Layout.ToggleNav" />
+                <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" OnClick="ToggleSidebar" aria-label="@T.Layout.ToggleNav" />
             </MudTooltip>
             <div class="global-search" @onclick="OnSearchBoxClick">
                 <MudTextField T="string"

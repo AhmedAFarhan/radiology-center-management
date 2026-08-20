@@ -33,6 +33,68 @@ private bool _drawerOpen = true;
     private string _userEmail = string.Empty;
     private string _userFullName = string.Empty;
 
+    private enum SidebarMode { Wide, Compact, Overlay }
+
+    private const int CompactBreakpoint = 1200;
+    private const int OverlayBreakpoint = 800;
+
+    private SidebarMode _sidebarMode = SidebarMode.Wide;
+    private bool _userOpen = true;
+    private DotNetObjectReference<MainLayout>? _jsRef;
+
+    private string SidebarModeClass => _sidebarMode switch
+    {
+        SidebarMode.Compact => "nav-compact",
+        SidebarMode.Overlay => "nav-overlay",
+        _ => string.Empty,
+    };
+
+    private string SidebarClass => _sidebarMode == SidebarMode.Overlay
+        ? (_drawerOpen ? "open" : "closed")
+        : (_drawerOpen ? "open" : "collapsed");
+
+    private bool ShowSidebarScrim => _sidebarMode == SidebarMode.Overlay && _drawerOpen;
+
+    private void ToggleSidebar()
+    {
+        _drawerOpen = !_drawerOpen;
+        if (_sidebarMode == SidebarMode.Wide)
+            _userOpen = _drawerOpen;
+        StateHasChanged();
+    }
+
+    private void CloseSidebarOverlay()
+    {
+        if (_sidebarMode == SidebarMode.Overlay)
+        {
+            _drawerOpen = false;
+            StateHasChanged();
+        }
+    }
+
+    [JSInvokable]
+    public void OnWindowResized(int width)
+    {
+        var mode = width >= CompactBreakpoint ? SidebarMode.Wide
+            : width >= OverlayBreakpoint ? SidebarMode.Compact
+            : SidebarMode.Overlay;
+
+        if (mode == _sidebarMode)
+            return;
+
+        if (_sidebarMode == SidebarMode.Wide)
+            _userOpen = _drawerOpen;
+
+        _sidebarMode = mode;
+
+        if (mode == SidebarMode.Wide)
+            _drawerOpen = _userOpen;
+        else if (mode == SidebarMode.Compact)
+            _drawerOpen = false;
+
+        StateHasChanged();
+    }
+
     private MudTextField<string>? _searchField;
     private string _searchText = string.Empty;
     private IReadOnlyList<GlobalSearchGroupDto>? _results;
@@ -60,13 +122,36 @@ protected override void OnParametersSet()
         base.OnInitialized();
         BusyState.Instance.Changed += OnBusyChanged;
         Connection.Start();
+        Navigation.LocationChanged += OnLocationChanged;
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            _jsRef = DotNetObjectReference.Create(this);
+            await JS.InvokeVoidAsync("trackSidebarResize", _jsRef);
+        }
+        await base.OnAfterRenderAsync(firstRender);
+    }
+
+    private void OnLocationChanged(object? sender, LocationChangedEventArgs e)
+    {
+        if (_sidebarMode == SidebarMode.Overlay && _drawerOpen)
+        {
+            _drawerOpen = false;
+            InvokeAsync(StateHasChanged);
+        }
     }
 
     private void OnBusyChanged() => InvokeAsync(StateHasChanged);
 
     public void Dispose()
     {
+        Navigation.LocationChanged -= OnLocationChanged;
         BusyState.Instance.Changed -= OnBusyChanged;
+        _ = JS.InvokeVoidAsync("untrackSidebarResize");
+        _jsRef?.Dispose();
     }
 
 private async Task RefreshUserAsync(Task<AuthenticationState> task)
