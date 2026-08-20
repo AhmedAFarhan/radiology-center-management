@@ -2,7 +2,6 @@
 
 public interface IExaminationTypeFields
 {
-    string Code { get; }
     string Name { get; }
     string Modality { get; }
     string BodyPart { get; }

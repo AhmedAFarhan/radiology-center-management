@@ -3,7 +3,6 @@
 namespace RadiologyCenter.Catalog.Application.Commands.CreateExaminationType;
 
 public record CreateExaminationTypeCommand(
-    string Code,
     string Name,
     string Modality,
     string BodyPart,

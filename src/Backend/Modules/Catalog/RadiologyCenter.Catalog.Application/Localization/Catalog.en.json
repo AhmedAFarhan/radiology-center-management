@@ -2,7 +2,6 @@
 "codes": {
     "Catalog.PriceNegative": "Price cannot be negative.",
     "Catalog.StandardDurationNegative": "Standard duration cannot be negative.",
-    "Catalog.ExaminationTypeCodeExists": "An examination type with code \u0027{0}\u0027 already exists.",
     "Catalog.ExaminationTypeInUse": "Examination type \u0027{0}\u0027 cannot be deleted because it is still referenced by active examinations."
   },
     "enums":  {

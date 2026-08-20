@@ -45,7 +45,6 @@ public partial class ExaminationTypeEditorDialog : EditorDialogBase
         if (Type is null)
             return;
 
-        _model.Code = Type.Code;
         _model.Name = Type.Name;
         _model.Modality = Type.Modality;
         _model.BodyPart = Type.BodyPart;
@@ -86,7 +85,6 @@ public partial class ExaminationTypeEditorDialog : EditorDialogBase
             {
                 var input = new ExaminationTypeInput
                 {
-                    Code = _model.Code,
                     Name = _model.Name,
                     Modality = _model.Modality,
                     BodyPart = _model.BodyPart,
@@ -117,10 +115,6 @@ public partial class ExaminationTypeEditorDialog : EditorDialogBase
 
     private sealed class TypeFormModel
     {
-        [Required(ErrorMessage = "Code is required.")]
-        [MaxLength(20, ErrorMessage = "Code must be 20 characters or fewer.")]
-        public string Code { get; set; } = string.Empty;
-
         [Required(ErrorMessage = "Name is required.")]
         [MaxLength(200, ErrorMessage = "Name must be 200 characters or fewer.")]
         public string Name { get; set; } = string.Empty;

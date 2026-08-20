@@ -39,13 +39,6 @@ public class ExaminationTypeRepository : BaseRepository<ExaminationType, Guid>, 
         return PagedResult<ExaminationType>.Create(items, totalCount, request.Pagination.PageNumber, request.Pagination.PageSize);
     }
 
-    public async Task<bool> ExistsByCodeAsync(string code, Guid? excludeId = null, CancellationToken ct = default)
-    {
-        if (excludeId.HasValue)
-            return await DbSet.AnyAsync(t => t.Code == code && t.Id != excludeId.Value, ct);
-        return await DbSet.AnyAsync(t => t.Code == code, ct);
-    }
-
     public override async Task<ExaminationType?> GetByIdAsync(Guid id, CancellationToken ct = default) =>
         await DbSet.FirstOrDefaultAsync(t => t.Id == id, ct);
 }

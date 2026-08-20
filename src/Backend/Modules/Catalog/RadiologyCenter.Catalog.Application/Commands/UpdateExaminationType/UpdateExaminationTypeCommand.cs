@@ -4,7 +4,6 @@ namespace RadiologyCenter.Catalog.Application.Commands.UpdateExaminationType;
 
 public record UpdateExaminationTypeCommand(
     Guid ExaminationTypeId,
-    string Code,
     string Name,
     string Modality,
     string BodyPart,

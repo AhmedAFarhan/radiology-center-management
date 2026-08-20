@@ -8,15 +8,7 @@
         <EditForm EditContext="_editContext">
             <LocalizedDataAnnotationsValidator />
             <MudGrid Spacing="2">
-                <MudItem xs="12" sm="4">
-                    <MudTextField @bind-Value="_model.Code"
-                                  Label="@T.ExamDialog.Code"
-                                  Variant="Variant.Outlined"
-                                  Margin="Margin.Dense"
-                                  Immediate="true"
-                                  For="@(() => _model.Code)" />
-                </MudItem>
-                <MudItem xs="12" sm="8">
+                <MudItem xs="12">
                     <MudTextField @bind-Value="_model.Name"
                                   Label="@T.Common.Name"
                                   Variant="Variant.Outlined"

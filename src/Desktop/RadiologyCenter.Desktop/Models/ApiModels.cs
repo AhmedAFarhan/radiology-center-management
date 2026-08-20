@@ -272,7 +272,6 @@ public sealed class ExaminationTypeItemInput
 
 public sealed class ExaminationTypeInput
 {
-    public string Code { get; set; } = string.Empty;
     public string Name { get; set; } = string.Empty;
     public string Modality { get; set; } = string.Empty;
     public string BodyPart { get; set; } = string.Empty;

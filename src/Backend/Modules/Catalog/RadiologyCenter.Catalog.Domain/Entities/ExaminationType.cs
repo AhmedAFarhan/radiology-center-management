@@ -63,7 +63,6 @@ public sealed class ExaminationType : SoftDeletableAggregateRoot<Guid>
     }
 
     public void Update(
-        string code,
         string name,
         Modality modality,
         string bodyPart,
@@ -72,14 +71,12 @@ public sealed class ExaminationType : SoftDeletableAggregateRoot<Guid>
         bool requiresPreparation = false,
         bool requiresConsent = false)
     {
-        Guard.AgainstNullOrWhiteSpace(code, nameof(code));
         Guard.AgainstNullOrWhiteSpace(name, nameof(name));
         Guard.AgainstNull(modality, nameof(modality));
         Guard.AgainstNullOrWhiteSpace(bodyPart, nameof(bodyPart));
         Guard.Against(standardDurationMinutes, d => d < 0, DomainErrors.StandardDurationNegative, "Standard duration cannot be negative.");
         Guard.Against(price, p => p < 0, DomainErrors.PriceNegative, "Price cannot be negative.");
 
-        Code = code.Trim();
         Name = name.Trim();
         Modality = modality;
         BodyPart = bodyPart.Trim();

@@ -9,6 +9,5 @@ namespace RadiologyCenter.Catalog.Application.Localization;
 public static class ErrorCodes
 {
     public const string ExaminationTypeNotFound = "Catalog.ExaminationTypeNotFound";
-    public const string ExaminationTypeCodeExists = "Catalog.ExaminationTypeCodeExists";
     public const string ExaminationTypeInUse = "Catalog.ExaminationTypeInUse";
 }
