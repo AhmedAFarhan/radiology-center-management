@@ -22,32 +22,27 @@ public partial class EquipmentEditorDialog : EditorDialogBase
 {
     [Parameter] public EquipmentDto? Equipment { get; set; }
 
-    private static readonly Dictionary<string, string> Modalities = new()
-    {
-        ["XRay"] = "X-Ray",
-        ["CT"] = "CT",
-        ["MRI"] = "MRI",
-        ["Ultrasound"] = "Ultrasound",
-        ["Mammography"] = "Mammography",
-        ["Fluoroscopy"] = "Fluoroscopy",
-        ["DEXA"] = "DEXA",
-        ["Other"] = "Other",
-    };
+    private IReadOnlyList<EnumOptionDto> _modalityOptions = Array.Empty<EnumOptionDto>();
 
     private readonly EquipmentFormModel _model = new();
     private EditContext _editContext = default!;
 
     private bool IsEdit => Equipment is not null;
 
-    protected override void OnInitialized()
+    protected override async Task OnInitializedAsync()
     {
         _editContext = new EditContext(_model);
+
+        await SafeExecute.RunAsync(async () =>
+                _modalityOptions = await EnumOptionsService.GetOptionsAsync("EquipmentModality"),
+            Snackbar,
+            () => T.EquipmentDialog.Unreachable);
 
         if (Equipment is null)
             return;
 
         _model.Name = Equipment.Name;
-        _model.Modality = Equipment.Modality;
+        _model.Modality = _modalityOptions.FirstOrDefault(o => o.Value == Equipment.Modality)?.Key ?? Equipment.Modality;
         _model.SerialNumber = Equipment.SerialNumber;
         _model.PurchaseDate = Equipment.PurchaseDate;
     }

@@ -99,15 +99,6 @@ public partial class Equipment : ListPageBase<EquipmentDto>
             () => T.Equipment.Unreachable);
     }
 
-    private static string FormatModality(string modality) => modality switch
-    {
-        "XRay" => "X-Ray",
-        "Ultrasound" => "Ultrasound",
-        "Mammography" => "Mammography",
-        "Fluoroscopy" => "Fluoroscopy",
-        _ => modality,
-    };
-
     private static string FormatStatus(string status) => status switch
     {
         "UnderMaintenance" => "Under Maintenance",

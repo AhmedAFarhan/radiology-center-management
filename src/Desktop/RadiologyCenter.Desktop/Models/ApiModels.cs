@@ -35,6 +35,10 @@ public sealed record PagedResult<T>(
     int PageSize,
     int TotalCount);
 
+public sealed record EnumOptionDto(
+    string Key,
+    string Value);
+
 public sealed record PatientDto(
     string Id,
     string PatientCode,

@@ -1,6 +1,7 @@
 @inherits EditorDialogBase
 @inject ExaminationService ExaminationService
 @inject InventoryService InventoryService
+@inject EnumOptionsService EnumOptionsService
 
 <MudDialog>
     <DialogContent>
@@ -23,9 +24,9 @@
                                Variant="Variant.Outlined"
                                Margin="Margin.Dense"
                                For="@(() => _model.Modality)">
-                        @foreach (var modality in Modalities)
+                        @foreach (var option in _modalityOptions)
                         {
-                            <MudSelectItem T="string" Value="@modality">@modality</MudSelectItem>
+                            <MudSelectItem T="string" Value="@option.Key">@option.Value</MudSelectItem>
                         }
                     </MudSelect>
                 </MudItem>

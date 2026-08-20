@@ -22,7 +22,7 @@ public partial class ExaminationTypeEditorDialog : EditorDialogBase
 {
 [Parameter] public ExaminationTypeDto? Type { get; set; }
 
-    private static readonly string[] Modalities = { "XRay", "CT", "MRI", "Ultrasound", "Mammography", "Fluoroscopy", "DEXA", "Other" };
+    private IReadOnlyList<EnumOptionDto> _modalityOptions = Array.Empty<EnumOptionDto>();
 
     private readonly TypeFormModel _model = new();
     private EditContext _editContext = default!;
@@ -38,6 +38,7 @@ public partial class ExaminationTypeEditorDialog : EditorDialogBase
             {
                 var items = await InventoryService.GetItemsPagedAsync(null, "Name", false, 1, 200);
                 _inventoryItems = items.Items.ToList();
+                _modalityOptions = await EnumOptionsService.GetOptionsAsync("Modality");
             },
             Snackbar,
             () => T.ExamDialog.LoadItemsError);
@@ -46,13 +47,13 @@ public partial class ExaminationTypeEditorDialog : EditorDialogBase
             return;
 
         _model.Name = Type.Name;
-        _model.Modality = Type.Modality;
+        _model.Modality = _modalityOptions.FirstOrDefault(o => o.Value == Type.Modality)?.Key ?? Type.Modality;
         _model.BodyPart = Type.BodyPart;
         _model.StandardDurationMinutes = Type.StandardDurationMinutes;
         _model.Price = Type.Price;
         _model.RequiresPreparation = Type.RequiresPreparation;
         _model.RequiresConsent = Type.RequiresConsent;
-        _model.Items = Type.Items.Select(i => new TypeItemModel
+        _model.Items = Type.Items is null ? new() : Type.Items.Select(i => new TypeItemModel
         {
             ItemId = i.ItemId,
             Quantity = i.Quantity,

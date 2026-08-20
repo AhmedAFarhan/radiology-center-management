@@ -26,7 +26,7 @@
             <MudText Class="font-weight-medium">@context.Name</MudText>
         </MudTd>
         <MudTd DataLabel="@T.Equipment.SerialNumber">@(string.IsNullOrWhiteSpace(context.SerialNumber) ? "-" : context.SerialNumber)</MudTd>
-        <MudTd DataLabel="@T.Equipment.Modality">@FormatModality(context.Modality)</MudTd>
+        <MudTd DataLabel="@T.Equipment.Modality">@context.Modality</MudTd>
         <MudTd DataLabel="@T.Common.Status">
             <StatusChip Token="@context.Status">@FormatStatus(context.Status)</StatusChip>
         </MudTd>
