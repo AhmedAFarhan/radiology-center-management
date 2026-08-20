@@ -11,10 +11,11 @@
             SearchValueChanged="OnSearchChanged"
             SearchPlaceholder="@T.Payroll.SearchPlaceholder"
             OnRefresh="ReloadAsync">
-    @if (Can("payroll.payruns.manage"))
-    {
-        <MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Add" OnClick="OpenCreateDialogAsync">@T.Payroll.NewPayRun</MudButton>
-    }
+    <AuthorizeView Policy="@PayrollPermissions.PayRunsManage">
+        <Authorized Context="auth">
+            <MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Add" OnClick="OpenCreateDialogAsync">@T.Payroll.NewPayRun</MudButton>
+        </Authorized>
+    </AuthorizeView>
 </PageHeader>
 
 @if (_statsLoaded)
@@ -84,12 +85,13 @@
             <MudTooltip Placement="Placement.Bottom" Text="@T.Payroll.View">
                 <MudIconButton Icon="@Icons.Material.Filled.Visibility" Size="Size.Small" Color="Color.Default" aria-label="@T.Payroll.View" OnClick="@(() => OpenDetailDialogAsync(context))" />
             </MudTooltip>
-            @if (Can("payroll.payruns.manage"))
-            {
-                <MudTooltip Placement="Placement.Bottom" Text="@T.Common.Delete">
-                    <MudIconButton Icon="@Icons.Material.Filled.Delete" Size="Size.Small" Color="Color.Error" aria-label="@T.Common.Delete" OnClick="@(() => DeletePayRunAsync(context))" />
-                </MudTooltip>
-            }
+            <AuthorizeView Policy="@PayrollPermissions.PayRunsManage">
+                <Authorized Context="auth">
+                    <MudTooltip Placement="Placement.Bottom" Text="@T.Common.Delete">
+                        <MudIconButton Icon="@Icons.Material.Filled.Delete" Size="Size.Small" Color="Color.Error" aria-label="@T.Common.Delete" OnClick="@(() => DeletePayRunAsync(context))" />
+                    </MudTooltip>
+                </Authorized>
+            </AuthorizeView>
         </MudTd>
     </RowTemplate>
     <NoRecordsContent>
@@ -102,20 +104,20 @@
         }
         else
         {
-        @if (Can("payroll.payruns.manage"))
-        {
-            <EmptyState Icon="@Icons.Material.Filled.ReceiptLong"
-                        Title="@T.Payroll.EmptyTitle"
-                        Message="@T.Payroll.EmptyMessage"
-                        ActionLabel="@T.Payroll.EmptyActionLabel"
-                        Action="OpenCreateDialogAsync" />
-        }
-        else
-        {
-            <EmptyState Icon="@Icons.Material.Filled.ReceiptLong"
-                        Title="@T.Payroll.EmptyTitle"
-                        Message="@T.Payroll.EmptyMessage" />
-        }
+        <AuthorizeView Policy="@PayrollPermissions.PayRunsManage">
+            <Authorized Context="auth">
+                <EmptyState Icon="@Icons.Material.Filled.ReceiptLong"
+                            Title="@T.Payroll.EmptyTitle"
+                            Message="@T.Payroll.EmptyMessage"
+                            ActionLabel="@T.Payroll.EmptyActionLabel"
+                            Action="OpenCreateDialogAsync" />
+            </Authorized>
+            <NotAuthorized>
+                <EmptyState Icon="@Icons.Material.Filled.ReceiptLong"
+                            Title="@T.Payroll.EmptyTitle"
+                            Message="@T.Payroll.EmptyMessage" />
+            </NotAuthorized>
+        </AuthorizeView>
         }
     </NoRecordsContent>
     <PagerContent>

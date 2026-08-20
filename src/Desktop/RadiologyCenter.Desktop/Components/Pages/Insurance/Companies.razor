@@ -13,10 +13,11 @@
             SearchValue="@SearchQuery"
             SearchPlaceholder="@T.Insurance.CompaniesSearchPlaceholder"
             OnRefresh="ReloadAsync">
-    @if (Can("insurance.companies.create"))
-    {
-        <MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Add" OnClick="OpenCreateDialogAsync">@T.Insurance.AddCompany</MudButton>
-    }
+    <AuthorizeView Policy="@InsurancePermissions.CompaniesCreate">
+        <Authorized Context="auth">
+            <MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Add" OnClick="OpenCreateDialogAsync">@T.Insurance.AddCompany</MudButton>
+        </Authorized>
+    </AuthorizeView>
 </PageHeader>
 
 <MudTable T="InsuranceCompanyDto" @ref="_table" ServerData="LoadServerData" Dense="true" Hover="true" Striped="true" Elevation="1" RowsPerPage="10" FixedHeader="true" Class="table-scroll">
@@ -37,18 +38,20 @@
         <MudTd DataLabel="@T.Insurance.Email">@(context.Email ?? "-")</MudTd>
         <MudTd DataLabel="@T.Insurance.Address">@(context.Address ?? "-")</MudTd>
         <MudTd DataLabel="@T.Common.Actions">
-            @if (Can("insurance.companies.update"))
-            {
-                <MudTooltip Placement="Placement.Bottom" Text="@T.Common.Edit">
-                    <MudIconButton Icon="@Icons.Material.Filled.Edit" Size="Size.Small" Color="Color.Default" aria-label="@T.Common.Edit" OnClick="@(() => OpenEditDialogAsync(context))" />
-                </MudTooltip>
-            }
-            @if (Can("insurance.companies.delete"))
-            {
-                <MudTooltip Placement="Placement.Bottom" Text="@T.Common.Delete">
-                    <MudIconButton Icon="@Icons.Material.Filled.Delete" Size="Size.Small" Color="Color.Error" aria-label="@T.Common.Delete" OnClick="@(() => DeleteCompanyAsync(context))" />
-                </MudTooltip>
-            }
+            <AuthorizeView Policy="@InsurancePermissions.CompaniesUpdate">
+                <Authorized Context="auth">
+                    <MudTooltip Placement="Placement.Bottom" Text="@T.Common.Edit">
+                        <MudIconButton Icon="@Icons.Material.Filled.Edit" Size="Size.Small" Color="Color.Default" aria-label="@T.Common.Edit" OnClick="@(() => OpenEditDialogAsync(context))" />
+                    </MudTooltip>
+                </Authorized>
+            </AuthorizeView>
+            <AuthorizeView Policy="@InsurancePermissions.CompaniesDelete">
+                <Authorized Context="auth">
+                    <MudTooltip Placement="Placement.Bottom" Text="@T.Common.Delete">
+                        <MudIconButton Icon="@Icons.Material.Filled.Delete" Size="Size.Small" Color="Color.Error" aria-label="@T.Common.Delete" OnClick="@(() => DeleteCompanyAsync(context))" />
+                    </MudTooltip>
+                </Authorized>
+            </AuthorizeView>
         </MudTd>
     </RowTemplate>
     <NoRecordsContent>
@@ -61,20 +64,20 @@
         }
         else
         {
-        @if (Can("insurance.companies.create"))
-        {
-            <EmptyState Icon="@Icons.Material.Filled.Shield"
-                        Title="@T.Insurance.EmptyTitle"
-                        Message="@T.Insurance.EmptyMessage"
-                        ActionLabel="@T.Insurance.EmptyActionLabel"
-                        Action="OpenCreateDialogAsync" />
-        }
-        else
-        {
-            <EmptyState Icon="@Icons.Material.Filled.Shield"
-                        Title="@T.Insurance.EmptyTitle"
-                        Message="@T.Insurance.EmptyMessage" />
-        }
+        <AuthorizeView Policy="@InsurancePermissions.CompaniesCreate">
+            <Authorized Context="auth">
+                <EmptyState Icon="@Icons.Material.Filled.Shield"
+                            Title="@T.Insurance.EmptyTitle"
+                            Message="@T.Insurance.EmptyMessage"
+                            ActionLabel="@T.Insurance.EmptyActionLabel"
+                            Action="OpenCreateDialogAsync" />
+            </Authorized>
+            <NotAuthorized>
+                <EmptyState Icon="@Icons.Material.Filled.Shield"
+                            Title="@T.Insurance.EmptyTitle"
+                            Message="@T.Insurance.EmptyMessage" />
+            </NotAuthorized>
+        </AuthorizeView>
         }
     </NoRecordsContent>
     <PagerContent>

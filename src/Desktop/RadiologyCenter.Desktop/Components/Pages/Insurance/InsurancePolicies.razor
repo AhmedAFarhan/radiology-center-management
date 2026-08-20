@@ -9,10 +9,11 @@
             SearchValue="@SearchQuery"
             SearchPlaceholder="@T.Policy.SearchPlaceholder"
             OnRefresh="ReloadAsync">
-    @if (Can("insurance.policies.create"))
-    {
-        <MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Add" OnClick="OpenCreateDialogAsync">@T.Policy.AddPolicy</MudButton>
-    }
+    <AuthorizeView Policy="@InsurancePermissions.PoliciesCreate">
+        <Authorized Context="auth">
+            <MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Add" OnClick="OpenCreateDialogAsync">@T.Policy.AddPolicy</MudButton>
+        </Authorized>
+    </AuthorizeView>
 </PageHeader>
 
 <MudTable T="InsurancePolicyListItemDto" @ref="Table" ServerData="LoadServerData" Dense="true" Hover="true" Striped="true" Elevation="1" RowsPerPage="10" FixedHeader="true" Class="table-scroll">
@@ -56,16 +57,17 @@
             <MudTooltip Placement="Placement.Bottom" Text="@T.Policy.View">
                 <MudIconButton Icon="@Icons.Material.Filled.Visibility" Size="Size.Small" Color="Color.Default" aria-label="@T.Policy.View" OnClick="@(() => OpenDetailDialogAsync(context))" />
             </MudTooltip>
-            @if (Can("insurance.policies.update"))
-            {
-                <MudTooltip Placement="Placement.Bottom" Text="@T.Policy.ToggleStatus">
-                    <MudIconButton Icon="@(context.IsActive ? Icons.Material.Filled.Block : Icons.Material.Filled.CheckCircle)"
-                                   Size="Size.Small"
-                                   Color="@(context.IsActive ? Color.Default : Color.Success)"
-                                   aria-label="@T.Policy.ToggleStatus"
-                                   OnClick="@(() => ToggleActiveAsync(context))" />
-                </MudTooltip>
-            }
+            <AuthorizeView Policy="@InsurancePermissions.PoliciesUpdate">
+                <Authorized Context="auth">
+                    <MudTooltip Placement="Placement.Bottom" Text="@T.Policy.ToggleStatus">
+                        <MudIconButton Icon="@(context.IsActive ? Icons.Material.Filled.Block : Icons.Material.Filled.CheckCircle)"
+                                       Size="Size.Small"
+                                       Color="@(context.IsActive ? Color.Default : Color.Success)"
+                                       aria-label="@T.Policy.ToggleStatus"
+                                       OnClick="@(() => ToggleActiveAsync(context))" />
+                    </MudTooltip>
+                </Authorized>
+            </AuthorizeView>
         </MudTd>
     </RowTemplate>
     <NoRecordsContent>
@@ -76,7 +78,7 @@
                         EmptyTitle="@T.Policy.EmptyTitle"
                         EmptyMessage="@T.Policy.EmptyMessage"
                         EmptyActionLabel="@T.Policy.EmptyActionLabel"
-                        ShowAction="@Can("insurance.policies.create")"
+                        ActionPolicy="@InsurancePermissions.PoliciesCreate"
                         OnReload="ReloadAsync"
                         OnEmptyAction="OpenCreateDialogAsync" />
     </NoRecordsContent>

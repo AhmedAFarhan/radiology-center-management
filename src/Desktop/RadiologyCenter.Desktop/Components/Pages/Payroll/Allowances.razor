@@ -10,10 +10,11 @@
             SearchValueChanged="OnSearchChanged"
             SearchPlaceholder="@T.Allowance.SearchPlaceholder"
             OnRefresh="ReloadAsync">
-    @if (Can("payroll.allowances.manage"))
-    {
-        <MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Add" OnClick="OpenCreateDialogAsync">@T.Allowance.NewAllowance</MudButton>
-    }
+    <AuthorizeView Policy="@PayrollPermissions.AllowancesManage">
+        <Authorized>
+            <MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Add" OnClick="OpenCreateDialogAsync">@T.Allowance.NewAllowance</MudButton>
+        </Authorized>
+    </AuthorizeView>
 </PageHeader>
 
 <MudTable T="AllowanceAssignmentDto" @ref="Table" ServerData="LoadServerData" Dense="true" Hover="true" Striped="true" Elevation="1" RowsPerPage="10" FixedHeader="true" Class="table-scroll">
@@ -55,9 +56,9 @@
                         EditLabel="@T.Common.Edit"
                         ToggleLabel="@T.Allowance.ToggleStatus"
                         DeleteLabel="@T.Common.Delete"
-                        CanEdit="@Can("payroll.allowances.manage")"
-                        CanToggle="@Can("payroll.allowances.manage")"
-                        CanDelete="@Can("payroll.allowances.manage")"
+                        EditPolicy="@PayrollPermissions.AllowancesManage"
+                        TogglePolicy="@PayrollPermissions.AllowancesManage"
+                        DeletePolicy="@PayrollPermissions.AllowancesManage"
                         OnEdit="@(() => OpenEditDialogAsync(context))"
                         OnToggle="@(() => ToggleActiveAsync(context))"
                         OnDelete="@(() => DeleteAllowanceAsync(context))" />
@@ -71,7 +72,7 @@
                         EmptyTitle="@T.Allowance.EmptyTitle"
                         EmptyMessage="@T.Allowance.EmptyMessage"
                         EmptyActionLabel="@T.Allowance.EmptyActionLabel"
-                        ShowAction="@Can("payroll.allowances.manage")"
+                        ActionPolicy="@PayrollPermissions.AllowancesManage"
                         OnReload="ReloadAsync"
                         OnEmptyAction="OpenCreateDialogAsync" />
     </NoRecordsContent>

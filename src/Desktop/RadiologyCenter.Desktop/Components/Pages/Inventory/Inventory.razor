@@ -9,10 +9,11 @@
             SearchValue="@SearchQuery"
             SearchPlaceholder="@T.Inventory.SearchPlaceholder"
             OnRefresh="ReloadAsync">
-    @if (Can("inventory.items.create"))
-    {
-        <MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Add" OnClick="OpenCreateDialogAsync">@T.Inventory.AddItem</MudButton>
-    }
+    <AuthorizeView Policy="@InventoryPermissions.ItemsCreate">
+        <Authorized Context="auth">
+            <MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Add" OnClick="OpenCreateDialogAsync">@T.Inventory.AddItem</MudButton>
+        </Authorized>
+    </AuthorizeView>
 </PageHeader>
 
 <MudTable T="ItemDto" @ref="Table" ServerData="LoadServerData" Dense="true" Hover="true" Striped="true" Elevation="1" RowsPerPage="10" FixedHeader="true" Class="table-scroll">
@@ -45,34 +46,38 @@
             <ActiveStatusChip IsActive="context.IsActive" ActiveLabel="@T.Common.Active" InactiveLabel="@T.Common.Inactive" />
         </MudTd>
         <MudTd DataLabel="@T.Common.Actions">
-            @if (Can("inventory.items.update"))
-            {
-                <MudTooltip Placement="Placement.Bottom" Text="@T.Common.Edit">
-                    <MudIconButton Icon="@Icons.Material.Filled.Edit" Size="Size.Small" Color="Color.Default" aria-label="@T.Common.Edit" OnClick="@(() => OpenEditDialogAsync(context))" />
-                </MudTooltip>
-            }
-            @if (Can("inventory.stock.issue"))
-            {
-                <MudTooltip Placement="Placement.Bottom" Text="@T.Inventory.Stock">
-                    <MudIconButton Icon="@Icons.Material.Filled.Inventory2" Size="Size.Small" Color="Color.Info" aria-label="@T.Inventory.Stock" OnClick="@(() => OpenStockDialogAsync(context))" />
-                </MudTooltip>
-            }
-            @if (Can("inventory.items.update"))
-            {
-                <MudTooltip Placement="Placement.Bottom" Text="@T.Inventory.ToggleStatus">
-                    <MudIconButton Icon="@(context.IsActive ? Icons.Material.Filled.Block : Icons.Material.Filled.CheckCircle)"
-                                   Size="Size.Small"
-                                   Color="@(context.IsActive ? Color.Default : Color.Success)"
-                                   aria-label="@T.Inventory.ToggleStatus"
-                                   OnClick="@(() => ToggleActiveAsync(context))" />
-                </MudTooltip>
-            }
-            @if (Can("inventory.items.delete"))
-            {
-                <MudTooltip Placement="Placement.Bottom" Text="@T.Common.Delete">
-                    <MudIconButton Icon="@Icons.Material.Filled.Delete" Size="Size.Small" Color="Color.Error" aria-label="@T.Common.Delete" OnClick="@(() => DeleteItemAsync(context))" />
-                </MudTooltip>
-            }
+            <AuthorizeView Policy="@InventoryPermissions.ItemsUpdate">
+                <Authorized Context="auth">
+                    <MudTooltip Placement="Placement.Bottom" Text="@T.Common.Edit">
+                        <MudIconButton Icon="@Icons.Material.Filled.Edit" Size="Size.Small" Color="Color.Default" aria-label="@T.Common.Edit" OnClick="@(() => OpenEditDialogAsync(context))" />
+                    </MudTooltip>
+                </Authorized>
+            </AuthorizeView>
+            <AuthorizeView Policy="@InventoryPermissions.StockIssue">
+                <Authorized Context="auth">
+                    <MudTooltip Placement="Placement.Bottom" Text="@T.Inventory.Stock">
+                        <MudIconButton Icon="@Icons.Material.Filled.Inventory2" Size="Size.Small" Color="Color.Info" aria-label="@T.Inventory.Stock" OnClick="@(() => OpenStockDialogAsync(context))" />
+                    </MudTooltip>
+                </Authorized>
+            </AuthorizeView>
+            <AuthorizeView Policy="@InventoryPermissions.ItemsUpdate">
+                <Authorized Context="auth">
+                    <MudTooltip Placement="Placement.Bottom" Text="@T.Inventory.ToggleStatus">
+                        <MudIconButton Icon="@(context.IsActive ? Icons.Material.Filled.Block : Icons.Material.Filled.CheckCircle)"
+                                       Size="Size.Small"
+                                       Color="@(context.IsActive ? Color.Default : Color.Success)"
+                                       aria-label="@T.Inventory.ToggleStatus"
+                                       OnClick="@(() => ToggleActiveAsync(context))" />
+                    </MudTooltip>
+                </Authorized>
+            </AuthorizeView>
+            <AuthorizeView Policy="@InventoryPermissions.ItemsDelete">
+                <Authorized Context="auth">
+                    <MudTooltip Placement="Placement.Bottom" Text="@T.Common.Delete">
+                        <MudIconButton Icon="@Icons.Material.Filled.Delete" Size="Size.Small" Color="Color.Error" aria-label="@T.Common.Delete" OnClick="@(() => DeleteItemAsync(context))" />
+                    </MudTooltip>
+                </Authorized>
+            </AuthorizeView>
         </MudTd>
     </RowTemplate>
     <NoRecordsContent>
@@ -83,7 +88,7 @@
                         EmptyTitle="@T.Inventory.NoItemsTitle"
                         EmptyMessage="@T.Inventory.EmptyMessage"
                         EmptyActionLabel="@T.Inventory.AddFirstItem"
-                        ShowAction="@Can("inventory.items.create")"
+                        ActionPolicy="@InventoryPermissions.ItemsCreate"
                         OnReload="ReloadAsync"
                         OnEmptyAction="OpenCreateDialogAsync" />
     </NoRecordsContent>

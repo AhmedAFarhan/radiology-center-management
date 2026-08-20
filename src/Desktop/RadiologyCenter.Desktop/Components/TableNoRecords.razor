@@ -7,11 +7,28 @@
                 Message="@LoadError"
                 Action="OnReload" />
 }
-else
+else if (string.IsNullOrWhiteSpace(ActionPolicy))
 {
     <EmptyState Icon="@EmptyIcon"
                 Title="@EmptyTitle"
                 Message="@EmptyMessage"
                 ActionLabel="@EmptyActionLabel"
-                Action="@(ShowAction ? OnEmptyAction : default(EventCallback))" />
+                Action="@OnEmptyAction" />
+}
+else
+{
+    <AuthorizeView Policy="@ActionPolicy">
+        <Authorized>
+            <EmptyState Icon="@EmptyIcon"
+                        Title="@EmptyTitle"
+                        Message="@EmptyMessage"
+                        ActionLabel="@EmptyActionLabel"
+                        Action="@OnEmptyAction" />
+        </Authorized>
+        <NotAuthorized>
+            <EmptyState Icon="@EmptyIcon"
+                        Title="@EmptyTitle"
+                        Message="@EmptyMessage" />
+        </NotAuthorized>
+    </AuthorizeView>
 }

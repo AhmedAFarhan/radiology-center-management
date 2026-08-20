@@ -12,7 +12,7 @@ public partial class TableNoRecords : ComponentBase
     [Parameter] public string EmptyTitle { get; set; } = string.Empty;
     [Parameter] public string EmptyMessage { get; set; } = string.Empty;
     [Parameter] public string? EmptyActionLabel { get; set; }
-    [Parameter] public bool ShowAction { get; set; } = true;
+    [Parameter] public string? ActionPolicy { get; set; }
     [Parameter] public EventCallback OnReload { get; set; }
     [Parameter] public EventCallback OnEmptyAction { get; set; }
 }

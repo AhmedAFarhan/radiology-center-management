@@ -10,10 +10,11 @@
             SearchValueChanged="OnSearchChanged"
             SearchPlaceholder="@T.ReferralFee.SearchPlaceholder"
             OnRefresh="ReloadAsync">
-    @if (Can("payroll.fees.manage"))
-    {
-        <MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Add" OnClick="OpenCreateDialogAsync">@T.ReferralFee.NewFee</MudButton>
-    }
+    <AuthorizeView Policy="@PayrollPermissions.FeesManage">
+        <Authorized>
+            <MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Add" OnClick="OpenCreateDialogAsync">@T.ReferralFee.NewFee</MudButton>
+        </Authorized>
+    </AuthorizeView>
 </PageHeader>
 
 <MudTable T="ReferralFeeDto" @ref="Table" ServerData="LoadServerData" Dense="true" Hover="true" Striped="true" Elevation="1" RowsPerPage="10" FixedHeader="true" Class="table-scroll">
@@ -42,9 +43,9 @@
                         EditLabel="@T.Common.Edit"
                         ToggleLabel="@T.ReferralFee.ToggleStatus"
                         DeleteLabel="@T.Common.Delete"
-                        CanEdit="@Can("payroll.fees.manage")"
-                        CanToggle="@Can("payroll.fees.manage")"
-                        CanDelete="@Can("payroll.fees.manage")"
+                        EditPolicy="@PayrollPermissions.FeesManage"
+                        TogglePolicy="@PayrollPermissions.FeesManage"
+                        DeletePolicy="@PayrollPermissions.FeesManage"
                         OnEdit="@(() => OpenEditDialogAsync(context))"
                         OnToggle="@(() => ToggleActiveAsync(context))"
                         OnDelete="@(() => DeleteFeeAsync(context))" />
@@ -58,7 +59,7 @@
                         EmptyTitle="@T.ReferralFee.EmptyTitle"
                         EmptyMessage="@T.ReferralFee.EmptyMessage"
                         EmptyActionLabel="@T.ReferralFee.EmptyActionLabel"
-                        ShowAction="@Can("payroll.fees.manage")"
+                        ActionPolicy="@PayrollPermissions.FeesManage"
                         OnReload="ReloadAsync"
                         OnEmptyAction="OpenCreateDialogAsync" />
     </NoRecordsContent>

@@ -8,10 +8,11 @@
             SearchValueChanged="OnSearchChanged"
             SearchPlaceholder="@T.PurchaseOrders.SearchPlaceholder"
             OnRefresh="ReloadAsync">
-    @if (Can("inventory.purchase-orders.create"))
-    {
-        <MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Add" OnClick="OpenCreateDialogAsync">@T.PurchaseOrders.NewOrder</MudButton>
-    }
+    <AuthorizeView Policy="@InventoryPermissions.PurchaseOrdersCreate">
+        <Authorized Context="auth">
+            <MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Add" OnClick="OpenCreateDialogAsync">@T.PurchaseOrders.NewOrder</MudButton>
+        </Authorized>
+    </AuthorizeView>
 </PageHeader>
 
 <MudTable T="PurchaseOrderDto" @ref="Table" ServerData="LoadServerData" Dense="true" Hover="true" Striped="true" Elevation="1" RowsPerPage="10" FixedHeader="true" Class="table-scroll">
@@ -32,23 +33,35 @@
         </MudTd>
         <MudTd DataLabel="@T.PurchaseOrders.Expected">@(context.ExpectedDeliveryAt?.ToString("dd MMM yyyy") ?? "-")</MudTd>
         <MudTd DataLabel="@T.Common.Actions">
-            @if (context.Status == "Draft" && Can("inventory.purchase-orders.update"))
+            @if (context.Status == "Draft")
             {
-                <MudTooltip Placement="Placement.Bottom" Text="@T.PurchaseOrders.PlaceOrder">
-                    <MudIconButton Icon="@Icons.Material.Filled.Send" Size="Size.Small" Color="Color.Primary" aria-label="@T.PurchaseOrders.PlaceOrder" OnClick="@(() => PlaceAsync(context))" />
-                </MudTooltip>
+                <AuthorizeView Policy="@InventoryPermissions.PurchaseOrdersUpdate">
+                    <Authorized Context="auth">
+                        <MudTooltip Placement="Placement.Bottom" Text="@T.PurchaseOrders.PlaceOrder">
+                            <MudIconButton Icon="@Icons.Material.Filled.Send" Size="Size.Small" Color="Color.Primary" aria-label="@T.PurchaseOrders.PlaceOrder" OnClick="@(() => PlaceAsync(context))" />
+                        </MudTooltip>
+                    </Authorized>
+                </AuthorizeView>
             }
-            @if (context.Status is "Ordered" or "PartiallyReceived" && Can("inventory.purchase-orders.update"))
+            @if (context.Status is "Ordered" or "PartiallyReceived")
             {
-                <MudTooltip Placement="Placement.Bottom" Text="@T.PurchaseOrders.Receive">
-                    <MudIconButton Icon="@Icons.Material.Filled.Inventory2" Size="Size.Small" Color="Color.Info" aria-label="@T.PurchaseOrders.Receive" OnClick="@(() => OpenReceiveDialogAsync(context))" />
-                </MudTooltip>
+                <AuthorizeView Policy="@InventoryPermissions.PurchaseOrdersUpdate">
+                    <Authorized Context="auth">
+                        <MudTooltip Placement="Placement.Bottom" Text="@T.PurchaseOrders.Receive">
+                            <MudIconButton Icon="@Icons.Material.Filled.Inventory2" Size="Size.Small" Color="Color.Info" aria-label="@T.PurchaseOrders.Receive" OnClick="@(() => OpenReceiveDialogAsync(context))" />
+                        </MudTooltip>
+                    </Authorized>
+                </AuthorizeView>
             }
-            @if (context.Status is "Draft" or "Ordered" && Can("inventory.purchase-orders.update"))
+            @if (context.Status is "Draft" or "Ordered")
             {
-                <MudTooltip Placement="Placement.Bottom" Text="@T.PurchaseOrders.CancelOrder">
-                    <MudIconButton Icon="@Icons.Material.Filled.Cancel" Size="Size.Small" Color="Color.Default" aria-label="@T.PurchaseOrders.CancelOrder" OnClick="@(() => CancelAsync(context))" />
-                </MudTooltip>
+                <AuthorizeView Policy="@InventoryPermissions.PurchaseOrdersUpdate">
+                    <Authorized Context="auth">
+                        <MudTooltip Placement="Placement.Bottom" Text="@T.PurchaseOrders.CancelOrder">
+                            <MudIconButton Icon="@Icons.Material.Filled.Cancel" Size="Size.Small" Color="Color.Default" aria-label="@T.PurchaseOrders.CancelOrder" OnClick="@(() => CancelAsync(context))" />
+                        </MudTooltip>
+                    </Authorized>
+                </AuthorizeView>
             }
             <MudTooltip Placement="Placement.Bottom" Text="@T.PurchaseOrders.View">
                 <MudIconButton Icon="@Icons.Material.Filled.Visibility" Size="Size.Small" Color="Color.Default" aria-label="@T.PurchaseOrders.View" OnClick="@(() => OpenViewDialogAsync(context))" />
@@ -63,7 +76,7 @@
                         EmptyTitle="@T.PurchaseOrders.NoOrdersTitle"
                         EmptyMessage="@T.PurchaseOrders.EmptyMessage"
                         EmptyActionLabel="@T.PurchaseOrders.CreateFirstOrder"
-                        ShowAction="@Can("inventory.purchase-orders.create")"
+                        ActionPolicy="@InventoryPermissions.PurchaseOrdersCreate"
                         OnReload="ReloadAsync"
                         OnEmptyAction="OpenCreateDialogAsync" />
     </NoRecordsContent>

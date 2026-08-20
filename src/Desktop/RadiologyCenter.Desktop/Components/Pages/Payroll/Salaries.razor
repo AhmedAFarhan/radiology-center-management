@@ -9,10 +9,11 @@
             SearchValueChanged="OnSearchChanged"
             SearchPlaceholder="@T.Salary.SearchPlaceholder"
             OnRefresh="ReloadAsync">
-    @if (Can("payroll.salary.manage"))
-    {
-        <MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Add" OnClick="OpenCreateDialogAsync">@T.Salary.NewSalary</MudButton>
-    }
+    <AuthorizeView Policy="@PayrollPermissions.SalaryManage">
+        <Authorized>
+            <MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Add" OnClick="OpenCreateDialogAsync">@T.Salary.NewSalary</MudButton>
+        </Authorized>
+    </AuthorizeView>
 </PageHeader>
 
 <MudTable T="SalaryDto" @ref="Table" ServerData="LoadServerData" Dense="true" Hover="true" Striped="true" Elevation="1" RowsPerPage="10" FixedHeader="true" Class="table-scroll">
@@ -41,9 +42,9 @@
                         EditLabel="@T.Common.Edit"
                         ToggleLabel="@T.Salary.ToggleStatus"
                         DeleteLabel="@T.Common.Delete"
-                        CanEdit="@Can("payroll.salary.manage")"
-                        CanToggle="@Can("payroll.salary.manage")"
-                        CanDelete="@Can("payroll.salary.manage")"
+                        EditPolicy="@PayrollPermissions.SalaryManage"
+                        TogglePolicy="@PayrollPermissions.SalaryManage"
+                        DeletePolicy="@PayrollPermissions.SalaryManage"
                         OnEdit="@(() => OpenEditDialogAsync(context))"
                         OnToggle="@(() => ToggleActiveAsync(context))"
                         OnDelete="@(() => DeleteSalaryAsync(context))" />
@@ -57,7 +58,7 @@
                         EmptyTitle="@T.Salary.EmptyTitle"
                         EmptyMessage="@T.Salary.EmptyMessage"
                         EmptyActionLabel="@T.Salary.EmptyActionLabel"
-                        ShowAction="@Can("payroll.salary.manage")"
+                        ActionPolicy="@PayrollPermissions.SalaryManage"
                         OnReload="ReloadAsync"
                         OnEmptyAction="OpenCreateDialogAsync" />
     </NoRecordsContent>

@@ -7,24 +7,24 @@
     <nav class="app-nav">
         <MudNavMenu>
             <MudTooltip Text="@T.Nav.Dashboard"><MudNavLink Href="/dashboard" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.Dashboard" aria-label="@T.Nav.Dashboard" Ripple="false" /></MudTooltip>
-            @if (Can("patients.read"))
+            @if (Can(PatientsPermissions.Read))
             {
                 <MudTooltip Text="@T.Nav.Patients"><MudNavLink Href="/patients" Icon="@Icons.Material.Filled.People" aria-label="@T.Nav.Patients" Ripple="false" /></MudTooltip>
             }
-            @if (Can("appointments.read"))
+            @if (Can(AppointmentsPermissions.Read))
             {
                 <MudTooltip Text="@T.Nav.Visits"><MudNavLink Href="/visits" Icon="@Icons.Material.Filled.EventNote" aria-label="@T.Nav.Visits" Ripple="false" /></MudTooltip>
             }
-            @if (Can("reports.read"))
+            @if (Can(ReportsPermissions.Read))
             {
                 <MudTooltip Text="@T.Nav.ReadingRoom"><MudNavLink Href="/radiologist" Icon="@Icons.Material.Filled.Biotech" aria-label="@T.Nav.ReadingRoom" Ripple="false" /></MudTooltip>
             }
-            @if (Can("examinations.read"))
+            @if (Can(ExaminationsPermissions.Read))
             {
                 <MudTooltip Text="@T.Nav.Examinations"><MudNavLink Href="/examinations" Icon="@Icons.Material.Filled.MedicalServices" aria-label="@T.Nav.Examinations" Ripple="false" /></MudTooltip>
             }
 
-        @if (CanAny("inventory.items.read", "inventory.suppliers.read", "inventory.purchase-orders.read", "inventory.stock.read"))
+        @if (CanAny(InventoryPermissions.ItemsRead, InventoryPermissions.SuppliersRead, InventoryPermissions.PurchaseOrdersRead, InventoryPermissions.StockRead))
         {
             <MudTooltip Text="@T.Nav.Inventory">
                 <MudMenu Icon="@Icons.Material.Filled.Warehouse" aria-label="@T.Nav.Inventory"
@@ -35,19 +35,19 @@
                          Dense="true"
                          OffsetX="12"
                          Direction="Direction.Left">
-                    @if (Can("inventory.items.read"))
+                    @if (Can(InventoryPermissions.ItemsRead))
                     {
                         <MudMenuItem Icon="@Icons.Material.Filled.Inventory2" OnClick="@(() => Go("/inventory/items"))">@T.Nav.Inventory</MudMenuItem>
                     }
-                    @if (Can("inventory.suppliers.read"))
+                    @if (Can(InventoryPermissions.SuppliersRead))
                     {
                         <MudMenuItem Icon="@Icons.Material.Filled.LocalShipping" OnClick="@(() => Go("/inventory/suppliers"))">@T.Nav.Suppliers</MudMenuItem>
                     }
-                    @if (Can("inventory.purchase-orders.read"))
+                    @if (Can(InventoryPermissions.PurchaseOrdersRead))
                     {
                         <MudMenuItem Icon="@Icons.Material.Filled.ReceiptLong" OnClick="@(() => Go("/inventory/purchase-orders"))">@T.Nav.PurchaseOrders</MudMenuItem>
                     }
-                    @if (Can("inventory.stock.read"))
+                    @if (Can(InventoryPermissions.StockRead))
                     {
                         <MudMenuItem Icon="@Icons.Material.Filled.SwapVert" OnClick="@(() => Go("/inventory/stock-movements"))">@T.Nav.StockMovements</MudMenuItem>
                     }
@@ -55,7 +55,7 @@
             </MudTooltip>
         }
 
-        @if (Can("payroll.read"))
+        @if (Can(PayrollPermissions.Read))
         {
             <MudTooltip Text="@T.Nav.Payroll">
                 <MudMenu Icon="@Icons.Material.Filled.Payments" aria-label="@T.Nav.Payroll"
@@ -76,7 +76,7 @@
             </MudTooltip>
         }
 
-        @if (CanAny("insurance.companies.read", "insurance.policies.read", "insurance.preauthorizations.read", "insurance.claims.read"))
+        @if (CanAny(InsurancePermissions.CompaniesRead, InsurancePermissions.PoliciesRead, InsurancePermissions.PreAuthorizationsRead, InsurancePermissions.ClaimsRead))
         {
             <MudTooltip Text="@T.Nav.Insurance">
                 <MudMenu Icon="@Icons.Material.Filled.Approval" aria-label="@T.Nav.Insurance"
@@ -87,19 +87,19 @@
                          Dense="true"
                          OffsetX="12"
                          Direction="Direction.Left">
-                    @if (Can("insurance.companies.read"))
+                    @if (Can(InsurancePermissions.CompaniesRead))
                     {
                         <MudMenuItem Icon="@Icons.Material.Filled.Shield" OnClick="@(() => Go("/insurance/companies"))">@T.Nav.Companies</MudMenuItem>
                     }
-                    @if (Can("insurance.policies.read"))
+                    @if (Can(InsurancePermissions.PoliciesRead))
                     {
                         <MudMenuItem Icon="@Icons.Material.Filled.Description" OnClick="@(() => Go("/insurance/policies"))">@T.Nav.Policies</MudMenuItem>
                     }
-                    @if (Can("insurance.preauthorizations.read"))
+                    @if (Can(InsurancePermissions.PreAuthorizationsRead))
                     {
                         <MudMenuItem Icon="@Icons.Material.Filled.Approval" OnClick="@(() => Go("/insurance/preauthorizations"))">@T.Nav.PreAuthorizations</MudMenuItem>
                     }
-                    @if (Can("insurance.claims.read"))
+                    @if (Can(InsurancePermissions.ClaimsRead))
                     {
                         <MudMenuItem Icon="@Icons.Material.Filled.RequestQuote" OnClick="@(() => Go("/insurance/claims"))">@T.Nav.Claims</MudMenuItem>
                     }
@@ -107,7 +107,7 @@
             </MudTooltip>
         }
 
-        @if (Can("cash.sessions.read"))
+        @if (Can(CashPermissions.SessionsRead))
         {
             <MudTooltip Text="@T.Nav.Cash">
                 <MudMenu Icon="@Icons.Material.Filled.AccountBalanceWallet" aria-label="@T.Nav.Cash"
@@ -123,7 +123,7 @@
             </MudTooltip>
         }
 
-        @if (CanAny("notifications.templates.manage", "notifications.messages.read"))
+        @if (CanAny(NotificationPermissions.TemplatesManage, NotificationPermissions.MessagesRead))
         {
             <MudTooltip Text="@T.Nav.Notifications">
                 <MudMenu Icon="@Icons.Material.Filled.Notifications" aria-label="@T.Nav.Notifications"
@@ -134,11 +134,11 @@
                          Dense="true"
                          OffsetX="12"
                          Direction="Direction.Left">
-                    @if (Can("notifications.templates.manage"))
+                    @if (Can(NotificationPermissions.TemplatesManage))
                     {
                         <MudMenuItem Icon="@Icons.Material.Filled.Article" OnClick="@(() => Go("/notifications/templates"))">@T.Nav.Templates</MudMenuItem>
                     }
-                    @if (Can("notifications.messages.read"))
+                    @if (Can(NotificationPermissions.MessagesRead))
                     {
                         <MudMenuItem Icon="@Icons.Material.Filled.Notifications" OnClick="@(() => Go("/notifications/messages"))">@T.Nav.Messages</MudMenuItem>
                     }
@@ -146,7 +146,7 @@
             </MudTooltip>
         }
 
-        @if (CanAny("resources.equipment.read", "resources.staff.read", "resources.shifts.read", "resources.leave.read", "resources.referrals.read"))
+        @if (CanAny(ResourcesPermissions.EquipmentRead, ResourcesPermissions.StaffRead, ResourcesPermissions.ShiftsRead, ResourcesPermissions.LeaveRead, ResourcesPermissions.ReferralDoctorsRead))
         {
             <MudTooltip Text="@T.Nav.Resources">
                 <MudMenu Icon="@Icons.Material.Filled.PrecisionManufacturing" aria-label="@T.Nav.Resources"
@@ -157,23 +157,23 @@
                          Dense="true"
                          OffsetX="12"
                          Direction="Direction.Left">
-                    @if (Can("resources.equipment.read"))
+                    @if (Can(ResourcesPermissions.EquipmentRead))
                     {
                         <MudMenuItem Icon="@Icons.Material.Filled.Biotech" OnClick="@(() => Go("/resources/equipment"))">@T.Nav.Equipment</MudMenuItem>
                     }
-                    @if (Can("resources.staff.read"))
+                    @if (Can(ResourcesPermissions.StaffRead))
                     {
                         <MudMenuItem Icon="@Icons.Material.Filled.Badge" OnClick="@(() => Go("/resources/staff"))">@T.Nav.Staff</MudMenuItem>
                     }
-                    @if (Can("resources.shifts.read"))
+                    @if (Can(ResourcesPermissions.ShiftsRead))
                     {
                         <MudMenuItem Icon="@Icons.Material.Filled.CalendarMonth" OnClick="@(() => Go("/resources/work-shifts"))">@T.Nav.WorkShifts</MudMenuItem>
                     }
-                    @if (Can("resources.leave.read"))
+                    @if (Can(ResourcesPermissions.LeaveRead))
                     {
                         <MudMenuItem Icon="@Icons.Material.Filled.BeachAccess" OnClick="@(() => Go("/resources/leaves"))">@T.Nav.Leave</MudMenuItem>
                     }
-                    @if (Can("resources.referrals.read"))
+                    @if (Can(ResourcesPermissions.ReferralDoctorsRead))
                     {
                         <MudMenuItem Icon="@Icons.Material.Filled.LocalHospital" OnClick="@(() => Go("/resources/referral-doctors"))">@T.Nav.ReferralDoctors</MudMenuItem>
                     }
@@ -181,7 +181,7 @@
             </MudTooltip>
         }
 
-        @if (Can("analytics.read"))
+        @if (Can(AnalyticsPermissions.Read))
         {
             <MudTooltip Text="@T.Nav.Analytics">
                 <MudMenu Icon="@Icons.Material.Filled.Insights" aria-label="@T.Nav.Analytics"
@@ -200,7 +200,7 @@
             </MudTooltip>
         }
 
-        @if (CanAny("users.read", "roles.read"))
+        @if (CanAny(UsersPermissions.Read, RolesPermissions.Read))
         {
             <MudTooltip Text="@T.Nav.Administration">
                 <MudMenu Icon="@Icons.Material.Filled.AdminPanelSettings" aria-label="@T.Nav.Administration"
@@ -211,11 +211,11 @@
                          Dense="true"
                          OffsetX="12"
                          Direction="Direction.Left">
-                    @if (Can("users.read"))
+                    @if (Can(UsersPermissions.Read))
                     {
                         <MudMenuItem Icon="@Icons.Material.Filled.Person" OnClick="@(() => Go("/users"))">@T.Nav.Users</MudMenuItem>
                     }
-                    @if (Can("roles.read"))
+                    @if (Can(RolesPermissions.Read))
                     {
                         <MudMenuItem Icon="@Icons.Material.Filled.Security" OnClick="@(() => Go("/roles"))">@T.Nav.Roles</MudMenuItem>
                     }
@@ -232,52 +232,52 @@
             <MudNavLink Href="/dashboard" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.Dashboard" Ripple="false">
                 @T.Nav.Dashboard
             </MudNavLink>
-        @if (Can("patients.read"))
+        @if (Can(PatientsPermissions.Read))
         {
             <MudNavLink Href="/patients" Icon="@Icons.Material.Filled.People" Ripple="false">
                 @T.Nav.Patients
             </MudNavLink>
         }
-        @if (Can("appointments.read"))
+        @if (Can(AppointmentsPermissions.Read))
         {
             <MudNavLink Href="/visits" Icon="@Icons.Material.Filled.EventNote" Ripple="false">
                 @T.Nav.Visits
             </MudNavLink>
         }
-        @if (Can("reports.read"))
+        @if (Can(ReportsPermissions.Read))
         {
             <MudNavLink Href="/radiologist" Icon="@Icons.Material.Filled.Biotech" Ripple="false">
                 @T.Nav.ReadingRoom
             </MudNavLink>
         }
-        @if (Can("examinations.read"))
+        @if (Can(ExaminationsPermissions.Read))
         {
             <MudNavLink Href="/examinations" Icon="@Icons.Material.Filled.MedicalServices" Ripple="false">
                 @T.Nav.Examinations
             </MudNavLink>
         }
-        @if (CanAny("inventory.items.read", "inventory.suppliers.read", "inventory.purchase-orders.read", "inventory.stock.read"))
+        @if (CanAny(InventoryPermissions.ItemsRead, InventoryPermissions.SuppliersRead, InventoryPermissions.PurchaseOrdersRead, InventoryPermissions.StockRead))
         {
             <MudNavGroup Title="@T.Nav.Inventory" Icon="@Icons.Material.Filled.Warehouse" Ripple="false">
-                @if (Can("inventory.items.read"))
+                @if (Can(InventoryPermissions.ItemsRead))
                 {
                     <MudNavLink Href="/inventory/items" Icon="@Icons.Material.Filled.Inventory2" Ripple="false">@T.Nav.Inventory</MudNavLink>
                 }
-                @if (Can("inventory.suppliers.read"))
+                @if (Can(InventoryPermissions.SuppliersRead))
                 {
                     <MudNavLink Href="/inventory/suppliers" Icon="@Icons.Material.Filled.LocalShipping" Ripple="false">@T.Nav.Suppliers</MudNavLink>
                 }
-                @if (Can("inventory.purchase-orders.read"))
+                @if (Can(InventoryPermissions.PurchaseOrdersRead))
                 {
                     <MudNavLink Href="/inventory/purchase-orders" Icon="@Icons.Material.Filled.ReceiptLong" Ripple="false">@T.Nav.PurchaseOrders</MudNavLink>
                 }
-                @if (Can("inventory.stock.read"))
+                @if (Can(InventoryPermissions.StockRead))
                 {
                     <MudNavLink Href="/inventory/stock-movements" Icon="@Icons.Material.Filled.SwapVert" Ripple="false">@T.Nav.StockMovements</MudNavLink>
                 }
             </MudNavGroup>
         }
-        @if (Can("payroll.read"))
+        @if (Can(PayrollPermissions.Read))
         {
             <MudNavGroup Title="@T.Nav.Payroll" Icon="@Icons.Material.Filled.Payments" Ripple="false">
                 <MudNavLink Href="/payroll/payruns" Icon="@Icons.Material.Filled.ReceiptLong" Ripple="false">@T.Nav.PayRuns</MudNavLink>
@@ -288,72 +288,72 @@
                 <MudNavLink Href="/payroll/referral-fees" Icon="@Icons.Material.Filled.LocalHospital" Ripple="false">@T.Nav.ReferralFees</MudNavLink>
             </MudNavGroup>
         }
-        @if (CanAny("insurance.companies.read", "insurance.policies.read", "insurance.preauthorizations.read", "insurance.claims.read"))
+        @if (CanAny(InsurancePermissions.CompaniesRead, InsurancePermissions.PoliciesRead, InsurancePermissions.PreAuthorizationsRead, InsurancePermissions.ClaimsRead))
         {
             <MudNavGroup Title="@T.Nav.Insurance" Icon="@Icons.Material.Filled.Approval" Ripple="false">
-                @if (Can("insurance.companies.read"))
+                @if (Can(InsurancePermissions.CompaniesRead))
                 {
                     <MudNavLink Href="/insurance/companies" Icon="@Icons.Material.Filled.Shield" Ripple="false">@T.Nav.Companies</MudNavLink>
                 }
-                @if (Can("insurance.policies.read"))
+                @if (Can(InsurancePermissions.PoliciesRead))
                 {
                     <MudNavLink Href="/insurance/policies" Icon="@Icons.Material.Filled.Description" Ripple="false">@T.Nav.Policies</MudNavLink>
                 }
-                @if (Can("insurance.preauthorizations.read"))
+                @if (Can(InsurancePermissions.PreAuthorizationsRead))
                 {
                     <MudNavLink Href="/insurance/preauthorizations" Icon="@Icons.Material.Filled.Approval" Ripple="false">@T.Nav.PreAuthorizations</MudNavLink>
                 }
-                @if (Can("insurance.claims.read"))
+                @if (Can(InsurancePermissions.ClaimsRead))
                 {
                     <MudNavLink Href="/insurance/claims" Icon="@Icons.Material.Filled.RequestQuote" Ripple="false">@T.Nav.Claims</MudNavLink>
                 }
             </MudNavGroup>
         }
-        @if (Can("cash.sessions.read"))
+        @if (Can(CashPermissions.SessionsRead))
         {
             <MudNavGroup Title="@T.Nav.Cash" Icon="@Icons.Material.Filled.AccountBalanceWallet" Ripple="false">
                 <MudNavLink Href="/cash/sessions" Icon="@Icons.Material.Filled.AccountBalanceWallet" Ripple="false">@T.Nav.CashSessions</MudNavLink>
             </MudNavGroup>
         }
-        @if (CanAny("notifications.templates.manage", "notifications.messages.read"))
+        @if (CanAny(NotificationPermissions.TemplatesManage, NotificationPermissions.MessagesRead))
         {
             <MudNavGroup Title="@T.Nav.Notifications" Icon="@Icons.Material.Filled.Notifications" Ripple="false">
-                @if (Can("notifications.templates.manage"))
+                @if (Can(NotificationPermissions.TemplatesManage))
                 {
                     <MudNavLink Href="/notifications/templates" Icon="@Icons.Material.Filled.Article" Ripple="false">@T.Nav.Templates</MudNavLink>
                 }
-                @if (Can("notifications.messages.read"))
+                @if (Can(NotificationPermissions.MessagesRead))
                 {
                     <MudNavLink Href="/notifications/messages" Icon="@Icons.Material.Filled.Notifications" Ripple="false">@T.Nav.Messages</MudNavLink>
                 }
             </MudNavGroup>
         }
-        @if (CanAny("resources.equipment.read", "resources.staff.read", "resources.shifts.read", "resources.leave.read", "resources.referrals.read"))
+        @if (CanAny(ResourcesPermissions.EquipmentRead, ResourcesPermissions.StaffRead, ResourcesPermissions.ShiftsRead, ResourcesPermissions.LeaveRead, ResourcesPermissions.ReferralDoctorsRead))
         {
             <MudNavGroup Title="@T.Nav.Resources" Icon="@Icons.Material.Filled.PrecisionManufacturing" Ripple="false">
-                @if (Can("resources.equipment.read"))
+                @if (Can(ResourcesPermissions.EquipmentRead))
                 {
                     <MudNavLink Href="/resources/equipment" Icon="@Icons.Material.Filled.Biotech" Ripple="false">@T.Nav.Equipment</MudNavLink>
                 }
-                @if (Can("resources.staff.read"))
+                @if (Can(ResourcesPermissions.StaffRead))
                 {
                     <MudNavLink Href="/resources/staff" Icon="@Icons.Material.Filled.Badge" Ripple="false">@T.Nav.Staff</MudNavLink>
                 }
-                @if (Can("resources.shifts.read"))
+                @if (Can(ResourcesPermissions.ShiftsRead))
                 {
                     <MudNavLink Href="/resources/work-shifts" Icon="@Icons.Material.Filled.CalendarMonth" Ripple="false">@T.Nav.WorkShifts</MudNavLink>
                 }
-                @if (Can("resources.leave.read"))
+                @if (Can(ResourcesPermissions.LeaveRead))
                 {
                     <MudNavLink Href="/resources/leaves" Icon="@Icons.Material.Filled.BeachAccess" Ripple="false">@T.Nav.Leave</MudNavLink>
                 }
-                @if (Can("resources.referrals.read"))
+                @if (Can(ResourcesPermissions.ReferralDoctorsRead))
                 {
                     <MudNavLink Href="/resources/referral-doctors" Icon="@Icons.Material.Filled.LocalHospital" Ripple="false">@T.Nav.ReferralDoctors</MudNavLink>
                 }
             </MudNavGroup>
         }
-        @if (Can("analytics.read"))
+        @if (Can(AnalyticsPermissions.Read))
         {
             <MudNavGroup Title="@T.Nav.Analytics" Icon="@Icons.Material.Filled.Insights" Ripple="false">
                 <MudNavLink Href="/analytics/overview" Icon="@Icons.Material.Filled.Speed" Ripple="false">@T.Nav.Overview</MudNavLink>
@@ -362,14 +362,14 @@
                 <MudNavLink Href="/analytics/staff" Icon="@Icons.Material.Filled.Groups" Ripple="false">@T.Nav.StaffMachines</MudNavLink>
             </MudNavGroup>
         }
-        @if (CanAny("users.read", "roles.read"))
+        @if (CanAny(UsersPermissions.Read, RolesPermissions.Read))
         {
             <MudNavGroup Title="@T.Nav.Administration" Icon="@Icons.Material.Filled.AdminPanelSettings" Ripple="false">
-                @if (Can("users.read"))
+                @if (Can(UsersPermissions.Read))
                 {
                     <MudNavLink Href="/users" Icon="@Icons.Material.Filled.Person" Ripple="false">@T.Nav.Users</MudNavLink>
                 }
-                @if (Can("roles.read"))
+                @if (Can(RolesPermissions.Read))
                 {
                     <MudNavLink Href="/roles" Icon="@Icons.Material.Filled.Security" Ripple="false">@T.Nav.Roles</MudNavLink>
                 }

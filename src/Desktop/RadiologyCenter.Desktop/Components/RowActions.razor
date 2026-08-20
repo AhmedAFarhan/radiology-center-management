@@ -1,12 +1,22 @@
 @using Microsoft.AspNetCore.Components
 
-@if (CanEdit)
+@if (string.IsNullOrWhiteSpace(EditPolicy))
 {
     <MudTooltip Placement="Placement.Bottom" Text="@EditLabel">
         <MudIconButton Icon="@Icons.Material.Filled.Edit" Size="Size.Small" Color="Color.Default" aria-label="@EditLabel" OnClick="OnEdit" />
     </MudTooltip>
 }
-@if (CanToggle)
+else
+{
+    <AuthorizeView Policy="@EditPolicy">
+        <Authorized>
+            <MudTooltip Placement="Placement.Bottom" Text="@EditLabel">
+                <MudIconButton Icon="@Icons.Material.Filled.Edit" Size="Size.Small" Color="Color.Default" aria-label="@EditLabel" OnClick="OnEdit" />
+            </MudTooltip>
+        </Authorized>
+    </AuthorizeView>
+}
+@if (string.IsNullOrWhiteSpace(TogglePolicy))
 {
     <MudTooltip Placement="Placement.Bottom" Text="@ToggleLabel">
         <MudIconButton Icon="@(IsActive ? Icons.Material.Filled.Block : Icons.Material.Filled.CheckCircle)"
@@ -16,9 +26,33 @@
                        OnClick="OnToggle" />
     </MudTooltip>
 }
-@if (CanDelete)
+else
+{
+    <AuthorizeView Policy="@TogglePolicy">
+        <Authorized>
+            <MudTooltip Placement="Placement.Bottom" Text="@ToggleLabel">
+                <MudIconButton Icon="@(IsActive ? Icons.Material.Filled.Block : Icons.Material.Filled.CheckCircle)"
+                               Size="Size.Small"
+                               Color="@(IsActive ? Color.Default : Color.Success)"
+                               aria-label="@ToggleLabel"
+                               OnClick="OnToggle" />
+            </MudTooltip>
+        </Authorized>
+    </AuthorizeView>
+}
+@if (string.IsNullOrWhiteSpace(DeletePolicy))
 {
     <MudTooltip Placement="Placement.Bottom" Text="@DeleteLabel">
         <MudIconButton Icon="@Icons.Material.Filled.Delete" Size="Size.Small" Color="Color.Error" aria-label="@DeleteLabel" OnClick="OnDelete" />
     </MudTooltip>
+}
+else
+{
+    <AuthorizeView Policy="@DeletePolicy">
+        <Authorized>
+            <MudTooltip Placement="Placement.Bottom" Text="@DeleteLabel">
+                <MudIconButton Icon="@Icons.Material.Filled.Delete" Size="Size.Small" Color="Color.Error" aria-label="@DeleteLabel" OnClick="OnDelete" />
+            </MudTooltip>
+        </Authorized>
+    </AuthorizeView>
 }

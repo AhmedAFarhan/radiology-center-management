@@ -20,10 +20,6 @@ namespace RadiologyCenter.Desktop.Components.Pages.Patients;
 
 public partial class Patients : ComponentBase, IDisposable
 {
-[Inject] private PermissionService Permissions { get; set; } = default!;
-
-    private bool Can(string code) => Permissions.HasPermission(code);
-
     private MudTable<PatientDto>? _table;
     private string? _search;
     private CancellationTokenSource? _searchCts;

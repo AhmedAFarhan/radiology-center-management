@@ -9,10 +9,11 @@
             SearchValue="@SearchQuery"
             SearchPlaceholder="@T.Suppliers.SearchPlaceholder"
             OnRefresh="ReloadAsync">
-    @if (Can("inventory.suppliers.create"))
-    {
-        <MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Add" OnClick="OpenCreateDialogAsync">@T.Suppliers.AddSupplier</MudButton>
-    }
+    <AuthorizeView Policy="@InventoryPermissions.SuppliersCreate">
+        <Authorized>
+            <MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Add" OnClick="OpenCreateDialogAsync">@T.Suppliers.AddSupplier</MudButton>
+        </Authorized>
+    </AuthorizeView>
 </PageHeader>
 
 <MudTable T="SupplierDto" @ref="Table" ServerData="LoadServerData" Dense="true" Hover="true" Striped="true" Elevation="1" RowsPerPage="10" FixedHeader="true" Class="table-scroll">
@@ -45,9 +46,9 @@
                         EditLabel="@T.Common.Edit"
                         ToggleLabel="@T.Suppliers.ToggleStatus"
                         DeleteLabel="@T.Common.Delete"
-                        CanEdit="@Can("inventory.suppliers.update")"
-                        CanToggle="@Can("inventory.suppliers.update")"
-                        CanDelete="@Can("inventory.suppliers.delete")"
+                        EditPolicy="@InventoryPermissions.SuppliersUpdate"
+                        TogglePolicy="@InventoryPermissions.SuppliersUpdate"
+                        DeletePolicy="@InventoryPermissions.SuppliersDelete"
                         OnEdit="@(() => OpenEditDialogAsync(context))"
                         OnToggle="@(() => ToggleActiveAsync(context))"
                         OnDelete="@(() => DeleteSupplierAsync(context))" />
@@ -61,7 +62,7 @@
                         EmptyTitle="@T.Suppliers.NoSuppliersTitle"
                         EmptyMessage="@T.Suppliers.EmptyMessage"
                         EmptyActionLabel="@T.Suppliers.AddFirstSupplier"
-                        ShowAction="@Can("inventory.suppliers.create")"
+                        ActionPolicy="@InventoryPermissions.SuppliersCreate"
                         OnReload="ReloadAsync"
                         OnEmptyAction="OpenCreateDialogAsync" />
     </NoRecordsContent>

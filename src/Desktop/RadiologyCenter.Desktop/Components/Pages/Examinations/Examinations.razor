@@ -9,10 +9,11 @@
             SearchValue="@SearchQuery"
             SearchPlaceholder="@T.Examinations.SearchPlaceholder"
             OnRefresh="ReloadAsync">
-    @if (Can("examinations.types.manage"))
-    {
-        <MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Add" OnClick="OpenCreateDialogAsync">@T.Examinations.AddType</MudButton>
-    }
+<AuthorizeView Policy="@ExaminationsPermissions.TypesManage">
+        <Authorized>
+            <MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Add" OnClick="OpenCreateDialogAsync">@T.Examinations.NewType</MudButton>
+        </Authorized>
+    </AuthorizeView>
 </PageHeader>
 
 <MudTable T="ExaminationTypeDto" @ref="Table" ServerData="LoadServerData" Dense="true" Hover="true" Striped="true" Elevation="1" RowsPerPage="10" FixedHeader="true" Class="table-scroll">
@@ -63,9 +64,9 @@
                         EditLabel="@T.Common.Edit"
                         ToggleLabel="@T.Examinations.ToggleStatus"
                         DeleteLabel="@T.Common.Delete"
-                        CanEdit="@Can("examinations.types.manage")"
-                        CanToggle="@Can("examinations.types.manage")"
-                        CanDelete="@Can("examinations.types.manage")"
+                        EditPolicy="@ExaminationsPermissions.TypesManage"
+                        TogglePolicy="@ExaminationsPermissions.TypesManage"
+                        DeletePolicy="@ExaminationsPermissions.TypesManage"
                         OnEdit="@(() => OpenEditDialogAsync(context))"
                         OnToggle="@(() => ToggleActiveAsync(context))"
                         OnDelete="@(() => DeleteTypeAsync(context))" />
@@ -79,7 +80,7 @@
                         EmptyTitle="@T.Examinations.EmptyTitle"
                         EmptyMessage="@T.Examinations.EmptyMessage"
                         EmptyActionLabel="@T.Examinations.EmptyAction"
-                        ShowAction="@Can("examinations.types.manage")"
+                        ActionPolicy="@ExaminationsPermissions.TypesManage"
                         OnReload="ReloadAsync"
                         OnEmptyAction="OpenCreateDialogAsync" />
     </NoRecordsContent>

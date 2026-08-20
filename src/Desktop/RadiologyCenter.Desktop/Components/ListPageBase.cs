@@ -20,11 +20,6 @@ public abstract class ListPageBase<TItem> : ComponentBase, IDisposable
     [Inject] protected ISnackbar Snackbar { get; set; } = default!;
     [Inject] protected AppLocalizer T { get; set; } = default!;
     [Inject] protected NavigationManager NavigationManager { get; set; } = default!;
-    [Inject] protected PermissionService Permissions { get; set; } = default!;
-
-    protected bool Can(string code) => Permissions.HasPermission(code);
-
-    protected bool CanAny(params string[] codes) => Permissions.HasAny(codes);
 
     protected MudTable<TItem>? Table { get; set; }
     protected string? Search { get; set; }

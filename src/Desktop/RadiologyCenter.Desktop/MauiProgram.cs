@@ -2,8 +2,10 @@
 using MudBlazor;
 using MudBlazor.Services;
 using MudBlazor.Utilities;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Components.Authorization;
 using RadiologyCenter.Desktop.Services;
+using RadiologyCenter.Desktop.Services.Authorization;
 
 namespace RadiologyCenter.Desktop;
 
@@ -25,6 +27,8 @@ public static class MauiProgram
 
         builder.Services.AddMauiBlazorWebView();
         builder.Services.AddAuthorizationCore();
+        builder.Services.AddScoped<IAuthorizationHandler, PermissionAuthorizationHandler>();
+        builder.Services.AddSingleton<IAuthorizationPolicyProvider, PermissionPolicyProvider>();
         builder.Services.AddSingleton(updateService);
         builder.Services.AddMudServices(config =>
         {
