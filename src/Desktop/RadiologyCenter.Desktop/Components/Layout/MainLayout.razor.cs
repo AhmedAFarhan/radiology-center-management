@@ -59,6 +59,7 @@ protected override void OnParametersSet()
     {
         base.OnInitialized();
         BusyState.Instance.Changed += OnBusyChanged;
+        Connection.Start();
     }
 
     private void OnBusyChanged() => InvokeAsync(StateHasChanged);

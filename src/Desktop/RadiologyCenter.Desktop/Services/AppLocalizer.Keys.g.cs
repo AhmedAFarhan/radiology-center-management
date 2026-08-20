@@ -957,6 +957,11 @@ public sealed class LayoutGroup : LocalizerGroup
     public string ChangePassword => Get("layout.changePassword");
     public string NoNotifications => Get("layout.noNotifications");
     public string Notifications => Get("layout.notifications");
+    public string OfflineMessage => Get("layout.offlineMessage");
+    public string OfflineTitle => Get("layout.offlineTitle");
+    public string OnlineMessage => Get("layout.onlineMessage");
+    public string OnlineTitle => Get("layout.onlineTitle");
+    public string Retry => Get("layout.retry");
     public string SearchPlaceholder => Get("layout.searchPlaceholder");
     public string SignedOut => Get("layout.signedOut");
     public string SigningOut => Get("layout.signingOut");

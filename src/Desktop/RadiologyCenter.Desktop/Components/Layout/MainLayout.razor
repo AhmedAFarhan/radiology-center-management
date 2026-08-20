@@ -9,6 +9,7 @@
 @inject AppLocalizer T
 @inject SearchService SearchService
 @inject SearchHistoryService SearchHistory
+@inject ConnectionMonitorService Connection
 
 <div class="app-shell" @onkeydown="HandleGlobalKeyDown">
     <aside class="app-sidebar @(_drawerOpen ? "open" : "collapsed")">
@@ -161,6 +162,8 @@
                 </ChildContent>
             </MudMenu>
         </header>
+
+        <ConnectionBanner />
 
         <main class="app-main-content">
             <MudContainer MaxWidth="MaxWidth.ExtraLarge" Class="mt-4 pb-4">

@@ -1,0 +1,107 @@
+@inject ConnectionMonitorService Connection
+@inject AppLocalizer T
+@implements IDisposable
+
+@if (!Connection.IsOnline)
+{
+    <div class="connection-banner connection-banner-offline">
+        <MudIcon Icon="@Icons.Material.Filled.CloudOff" Class="connection-banner-icon" />
+        <div class="connection-banner-text">
+            <span class="connection-banner-title">@T.Layout.OfflineTitle</span>
+            <span class="connection-banner-message">@T.Layout.OfflineMessage</span>
+        </div>
+        <MudButton Variant="Variant.Text" Color="Color.Inherit" Class="connection-banner-retry" OnClick="RetryAsync" Disabled="_retrying" StartIcon="@Icons.Material.Filled.Refresh">@T.Layout.Retry</MudButton>
+    </div>
+}
+else if (_showOnlineToast)
+{
+    <div class="connection-banner connection-banner-online connection-banner-toast @(_hiding ? "connection-banner-hiding" : null)">
+        <MudIcon Icon="@Icons.Material.Filled.CloudDone" Class="connection-banner-icon" />
+        <div class="connection-banner-text">
+            <span class="connection-banner-title">@T.Layout.OnlineTitle</span>
+            <span class="connection-banner-message">@T.Layout.OnlineMessage</span>
+        </div>
+    </div>
+}
+
+@code {
+    private const int ToastVisibleMilliseconds = 3000;
+    private const int FadeOutMilliseconds = 800;
+
+    private Timer? _pollTimer;
+    private Timer? _toastTimer;
+    private bool _wasOnline;
+    private bool _showOnlineToast;
+    private bool _hiding;
+    private bool _retrying;
+
+    protected override void OnInitialized()
+    {
+        _wasOnline = Connection.IsOnline;
+        Connection.StateChanged += OnConnectionChanged;
+        _pollTimer = new Timer(_ => CheckState(), null, TimeSpan.FromSeconds(1), TimeSpan.FromSeconds(2));
+        CheckState();
+    }
+
+    private void OnConnectionChanged() => CheckState();
+
+    private void CheckState()
+    {
+        var online = Connection.IsOnline;
+
+        if (!online)
+        {
+            _showOnlineToast = false;
+            _hiding = false;
+            _toastTimer?.Dispose();
+            _toastTimer = null;
+        }
+        else if (online && !_wasOnline)
+        {
+            _showOnlineToast = true;
+            _hiding = false;
+            _toastTimer?.Dispose();
+            _toastTimer = new Timer(_ => BeginHide(), null, TimeSpan.FromMilliseconds(ToastVisibleMilliseconds), Timeout.InfiniteTimeSpan);
+        }
+
+        _wasOnline = online;
+        InvokeAsync(StateHasChanged);
+    }
+
+    private void BeginHide()
+    {
+        _hiding = true;
+        _toastTimer?.Dispose();
+        _toastTimer = new Timer(_ => CompleteHide(), null, TimeSpan.FromMilliseconds(FadeOutMilliseconds), Timeout.InfiniteTimeSpan);
+        InvokeAsync(StateHasChanged);
+    }
+
+    private void CompleteHide()
+    {
+        _showOnlineToast = false;
+        _hiding = false;
+        _toastTimer?.Dispose();
+        _toastTimer = null;
+        InvokeAsync(StateHasChanged);
+    }
+
+    private async Task RetryAsync()
+    {
+        if (_retrying)
+            return;
+        _retrying = true;
+        StateHasChanged();
+        await Task.Yield();
+        Connection.CheckNow();
+        CheckState();
+        _retrying = false;
+        StateHasChanged();
+    }
+
+    public void Dispose()
+    {
+        Connection.StateChanged -= OnConnectionChanged;
+        _pollTimer?.Dispose();
+        _toastTimer?.Dispose();
+    }
+}
