@@ -1352,6 +1352,20 @@ h1:focus {
     background: #0e1420;
 }
 
+/* Full-page viewer: lifts the image viewer over the whole app shell
+   (sidebar, topbar and other panes). The Blazor host toggles .fullscreen. */
+.rr-viewer.fullscreen {
+    position: fixed;
+    inset: 0;
+    z-index: 9000;
+    border: none;
+    border-radius: 0;
+}
+
+.rr-viewer.fullscreen .rr-pane-header {
+    background: var(--mud-palette-appbar-background, #ffffff);
+}
+
 .rr-placeholder {
     display: flex;
     flex-direction: column;

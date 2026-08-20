@@ -431,6 +431,7 @@
     "referralFee.created":  "تم إنشاء رسوم التحويل.",
     "inventory.unit":  "الوحدة",
     "visitDialog.scheduled":  "المجدول",
+    "visitDialog.checkedIn":  "تم الحضور",
     "itemDialog.noBatches":  "لا توجد دفعات مسجلة.",
     "stockMovements.loadErrorTitle":  "تعذر تحميل البيانات",
     "visitSchedule.scheduled":  "تمت جدولة الزيارة.",
@@ -1586,6 +1587,7 @@
     "validation.licenseNumberMaxLength":  "يجب ألا يتجاوز رقم الترخيص 100 حرف.",
     "roles.permission.appointmentscreate":  "إنشاء المواعيد",
     "validation.patientRequired":  "المريض مطلوب.",
+    "validation.examinationTypeRequired":  "نوع الفحص مطلوب.",
     "validation.bodyPartMaxLength":  "يجب ألا يتجاوز جزء الجسم 200 حرف.",
     "validation.salaryTypeRequired":  "نوع الراتب مطلوب.",
     "validation.nameMaxLength200":  "يجب ألا يتجاوز الاسم 200 حرف.",
@@ -1799,5 +1801,7 @@
     "readingRoom.hideWorklist":  "إخفاء قائمة العمل",
     "readingRoom.showWorklist":  "إظهار قائمة العمل",
     "readingRoom.hideReport":  "إخفاء التقرير",
-    "readingRoom.showReport":  "إظهار التقرير"
+    "readingRoom.showReport":  "إظهار التقرير",
+    "readingRoom.fullscreen":  "ملء الشاشة",
+    "readingRoom.exitFullscreen":  "إنهاء ملء الشاشة"
 }

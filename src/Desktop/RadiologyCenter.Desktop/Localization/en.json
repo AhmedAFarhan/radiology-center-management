@@ -431,6 +431,7 @@
     "referralFee.created":  "Referral fee created.",
     "inventory.unit":  "Unit",
     "visitDialog.scheduled":  "Scheduled",
+    "visitDialog.checkedIn":  "Checked In",
     "itemDialog.noBatches":  "No batches recorded.",
     "stockMovements.loadErrorTitle":  "Couldn\u0027t load data",
     "visitSchedule.scheduled":  "Visit scheduled.",
@@ -1586,6 +1587,7 @@
     "validation.licenseNumberMaxLength":  "License number must be 100 characters or fewer.",
     "roles.permission.appointmentscreate":  "Create Appointments",
     "validation.patientRequired":  "Patient is required.",
+    "validation.examinationTypeRequired":  "Examination type is required.",
     "validation.bodyPartMaxLength":  "Body part must be 200 characters or fewer.",
     "validation.salaryTypeRequired":  "Salary type is required.",
     "validation.nameMaxLength200":  "Name must be 200 characters or fewer.",
@@ -1799,5 +1801,7 @@
     "readingRoom.hideWorklist":  "Hide worklist",
     "readingRoom.showWorklist":  "Show worklist",
     "readingRoom.hideReport":  "Hide report",
-    "readingRoom.showReport":  "Show report"
+    "readingRoom.showReport":  "Show report",
+    "readingRoom.fullscreen":  "Fullscreen",
+    "readingRoom.exitFullscreen":  "Exit fullscreen"
 }

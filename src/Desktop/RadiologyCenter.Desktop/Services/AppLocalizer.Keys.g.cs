@@ -1578,12 +1578,14 @@ public sealed class ReadingRoomGroup : LocalizerGroup
     public string Description => Get("readingRoom.description");
     public string DraftSaved => Get("readingRoom.draftSaved");
     public string Exam => Get("readingRoom.exam");
+    public string ExitFullscreen => Get("readingRoom.exitFullscreen");
     public string FilterPlaceholder => Get("readingRoom.filterPlaceholder");
     public string FinalizeConfirm => Get("readingRoom.finalizeConfirm");
     public string FindingAdded => Get("readingRoom.findingAdded");
     public string FindingRemoved => Get("readingRoom.findingRemoved");
     public string Findings => Get("readingRoom.findings");
     public string FindingUpdated => Get("readingRoom.findingUpdated");
+    public string Fullscreen => Get("readingRoom.fullscreen");
     public string HideReport => Get("readingRoom.hideReport");
     public string HideWorklist => Get("readingRoom.hideWorklist");
     public string Imaged => Get("readingRoom.imaged");
@@ -2255,6 +2257,7 @@ public sealed class ValidationGroup : LocalizerGroup
     public string EmailMaxLength => Get("validation.emailMaxLength");
     public string EmailRequired => Get("validation.emailRequired");
     public string EstimatedAmountNonNegative => Get("validation.estimatedAmountNonNegative");
+    public string ExaminationTypeRequired => Get("validation.examinationTypeRequired");
     public string FirstNameMaxLength => Get("validation.firstNameMaxLength");
     public string FirstNameRequired => Get("validation.firstNameRequired");
     public string FullNameFirstAndLast => Get("validation.fullNameFirstAndLast");
@@ -2326,6 +2329,7 @@ public sealed class VisitDialogGroup : LocalizerGroup
     public string AmountPaid => Get("visitDialog.amountPaid");
     public string Billing => Get("visitDialog.billing");
     public string CancellationReason => Get("visitDialog.cancellationReason");
+    public string CheckedIn => Get("visitDialog.checkedIn");
     public string ClinicalIndication => Get("visitDialog.clinicalIndication");
     public string Completed => Get("visitDialog.completed");
     public string Consumable => Get("visitDialog.consumable");

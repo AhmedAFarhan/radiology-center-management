@@ -22,40 +22,9 @@
         <span class="dismiss">🗙</span>
     </div>
 
-    <script>
-        window.setAppLanguage = function (lang, dir) {
-            document.documentElement.lang = lang;
-            document.documentElement.dir = dir;
-            var errorMessage = document.getElementById('blazor-error-message');
-            if (errorMessage) {
-                errorMessage.textContent = lang === 'ar' ? 'حدث خطأ غير متوقع.' : 'An unhandled error has occurred.';
-            }
-            var reload = document.querySelector('#blazor-error-ui .reload');
-            if (reload) {
-                reload.textContent = lang === 'ar' ? 'إعادة التحميل' : 'Reload';
-            }
-        };
-    </script>
-    <script>
-        window.trackSidebarResize = function (dotnetRef) {
-            window.__sidebarDotnet = dotnetRef;
-            window.__sidebarResizeHandler = function () {
-                var width = window.innerWidth || document.documentElement.clientWidth;
-                if (window.__sidebarDotnet) {
-                    window.__sidebarDotnet.invokeMethodAsync('OnWindowResized', width);
-                }
-            };
-            window.addEventListener('resize', window.__sidebarResizeHandler);
-            window.__sidebarResizeHandler();
-        };
-        window.untrackSidebarResize = function () {
-            if (window.__sidebarResizeHandler) {
-                window.removeEventListener('resize', window.__sidebarResizeHandler);
-                window.__sidebarResizeHandler = null;
-            }
-            window.__sidebarDotnet = null;
-        };
-    </script>
+    <script src="js/app-language.js"></script>
+    <script src="js/sidebar-resize.js"></script>
+    <script src="js/reading-room.js"></script>
     <script src="_framework/blazor.webview.js" autostart="false"></script>
     <script src="_content/MudBlazor/MudBlazor.min.js"></script>
 

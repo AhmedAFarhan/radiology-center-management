@@ -95,7 +95,7 @@
     </section>
 
     <!-- â•â•â•â•â•â•â•â•â•â• Image viewer pane â•â•â•â•â•â•â•â•â•â• -->
-    <section class="reading-room-pane rr-viewer">
+    <section class="reading-room-pane rr-viewer @(_viewerFullscreen ? "fullscreen" : string.Empty)">
         <div class="rr-pane-header">
             <MudStack Row="true" AlignItems="AlignItems.Center" Spacing="1">
                 <MudIcon Icon="@Icons.Material.Filled.Monitor" Size="Size.Small" />
@@ -119,6 +119,13 @@
                                    Color="Color.Default"
                                    aria-label="@(_reportCollapsed ? T.ReadingRoom.ShowReport : T.ReadingRoom.HideReport)"
                                    OnClick="ToggleReport" />
+                </MudTooltip>
+                <MudTooltip Placement="Placement.Bottom" Text="@(_viewerFullscreen ? T.ReadingRoom.ExitFullscreen : T.ReadingRoom.Fullscreen)">
+                    <MudIconButton Icon="@(_viewerFullscreen ? Icons.Material.Filled.CloseFullscreen : Icons.Material.Filled.OpenInFull)"
+                                   Size="Size.Small"
+                                   Color="Color.Default"
+                                   aria-label="@(_viewerFullscreen ? T.ReadingRoom.ExitFullscreen : T.ReadingRoom.Fullscreen)"
+                                   OnClick="ToggleViewerFullscreen" />
                 </MudTooltip>
             </MudStack>
             <span class="rr-modality">@(Selected?.ExamName ?? "-")</span>
@@ -238,15 +245,19 @@
                     <MudSpacer />
                     @if (CanEdit)
                     {
-                        <MudIconButton Icon="@Icons.Material.Filled.Newspaper"
-                                       Size="Size.Small"
-                                       aria-label="@T.ReportTemplate.Title"
-                                       OnClick="OpenTemplatePicker" />
+                        <MudTooltip Placement="Placement.Bottom" Text="@T.ReportTemplate.Title">
+                            <MudIconButton Icon="@Icons.Material.Filled.Newspaper"
+                                           Size="Size.Small"
+                                           aria-label="@T.ReportTemplate.Title"
+                                           OnClick="OpenTemplatePicker" />
+                        </MudTooltip>
                     }
-                    <MudIconButton Icon="@Icons.Material.Filled.History"
-                                   Size="Size.Small"
-                                   aria-label="@T.ReportVersions.Title"
-                                   OnClick="OpenVersionsAsync" />
+                    <MudTooltip Placement="Placement.Bottom" Text="@T.ReportVersions.Title">
+                        <MudIconButton Icon="@Icons.Material.Filled.History"
+                                       Size="Size.Small"
+                                       aria-label="@T.ReportVersions.Title"
+                                       OnClick="OpenVersionsAsync" />
+                    </MudTooltip>
                 </div>
 
                 @foreach (var section in _sections)

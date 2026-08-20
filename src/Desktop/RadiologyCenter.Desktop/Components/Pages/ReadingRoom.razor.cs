@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Components;
+using Microsoft.JSInterop;
 using MudBlazor;
 using RadiologyCenter.Desktop.Models;
 using RadiologyCenter.Desktop.Services;
@@ -7,7 +8,7 @@ using Color = MudBlazor.Color;
 
 namespace RadiologyCenter.Desktop.Components.Pages;
 
-public partial class ReadingRoom : ComponentBase
+public partial class ReadingRoom : ComponentBase, IDisposable
 {
 [Inject] private ExaminationService ExaminationService { get; set; } = default!;
     [Inject] private PatientService PatientService { get; set; } = default!;
@@ -15,7 +16,8 @@ public partial class ReadingRoom : ComponentBase
     [Inject] private PacsSyncService PacsSync { get; set; } = default!;
     [Inject] private IDialogService DialogService { get; set; } = default!;
     [Inject] private ISnackbar Snackbar { get; set; } = default!;
-    [Inject] private AppLocalizer T { get; set; } = default!;
+[Inject] private AppLocalizer T { get; set; } = default!;
+    [Inject] private IJSRuntime JS { get; set; } = default!;
     private static readonly string[] SeverityOptions = { "None", "Mild", "Moderate", "Severe" };
 
     private readonly List<QueueExam> _queue = new();
@@ -46,10 +48,24 @@ public partial class ReadingRoom : ComponentBase
 
     private bool _worklistCollapsed;
     private bool _reportCollapsed;
+    private bool _viewerFullscreen;
+    private DotNetObjectReference<ReadingRoom>? _jsRef;
 
     private void ToggleWorklist() => _worklistCollapsed = !_worklistCollapsed;
 
     private void ToggleReport() => _reportCollapsed = !_reportCollapsed;
+
+    private void ToggleViewerFullscreen() => _viewerFullscreen = !_viewerFullscreen;
+
+    [JSInvokable]
+    public void OnViewerEscape()
+    {
+        if (_viewerFullscreen)
+        {
+            _viewerFullscreen = false;
+            StateHasChanged();
+        }
+    }
 
     private record CanonicalSection(string Type, string Label, int Position);
 
@@ -100,14 +116,22 @@ public partial class ReadingRoom : ComponentBase
         }
     }
 
-    protected override void OnAfterRender(bool firstRender)
+    protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        base.OnAfterRender(firstRender);
+        await base.OnAfterRenderAsync(firstRender);
         if (firstRender && !_loaded)
         {
             _loaded = true;
+            _jsRef = DotNetObjectReference.Create(this);
+            await JS.InvokeVoidAsync("readingRoomKeydown", _jsRef);
             _ = LoadQueueAsync();
         }
+    }
+
+    public void Dispose()
+    {
+        _ = JS.InvokeVoidAsync("unregisterReadingRoomKeydown");
+        _jsRef?.Dispose();
     }
 
     private bool IsSelected(QueueExam exam) => _selected?.Id == exam.Id;
