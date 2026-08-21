@@ -211,8 +211,8 @@ public sealed record ExaminationDto(
     string ExaminationTypeId,
     string ExaminationTypeName,
     string? ReferralDoctorId,
-    string RadiologistId,
-    string TechnicianId,
+    string? RadiologistId,
+    string? TechnicianId,
     string ClinicalIndication,
     string Priority,
     string PriorityKey,
@@ -290,8 +290,8 @@ public sealed class ExaminationInput
 {
     public string PatientId { get; set; } = string.Empty;
     public string ExaminationTypeId { get; set; } = string.Empty;
-    public string RadiologistId { get; set; } = string.Empty;
-    public string TechnicianId { get; set; } = string.Empty;
+    public string? RadiologistId { get; set; }
+    public string? TechnicianId { get; set; }
     public string? ReferralDoctorId { get; set; }
     public string ClinicalIndication { get; set; } = string.Empty;
     public string Priority { get; set; } = "Routine";
@@ -303,8 +303,8 @@ public sealed class ExaminationInput
 
 public sealed class ExaminationUpdateInput
 {
-    public string RadiologistId { get; set; } = string.Empty;
-    public string TechnicianId { get; set; } = string.Empty;
+    public string? RadiologistId { get; set; }
+    public string? TechnicianId { get; set; }
     public string? ReferralDoctorId { get; set; }
     public string ClinicalIndication { get; set; } = string.Empty;
     public string Priority { get; set; } = "Routine";

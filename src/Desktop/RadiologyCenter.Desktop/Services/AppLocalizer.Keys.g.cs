@@ -1610,6 +1610,7 @@ public sealed class ReadingRoomGroup : LocalizerGroup
     public string RemoveFindingConfirm => Get("readingRoom.removeFindingConfirm");
     public string ReopenedForAmendment => Get("readingRoom.reopenedForAmendment");
     public string ReportLoadError => Get("readingRoom.reportLoadError");
+    public string ReportNeedsRadiologist => Get("readingRoom.reportNeedsRadiologist");
     public string ReportLoadErrorTitle => Get("readingRoom.reportLoadErrorTitle");
     public string ReportSigned => Get("readingRoom.reportSigned");
     public string SaveDraft => Get("readingRoom.saveDraft");

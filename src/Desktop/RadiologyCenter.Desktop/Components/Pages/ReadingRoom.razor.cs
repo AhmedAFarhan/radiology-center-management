@@ -350,6 +350,13 @@ public partial class ReadingRoom : ComponentBase, IDisposable
         if (_selected is null)
             return;
 
+        if (string.IsNullOrWhiteSpace(_selected.AssignedRadiologistId))
+        {
+            _reportError = T.ReadingRoom.ReportNeedsRadiologist;
+            StateHasChanged();
+            return;
+        }
+
         _loadingReport = true;
         _reportError = null;
         StateHasChanged();

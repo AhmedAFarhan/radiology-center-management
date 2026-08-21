@@ -15,8 +15,8 @@ public sealed class Examination : AuditableAggregateRoot<Guid>
     public Guid PatientId { get; private set; }
     public Guid ExaminationTypeId { get; private set; }
     public Guid? ReferralDoctorId { get; private set; }
-    public Guid RadiologistId { get; private set; }
-    public Guid TechnicianId { get; private set; }
+    public Guid? RadiologistId { get; private set; }
+    public Guid? TechnicianId { get; private set; }
     public string ClinicalIndication { get; private set; }
     public ExaminationPriority Priority { get; private set; }
     public ExaminationStatus Status { get; private set; }
@@ -47,8 +47,8 @@ public sealed class Examination : AuditableAggregateRoot<Guid>
     public static Examination Create(
         Guid patientId,
         Guid examinationTypeId,
-        Guid radiologistId,
-        Guid technicianId,
+        Guid? radiologistId,
+        Guid? technicianId,
         string clinicalIndication,
         ExaminationPriority priority,
         decimal price,
@@ -60,8 +60,6 @@ public sealed class Examination : AuditableAggregateRoot<Guid>
     {
         Guard.AgainstEmpty(patientId, nameof(patientId));
         Guard.AgainstEmpty(examinationTypeId, nameof(examinationTypeId));
-        Guard.AgainstEmpty(radiologistId, nameof(radiologistId));
-        Guard.AgainstEmpty(technicianId, nameof(technicianId));
         Guard.AgainstNullOrWhiteSpace(clinicalIndication, nameof(clinicalIndication));
         Guard.AgainstNull(priority, nameof(priority));
         Guard.Against(price, p => p < 0, DomainErrors.PriceNegative, "Price cannot be negative.");
@@ -119,16 +117,14 @@ public sealed class Examination : AuditableAggregateRoot<Guid>
     }
 
     public void Update(
-        Guid radiologistId,
-        Guid technicianId,
+        Guid? radiologistId,
+        Guid? technicianId,
         string clinicalIndication,
         ExaminationPriority priority,
         Guid? referralDoctorId = null,
         string? notes = null)
     {
         EnsureNotTerminal();
-        Guard.AgainstEmpty(radiologistId, nameof(radiologistId));
-        Guard.AgainstEmpty(technicianId, nameof(technicianId));
         Guard.AgainstNullOrWhiteSpace(clinicalIndication, nameof(clinicalIndication));
         Guard.AgainstNull(priority, nameof(priority));
 
@@ -173,6 +169,7 @@ public sealed class Examination : AuditableAggregateRoot<Guid>
     public void Complete()
     {
         EnsureStatus(ExaminationStatus.InProgress);
+        EnsureStaffAssigned();
 
         CompletedAt = DateTime.UtcNow;
         Status = ExaminationStatus.Completed;
@@ -263,5 +260,14 @@ public sealed class Examination : AuditableAggregateRoot<Guid>
     {
         if (!allowed.Contains(Status))
             throw new BusinessRuleViolationException(nameof(EnsureStatus), DomainErrors.InvalidStatusTransition, $"Examination '{Id}' cannot transition from status '{Status}'.");
+    }
+
+    private void EnsureStaffAssigned()
+    {
+        if (RadiologistId is null || TechnicianId is null)
+            throw new BusinessRuleViolationException(
+                nameof(EnsureStaffAssigned),
+                DomainErrors.StaffNotAssigned,
+                $"Examination '{Id}' cannot be completed until a radiologist and a technician are assigned.");
     }
 }

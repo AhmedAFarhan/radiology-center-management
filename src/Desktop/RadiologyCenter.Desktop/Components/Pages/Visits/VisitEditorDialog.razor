@@ -1,5 +1,6 @@
 @inject ExaminationService ExaminationService
 @inject PatientService PatientService
+@inject ResourceService ResourceService
 @inject InventoryService InventoryService
 @inject EnumOptionsService EnumOptionsService
 @inject ISnackbar Snackbar
@@ -15,7 +16,7 @@
                 {
                     <MudItem xs="12" sm="6">
                         <MudAutocomplete T="PatientDto"
-                                         @bind-Value="_selectedPatient"
+                                         @bind-Value="_model.Patient"
                                          Label="@T.VisitDialog.PatientSearch"
                                          Variant="Variant.Outlined"
                                          Margin="Margin.Dense"
@@ -23,11 +24,12 @@
                                          DebounceInterval="300"
                                          SearchFunc="SearchPatientsAsync"
                                          ToStringFunc="@(p => p is null ? string.Empty : p.FullName)"
+                                         For="@(() => _model.Patient)"
                                          Clearable="true" />
                     </MudItem>
                     <MudItem xs="12" sm="6">
                         <MudAutocomplete T="ExaminationTypeDto"
-                                         @bind-Value="_selectedType"
+                                         @bind-Value="_model.ExaminationType"
                                          Label="@T.VisitDialog.TypeSearch"
                                          Variant="Variant.Outlined"
                                          Margin="Margin.Dense"
@@ -35,6 +37,7 @@
                                          DebounceInterval="300"
                                          SearchFunc="SearchTypesAsync"
                                          ToStringFunc="@(t => t is null ? string.Empty : $"{t.Code} - {t.Name}")"
+                                         For="@(() => _model.ExaminationType)"
                                          Clearable="true" />
                     </MudItem>
                 }
@@ -56,27 +59,42 @@
                     </MudItem>
                 }
                 <MudItem xs="12" sm="6">
-                    <MudTextField @bind-Value="_model.RadiologistId"
-                                  Label="@T.VisitDialog.RadiologistId"
-                                  Variant="Variant.Outlined"
-                                  Margin="Margin.Dense"
-                                  Immediate="true"
-                                  For="@(() => _model.RadiologistId)" />
+                    <MudSelect T="string"
+                               @bind-Value="_model.RadiologistId"
+                               Label="@T.VisitDialog.Radiologist"
+                               Variant="Variant.Outlined"
+                               Margin="Margin.Dense"
+                               Clearable="true">
+                        @foreach (var staff in _radiologists)
+                        {
+                            <MudSelectItem T="string" Value="@staff.Id">@staff.FullName</MudSelectItem>
+                        }
+                    </MudSelect>
                 </MudItem>
                 <MudItem xs="12" sm="6">
-                    <MudTextField @bind-Value="_model.TechnicianId"
-                                  Label="@T.VisitDialog.TechnicianId"
-                                  Variant="Variant.Outlined"
-                                  Margin="Margin.Dense"
-                                  Immediate="true"
-                                  For="@(() => _model.TechnicianId)" />
+                    <MudSelect T="string"
+                               @bind-Value="_model.TechnicianId"
+                               Label="@T.VisitDialog.Technician"
+                               Variant="Variant.Outlined"
+                               Margin="Margin.Dense"
+                               Clearable="true">
+                        @foreach (var staff in _technicians)
+                        {
+                            <MudSelectItem T="string" Value="@staff.Id">@staff.FullName</MudSelectItem>
+                        }
+                    </MudSelect>
                 </MudItem>
                 <MudItem xs="12" sm="6">
-                    <MudTextField @bind-Value="_model.ReferralDoctorId"
-                                  Label="@T.VisitDialog.ReferralDoctorId"
-                                  Variant="Variant.Outlined"
-                                  Margin="Margin.Dense"
-                                  Immediate="true" />
+                    <MudAutocomplete T="ReferralDoctorDto"
+                                     @bind-Value="_selectedReferralDoctor"
+                                     Label="@T.VisitDialog.ReferralDoctorId"
+                                     Variant="Variant.Outlined"
+                                     Margin="Margin.Dense"
+                                     MinCharacters="1"
+                                     DebounceInterval="300"
+                                     SearchFunc="SearchReferralDoctorsAsync"
+                                     ToStringFunc="@(d => d is null ? string.Empty : d.FullName)"
+                                     Clearable="true" />
                 </MudItem>
                 <MudItem xs="12" sm="6">
                     <MudSelect T="string"

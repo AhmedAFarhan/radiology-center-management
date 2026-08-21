@@ -23,6 +23,7 @@ public static class DomainErrors
     public const string ItemNotOnExamination = "Examination.ItemNotOnExamination";
     public const string ItemsCannotBeModified = "Examination.ItemsCannotBeModified";
     public const string InvalidStatusTransition = "Examination.InvalidStatusTransition";
+    public const string StaffNotAssigned = "Examination.StaffNotAssigned";
     public const string RadiologistFeeNegative = "Examination.RadiologistFeeNegative";
     public const string TechnicianFeeNegative = "Examination.TechnicianFeeNegative";
     public const string ReferralFeeNegative = "Examination.ReferralFeeNegative";

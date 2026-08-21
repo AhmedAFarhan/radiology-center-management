@@ -40,8 +40,8 @@ public static class ExaminationCompletedEventHandler
         var fees = await examinationFeeResolver.ResolveAsync(
             examination.ExaminationTypeId,
             typeSnapshot.Price,
-            examination.RadiologistId,
-            examination.TechnicianId,
+            examination.RadiologistId!.Value,
+            examination.TechnicianId!.Value,
             examination.ReferralDoctorId,
             ct);
 

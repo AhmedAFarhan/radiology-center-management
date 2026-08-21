@@ -18,8 +18,8 @@ public class ExaminationConfiguration : IEntityTypeConfiguration<Examination>
         builder.Property(e => e.PatientId).IsRequired();
         builder.Property(e => e.ExaminationTypeId).IsRequired();
         builder.Property(e => e.ReferralDoctorId);
-        builder.Property(e => e.RadiologistId).IsRequired();
-        builder.Property(e => e.TechnicianId).IsRequired();
+        builder.Property(e => e.RadiologistId);
+        builder.Property(e => e.TechnicianId);
         builder.Property(e => e.ClinicalIndication).IsRequired().HasMaxLength(1000);
         builder.Property(e => e.Priority)
             .HasConversion(p => p.Value, v => ExaminationPriority.FromValue<ExaminationPriority>(v));

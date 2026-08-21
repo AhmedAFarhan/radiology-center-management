@@ -15,6 +15,11 @@ public static class CompleteExaminationCommandHandler
         if (examination is null)
             return Result.Failure(Error.NotFound(ErrorCodes.ExaminationNotFound, "Examination", command.ExaminationId));
 
+        if (examination.RadiologistId is null || examination.TechnicianId is null)
+            return Result.Failure(Error.Conflict(
+                ErrorCodes.StaffNotAssigned,
+                "A radiologist and a technician must be assigned before the examination can be completed."));
+
         examination.Complete();
 
         await unitOfWork.SaveChangesAsync(ct);

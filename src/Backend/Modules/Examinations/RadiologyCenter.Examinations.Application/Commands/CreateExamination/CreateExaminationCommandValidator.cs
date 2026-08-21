@@ -1,5 +1,6 @@
 using FluentValidation;
 using RadiologyCenter.BuildingBlocks.Application.Validation;
+using RadiologyCenter.Examinations.Application.Localization;
 using RadiologyCenter.Examinations.Domain.Enumerations;
 
 namespace RadiologyCenter.Examinations.Application.Commands.CreateExamination;
@@ -10,8 +11,6 @@ public class CreateExaminationCommandValidator : AbstractValidator<CreateExamina
     {
         RuleFor(x => x.PatientId).NotEmpty();
         RuleFor(x => x.ExaminationTypeId).NotEmpty();
-        RuleFor(x => x.RadiologistId).NotEmpty();
-        RuleFor(x => x.TechnicianId).NotEmpty();
         RuleFor(x => x.ClinicalIndication).NotEmpty().MaximumLength(1000);
         RuleFor(x => x.Priority).NotEmpty().IsEnumerationMember<ExaminationPriority, CreateExaminationCommand>("Priority");
         RuleFor(x => x.Discount).GreaterThanOrEqualTo(0);

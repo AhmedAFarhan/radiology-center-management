@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using RadiologyCenter.Examinations.Infrastructure.Persistence;
 
@@ -11,9 +12,11 @@ using RadiologyCenter.Examinations.Infrastructure.Persistence;
 namespace RadiologyCenter.Examinations.Infrastructure.Persistence.Migrations
 {
     [DbContext(typeof(ExaminationsDbContext))]
-    partial class ExaminationsDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260821112339_MakeExaminationStaffNullable")]
+    partial class MakeExaminationStaffNullable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -180,7 +183,7 @@ namespace RadiologyCenter.Examinations.Infrastructure.Persistence.Migrations
                         .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
-                    b.Property<Guid>("RadiologistId")
+                    b.Property<Guid?>("RadiologistId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<Guid?>("ReferralDoctorId")
@@ -204,7 +207,7 @@ namespace RadiologyCenter.Examinations.Infrastructure.Persistence.Migrations
                         .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
-                    b.Property<Guid>("TechnicianId")
+                    b.Property<Guid?>("TechnicianId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("TypeBodyPart")

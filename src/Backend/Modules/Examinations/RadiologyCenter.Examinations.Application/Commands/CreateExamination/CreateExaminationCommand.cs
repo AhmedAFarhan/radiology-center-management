@@ -3,8 +3,8 @@ namespace RadiologyCenter.Examinations.Application.Commands.CreateExamination;
 public record CreateExaminationCommand(
     Guid PatientId,
     Guid ExaminationTypeId,
-    Guid RadiologistId,
-    Guid TechnicianId,
+    Guid? RadiologistId = null,
+    Guid? TechnicianId = null,
     Guid? ReferralDoctorId = null,
     string ClinicalIndication = null!,
     string Priority = "",
