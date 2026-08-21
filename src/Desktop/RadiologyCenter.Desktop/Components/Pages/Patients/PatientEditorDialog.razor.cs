@@ -24,8 +24,8 @@ public partial class PatientEditorDialog : ComponentBase
 
     [CascadingParameter] public IMudDialogInstance MudDialog { get; set; } = default!;
 
-    private static readonly string[] Genders = { "Male", "Female", "Other" };
-    private static readonly string[] BloodTypes = { "A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-" };
+    private IReadOnlyList<EnumOptionDto> _genderOptions = Array.Empty<EnumOptionDto>();
+    private IReadOnlyList<EnumOptionDto> _bloodTypeOptions = Array.Empty<EnumOptionDto>();
 
     private readonly PatientFormModel _model = new();
     private EditContext _editContext = default!;
@@ -33,9 +33,17 @@ public partial class PatientEditorDialog : ComponentBase
 
     private bool IsEdit => Patient is not null;
 
-    protected override void OnInitialized()
+    protected override async Task OnInitializedAsync()
     {
         _editContext = new EditContext(_model);
+
+        await SafeExecute.RunAsync(async () =>
+            {
+                _genderOptions = await EnumOptionsService.GetOptionsAsync("Gender");
+                _bloodTypeOptions = await EnumOptionsService.GetOptionsAsync("BloodType");
+            },
+            Snackbar,
+            () => T.PatientDialog.Unreachable);
 
         if (Patient is null)
             return;

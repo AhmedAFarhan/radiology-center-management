@@ -1,6 +1,7 @@
 @using static RadiologyCenter.Desktop.Services.Formatting
 @inherits EditorDialogBase
 @inject PayrollService PayrollService
+@inject EnumOptionsService EnumOptionsService
 
 <MudDialog>
     <DialogContent>
@@ -23,8 +24,10 @@
                                Variant="Variant.Outlined"
                                Margin="Margin.Dense"
                                For="@(() => _model.Kind)">
-                        <MudSelectItem T="string" Value="@("Earning")">Earning</MudSelectItem>
-                        <MudSelectItem T="string" Value="@("Deduction")">Deduction</MudSelectItem>
+                        @foreach (var kind in _kindOptions)
+                        {
+                            <MudSelectItem T="string" Value="@kind.Key">@kind.Value</MudSelectItem>
+                        }
                     </MudSelect>
                 </MudItem>
                 <MudItem xs="12" sm="4">
@@ -34,9 +37,9 @@
                                Variant="Variant.Outlined"
                                Margin="Margin.Dense">
                         <MudSelectItem T="string" Value="@((string?)null)">@T.SalaryComponent.NotSet</MudSelectItem>
-                        @foreach (var frequency in Frequencies)
+                        @foreach (var frequency in _frequencyOptions)
                         {
-                            <MudSelectItem T="string" Value="@frequency">@FormatFrequency(frequency)</MudSelectItem>
+                            <MudSelectItem T="string" Value="@frequency.Key">@frequency.Value</MudSelectItem>
                         }
                     </MudSelect>
                 </MudItem>

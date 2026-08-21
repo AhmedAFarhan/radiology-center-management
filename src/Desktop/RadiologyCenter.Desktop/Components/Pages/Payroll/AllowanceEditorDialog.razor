@@ -2,6 +2,7 @@
 @inherits EditorDialogBase
 @inject PayrollService PayrollService
 @inject ResourceService ResourceService
+@inject EnumOptionsService EnumOptionsService
 
 <MudDialog>
     <DialogContent>
@@ -79,9 +80,9 @@
                                Variant="Variant.Outlined"
                                Margin="Margin.Dense">
                         <MudSelectItem T="string" Value="@((string?)null)">@T.AllowanceDialog.NotSet</MudSelectItem>
-                        @foreach (var frequency in Frequencies)
+                        @foreach (var frequency in _frequencyOptions)
                         {
-                            <MudSelectItem T="string" Value="@frequency">@FormatFrequency(frequency)</MudSelectItem>
+                            <MudSelectItem T="string" Value="@frequency.Key">@frequency.Value</MudSelectItem>
                         }
                     </MudSelect>
                 </MudItem>

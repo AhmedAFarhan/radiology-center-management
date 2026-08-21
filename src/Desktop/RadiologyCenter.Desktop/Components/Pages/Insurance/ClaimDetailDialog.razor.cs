@@ -27,7 +27,7 @@ public partial class ClaimDetailDialog : ComponentBase
 
     [CascadingParameter] public IMudDialogInstance MudDialog { get; set; } = default!;
 
-    private static readonly string[] SettlementMethods = { "Check", "Wire Transfer", "Electronic Funds Transfer", "Adjustment" };
+    private IReadOnlyList<EnumOptionDto> _settlementMethodOptions = Array.Empty<EnumOptionDto>();
 
     private ClaimDto? _claim;
     private string _patientName = string.Empty;
@@ -37,7 +37,7 @@ public partial class ClaimDetailDialog : ComponentBase
     private string? _rejectionCode;
     private string? _rejectionReason;
     private decimal _settlementAmount;
-    private string _settlementMethod = "Check";
+    private string _settlementMethod = string.Empty;
     private string? _settlementReference;
     private string? _loadError;
     private bool _busy;
@@ -55,6 +55,10 @@ public partial class ClaimDetailDialog : ComponentBase
         _loadError = null;
         try
         {
+            _settlementMethodOptions = await EnumOptionsService.GetOptionsAsync("SettlementMethod");
+            if (_settlementMethodOptions.Count > 0 && string.IsNullOrEmpty(_settlementMethod))
+                _settlementMethod = _settlementMethodOptions[0].Key;
+
             _claim = await InsuranceService.GetClaimByIdAsync(ClaimId);
             _loadError = null;
         }

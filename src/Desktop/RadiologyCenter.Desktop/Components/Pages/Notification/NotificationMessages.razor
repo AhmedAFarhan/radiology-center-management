@@ -3,6 +3,7 @@
 @attribute [Authorize]
 @inherits ListPageBase<NotificationMessageDto>
 @inject NotificationService NotificationService
+@inject EnumOptionsService EnumOptionsService
 
 <PageHeader Icon="@Icons.Material.Filled.Notifications" Title="@T.Notifications.MessagesTitle"
             Subtitle="@T.Notifications.MessagesSubtitle"
@@ -12,16 +13,18 @@
     <MudSelect T="string" Value="_channel" ValueChanged="OnChannelChangedAsync" Label="@T.Notifications.Channel"
                Variant="Variant.Outlined" Margin="Margin.Dense" Dense="true" Class="status-filter ms-2">
         <MudSelectItem Value="@(string.Empty)">@T.Common.All</MudSelectItem>
-        <MudSelectItem Value="@("Sms")">SMS</MudSelectItem>
-        <MudSelectItem Value="@("Email")">Email</MudSelectItem>
-        <MudSelectItem Value="@("Push")">Push</MudSelectItem>
+        @foreach (var channel in _channelOptions)
+        {
+            <MudSelectItem Value="@channel.Key">@channel.Value</MudSelectItem>
+        }
     </MudSelect>
     <MudSelect T="string" Value="_status" ValueChanged="OnStatusChangedAsync" Label="@T.Common.Status"
                Variant="Variant.Outlined" Margin="Margin.Dense" Dense="true" Class="status-filter ms-2">
         <MudSelectItem Value="@(string.Empty)">@T.Common.All</MudSelectItem>
-        <MudSelectItem Value="@("Pending")">Pending</MudSelectItem>
-        <MudSelectItem Value="@("Sent")">Sent</MudSelectItem>
-        <MudSelectItem Value="@("Failed")">Failed</MudSelectItem>
+        @foreach (var status in _statusOptions)
+        {
+            <MudSelectItem Value="@status.Key">@status.Value</MudSelectItem>
+        }
     </MudSelect>
     <MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Send" OnClick="OpenSendDialogAsync">@T.SendDialog.Title</MudButton>
 </PageHeader>

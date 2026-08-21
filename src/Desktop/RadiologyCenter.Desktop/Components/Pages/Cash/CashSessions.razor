@@ -3,6 +3,7 @@
 @attribute [Authorize]
 @inherits ListPageBase<CashSessionDto>
 @inject CashService CashService
+@inject EnumOptionsService EnumOptionsService
 
 <PageHeader Icon="@Icons.Material.Filled.AccountBalanceWallet" Title="@T.Cash.Title"
             Subtitle="@T.Cash.Subtitle"
@@ -12,8 +13,10 @@
     <MudSelect T="string" Value="_status" ValueChanged="OnStatusChangedAsync" Label="@T.Common.Status"
                Variant="Variant.Outlined" Margin="Margin.Dense" Dense="true" Class="status-filter ms-2">
         <MudSelectItem Value="@(string.Empty)">@T.Common.All</MudSelectItem>
-        <MudSelectItem Value="@("Open")">@T.Cash.StatusOpen</MudSelectItem>
-        <MudSelectItem Value="@("Closed")">@T.Cash.StatusClosed</MudSelectItem>
+        @foreach (var status in _statusOptions)
+        {
+            <MudSelectItem Value="@status.Key">@status.Value</MudSelectItem>
+        }
     </MudSelect>
     <AuthorizeView Policy="@CashPermissions.SessionsOpen">
         <Authorized>

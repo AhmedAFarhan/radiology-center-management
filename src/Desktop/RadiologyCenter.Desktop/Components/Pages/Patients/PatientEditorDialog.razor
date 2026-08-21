@@ -1,4 +1,5 @@
 @inject PatientService PatientService
+@inject EnumOptionsService EnumOptionsService
 @inject ISnackbar Snackbar
 @inject AppLocalizer T
 
@@ -23,9 +24,9 @@
                                Variant="Variant.Outlined"
                                Margin="Margin.Dense"
                                For="@(() => _model.Gender)">
-                        @foreach (var gender in Genders)
+                        @foreach (var gender in _genderOptions)
                         {
-                            <MudSelectItem T="string" Value="@gender">@gender</MudSelectItem>
+                            <MudSelectItem T="string" Value="@gender.Key">@gender.Value</MudSelectItem>
                         }
                     </MudSelect>
                 </MudItem>
@@ -77,9 +78,9 @@
                                Variant="Variant.Outlined"
                                Margin="Margin.Dense"
                                Clearable="true">
-                        @foreach (var bloodType in BloodTypes)
+                        @foreach (var bloodType in _bloodTypeOptions)
                         {
-                            <MudSelectItem T="string" Value="@bloodType">@bloodType</MudSelectItem>
+                            <MudSelectItem T="string" Value="@bloodType.Key">@bloodType.Value</MudSelectItem>
                         }
                     </MudSelect>
                 </MudItem>

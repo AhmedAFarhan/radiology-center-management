@@ -1,6 +1,7 @@
 @inherits EditorDialogBase
 @inject PayrollService PayrollService
 @inject ResourceService ResourceService
+@inject EnumOptionsService EnumOptionsService
 
 <MudDialog>
     <DialogContent>
@@ -50,8 +51,10 @@
                                Variant="Variant.Outlined"
                                Margin="Margin.Dense"
                                For="@(() => _model.SalaryType)">
-                        <MudSelectItem T="string" Value="@("Monthly")">Monthly</MudSelectItem>
-                        <MudSelectItem T="string" Value="@("Hourly")">Hourly</MudSelectItem>
+                        @foreach (var salaryType in _salaryTypeOptions)
+                        {
+                            <MudSelectItem T="string" Value="@salaryType.Key">@salaryType.Value</MudSelectItem>
+                        }
                     </MudSelect>
                 </MudItem>
                 <MudItem xs="12" sm="6">

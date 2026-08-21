@@ -7,8 +7,23 @@ namespace RadiologyCenter.Desktop.Components.Pages.Cash;
 public partial class CashSessions : ListPageBase<CashSessionDto>
 {
     private string _status = string.Empty;
+    private IReadOnlyList<EnumOptionDto> _statusOptions = Array.Empty<EnumOptionDto>();
 
     protected override string UnreachableMessage => T.Cash.Unreachable;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+
+        try
+        {
+            _statusOptions = await EnumOptionsService.GetOptionsAsync("CashSessionStatus");
+        }
+        catch
+        {
+            // filter options are non-critical; leave empty
+        }
+    }
 
     protected override async Task<PagedResult<CashSessionDto>> LoadPageAsync(
         string? search,

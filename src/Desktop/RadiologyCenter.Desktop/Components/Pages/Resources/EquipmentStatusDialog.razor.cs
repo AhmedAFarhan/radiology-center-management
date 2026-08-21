@@ -24,21 +24,21 @@ public partial class EquipmentStatusDialog : ComponentBase
 
     [CascadingParameter] public IMudDialogInstance MudDialog { get; set; } = default!;
 
-    private static readonly Dictionary<string, string> StatusOptions = new()
-    {
-        ["Operational"] = "Operational",
-        ["UnderMaintenance"] = "Under Maintenance",
-        ["OutOfService"] = "Out of Service",
-        ["Retired"] = "Retired",
-    };
+    private IReadOnlyList<EnumOptionDto> _statusOptions = Array.Empty<EnumOptionDto>();
 
     private readonly EquipmentStatusModel _model = new();
     private EditContext _editContext = default!;
     private bool _busy;
 
-    protected override void OnInitialized()
+    protected override async Task OnInitializedAsync()
     {
         _editContext = new EditContext(_model);
+
+        await SafeExecute.RunAsync(async () =>
+            _statusOptions = await EnumOptionsService.GetOptionsAsync("EquipmentStatus"),
+            Snackbar,
+            () => T.EquipmentDialog.Unreachable);
+
         _model.Status = Equipment.Status;
     }
 

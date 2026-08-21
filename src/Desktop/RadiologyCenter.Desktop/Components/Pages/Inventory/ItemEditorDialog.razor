@@ -1,5 +1,6 @@
 @inherits EditorDialogBase
 @inject InventoryService InventoryService
+@inject EnumOptionsService EnumOptionsService
 
 <MudDialog>
     <DialogContent>
@@ -29,7 +30,7 @@
                                Variant="Variant.Outlined"
                                Margin="Margin.Dense"
                                For="@(() => _model.Category)">
-                        @foreach (var category in Categories)
+                        @foreach (var category in _categoryOptions)
                         {
                             <MudSelectItem T="string" Value="@category.Key">@category.Value</MudSelectItem>
                         }
@@ -42,9 +43,9 @@
                                Variant="Variant.Outlined"
                                Margin="Margin.Dense"
                                For="@(() => _model.Unit)">
-                        @foreach (var unit in Units)
+                        @foreach (var unit in _unitOptions)
                         {
-                            <MudSelectItem T="string" Value="@unit">@unit</MudSelectItem>
+                            <MudSelectItem T="string" Value="@unit.Key">@unit.Value</MudSelectItem>
                         }
                     </MudSelect>
                 </MudItem>

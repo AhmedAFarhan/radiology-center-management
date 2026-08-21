@@ -22,14 +22,7 @@ public partial class LeaveEditorDialog : EditorDialogBase
 {
     [Parameter] public LeaveDto? Leave { get; set; }
 
-    private static readonly Dictionary<string, string> LeaveTypes = new()
-    {
-        ["Annual"] = "Annual",
-        ["Sick"] = "Sick",
-        ["Unpaid"] = "Unpaid",
-        ["Maternity"] = "Maternity",
-        ["Other"] = "Other",
-    };
+    private IReadOnlyList<EnumOptionDto> _leaveTypeOptions = Array.Empty<EnumOptionDto>();
 
     private readonly LeaveFormModel _model = new();
     private EditContext _editContext = default!;
@@ -62,6 +55,11 @@ public partial class LeaveEditorDialog : EditorDialogBase
     protected override async Task OnInitializedAsync()
     {
         _editContext = new EditContext(_model);
+
+        await SafeExecute.RunAsync(async () =>
+            _leaveTypeOptions = await EnumOptionsService.GetOptionsAsync("LeaveType"),
+            Snackbar,
+            () => T.LeaveDialog.Unreachable);
 
         if (Leave is null)
         {

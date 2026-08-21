@@ -22,25 +22,25 @@ public partial class ItemEditorDialog : EditorDialogBase
 {
     [Parameter] public ItemDto? Item { get; set; }
 
-    private static readonly Dictionary<string, string> Categories = new()
-    {
-        ["ContrastMedia"] = "Contrast Media",
-        ["Drug"] = "Drug",
-        ["MedicalSupply"] = "Medical Supply",
-        ["Consumable"] = "Consumable",
-        ["Other"] = "Other",
-    };
-
-    private static readonly string[] Units = { "Piece", "Box", "Bottle", "Vial", "Ampoule", "Pack", "Tube", "Roll", "Sheet", "Kit" };
+    private IReadOnlyList<EnumOptionDto> _categoryOptions = Array.Empty<EnumOptionDto>();
+    private IReadOnlyList<EnumOptionDto> _unitOptions = Array.Empty<EnumOptionDto>();
 
     private readonly ItemFormModel _model = new();
     private EditContext _editContext = default!;
 
     private bool IsEdit => Item is not null;
 
-    protected override void OnInitialized()
+    protected override async Task OnInitializedAsync()
     {
         _editContext = new EditContext(_model);
+
+        await SafeExecute.RunAsync(async () =>
+            {
+                _categoryOptions = await EnumOptionsService.GetOptionsAsync("ItemCategory");
+                _unitOptions = await EnumOptionsService.GetOptionsAsync("UnitType");
+            },
+            Snackbar,
+            () => T.ItemDialog.Unreachable);
 
         if (Item is null)
             return;

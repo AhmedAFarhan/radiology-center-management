@@ -22,7 +22,7 @@ public partial class AllowanceEditorDialog : EditorDialogBase
 {
     [Parameter] public AllowanceAssignmentDto? Allowance { get; set; }
 
-    private static readonly string[] Frequencies = { "OneTime", "Monthly", "Quarterly", "Annual" };
+    private IReadOnlyList<EnumOptionDto> _frequencyOptions = Array.Empty<EnumOptionDto>();
 
     private readonly AllowanceFormModel _model = new();
     private EditContext _editContext = default!;
@@ -70,6 +70,11 @@ public partial class AllowanceEditorDialog : EditorDialogBase
     protected override async Task OnInitializedAsync()
     {
         _editContext = new EditContext(_model);
+
+        await SafeExecute.RunAsync(async () =>
+            _frequencyOptions = await EnumOptionsService.GetOptionsAsync("Frequency"),
+            Snackbar,
+            () => T.AllowanceDialog.Unreachable);
 
         if (Allowance is null)
         {

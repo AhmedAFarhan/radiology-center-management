@@ -22,6 +22,8 @@ public partial class ExaminationFeeEditorDialog : EditorDialogBase
 {
     [Parameter] public ExaminationFeeDto? Fee { get; set; }
 
+    private IReadOnlyList<EnumOptionDto> _roleOptions = Array.Empty<EnumOptionDto>();
+
     private readonly ExaminationFeeFormModel _model = new();
     private EditContext _editContext = default!;
     private ExaminationTypeDto? _selectedType;
@@ -49,6 +51,11 @@ public partial class ExaminationFeeEditorDialog : EditorDialogBase
     protected override async Task OnInitializedAsync()
     {
         _editContext = new EditContext(_model);
+
+        await SafeExecute.RunAsync(async () =>
+            _roleOptions = await EnumOptionsService.GetOptionsAsync("ExamFeeRole"),
+            Snackbar,
+            () => T.ExamFee.UnreachableTryAgain);
 
         if (Fee is null)
             return;

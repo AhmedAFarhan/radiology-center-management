@@ -22,16 +22,25 @@ public partial class SalaryComponentEditorDialog : EditorDialogBase
 {
     [Parameter] public SalaryComponentDto? Component { get; set; }
 
-    private static readonly string[] Frequencies = { "OneTime", "Monthly", "Quarterly", "Annual" };
+    private IReadOnlyList<EnumOptionDto> _kindOptions = Array.Empty<EnumOptionDto>();
+    private IReadOnlyList<EnumOptionDto> _frequencyOptions = Array.Empty<EnumOptionDto>();
 
     private readonly SalaryComponentFormModel _model = new();
     private EditContext _editContext = default!;
 
     private bool IsEdit => Component is not null;
 
-    protected override void OnInitialized()
+    protected override async Task OnInitializedAsync()
     {
         _editContext = new EditContext(_model);
+
+        await SafeExecute.RunAsync(async () =>
+            {
+                _kindOptions = await EnumOptionsService.GetOptionsAsync("ComponentKind");
+                _frequencyOptions = await EnumOptionsService.GetOptionsAsync("Frequency");
+            },
+            Snackbar,
+            () => T.SalaryComponent.UnreachableTryAgain);
 
         if (Component is null)
             return;

@@ -11,12 +11,24 @@ public partial class AddCashEntryDialog : EditorDialogBase
 {
     [Parameter] public string SessionId { get; set; } = string.Empty;
 
+    private IReadOnlyList<EnumOptionDto> _directionOptions = Array.Empty<EnumOptionDto>();
+    private IReadOnlyList<EnumOptionDto> _reasonOptions = Array.Empty<EnumOptionDto>();
+
     private readonly AddEntryFormModel _model = new();
     private EditContext _editContext = default!;
 
-    protected override void OnInitialized()
+    protected override async Task OnInitializedAsync()
     {
         _editContext = new EditContext(_model);
+
+        await SafeExecute.RunAsync(async () =>
+            {
+                _directionOptions = await EnumOptionsService.GetOptionsAsync("CashEntryDirection");
+                _reasonOptions = await EnumOptionsService.GetOptionsAsync("CashEntryReason");
+            },
+            Snackbar,
+            () => T.CashEntry.UnreachableRetry);
+
         _model.Reason = "Payment";
     }
 

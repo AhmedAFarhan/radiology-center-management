@@ -22,14 +22,7 @@ public partial class StaffEditorDialog : EditorDialogBase
 {
     [Parameter] public StaffDto? Staff { get; set; }
 
-    private static readonly Dictionary<string, string> Positions = new()
-    {
-        ["Technician"] = "Technician",
-        ["Radiologist"] = "Radiologist",
-        ["Receptionist"] = "Receptionist",
-        ["Nurse"] = "Nurse",
-        ["Other"] = "Other",
-    };
+    private IReadOnlyList<EnumOptionDto> _positionOptions = Array.Empty<EnumOptionDto>();
 
     private readonly StaffFormModel _model = new();
     private EditContext _editContext = default!;
@@ -62,6 +55,11 @@ public partial class StaffEditorDialog : EditorDialogBase
     protected override async Task OnInitializedAsync()
     {
         _editContext = new EditContext(_model);
+
+        await SafeExecute.RunAsync(async () =>
+            _positionOptions = await EnumOptionsService.GetOptionsAsync("StaffPosition"),
+            Snackbar,
+            () => T.StaffDialog.Unreachable);
 
         if (Staff is null)
             return;

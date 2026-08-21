@@ -1,5 +1,6 @@
 @inherits EditorDialogBase
 @inject CashService CashService
+@inject EnumOptionsService EnumOptionsService
 
 <MudDialog>
     <DialogContent>
@@ -13,8 +14,10 @@
                                Variant="Variant.Outlined"
                                Margin="Margin.Dense"
                                For="@(() => _model.Direction)">
-                        <MudSelectItem Value="@("In")">@T.CashEntry.DirectionIn</MudSelectItem>
-                        <MudSelectItem Value="@("Out")">@T.CashEntry.DirectionOut</MudSelectItem>
+                        @foreach (var direction in _directionOptions)
+                        {
+                            <MudSelectItem T="string" Value="@direction.Key">@direction.Value</MudSelectItem>
+                        }
                     </MudSelect>
                 </MudItem>
                 <MudItem xs="12" sm="6">
@@ -23,11 +26,10 @@
                                Variant="Variant.Outlined"
                                Margin="Margin.Dense"
                                For="@(() => _model.Reason)">
-                        <MudSelectItem Value="@("Payment")">@T.CashEntry.ReasonPayment</MudSelectItem>
-                        <MudSelectItem Value="@("Refund")">@T.CashEntry.ReasonRefund</MudSelectItem>
-                        <MudSelectItem Value="@("Deposit")">@T.CashEntry.ReasonDeposit</MudSelectItem>
-                        <MudSelectItem Value="@("Payout")">@T.CashEntry.ReasonPayout</MudSelectItem>
-                        <MudSelectItem Value="@("Adjustment")">@T.CashEntry.ReasonAdjustment</MudSelectItem>
+                        @foreach (var reason in _reasonOptions)
+                        {
+                            <MudSelectItem T="string" Value="@reason.Key">@reason.Value</MudSelectItem>
+                        }
                     </MudSelect>
                 </MudItem>
                 <MudItem xs="12" sm="6">

@@ -1,5 +1,6 @@
 @inherits EditorDialogBase
 @inject ResourceService ResourceService
+@inject EnumOptionsService EnumOptionsService
 
 <MudDialog>
     <DialogContent>
@@ -27,7 +28,7 @@
                                Variant="Variant.Outlined"
                                Margin="Margin.Dense"
                                For="@(() => _model.LeaveType)">
-                        @foreach (var type in LeaveTypes)
+                        @foreach (var type in _leaveTypeOptions)
                         {
                             <MudSelectItem T="string" Value="@type.Key">@type.Value</MudSelectItem>
                         }

@@ -1,6 +1,7 @@
 @inject ExaminationService ExaminationService
 @inject PatientService PatientService
 @inject InventoryService InventoryService
+@inject EnumOptionsService EnumOptionsService
 @inject ISnackbar Snackbar
 @inject AppLocalizer T
 
@@ -83,9 +84,9 @@
                                Label="@T.VisitDialog.Priority"
                                Variant="Variant.Outlined"
                                Margin="Margin.Dense">
-                        @foreach (var priority in Priorities)
+                        @foreach (var priority in _priorityOptions)
                         {
-                            <MudSelectItem T="string" Value="@priority">@priority</MudSelectItem>
+                            <MudSelectItem T="string" Value="@priority.Key">@priority.Value</MudSelectItem>
                         }
                     </MudSelect>
                 </MudItem>

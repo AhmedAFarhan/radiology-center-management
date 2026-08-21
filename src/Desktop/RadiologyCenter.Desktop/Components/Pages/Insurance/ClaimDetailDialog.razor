@@ -1,4 +1,5 @@
 @inject InsuranceService InsuranceService
+@inject EnumOptionsService EnumOptionsService
 @inject IDialogService DialogService
 @inject ISnackbar Snackbar
 @inject AppLocalizer T
@@ -97,9 +98,9 @@
                                    Label="@T.ClaimDialog.Method"
                                    Variant="Variant.Outlined"
                                    Margin="Margin.Dense">
-                            @foreach (var method in SettlementMethods)
+                            @foreach (var method in _settlementMethodOptions)
                             {
-                                <MudSelectItem T="string" Value="@method">@method</MudSelectItem>
+                                <MudSelectItem T="string" Value="@method.Key">@method.Value</MudSelectItem>
                             }
                         </MudSelect>
                     </MudItem>

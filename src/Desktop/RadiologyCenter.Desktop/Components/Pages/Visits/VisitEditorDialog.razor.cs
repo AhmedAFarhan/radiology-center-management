@@ -24,7 +24,7 @@ public partial class VisitEditorDialog : ComponentBase
 
     [CascadingParameter] public IMudDialogInstance MudDialog { get; set; } = default!;
 
-    private static readonly string[] Priorities = { "Routine", "Urgent", "Stat" };
+    private IReadOnlyList<EnumOptionDto> _priorityOptions = Array.Empty<EnumOptionDto>();
 
     private readonly VisitFormModel _model = new();
     private EditContext _editContext = default!;
@@ -81,6 +81,11 @@ public partial class VisitEditorDialog : ComponentBase
     protected override async Task OnInitializedAsync()
     {
         _editContext = new EditContext(_model);
+
+        await SafeExecute.RunAsync(async () =>
+            _priorityOptions = await EnumOptionsService.GetOptionsAsync("ExaminationPriority"),
+            Snackbar,
+            () => T.VisitDialog.Unreachable);
 
         if (IsEdit)
         {

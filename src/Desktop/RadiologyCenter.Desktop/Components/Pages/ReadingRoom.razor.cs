@@ -18,7 +18,8 @@ public partial class ReadingRoom : ComponentBase, IDisposable
     [Inject] private ISnackbar Snackbar { get; set; } = default!;
 [Inject] private AppLocalizer T { get; set; } = default!;
     [Inject] private IJSRuntime JS { get; set; } = default!;
-    private static readonly string[] SeverityOptions = { "None", "Mild", "Moderate", "Severe" };
+    [Inject] private EnumOptionsService EnumOptionsService { get; set; } = default!;
+    private IReadOnlyList<EnumOptionDto> _severityOptions = Array.Empty<EnumOptionDto>();
 
     private readonly List<QueueExam> _queue = new();
     private readonly Dictionary<string, PatientDto> _patientCache = new(StringComparer.OrdinalIgnoreCase);
@@ -124,7 +125,20 @@ public partial class ReadingRoom : ComponentBase, IDisposable
             _loaded = true;
             _jsRef = DotNetObjectReference.Create(this);
             await JS.InvokeVoidAsync("readingRoomKeydown", _jsRef);
+            _ = LoadSeverityOptionsAsync();
             _ = LoadQueueAsync();
+        }
+    }
+
+    private async Task LoadSeverityOptionsAsync()
+    {
+        try
+        {
+            _severityOptions = await EnumOptionsService.GetOptionsAsync("FindingSeverity");
+        }
+        catch
+        {
+            // severity options are non-critical; leave empty
         }
     }
 

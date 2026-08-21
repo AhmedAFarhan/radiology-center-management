@@ -296,9 +296,9 @@
                                            Variant="Variant.Outlined"
                                            Class="flex-shrink-0"
                                            Style="min-width:120px;">
-                                    @foreach (var level in SeverityOptions)
+                                    @foreach (var level in _severityOptions)
                                     {
-                                        <MudSelectItem T="string" Value="@level">@level</MudSelectItem>
+                                        <MudSelectItem T="string" Value="@level.Key">@level.Value</MudSelectItem>
                                     }
                                 </MudSelect>
                                 <MudTooltip Placement="Placement.Bottom" Text="@T.ReadingRoom.RemoveFinding">
@@ -342,9 +342,9 @@
                                Variant="Variant.Outlined"
                                Margin="Margin.Dense"
                                Class="mt-2">
-                        @foreach (var level in SeverityOptions)
+                        @foreach (var level in _severityOptions)
                         {
-                            <MudSelectItem T="string" Value="@level">@level</MudSelectItem>
+                            <MudSelectItem T="string" Value="@level.Key">@level.Value</MudSelectItem>
                         }
                     </MudSelect>
                     <MudButton Variant="Variant.Filled"

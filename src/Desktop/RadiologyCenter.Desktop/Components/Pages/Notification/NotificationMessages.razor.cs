@@ -23,8 +23,25 @@ public partial class NotificationMessages : ListPageBase<NotificationMessageDto>
 {
     private string _channel = string.Empty;
     private string _status = string.Empty;
+    private IReadOnlyList<EnumOptionDto> _channelOptions = Array.Empty<EnumOptionDto>();
+    private IReadOnlyList<EnumOptionDto> _statusOptions = Array.Empty<EnumOptionDto>();
 
     protected override string UnreachableMessage => T.Notifications.Unreachable;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+
+        try
+        {
+            _channelOptions = await EnumOptionsService.GetOptionsAsync("NotificationChannel");
+            _statusOptions = await EnumOptionsService.GetOptionsAsync("NotificationStatus");
+        }
+        catch
+        {
+            // filter options are non-critical; leave empty
+        }
+    }
 
     protected override async Task<PagedResult<NotificationMessageDto>> LoadPageAsync(
         string? search,

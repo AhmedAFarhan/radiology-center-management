@@ -25,12 +25,22 @@ public partial class SendNotificationDialog : ComponentBase
     private readonly SendNotificationFormModel _model = new();
     private EditContext _editContext = default!;
     private bool _busy;
+    private IReadOnlyList<EnumOptionDto> _channelOptions = Array.Empty<EnumOptionDto>();
     private IReadOnlyList<NotificationTemplateDto> _templates = Array.Empty<NotificationTemplateDto>();
     private NotificationPreviewDto? _preview;
 
     protected override async Task OnInitializedAsync()
     {
         _editContext = new EditContext(_model);
+
+        try
+        {
+            _channelOptions = await EnumOptionsService.GetOptionsAsync("NotificationChannel");
+        }
+        catch
+        {
+            // channel options fall back to an empty list; the select will render no items
+        }
 
         try
         {

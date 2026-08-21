@@ -22,6 +22,8 @@ public partial class SalaryEditorDialog : EditorDialogBase
 {
     [Parameter] public SalaryDto? Salary { get; set; }
 
+    private IReadOnlyList<EnumOptionDto> _salaryTypeOptions = Array.Empty<EnumOptionDto>();
+
     private readonly SalaryFormModel _model = new();
     private EditContext _editContext = default!;
     private StaffDto? _selectedStaff;
@@ -55,6 +57,11 @@ public partial class SalaryEditorDialog : EditorDialogBase
     protected override async Task OnInitializedAsync()
     {
         _editContext = new EditContext(_model);
+
+        await SafeExecute.RunAsync(async () =>
+            _salaryTypeOptions = await EnumOptionsService.GetOptionsAsync("SalaryType"),
+            Snackbar,
+            () => T.SalaryDialog.Unreachable);
 
         if (Salary is null)
         {

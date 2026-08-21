@@ -1,4 +1,5 @@
 @inject ResourceService ResourceService
+@inject EnumOptionsService EnumOptionsService
 @inject ISnackbar Snackbar
 @inject AppLocalizer T
 
@@ -17,7 +18,7 @@
                        Variant="Variant.Outlined"
                        Margin="Margin.Dense"
                        Class="w-100">
-                @foreach (var option in StatusOptions)
+                @foreach (var option in _statusOptions)
                 {
                     <MudSelectItem T="string" Value="@option.Key">@option.Value</MudSelectItem>
                 }
