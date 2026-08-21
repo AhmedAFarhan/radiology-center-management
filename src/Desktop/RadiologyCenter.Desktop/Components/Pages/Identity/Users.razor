@@ -18,7 +18,7 @@
     </AuthorizeView>
 </PageHeader>
 
-<MudTable T="UserDto" @ref="Table" ServerData="LoadServerData" Dense="true" Hover="true" Striped="true" Elevation="1" RowsPerPage="10" FixedHeader="true" Class="table-scroll">
+<MudTable Breakpoint="Breakpoint.Sm" T="UserDto" @ref="Table" ServerData="LoadServerData" Dense="true" Hover="true" Striped="true" Elevation="1" RowsPerPage="10" FixedHeader="true" Class="table-scroll">
     <HeaderContent>
         <MudTh><MudTableSortLabel T="UserDto" SortLabel="@("UserName")">@T.Users.Username</MudTableSortLabel></MudTh>
         <MudTh><MudTableSortLabel T="UserDto" SortLabel="@("LastName")">@T.Common.Name</MudTableSortLabel></MudTh>

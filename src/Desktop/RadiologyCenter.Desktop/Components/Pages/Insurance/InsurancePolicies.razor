@@ -16,7 +16,7 @@
     </AuthorizeView>
 </PageHeader>
 
-<MudTable T="InsurancePolicyListItemDto" @ref="Table" ServerData="LoadServerData" Dense="true" Hover="true" Striped="true" Elevation="1" RowsPerPage="10" FixedHeader="true" Class="table-scroll">
+<MudTable Breakpoint="Breakpoint.Sm" T="InsurancePolicyListItemDto" @ref="Table" ServerData="LoadServerData" Dense="true" Hover="true" Striped="true" Elevation="1" RowsPerPage="10" FixedHeader="true" Class="table-scroll">
     <HeaderContent>
         <MudTh><MudTableSortLabel T="InsurancePolicyListItemDto" SortLabel="@("PolicyNumber")">@T.Policy.Number</MudTableSortLabel></MudTh>
         <MudTh><MudTableSortLabel T="InsurancePolicyListItemDto" SortLabel="@("PatientName")">@T.Policy.Patient</MudTableSortLabel></MudTh>

@@ -11,7 +11,7 @@
             OnRefresh="ReloadAsync">
 </PageHeader>
 
-<MudTable T="StockMovementDto" @ref="Table" ServerData="LoadServerData" Dense="true" Hover="true" Striped="true" Elevation="1" RowsPerPage="10" FixedHeader="true" Class="table-scroll">
+<MudTable Breakpoint="Breakpoint.Sm" T="StockMovementDto" @ref="Table" ServerData="LoadServerData" Dense="true" Hover="true" Striped="true" Elevation="1" RowsPerPage="10" FixedHeader="true" Class="table-scroll">
     <HeaderContent>
         <MudTh><MudTableSortLabel T="StockMovementDto" SortLabel="@("CreatedAt")">@T.Common.Date</MudTableSortLabel></MudTh>
         <MudTh><MudTableSortLabel T="StockMovementDto" SortLabel="@("MovementType")">@T.Common.Type</MudTableSortLabel></MudTh>

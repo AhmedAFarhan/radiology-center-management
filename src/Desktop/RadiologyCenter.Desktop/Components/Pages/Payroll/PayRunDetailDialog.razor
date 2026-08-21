@@ -65,7 +65,7 @@
                     }
                     else
                     {
-                        <MudTable T="PayslipDto" Items="_payRun.Payslips" Dense="true" Hover="true" Elevation="0" Class="rounded" Style="border:1px solid rgba(0,0,0,.12)">
+                        <MudTable Breakpoint="Breakpoint.Sm" T="PayslipDto" Items="_payRun.Payslips" Dense="true" Hover="true" Elevation="0" Class="rounded" Style="border:1px solid rgba(0,0,0,.12)">
                             <HeaderContent>
                                 <MudTh />
                                 <MudTh>@T.PayRunDialog.Employee</MudTh>
@@ -80,7 +80,7 @@
                                 }
                             </HeaderContent>
                             <RowTemplate Context="ps">
-                                <MudTd>
+                                <MudTd DataLabel="@T.PayRunDialog.ToggleBreakdown">
                                     <MudIconButton Icon="@(IsExpanded(ps) ? Icons.Material.Filled.ExpandMore : Icons.Material.Filled.ChevronRight)"
                                                    Size="Size.Small"
                                                    aria-label="@T.PayRunDialog.ToggleBreakdown"
@@ -119,11 +119,11 @@
                                                 <MudTh Class="text-right">@T.PayRunDialog.Amount</MudTh>
                                             </HeaderContent>
                                             <RowTemplate Context="cmp">
-                                                <MudTd>
+                                                <MudTd DataLabel="@T.PayRunDialog.Component">
                                                     <MudChip T="string" Size="Size.Small" Color="@(cmp.IsDeduction ? Color.Error : Color.Success)" Variant="Variant.Text">@(cmp.IsDeduction ? T.PayRunDialog.Deduction : T.PayRunDialog.Earning)</MudChip>
                                                     <span class="ms-2">@cmp.Name</span>
                                                 </MudTd>
-                                                <MudTd Class="text-right" Style="@(cmp.IsDeduction ? "color:var(--mud-palette-error)" : "color:var(--mud-palette-success)")">
+                                                <MudTd DataLabel="@T.PayRunDialog.Amount" Class="text-right" Style="@(cmp.IsDeduction ? "color:var(--mud-palette-error)" : "color:var(--mud-palette-success)")">
                                                     @(cmp.IsDeduction ? "-" : "+")@cmp.Amount.ToString("N2")
                                                 </MudTd>
                                             </RowTemplate>

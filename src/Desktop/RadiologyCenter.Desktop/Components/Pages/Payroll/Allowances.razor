@@ -17,7 +17,7 @@
     </AuthorizeView>
 </PageHeader>
 
-<MudTable T="AllowanceAssignmentDto" @ref="Table" ServerData="LoadServerData" Dense="true" Hover="true" Striped="true" Elevation="1" RowsPerPage="10" FixedHeader="true" Class="table-scroll">
+<MudTable Breakpoint="Breakpoint.Sm" T="AllowanceAssignmentDto" @ref="Table" ServerData="LoadServerData" Dense="true" Hover="true" Striped="true" Elevation="1" RowsPerPage="10" FixedHeader="true" Class="table-scroll">
     <HeaderContent>
         <MudTh>@T.Allowance.Employee</MudTh>
         <MudTh><MudTableSortLabel T="AllowanceAssignmentDto" SortLabel="@("Name")">@T.Allowance.Allowance</MudTableSortLabel></MudTh>

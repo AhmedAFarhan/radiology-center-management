@@ -11,7 +11,7 @@
     <MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Add" OnClick="OpenCreateDialogAsync">@T.PreAuth.RequestAuthorization</MudButton>
 </PageHeader>
 
-<MudTable T="PreAuthorizationListItemDto" @ref="Table" ServerData="LoadServerData" Dense="true" Hover="true" Striped="true" Elevation="1" RowsPerPage="10" FixedHeader="true" Class="table-scroll">
+<MudTable Breakpoint="Breakpoint.Sm" T="PreAuthorizationListItemDto" @ref="Table" ServerData="LoadServerData" Dense="true" Hover="true" Striped="true" Elevation="1" RowsPerPage="10" FixedHeader="true" Class="table-scroll">
     <HeaderContent>
         <MudTh><MudTableSortLabel T="PreAuthorizationListItemDto" SortLabel="@("PatientName")">@T.PreAuth.Patient</MudTableSortLabel></MudTh>
         <MudTh><MudTableSortLabel T="PreAuthorizationListItemDto" SortLabel="@("ExaminationTypeName")">@T.PreAuth.Examination</MudTableSortLabel></MudTh>

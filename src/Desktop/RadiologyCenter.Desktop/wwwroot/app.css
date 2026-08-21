@@ -928,7 +928,7 @@ h1:focus {
     position: absolute;
     top: calc(100% + 6px);
     left: 0;
-    width: 380px;
+    width: min(380px, calc(100vw - 24px));
     max-height: min(60vh, 480px);
     overflow-y: auto;
     z-index: 1000;
@@ -1866,6 +1866,312 @@ h1:focus {
   padding-bottom: 8px;
 }
 .change-password-dialog .mud-dialog-content {
-  overflow: hidden;
+    overflow: hidden;
 }
 
+/* ─────────── Responsive page header ───────────
+   MudToolBar is a nowrap flex container; on narrow windows the title,
+   search box and action buttons would overflow. Let the PageHeader
+   toolbar wrap and give the search field its own row. */
+@media (max-width: 700px) {
+    .page-header-toolbar {
+        height: auto;
+        min-height: 56px;
+        flex-wrap: wrap;
+        padding-block: 6px;
+    }
+
+    .page-header-toolbar .page-header-title {
+        font-size: 1.35rem;
+    }
+}
+
+@media (max-width: 600px) {
+    .page-header-toolbar .search-field {
+        order: 10;
+    }
+
+    .page-header-toolbar .search-field + * {
+        order: 11;
+    }
+}
+
+/* ─────────── Responsive table cards ───────────
+   MudBlazor stacks table rows below the table's breakpoint using DataLabel.
+   This section turns those stacks into designed cards:
+     - row          -> elevated card with a primary accent spine
+     - first cell   -> hero header strip (tinted, prominent value)
+     - middle cells -> two-column stat tiles (label above value)
+     - action cells -> toolbar footer pinned to the card bottom
+   Palette tokens + logical properties only: dark mode and RTL safe. */
+
+@media (max-width: 960px) {
+    .mud-table.mud-sm-table {
+        background: transparent;
+        border-radius: 0;
+        box-shadow: none;
+    }
+
+    .table-scroll.mud-sm-table .mud-table-container {
+        max-height: none;
+        overflow: visible;
+    }
+
+    .mud-sm-table .mud-table-smalldevices-sortselect {
+        display: none;
+    }
+
+    .mud-sm-table .mud-table-body {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        padding: 2px 2px 14px;
+        border-top: none;
+        background: transparent;
+    }
+
+    .mud-sm-table .mud-table-body .mud-table-row {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: stretch;
+        background: var(--mud-palette-surface);
+        border: 1px solid var(--mud-palette-lines-default);
+        border-inline-start: 3px solid var(--mud-palette-primary);
+        border-radius: 16px;
+        box-shadow: 0 1px 2px rgba(15, 23, 42, 0.05), 0 10px 28px rgba(15, 23, 42, 0.08);
+        overflow: hidden;
+    }
+
+    /* Default cell: compact stat tile */
+    .mud-sm-table .mud-table-body .mud-table-cell {
+        flex: 1 1 42%;
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 3px;
+        padding: 10px 16px 8px;
+        border: none;
+    }
+
+    .mud-sm-table .mud-table-body .mud-table-cell:before {
+        content: attr(data-label);
+        font-size: 10px;
+        font-weight: 700;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        color: var(--mud-palette-text-secondary);
+    }
+
+    /* First cell: hero header strip */
+    .mud-sm-table .mud-table-body .mud-table-cell:first-child:not(:has(.mud-icon-button)) {
+        flex-basis: 100%;
+        padding: 13px 16px 11px;
+        font-size: 15px;
+        font-weight: 600;
+        color: var(--mud-palette-text-primary);
+        background: linear-gradient(180deg, rgba(76, 88, 224, 0.08), rgba(76, 88, 224, 0));
+        border-bottom: 1px solid var(--mud-palette-lines-light, var(--mud-palette-lines-default));
+    }
+
+    .mud-sm-table .mud-table-body .mud-table-cell:first-child:not(:has(.mud-icon-button)) .mud-typography {
+        font-weight: 600;
+    }
+
+    /* Any cell containing action buttons: toolbar footer */
+    .mud-sm-table .mud-table-body .mud-table-cell:has(.mud-icon-button) {
+        flex-basis: 100%;
+        flex-direction: row;
+        align-items: center;
+        justify-content: flex-end;
+        gap: 2px;
+        padding: 6px 10px;
+        background: rgba(15, 23, 42, 0.02);
+        border-top: 1px solid var(--mud-palette-lines-light, var(--mud-palette-lines-default));
+        border-bottom: none;
+    }
+
+    .mud-sm-table .mud-table-body .mud-table-cell:has(.mud-icon-button):before {
+        margin-inline-end: auto;
+        padding-inline-end: 10px;
+    }
+
+    .mud-sm-table .mud-table-body .mud-table-cell .mud-icon-button {
+        width: 40px;
+        height: 40px;
+        border-radius: 10px;
+    }
+
+    .mud-sm-table .mud-table-body .mud-table-cell .mud-icon-root,
+    .mud-sm-table .mud-table-body .mud-table-cell .mud-icon-button .mud-icon-root {
+        font-size: 24px;
+    }
+
+    /* Expanded child panels (e.g. payslip breakdown): attached detail pane */
+    .mud-sm-table .mud-table-body .mud-table-row:has(> td[colspan]) {
+        margin-top: -6px;
+        border: 1px dashed var(--mud-palette-lines-default);
+        border-inline-start: 3px solid var(--mud-palette-primary-lighten, var(--mud-palette-primary));
+        border-radius: 12px;
+        box-shadow: none;
+        background: var(--mud-palette-background, var(--mud-palette-surface));
+    }
+
+    /* Empty / loading states stay plain, not card-shaped */
+    .mud-sm-table .mud-table-body .mud-table-empty-row,
+    .mud-sm-table .mud-table-body .mud-table-loading-row {
+        display: block;
+        background: transparent;
+        border: none;
+        border-radius: var(--mud-default-borderradius);
+        box-shadow: none;
+    }
+
+    .mud-sm-table .mud-table-body .mud-table-empty-row > td {
+        display: block;
+        padding: 20px 8px;
+    }
+}
+
+@media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
+    .mud-sm-table .mud-table-body .mud-table-row {
+        transition: transform 0.18s ease, box-shadow 0.18s ease;
+    }
+
+    .mud-sm-table .mud-table-body .mud-table-row:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 10px rgba(15, 23, 42, 0.07), 0 18px 40px rgba(15, 23, 42, 0.13);
+    }
+}
+
+@media (max-width: 600px) {
+    .mud-table.mud-xs-table {
+        background: transparent;
+        border-radius: 0;
+        box-shadow: none;
+    }
+
+    .table-scroll.mud-xs-table .mud-table-container {
+        max-height: none;
+        overflow: visible;
+    }
+
+    .mud-xs-table .mud-table-smalldevices-sortselect {
+        display: none;
+    }
+
+    .mud-xs-table .mud-table-body {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        padding: 2px 2px 14px;
+        border-top: none;
+        background: transparent;
+    }
+
+    .mud-xs-table .mud-table-body .mud-table-row {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: stretch;
+        background: var(--mud-palette-surface);
+        border: 1px solid var(--mud-palette-lines-default);
+        border-inline-start: 3px solid var(--mud-palette-primary);
+        border-radius: 16px;
+        box-shadow: 0 1px 2px rgba(15, 23, 42, 0.05), 0 10px 28px rgba(15, 23, 42, 0.08);
+        overflow: hidden;
+    }
+
+    .mud-xs-table .mud-table-body .mud-table-cell {
+        flex: 1 1 42%;
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 3px;
+        padding: 10px 16px 8px;
+        border: none;
+    }
+
+    .mud-xs-table .mud-table-body .mud-table-cell:before {
+        content: attr(data-label);
+        font-size: 10px;
+        font-weight: 700;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        color: var(--mud-palette-text-secondary);
+    }
+
+    .mud-xs-table .mud-table-body .mud-table-cell:first-child:not(:has(.mud-icon-button)) {
+        flex-basis: 100%;
+        padding: 13px 16px 11px;
+        font-size: 15px;
+        font-weight: 600;
+        color: var(--mud-palette-text-primary);
+        background: linear-gradient(180deg, rgba(76, 88, 224, 0.08), rgba(76, 88, 224, 0));
+        border-bottom: 1px solid var(--mud-palette-lines-light, var(--mud-palette-lines-default));
+    }
+
+    .mud-xs-table .mud-table-body .mud-table-cell:first-child:not(:has(.mud-icon-button)) .mud-typography {
+        font-weight: 600;
+    }
+
+    .mud-xs-table .mud-table-body .mud-table-cell:has(.mud-icon-button) {
+        flex-basis: 100%;
+        flex-direction: row;
+        align-items: center;
+        justify-content: flex-end;
+        gap: 2px;
+        padding: 6px 10px;
+        background: rgba(15, 23, 42, 0.02);
+        border-top: 1px solid var(--mud-palette-lines-light, var(--mud-palette-lines-default));
+        border-bottom: none;
+    }
+
+    .mud-xs-table .mud-table-body .mud-table-cell:has(.mud-icon-button):before {
+        margin-inline-end: auto;
+        padding-inline-end: 10px;
+    }
+
+    .mud-xs-table .mud-table-body .mud-table-cell .mud-icon-button {
+        width: 40px;
+        height: 40px;
+        border-radius: 10px;
+    }
+
+    .mud-xs-table .mud-table-body .mud-table-cell .mud-icon-root,
+    .mud-xs-table .mud-table-body .mud-table-cell .mud-icon-button .mud-icon-root {
+        font-size: 24px;
+    }
+
+    .mud-xs-table .mud-table-body .mud-table-row:has(> td[colspan]) {
+        margin-top: -6px;
+        border: 1px dashed var(--mud-palette-lines-default);
+        border-inline-start: 3px solid var(--mud-palette-primary-lighten, var(--mud-palette-primary));
+        border-radius: 12px;
+        box-shadow: none;
+        background: var(--mud-palette-background, var(--mud-palette-surface));
+    }
+
+    .mud-xs-table .mud-table-body .mud-table-empty-row,
+    .mud-xs-table .mud-table-body .mud-table-loading-row {
+        display: block;
+        background: transparent;
+        border: none;
+        border-radius: var(--mud-default-borderradius);
+        box-shadow: none;
+    }
+
+    .mud-xs-table .mud-table-body .mud-table-empty-row > td {
+        display: block;
+        padding: 20px 8px;
+    }
+}
+
+@media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
+    .mud-xs-table .mud-table-body .mud-table-row {
+        transition: transform 0.18s ease, box-shadow 0.18s ease;
+    }
+
+    .mud-xs-table .mud-table-body .mud-table-row:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 10px rgba(15, 23, 42, 0.07), 0 18px 40px rgba(15, 23, 42, 0.13);
+    }
+}

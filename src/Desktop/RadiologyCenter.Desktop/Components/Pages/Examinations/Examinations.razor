@@ -16,7 +16,7 @@
     </AuthorizeView>
 </PageHeader>
 
-<MudTable T="ExaminationTypeDto" @ref="Table" ServerData="LoadServerData" Dense="true" Hover="true" Striped="true" Elevation="1" RowsPerPage="10" FixedHeader="true" Class="table-scroll">
+<MudTable Breakpoint="Breakpoint.Sm" T="ExaminationTypeDto" @ref="Table" ServerData="LoadServerData" Dense="true" Hover="true" Striped="true" Elevation="1" RowsPerPage="10" FixedHeader="true" Class="table-scroll">
     <HeaderContent>
         <MudTh><MudTableSortLabel T="ExaminationTypeDto" SortLabel="@("Code")">@T.Examinations.Code</MudTableSortLabel></MudTh>
         <MudTh><MudTableSortLabel T="ExaminationTypeDto" SortLabel="@("Name")">@T.Common.Name</MudTableSortLabel></MudTh>

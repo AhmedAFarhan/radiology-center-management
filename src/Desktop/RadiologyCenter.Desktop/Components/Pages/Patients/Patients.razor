@@ -20,7 +20,7 @@
     </AuthorizeView>
 </PageHeader>
 
-<MudTable T="PatientDto" @ref="_table" ServerData="LoadServerData" Dense="true" Hover="true" Striped="true" Elevation="1" RowsPerPage="10" FixedHeader="true" Class="table-scroll">
+<MudTable Breakpoint="Breakpoint.Sm" T="PatientDto" @ref="_table" ServerData="LoadServerData" Dense="true" Hover="true" Striped="true" Elevation="1" RowsPerPage="10" FixedHeader="true" Class="table-scroll">
     <HeaderContent>
         <MudTh><MudTableSortLabel T="PatientDto" SortLabel="@("PatientCode")">@T.Patients.Code</MudTableSortLabel></MudTh>
         <MudTh><MudTableSortLabel T="PatientDto" SortLabel="@("LastName")">@T.Common.Name</MudTableSortLabel></MudTh>

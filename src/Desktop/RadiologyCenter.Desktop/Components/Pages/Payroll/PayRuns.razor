@@ -60,7 +60,7 @@
     </MudGrid>
 }
 
-<MudTable T="PayRunDto" @ref="_table" ServerData="LoadServerData" Dense="true" Hover="true" Striped="true" Elevation="1" RowsPerPage="10" FixedHeader="true" Class="table-scroll">
+<MudTable Breakpoint="Breakpoint.Sm" T="PayRunDto" @ref="_table" ServerData="LoadServerData" Dense="true" Hover="true" Striped="true" Elevation="1" RowsPerPage="10" FixedHeader="true" Class="table-scroll">
     <HeaderContent>
         <MudTh><MudTableSortLabel T="PayRunDto" SortLabel="@("RunFrom")">@T.Payroll.Period</MudTableSortLabel></MudTh>
         <MudTh><MudTableSortLabel T="PayRunDto" SortLabel="@("Status")">@T.Common.Status</MudTableSortLabel></MudTh>

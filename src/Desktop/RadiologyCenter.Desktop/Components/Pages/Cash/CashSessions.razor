@@ -25,7 +25,7 @@
     </AuthorizeView>
 </PageHeader>
 
-<MudTable T="CashSessionDto" @ref="Table" ServerData="LoadServerData" Dense="true" Hover="true" Striped="true" Elevation="1" RowsPerPage="10" FixedHeader="true" Class="table-scroll">
+<MudTable Breakpoint="Breakpoint.Sm" T="CashSessionDto" @ref="Table" ServerData="LoadServerData" Dense="true" Hover="true" Striped="true" Elevation="1" RowsPerPage="10" FixedHeader="true" Class="table-scroll">
     <HeaderContent>
         <MudTh><MudTableSortLabel T="CashSessionDto" SortLabel="@("OpenedAt")">@T.Cash.OpenedAt</MudTableSortLabel></MudTh>
         <MudTh>@T.Cash.User</MudTh>
