@@ -1930,11 +1930,17 @@ h1:focus {
         background: transparent;
     }
 
+    /* Cards stay pure white — kill every striped/hover tint outright */
+    .mud-sm-table .mud-table-body .mud-table-row,
+    .mud-sm-table .mud-table-body .mud-table-row:hover {
+        background-color: #ffffff !important;
+    }
+
     .mud-sm-table .mud-table-body .mud-table-row {
         display: flex;
         flex-wrap: wrap;
         align-items: stretch;
-        background: var(--mud-palette-surface);
+        background: #ffffff;
         border: 1px solid var(--mud-palette-lines-default);
         border-inline-start: 3px solid var(--mud-palette-primary);
         border-radius: 16px;
@@ -1969,7 +1975,7 @@ h1:focus {
         font-size: 15px;
         font-weight: 600;
         color: var(--mud-palette-text-primary);
-        background: linear-gradient(180deg, rgba(76, 88, 224, 0.08), rgba(76, 88, 224, 0));
+        background: transparent;
         border-bottom: 1px solid var(--mud-palette-lines-light, var(--mud-palette-lines-default));
     }
 
@@ -1985,7 +1991,7 @@ h1:focus {
         justify-content: flex-end;
         gap: 2px;
         padding: 6px 10px;
-        background: rgba(15, 23, 42, 0.02);
+        background: transparent;
         border-top: 1px solid var(--mud-palette-lines-light, var(--mud-palette-lines-default));
         border-bottom: none;
     }
@@ -2068,11 +2074,17 @@ h1:focus {
         background: transparent;
     }
 
+    /* Cards stay pure white — kill every striped/hover tint outright */
+    .mud-xs-table .mud-table-body .mud-table-row,
+    .mud-xs-table .mud-table-body .mud-table-row:hover {
+        background-color: #ffffff !important;
+    }
+
     .mud-xs-table .mud-table-body .mud-table-row {
         display: flex;
         flex-wrap: wrap;
         align-items: stretch;
-        background: var(--mud-palette-surface);
+        background: #ffffff;
         border: 1px solid var(--mud-palette-lines-default);
         border-inline-start: 3px solid var(--mud-palette-primary);
         border-radius: 16px;
@@ -2105,7 +2117,7 @@ h1:focus {
         font-size: 15px;
         font-weight: 600;
         color: var(--mud-palette-text-primary);
-        background: linear-gradient(180deg, rgba(76, 88, 224, 0.08), rgba(76, 88, 224, 0));
+        background: transparent;
         border-bottom: 1px solid var(--mud-palette-lines-light, var(--mud-palette-lines-default));
     }
 
@@ -2120,7 +2132,7 @@ h1:focus {
         justify-content: flex-end;
         gap: 2px;
         padding: 6px 10px;
-        background: rgba(15, 23, 42, 0.02);
+        background: transparent;
         border-top: 1px solid var(--mud-palette-lines-light, var(--mud-palette-lines-default));
         border-bottom: none;
     }
@@ -2173,5 +2185,114 @@ h1:focus {
     .mud-xs-table .mud-table-body .mud-table-row:hover {
         transform: translateY(-2px);
         box-shadow: 0 4px 10px rgba(15, 23, 42, 0.07), 0 18px 40px rgba(15, 23, 42, 0.13);
+    }
+}
+
+/* ─────────── Collapsed card summary ───────────
+   Cards start collapsed showing only the first two fields plus any
+   status chip; js/responsive-cards.js injects the chevron and toggles
+   .card-expanded on tap. Actions stay hidden until expanded. */
+
+.card-chevron {
+    display: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .card-chevron {
+        transition: none;
+    }
+}
+
+@media (max-width: 960px) {
+    .mud-sm-table .mud-table-body .mud-table-row {
+        position: relative;
+        cursor: pointer;
+    }
+
+    .mud-sm-table .mud-table-body .mud-table-row.card-expanded {
+        cursor: default;
+    }
+
+    .mud-sm-table .mud-table-body .mud-table-row:not(.card-expanded) .mud-table-cell:nth-child(n+3):not(:has(.mud-chip)),
+    .mud-sm-table .mud-table-body .mud-table-row:not(.card-expanded) .mud-table-cell:has(.mud-icon-button):not(:first-child) {
+        display: none;
+    }
+
+    .mud-sm-table .mud-table-body .mud-table-row:not(.card-expanded) .mud-table-cell:has(.mud-chip) {
+        flex: 0 1 auto;
+        padding-inline-start: 4px;
+    }
+
+    .mud-sm-table .mud-table-body .mud-table-cell:first-child:not(:has(.mud-icon-button)) {
+        padding-inline-end: 48px;
+    }
+
+    .mud-sm-table .card-chevron {
+        display: grid;
+        place-items: center;
+        position: absolute;
+        inset-inline-end: 10px;
+        top: 12px;
+        width: 28px;
+        height: 28px;
+        color: var(--mud-palette-text-secondary);
+        transition: transform 0.2s ease;
+    }
+
+    .mud-sm-table .card-chevron svg {
+        width: 24px;
+        height: 24px;
+        fill: currentColor;
+    }
+
+    .mud-sm-table .mud-table-row.card-expanded .card-chevron {
+        transform: rotate(180deg);
+    }
+}
+
+@media (max-width: 600px) {
+    .mud-xs-table .mud-table-body .mud-table-row {
+        position: relative;
+        cursor: pointer;
+    }
+
+    .mud-xs-table .mud-table-body .mud-table-row.card-expanded {
+        cursor: default;
+    }
+
+    .mud-xs-table .mud-table-body .mud-table-row:not(.card-expanded) .mud-table-cell:nth-child(n+3):not(:has(.mud-chip)),
+    .mud-xs-table .mud-table-body .mud-table-row:not(.card-expanded) .mud-table-cell:has(.mud-icon-button):not(:first-child) {
+        display: none;
+    }
+
+    .mud-xs-table .mud-table-body .mud-table-row:not(.card-expanded) .mud-table-cell:has(.mud-chip) {
+        flex: 0 1 auto;
+        padding-inline-start: 4px;
+    }
+
+    .mud-xs-table .mud-table-body .mud-table-cell:first-child:not(:has(.mud-icon-button)) {
+        padding-inline-end: 48px;
+    }
+
+    .mud-xs-table .card-chevron {
+        display: grid;
+        place-items: center;
+        position: absolute;
+        inset-inline-end: 10px;
+        top: 12px;
+        width: 28px;
+        height: 28px;
+        color: var(--mud-palette-text-secondary);
+        transition: transform 0.2s ease;
+    }
+
+    .mud-xs-table .card-chevron svg {
+        width: 24px;
+        height: 24px;
+        fill: currentColor;
+    }
+
+    .mud-xs-table .mud-table-row.card-expanded .card-chevron {
+        transform: rotate(180deg);
     }
 }
