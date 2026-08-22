@@ -12,4 +12,5 @@ public sealed record PreAuthorizationDto(
     decimal? ApprovedAmount,
     string? RejectionReason,
     bool IsGovernment,
-    IReadOnlyList<PreAuthorizationDocumentDto>? Documents = null);
+    IReadOnlyList<PreAuthorizationDocumentDto>? Documents = null,
+    string StatusKey = "");

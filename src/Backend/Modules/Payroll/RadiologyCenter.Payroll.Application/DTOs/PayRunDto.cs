@@ -8,4 +8,5 @@ public record PayRunDto(
     string? ProcessedBy,
     DateTime? ProcessedAt,
     string? Notes,
-    IReadOnlyList<PayslipDto> Payslips);
+    IReadOnlyList<PayslipDto> Payslips,
+    string StatusKey = "");

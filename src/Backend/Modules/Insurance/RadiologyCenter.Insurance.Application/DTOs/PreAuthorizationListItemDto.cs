@@ -14,4 +14,5 @@ public sealed record PreAuthorizationListItemDto(
     DateTime? DecidedAt,
     decimal? ApprovedAmount,
     string? RejectionReason,
-    bool IsGovernment);
+    bool IsGovernment,
+    string StatusKey = "");

@@ -41,7 +41,8 @@ public static class GetClaimsQueryHandler
             c.ApprovedAt,
             c.PaidAt,
             c.TotalSettled,
-            c.RemainingOwed)).ToList();
+            c.RemainingOwed,
+            c.Status.Name)).ToList();
 
         return Result.Success(new PagedResult<ClaimListItemDto>(
             items,

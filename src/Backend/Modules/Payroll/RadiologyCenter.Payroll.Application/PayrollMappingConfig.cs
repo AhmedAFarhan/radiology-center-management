@@ -31,6 +31,7 @@ public static class PayrollMappingConfig
 
         TypeAdapterConfig<PayRun, PayRunDto>.NewConfig()
             .Map(d => d.Status, s => s.Status.LocalizedName())
+            .Map(d => d.StatusKey, s => s.Status.Name)
             .Map(d => d.Payslips, s => s.Payslips);
 
         TypeAdapterConfig<Payslip, PayslipDto>.NewConfig()

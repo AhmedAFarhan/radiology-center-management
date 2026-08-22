@@ -17,4 +17,5 @@ public sealed record ClaimListItemDto(
     DateTime? ApprovedAt,
     DateTime? PaidAt,
     decimal TotalSettled,
-    decimal RemainingOwed);
+    decimal RemainingOwed,
+    string StatusKey = "");

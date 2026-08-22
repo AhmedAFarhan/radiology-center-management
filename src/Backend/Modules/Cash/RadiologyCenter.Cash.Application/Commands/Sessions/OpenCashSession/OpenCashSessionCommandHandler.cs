@@ -42,6 +42,7 @@ public static class OpenCashSessionCommandHandler
             session.OpenedAt,
             null,
             session.Notes,
-            0));
+            0,
+            session.Status.Name));
     }
 }

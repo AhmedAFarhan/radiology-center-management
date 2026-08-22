@@ -39,7 +39,8 @@ internal static class InsuranceMapper
             preAuthorization.ApprovedAmount,
             preAuthorization.RejectionReason,
             preAuthorization.IsGovernment,
-            preAuthorization.Documents.Select(d => d.ToDto()).ToList());
+            preAuthorization.Documents.Select(d => d.ToDto()).ToList(),
+            preAuthorization.Status.Name);
 
     public static ClaimDto ToDto(this Claim claim) =>
         new(
@@ -58,7 +59,8 @@ internal static class InsuranceMapper
             claim.TotalSettled,
             claim.RemainingOwed,
             claim.Settlements.Select(s => s.ToDto()).ToList(),
-            claim.Rejections.Select(r => r.ToDto()).ToList());
+            claim.Rejections.Select(r => r.ToDto()).ToList(),
+            claim.Status.Name);
 
     public static SettlementDto ToDto(this Settlement settlement) =>
         new(

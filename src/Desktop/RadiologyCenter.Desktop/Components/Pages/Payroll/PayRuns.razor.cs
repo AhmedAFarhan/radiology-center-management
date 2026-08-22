@@ -43,11 +43,11 @@ public partial class PayRuns : ComponentBase, IDisposable
             _stats = new PayRunStats
             {
                 Total = page.Items.Count,
-                Draft = page.Items.Count(p => p.Status == "Draft"),
-                Computed = page.Items.Count(p => p.Status == "Computed"),
-                Approved = page.Items.Count(p => p.Status == "Approved"),
-                Paid = page.Items.Count(p => p.Status == "Paid"),
-                Rejected = page.Items.Count(p => p.Status == "Rejected"),
+                Draft = page.Items.Count(p => p.StatusKey == "Draft"),
+                Computed = page.Items.Count(p => p.StatusKey == "Computed"),
+                Approved = page.Items.Count(p => p.StatusKey == "Approved"),
+                Paid = page.Items.Count(p => p.StatusKey == "Paid"),
+                Rejected = page.Items.Count(p => p.StatusKey == "Rejected"),
             };
             _statsLoaded = true;
 

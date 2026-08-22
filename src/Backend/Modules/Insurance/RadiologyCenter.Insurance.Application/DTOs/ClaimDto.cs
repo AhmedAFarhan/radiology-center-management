@@ -16,4 +16,5 @@ public sealed record ClaimDto(
     decimal TotalSettled,
     decimal RemainingOwed,
     IReadOnlyList<SettlementDto> Settlements,
-    IReadOnlyList<ClaimRejectionDto> Rejections);
+    IReadOnlyList<ClaimRejectionDto> Rejections,
+    string StatusKey = "");

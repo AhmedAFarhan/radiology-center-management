@@ -76,7 +76,8 @@ public sealed record PreAuthorizationDto(
     decimal? ApprovedAmount,
     string? RejectionReason,
     bool IsGovernment,
-    IReadOnlyList<PreAuthorizationDocumentDto>? Documents = null);
+    IReadOnlyList<PreAuthorizationDocumentDto>? Documents = null,
+    string StatusKey = "");
 
 public sealed record PreAuthorizationListItemDto(
     string Id,
@@ -92,7 +93,8 @@ public sealed record PreAuthorizationListItemDto(
     DateTime? DecidedAt,
     decimal? ApprovedAmount,
     string? RejectionReason,
-    bool IsGovernment);
+    bool IsGovernment,
+    string StatusKey = "");
 
 public sealed class CreatePreAuthorizationInput
 {
@@ -125,7 +127,8 @@ public sealed record ClaimDto(
     decimal TotalSettled,
     decimal RemainingOwed,
     IReadOnlyList<SettlementDto> Settlements,
-    IReadOnlyList<ClaimRejectionDto> Rejections);
+    IReadOnlyList<ClaimRejectionDto> Rejections,
+    string StatusKey = "");
 
 public sealed record ClaimListItemDto(
     string Id,
@@ -144,7 +147,8 @@ public sealed record ClaimListItemDto(
     DateTime? ApprovedAt,
     DateTime? PaidAt,
     decimal TotalSettled,
-    decimal RemainingOwed);
+    decimal RemainingOwed,
+    string StatusKey = "");
 
 public sealed class CreateClaimInput
 {

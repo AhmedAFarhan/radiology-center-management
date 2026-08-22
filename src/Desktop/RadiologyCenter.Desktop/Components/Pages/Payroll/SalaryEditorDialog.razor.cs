@@ -71,7 +71,7 @@ public partial class SalaryEditorDialog : EditorDialogBase
 
         _staffId = Salary.StaffId;
         _model.BaseSalary = Salary.BaseSalary;
-        _model.SalaryType = Salary.SalaryType;
+        _model.SalaryType = Salary.SalaryTypeKey;
         _model.EffectiveDate = Salary.EffectiveDate;
 
         try

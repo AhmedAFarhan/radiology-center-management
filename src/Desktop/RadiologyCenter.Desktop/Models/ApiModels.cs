@@ -58,7 +58,9 @@ public sealed record PatientDto(
     string? MedicalHistory,
     string? ReferringPhysician,
     bool IsActive,
-    DateTime CreatedAt);
+    DateTime CreatedAt,
+    string GenderKey = "",
+    string? BloodTypeKey = null);
 
 public sealed class PatientInput
 {
@@ -87,7 +89,9 @@ public sealed record ItemDto(
     bool LotTracked,
     string? StorageInstructions,
     bool IsActive,
-    DateTime CreatedAt);
+    DateTime CreatedAt,
+    string CategoryKey = "",
+    string UnitKey = "");
 
 public sealed class ItemInput
 {
@@ -175,7 +179,8 @@ public sealed record PurchaseOrderDto(
     DateTime? ExpectedDeliveryAt,
     DateTime? ReceivedAt,
     string? Notes,
-    IReadOnlyList<PurchaseOrderItemDto> Items);
+    IReadOnlyList<PurchaseOrderItemDto> Items,
+    string StatusKey = "");
 
 public sealed class PurchaseOrderLineInput
 {
@@ -255,7 +260,8 @@ public sealed record ExaminationTypeDto(
     bool RequiresContrast,
     bool IsActive,
     IReadOnlyList<ExaminationTypeItemDto> Items,
-    DateTime CreatedAt);
+    DateTime CreatedAt,
+    string ModalityKey = "");
 
 public sealed record ExaminationTypeItemDto(
     string Id,
@@ -412,7 +418,9 @@ public sealed record EquipmentDto(
     string Status,
     DateTime? PurchaseDate,
     bool IsActive,
-    DateTime CreatedAt);
+    DateTime CreatedAt,
+    string ModalityKey = "",
+    string StatusKey = "");
 
 public sealed class EquipmentInput
 {
@@ -436,7 +444,8 @@ public sealed record StaffDto(
     string? LicenseNumber,
     DateTime HireDate,
     bool IsActive,
-    DateTime CreatedAt);
+    DateTime CreatedAt,
+    string PositionKey = "");
 
 public sealed class StaffInput
 {
@@ -477,7 +486,8 @@ public sealed record LeaveDto(
     DateTime StartDate,
     DateTime EndDate,
     string? Reason,
-    DateTime CreatedAt);
+    DateTime CreatedAt,
+    string LeaveTypeKey = "");
 
 public sealed class LeaveInput
 {
@@ -518,7 +528,8 @@ public sealed record PayRunDto(
     string? ProcessedBy,
     DateTime? ProcessedAt,
     string? Notes,
-    IReadOnlyList<PayslipDto> Payslips);
+    IReadOnlyList<PayslipDto> Payslips,
+    string StatusKey = "");
 
 public sealed record PayslipDto(
     string Id,
@@ -552,7 +563,8 @@ public sealed record SalaryDto(
     decimal BaseSalary,
     string SalaryType,
     DateTime EffectiveDate,
-    bool IsActive);
+    bool IsActive,
+    string SalaryTypeKey = "");
 
 public sealed class SalaryInput
 {
@@ -570,7 +582,9 @@ public sealed record SalaryComponentDto(
     bool IsPercentage,
     bool IsPerWorkDay,
     decimal DefaultValue,
-    bool IsActive);
+    bool IsActive,
+    string KindKey = "",
+    string? FrequencyKey = null);
 
 public sealed class SalaryComponentInput
 {
@@ -592,7 +606,8 @@ public sealed record AllowanceAssignmentDto(
     bool IsPerWorkDay,
     DateTime EffectiveDate,
     DateTime? EndDate,
-    bool IsActive);
+    bool IsActive,
+    string? FrequencyKey = null);
 
 public sealed class AllowanceAssignmentInput
 {
@@ -612,7 +627,8 @@ public sealed record ExaminationFeeDto(
     string Role,
     decimal Amount,
     bool IsPercentage,
-    bool IsActive);
+    bool IsActive,
+    string RoleKey = "");
 
 public sealed class ExaminationFeeInput
 {
@@ -680,14 +696,16 @@ public sealed record ReportSectionDto(
     string Title,
     string Body,
     int Position,
-    bool IsLocked);
+    bool IsLocked,
+    string SectionTypeKey = "");
 
 public sealed record ReportFindingDto(
     string Id,
     string Region,
     string Description,
     string Severity,
-    int Position);
+    int Position,
+    string SeverityKey = "");
 
 public sealed record ReportTemplateDto(
     string Id,
@@ -706,7 +724,8 @@ public sealed record ReportTemplateSectionDto(
     string Title,
     string Body,
     int Position,
-    bool IsLocked);
+    bool IsLocked,
+    string SectionTypeKey = "");
 
 public sealed class CreateReportDraftInput
 {

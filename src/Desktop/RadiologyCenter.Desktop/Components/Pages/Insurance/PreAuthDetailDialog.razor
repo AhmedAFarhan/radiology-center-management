@@ -24,11 +24,11 @@
                 <DetailField Label="@T.PreAuthDialog.EstimatedAmount" Value="@_preAuth.EstimatedAmount.ToString("C")" />
                 <DetailField Label="@T.Common.Status" Value="@_preAuth.Status" />
                 <DetailField Label="@T.PreAuthDialog.RequestedAt" Value="@_preAuth.RequestedAt.ToString("yyyy-MM-dd HH:mm")" />
-                @if (_preAuth.Status == "Approved")
+                @if (_preAuth.StatusKey == "Approved")
                 {
                     <DetailField Label="@T.PreAuthDialog.ApprovedAmount" Value="@(_preAuth.ApprovedAmount?.ToString("C") ?? "-")" />
                 }
-                @if (_preAuth.Status == "Denied" && !string.IsNullOrWhiteSpace(_preAuth.RejectionReason))
+                @if (_preAuth.StatusKey == "Denied" && !string.IsNullOrWhiteSpace(_preAuth.RejectionReason))
                 {
                     <DetailField Label="@T.PreAuthDialog.RejectionReason" Sm="12" Md="12">
                         <MudText>@_preAuth.RejectionReason</MudText>
@@ -36,7 +36,7 @@
                 }
             </MudGrid>
 
-            @if (_preAuth.Status == "Requested")
+            @if (_preAuth.StatusKey == "Requested")
             {
                 <MudDivider Class="my-2" />
                 <MudText Typo="Typo.subtitle2" Class="mb-1">@T.PreAuthDialog.Decision</MudText>

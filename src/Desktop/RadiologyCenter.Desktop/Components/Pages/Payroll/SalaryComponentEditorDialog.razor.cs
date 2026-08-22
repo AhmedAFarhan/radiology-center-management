@@ -46,8 +46,8 @@ public partial class SalaryComponentEditorDialog : EditorDialogBase
             return;
 
         _model.Name = Component.Name;
-        _model.Kind = Component.Kind;
-        _model.Frequency = Component.Frequency;
+        _model.Kind = Component.KindKey;
+        _model.Frequency = Component.FrequencyKey;
         _model.IsPercentage = Component.IsPercentage;
         _model.IsPerWorkDay = Component.IsPerWorkDay;
         _model.DefaultValue = Component.DefaultValue;

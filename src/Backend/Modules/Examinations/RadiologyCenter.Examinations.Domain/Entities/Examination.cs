@@ -116,6 +116,12 @@ public sealed class Examination : AuditableAggregateRoot<Guid>
         _items.Remove(item);
     }
 
+    public void ClearItems()
+    {
+        EnsureNotTerminal();
+        _items.Clear();
+    }
+
     public void Update(
         Guid? radiologistId,
         Guid? technicianId,

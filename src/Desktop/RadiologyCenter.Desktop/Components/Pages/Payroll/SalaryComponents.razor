@@ -31,7 +31,7 @@
             <MudText Class="font-weight-medium">@context.Name</MudText>
         </MudTd>
         <MudTd DataLabel="@T.SalaryComponent.Kind">
-            <MudChip T="string" Size="Size.Small" Color="@(context.Kind == "Deduction" ? Color.Error : Color.Success)">@context.Kind</MudChip>
+            <MudChip T="string" Size="Size.Small" Color="@(context.KindKey == "Deduction" ? Color.Error : Color.Success)">@context.Kind</MudChip>
         </MudTd>
         <MudTd DataLabel="@T.Common.Type">
             @if (context.IsPerWorkDay)

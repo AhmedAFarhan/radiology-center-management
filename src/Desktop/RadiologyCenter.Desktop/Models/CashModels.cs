@@ -11,7 +11,8 @@ public sealed record CashSessionDto(
     DateTime OpenedAt,
     DateTime? ClosedAt,
     string? Notes,
-    int EntryCount);
+    int EntryCount,
+    string StatusKey = "");
 
 public sealed class OpenCashSessionInput
 {

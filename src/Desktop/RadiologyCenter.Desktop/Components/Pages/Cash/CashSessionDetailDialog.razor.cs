@@ -31,7 +31,7 @@ public partial class CashSessionDetailDialog : ComponentBase
     private bool _busy;
     private bool _loadFailed;
 
-    private bool IsOpen => Session?.Status == "Open";
+    private bool IsOpen => Session?.StatusKey == "Open";
 
     protected override async Task OnInitializedAsync()
         => await LoadAsync();
@@ -42,7 +42,7 @@ public partial class CashSessionDetailDialog : ComponentBase
         {
             Session = await CashService.GetByIdAsync(SessionId);
             _entries = (await CashService.GetEntriesAsync(SessionId)).ToList();
-            _handover = Session?.Status == "Closed"
+            _handover = Session?.StatusKey == "Closed"
                 ? await CashService.GetHandoverBySessionAsync(SessionId)
                 : null;
             _loadFailed = false;

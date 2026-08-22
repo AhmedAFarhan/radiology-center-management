@@ -43,5 +43,6 @@ internal static class CashMapper
             session.OpenedAt,
             session.ClosedAt,
             session.Notes,
-            entryCount);
+            entryCount,
+            session.Status.Name);
 }

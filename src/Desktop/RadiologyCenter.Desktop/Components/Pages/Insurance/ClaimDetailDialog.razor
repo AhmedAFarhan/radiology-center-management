@@ -33,12 +33,12 @@
                 }
             </MudGrid>
 
-            @if (_claim.Status == "Draft")
+            @if (_claim.StatusKey == "Draft")
             {
                 <MudDivider Class="my-2" />
                 <MudButton FullWidth="true" Color="Color.Primary" Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Send" OnClick="SubmitAsync" Disabled="_busy">@T.ClaimDialog.SubmitClaim</MudButton>
             }
-            else if (_claim.Status == "Submitted")
+            else if (_claim.StatusKey == "Submitted")
             {
                 <MudDivider Class="my-2" />
                 <MudText Typo="Typo.subtitle2" Class="mb-1">@T.ClaimDialog.Adjudication</MudText>
@@ -74,12 +74,12 @@
                     </MudItem>
                 </MudGrid>
             }
-            else if (_claim.Status == "Rejected")
+            else if (_claim.StatusKey == "Rejected")
             {
                 <MudDivider Class="my-2" />
                 <MudButton FullWidth="true" Color="Color.Primary" Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Refresh" OnClick="ResubmitAsync" Disabled="_busy">@T.ClaimDialog.ResubmitClaim</MudButton>
             }
-            else if (_claim.Status is "Approved" or "Paid" && _claim.RemainingOwed > 0)
+            else if (_claim.StatusKey is "Approved" or "Paid" && _claim.RemainingOwed > 0)
             {
                 <MudDivider Class="my-2" />
                 <MudText Typo="Typo.subtitle2" Class="mb-1">@T.ClaimDialog.RecordSettlement</MudText>
@@ -117,7 +117,7 @@
                 </MudGrid>
             }
 
-            @if (_claim.Status == "Rejected" && _claim.Rejections.Count > 0)
+            @if (_claim.StatusKey == "Rejected" && _claim.Rejections.Count > 0)
             {
                 <MudDivider Class="my-2" />
                 <MudText Typo="Typo.subtitle2" Class="mb-1">@T.ClaimDialog.Rejections</MudText>
@@ -150,7 +150,7 @@
                 }
             }
 
-            @if (_claim.Status == "Submitted" && _claim.Rejections.Count > 0)
+            @if (_claim.StatusKey == "Submitted" && _claim.Rejections.Count > 0)
             {
                 <MudDivider Class="my-2" />
                 <MudText Typo="Typo.subtitle2" Class="mb-1">@T.ClaimDialog.PriorRejections</MudText>

@@ -9,4 +9,5 @@ public record PurchaseOrderDto(
     DateTime? ExpectedDeliveryAt,
     DateTime? ReceivedAt,
     string? Notes,
-    IReadOnlyList<PurchaseOrderItemDto> Items);
+    IReadOnlyList<PurchaseOrderItemDto> Items,
+    string StatusKey = "");

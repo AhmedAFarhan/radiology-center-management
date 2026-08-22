@@ -29,11 +29,11 @@
         </MudTd>
         <MudTd DataLabel="@T.PurchaseOrders.Supplier">@context.SupplierName</MudTd>
         <MudTd DataLabel="@T.Common.Status">
-            <StatusChip Token="@context.Status">@FormatStatus(context.Status)</StatusChip>
+            <StatusChip Token="@context.StatusKey">@FormatStatus(context.Status)</StatusChip>
         </MudTd>
         <MudTd DataLabel="@T.PurchaseOrders.Expected">@(context.ExpectedDeliveryAt?.ToString("dd MMM yyyy") ?? "-")</MudTd>
-        <MudTd DataLabel="@T.Common.Actions">
-            @if (context.Status == "Draft")
+        <MudTd DataLabel="@T.PurchaseOrders.Actions">
+            @if (context.StatusKey == "Draft")
             {
                 <AuthorizeView Policy="@InventoryPermissions.PurchaseOrdersUpdate">
                     <Authorized Context="auth">
@@ -43,7 +43,7 @@
                     </Authorized>
                 </AuthorizeView>
             }
-            @if (context.Status is "Ordered" or "PartiallyReceived")
+            @if (context.StatusKey is "Ordered" or "PartiallyReceived")
             {
                 <AuthorizeView Policy="@InventoryPermissions.PurchaseOrdersUpdate">
                     <Authorized Context="auth">
@@ -53,7 +53,7 @@
                     </Authorized>
                 </AuthorizeView>
             }
-            @if (context.Status is "Draft" or "Ordered")
+            @if (context.StatusKey is "Draft" or "Ordered")
             {
                 <AuthorizeView Policy="@InventoryPermissions.PurchaseOrdersUpdate">
                     <Authorized Context="auth">

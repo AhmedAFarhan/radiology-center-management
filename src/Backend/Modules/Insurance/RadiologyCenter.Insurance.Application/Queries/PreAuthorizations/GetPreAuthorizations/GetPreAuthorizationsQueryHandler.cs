@@ -38,7 +38,8 @@ public static class GetPreAuthorizationsQueryHandler
             p.DecidedAt,
             p.ApprovedAmount,
             p.RejectionReason,
-            p.IsGovernment)).ToList();
+            p.IsGovernment,
+            p.Status.Name)).ToList();
 
         return Result.Success(new PagedResult<PreAuthorizationListItemDto>(
             items,

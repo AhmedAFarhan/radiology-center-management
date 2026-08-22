@@ -68,7 +68,7 @@ public partial class LeaveEditorDialog : EditorDialogBase
             return;
         }
 
-        _model.LeaveType = Leave.LeaveType;
+        _model.LeaveType = Leave.LeaveTypeKey;
         _model.StartDate = Leave.StartDate;
         _model.EndDate = Leave.EndDate;
         _model.Reason = Leave.Reason;

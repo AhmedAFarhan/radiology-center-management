@@ -28,7 +28,8 @@ public static class PurchaseOrderMapper
                     i.QuantityOrdered,
                     i.UnitCost,
                     i.QuantityReceived))
-                .ToList());
+                .ToList(),
+            purchaseOrder.Status.Name);
 
     public static async Task<IReadOnlyDictionary<Guid, string>> LoadItemNamesAsync(
         IEnumerable<Guid> itemIds,

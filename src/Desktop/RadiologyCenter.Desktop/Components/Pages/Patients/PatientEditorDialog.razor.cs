@@ -49,14 +49,14 @@ public partial class PatientEditorDialog : ComponentBase
             return;
 
         _model.FullName = Patient.FullName;
-        _model.Gender = Patient.Gender;
+        _model.Gender = Patient.GenderKey;
         _model.DateOfBirth = Patient.DateOfBirth;
         _model.Age = Patient.Age;
         _model.PhoneNumber = Patient.PhoneNumber;
         _model.Email = Patient.Email;
         _model.Address = Patient.Address;
         _model.NationalId = Patient.NationalId;
-        _model.BloodType = Patient.BloodType;
+        _model.BloodType = Patient.BloodTypeKey;
         _model.Allergies = Patient.Allergies;
         _model.MedicalHistory = Patient.MedicalHistory;
         _model.ReferringPhysician = Patient.ReferringPhysician;

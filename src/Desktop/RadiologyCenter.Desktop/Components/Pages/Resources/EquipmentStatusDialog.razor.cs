@@ -39,7 +39,7 @@ public partial class EquipmentStatusDialog : ComponentBase
             Snackbar,
             () => T.EquipmentDialog.Unreachable);
 
-        _model.Status = Equipment.Status;
+        _model.Status = Equipment.StatusKey;
     }
 
     private async Task SubmitAsync()

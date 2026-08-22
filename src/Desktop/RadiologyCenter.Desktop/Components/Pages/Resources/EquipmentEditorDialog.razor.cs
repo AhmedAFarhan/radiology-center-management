@@ -42,7 +42,7 @@ public partial class EquipmentEditorDialog : EditorDialogBase
             return;
 
         _model.Name = Equipment.Name;
-        _model.Modality = _modalityOptions.FirstOrDefault(o => o.Value == Equipment.Modality)?.Key ?? Equipment.Modality;
+        _model.Modality = Equipment.ModalityKey;
         _model.SerialNumber = Equipment.SerialNumber;
         _model.PurchaseDate = Equipment.PurchaseDate;
     }

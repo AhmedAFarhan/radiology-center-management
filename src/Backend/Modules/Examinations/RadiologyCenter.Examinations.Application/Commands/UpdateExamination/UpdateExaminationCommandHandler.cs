@@ -107,8 +107,7 @@ public static class UpdateExaminationCommandHandler
         Examination examination,
         IReadOnlyList<UpdateExaminationItemRequest> requested)
     {
-        foreach (var item in examination.Items.ToList())
-            examination.RemoveItem(item.Id);
+        examination.ClearItems();
 
         foreach (var request in requested)
             examination.AddItem(

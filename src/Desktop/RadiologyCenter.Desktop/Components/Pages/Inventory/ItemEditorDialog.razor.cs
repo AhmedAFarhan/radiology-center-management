@@ -47,8 +47,8 @@ public partial class ItemEditorDialog : EditorDialogBase
 
         _model.Name = Item.Name;
         _model.Brand = Item.Brand;
-        _model.Category = Item.Category;
-        _model.Unit = Item.Unit;
+        _model.Category = Item.CategoryKey;
+        _model.Unit = Item.UnitKey;
         _model.ReorderLevel = Item.ReorderLevel;
         _model.ReorderQuantity = Item.ReorderQuantity;
         _model.LotTracked = Item.LotTracked ? "Yes" : "No";

@@ -37,12 +37,12 @@ public partial class PayRunDetailDialog : ComponentBase
             _expandedPayslips.Remove(payslip.StaffId);
     }
 
-    private bool CanEditPayslips => _payRun?.Status == "Draft";
-    private bool CanCompute => _payRun?.Status == "Draft";
-    private bool CanApprove => _payRun?.Status == "Computed";
-    private bool CanReject => _payRun?.Status == "Computed";
-    private bool CanRestart => _payRun?.Status == "Rejected";
-    private bool CanPay => _payRun?.Status == "Approved";
+    private bool CanEditPayslips => _payRun?.StatusKey == "Draft";
+    private bool CanCompute => _payRun?.StatusKey == "Draft";
+    private bool CanApprove => _payRun?.StatusKey == "Computed";
+    private bool CanReject => _payRun?.StatusKey == "Computed";
+    private bool CanRestart => _payRun?.StatusKey == "Rejected";
+    private bool CanPay => _payRun?.StatusKey == "Approved";
 
     protected override async Task OnInitializedAsync()
     {

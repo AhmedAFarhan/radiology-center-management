@@ -66,7 +66,7 @@ public partial class StaffEditorDialog : EditorDialogBase
 
         _model.FullName = Staff.FullName;
         _model.PhoneNumber = Staff.PhoneNumber;
-        _model.Position = Staff.Position;
+        _model.Position = Staff.PositionKey;
         _model.HireDate = Staff.HireDate;
         _model.Department = Staff.Department;
         _model.Specialization = Staff.Specialization;

@@ -153,10 +153,10 @@ public partial class VisitEditorDialog : ComponentBase, IDisposable
 
                 var staffPage = await ResourceService.GetStaffsPagedAsync(null, null, false, 1, 200);
                 _radiologists = staffPage.Items
-                    .Where(s => s.IsActive && s.Position == "Radiologist")
+                    .Where(s => s.IsActive && s.PositionKey == "Radiologist")
                     .ToList();
                 _technicians = staffPage.Items
-                    .Where(s => s.IsActive && s.Position == "Technician")
+                    .Where(s => s.IsActive && s.PositionKey == "Technician")
                     .ToList();
             },
             Snackbar,

@@ -47,7 +47,7 @@ public partial class ExaminationTypeEditorDialog : EditorDialogBase
             return;
 
         _model.Name = Type.Name;
-        _model.Modality = _modalityOptions.FirstOrDefault(o => o.Value == Type.Modality)?.Key ?? Type.Modality;
+        _model.Modality = Type.ModalityKey;
         _model.BodyPart = Type.BodyPart;
         _model.StandardDurationMinutes = Type.StandardDurationMinutes;
         _model.Price = Type.Price;
