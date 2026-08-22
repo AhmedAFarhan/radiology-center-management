@@ -8,4 +8,6 @@ public record EquipmentDto(
     string Status,
     DateTime? PurchaseDate,
     bool IsActive,
-    DateTime CreatedAt);
+    DateTime CreatedAt,
+    string ModalityKey = "",
+    string StatusKey = "");

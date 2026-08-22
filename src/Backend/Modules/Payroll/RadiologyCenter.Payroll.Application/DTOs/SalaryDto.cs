@@ -6,4 +6,5 @@ public record SalaryDto(
     decimal BaseSalary,
     string SalaryType,
     DateTime EffectiveDate,
-    bool IsActive);
+    bool IsActive,
+    string SalaryTypeKey = "");

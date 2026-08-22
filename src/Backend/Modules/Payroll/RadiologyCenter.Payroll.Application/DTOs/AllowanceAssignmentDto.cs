@@ -10,4 +10,5 @@ public record AllowanceAssignmentDto(
     bool IsPerWorkDay,
     DateTime EffectiveDate,
     DateTime? EndDate,
-    bool IsActive);
+    bool IsActive,
+    string? FrequencyKey = null);

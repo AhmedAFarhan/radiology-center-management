@@ -5,4 +5,5 @@ public record ReportFindingDto(
     string Region,
     string Description,
     string Severity,
-    int Position);
+    int Position,
+    string SeverityKey = "");

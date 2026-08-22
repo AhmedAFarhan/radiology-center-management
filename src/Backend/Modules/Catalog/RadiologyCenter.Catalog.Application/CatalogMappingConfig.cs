@@ -10,6 +10,7 @@ public static class CatalogMappingConfig
     public static void Configure()
     {
         TypeAdapterConfig<ExaminationType, ExaminationTypeDto>.NewConfig()
-            .Map(d => d.Modality, s => s.Modality.LocalizedName());
+            .Map(d => d.Modality, s => s.Modality.LocalizedName())
+            .Map(d => d.ModalityKey, s => s.Modality.Name);
     }
 }

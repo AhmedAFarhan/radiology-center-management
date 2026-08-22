@@ -7,4 +7,5 @@ public record LeaveDto(
     DateTime StartDate,
     DateTime EndDate,
     string? Reason,
-    DateTime CreatedAt);
+    DateTime CreatedAt,
+    string LeaveTypeKey = "");

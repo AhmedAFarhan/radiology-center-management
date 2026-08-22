@@ -11,4 +11,5 @@ public record ExaminationTypeDto(
     bool RequiresPreparation,
     bool RequiresConsent,
     bool IsActive,
-    DateTime CreatedAt);
+    DateTime CreatedAt,
+    string ModalityKey = "");

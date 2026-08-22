@@ -10,13 +10,16 @@ public static class ReportsMappingConfig
     public static void Configure()
     {
         TypeAdapterConfig<ReportSection, ReportSectionDto>.NewConfig()
-            .Map(d => d.SectionType, s => s.SectionType.LocalizedName());
+            .Map(d => d.SectionType, s => s.SectionType.LocalizedName())
+            .Map(d => d.SectionTypeKey, s => s.SectionType.Name);
 
         TypeAdapterConfig<ReportFinding, ReportFindingDto>.NewConfig()
-            .Map(d => d.Severity, s => s.Severity.LocalizedName());
+            .Map(d => d.Severity, s => s.Severity.LocalizedName())
+            .Map(d => d.SeverityKey, s => s.Severity.Name);
 
         TypeAdapterConfig<ReportTemplateSection, ReportTemplateSectionDto>.NewConfig()
-            .Map(d => d.SectionType, s => s.SectionType.LocalizedName());
+            .Map(d => d.SectionType, s => s.SectionType.LocalizedName())
+            .Map(d => d.SectionTypeKey, s => s.SectionType.Name);
 
         TypeAdapterConfig<ReportTemplate, ReportTemplateDto>.NewConfig()
             .Map(d => d.Modality, s => s.Modality.LocalizedName())

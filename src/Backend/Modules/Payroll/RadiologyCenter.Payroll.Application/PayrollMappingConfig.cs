@@ -11,16 +11,21 @@ public static class PayrollMappingConfig
     {
         TypeAdapterConfig<SalaryComponent, SalaryComponentDto>.NewConfig()
             .Map(d => d.Kind, s => s.Kind.LocalizedName())
-            .Map(d => d.Frequency, s => s.Frequency == null ? null : s.Frequency.LocalizedName());
+            .Map(d => d.KindKey, s => s.Kind.Name)
+            .Map(d => d.Frequency, s => s.Frequency == null ? null : s.Frequency.LocalizedName())
+            .Map(d => d.FrequencyKey, s => s.Frequency == null ? null : s.Frequency.Name);
 
         TypeAdapterConfig<Salary, SalaryDto>.NewConfig()
-            .Map(d => d.SalaryType, s => s.SalaryType.LocalizedName());
+            .Map(d => d.SalaryType, s => s.SalaryType.LocalizedName())
+            .Map(d => d.SalaryTypeKey, s => s.SalaryType.Name);
 
         TypeAdapterConfig<AllowanceAssignment, AllowanceAssignmentDto>.NewConfig()
-            .Map(d => d.Frequency, s => s.Frequency == null ? null : s.Frequency.LocalizedName());
+            .Map(d => d.Frequency, s => s.Frequency == null ? null : s.Frequency.LocalizedName())
+            .Map(d => d.FrequencyKey, s => s.Frequency == null ? null : s.Frequency.Name);
 
         TypeAdapterConfig<ExaminationFee, ExaminationFeeDto>.NewConfig()
-            .Map(d => d.Role, s => s.Role.LocalizedName());
+            .Map(d => d.Role, s => s.Role.LocalizedName())
+            .Map(d => d.RoleKey, s => s.Role.Name);
 
         TypeAdapterConfig<ReferralFee, ReferralFeeDto>.NewConfig();
 

@@ -96,12 +96,12 @@ public sealed class JsonTranslator : ITranslator
                 }
                 catch (FormatException)
                 {
-                    return localizedTemplate;
+                    return fallbackMessage;
                 }
             }
         }
 
-        return localizedTemplate;
+        return fallbackMessage;
     }
 
     public string TranslateEnum(string typeName, string name)

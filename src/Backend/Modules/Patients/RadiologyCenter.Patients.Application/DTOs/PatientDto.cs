@@ -19,5 +19,7 @@ public record PatientDto(
     string? MedicalHistory,
     string? ReferringPhysician,
     bool IsActive,
-    DateTime CreatedAt
+    DateTime CreatedAt,
+    string GenderKey = "",
+    string? BloodTypeKey = null
 );

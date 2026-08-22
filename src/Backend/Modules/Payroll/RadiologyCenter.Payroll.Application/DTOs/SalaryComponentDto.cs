@@ -8,4 +8,6 @@ public record SalaryComponentDto(
     bool IsPercentage,
     bool IsPerWorkDay,
     decimal DefaultValue,
-    bool IsActive);
+    bool IsActive,
+    string KindKey = "",
+    string? FrequencyKey = null);

@@ -11,7 +11,9 @@ public static class InventoryMappingConfig
     {
         TypeAdapterConfig<Item, ItemDto>.NewConfig()
             .Map(d => d.Category, s => s.Category.LocalizedName())
-            .Map(d => d.Unit, s => s.Unit.LocalizedName());
+            .Map(d => d.CategoryKey, s => s.Category.Name)
+            .Map(d => d.Unit, s => s.Unit.LocalizedName())
+            .Map(d => d.UnitKey, s => s.Unit.Name);
 
         TypeAdapterConfig<StockBatch, StockBatchDto>.NewConfig()
             .Map(d => d.IsExpired, s => s.IsExpired(DateTime.UtcNow));

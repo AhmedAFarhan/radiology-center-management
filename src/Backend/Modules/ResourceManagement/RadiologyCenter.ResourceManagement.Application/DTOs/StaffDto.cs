@@ -14,4 +14,5 @@ public record StaffDto(
     string? LicenseNumber,
     DateTime HireDate,
     bool IsActive,
-    DateTime CreatedAt);
+    DateTime CreatedAt,
+    string PositionKey = "");

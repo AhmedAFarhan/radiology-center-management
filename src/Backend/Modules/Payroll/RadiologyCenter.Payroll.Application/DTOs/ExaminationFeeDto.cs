@@ -6,4 +6,5 @@ public record ExaminationFeeDto(
     string Role,
     decimal Amount,
     bool IsPercentage,
-    bool IsActive);
+    bool IsActive,
+    string RoleKey = "");

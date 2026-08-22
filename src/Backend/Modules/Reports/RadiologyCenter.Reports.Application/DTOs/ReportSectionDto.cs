@@ -6,4 +6,5 @@ public record ReportSectionDto(
     string Title,
     string Body,
     int Position,
-    bool IsLocked);
+    bool IsLocked,
+    string SectionTypeKey = "");

@@ -11,4 +11,6 @@ public record ItemDto(
     bool LotTracked,
     string? StorageInstructions,
     bool IsActive,
-    DateTime CreatedAt);
+    DateTime CreatedAt,
+    string CategoryKey = "",
+    string UnitKey = "");
