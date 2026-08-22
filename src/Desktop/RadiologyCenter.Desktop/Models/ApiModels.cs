@@ -160,7 +160,8 @@ public sealed record StockMovementDto(
     decimal? UnitCost,
     string? Reference,
     string? Notes,
-    DateTime CreatedAt);
+    DateTime CreatedAt,
+    string MovementTypeKey = "");
 
 public sealed record PurchaseOrderItemDto(
     string Id,

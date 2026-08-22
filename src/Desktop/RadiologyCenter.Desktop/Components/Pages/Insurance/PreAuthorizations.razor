@@ -32,7 +32,7 @@
         <MudTd DataLabel="@T.PreAuth.Estimated" Class="text-right">@context.EstimatedAmount.ToString("C")</MudTd>
         <MudTd DataLabel="@T.PreAuth.Requested">@context.RequestedAt.ToString("yyyy-MM-dd")</MudTd>
         <MudTd DataLabel="@T.Common.Status">
-            <StatusChip Token="@context.Status">@FormatStatus(context.Status)</StatusChip>
+            <StatusChip Token="@context.StatusKey">@context.Status</StatusChip>
         </MudTd>
         <MudTd DataLabel="@T.Common.Actions">
             <MudTooltip Placement="Placement.Bottom" Text="@T.PreAuth.View">

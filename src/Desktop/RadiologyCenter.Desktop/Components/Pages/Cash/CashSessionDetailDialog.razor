@@ -19,7 +19,7 @@
                         <MudGrid Spacing="2">
                             <MudItem xs="12" sm="6" md="3">
                                 <MudText Typo="Typo.caption" Class="text-secondary">@T.Common.Status</MudText>
-                                <StatusChip Token="@Session.Status">@Session.Status</StatusChip>
+                                <StatusChip Token="@Session.StatusKey">@Session.Status</StatusChip>
                             </MudItem>
                             <MudItem xs="12" sm="6" md="3">
                                 <MudText Typo="Typo.caption" Class="text-secondary">@T.CashSession.User</MudText>
@@ -132,11 +132,11 @@
                             <RowTemplate Context="entry">
                                 <MudTd DataLabel="@T.Common.Date">@entry.OccurredAt.ToLocalTime().ToString("g")</MudTd>
                                 <MudTd DataLabel="@T.CashSession.Direction">
-                                    <StatusChip Token="@entry.Direction">@entry.Direction</StatusChip>
+                                    <StatusChip Token="@entry.DirectionKey">@entry.Direction</StatusChip>
                                 </MudTd>
                                 <MudTd DataLabel="@T.CashSession.Reason">@entry.Reason</MudTd>
                                 <MudTd DataLabel="@T.CashSession.Amount" Class="text-right">
-                                    <MudText Class="font-weight-medium" Color="@(entry.Direction == "Out" ? Color.Error : Color.Success)">
+                                    <MudText Class="font-weight-medium" Color="@(entry.DirectionKey == "Out" ? Color.Error : Color.Success)">
                                         @(entry.Direction == "Out" ? $"-{entry.Amount:C}" : $"+{entry.Amount:C}")
                                     </MudText>
                                 </MudTd>

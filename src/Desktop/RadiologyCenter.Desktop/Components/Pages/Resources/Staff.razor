@@ -31,7 +31,7 @@
         <MudTd DataLabel="@T.Common.Name">
             <MudText Class="font-weight-medium">@context.FullName</MudText>
         </MudTd>
-        <MudTd DataLabel="@T.Staff.Position">@FormatPosition(context.Position)</MudTd>
+        <MudTd DataLabel="@T.Staff.Position">@context.Position</MudTd>
         <MudTd DataLabel="@T.Staff.Department">@(string.IsNullOrWhiteSpace(context.Department) ? "-" : context.Department)</MudTd>
         <MudTd DataLabel="@T.Staff.Specialization">@(string.IsNullOrWhiteSpace(context.Specialization) ? "-" : context.Specialization)</MudTd>
         <MudTd DataLabel="@T.Staff.Phone">@context.PhoneNumber</MudTd>

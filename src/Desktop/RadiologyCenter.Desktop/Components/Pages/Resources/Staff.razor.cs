@@ -37,7 +37,7 @@ public partial class Staff : ListPageBase<StaffDto>
     {
         StaffDto? staff = null;
         var ok = await SafeExecute.RunAsync(
-            async () => staff = await ResourceService.GetStaffByIdAsync(id),
+            async () => { staff = await ResourceService.GetStaffByIdAsync(id); },
             Snackbar,
             () => T.Staff.Unreachable);
 
@@ -110,13 +110,4 @@ public partial class Staff : ListPageBase<StaffDto>
             Snackbar,
             () => T.Staff.Unreachable);
     }
-
-    private static string FormatPosition(string position) => position switch
-    {
-        "Technician" => "Technician",
-        "Radiologist" => "Radiologist",
-        "Receptionist" => "Receptionist",
-        "Nurse" => "Nurse",
-        _ => position,
-    };
 }

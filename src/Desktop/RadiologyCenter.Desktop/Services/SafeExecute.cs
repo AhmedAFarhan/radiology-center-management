@@ -10,6 +10,29 @@ public static class SafeExecute
     public static Task<bool> RunAsync(Func<Task> action, ISnackbar snackbar, Func<string> unreachable, Action<bool> setBusy)
         => RunAsyncCore(action, snackbar, unreachable, setBusy, useGlobalBusy: false);
 
+    /// <summary>
+    /// Runs a value-returning operation without the global busy overlay,
+    /// showing <paramref name="unreachable"/> on unexpected failures and the
+    /// server-provided message on API errors. Returns default on failure.
+    /// </summary>
+    public static async Task<T?> RunAsync<T>(Func<Task<T>> action, ISnackbar snackbar, Func<string> unreachable)
+    {
+        try
+        {
+            return await action();
+        }
+        catch (ApiException ex)
+        {
+            snackbar.Add(ex.Message, Severity.Error);
+            return default;
+        }
+        catch (Exception)
+        {
+            snackbar.Add(unreachable(), Severity.Error);
+            return default;
+        }
+    }
+
     private static async Task<bool> RunAsyncCore(Func<Task> action, ISnackbar snackbar, Func<string> unreachable, Action<bool>? setBusy, bool useGlobalBusy)
     {
         if (setBusy is not null)

@@ -75,21 +75,11 @@ public partial class VisitEditorDialog : ComponentBase, IDisposable
         if (string.IsNullOrWhiteSpace(value))
             return Array.Empty<PatientDto>();
 
-        try
-        {
-            var page = await PatientService.GetPagedAsync(value, "LastName", false, 1, 20, ct);
-            return page.Items;
-        }
-        catch (ApiException ex)
-        {
-            Snackbar.Add(ex.Message, Severity.Error);
-            return Array.Empty<PatientDto>();
-        }
-        catch (Exception)
-        {
-            Snackbar.Add(T.VisitDialog.SearchPatientsError, Severity.Error);
-            return Array.Empty<PatientDto>();
-        }
+        var page = await SafeExecute.RunAsync(
+            () => PatientService.GetPagedAsync(value, "LastName", false, 1, 20, ct),
+            Snackbar,
+            () => T.VisitDialog.SearchPatientsError);
+        return page?.Items ?? Array.Empty<PatientDto>();
     }
 
     private async Task<IEnumerable<ExaminationTypeDto>> SearchTypesAsync(string? value, CancellationToken ct)
@@ -97,21 +87,11 @@ public partial class VisitEditorDialog : ComponentBase, IDisposable
         if (string.IsNullOrWhiteSpace(value))
             return Array.Empty<ExaminationTypeDto>();
 
-        try
-        {
-            var page = await ExaminationService.GetTypesPagedAsync(value, "Name", false, 1, 20, ct);
-            return page.Items;
-        }
-        catch (ApiException ex)
-        {
-            Snackbar.Add(ex.Message, Severity.Error);
-            return Array.Empty<ExaminationTypeDto>();
-        }
-        catch (Exception)
-        {
-            Snackbar.Add(T.VisitDialog.SearchTypesError, Severity.Error);
-            return Array.Empty<ExaminationTypeDto>();
-        }
+        var page = await SafeExecute.RunAsync(
+            () => ExaminationService.GetTypesPagedAsync(value, "Name", false, 1, 20, ct),
+            Snackbar,
+            () => T.VisitDialog.SearchTypesError);
+        return page?.Items ?? Array.Empty<ExaminationTypeDto>();
     }
 
     private async Task<IEnumerable<ReferralDoctorDto>> SearchReferralDoctorsAsync(string? value, CancellationToken ct)
@@ -119,21 +99,11 @@ public partial class VisitEditorDialog : ComponentBase, IDisposable
         if (string.IsNullOrWhiteSpace(value))
             return Array.Empty<ReferralDoctorDto>();
 
-        try
-        {
-            var page = await ResourceService.GetReferralDoctorsPagedAsync(value, "LastName", false, 1, 20, ct);
-            return page.Items;
-        }
-        catch (ApiException ex)
-        {
-            Snackbar.Add(ex.Message, Severity.Error);
-            return Array.Empty<ReferralDoctorDto>();
-        }
-        catch (Exception)
-        {
-            Snackbar.Add(T.VisitDialog.SearchPatientsError, Severity.Error);
-            return Array.Empty<ReferralDoctorDto>();
-        }
+        var page = await SafeExecute.RunAsync(
+            () => ResourceService.GetReferralDoctorsPagedAsync(value, "LastName", false, 1, 20, ct),
+            Snackbar,
+            () => T.VisitDialog.SearchPatientsError);
+        return page?.Items ?? Array.Empty<ReferralDoctorDto>();
     }
 
     protected override async Task OnInitializedAsync()

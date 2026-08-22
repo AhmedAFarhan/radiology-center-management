@@ -31,14 +31,4 @@ public partial class Claims : ListPageBase<ClaimListItemDto>
         var dialog = await DialogService.ShowAsync<ClaimDetailDialog>(claim.PatientName, parameters, options);
         await ReloadIfSavedAsync(dialog);
     }
-
-    private static string FormatStatus(string status) => status switch
-    {
-        "Draft" => "Draft",
-        "Submitted" => "Submitted",
-        "Approved" => "Approved",
-        "Rejected" => "Rejected",
-        "Paid" => "Paid",
-        _ => status,
-    };
 }

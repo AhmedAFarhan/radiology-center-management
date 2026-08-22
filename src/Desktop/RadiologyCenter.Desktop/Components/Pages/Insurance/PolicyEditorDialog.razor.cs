@@ -25,43 +25,24 @@ public partial class PolicyEditorDialog : EditorDialogBase
         if (string.IsNullOrWhiteSpace(value))
             return Array.Empty<PatientDto>();
 
-        try
-        {
-            var page = await PatientService.GetPagedAsync(value, "LastName", false, 1, 20, ct);
-            return page.Items;
-        }
-        catch (ApiException ex)
-        {
-            Snackbar.Add(ex.Message, Severity.Error);
-            return Array.Empty<PatientDto>();
-        }
-        catch (Exception)
-        {
-            Snackbar.Add(T.PolicyDialog.UnableSearchPatients, Severity.Error);
-            return Array.Empty<PatientDto>();
-        }
+        var page = await SafeExecute.RunAsync(
+            () => PatientService.GetPagedAsync(value, "LastName", false, 1, 20, ct),
+            Snackbar,
+            () => T.PolicyDialog.UnableSearchPatients);
+        return page?.Items ?? Array.Empty<PatientDto>();
     }
 
     private async Task<IEnumerable<InsuranceCompanyDto>> SearchCompaniesAsync(string? value, CancellationToken ct)
     {
-        try
-        {
-            var companies = await InsuranceService.GetCompaniesAsync(ct);
-            if (string.IsNullOrWhiteSpace(value))
-                return companies;
+        var companies = await SafeExecute.RunAsync(
+            () => InsuranceService.GetCompaniesAsync(ct),
+            Snackbar,
+            () => T.PolicyDialog.UnableSearchCompanies) ?? Array.Empty<InsuranceCompanyDto>();
 
-            return companies.Where(c => c.Name.Contains(value, StringComparison.OrdinalIgnoreCase));
-        }
-        catch (ApiException ex)
-        {
-            Snackbar.Add(ex.Message, Severity.Error);
-            return Array.Empty<InsuranceCompanyDto>();
-        }
-        catch (Exception)
-        {
-            Snackbar.Add(T.PolicyDialog.UnableSearchCompanies, Severity.Error);
-            return Array.Empty<InsuranceCompanyDto>();
-        }
+        if (string.IsNullOrWhiteSpace(value))
+            return companies;
+
+        return companies.Where(c => c.Name.Contains(value, StringComparison.OrdinalIgnoreCase));
     }
 
     private async Task SubmitAsync()

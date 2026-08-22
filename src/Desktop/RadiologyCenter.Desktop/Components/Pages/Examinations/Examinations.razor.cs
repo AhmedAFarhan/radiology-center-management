@@ -37,7 +37,7 @@ public partial class Examinations : ListPageBase<ExaminationTypeDto>
     {
         ExaminationTypeDto? type = null;
         var ok = await SafeExecute.RunAsync(
-            async () => type = await ExaminationService.GetTypeByIdAsync(id),
+            async () => { type = await ExaminationService.GetTypeByIdAsync(id); },
             Snackbar,
             () => T.Examinations.Unreachable);
 

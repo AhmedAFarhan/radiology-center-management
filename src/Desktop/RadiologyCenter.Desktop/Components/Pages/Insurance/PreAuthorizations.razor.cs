@@ -31,12 +31,4 @@ public partial class PreAuthorizations : ListPageBase<PreAuthorizationListItemDt
         var dialog = await DialogService.ShowAsync<PreAuthDetailDialog>(preAuth.PatientName, parameters, options);
         await ReloadIfSavedAsync(dialog);
     }
-
-    private static string FormatStatus(string status) => status switch
-    {
-        "Requested" => "Requested",
-        "Approved" => "Approved",
-        "Denied" => "Denied",
-        _ => status,
-    };
 }

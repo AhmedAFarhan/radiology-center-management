@@ -51,7 +51,8 @@ public partial class PreAuthDetailDialog : ComponentBase
                 PreAuthorization.DecidedAt,
                 PreAuthorization.ApprovedAmount,
                 PreAuthorization.RejectionReason,
-                PreAuthorization.IsGovernment);
+                PreAuthorization.IsGovernment,
+                StatusKey: PreAuthorization.StatusKey);
         await LoadAsync();
     }
 
@@ -73,10 +74,8 @@ public partial class PreAuthDetailDialog : ComponentBase
         }
     }
 
-    private async Task ApproveAsync()
-    {
-        _busy = true;
-        try
+    private Task ApproveAsync()
+        => SafeExecute.RunAsync(async () =>
         {
             var input = new DecidePreAuthorizationInput
             {
@@ -87,21 +86,10 @@ public partial class PreAuthDetailDialog : ComponentBase
             _preAuth = await InsuranceService.DecidePreAuthorizationAsync(Id, input);
             Snackbar.Add(T.PreAuthDialog.Approved, Severity.Success);
             await LoadAsync();
-        }
-        catch (ApiException ex)
-        {
-            Snackbar.Add(ex.Message, Severity.Error);
-        }
-        finally
-        {
-            _busy = false;
-        }
-    }
+        }, Snackbar, () => T.PreAuthDialog.Unreachable, busy => _busy = busy);
 
-    private async Task DenyAsync()
-    {
-        _busy = true;
-        try
+    private Task DenyAsync()
+        => SafeExecute.RunAsync(async () =>
         {
             var input = new DecidePreAuthorizationInput
             {
@@ -112,16 +100,7 @@ public partial class PreAuthDetailDialog : ComponentBase
             _preAuth = await InsuranceService.DecidePreAuthorizationAsync(Id, input);
             Snackbar.Add(T.PreAuthDialog.Denied, Severity.Success);
             await LoadAsync();
-        }
-        catch (ApiException ex)
-        {
-            Snackbar.Add(ex.Message, Severity.Error);
-        }
-        finally
-        {
-            _busy = false;
-        }
-    }
+        }, Snackbar, () => T.PreAuthDialog.Unreachable, busy => _busy = busy);
 
     private async Task OnFileSelectedAsync(InputFileChangeEventArgs e)
     {

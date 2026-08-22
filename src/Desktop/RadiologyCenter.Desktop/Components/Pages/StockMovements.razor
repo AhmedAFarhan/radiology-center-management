@@ -24,7 +24,7 @@
     <RowTemplate>
         <MudTd DataLabel="@T.Common.Date">@context.CreatedAt.ToLocalTime().ToString("dd MMM yyyy HH:mm")</MudTd>
         <MudTd DataLabel="@T.Common.Type">
-            <StatusChip Token="@context.MovementType">@FormatMovementType(context.MovementType)</StatusChip>
+            <StatusChip Token="@context.MovementTypeKey">@context.MovementType</StatusChip>
         </MudTd>
         <MudTd DataLabel="@T.StockMovements.Quantity" Class="text-right">
             <MudText Color="@(context.Quantity < 0 ? Color.Error : Color.Success)">@(context.Quantity > 0 ? $"+{context.Quantity}" : context.Quantity.ToString())</MudText>

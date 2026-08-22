@@ -29,10 +29,10 @@
         </MudTd>
         <MudTd DataLabel="@T.PurchaseOrders.Supplier">@context.SupplierName</MudTd>
         <MudTd DataLabel="@T.Common.Status">
-            <StatusChip Token="@context.StatusKey">@FormatStatus(context.Status)</StatusChip>
+            <StatusChip Token="@context.StatusKey">@context.Status</StatusChip>
         </MudTd>
         <MudTd DataLabel="@T.PurchaseOrders.Expected">@(context.ExpectedDeliveryAt?.ToString("dd MMM yyyy") ?? "-")</MudTd>
-        <MudTd DataLabel="@T.PurchaseOrders.Actions">
+        <MudTd DataLabel="@T.Common.Actions">
             @if (context.StatusKey == "Draft")
             {
                 <AuthorizeView Policy="@InventoryPermissions.PurchaseOrdersUpdate">

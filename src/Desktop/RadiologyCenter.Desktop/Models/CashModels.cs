@@ -29,7 +29,9 @@ public sealed record CashEntryDto(
     decimal Amount,
     string? Description,
     string? ReferenceId,
-    DateTime OccurredAt);
+    DateTime OccurredAt,
+    string DirectionKey = "",
+    string ReasonKey = "");
 
 public sealed class AddCashEntryInput
 {

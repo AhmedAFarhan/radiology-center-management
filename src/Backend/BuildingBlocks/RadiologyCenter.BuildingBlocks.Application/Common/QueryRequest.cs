@@ -3,7 +3,7 @@ using RadiologyCenter.BuildingBlocks.Domain.Specifications;
 
 namespace RadiologyCenter.BuildingBlocks.Application.Common;
 
-public class QueryRequest
+public sealed record QueryRequest
 {
     public PaginationParams Pagination { get; init; } = new();
     public string? SortBy { get; init; }

@@ -56,12 +56,6 @@ public partial class PurchaseOrderViewDialog : ComponentBase
     private decimal Total()
         => _po is null ? 0 : _po.Items.Sum(i => i.QuantityOrdered * i.UnitCost);
 
-    private static string FormatStatus(string status) => status switch
-    {
-        "PartiallyReceived" => "Partially Received",
-        _ => status,
-    };
-
     private void CloseAsync()
         => MudDialog.Close();
 }

@@ -35,21 +35,11 @@ public partial class StaffEditorDialog : EditorDialogBase
         if (string.IsNullOrWhiteSpace(value))
             return Array.Empty<UserDto>();
 
-        try
-        {
-            var page = await IdentityService.GetUsersPagedAsync(value, "LastName", false, 1, 20, ct);
-            return page.Items;
-        }
-        catch (ApiException ex)
-        {
-            Snackbar.Add(ex.Message, Severity.Error);
-            return Array.Empty<UserDto>();
-        }
-        catch (Exception)
-        {
-            Snackbar.Add(T.StaffDialog.SearchError, Severity.Error);
-            return Array.Empty<UserDto>();
-        }
+        var page = await SafeExecute.RunAsync(
+            () => IdentityService.GetUsersPagedAsync(value, "LastName", false, 1, 20, ct),
+            Snackbar,
+            () => T.StaffDialog.SearchError);
+        return page?.Items ?? Array.Empty<UserDto>();
     }
 
     protected override async Task OnInitializedAsync()

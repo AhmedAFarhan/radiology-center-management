@@ -7,7 +7,7 @@
     <DialogContent>
         <DialogHeader Icon="@Icons.Material.Filled.Biotech" Title="@(T.FormatValue(T.Equipment.SetStatusTitle, Equipment.Name))" />
         <MudText Typo="Typo.body2" Class="mb-2 text-secondary">
-            @(T.Equipment.CurrentStatus): <StatusChip Token="@Equipment.Status">@FormatStatus(Equipment.Status)</StatusChip>
+            @(T.Equipment.CurrentStatus): <StatusChip Token="@Equipment.StatusKey">@Equipment.Status</StatusChip>
         </MudText>
         <EditForm EditContext="_editContext">
             <LocalizedDataAnnotationsValidator />

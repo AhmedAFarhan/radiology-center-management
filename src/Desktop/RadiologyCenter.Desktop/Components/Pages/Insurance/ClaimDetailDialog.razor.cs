@@ -72,28 +72,15 @@ public partial class ClaimDetailDialog : ComponentBase
         }
     }
 
-    private async Task SubmitAsync()
-    {
-        _busy = true;
-        try
+    private Task SubmitAsync()
+        => SafeExecute.RunAsync(async () =>
         {
             _claim = await InsuranceService.SubmitClaimAsync(ClaimId);
             Snackbar.Add(T.ClaimDialog.Submitted, Severity.Success);
-        }
-        catch (ApiException ex)
-        {
-            Snackbar.Add(ex.Message, Severity.Error);
-        }
-        finally
-        {
-            _busy = false;
-        }
-    }
+        }, Snackbar, () => T.ClaimDialog.Unreachable, busy => _busy = busy);
 
-    private async Task ApproveAsync()
-    {
-        _busy = true;
-        try
+    private Task ApproveAsync()
+        => SafeExecute.RunAsync(async () =>
         {
             var input = new AdjudicateClaimInput
             {
@@ -103,21 +90,10 @@ public partial class ClaimDetailDialog : ComponentBase
 
             _claim = await InsuranceService.AdjudicateClaimAsync(ClaimId, input);
             Snackbar.Add(T.ClaimDialog.Approved, Severity.Success);
-        }
-        catch (ApiException ex)
-        {
-            Snackbar.Add(ex.Message, Severity.Error);
-        }
-        finally
-        {
-            _busy = false;
-        }
-    }
+        }, Snackbar, () => T.ClaimDialog.Unreachable, busy => _busy = busy);
 
-    private async Task RejectAsync()
-    {
-        _busy = true;
-        try
+    private Task RejectAsync()
+        => SafeExecute.RunAsync(async () =>
         {
             var input = new AdjudicateClaimInput
             {
@@ -128,39 +104,17 @@ public partial class ClaimDetailDialog : ComponentBase
 
             _claim = await InsuranceService.AdjudicateClaimAsync(ClaimId, input);
             Snackbar.Add(T.ClaimDialog.Rejected, Severity.Success);
-        }
-        catch (ApiException ex)
-        {
-            Snackbar.Add(ex.Message, Severity.Error);
-        }
-        finally
-        {
-            _busy = false;
-        }
-    }
+        }, Snackbar, () => T.ClaimDialog.Unreachable, busy => _busy = busy);
 
-    private async Task ResubmitAsync()
-    {
-        _busy = true;
-        try
+    private Task ResubmitAsync()
+        => SafeExecute.RunAsync(async () =>
         {
             _claim = await InsuranceService.ResubmitClaimAsync(ClaimId);
             Snackbar.Add(T.ClaimDialog.Resubmitted, Severity.Success);
-        }
-        catch (ApiException ex)
-        {
-            Snackbar.Add(ex.Message, Severity.Error);
-        }
-        finally
-        {
-            _busy = false;
-        }
-    }
+        }, Snackbar, () => T.ClaimDialog.Unreachable, busy => _busy = busy);
 
-    private async Task RecordSettlementAsync()
-    {
-        _busy = true;
-        try
+    private Task RecordSettlementAsync()
+        => SafeExecute.RunAsync(async () =>
         {
             var input = new RecordSettlementInput
             {
@@ -171,16 +125,7 @@ public partial class ClaimDetailDialog : ComponentBase
 
             _claim = await InsuranceService.RecordSettlementAsync(ClaimId, input);
             Snackbar.Add(T.ClaimDialog.SettlementRecorded, Severity.Success);
-        }
-        catch (ApiException ex)
-        {
-            Snackbar.Add(ex.Message, Severity.Error);
-        }
-        finally
-        {
-            _busy = false;
-        }
-    }
+        }, Snackbar, () => T.ClaimDialog.Unreachable, busy => _busy = busy);
 
     private void CancelAsync()
         => MudDialog.Close();

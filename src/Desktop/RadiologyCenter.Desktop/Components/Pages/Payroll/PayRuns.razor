@@ -75,7 +75,7 @@
             <MudText Class="font-weight-medium">@context.RunFrom.ToString("yyyy-MM-dd") → @context.RunTo.ToString("yyyy-MM-dd")</MudText>
         </MudTd>
         <MudTd DataLabel="@T.Common.Status">
-            <StatusChip Token="@context.Status">@FormatStatus(context.Status)</StatusChip>
+            <StatusChip Token="@context.StatusKey">@context.Status</StatusChip>
         </MudTd>
         <MudTd DataLabel="@T.Payroll.Employees">@context.Payslips.Count</MudTd>
         <MudTd DataLabel="@T.Payroll.NetPay" Class="text-right">@context.Payslips.Sum(p => p.NetSalary).ToString("N2")</MudTd>

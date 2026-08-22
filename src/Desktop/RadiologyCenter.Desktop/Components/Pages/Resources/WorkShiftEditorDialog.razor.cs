@@ -34,21 +34,11 @@ public partial class WorkShiftEditorDialog : EditorDialogBase
         if (string.IsNullOrWhiteSpace(value))
             return Array.Empty<StaffDto>();
 
-        try
-        {
-            var page = await ResourceService.GetStaffsPagedAsync(value, "LastName", false, 1, 20, ct);
-            return page.Items;
-        }
-        catch (ApiException ex)
-        {
-            Snackbar.Add(ex.Message, Severity.Error);
-            return Array.Empty<StaffDto>();
-        }
-        catch (Exception)
-        {
-            Snackbar.Add(T.WorkShiftDialog.SearchStaffError, Severity.Error);
-            return Array.Empty<StaffDto>();
-        }
+        var page = await SafeExecute.RunAsync(
+            () => ResourceService.GetStaffsPagedAsync(value, "LastName", false, 1, 20, ct),
+            Snackbar,
+            () => T.WorkShiftDialog.SearchStaffError);
+        return page?.Items ?? Array.Empty<StaffDto>();
     }
 
     private async Task<IEnumerable<EquipmentDto>> SearchEquipmentAsync(string? value, CancellationToken ct)
@@ -56,21 +46,11 @@ public partial class WorkShiftEditorDialog : EditorDialogBase
         if (string.IsNullOrWhiteSpace(value))
             return Array.Empty<EquipmentDto>();
 
-        try
-        {
-            var page = await ResourceService.GetEquipmentPagedAsync(value, "Name", false, 1, 20, ct);
-            return page.Items;
-        }
-        catch (ApiException ex)
-        {
-            Snackbar.Add(ex.Message, Severity.Error);
-            return Array.Empty<EquipmentDto>();
-        }
-        catch (Exception)
-        {
-            Snackbar.Add(T.WorkShiftDialog.SearchEquipmentError, Severity.Error);
-            return Array.Empty<EquipmentDto>();
-        }
+        var page = await SafeExecute.RunAsync(
+            () => ResourceService.GetEquipmentPagedAsync(value, "Name", false, 1, 20, ct),
+            Snackbar,
+            () => T.WorkShiftDialog.SearchEquipmentError);
+        return page?.Items ?? Array.Empty<EquipmentDto>();
     }
 
     protected override async Task OnInitializedAsync()

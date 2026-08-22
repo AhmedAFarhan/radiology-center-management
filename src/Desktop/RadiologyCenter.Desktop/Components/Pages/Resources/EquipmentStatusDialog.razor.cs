@@ -61,13 +61,6 @@ public partial class EquipmentStatusDialog : ComponentBase
     private void CancelAsync()
         => MudDialog.Cancel();
 
-    private static string FormatStatus(string status) => status switch
-    {
-        "UnderMaintenance" => "Under Maintenance",
-        "OutOfService" => "Out of Service",
-        _ => status,
-    };
-
     private sealed class EquipmentStatusModel
     {
         [Required(ErrorMessage = "Status is required.")]

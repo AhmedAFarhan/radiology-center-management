@@ -37,7 +37,7 @@ public partial class Inventory : ListPageBase<ItemDto>
     {
         ItemDto? item = null;
         var ok = await SafeExecute.RunAsync(
-            async () => item = await InventoryService.GetItemByIdAsync(id),
+            async () => { item = await InventoryService.GetItemByIdAsync(id); },
             Snackbar,
             () => T.Inventory.Unreachable);
 
@@ -119,11 +119,4 @@ public partial class Inventory : ListPageBase<ItemDto>
             Snackbar,
             () => T.Inventory.Unreachable);
     }
-
-    private static string FormatCategory(string category) => category switch
-    {
-        "ContrastMedia" => "Contrast Media",
-        "MedicalSupply" => "Medical Supply",
-        _ => category,
-    };
 }

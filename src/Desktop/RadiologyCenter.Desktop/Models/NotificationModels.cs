@@ -28,7 +28,9 @@ public sealed record NotificationMessageDto(
     int Attempts,
     DateTime? SentAtUtc,
     string? FailureReason,
-    DateTime CreatedAt);
+    DateTime CreatedAt,
+    string ChannelKey = "",
+    string StatusKey = "");
 
 public sealed class SendNotificationInput
 {

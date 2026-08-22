@@ -54,7 +54,7 @@ public partial class Patients : ComponentBase, IDisposable
     {
         PatientDto? patient = null;
         var ok = await SafeExecute.RunAsync(
-            async () => patient = await PatientService.GetByIdAsync(id),
+            async () => { patient = await PatientService.GetByIdAsync(id); },
             Snackbar,
             () => T.Patients.Unreachable);
 

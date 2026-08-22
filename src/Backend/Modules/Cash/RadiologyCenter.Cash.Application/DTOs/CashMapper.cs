@@ -14,7 +14,9 @@ internal static class CashMapper
             entry.Amount,
             entry.Description,
             entry.ReferenceId,
-            entry.OccurredAt);
+            entry.OccurredAt,
+            entry.Direction.Name,
+            entry.Reason.Name);
 
     public static CashHandoverDto ToDto(this CashHandover handover, string closedByName = "") =>
         new(

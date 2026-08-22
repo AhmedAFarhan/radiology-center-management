@@ -1,3 +1,4 @@
+using System.Collections.Concurrent;
 using RadiologyCenter.Desktop.Models;
 
 namespace RadiologyCenter.Desktop.Services;
@@ -5,12 +6,14 @@ namespace RadiologyCenter.Desktop.Services;
 /// <summary>
 /// Loads enum options from the backend enums endpoint and caches them per culture,
 /// so dropdowns can render localized values while submitting the stable enum keys.
+/// Concurrent callers for the same type share a single in-flight request; failed
+/// loads are evicted so the next call retries.
 /// </summary>
 public sealed class EnumOptionsService : IDisposable
 {
     private readonly ApiClient _api;
     private readonly AppLocalizer _localizer;
-    private readonly Dictionary<string, IReadOnlyList<EnumOptionDto>> _cache = new(StringComparer.Ordinal);
+    private readonly ConcurrentDictionary<string, Lazy<Task<IReadOnlyList<EnumOptionDto>>>> _cache = new(StringComparer.Ordinal);
     private bool _disposed;
 
     public EnumOptionsService(ApiClient api, AppLocalizer localizer)
@@ -20,20 +23,27 @@ public sealed class EnumOptionsService : IDisposable
         _localizer.LanguageChanged += OnLanguageChanged;
     }
 
-    public Task<IReadOnlyList<EnumOptionDto>> GetOptionsAsync(string typeName, CancellationToken ct = default)
+    public async Task<IReadOnlyList<EnumOptionDto>> GetOptionsAsync(string typeName, CancellationToken ct = default)
     {
-        if (_cache.TryGetValue(typeName, out var cached))
-            return Task.FromResult(cached);
+        var entry = _cache.GetOrAdd(typeName, CreateEntry);
 
-        return LoadAsync(typeName, ct);
+        try
+        {
+            return await entry.Value.WaitAsync(ct);
+        }
+        catch (OperationCanceledException) when (ct.IsCancellationRequested)
+        {
+            throw;
+        }
+        catch
+        {
+            _cache.TryRemove(new KeyValuePair<string, Lazy<Task<IReadOnlyList<EnumOptionDto>>>>(typeName, entry));
+            throw;
+        }
     }
 
-    private async Task<IReadOnlyList<EnumOptionDto>> LoadAsync(string typeName, CancellationToken ct)
-    {
-        var options = await _api.GetAsync<IReadOnlyList<EnumOptionDto>>($"api/enums/{typeName}", ct);
-        _cache[typeName] = options;
-        return options;
-    }
+    private Lazy<Task<IReadOnlyList<EnumOptionDto>>> CreateEntry(string typeName) =>
+        new(() => _api.GetAsync<IReadOnlyList<EnumOptionDto>>($"api/enums/{typeName}"));
 
     private void OnLanguageChanged() => _cache.Clear();
 

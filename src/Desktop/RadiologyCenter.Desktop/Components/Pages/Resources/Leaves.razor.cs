@@ -85,13 +85,4 @@ public partial class Leaves : ListPageBase<LeaveDto>
             Snackbar,
             () => T.Leave.Unreachable);
     }
-
-    private static string FormatLeaveType(string leaveType) => leaveType switch
-    {
-        "Annual" => "Annual",
-        "Sick" => "Sick",
-        "Unpaid" => "Unpaid",
-        "Maternity" => "Maternity",
-        _ => leaveType,
-    };
 }

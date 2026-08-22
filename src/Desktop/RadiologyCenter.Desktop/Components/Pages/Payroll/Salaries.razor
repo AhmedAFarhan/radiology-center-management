@@ -31,7 +31,7 @@
         </MudTd>
         <MudTd DataLabel="@T.Salary.BaseSalary" Class="text-right">@context.BaseSalary.ToString("N2")</MudTd>
         <MudTd DataLabel="@T.Common.Type">
-            <StatusChip Token="@context.SalaryType">@context.SalaryType</StatusChip>
+            <StatusChip Token="@context.SalaryTypeKey">@context.SalaryType</StatusChip>
         </MudTd>
         <MudTd DataLabel="@T.Salary.Effective">@context.EffectiveDate.ToString("yyyy-MM-dd")</MudTd>
         <MudTd DataLabel="@T.Common.Status">

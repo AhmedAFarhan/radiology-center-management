@@ -56,7 +56,7 @@
                             @foreach (var finding in version.Findings.OrderBy(f => f.Position))
                             {
                                 <div class="mb-1">
-                                    <StatusChip Token="@finding.Severity" Variant="Variant.Outlined" Class="me-1">@finding.Severity</StatusChip>
+                                    <StatusChip Token="@finding.SeverityKey" Variant="Variant.Outlined" Class="me-1">@finding.Severity</StatusChip>
                                     <MudText Typo="Typo.body2" Class="d-inline">@finding.Region - @finding.Description</MudText>
                                 </div>
                             }

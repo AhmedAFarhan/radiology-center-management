@@ -67,7 +67,7 @@
                         </div>
                         <div class="rr-item-meta">
                             <StatusChip Token="@current.ReportStatusKey">@current.ReportStatus</StatusChip>
-                            <StatusChip Token="@current.Priority">@current.Priority</StatusChip>
+                            <StatusChip Token="@current.PriorityKey">@current.Priority</StatusChip>
                             @if (current.StudyInstanceUid is null)
                             {
                                 @if (IsLinking(current))

@@ -24,6 +24,7 @@ public sealed class ApiException : Exception
 public sealed class ApiClient
 {
     public const string BaseUrl = "http://localhost:5224";
+    public const string HttpClientName = "Api";
 
     private static readonly JsonSerializerOptions JsonOptions = new()
     {
@@ -38,13 +39,13 @@ public sealed class ApiClient
     private readonly ISnackbar _snackbar;
     private Task<TokenResult?>? _refreshTask;
 
-    public ApiClient(TokenStorage tokenStorage, AppAuthenticationStateProvider authState, AppLocalizer localizer, ISnackbar snackbar)
+    public ApiClient(IHttpClientFactory httpClientFactory, TokenStorage tokenStorage, AppAuthenticationStateProvider authState, AppLocalizer localizer, ISnackbar snackbar)
     {
         _tokenStorage = tokenStorage;
         _authState = authState;
         _localizer = localizer;
         _snackbar = snackbar;
-        _http = new HttpClient { BaseAddress = new Uri(BaseUrl), Timeout = TimeSpan.FromSeconds(30) };
+        _http = httpClientFactory.CreateClient(HttpClientName);
     }
 
     public Task<T> GetAsync<T>(string path, CancellationToken ct = default)

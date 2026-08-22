@@ -149,14 +149,6 @@ public partial class PayRuns : ComponentBase, IDisposable
             () => T.Payroll.Unreachable);
     }
 
-    private static string FormatStatus(string status) => status switch
-    {
-        "Computed" => "Computed",
-        "Approved" => "Approved",
-        "Rejected" => "Rejected",
-        _ => status,
-    };
-
     public void Dispose() => _searchCts?.Cancel();
 
     private sealed class PayRunStats

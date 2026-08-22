@@ -23,21 +23,11 @@ public partial class PreAuthDialog : EditorDialogBase
         if (string.IsNullOrWhiteSpace(value))
             return Array.Empty<PatientDto>();
 
-        try
-        {
-            var page = await PatientService.GetPagedAsync(value, "LastName", false, 1, 20, ct);
-            return page.Items;
-        }
-        catch (ApiException ex)
-        {
-            Snackbar.Add(ex.Message, Severity.Error);
-            return Array.Empty<PatientDto>();
-        }
-        catch (Exception)
-        {
-            Snackbar.Add(T.PreAuthDialog.UnableSearchPatients, Severity.Error);
-            return Array.Empty<PatientDto>();
-        }
+        var page = await SafeExecute.RunAsync(
+            () => PatientService.GetPagedAsync(value, "LastName", false, 1, 20, ct),
+            Snackbar,
+            () => T.PreAuthDialog.UnableSearchPatients);
+        return page?.Items ?? Array.Empty<PatientDto>();
     }
 
     private async Task<IEnumerable<InsurancePolicyDto>> SearchPoliciesAsync(string? value, CancellationToken ct)
@@ -48,24 +38,15 @@ public partial class PreAuthDialog : EditorDialogBase
             return Array.Empty<InsurancePolicyDto>();
         }
 
-        try
-        {
-            var policies = await InsuranceService.GetPoliciesByPatientAsync(_selectedPatient.Id, ct);
-            if (string.IsNullOrWhiteSpace(value))
-                return policies;
+        var policies = await SafeExecute.RunAsync(
+            () => InsuranceService.GetPoliciesByPatientAsync(_selectedPatient.Id, ct),
+            Snackbar,
+            () => T.PreAuthDialog.UnableSearchPolicies) ?? Array.Empty<InsurancePolicyDto>();
 
-            return policies.Where(p => p.PolicyNumber.Contains(value, StringComparison.OrdinalIgnoreCase));
-        }
-        catch (ApiException ex)
-        {
-            Snackbar.Add(ex.Message, Severity.Error);
-            return Array.Empty<InsurancePolicyDto>();
-        }
-        catch (Exception)
-        {
-            Snackbar.Add(T.PreAuthDialog.UnableSearchPolicies, Severity.Error);
-            return Array.Empty<InsurancePolicyDto>();
-        }
+        if (string.IsNullOrWhiteSpace(value))
+            return policies;
+
+        return policies.Where(p => p.PolicyNumber.Contains(value, StringComparison.OrdinalIgnoreCase));
     }
 
     private async Task<IEnumerable<ExaminationDto>> SearchExaminationsAsync(string? value, CancellationToken ct)
@@ -76,21 +57,11 @@ public partial class PreAuthDialog : EditorDialogBase
             return Array.Empty<ExaminationDto>();
         }
 
-        try
-        {
-            var page = await ExaminationService.GetPagedAsync(value, "ScheduledAt", false, 1, 50, ct);
-            return page.Items.Where(e => e.PatientId == _selectedPatient.Id);
-        }
-        catch (ApiException ex)
-        {
-            Snackbar.Add(ex.Message, Severity.Error);
-            return Array.Empty<ExaminationDto>();
-        }
-        catch (Exception)
-        {
-            Snackbar.Add(T.PreAuthDialog.UnableSearchExaminations, Severity.Error);
-            return Array.Empty<ExaminationDto>();
-        }
+        var page = await SafeExecute.RunAsync(
+            () => ExaminationService.GetPagedAsync(value, "ScheduledAt", false, 1, 50, ct),
+            Snackbar,
+            () => T.PreAuthDialog.UnableSearchExaminations);
+        return page?.Items.Where(e => e.PatientId == _selectedPatient.Id) ?? Array.Empty<ExaminationDto>();
     }
 
     private async Task SubmitAsync()

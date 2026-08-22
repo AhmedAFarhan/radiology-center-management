@@ -50,7 +50,7 @@
         </MudTd>
         <MudTd DataLabel="@T.Notifications.Subject">@(string.IsNullOrWhiteSpace(context.Subject) ? "-" : Truncate(context.Subject, 55))</MudTd>
         <MudTd DataLabel="@T.Common.Status">
-            <StatusChip Token="@context.Status">@context.Status</StatusChip>
+            <StatusChip Token="@context.StatusKey">@context.Status</StatusChip>
         </MudTd>
         <MudTd DataLabel="@T.Notifications.Attempts" Class="text-center">@context.Attempts</MudTd>
         <MudTd DataLabel="@T.Notifications.Reference">@(string.IsNullOrWhiteSpace(context.ReferenceId) ? "-" : context.ReferenceId)</MudTd>

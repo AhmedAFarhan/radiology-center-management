@@ -37,21 +37,11 @@ public partial class SalaryEditorDialog : EditorDialogBase
         if (string.IsNullOrWhiteSpace(value))
             return Array.Empty<StaffDto>();
 
-        try
-        {
-            var page = await ResourceService.GetStaffsPagedAsync(value, "LastName", false, 1, 20, ct);
-            return page.Items;
-        }
-        catch (ApiException ex)
-        {
-            Snackbar.Add(ex.Message, Severity.Error);
-            return Array.Empty<StaffDto>();
-        }
-        catch (Exception)
-        {
-            Snackbar.Add(T.SalaryDialog.SearchError, Severity.Error);
-            return Array.Empty<StaffDto>();
-        }
+        var page = await SafeExecute.RunAsync(
+            () => ResourceService.GetStaffsPagedAsync(value, "LastName", false, 1, 20, ct),
+            Snackbar,
+            () => T.SalaryDialog.SearchError);
+        return page?.Items ?? Array.Empty<StaffDto>();
     }
 
     protected override async Task OnInitializedAsync()

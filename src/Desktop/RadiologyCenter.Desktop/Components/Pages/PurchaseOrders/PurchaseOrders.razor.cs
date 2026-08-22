@@ -108,10 +108,4 @@ public partial class PurchaseOrders : ListPageBase<PurchaseOrderDto>
             Snackbar,
             () => T.PurchaseOrders.Unreachable);
     }
-
-    private static string FormatStatus(string status) => status switch
-    {
-        "PartiallyReceived" => "Partially Received",
-        _ => status,
-    };
 }

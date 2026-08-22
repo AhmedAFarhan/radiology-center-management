@@ -24,21 +24,11 @@ public partial class ClaimCreateDialog : EditorDialogBase
         if (string.IsNullOrWhiteSpace(value))
             return Array.Empty<PatientDto>();
 
-        try
-        {
-            var page = await PatientService.GetPagedAsync(value, "LastName", false, 1, 20, ct);
-            return page.Items;
-        }
-        catch (ApiException ex)
-        {
-            Snackbar.Add(ex.Message, Severity.Error);
-            return Array.Empty<PatientDto>();
-        }
-        catch (Exception)
-        {
-            Snackbar.Add(T.ClaimDialog.UnableSearchPatients, Severity.Error);
-            return Array.Empty<PatientDto>();
-        }
+        var page = await SafeExecute.RunAsync(
+            () => PatientService.GetPagedAsync(value, "LastName", false, 1, 20, ct),
+            Snackbar,
+            () => T.ClaimDialog.UnableSearchPatients);
+        return page?.Items ?? Array.Empty<PatientDto>();
     }
 
     private async Task<IEnumerable<InsurancePolicyDto>> SearchPoliciesAsync(string? value, CancellationToken ct)
@@ -49,24 +39,15 @@ public partial class ClaimCreateDialog : EditorDialogBase
             return Array.Empty<InsurancePolicyDto>();
         }
 
-        try
-        {
-            var policies = await InsuranceService.GetPoliciesByPatientAsync(_selectedPatient.Id, ct);
-            if (string.IsNullOrWhiteSpace(value))
-                return policies;
+        var policies = await SafeExecute.RunAsync(
+            () => InsuranceService.GetPoliciesByPatientAsync(_selectedPatient.Id, ct),
+            Snackbar,
+            () => T.ClaimDialog.UnableSearchPolicies) ?? Array.Empty<InsurancePolicyDto>();
 
-            return policies.Where(p => p.PolicyNumber.Contains(value, StringComparison.OrdinalIgnoreCase));
-        }
-        catch (ApiException ex)
-        {
-            Snackbar.Add(ex.Message, Severity.Error);
-            return Array.Empty<InsurancePolicyDto>();
-        }
-        catch (Exception)
-        {
-            Snackbar.Add(T.ClaimDialog.UnableSearchPolicies, Severity.Error);
-            return Array.Empty<InsurancePolicyDto>();
-        }
+        if (string.IsNullOrWhiteSpace(value))
+            return policies;
+
+        return policies.Where(p => p.PolicyNumber.Contains(value, StringComparison.OrdinalIgnoreCase));
     }
 
     private async Task<IEnumerable<ExaminationDto>> SearchExaminationsAsync(string? value, CancellationToken ct)
@@ -77,21 +58,11 @@ public partial class ClaimCreateDialog : EditorDialogBase
             return Array.Empty<ExaminationDto>();
         }
 
-        try
-        {
-            var page = await ExaminationService.GetPagedAsync(value, "ScheduledAt", false, 1, 50, ct);
-            return page.Items.Where(e => e.PatientId == _selectedPatient.Id);
-        }
-        catch (ApiException ex)
-        {
-            Snackbar.Add(ex.Message, Severity.Error);
-            return Array.Empty<ExaminationDto>();
-        }
-        catch (Exception)
-        {
-            Snackbar.Add(T.ClaimDialog.UnableSearchExaminations, Severity.Error);
-            return Array.Empty<ExaminationDto>();
-        }
+        var page = await SafeExecute.RunAsync(
+            () => ExaminationService.GetPagedAsync(value, "ScheduledAt", false, 1, 50, ct),
+            Snackbar,
+            () => T.ClaimDialog.UnableSearchExaminations);
+        return page?.Items.Where(e => e.PatientId == _selectedPatient.Id) ?? Array.Empty<ExaminationDto>();
     }
 
     private async Task<IEnumerable<PreAuthorizationDto>> SearchPreAuthorizationsAsync(string? value, CancellationToken ct)
@@ -102,24 +73,14 @@ public partial class ClaimCreateDialog : EditorDialogBase
             return Array.Empty<PreAuthorizationDto>();
         }
 
-        try
+        var result = await SafeExecute.RunAsync(async () =>
         {
             var preAuthorization = await InsuranceService.GetPreAuthorizationByExaminationAsync(_selectedExamination.Id, ct);
-            if (preAuthorization is null)
-                return Array.Empty<PreAuthorizationDto>();
-
-            return new[] { preAuthorization };
-        }
-        catch (ApiException ex)
-        {
-            Snackbar.Add(ex.Message, Severity.Error);
-            return Array.Empty<PreAuthorizationDto>();
-        }
-        catch (Exception)
-        {
-            Snackbar.Add(T.ClaimDialog.UnableSearchPreAuthorizations, Severity.Error);
-            return Array.Empty<PreAuthorizationDto>();
-        }
+            return preAuthorization is null
+                ? Array.Empty<PreAuthorizationDto>()
+                : new[] { preAuthorization };
+        }, Snackbar, () => T.ClaimDialog.UnableSearchPreAuthorizations);
+        return result ?? Array.Empty<PreAuthorizationDto>();
     }
 
     private async Task SubmitAsync()

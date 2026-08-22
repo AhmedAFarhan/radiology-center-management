@@ -56,7 +56,7 @@ public partial class Companies : ComponentBase, IDisposable
     {
         InsuranceCompanyDto? company = null;
         var ok = await SafeExecute.RunAsync(
-            async () => company = await InsuranceService.GetCompanyByIdAsync(id),
+            async () => { company = await InsuranceService.GetCompanyByIdAsync(id); },
             Snackbar,
             () => T.Insurance.Unreachable);
 

@@ -9,4 +9,5 @@ public record StockMovementDto(
     decimal? UnitCost,
     string? Reference,
     string? Notes,
-    DateTime CreatedAt);
+    DateTime CreatedAt,
+    string MovementTypeKey = "");

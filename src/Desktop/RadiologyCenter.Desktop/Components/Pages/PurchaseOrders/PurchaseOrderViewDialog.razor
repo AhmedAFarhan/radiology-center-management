@@ -16,7 +16,7 @@
         else if (_po is not null)
         {
             <MudText Typo="Typo.body2" Class="text-secondary mb-3">
-                @_po.SupplierName · <StatusChip Token="@_po.Status">@FormatStatus(_po.Status)</StatusChip>
+                @_po.SupplierName · <StatusChip Token="@_po.StatusKey">@_po.Status</StatusChip>
             </MudText>
 
             <MudSimpleTable Dense="true">

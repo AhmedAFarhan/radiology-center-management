@@ -28,7 +28,7 @@
         <MudTd DataLabel="@T.Equipment.SerialNumber">@(string.IsNullOrWhiteSpace(context.SerialNumber) ? "-" : context.SerialNumber)</MudTd>
         <MudTd DataLabel="@T.Equipment.Modality">@context.Modality</MudTd>
         <MudTd DataLabel="@T.Common.Status">
-            <StatusChip Token="@context.Status">@FormatStatus(context.Status)</StatusChip>
+            <StatusChip Token="@context.StatusKey">@context.Status</StatusChip>
         </MudTd>
         <MudTd DataLabel="@T.Equipment.PurchaseDate">@(context.PurchaseDate?.ToString("yyyy-MM-dd") ?? "-")</MudTd>
         <MudTd DataLabel="@T.Common.Active">

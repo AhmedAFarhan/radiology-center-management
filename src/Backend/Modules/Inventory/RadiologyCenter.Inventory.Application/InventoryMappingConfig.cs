@@ -19,7 +19,8 @@ public static class InventoryMappingConfig
             .Map(d => d.IsExpired, s => s.IsExpired(DateTime.UtcNow));
 
         TypeAdapterConfig<StockMovement, StockMovementDto>.NewConfig()
-            .Map(d => d.MovementType, s => s.MovementType.LocalizedName());
+            .Map(d => d.MovementType, s => s.MovementType.LocalizedName())
+            .Map(d => d.MovementTypeKey, s => s.MovementType.Name);
 
         TypeAdapterConfig<PurchaseOrder, PurchaseOrderDto>.NewConfig()
             .Map(d => d.Status, s => s.Status.LocalizedName());

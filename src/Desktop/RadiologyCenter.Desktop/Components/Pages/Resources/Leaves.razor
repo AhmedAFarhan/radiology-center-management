@@ -26,7 +26,7 @@
             <MudText Class="font-weight-medium">@ResolveStaff(context.StaffId)</MudText>
         </MudTd>
         <MudTd DataLabel="@T.Common.Type">
-            <StatusChip Token="@context.LeaveType">@FormatLeaveType(context.LeaveType)</StatusChip>
+            <StatusChip Token="@context.LeaveTypeKey">@context.LeaveType</StatusChip>
         </MudTd>
         <MudTd DataLabel="@T.Leave.StartDate">@context.StartDate.ToString("yyyy-MM-dd")</MudTd>
         <MudTd DataLabel="@T.Leave.EndDate">@context.EndDate.ToString("yyyy-MM-dd")</MudTd>

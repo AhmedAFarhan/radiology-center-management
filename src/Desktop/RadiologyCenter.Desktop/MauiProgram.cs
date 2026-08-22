@@ -35,6 +35,11 @@ public static class MauiProgram
             config.SnackbarConfiguration.PositionClass = Defaults.Classes.Position.TopEnd;
         });
 
+        builder.Services.AddHttpClient(ApiClient.HttpClientName, client =>
+        {
+            client.BaseAddress = new Uri(ApiClient.BaseUrl);
+            client.Timeout = TimeSpan.FromSeconds(30);
+        });
         builder.Services.AddSingleton<AppLocalizer>();
         builder.Services.AddSingleton<MudLocalizer, AppMudLocalizer>();
         builder.Services.AddSingleton<BackendStatusService>();

@@ -23,7 +23,7 @@ public partial class Suppliers : ListPageBase<SupplierDto>
     {
         SupplierDto? supplier = null;
         var ok = await SafeExecute.RunAsync(
-            async () => supplier = await InventoryService.GetSupplierByIdAsync(id),
+            async () => { supplier = await InventoryService.GetSupplierByIdAsync(id); },
             Snackbar,
             () => T.Suppliers.Unreachable);
 

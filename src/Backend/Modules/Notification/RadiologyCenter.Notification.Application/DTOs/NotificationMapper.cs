@@ -27,5 +27,7 @@ internal static class NotificationMapper
             message.Attempts,
             message.SentAtUtc,
             message.FailureReason,
-            message.CreatedAt);
+            message.CreatedAt,
+            message.Channel.Name,
+            message.Status.Name);
 }

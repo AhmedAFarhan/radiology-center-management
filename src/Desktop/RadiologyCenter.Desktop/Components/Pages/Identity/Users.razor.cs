@@ -40,7 +40,7 @@ public partial class Users : ListPageBase<UserDto>
     {
         UserDto? user = null;
         var ok = await SafeExecute.RunAsync(
-            async () => user = await IdentityService.GetUserByIdAsync(id),
+            async () => { user = await IdentityService.GetUserByIdAsync(id); },
             Snackbar,
             () => T.Users.Unreachable);
 

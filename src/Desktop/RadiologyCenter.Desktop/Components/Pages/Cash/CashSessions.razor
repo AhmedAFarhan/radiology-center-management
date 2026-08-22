@@ -40,7 +40,7 @@
         <MudTd DataLabel="@T.Cash.OpenedAt">@context.OpenedAt.ToLocalTime().ToString("g")</MudTd>
         <MudTd DataLabel="@T.Cash.User">@(string.IsNullOrWhiteSpace(context.UserName) ? ShortId(context.UserId) : context.UserName)</MudTd>
         <MudTd DataLabel="@T.Common.Status">
-            <StatusChip Token="@context.Status">@context.Status</StatusChip>
+            <StatusChip Token="@context.StatusKey">@context.Status</StatusChip>
         </MudTd>
         <MudTd DataLabel="@T.Cash.OpeningFloat" Class="text-right">@context.OpeningFloat.ToString("C")</MudTd>
         <MudTd DataLabel="@T.Cash.Balance" Class="text-right">

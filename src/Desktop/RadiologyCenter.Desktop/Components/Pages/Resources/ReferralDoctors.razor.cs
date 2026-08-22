@@ -37,7 +37,7 @@ public partial class ReferralDoctors : ListPageBase<ReferralDoctorDto>
     {
         ReferralDoctorDto? doctor = null;
         var ok = await SafeExecute.RunAsync(
-            async () => doctor = await ResourceService.GetReferralDoctorByIdAsync(id),
+            async () => { doctor = await ResourceService.GetReferralDoctorByIdAsync(id); },
             Snackbar,
             () => T.ReferralDoctor.Unreachable);
 

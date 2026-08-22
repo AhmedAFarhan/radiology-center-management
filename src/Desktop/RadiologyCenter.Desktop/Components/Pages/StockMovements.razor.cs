@@ -30,10 +30,4 @@ public partial class StockMovements : ListPageBase<StockMovementDto>
         int pageSize,
         CancellationToken ct)
         => await InventoryService.GetStockMovementsPagedAsync(search, sortBy, sortDescending, page, pageSize, ct);
-
-    private static string FormatMovementType(string type) => type switch
-    {
-        "ReturnToSupplier" => "Return to Supplier",
-        _ => type,
-    };
 }

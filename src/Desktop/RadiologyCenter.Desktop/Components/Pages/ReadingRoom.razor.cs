@@ -196,6 +196,7 @@ public partial class ReadingRoom : ComponentBase, IDisposable
                     ScheduledAt = exam.ScheduledAt,
                     CompletedAt = exam.CompletedAt,
                     Priority = exam.Priority,
+                    PriorityKey = exam.PriorityKey,
                     Indication = exam.ClinicalIndication,
                     AssignedRadiologistId = exam.RadiologistId,
                     ReportStatus = _reportStatusByExam.GetValueOrDefault(exam.Id, "New"),
@@ -785,6 +786,7 @@ public partial class ReadingRoom : ComponentBase, IDisposable
         public DateTime? ScheduledAt { get; init; }
         public DateTime? CompletedAt { get; init; }
         public string Priority { get; init; } = string.Empty;
+        public string PriorityKey { get; init; } = string.Empty;
         public string Indication { get; init; } = string.Empty;
         public string? AssignedRadiologistId { get; init; }
         public string ReportStatus { get; set; } = "New";
