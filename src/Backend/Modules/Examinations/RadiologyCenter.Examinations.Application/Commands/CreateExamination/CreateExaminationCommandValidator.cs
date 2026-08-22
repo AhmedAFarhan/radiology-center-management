@@ -17,5 +17,9 @@ public class CreateExaminationCommandValidator : AbstractValidator<CreateExamina
         RuleFor(x => x.Discount).LessThanOrEqualTo(100).When(x => x.IsDiscountPercentage);
         RuleFor(x => x.Paid).GreaterThanOrEqualTo(0);
         RuleFor(x => x.Notes).MaximumLength(500).When(x => !string.IsNullOrWhiteSpace(x.Notes));
+        RuleFor(x => x.Status)
+            .Must(s => s == ExaminationStatus.Scheduled.Name || s == ExaminationStatus.CheckedIn.Name)
+            .WithErrorCode(ErrorCodes.InvalidStatusTransition)
+            .When(x => !string.IsNullOrWhiteSpace(x.Status));
     }
 }

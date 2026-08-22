@@ -299,10 +299,14 @@ public sealed class ExaminationInput
     public bool IsDiscountPercentage { get; set; }
     public decimal Paid { get; set; }
     public string? Notes { get; set; }
+    public string? Status { get; set; }
+    public string? ScheduledAt { get; set; }
 }
 
 public sealed class ExaminationUpdateInput
 {
+    public string? PatientId { get; set; }
+    public string? ExaminationTypeId { get; set; }
     public string? RadiologistId { get; set; }
     public string? TechnicianId { get; set; }
     public string? ReferralDoctorId { get; set; }
@@ -312,6 +316,8 @@ public sealed class ExaminationUpdateInput
     public decimal? Discount { get; set; }
     public bool? IsDiscountPercentage { get; set; }
     public decimal? Paid { get; set; }
+    public string? Status { get; set; }
+    public string? ScheduledAt { get; set; }
     public List<ExaminationItemInput>? Items { get; set; }
 }
 

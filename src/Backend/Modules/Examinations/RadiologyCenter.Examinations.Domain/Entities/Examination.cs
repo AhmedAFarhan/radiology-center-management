@@ -136,9 +136,33 @@ public sealed class Examination : AuditableAggregateRoot<Guid>
         Notes = notes?.Trim();
     }
 
+    public void UpdatePatient(Guid patientId)
+    {
+        EnsureStatus(ExaminationStatus.Requested, ExaminationStatus.Scheduled, ExaminationStatus.CheckedIn);
+        Guard.AgainstEmpty(patientId, nameof(patientId));
+
+        PatientId = patientId;
+    }
+
+    public void ChangeType(Guid examinationTypeId, decimal price)
+    {
+        EnsureStatus(ExaminationStatus.Requested, ExaminationStatus.Scheduled, ExaminationStatus.CheckedIn);
+        Guard.AgainstEmpty(examinationTypeId, nameof(examinationTypeId));
+        Guard.Against(price, p => p < 0, DomainErrors.PriceNegative, "Price cannot be negative.");
+
+        if (examinationTypeId != ExaminationTypeId)
+        {
+            _items.Clear();
+            ExaminationTypeId = examinationTypeId;
+        }
+
+        Price = price;
+        RecalculateRemaining();
+    }
+
     public void Schedule(DateTime scheduledAt)
     {
-        EnsureStatus(ExaminationStatus.Requested);
+        EnsureStatus(ExaminationStatus.Requested, ExaminationStatus.Scheduled);
         Guard.Against(scheduledAt, s => s == default, DomainErrors.ScheduledTimeDefault, "Scheduled time cannot be the default value.");
         Guard.Against(scheduledAt, s => s < DateTime.UtcNow.AddMinutes(-1), DomainErrors.ScheduledTimePast, "Scheduled time cannot be in the past.");
 

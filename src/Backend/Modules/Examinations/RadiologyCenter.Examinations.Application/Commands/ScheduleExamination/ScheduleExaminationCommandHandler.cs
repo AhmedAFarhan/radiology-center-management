@@ -1,5 +1,6 @@
 using RadiologyCenter.Examinations.Application.Localization;
 using RadiologyCenter.Examinations.Application.Abstractions;
+using RadiologyCenter.Examinations.Application.Scheduling;
 
 namespace RadiologyCenter.Examinations.Application.Commands.ScheduleExamination;
 
@@ -15,7 +16,7 @@ public static class ScheduleExaminationCommandHandler
         if (examination is null)
             return Result.Failure(Error.NotFound(ErrorCodes.ExaminationNotFound, "Examination", command.ExaminationId));
 
-        examination.Schedule(command.ScheduledAt);
+        examination.Schedule(ClinicClock.ToUtc(command.ScheduledAt));
 
         await unitOfWork.SaveChangesAsync(ct);
         return Result.Success();

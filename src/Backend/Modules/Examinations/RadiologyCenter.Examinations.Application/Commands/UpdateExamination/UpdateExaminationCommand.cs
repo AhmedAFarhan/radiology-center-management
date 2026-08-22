@@ -11,4 +11,8 @@ public record UpdateExaminationCommand(
     decimal? Discount = null,
     bool? IsDiscountPercentage = null,
     decimal? Paid = null,
-    IReadOnlyList<UpdateExaminationItemRequest>? Items = null) : ICommand;
+    IReadOnlyList<UpdateExaminationItemRequest>? Items = null,
+    Guid? PatientId = null,
+    Guid? ExaminationTypeId = null,
+    string? Status = null,
+    DateTime? ScheduledAt = null) : ICommand;

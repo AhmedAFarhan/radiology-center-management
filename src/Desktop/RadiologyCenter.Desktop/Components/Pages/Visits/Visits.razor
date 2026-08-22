@@ -59,13 +59,13 @@
                     <MudIconButton Icon="@Icons.Material.Filled.Approval" Size="Size.Small" Color="Color.Info" aria-label="@T.Visits.Insurance" OnClick="@(() => OpenInsuranceAsync(context))" />
                 </MudTooltip>
             }
-            @if (context.StatusKey is "Requested" or "Scheduled")
+            @if (context.StatusKey is "Requested" or "Scheduled" or "CheckedIn")
             {
-                <MudTooltip Placement="Placement.Bottom" Text="@T.Common.Edit">
-                    <MudIconButton Icon="@Icons.Material.Filled.Edit" Size="Size.Small" Color="Color.Default" aria-label="@T.Common.Edit" OnClick="@(() => OpenEditDialogAsync(context))" />
+                <MudTooltip Placement="Placement.Bottom" Text="@T.Visits.EditVisit">
+                    <MudIconButton Icon="@Icons.Material.Filled.Edit" Size="Size.Small" Color="Color.Primary" aria-label="@T.Visits.EditVisit" OnClick="@(() => OpenEditDialogAsync(context))" />
                 </MudTooltip>
             }
-            @if (context.StatusKey is "Requested" or "Scheduled")
+            @if (context.StatusKey == "Requested")
             {
                 <MudTooltip Placement="Placement.Bottom" Text="@T.Visits.Schedule">
                     <MudIconButton Icon="@Icons.Material.Filled.Schedule" Size="Size.Small" Color="Color.Info" aria-label="@T.Visits.Schedule" OnClick="@(() => OpenScheduleDialogAsync(context))" />

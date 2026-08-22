@@ -19,5 +19,6 @@ public static class ErrorCodes
     public const string PaymentExceedsRemaining = "Examination.PaymentExceedsRemaining";
     public const string AuthenticationRequired = "Examination.AuthenticationRequired";
     public const string PaidAmountImmutable = "Examination.PaidAmountImmutable";
+    public const string InvalidStatusTransition = "Examination.InvalidStatusTransition";
     public const string StaffNotAssigned = "Examination.StaffNotAssigned";
 }

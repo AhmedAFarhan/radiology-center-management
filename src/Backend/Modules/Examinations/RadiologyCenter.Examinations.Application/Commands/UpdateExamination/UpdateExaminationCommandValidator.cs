@@ -10,6 +10,11 @@ public class UpdateExaminationCommandValidator : AbstractValidator<UpdateExamina
     public UpdateExaminationCommandValidator()
     {
         RuleFor(x => x.ExaminationId).NotEmpty();
+        RuleFor(x => x.PatientId).NotEmpty().When(x => x.PatientId.HasValue);
+        RuleFor(x => x.ExaminationTypeId).NotEmpty().When(x => x.ExaminationTypeId.HasValue);
+        RuleFor(x => x.Status)
+            .Must(s => s is null || s == ExaminationStatus.Scheduled.Name || s == ExaminationStatus.CheckedIn.Name)
+            .WithErrorCode(ErrorCodes.InvalidStatusTransition);
         RuleFor(x => x.ClinicalIndication).NotEmpty().MaximumLength(1000);
         RuleFor(x => x.Priority).NotEmpty().IsEnumerationMember<ExaminationPriority, UpdateExaminationCommand>("Priority");
         RuleFor(x => x.Notes).MaximumLength(500).When(x => !string.IsNullOrWhiteSpace(x.Notes));

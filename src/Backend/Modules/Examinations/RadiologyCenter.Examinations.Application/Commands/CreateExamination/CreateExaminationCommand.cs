@@ -11,4 +11,6 @@ public record CreateExaminationCommand(
     decimal Discount = 0,
     bool IsDiscountPercentage = false,
     decimal Paid = 0,
-    string? Notes = null) : ICommand;
+    string? Notes = null,
+    string? Status = null,
+    DateTime? ScheduledAt = null) : ICommand;

@@ -2363,11 +2363,14 @@ public sealed class VisitDialogGroup : LocalizerGroup
     public string Required => Get("visitDialog.required");
     public string SaveChanges => Get("visitDialog.saveChanges");
     public string Scheduled => Get("visitDialog.scheduled");
+    public string ScheduledDate => Get("visitDialog.scheduledDate");
+    public string ScheduledTime => Get("visitDialog.scheduledTime");
     public string SearchPatientsError => Get("visitDialog.searchPatientsError");
     public string SearchTypesError => Get("visitDialog.searchTypesError");
     public string SelectPatient => Get("visitDialog.selectPatient");
     public string SelectType => Get("visitDialog.selectType");
     public string Started => Get("visitDialog.started");
+    public string Status => Get("visitDialog.status");
     public string Technician => Get("visitDialog.technician");
     public string TechnicianId => Get("visitDialog.technicianId");
     public string TypeSearch => Get("visitDialog.typeSearch");
