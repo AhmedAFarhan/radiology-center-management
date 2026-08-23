@@ -1,4 +1,5 @@
 using FluentValidation;
+using ErrorCodes = RadiologyCenter.BuildingBlocks.Application.Localization.ErrorCodes;
 
 namespace RadiologyCenter.Payroll.Application.Commands.ActivateReferralFee;
 
@@ -6,6 +7,6 @@ public class ActivateReferralFeeCommandValidator : AbstractValidator<ActivateRef
 {
     public ActivateReferralFeeCommandValidator()
     {
-        RuleFor(x => x.Id).NotEmpty();
+        RuleFor(x => x.Id).NotEmpty().WithErrorCode(ErrorCodes.Shared.FieldRequired);
     }
 }

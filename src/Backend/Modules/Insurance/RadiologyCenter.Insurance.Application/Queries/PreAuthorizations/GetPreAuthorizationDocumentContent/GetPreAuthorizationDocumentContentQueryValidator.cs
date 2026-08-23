@@ -1,4 +1,5 @@
 using FluentValidation;
+using SharedCodes = RadiologyCenter.BuildingBlocks.Application.Localization.ErrorCodes;
 
 namespace RadiologyCenter.Insurance.Application.Queries.PreAuthorizations.GetPreAuthorizationDocumentContent;
 
@@ -6,7 +7,7 @@ public class GetPreAuthorizationDocumentContentQueryValidator : AbstractValidato
 {
     public GetPreAuthorizationDocumentContentQueryValidator()
     {
-        RuleFor(x => x.PreAuthorizationId).NotEmpty();
-        RuleFor(x => x.DocumentId).NotEmpty();
+        RuleFor(x => x.PreAuthorizationId).NotEmpty().WithErrorCode(SharedCodes.Shared.IdRequired);
+        RuleFor(x => x.DocumentId).NotEmpty().WithErrorCode(SharedCodes.Shared.IdRequired);
     }
 }

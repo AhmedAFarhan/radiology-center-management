@@ -8,8 +8,8 @@ public class CloseCashSessionCommandValidator : AbstractValidator<CloseCashSessi
     public CloseCashSessionCommandValidator()
     {
         RuleFor(x => x.CashSessionId).NotEmpty().WithErrorCode(ErrorCodes.Shared.IdRequired);
-        RuleFor(x => x.CountedTotal).GreaterThanOrEqualTo(0);
-        RuleFor(x => x.ReceivingOpeningFloat).GreaterThanOrEqualTo(0).When(x => x.ReceivingOpeningFloat.HasValue);
-        RuleFor(x => x.Notes).MaximumLength(1000);
+        RuleFor(x => x.CountedTotal).GreaterThanOrEqualTo(0).WithErrorCode(ErrorCodes.Shared.CannotBeNegative);
+        RuleFor(x => x.ReceivingOpeningFloat).GreaterThanOrEqualTo(0).WithErrorCode(ErrorCodes.Shared.CannotBeNegative).When(x => x.ReceivingOpeningFloat.HasValue);
+        RuleFor(x => x.Notes).MaximumLength(1000).WithErrorCode(ErrorCodes.Shared.TextTooLong);
     }
 }

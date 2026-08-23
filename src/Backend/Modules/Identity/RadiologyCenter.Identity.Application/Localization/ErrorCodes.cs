@@ -23,4 +23,5 @@ public static class ErrorCodes
     public const string RefreshTokenExpired = "Identity.RefreshTokenExpired";
     public const string InvalidRefreshToken = "Identity.InvalidRefreshToken";
     public const string AccountDeactivated = "Identity.AccountDeactivated";
+    public const string LockoutEndMustBeFuture = "Identity.LockoutEndMustBeFuture";
 }

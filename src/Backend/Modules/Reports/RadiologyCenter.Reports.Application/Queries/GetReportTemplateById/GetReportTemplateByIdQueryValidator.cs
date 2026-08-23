@@ -1,4 +1,5 @@
 using FluentValidation;
+using SharedCodes = RadiologyCenter.BuildingBlocks.Application.Localization.ErrorCodes;
 
 namespace RadiologyCenter.Reports.Application.Queries.GetReportTemplateById;
 
@@ -6,6 +7,6 @@ public class GetReportTemplateByIdQueryValidator : AbstractValidator<GetReportTe
 {
     public GetReportTemplateByIdQueryValidator()
     {
-        RuleFor(x => x.TemplateId).NotEmpty();
+        RuleFor(x => x.TemplateId).NotEmpty().WithErrorCode(SharedCodes.Shared.IdRequired);
     }
 }

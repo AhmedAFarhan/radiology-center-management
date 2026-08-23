@@ -18,6 +18,7 @@
     "Examination.ItemNotOnExamination": "الصنف \u0027{0}\u0027 ليس على الفحص \u0027{1}\u0027.",
     "Examination.ItemsCannotBeModified": "الفحص \u0027{0}\u0027 هو \u0027{1}\u0027 ولم يعد من الممكن تعديل عناصره.",
     "Examination.InvalidStatusTransition": "لا يمكن للفحص \u0027{0}\u0027 الانتقال من الحالة \u0027{1}\u0027.",
+    "Examination.StaffNotAssigned": "يجب تعيين أخصائي أشعة وفني قبل إكمال الفحص.",
     "Examination.RadiologistFeeNegative": "لا يمكن أن تكون رسوم أخصائي الأشعة سالبة.",
     "Examination.TechnicianFeeNegative": "لا يمكن أن تكون رسوم الفني سالبة.",
     "Examination.ReferralFeeNegative": "لا يمكن أن تكون رسوم الإحالة سالبة.",

@@ -18,4 +18,7 @@ public static class ErrorCodes
     public const string PayRunCannotDelete = "Payroll.PayRunCannotDelete";
     public const string PayRunOverlapExists = "Payroll.PayRunOverlapExists";
     public const string PayslipComponentNotFound = "Payroll.PayslipComponentNotFound";
+    public const string PayRunEndOnOrAfterStart = "Payroll.PayRunEndOnOrAfterStart";
+    public const string EndDateOnOrAfterEffectiveDate = "Payroll.EndDateOnOrAfterEffectiveDate";
+    public const string PercentageAmountMax = "Payroll.PercentageAmountMax";
 }

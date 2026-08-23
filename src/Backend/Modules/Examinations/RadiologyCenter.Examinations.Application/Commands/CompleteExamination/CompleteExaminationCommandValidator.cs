@@ -1,4 +1,5 @@
 using FluentValidation;
+using SharedCodes = RadiologyCenter.BuildingBlocks.Application.Localization.ErrorCodes;
 
 namespace RadiologyCenter.Examinations.Application.Commands.CompleteExamination;
 
@@ -6,6 +7,6 @@ public class CompleteExaminationCommandValidator : AbstractValidator<CompleteExa
 {
     public CompleteExaminationCommandValidator()
     {
-        RuleFor(x => x.ExaminationId).NotEmpty();
+        RuleFor(x => x.ExaminationId).NotEmpty().WithErrorCode(SharedCodes.Shared.IdRequired);
     }
 }

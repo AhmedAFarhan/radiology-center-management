@@ -1,4 +1,5 @@
-﻿using RadiologyCenter.Catalog.Application.Commands.Common;
+using RadiologyCenter.Catalog.Application.Commands.Common;
+using ErrorCodes = RadiologyCenter.BuildingBlocks.Application.Localization.ErrorCodes;
 
 namespace RadiologyCenter.Catalog.Application.Commands.CreateExaminationType;
 

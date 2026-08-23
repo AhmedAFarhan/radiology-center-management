@@ -7,7 +7,7 @@ public class OpenCashSessionCommandValidator : AbstractValidator<OpenCashSession
 {
     public OpenCashSessionCommandValidator()
     {
-        RuleFor(x => x.OpeningFloat).GreaterThanOrEqualTo(0);
-        RuleFor(x => x.Notes).MaximumLength(1000);
+        RuleFor(x => x.OpeningFloat).GreaterThanOrEqualTo(0).WithErrorCode(ErrorCodes.Shared.CannotBeNegative);
+        RuleFor(x => x.Notes).MaximumLength(1000).WithErrorCode(ErrorCodes.Shared.TextTooLong);
     }
 }

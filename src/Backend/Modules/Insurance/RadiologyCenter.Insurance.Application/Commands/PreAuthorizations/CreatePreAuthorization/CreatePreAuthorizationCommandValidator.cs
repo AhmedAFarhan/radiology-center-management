@@ -1,4 +1,5 @@
 using FluentValidation;
+using SharedCodes = RadiologyCenter.BuildingBlocks.Application.Localization.ErrorCodes;
 
 namespace RadiologyCenter.Insurance.Application.Commands.PreAuthorizations.CreatePreAuthorization;
 
@@ -6,9 +7,9 @@ public class CreatePreAuthorizationCommandValidator : AbstractValidator<CreatePr
 {
     public CreatePreAuthorizationCommandValidator()
     {
-        RuleFor(x => x.ExaminationId).NotEmpty();
-        RuleFor(x => x.PatientId).NotEmpty();
-        RuleFor(x => x.PolicyId).NotEmpty();
-        RuleFor(x => x.EstimatedAmount).GreaterThanOrEqualTo(0);
+        RuleFor(x => x.ExaminationId).NotEmpty().WithErrorCode(SharedCodes.Shared.IdRequired);
+        RuleFor(x => x.PatientId).NotEmpty().WithErrorCode(SharedCodes.Shared.IdRequired);
+        RuleFor(x => x.PolicyId).NotEmpty().WithErrorCode(SharedCodes.Shared.IdRequired);
+        RuleFor(x => x.EstimatedAmount).GreaterThanOrEqualTo(0).WithErrorCode(SharedCodes.Shared.CannotBeNegative);
     }
 }

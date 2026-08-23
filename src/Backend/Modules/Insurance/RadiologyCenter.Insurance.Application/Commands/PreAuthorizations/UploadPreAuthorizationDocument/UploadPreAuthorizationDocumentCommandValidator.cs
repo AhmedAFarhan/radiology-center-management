@@ -1,4 +1,5 @@
 using FluentValidation;
+using SharedCodes = RadiologyCenter.BuildingBlocks.Application.Localization.ErrorCodes;
 
 namespace RadiologyCenter.Insurance.Application.Commands.PreAuthorizations.UploadPreAuthorizationDocument;
 
@@ -6,11 +7,11 @@ public class UploadPreAuthorizationDocumentCommandValidator : AbstractValidator<
 {
     public UploadPreAuthorizationDocumentCommandValidator()
     {
-        RuleFor(x => x.PreAuthorizationId).NotEmpty();
-        RuleFor(x => x.Type).NotEmpty();
-        RuleFor(x => x.FileName).NotEmpty().MaximumLength(255);
-        RuleFor(x => x.ContentType).NotEmpty();
-        RuleFor(x => x.SizeInBytes).GreaterThan(0);
-        RuleFor(x => x.Content).NotNull();
+        RuleFor(x => x.PreAuthorizationId).NotEmpty().WithErrorCode(SharedCodes.Shared.IdRequired);
+        RuleFor(x => x.Type).NotEmpty().WithErrorCode(SharedCodes.Shared.FieldRequired);
+        RuleFor(x => x.FileName).NotEmpty().WithErrorCode(SharedCodes.Shared.FieldRequired).MaximumLength(255).WithErrorCode(SharedCodes.Shared.TextTooLong);
+        RuleFor(x => x.ContentType).NotEmpty().WithErrorCode(SharedCodes.Shared.FieldRequired);
+        RuleFor(x => x.SizeInBytes).GreaterThan(0).WithErrorCode(SharedCodes.Shared.ValueMustBePositive);
+        RuleFor(x => x.Content).NotNull().WithErrorCode(SharedCodes.Shared.FieldRequired);
     }
 }

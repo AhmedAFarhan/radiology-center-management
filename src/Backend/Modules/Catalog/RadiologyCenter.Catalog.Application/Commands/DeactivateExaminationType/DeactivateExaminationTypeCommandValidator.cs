@@ -1,4 +1,5 @@
-﻿using FluentValidation;
+using FluentValidation;
+using SharedCodes = RadiologyCenter.BuildingBlocks.Application.Localization.ErrorCodes;
 
 namespace RadiologyCenter.Catalog.Application.Commands.DeactivateExaminationType;
 
@@ -6,6 +7,6 @@ public class DeactivateExaminationTypeCommandValidator : AbstractValidator<Deact
 {
     public DeactivateExaminationTypeCommandValidator()
     {
-        RuleFor(x => x.ExaminationTypeId).NotEmpty();
+        RuleFor(x => x.ExaminationTypeId).NotEmpty().WithErrorCode(SharedCodes.Shared.IdRequired);
     }
 }

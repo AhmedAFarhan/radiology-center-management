@@ -11,6 +11,12 @@ public static class ErrorCodes
     public static class Shared
     {
         public const string IdRequired = "Shared.IdRequired";
+        public const string FieldRequired = "Shared.FieldRequired";
+        public const string ValueMustBePositive = "Shared.ValueMustBePositive";
+        public const string CannotBeNegative = "Shared.CannotBeNegative";
+        public const string TextTooLong = "Shared.TextTooLong";
+        public const string InvalidEmail = "Shared.InvalidEmail";
+        public const string MustBeBetween = "Shared.MustBeBetween";
         public const string PasswordPolicy = "Shared.PasswordPolicy";
         public const string FullNameTwoParts = "Shared.FullNameTwoParts";
         public const string InvalidPhoneNumber = "Shared.InvalidPhoneNumber";

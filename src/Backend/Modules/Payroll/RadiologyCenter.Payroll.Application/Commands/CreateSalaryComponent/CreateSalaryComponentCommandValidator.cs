@@ -1,6 +1,7 @@
 using FluentValidation;
 using RadiologyCenter.BuildingBlocks.Application.Validation;
 using RadiologyCenter.Payroll.Domain.Enumerations;
+using ErrorCodes = RadiologyCenter.BuildingBlocks.Application.Localization.ErrorCodes;
 
 namespace RadiologyCenter.Payroll.Application.Commands.CreateSalaryComponent;
 
@@ -8,9 +9,9 @@ public class CreateSalaryComponentCommandValidator : AbstractValidator<CreateSal
 {
     public CreateSalaryComponentCommandValidator()
     {
-        RuleFor(x => x.Name).NotEmpty().MaximumLength(100);
-        RuleFor(x => x.Kind).NotEmpty().IsEnumerationMember<ComponentKind, CreateSalaryComponentCommand>("Kind");
-        RuleFor(x => x.DefaultValue).GreaterThanOrEqualTo(0);
+        RuleFor(x => x.Name).NotEmpty().WithErrorCode(ErrorCodes.Shared.FieldRequired).MaximumLength(100).WithErrorCode(ErrorCodes.Shared.TextTooLong);
+        RuleFor(x => x.Kind).NotEmpty().WithErrorCode(ErrorCodes.Shared.FieldRequired).IsEnumerationMember<ComponentKind, CreateSalaryComponentCommand>("Kind");
+        RuleFor(x => x.DefaultValue).GreaterThanOrEqualTo(0).WithErrorCode(ErrorCodes.Shared.CannotBeNegative);
         RuleFor(x => x.Frequency).IsEnumerationMemberOrEmpty<Frequency, CreateSalaryComponentCommand>("Frequency");
     }
 }

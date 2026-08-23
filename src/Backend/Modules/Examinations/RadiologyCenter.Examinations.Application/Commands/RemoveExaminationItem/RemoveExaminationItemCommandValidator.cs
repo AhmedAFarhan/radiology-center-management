@@ -1,4 +1,5 @@
 using FluentValidation;
+using SharedCodes = RadiologyCenter.BuildingBlocks.Application.Localization.ErrorCodes;
 
 namespace RadiologyCenter.Examinations.Application.Commands.RemoveExaminationItem;
 
@@ -6,7 +7,7 @@ public class RemoveExaminationItemCommandValidator : AbstractValidator<RemoveExa
 {
     public RemoveExaminationItemCommandValidator()
     {
-        RuleFor(x => x.ExaminationId).NotEmpty();
-        RuleFor(x => x.ExaminationItemId).NotEmpty();
+        RuleFor(x => x.ExaminationId).NotEmpty().WithErrorCode(SharedCodes.Shared.IdRequired);
+        RuleFor(x => x.ExaminationItemId).NotEmpty().WithErrorCode(SharedCodes.Shared.IdRequired);
     }
 }

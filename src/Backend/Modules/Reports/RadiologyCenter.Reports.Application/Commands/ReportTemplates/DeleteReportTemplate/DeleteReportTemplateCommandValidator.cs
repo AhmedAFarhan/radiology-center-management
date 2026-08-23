@@ -1,4 +1,5 @@
 using FluentValidation;
+using SharedCodes = RadiologyCenter.BuildingBlocks.Application.Localization.ErrorCodes;
 
 namespace RadiologyCenter.Reports.Application.Commands.ReportTemplates.DeleteReportTemplate;
 
@@ -6,6 +7,6 @@ public class DeleteReportTemplateCommandValidator : AbstractValidator<DeleteRepo
 {
     public DeleteReportTemplateCommandValidator()
     {
-        RuleFor(x => x.TemplateId).NotEmpty();
+        RuleFor(x => x.TemplateId).NotEmpty().WithErrorCode(SharedCodes.Shared.IdRequired);
     }
 }

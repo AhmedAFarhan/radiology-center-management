@@ -49,8 +49,29 @@ private MudTable<ExaminationDto>? _table;
     private bool HasInsurance(ExaminationDto visit)
         => _insuranceCache.TryGetValue(visit.PatientId, out var insured) && insured;
 
-    private void OpenInsuranceAsync(ExaminationDto visit)
-        => Navigation.NavigateTo("/insurance/preauthorizations");
+    private async Task<bool> ConfirmAsync(string message, string icon, MudBlazor.Color color)
+    {
+        var parameters = new DialogParameters
+        {
+            ["Title"] = T.Common.Confirm,
+            ["Message"] = message,
+            ["Icon"] = icon,
+            ["Color"] = color,
+            ["ConfirmText"] = T.Common.Confirm,
+            ["CancelText"] = T.Common.Cancel,
+        };
+        var options = new DialogOptions { MaxWidth = MaxWidth.Small, FullWidth = true, NoHeader = true };
+        var dialog = await DialogService.ShowAsync<ConfirmDialog>(string.Empty, parameters, options);
+        var result = await dialog.Result;
+        return result is { Canceled: false };
+    }
+
+    private async Task OpenInsuranceAsync(ExaminationDto visit)
+    {
+        if (!await ConfirmAsync(T.Visits.InsuranceConfirm, Icons.Material.Filled.Approval, MudBlazor.Color.Info))
+            return;
+        Navigation.NavigateTo("/insurance/preauthorizations");
+    }
 
     protected override async Task OnInitializedAsync()
     {
@@ -140,6 +161,8 @@ private MudTable<ExaminationDto>? _table;
 
     private async Task OpenEditDialogAsync(ExaminationDto visit)
     {
+        if (!await ConfirmAsync(T.Visits.EditConfirm, Icons.Material.Filled.Edit, MudBlazor.Color.Primary))
+            return;
         var parameters = new DialogParameters { ["Visit"] = visit };
         var options = new DialogOptions { MaxWidth = MaxWidth.Medium, FullWidth = true, NoHeader = true };
         var dialog = await DialogService.ShowAsync<VisitEditorDialog>(T.Visits.EditVisit, parameters, options);
@@ -148,6 +171,8 @@ private MudTable<ExaminationDto>? _table;
 
     private async Task OpenScheduleDialogAsync(ExaminationDto visit)
     {
+        if (!await ConfirmAsync(T.Visits.ScheduleConfirm, Icons.Material.Filled.Schedule, MudBlazor.Color.Info))
+            return;
         var parameters = new DialogParameters { ["Visit"] = visit };
         var options = new DialogOptions { MaxWidth = MaxWidth.Small, FullWidth = true, NoHeader = true };
         var dialog = await DialogService.ShowAsync<VisitScheduleDialog>(T.Visits.ScheduleVisit, parameters, options);
@@ -171,6 +196,8 @@ private MudTable<ExaminationDto>? _table;
 
     private async Task CheckInAsync(ExaminationDto visit)
     {
+        if (!await ConfirmAsync(T.Visits.CheckInConfirm, Icons.Material.Filled.Login, MudBlazor.Color.Primary))
+            return;
         await SafeExecute.RunAsync(async () =>
             {
                 await ExaminationService.CheckInAsync(visit.Id);
@@ -183,6 +210,8 @@ private MudTable<ExaminationDto>? _table;
 
     private async Task StartAsync(ExaminationDto visit)
     {
+        if (!await ConfirmAsync(T.Visits.StartConfirm, Icons.Material.Filled.PlayArrow, MudBlazor.Color.Secondary))
+            return;
         await SafeExecute.RunAsync(async () =>
             {
                 await ExaminationService.StartAsync(visit.Id);
@@ -195,6 +224,8 @@ private MudTable<ExaminationDto>? _table;
 
     private async Task CompleteAsync(ExaminationDto visit)
     {
+        if (!await ConfirmAsync(T.Visits.CompleteConfirm, Icons.Material.Filled.CheckCircle, MudBlazor.Color.Success))
+            return;
         await SafeExecute.RunAsync(async () =>
             {
                 await ExaminationService.CompleteAsync(visit.Id);
@@ -207,6 +238,8 @@ private MudTable<ExaminationDto>? _table;
 
     private async Task CancelAsync(ExaminationDto visit)
     {
+        if (!await ConfirmAsync(T.Visits.CancelConfirm, Icons.Material.Filled.Cancel, MudBlazor.Color.Error))
+            return;
         var parameters = new DialogParameters { ["Visit"] = visit };
         var options = new DialogOptions { MaxWidth = MaxWidth.Small, FullWidth = true, NoHeader = true };
         var dialog = await DialogService.ShowAsync<CancelVisitDialog>(T.Visits.CancelVisit, parameters, options);
