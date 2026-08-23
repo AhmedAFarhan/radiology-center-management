@@ -1,8 +1,23 @@
-﻿{
+{
   "codes": {
-    "Catalog.PriceNegative": "لا يمكن أن يكون السعر سالباً.",
+    "Catalog.PriceNegative": "لا يمكن أن يكون سعر الفحص سالباً.",
     "Catalog.StandardDurationNegative": "لا يمكن أن تكون المدة القياسية سالبة.",
-    "Catalog.ExaminationTypeInUse": "لا يمكن حذف نوع الفحص \u0027{0}\u0027 لأنه لا يزال مرتبطاً بفحوصات نشطة."
+    "Catalog.ExaminationTypeInUse": "لا يمكن حذف نوع الفحص '{0}' لأنه لا يزال مشاراً إليه في فحوصات نشطة.",
+    "Excel.ExamType.Code": "الكود",
+    "Excel.ExamType.Name": "الاسم",
+    "Excel.ExamType.Modality": "الجهاز",
+    "Excel.ExamType.BodyPart": "منطقة الجسم",
+    "Excel.ExamType.Duration": "المدة (دقيقة)",
+    "Excel.ExamType.Price": "السعر",
+    "Excel.ExamType.RequiresPreparation": "يتطلب تحضيراً",
+    "Excel.ExamType.RequiresConsent": "يتطلب موافقة",
+    "Excel.Common.IsActive": "نشط",
+    "Excel.Error.InvalidModality": "يجب أن يكون الجهاز من القيم المذكورة في ورقة Modality.",
+    "Excel.Error.InvalidNumber": "قيمة رقمية غير صحيحة.",
+    "Excel.Error.InvalidDate": "يجب أن يكون التاريخ بصيغة YYYY-MM-DD.",
+    "Excel.Error.DuplicateName": "يوجد نوع فحص بنفس هذا الاسم بالفعل.",
+    "Excel.ExamType.Instructions.AutoCode": "كود نوع الفحص يُولَّد تلقائياً بواسطة النظام - لا تضفه إلى الملف.",
+    "Excel.ExamType.Instructions.AllowedValues": "يجب أن يطابق الجهاز تماماً إحدى القيم في ورقة Modality المخفية (مثل XRay, CT, MRI)."
   },
   "enums": {
     "Modality": {
@@ -10,9 +25,9 @@
       "CT": "أشعة مقطعية",
       "MRI": "رنين مغناطيسي",
       "Ultrasound": "موجات فوق صوتية",
-      "Mammography": "ماموجرام",
-      "Fluoroscopy": "تنظير فلوري",
-      "DEXA": "ديكسا",
+      "Mammography": "أشعة ثديية",
+      "Fluoroscopy": "تنظيم فلوري",
+      "DEXA": "قياس كثافة العظام",
       "Other": "أخرى"
     }
   }

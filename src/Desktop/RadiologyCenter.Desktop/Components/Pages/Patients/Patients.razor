@@ -12,9 +12,11 @@
             SearchValueChanged="OnSearchChanged"
             SearchValue="@SearchQuery"
             SearchPlaceholder="@T.Patients.SearchPlaceholder"
-            OnRefresh="ReloadAsync">
+            OnRefresh="ReloadAsync"
+            OnExport="ExportToExcelAsync">
     <AuthorizeView Policy="@PatientsPermissions.Create">
         <Authorized Context="auth">
+            <MudIconButton Icon="@Icons.Material.Filled.Upload" Color="Color.Default" aria-label="@T.Common.ImportFromExcel" OnClick="OpenImportDialogAsync" />
             <MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Add" OnClick="OpenCreateDialogAsync">@T.Patients.AddPatient</MudButton>
         </Authorized>
     </AuthorizeView>

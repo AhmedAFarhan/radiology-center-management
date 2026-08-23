@@ -69,6 +69,31 @@ public partial class Patients : ComponentBase, IDisposable
         NavigationManager.NavigateTo("/patients", replace: true);
     }
 
+    private async Task ExportToExcelAsync()
+    {
+        await SafeExecute.RunAsync(
+            async () =>
+            {
+                var content = await PatientService.ExportAsync(_search);
+                var path = await FileSaveHelper.SaveAsync(content, "patients.xlsx");
+                Snackbar.Add(T.FormatValue(T.Common.SavedTo, path), Severity.Success);
+            },
+            Snackbar,
+            () => T.Patients.Unreachable);
+    }
+
+    private async Task OpenImportDialogAsync()
+    {
+        var parameters = new DialogParameters
+        {
+            ["DownloadTemplate"] = new Func<Task<byte[]>>(() => PatientService.DownloadImportTemplateAsync()),
+            ["ImportFile"] = new Func<string, Stream, Task<ExcelImportResultDto>>((fileName, stream) => PatientService.ImportAsync(fileName, stream)),
+            ["Imported"] = EventCallback.Factory.Create(this, ReloadAsync),
+        };
+        var options = new DialogOptions { MaxWidth = MaxWidth.Small, FullWidth = true, NoHeader = true };
+        await DialogService.ShowAsync<ExcelImportDialog>(string.Empty, parameters, options);
+    }
+
     private async Task<TableData<PatientDto>> LoadServerData(TableState state, CancellationToken ct)
     {
         try

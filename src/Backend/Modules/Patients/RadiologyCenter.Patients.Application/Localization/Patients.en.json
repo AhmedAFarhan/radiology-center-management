@@ -4,7 +4,26 @@
                   "Patient.DobOrAgeRequired":  "Either date of birth or age must be provided.",
                   "Patient.DateOfBirthFuture":  "Date of birth cannot be in the future.",
                   "Patient.AgeOutOfRange":  "Age must be between 0 and 150.",
-                  "Patient.BloodTypeInvalid":  "Blood type is invalid."
+                  "Patient.BloodTypeInvalid":  "Blood type is invalid.",
+                  "Excel.Patient.Code":  "Code",
+                  "Excel.Patient.FullName":  "Full Name",
+                  "Excel.Patient.Gender":  "Gender",
+                  "Excel.Patient.DateOfBirth":  "Date of Birth",
+                  "Excel.Patient.Age":  "Age",
+                  "Excel.Patient.PhoneNumber":  "Phone",
+                  "Excel.Patient.Email":  "Email",
+                  "Excel.Patient.Address":  "Address",
+                  "Excel.Patient.NationalId":  "National ID",
+                  "Excel.Patient.BloodType":  "Blood Type",
+                  "Excel.Patient.Allergies":  "Allergies",
+                  "Excel.Patient.MedicalHistory":  "Medical History",
+                  "Excel.Patient.ReferringPhysician":  "Referring Physician",
+                  "Excel.Common.IsActive":  "Active",
+                  "Excel.Error.DuplicateNationalId":  "A patient with this National ID already exists.",
+                  "Excel.Error.InvalidDate":  "Date must use the YYYY-MM-DD format.",
+                  "Excel.Patient.Instructions.AutoCode":  "Patient Code is generated automatically by the system - do not add it to the file.",
+                  "Excel.Patient.Instructions.AllowedValues":  "Gender must be Male or Female; Blood Type one of A+, A-, B+, B-, AB+, AB-, O+, O- (both optional).",
+                  "Excel.Patient.Instructions.DuplicateRule":  "Rows whose National ID already exists are skipped and reported at the end."
               },
     "enums":  {
                   "BloodType":  {

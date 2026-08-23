@@ -93,6 +93,9 @@ public sealed class ApiClient
     public Task<byte[]> GetBytesAsync(string path, CancellationToken ct = default)
         => SendCoreRawAsync(() => new HttpRequestMessage(HttpMethod.Get, path), ct);
 
+    public Task<byte[]> PostBytesAsync(string path, object? body = null, CancellationToken ct = default)
+        => SendCoreRawAsync(() => new HttpRequestMessage(HttpMethod.Post, path) { Content = CreateJson(body) }, ct);
+
     private async Task<T> SendCoreAsync<T>(Func<HttpRequestMessage> requestFactory, CancellationToken ct)
     {
         var response = await SendWithRefreshAsync(requestFactory, ct);

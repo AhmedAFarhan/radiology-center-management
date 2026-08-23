@@ -36,6 +36,10 @@ public partial class PageHeader : ComponentBase
 
     [Parameter] public Func<Task>? OnRefresh { get; set; }
 
+    [Parameter] public Func<Task>? OnExport { get; set; }
+
+    [Parameter] public Func<Task>? OnImport { get; set; }
+
     [Parameter] public RenderFragment? ChildContent { get; set; }
 
     private string? _search;

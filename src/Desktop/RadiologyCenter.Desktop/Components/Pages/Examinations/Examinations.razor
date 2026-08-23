@@ -8,9 +8,11 @@
             SearchValueChanged="OnSearchChanged"
             SearchValue="@SearchQuery"
             SearchPlaceholder="@T.Examinations.SearchPlaceholder"
-            OnRefresh="ReloadAsync">
+            OnRefresh="ReloadAsync"
+            OnExport="ExportTypesToExcelAsync">
 <AuthorizeView Policy="@ExaminationsPermissions.TypesManage">
         <Authorized>
+            <MudIconButton Icon="@Icons.Material.Filled.Upload" Color="Color.Default" aria-label="@T.Common.ImportFromExcel" OnClick="OpenTypesImportDialogAsync" />
             <MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Add" OnClick="OpenCreateDialogAsync">@T.Examinations.NewType</MudButton>
         </Authorized>
     </AuthorizeView>

@@ -58,6 +58,31 @@ public partial class Examinations : ListPageBase<ExaminationTypeDto>
         await ReloadIfSavedAsync(dialog);
     }
 
+    private async Task ExportTypesToExcelAsync()
+    {
+        await SafeExecute.RunAsync(
+            async () =>
+            {
+                var content = await ExaminationService.ExportTypesAsync(Search);
+                var path = await FileSaveHelper.SaveAsync(content, "examination-types.xlsx");
+                Snackbar.Add(T.FormatValue(T.Common.SavedTo, path), Severity.Success);
+            },
+            Snackbar,
+            () => T.Examinations.Unreachable);
+    }
+
+    private async Task OpenTypesImportDialogAsync()
+    {
+        var parameters = new DialogParameters
+        {
+            ["DownloadTemplate"] = new Func<Task<byte[]>>(() => ExaminationService.DownloadTypesImportTemplateAsync()),
+            ["ImportFile"] = new Func<string, Stream, Task<ExcelImportResultDto>>((fileName, stream) => ExaminationService.ImportTypesAsync(fileName, stream)),
+            ["Imported"] = EventCallback.Factory.Create(this, ReloadAsync),
+        };
+        var options = new DialogOptions { MaxWidth = MaxWidth.Small, FullWidth = true, NoHeader = true };
+        await DialogService.ShowAsync<ExcelImportDialog>(string.Empty, parameters, options);
+    }
+
     private async Task OpenEditDialogAsync(ExaminationTypeDto type)
     {
         var parameters = new DialogParameters { ["Type"] = type };

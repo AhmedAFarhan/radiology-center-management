@@ -24,6 +24,14 @@
                       AdornmentIcon="@Icons.Material.Filled.Search"
                       Class="search-field" />
     }
+    @if (OnImport is not null)
+    {
+        <MudIconButton Icon="@Icons.Material.Filled.Upload" Color="Color.Default" aria-label="@T.Common.ImportFromExcel" OnClick="OnImport" />
+    }
+    @if (OnExport is not null)
+    {
+        <MudIconButton Icon="@Icons.Material.Filled.FileDownload" Color="Color.Default" aria-label="@T.Common.ExportToExcel" OnClick="OnExport" />
+    }
     @if (OnRefresh is not null)
     {
         <MudIconButton Icon="@Icons.Material.Filled.Refresh" Color="Color.Default" aria-label="@T.Common.Retry" OnClick="OnRefresh" />

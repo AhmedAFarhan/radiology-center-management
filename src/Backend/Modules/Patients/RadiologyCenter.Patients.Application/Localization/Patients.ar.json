@@ -4,7 +4,26 @@
     "Patient.DobOrAgeRequired": "يجب توفير تاريخ الميلاد أو العمر.",
     "Patient.DateOfBirthFuture": "لا يمكن أن يكون تاريخ الميلاد في المستقبل.",
     "Patient.AgeOutOfRange": "يجب أن يكون العمر بين 0 و 150.",
-    "Patient.BloodTypeInvalid": "فصيلة الدم غير صالحة."
+    "Patient.BloodTypeInvalid": "فصيلة الدم غير صالحة.",
+    "Excel.Patient.Code": "الكود",
+    "Excel.Patient.FullName": "الاسم الكامل",
+    "Excel.Patient.Gender": "الجنس",
+    "Excel.Patient.DateOfBirth": "تاريخ الميلاد",
+    "Excel.Patient.Age": "العمر",
+    "Excel.Patient.PhoneNumber": "الهاتف",
+    "Excel.Patient.Email": "البريد الإلكتروني",
+    "Excel.Patient.Address": "العنوان",
+    "Excel.Patient.NationalId": "الرقم القومي",
+    "Excel.Patient.BloodType": "فصيلة الدم",
+    "Excel.Patient.Allergies": "الحساسية",
+    "Excel.Patient.MedicalHistory": "التاريخ المرضي",
+    "Excel.Patient.ReferringPhysician": "الطبيب المُحوِّل",
+    "Excel.Common.IsActive": "نشط",
+    "Excel.Error.DuplicateNationalId": "يوجد مريض بهذا الرقم القومي بالفعل.",
+    "Excel.Error.InvalidDate": "يجب أن يكون التاريخ بصيغة YYYY-MM-DD.",
+    "Excel.Patient.Instructions.AutoCode": "كود المريض يُولَّد تلقائياً بواسطة النظام - لا تضفه إلى الملف.",
+    "Excel.Patient.Instructions.AllowedValues": "يجب أن يكون الجنس Male أو Female، وفصيلة الدم إحدى: A+‎, A-‎, B+‎, B-‎, AB+‎, AB-‎, O+‎, O-‎ (كلاهما اختياري).",
+    "Excel.Patient.Instructions.DuplicateRule": "الصفوف التي يتكرر فيها الرقم القومي الموجود مسبقاً يتم تخطيها وإظهارها في النهاية."
   },
   "enums": {
     "BloodType": {

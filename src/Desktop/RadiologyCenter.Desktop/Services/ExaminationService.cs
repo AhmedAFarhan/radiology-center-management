@@ -36,6 +36,22 @@ public sealed class ExaminationService : CrudServiceBase
     public Task DeleteTypeAsync(string id, CancellationToken ct = default)
         => DeleteEntityAsync(TypesRes, id, ct);
 
+    public Task<byte[]> ExportTypesAsync(string? searchTerm, CancellationToken ct = default)
+        => Api.PostBytesAsync($"{TypesRes}/export", new
+        {
+            searchTerm,
+            pagination = new { pageNumber = 1, pageSize = 50_000 },
+        }, ct);
+
+    public Task<byte[]> DownloadTypesImportTemplateAsync(CancellationToken ct = default)
+        => Api.GetBytesAsync($"{TypesRes}/import-template", ct);
+
+    public Task<ExcelImportResultDto> ImportTypesAsync(string fileName, Stream content, CancellationToken ct = default)
+        => Api.PostFormAsync<ExcelImportResultDto>(
+            $"{TypesRes}/import",
+            file: ("file", fileName, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", content),
+            ct: ct);
+
     public Task<PagedResult<ExaminationDto>> GetPagedAsync(
         string? searchTerm,
         string? sortBy,

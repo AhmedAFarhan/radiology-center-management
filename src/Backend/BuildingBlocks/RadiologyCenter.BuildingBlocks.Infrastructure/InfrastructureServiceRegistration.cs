@@ -3,6 +3,8 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using RadiologyCenter.BuildingBlocks.Application.Abstractions;
 using RadiologyCenter.BuildingBlocks.Application.Abstractions.Services;
+using RadiologyCenter.BuildingBlocks.Application.Excel;
+using RadiologyCenter.BuildingBlocks.Infrastructure.Excel;
 using RadiologyCenter.BuildingBlocks.Infrastructure.Persistence;
 using RadiologyCenter.BuildingBlocks.Infrastructure.Persistence.Interceptors;
 using RadiologyCenter.BuildingBlocks.Infrastructure.Repositories;
@@ -39,6 +41,7 @@ public static class InfrastructureServiceRegistration
         services.AddScoped<ICurrentUser, CurrentUserService>();
         services.AddScoped<IDomainEventDispatcher, DomainEventDispatcher>();
         services.AddScoped<INumberSequenceGenerator, NumberSequenceGenerator>();
+        services.AddSingleton<IExcelService, ExcelService>();
 
         return services;
     }

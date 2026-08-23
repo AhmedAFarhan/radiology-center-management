@@ -1,0 +1,56 @@
+@using Microsoft.AspNetCore.Components.Forms
+
+<MudDialog>
+    <DialogContent>
+        <DialogHeader Icon="@Icons.Material.Filled.UploadFile" Title="@T.Common.ImportFromExcel" />
+        <MudText Typo="Typo.body2" Class="text-secondary">@T.Common.ImportExcelHint</MudText>
+        <MudStack Row="true" Spacing="2" Wrap="Wrap.Wrap" AlignItems="AlignItems.Center" Class="mt-4">
+            <MudButton Variant="Variant.Outlined"
+                       StartIcon="@Icons.Material.Filled.Download"
+                       OnClick="DownloadTemplateAsync">
+                @T.Common.DownloadTemplate
+            </MudButton>
+            <MudButton HtmlTag="label" for="excel-import-input"
+                       Variant="Variant.Outlined"
+                       Color="Color.Primary"
+                       StartIcon="@Icons.Material.Filled.UploadFile"
+                       Disabled="_busy">
+                @(_file?.Name ?? T.Common.ChooseFile)
+            </MudButton>
+            <InputFile id="excel-import-input" OnChange="OnFileSelected" accept=".xlsx" style="display:none" />
+        </MudStack>
+        @if (_result is not null)
+        {
+            <MudAlert Severity="Severity.Warning" Class="mt-4">
+                @T.FormatValue(T.Common.ImportSummary, _result.ImportedCount, _result.TotalRows)
+            </MudAlert>
+            @if (_result.Errors.Count > 0)
+            {
+                <MudText Typo="Typo.subtitle2" Class="mt-2">@T.Common.SkippedRows</MudText>
+                <div class="excel-import-errors">
+                    @foreach (var error in _result.Errors)
+                    {
+                        <MudText Typo="Typo.caption" Color="Color.Error">@T.FormatValue(T.Common.RowError, error.RowNumber, error.Message)</MudText>
+                    }
+                </div>
+            }
+        }
+    </DialogContent>
+    <DialogActions>
+        <MudButton Color="Color.Default" OnClick="Cancel">@T.Common.Cancel</MudButton>
+        <MudButton Color="Color.Primary"
+                   Variant="Variant.Filled"
+                   StartIcon="@Icons.Material.Filled.UploadFile"
+                   OnClick="ImportAsync"
+                   Disabled="@(_busy || _file is null)">
+            @if (_busy)
+            {
+                <MudProgressCircular Size="Size.Small" Indeterminate="true" Class="mx-1" />
+            }
+            else
+            {
+                <text>@T.Common.Import</text>
+            }
+        </MudButton>
+    </DialogActions>
+</MudDialog>

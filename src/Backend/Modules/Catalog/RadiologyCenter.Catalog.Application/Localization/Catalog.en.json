@@ -2,7 +2,22 @@
 "codes": {
     "Catalog.PriceNegative": "Price cannot be negative.",
     "Catalog.StandardDurationNegative": "Standard duration cannot be negative.",
-    "Catalog.ExaminationTypeInUse": "Examination type \u0027{0}\u0027 cannot be deleted because it is still referenced by active examinations."
+    "Catalog.ExaminationTypeInUse": "Examination type \u0027{0}\u0027 cannot be deleted because it is still referenced by active examinations.",
+    "Excel.ExamType.Code": "Code",
+    "Excel.ExamType.Name": "Name",
+    "Excel.ExamType.Modality": "Modality",
+    "Excel.ExamType.BodyPart": "Body Part",
+    "Excel.ExamType.Duration": "Duration (min)",
+    "Excel.ExamType.Price": "Price",
+    "Excel.ExamType.RequiresPreparation": "Requires Preparation",
+    "Excel.ExamType.RequiresConsent": "Requires Consent",
+    "Excel.Common.IsActive": "Active",
+    "Excel.Error.InvalidModality": "Modality must be one of the values listed in the Modality sheet.",
+    "Excel.Error.InvalidNumber": "Numeric value is invalid.",
+    "Excel.Error.InvalidDate": "Date must use the YYYY-MM-DD format.",
+    "Excel.Error.DuplicateName": "An examination type with this name already exists.",
+    "Excel.ExamType.Instructions.AutoCode": "Examination Type code is generated automatically by the system - do not add it to the file.",
+    "Excel.ExamType.Instructions.AllowedValues": "Modality must exactly match a value from the hidden Modality sheet (e.g. XRay, CT, MRI)."
   },
     "enums":  {
                   "Modality":  {
