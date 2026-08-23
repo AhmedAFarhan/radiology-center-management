@@ -142,6 +142,7 @@ public partial class VisitEditorDialog : ComponentBase, IDisposable
             _model.Notes = Visit.Notes;
             _model.Discount = Visit.Discount;
             _model.IsDiscountPercentage = Visit.IsDiscountPercentage;
+            _model.Paid = Visit.Paid;
             _model.Status = Visit.StatusKey;
 
             if (Visit.ScheduledAt is { } scheduledUtc)
@@ -230,6 +231,7 @@ public partial class VisitEditorDialog : ComponentBase, IDisposable
                         Notes = _model.Notes,
                         Discount = _model.Discount,
                         IsDiscountPercentage = _model.IsDiscountPercentage,
+                        Paid = _model.Paid,
                         Status = _model.Status,
                         ScheduledAt = scheduledAt,
                     });

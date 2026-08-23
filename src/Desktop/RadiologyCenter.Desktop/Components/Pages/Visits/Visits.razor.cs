@@ -161,8 +161,6 @@ private MudTable<ExaminationDto>? _table;
 
     private async Task OpenEditDialogAsync(ExaminationDto visit)
     {
-        if (!await ConfirmAsync(T.Visits.EditConfirm, Icons.Material.Filled.Edit, MudBlazor.Color.Primary))
-            return;
         var parameters = new DialogParameters { ["Visit"] = visit };
         var options = new DialogOptions { MaxWidth = MaxWidth.Medium, FullWidth = true, NoHeader = true };
         var dialog = await DialogService.ShowAsync<VisitEditorDialog>(T.Visits.EditVisit, parameters, options);

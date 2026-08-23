@@ -2394,7 +2394,6 @@ public sealed class VisitsGroup : LocalizerGroup
     public string Complete => Get("visits.complete");
     public string CompleteConfirm => Get("visits.completeConfirm");
     public string Completed => Get("visits.completed");
-    public string EditConfirm => Get("visits.editConfirm");
     public string EditVisit => Get("visits.editVisit");
     public string EmptyAction => Get("visits.emptyAction");
     public string EmptyMessage => Get("visits.emptyMessage");

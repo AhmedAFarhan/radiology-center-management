@@ -19,6 +19,7 @@
     "Examination.ItemsCannotBeModified": "Examination \u0027{0}\u0027 is \u0027{1}\u0027 and its items can no longer be modified.",
     "Examination.InvalidStatusTransition": "Examination \u0027{0}\u0027 cannot transition from status \u0027{1}\u0027.",
     "Examination.StaffNotAssigned": "A radiologist and a technician must be assigned before the examination can be completed.",
+    "Examination.OutstandingBalance": "The examination cannot start until the remaining balance is fully paid.",
     "Examination.RadiologistFeeNegative": "Radiologist fee cannot be negative.",
     "Examination.TechnicianFeeNegative": "Technician fee cannot be negative.",
     "Examination.ReferralFeeNegative": "Referral fee cannot be negative.",

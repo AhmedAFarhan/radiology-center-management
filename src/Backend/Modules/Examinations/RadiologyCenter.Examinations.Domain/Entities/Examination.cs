@@ -189,6 +189,7 @@ public sealed class Examination : AuditableAggregateRoot<Guid>
     {
         EnsureStatus(ExaminationStatus.CheckedIn);
         Guard.AgainstEmpty(performedByUserId, nameof(performedByUserId));
+        Guard.Against(Remaining, r => r > 0, DomainErrors.OutstandingBalance, $"Examination '{Id}' has an outstanding balance of '{Remaining}' and cannot start until fully paid.");
 
         PerformedByUserId = performedByUserId;
         StartedAt = DateTime.UtcNow;
@@ -235,11 +236,6 @@ public sealed class Examination : AuditableAggregateRoot<Guid>
         if (paid.HasValue)
         {
             Guard.Against(paid.Value, p => p < 0, DomainErrors.PaidAmountNegative, "Paid amount cannot be negative.");
-            Guard.Against(
-                paid.Value,
-                p => Paid > 0 && p != Paid,
-                DomainErrors.PaidAmountImmutable,
-                "Paid amount cannot be modified once a payment has been recorded.");
         }
 
         Discount = discount;

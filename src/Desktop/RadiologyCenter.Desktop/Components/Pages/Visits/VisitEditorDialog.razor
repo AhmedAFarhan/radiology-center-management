@@ -135,6 +135,14 @@
                 </MudItem>
                 <MudItem xs="12" sm="6">
                     <MudNumericField T="decimal"
+                                     Value="_model.ExaminationType?.Price ?? 0"
+                                     Label="@T.VisitDialog.Price"
+                                     Variant="Variant.Outlined"
+                                     Margin="Margin.Dense"
+                                     ReadOnly="true" />
+                </MudItem>
+                <MudItem xs="12" sm="6">
+                    <MudNumericField T="decimal"
                                      @bind-Value="_model.Discount"
                                      Label="@T.VisitDialog.Discount"
                                      Variant="Variant.Outlined"
@@ -144,17 +152,14 @@
                 <MudItem xs="12" sm="6">
                     <MudSwitch T="bool" @bind-Value="_model.IsDiscountPercentage" Color="Color.Primary">@T.VisitDialog.DiscountIsPercentage</MudSwitch>
                 </MudItem>
-                @if (!IsEdit)
-                {
-                    <MudItem xs="12" sm="6">
-                        <MudNumericField T="decimal"
-                                         @bind-Value="_model.Paid"
-                                         Label="@T.VisitDialog.AmountPaid"
-                                         Variant="Variant.Outlined"
-                                         Margin="Margin.Dense"
-                                         Min="0" />
-                    </MudItem>
-                }
+                <MudItem xs="12" sm="6">
+                    <MudNumericField T="decimal"
+                                     @bind-Value="_model.Paid"
+                                     Label="@T.VisitDialog.AmountPaid"
+                                     Variant="Variant.Outlined"
+                                     Margin="Margin.Dense"
+                                     Min="0" />
+                </MudItem>
                 <MudItem xs="12">
                     <MudTextField @bind-Value="_model.Notes"
                                   Label="@T.VisitDialog.Notes"
