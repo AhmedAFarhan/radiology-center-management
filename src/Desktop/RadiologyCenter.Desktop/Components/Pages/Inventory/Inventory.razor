@@ -8,9 +8,13 @@
             SearchValueChanged="OnSearchChanged"
             SearchValue="@SearchQuery"
             SearchPlaceholder="@T.Inventory.SearchPlaceholder"
-            OnRefresh="ReloadAsync">
+            OnRefresh="ReloadAsync"
+            OnExport="ExportItemsToExcelAsync">
     <AuthorizeView Policy="@InventoryPermissions.ItemsCreate">
         <Authorized Context="auth">
+            <MudTooltip Placement="Placement.Bottom" Text="@T.Common.ImportFromExcel">
+                <MudIconButton Icon="@Icons.Material.Filled.Download" Color="Color.Default" aria-label="@T.Common.ImportFromExcel" OnClick="OpenItemsImportDialogAsync" />
+            </MudTooltip>
             <MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Add" OnClick="OpenCreateDialogAsync">@T.Inventory.AddItem</MudButton>
         </Authorized>
     </AuthorizeView>

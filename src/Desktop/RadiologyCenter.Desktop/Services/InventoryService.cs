@@ -20,6 +20,22 @@ public sealed class InventoryService : CrudServiceBase
         CancellationToken ct = default)
         => FetchPageAsync<ItemDto>(ItemsRes, searchTerm, sortBy, sortDescending, pageNumber, pageSize, ct);
 
+    public Task<byte[]> ExportItemsAsync(string? searchTerm, CancellationToken ct = default)
+        => Api.PostBytesAsync($"{ItemsRes}/export", new
+        {
+            searchTerm,
+            pagination = new { pageNumber = 1, pageSize = 50_000 },
+        }, ct);
+
+    public Task<byte[]> DownloadItemsImportTemplateAsync(CancellationToken ct = default)
+        => Api.GetBytesAsync($"{ItemsRes}/import-template", ct);
+
+    public Task<ExcelImportResultDto> ImportItemsAsync(string fileName, Stream content, CancellationToken ct = default)
+        => Api.PostFormAsync<ExcelImportResultDto>(
+            $"{ItemsRes}/import",
+            file: ("file", fileName, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", content),
+            ct: ct);
+
     public Task<ItemDto> GetItemByIdAsync(string id, CancellationToken ct = default)
         => FetchByIdAsync<ItemDto>(ItemsRes, id, ct);
 

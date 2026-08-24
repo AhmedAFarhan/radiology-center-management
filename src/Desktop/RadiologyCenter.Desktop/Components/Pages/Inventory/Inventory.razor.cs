@@ -57,6 +57,31 @@ public partial class Inventory : ListPageBase<ItemDto>
         await ReloadIfSavedAsync(dialog);
     }
 
+    private async Task ExportItemsToExcelAsync()
+    {
+        await SafeExecute.RunAsync(
+            async () =>
+            {
+                var content = await InventoryService.ExportItemsAsync(Search);
+                var path = await FileSaveHelper.SaveAsync(content, "inventory-items.xlsx");
+                Snackbar.Add(T.FormatValue(T.Common.SavedTo, path), Severity.Success);
+            },
+            Snackbar,
+            () => T.Inventory.Unreachable);
+    }
+
+    private async Task OpenItemsImportDialogAsync()
+    {
+        var parameters = new DialogParameters
+        {
+            ["DownloadTemplate"] = new Func<Task<byte[]>>(() => InventoryService.DownloadItemsImportTemplateAsync()),
+            ["ImportFile"] = new Func<string, Stream, Task<ExcelImportResultDto>>((fileName, stream) => InventoryService.ImportItemsAsync(fileName, stream)),
+            ["Imported"] = EventCallback.Factory.Create(this, ReloadAsync),
+        };
+        var options = new DialogOptions { MaxWidth = MaxWidth.Small, FullWidth = true, NoHeader = true };
+        await DialogService.ShowAsync<ExcelImportDialog>(string.Empty, parameters, options);
+    }
+
     private async Task OpenEditDialogAsync(ItemDto item)
     {
         var parameters = new DialogParameters { ["Item"] = item };
