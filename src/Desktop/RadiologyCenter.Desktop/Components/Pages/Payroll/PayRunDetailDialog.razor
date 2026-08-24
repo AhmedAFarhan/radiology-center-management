@@ -74,10 +74,7 @@
                                 <MudTh Class="text-right">@T.PayRunDialog.Deductions</MudTh>
                                 <MudTh Class="text-right">@T.PayRunDialog.UnpaidDays</MudTh>
                                 <MudTh Class="text-right">@T.PayRunDialog.Net</MudTh>
-                                @if (CanEditPayslips)
-                                {
-                                    <MudTh Class="text-center">@T.Common.Actions</MudTh>
-                                }
+                                <MudTh Class="text-center">@T.Common.Actions</MudTh>
                             </HeaderContent>
                             <RowTemplate Context="ps">
                                 <MudTd DataLabel="@T.PayRunDialog.ToggleBreakdown">
@@ -94,12 +91,17 @@
                                 <MudTd DataLabel="@T.PayRunDialog.Deductions" Class="text-right" Style="color:var(--mud-palette-error)">@ps.TotalDeductions.ToString("N2")</MudTd>
                                 <MudTd DataLabel="@T.PayRunDialog.UnpaidDays" Class="text-right">@ps.UnpaidLeaveDays</MudTd>
                                 <MudTd DataLabel="@T.PayRunDialog.Net" Class="text-right"><MudText Typo="Typo.body2" Class="font-weight-medium">@ps.NetSalary.ToString("N2")</MudText></MudTd>
-                                @if (CanEditPayslips)
-                                {
-                                    <MudTd DataLabel="@T.Common.Actions" Class="text-center">
-                                        <MudIconButton Icon="@Icons.Material.Filled.Delete" Size="Size.Small" Color="Color.Error" aria-label="@T.PayRunDialog.RemovePayslip" OnClick="@(() => RemovePayslipAsync(ps))" Disabled="_busy" />
-                                    </MudTd>
-                                }
+                                <MudTd DataLabel="@T.Common.Actions" Class="text-center">
+                                    <MudTooltip Text="@T.PayRunDialog.ExportPdf">
+                                        <MudIconButton Icon="@Icons.Material.Filled.PictureAsPdf" Size="Size.Small" Color="Color.Info" aria-label="@T.PayRunDialog.ExportPdf" OnClick="@(() => ExportPayslipPdfAsync(ps))" Disabled="_busy" />
+                                    </MudTooltip>
+                                    @if (CanEditPayslips)
+                                    {
+                                        <MudTooltip Text="@T.PayRunDialog.RemovePayslip">
+                                            <MudIconButton Icon="@Icons.Material.Filled.Delete" Size="Size.Small" Color="Color.Error" aria-label="@T.PayRunDialog.RemovePayslip" OnClick="@(() => RemovePayslipAsync(ps))" Disabled="_busy" />
+                                        </MudTooltip>
+                                    }
+                                </MudTd>
                             </RowTemplate>
                             <ChildRowContent>
                                 @if (IsExpanded(context))

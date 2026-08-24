@@ -5,6 +5,7 @@ using RadiologyCenter.BuildingBlocks.Infrastructure.Persistence.Interceptors;
 using RadiologyCenter.Payroll.Application.Abstractions;
 using RadiologyCenter.Payroll.Infrastructure.Persistence;
 using RadiologyCenter.Payroll.Infrastructure.Repositories;
+using RadiologyCenter.Payroll.Infrastructure.Services;
 
 namespace RadiologyCenter.Payroll.Infrastructure;
 
@@ -25,6 +26,7 @@ public static class PayrollInfrastructureRegistration
         services.AddScoped<IReferralFeeRepository, ReferralFeeRepository>();
         services.AddScoped<IPayRunRepository, PayRunRepository>();
         services.AddScoped<IPayrollUnitOfWork, PayrollUnitOfWork>();
+        services.AddScoped<IPayslipPdfService, PayslipPdfService>();
 
         return services;
     }

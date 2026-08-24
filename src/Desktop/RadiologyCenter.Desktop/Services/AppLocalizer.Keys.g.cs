@@ -1368,6 +1368,9 @@ public sealed class PayRunDialogGroup : LocalizerGroup
     public string UnpaidDays => Get("payRunDialog.unpaidDays");
     public string Unreachable => Get("payRunDialog.unreachable");
     public string Workflow => Get("payRunDialog.workflow");
+    public string ExportPdf => Get("payRunDialog.exportPdf");
+    public string PayslipPdfSaved => Get("payRunDialog.payslipPdfSaved");
+    public string PayslipPdfError => Get("payRunDialog.payslipPdfError");
 }
 
 public sealed class PayslipGroup : LocalizerGroup

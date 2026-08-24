@@ -184,6 +184,21 @@ public partial class PayRunDetailDialog : ComponentBase
     private Task RestartAsync() => RunLifecycleAsync("restart", T.PayRunDialog.RestartTitle, T.PayRunDialog.RestartConfirm, T.PayRunDialog.Restart);
     private Task PayAsync() => RunLifecycleAsync("pay", T.PayRunDialog.PayTitle, T.PayRunDialog.PayConfirm, T.PayRunDialog.Pay);
 
+    private async Task ExportPayslipPdfAsync(PayslipDto payslip)
+    {
+        await SafeExecute.RunAsync(async () =>
+            {
+                _busy = true;
+                var pdfBytes = await PayrollService.GetPayslipPdfAsync(PayRunId, payslip.StaffId);
+                var fileName = $"payslip-{ResolveStaff(payslip.StaffId).Replace(" ", "_")}-{DateTime.Now:yyyyMMdd}.pdf";
+                var path = await FileSaveHelper.SaveAsync(pdfBytes, fileName);
+                Snackbar.Add(T.FormatValue(T.PayRunDialog.PayslipPdfSaved, path), Severity.Success);
+            },
+            Snackbar,
+            () => T.PayRunDialog.PayslipPdfError,
+            busy => _busy = busy);
+    }
+
     private void CloseAsync()
         => MudDialog.Close(DialogResult.Ok(true));
 }

@@ -3,6 +3,15 @@
   <ItemGroup>
     <ProjectReference Include="..\RadiologyCenter.Payroll.Application\RadiologyCenter.Payroll.Application.csproj" />
     <ProjectReference Include="..\..\..\BuildingBlocks\RadiologyCenter.BuildingBlocks.Infrastructure\RadiologyCenter.BuildingBlocks.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\ResourceManagement\RadiologyCenter.ResourceManagement.Application\RadiologyCenter.ResourceManagement.Application.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="QuestPDF" Version="2024.12.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\logo.png" />
   </ItemGroup>
 
   <PropertyGroup>

@@ -53,6 +53,9 @@ public sealed class PayrollService : CrudServiceBase
     public Task DeletePayRunAsync(string id, CancellationToken ct = default)
         => DeleteEntityAsync(PayRunsRes, id, ct);
 
+    public Task<byte[]> GetPayslipPdfAsync(string payRunId, string staffId, CancellationToken ct = default)
+        => Api.GetBytesAsync($"{PayRunsRes}/{payRunId}/payslips/{staffId}/pdf", ct);
+
     // ----- Salary Components -----
     public Task<PagedResult<SalaryComponentDto>> GetSalaryComponentsPagedAsync(
         string? searchTerm,

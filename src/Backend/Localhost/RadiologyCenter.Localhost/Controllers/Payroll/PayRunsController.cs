@@ -4,6 +4,7 @@ using RadiologyCenter.BuildingBlocks.Domain.Pagination;
 using RadiologyCenter.BuildingBlocks.Domain.Results;
 using RadiologyCenter.Localhost.Authorization;
 using RadiologyCenter.Localhost.Extensions;
+using RadiologyCenter.Payroll.Application.Abstractions;
 using RadiologyCenter.Payroll.Application.Commands.AddPayslip;
 using RadiologyCenter.Payroll.Application.Commands.ApprovePayRun;
 using RadiologyCenter.Payroll.Application.Commands.ComputePayRun;
@@ -115,5 +116,13 @@ public class PayRunsController : ControllerBase
     {
         var result = await _bus.InvokeAsync<Result>(new DeletePayRunCommand(id), ct);
         return result.ToActionResult();
+    }
+
+    [HasPermission(PayrollReadCode)]
+    [HttpGet("{id:guid}/payslips/{staffId:guid}/pdf")]
+    public async Task<IActionResult> GetPayslipPdfAsync(Guid id, Guid staffId, [FromServices] IPayslipPdfService pdfService, CancellationToken ct)
+    {
+        var pdfBytes = await pdfService.GeneratePayslipPdfAsync(id, staffId, ct);
+        return File(pdfBytes, "application/pdf", $"payslip-{id}-{staffId}.pdf");
     }
 }
