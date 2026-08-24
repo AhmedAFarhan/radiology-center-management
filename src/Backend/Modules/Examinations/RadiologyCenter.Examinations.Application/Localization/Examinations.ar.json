@@ -1,5 +1,8 @@
 ﻿{
   "codes": {
+    "Examination.ExaminationNotFound": "الفحص غير موجود.",
+    "Examination.ExaminationTypeNotFound": "نوع الفحص غير موجود.",
+    "Examination.ExaminationTypeItemNotFound": "عنصر نوع الفحص غير موجود.",
     "Examination.ScheduledTimePast": "لا يمكن أن يكون الموعد في الماضي.",
     "Examination.PercentageDiscountMax": "لا يمكن أن يتجاوز الخصم النسبي 100.",
     "Examination.DuplicateItem": "لا يمكن إضافة عنصر أكثر من مرة لكل فحص.",

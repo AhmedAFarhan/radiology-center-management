@@ -778,7 +778,7 @@
     "payRunDialog.removeError":  "Unable to remove payslip.",
     "payRunDialog.earnings":  "Earnings",
     "preAuth.view":  "View",
-    "patientDialog.referringPhysician":  "Referring Physician",
+    
     "poDialog.orderDetails":  "Order Details",
     "preAuthDialog.unableSearchPatients":  "Unable to search patients.",
     "itemDialog.issueStock":  "Issue Stock",

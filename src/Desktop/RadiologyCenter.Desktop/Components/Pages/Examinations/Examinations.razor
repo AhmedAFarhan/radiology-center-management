@@ -12,7 +12,9 @@
             OnExport="ExportTypesToExcelAsync">
 <AuthorizeView Policy="@ExaminationsPermissions.TypesManage">
         <Authorized>
-            <MudIconButton Icon="@Icons.Material.Filled.Upload" Color="Color.Default" aria-label="@T.Common.ImportFromExcel" OnClick="OpenTypesImportDialogAsync" />
+            <MudTooltip Placement="Placement.Bottom" Text="@T.Common.ImportFromExcel">
+                <MudIconButton Icon="@Icons.Material.Filled.Download" Color="Color.Default" aria-label="@T.Common.ImportFromExcel" OnClick="OpenTypesImportDialogAsync" />
+            </MudTooltip>
             <MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Add" OnClick="OpenCreateDialogAsync">@T.Examinations.NewType</MudButton>
         </Authorized>
     </AuthorizeView>

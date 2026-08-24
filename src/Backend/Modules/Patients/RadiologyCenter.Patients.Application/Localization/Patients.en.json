@@ -1,4 +1,4 @@
-﻿{
+{
     "codes":  {
                   "Patient.NameRequired":  "Full name is required.",
                   "Patient.DobOrAgeRequired":  "Either date of birth or age must be provided.",
@@ -17,7 +17,7 @@
                   "Excel.Patient.BloodType":  "Blood Type",
                   "Excel.Patient.Allergies":  "Allergies",
                   "Excel.Patient.MedicalHistory":  "Medical History",
-                  "Excel.Patient.ReferringPhysician":  "Referring Physician",
+                  
                   "Excel.Common.IsActive":  "Active",
                   "Excel.Error.DuplicateNationalId":  "A patient with this National ID already exists.",
                   "Excel.Error.InvalidDate":  "Date must use the YYYY-MM-DD format.",

@@ -30,7 +30,6 @@ public class PatientConfiguration : IEntityTypeConfiguration<Patient>
         builder.Property(p => p.NationalId).HasMaxLength(50);
         builder.Property(p => p.Allergies).HasMaxLength(1000);
         builder.Property(p => p.MedicalHistory).HasMaxLength(2000);
-        builder.Property(p => p.ReferringPhysician).HasMaxLength(200);
 
         builder.Property(p => p.Gender)
             .HasConversion(g => g.Value, v => Gender.FromValue<Gender>(v));

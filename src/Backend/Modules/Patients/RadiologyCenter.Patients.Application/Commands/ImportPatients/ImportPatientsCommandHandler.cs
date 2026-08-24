@@ -87,8 +87,7 @@ public static class ImportPatientsCommandHandler
                 row.Value(HeaderCode.NationalId)?.Trim(),
                 row.Value(HeaderCode.BloodType)?.Trim(),
                 row.Value(HeaderCode.Allergies)?.Trim(),
-                row.Value(HeaderCode.MedicalHistory)?.Trim(),
-                row.Value(HeaderCode.ReferringPhysician)?.Trim());
+                row.Value(HeaderCode.MedicalHistory)?.Trim());
 
             var validation = await validator.ValidateAsync(candidate, ct);
             var rowErrors = validation.Errors.Select(e => Translator.LocalizeCode(e.ErrorCode, e.ErrorMessage)).ToList();
@@ -134,8 +133,7 @@ public static class ImportPatientsCommandHandler
                         candidate.NationalId,
                         candidate.BloodType is not null ? BloodType.FromName<BloodType>(candidate.BloodType) : null,
                         candidate.Allergies,
-                        candidate.MedicalHistory,
-                        candidate.ReferringPhysician),
+                        candidate.MedicalHistory),
                     ct);
             }
 
@@ -158,7 +156,6 @@ public static class ImportPatientsCommandHandler
         public const string BloodType = "Excel.Patient.BloodType";
         public const string Allergies = "Excel.Patient.Allergies";
         public const string MedicalHistory = "Excel.Patient.MedicalHistory";
-        public const string ReferringPhysician = "Excel.Patient.ReferringPhysician";
     }
 
     private static IReadOnlyList<string> HeaderCodes { get; } =
@@ -174,7 +171,6 @@ public static class ImportPatientsCommandHandler
         HeaderCode.BloodType,
         HeaderCode.Allergies,
         HeaderCode.MedicalHistory,
-        HeaderCode.ReferringPhysician,
     ];
 
     private static string Normalize(string? value) => value?.Trim().ToLowerInvariant() ?? string.Empty;

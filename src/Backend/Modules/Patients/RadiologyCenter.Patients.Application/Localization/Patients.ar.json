@@ -1,4 +1,4 @@
-﻿{
+{
   "codes": {
     "Patient.NameRequired": "الاسم الكامل مطلوب.",
     "Patient.DobOrAgeRequired": "يجب توفير تاريخ الميلاد أو العمر.",
@@ -17,7 +17,7 @@
     "Excel.Patient.BloodType": "فصيلة الدم",
     "Excel.Patient.Allergies": "الحساسية",
     "Excel.Patient.MedicalHistory": "التاريخ المرضي",
-    "Excel.Patient.ReferringPhysician": "الطبيب المُحوِّل",
+    
     "Excel.Common.IsActive": "نشط",
     "Excel.Error.DuplicateNationalId": "يوجد مريض بهذا الرقم القومي بالفعل.",
     "Excel.Error.InvalidDate": "يجب أن يكون التاريخ بصيغة YYYY-MM-DD.",

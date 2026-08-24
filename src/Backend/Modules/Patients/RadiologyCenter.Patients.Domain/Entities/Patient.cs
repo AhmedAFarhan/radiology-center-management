@@ -22,7 +22,6 @@ public sealed class Patient : SoftDeletableAggregateRoot<Guid>
     public BloodType? BloodType { get; private set; }
     public string? Allergies { get; private set; }
     public string? MedicalHistory { get; private set; }
-    public string? ReferringPhysician { get; private set; }
     public bool IsActive { get; private set; }
 
     public string FullName => string.Join(' ',
@@ -51,8 +50,7 @@ public sealed class Patient : SoftDeletableAggregateRoot<Guid>
         string? nationalId = null,
         BloodType? bloodType = null,
         string? allergies = null,
-        string? medicalHistory = null,
-        string? referringPhysician = null)
+        string? medicalHistory = null)
     {
         Guard.AgainstNullOrWhiteSpace(patientCode, nameof(patientCode));
         Guard.AgainstNullOrWhiteSpace(fullName, nameof(fullName));
@@ -77,7 +75,6 @@ public sealed class Patient : SoftDeletableAggregateRoot<Guid>
             BloodType = bloodType,
             Allergies = allergies,
             MedicalHistory = medicalHistory,
-            ReferringPhysician = referringPhysician,
             IsActive = true
         };
 
@@ -97,8 +94,7 @@ public sealed class Patient : SoftDeletableAggregateRoot<Guid>
         string? nationalId = null,
         BloodType? bloodType = null,
         string? allergies = null,
-        string? medicalHistory = null,
-        string? referringPhysician = null)
+        string? medicalHistory = null)
     {
         Guard.AgainstNullOrWhiteSpace(fullName, nameof(fullName));
         Guard.AgainstNullOrWhiteSpace(phoneNumber, nameof(phoneNumber));
@@ -118,7 +114,6 @@ public sealed class Patient : SoftDeletableAggregateRoot<Guid>
         BloodType = bloodType;
         Allergies = allergies;
         MedicalHistory = medicalHistory;
-        ReferringPhysician = referringPhysician;
         SetBirthDetails(dateOfBirth, age);
 
         RaiseDomainEvent(new PatientUpdatedEvent(Id, PatientCode));

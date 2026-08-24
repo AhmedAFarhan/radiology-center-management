@@ -103,7 +103,18 @@ public sealed class ExcelService : IExcelService
                 for (var i = 0; i < values.Count; i++)
                     refSheet.Cell(i + 1, 1).Value = values[i];
                 refSheet.Columns().AdjustToContents();
-                refSheet.Hide();
+                refSheet.SetTabColor(XLColor.FromHtml("#3B82F6"));
+            }
+
+            foreach (var (name, values) in referenceSheets)
+            {
+                var columnIndex = GetColumnIndexForReferenceSheet(columns, name);
+                if (columnIndex == 0 || values.Count == 0)
+                    continue;
+
+                var target = sheet.Range(2, columnIndex, ExcelImportLimits.MaxRows + 1, columnIndex);
+                var validation = target.CreateDataValidation();
+                validation.List(workbook.Worksheet(name).Range(1, 1, values.Count, 1), true);
             }
         }
 
@@ -179,6 +190,21 @@ public sealed class ExcelService : IExcelService
         }
 
         return new ParsedWorkbook(version, rows);
+    }
+
+    private static int GetColumnIndexForReferenceSheet(
+        IReadOnlyList<(string HeaderCode, string HeaderFallback)> columns,
+        string sheetName)
+    {
+        for (var i = 0; i < columns.Count; i++)
+        {
+            var (code, fallback) = columns[i];
+            if (fallback.Equals(sheetName, StringComparison.OrdinalIgnoreCase)
+                || code.EndsWith("." + sheetName, StringComparison.OrdinalIgnoreCase))
+                return i + 1;
+        }
+
+        return 0;
     }
 
     private static void WriteCell<T>(IXLCell cell, ExcelColumn<T> column, T row)

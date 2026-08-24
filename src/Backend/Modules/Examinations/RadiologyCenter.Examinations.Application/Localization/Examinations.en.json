@@ -1,5 +1,8 @@
 ﻿{
   "codes": {
+    "Examination.ExaminationNotFound": "Examination not found.",
+    "Examination.ExaminationTypeNotFound": "Examination type not found.",
+    "Examination.ExaminationTypeItemNotFound": "Examination type item not found.",
     "Examination.ScheduledTimePast": "Scheduled time cannot be in the past.",
     "Examination.PercentageDiscountMax": "Percentage discount cannot exceed 100.",
     "Examination.DuplicateItem": "An item can only be added once per examination.",

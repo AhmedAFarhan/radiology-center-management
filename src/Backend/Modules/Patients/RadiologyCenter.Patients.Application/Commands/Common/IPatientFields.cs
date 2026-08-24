@@ -13,5 +13,4 @@ public interface IPatientFields
     string? BloodType { get; }
     string? Allergies { get; }
     string? MedicalHistory { get; }
-    string? ReferringPhysician { get; }
 }

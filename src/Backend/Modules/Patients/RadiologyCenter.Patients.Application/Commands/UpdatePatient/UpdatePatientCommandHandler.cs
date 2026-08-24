@@ -33,8 +33,7 @@ public static class UpdatePatientCommandHandler
             command.NationalId,
             bloodType,
             command.Allergies,
-            command.MedicalHistory,
-            command.ReferringPhysician);
+            command.MedicalHistory);
 
         patientRepository.Update(patient);
         await unitOfWork.SaveChangesAsync(ct);

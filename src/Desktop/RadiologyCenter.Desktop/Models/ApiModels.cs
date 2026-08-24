@@ -56,7 +56,6 @@ public sealed record PatientDto(
     string? BloodType,
     string? Allergies,
     string? MedicalHistory,
-    string? ReferringPhysician,
     bool IsActive,
     DateTime CreatedAt,
     string GenderKey = "",
@@ -75,7 +74,6 @@ public sealed class PatientInput
     public string? BloodType { get; set; }
     public string? Allergies { get; set; }
     public string? MedicalHistory { get; set; }
-    public string? ReferringPhysician { get; set; }
 }
 
 public sealed record ItemDto(

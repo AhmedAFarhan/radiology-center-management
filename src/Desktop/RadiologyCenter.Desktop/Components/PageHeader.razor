@@ -26,11 +26,15 @@
     }
     @if (OnImport is not null)
     {
-        <MudIconButton Icon="@Icons.Material.Filled.Upload" Color="Color.Default" aria-label="@T.Common.ImportFromExcel" OnClick="OnImport" />
+        <MudTooltip Placement="Placement.Bottom" Text="@T.Common.ImportFromExcel">
+            <MudIconButton Icon="@Icons.Material.Filled.Download" Color="Color.Default" aria-label="@T.Common.ImportFromExcel" OnClick="OnImport" />
+        </MudTooltip>
     }
     @if (OnExport is not null)
     {
-        <MudIconButton Icon="@Icons.Material.Filled.FileDownload" Color="Color.Default" aria-label="@T.Common.ExportToExcel" OnClick="OnExport" />
+        <MudTooltip Placement="Placement.Bottom" Text="@T.Common.ExportToExcel">
+            <MudIconButton Icon="@Icons.Material.Filled.Upload" Color="Color.Default" aria-label="@T.Common.ExportToExcel" OnClick="OnExport" />
+        </MudTooltip>
     }
     @if (OnRefresh is not null)
     {

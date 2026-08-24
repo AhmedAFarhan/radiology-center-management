@@ -1244,7 +1244,6 @@ public sealed class PatientDialogGroup : LocalizerGroup
     public string NationalId => Get("patientDialog.nationalId");
     public string NewTitle => Get("patientDialog.newTitle");
     public string PhoneNumber => Get("patientDialog.phoneNumber");
-    public string ReferringPhysician => Get("patientDialog.referringPhysician");
     public string SaveChanges => Get("patientDialog.saveChanges");
     public string Unreachable => Get("patientDialog.unreachable");
     public string Updated => Get("patientDialog.updated");

@@ -25,9 +25,8 @@ public static class GetPatientsImportTemplateQueryHandler
                 ("Excel.Patient.BloodType", "Blood Type"),
                 ("Excel.Patient.Allergies", "Allergies"),
                 ("Excel.Patient.MedicalHistory", "Medical History"),
-                ("Excel.Patient.ReferringPhysician", "Referring Physician"),
             ],
-            sampleRow: ["Ahmed Mohamed Ali", "Male", "1990-05-15", 35, "01012345678", "ahmed@example.com", "Cairo", "29801011234567", "A+", "None", "No known conditions", "Dr. Samer Ali"],
+            sampleRow: ["Ahmed Mohamed Ali", "Male", "1990-05-15", 35, "01012345678", "ahmed@example.com", "Cairo", "29801011234567", "A+", "None", "No known conditions"],
             referenceSheets:
             [
                 ("Gender", [.. Gender.GetAll<Gender>().Select(g => g.Name)]),

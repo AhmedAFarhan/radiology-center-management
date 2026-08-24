@@ -13,5 +13,4 @@ public record CreatePatientCommand(
     string? NationalId = null,
     string? BloodType = null,
     string? Allergies = null,
-    string? MedicalHistory = null,
-    string? ReferringPhysician = null) : ICommand, IPatientFields;
+    string? MedicalHistory = null) : ICommand, IPatientFields;

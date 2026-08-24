@@ -17,7 +17,6 @@ public record PatientDto(
     string? BloodType,
     string? Allergies,
     string? MedicalHistory,
-    string? ReferringPhysician,
     bool IsActive,
     DateTime CreatedAt,
     string GenderKey = "",

@@ -59,7 +59,6 @@ public partial class PatientEditorDialog : ComponentBase
         _model.BloodType = Patient.BloodTypeKey;
         _model.Allergies = Patient.Allergies;
         _model.MedicalHistory = Patient.MedicalHistory;
-        _model.ReferringPhysician = Patient.ReferringPhysician;
     }
 
     private async Task SubmitAsync()
@@ -80,7 +79,6 @@ public partial class PatientEditorDialog : ComponentBase
             BloodType = _model.BloodType,
             Allergies = _model.Allergies,
             MedicalHistory = _model.MedicalHistory,
-            ReferringPhysician = _model.ReferringPhysician,
         };
 
         if (await SafeExecute.RunAsync(
@@ -121,7 +119,6 @@ public partial class PatientEditorDialog : ComponentBase
         public string? BloodType { get; set; }
         public string? Allergies { get; set; }
         public string? MedicalHistory { get; set; }
-        public string? ReferringPhysician { get; set; }
 
         public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
         {

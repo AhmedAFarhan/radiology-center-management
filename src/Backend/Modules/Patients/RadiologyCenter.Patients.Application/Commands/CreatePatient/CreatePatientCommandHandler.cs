@@ -43,8 +43,7 @@ public static class CreatePatientCommandHandler
             command.NationalId,
             bloodType,
             command.Allergies,
-            command.MedicalHistory,
-            command.ReferringPhysician);
+            command.MedicalHistory);
 
         await patientRepository.AddAsync(patient, ct);
         await transaction.CommitAsync(ct);

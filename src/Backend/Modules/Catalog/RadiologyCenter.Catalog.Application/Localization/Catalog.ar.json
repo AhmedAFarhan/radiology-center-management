@@ -3,6 +3,7 @@
     "Catalog.PriceNegative": "لا يمكن أن يكون سعر الفحص سالباً.",
     "Catalog.StandardDurationNegative": "لا يمكن أن تكون المدة القياسية سالبة.",
     "Catalog.ExaminationTypeInUse": "لا يمكن حذف نوع الفحص '{0}' لأنه لا يزال مشاراً إليه في فحوصات نشطة.",
+    "Catalog.ExaminationTypeNotFound": "نوع الفحص غير موجود.",
     "Excel.ExamType.Code": "الكود",
     "Excel.ExamType.Name": "الاسم",
     "Excel.ExamType.Modality": "الجهاز",
@@ -17,7 +18,7 @@
     "Excel.Error.InvalidDate": "يجب أن يكون التاريخ بصيغة YYYY-MM-DD.",
     "Excel.Error.DuplicateName": "يوجد نوع فحص بنفس هذا الاسم بالفعل.",
     "Excel.ExamType.Instructions.AutoCode": "كود نوع الفحص يُولَّد تلقائياً بواسطة النظام - لا تضفه إلى الملف.",
-    "Excel.ExamType.Instructions.AllowedValues": "يجب أن يطابق الجهاز تماماً إحدى القيم في ورقة Modality المخفية (مثل XRay, CT, MRI)."
+    "Excel.ExamType.Instructions.AllowedValues": "يجب أن يطابق الجهاز تماماً إحدى القيم المذكورة في ورقة Modality - تتوفر قائمة منسدلة داخل Excel."
   },
   "enums": {
     "Modality": {

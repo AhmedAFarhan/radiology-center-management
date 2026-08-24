@@ -46,7 +46,6 @@ public static class ExportPatientsQueryHandler
         new("Excel.Patient.BloodType", "Blood Type", p => p.BloodType),
         new("Excel.Patient.Allergies", "Allergies", p => p.Allergies, width: 28),
         new("Excel.Patient.MedicalHistory", "Medical History", p => p.MedicalHistory, width: 32),
-        new("Excel.Patient.ReferringPhysician", "Referring Physician", p => p.ReferringPhysician, width: 24),
         new("Excel.Common.IsActive", "Active", p => p.IsActive ? "Yes" : "No"),
     ];
 
