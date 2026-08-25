@@ -19,6 +19,7 @@ public partial class ReadingRoom : ComponentBase, IDisposable
 [Inject] private AppLocalizer T { get; set; } = default!;
     [Inject] private IJSRuntime JS { get; set; } = default!;
     [Inject] private EnumOptionsService EnumOptionsService { get; set; } = default!;
+    [Inject] private RealTimeNotificationService RealTime { get; set; } = default!;
     private IReadOnlyList<EnumOptionDto> _severityOptions = Array.Empty<EnumOptionDto>();
 
     private readonly List<QueueExam> _queue = new();
@@ -127,6 +128,46 @@ public partial class ReadingRoom : ComponentBase, IDisposable
             await JS.InvokeVoidAsync("readingRoomKeydown", _jsRef);
             _ = LoadSeverityOptionsAsync();
             _ = LoadQueueAsync();
+            _ = ConnectToRealTimeAsync();
+        }
+    }
+
+    private async Task ConnectToRealTimeAsync()
+    {
+        try
+        {
+            var baseUrl = Environment.GetEnvironmentVariable("API_BASE_URL") ?? "http://localhost:5000";
+            await RealTime.StartAsync($"{baseUrl}/hubs/notifications");
+            RealTime.On<ExamCheckedInNotificationDto>("exams:checkedin", dto =>
+            {
+                if (_queue.Any(q => q.Id == dto.ExaminationId))
+                    return Task.CompletedTask;
+
+                _queue.Add(new QueueExam
+                {
+                    Id = dto.ExaminationId,
+                    PatientId = dto.PatientId,
+                    PatientName = dto.PatientName,
+                    PatientCode = dto.PatientCode,
+                    ExamName = dto.ExamName,
+                    StatusKey = dto.StatusKey,
+                    ScheduledAt = dto.ScheduledAt,
+                    Priority = dto.Priority,
+                    PriorityKey = dto.PriorityKey,
+                    Indication = dto.Indication ?? string.Empty,
+                    AssignedRadiologistId = dto.RadiologistId,
+                });
+
+                _queue.Sort((a, b) =>
+                    (a.ScheduledAt ?? DateTime.MaxValue).CompareTo(b.ScheduledAt ?? DateTime.MaxValue));
+
+                StateHasChanged();
+                return Task.CompletedTask;
+            });
+        }
+        catch
+        {
+            // real-time is non-critical; worklist still works via manual refresh
         }
     }
 

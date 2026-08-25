@@ -182,7 +182,8 @@ public sealed class Examination : AuditableAggregateRoot<Guid>
         EnsureStatus(ExaminationStatus.Requested, ExaminationStatus.Scheduled);
 
         Status = ExaminationStatus.CheckedIn;
-        RaiseDomainEvent(new ExaminationCheckedInEvent(Id));
+        RaiseDomainEvent(new ExaminationCheckedInEvent(
+            Id, PatientId, ExaminationTypeId, Priority, ScheduledAt, ClinicalIndication, RadiologistId));
     }
 
     public void Start(Guid performedByUserId)

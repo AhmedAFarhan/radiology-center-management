@@ -55,6 +55,16 @@ builder.Services.AddControllers(options =>
 });
 
 builder.Services.AddLocalization();
+builder.Services.AddCors(options =>
+{
+    options.AddDefaultPolicy(policy =>
+    {
+        policy.AllowAnyHeader()
+              .AllowAnyMethod()
+              .AllowCredentials()
+              .SetIsOriginAllowed(_ => true);
+    });
+});
 builder.Services.AddSingleton<Microsoft.Extensions.Localization.IStringLocalizerFactory, RadiologyCenter.Localhost.Localization.JsonStringLocalizerFactory>();
 builder.Services.AddSingleton<RadiologyCenter.BuildingBlocks.Application.Localization.ITranslator, RadiologyCenter.Localhost.Localization.JsonTranslator>();
 builder.Services.Configure<Microsoft.AspNetCore.Builder.RequestLocalizationOptions>(options =>
@@ -132,6 +142,7 @@ builder.Services.AddScoped<RadiologyCenter.Examinations.Application.Abstractions
 builder.Services.AddScoped<RadiologyCenter.Examinations.Application.Abstractions.IExaminationTypeDirectory, ExaminationTypeInfoDirectory>();
 builder.Services.AddScoped<RadiologyCenter.Catalog.Application.Abstractions.IExaminationTypeUsageChecker, ExaminationTypeUsageChecker>();
 builder.Services.AddScoped<RadiologyCenter.Examinations.Application.Abstractions.IProfitSourceResolver, ProfitSourceResolver>();
+builder.Services.AddScoped<RadiologyCenter.Examinations.Application.Abstractions.IPatientInfoResolver, PatientInfoResolver>();
 builder.Services.AddScoped<RadiologyCenter.Reports.Application.Abstractions.IReportDirectory, ReportDirectory>();
 builder.Services.AddScoped<RadiologyCenter.Insurance.Application.Abstractions.IInsuranceDirectory, InsuranceDirectory>();
 builder.Services.AddScoped<RadiologyCenter.Cash.Application.Abstractions.ICashDirectory, CashDirectory>();
@@ -184,10 +195,13 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+app.UseCors();
+
 app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
 app.MapHealthChecks("/health").AllowAnonymous();
+app.MapHub<RadiologyCenter.BuildingBlocks.Infrastructure.RealTime.NotificationHub>("/hubs/notifications").AllowAnonymous();
 
 app.Run();

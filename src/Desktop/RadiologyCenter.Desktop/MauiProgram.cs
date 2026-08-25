@@ -68,6 +68,7 @@ public static class MauiProgram
         builder.Services.AddScoped<NotificationService>();
         builder.Services.AddScoped<SearchService>();
         builder.Services.AddSingleton<SearchHistoryService>();
+        builder.Services.AddSingleton<RealTimeNotificationService>();
 
 #if DEBUG
         builder.Services.AddBlazorWebViewDeveloperTools();

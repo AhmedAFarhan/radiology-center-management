@@ -7,6 +7,7 @@ using RadiologyCenter.BuildingBlocks.Application.Excel;
 using RadiologyCenter.BuildingBlocks.Infrastructure.Excel;
 using RadiologyCenter.BuildingBlocks.Infrastructure.Persistence;
 using RadiologyCenter.BuildingBlocks.Infrastructure.Persistence.Interceptors;
+using RadiologyCenter.BuildingBlocks.Infrastructure.RealTime;
 using RadiologyCenter.BuildingBlocks.Infrastructure.Repositories;
 using RadiologyCenter.BuildingBlocks.Infrastructure.Services;
 
@@ -42,6 +43,9 @@ public static class InfrastructureServiceRegistration
         services.AddScoped<IDomainEventDispatcher, DomainEventDispatcher>();
         services.AddScoped<INumberSequenceGenerator, NumberSequenceGenerator>();
         services.AddSingleton<IExcelService, ExcelService>();
+
+        services.AddSignalR();
+        services.AddSingleton<INotificationService, NotificationService>();
 
         return services;
     }
