@@ -158,7 +158,7 @@ public partial class ReadingRoom : ComponentBase, IDisposable
         {
             var exams = await ExaminationService.GetPagedAsync(null, null, false, 1, 100);
             var visible = exams.Items
-                .Where(e => e.StatusKey is "CheckedIn" or "Completed")
+                .Where(e => e.StatusKey is "CheckedIn")
                 .ToList();
 
             IReadOnlyList<ReportListItemDto> reportItems = Array.Empty<ReportListItemDto>();
@@ -206,16 +206,7 @@ public partial class ReadingRoom : ComponentBase, IDisposable
             }
 
             _queue.Sort((a, b) =>
-            {
-                // CheckedIn first, then Completed; within each group by their own date.
-                var groupCompare = (a.StatusKey == "CheckedIn" ? 0 : 1)
-                    .CompareTo(b.StatusKey == "CheckedIn" ? 0 : 1);
-                if (groupCompare != 0)
-                    return groupCompare;
-                return a.StatusKey == "CheckedIn"
-                    ? (a.ScheduledAt ?? DateTime.MaxValue).CompareTo(b.ScheduledAt ?? DateTime.MaxValue)
-                    : (b.CompletedAt ?? DateTime.MinValue).CompareTo(a.CompletedAt ?? DateTime.MinValue);
-            });
+                (a.ScheduledAt ?? DateTime.MaxValue).CompareTo(b.ScheduledAt ?? DateTime.MaxValue));
         }
         catch (Exception)
         {
@@ -225,6 +216,8 @@ public partial class ReadingRoom : ComponentBase, IDisposable
         {
             _loadingQueue = false;
         }
+
+        StateHasChanged();
     }
 
     private async Task<PatientDto?> GetPatientAsync(string patientId)
@@ -793,7 +786,7 @@ public partial class ReadingRoom : ComponentBase, IDisposable
         public string ReportStatusKey { get; set; } = "New";
         public string? StudyInstanceUid { get; init; }
 
-        public string DateLabel => (StatusKey == "CheckedIn" ? ScheduledAt : CompletedAt)?.ToString("yyyy-MM-dd") ?? string.Empty;
+        public string DateLabel => ScheduledAt?.ToString("yyyy-MM-dd") ?? string.Empty;
     }
 
     private sealed class SectionEditor
