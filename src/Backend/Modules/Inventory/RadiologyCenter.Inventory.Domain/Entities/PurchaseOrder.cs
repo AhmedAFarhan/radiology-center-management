@@ -51,7 +51,7 @@ public sealed class PurchaseOrder : SoftDeletableAggregateRoot<Guid>
     public void AddItem(Guid itemId, int quantityOrdered, decimal unitCost)
     {
         EnsureDraft();
-        Guard.Against(_items.Any(i => i.ItemId == itemId), isDuplicate => isDuplicate, DomainErrors.DuplicateItem, $"Item '{itemId}' is already on purchase order '{OrderNumber}'.");
+        Guard.Against(_items.Any(i => i.ItemId == itemId), isDuplicate => isDuplicate, DomainErrors.DuplicateItem, $"Item is already on purchase order '{OrderNumber}'.");
 
         _items.Add(PurchaseOrderItem.Create(Id, itemId, quantityOrdered, unitCost));
     }
@@ -61,7 +61,7 @@ public sealed class PurchaseOrder : SoftDeletableAggregateRoot<Guid>
         EnsureDraft();
 
         var line = _items.FirstOrDefault(i => i.ItemId == itemId)
-            ?? throw new DomainException(DomainErrors.ItemNotOnPurchaseOrder, $"Item '{itemId}' is not on purchase order '{OrderNumber}'.");
+            ?? throw new DomainException(DomainErrors.ItemNotOnPurchaseOrder, $"Item is not on purchase order '{OrderNumber}'.");
         _items.Remove(line);
     }
 
@@ -87,7 +87,7 @@ public sealed class PurchaseOrder : SoftDeletableAggregateRoot<Guid>
             throw new BusinessRuleViolationException(nameof(RecordReceipt), DomainErrors.ReceiptsOrderedOnly, $"Receipts can only be recorded against an ordered purchase order, not '{Status}'.");
 
         var line = _items.FirstOrDefault(i => i.ItemId == itemId)
-            ?? throw new DomainException(DomainErrors.ItemNotOnPurchaseOrder, $"Item '{itemId}' is not on purchase order '{OrderNumber}'.");
+            ?? throw new DomainException(DomainErrors.ItemNotOnPurchaseOrder, $"Item is not on purchase order '{OrderNumber}'.");
         line.RecordReceipt(quantity);
 
         if (_items.All(i => i.QuantityReceived >= i.QuantityOrdered))

@@ -88,7 +88,7 @@ private MudTable<ExaminationDto>? _table;
     }
 
     private string ResolvePatientName(string patientId)
-        => _patientNames.TryGetValue(patientId, out var name) ? name : patientId;
+        => _patientNames.TryGetValue(patientId, out var name) ? name : "-";
 
     private async Task<TableData<ExaminationDto>> LoadServerData(TableState state, CancellationToken ct)
     {

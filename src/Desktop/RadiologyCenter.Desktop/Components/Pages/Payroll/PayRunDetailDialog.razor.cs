@@ -63,10 +63,10 @@ public partial class PayRunDetailDialog : ComponentBase
     }
 
     private string ResolveStaff(string staffId)
-        => _staffNames.TryGetValue(staffId, out var name) ? name : staffId;
+        => _staffNames.TryGetValue(staffId, out var name) ? name : "-";
 
     private string ResolveDoctor(string doctorId)
-        => _doctorNames.TryGetValue(doctorId, out var name) ? name : doctorId;
+        => _doctorNames.TryGetValue(doctorId, out var name) ? name : "-";
 
     private async Task ReloadAsync()
     {

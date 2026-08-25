@@ -62,7 +62,7 @@ public sealed class Payslip : Entity<Guid>
             ?? throw new BusinessRuleViolationException(
                 nameof(RemoveComponent),
                 DomainErrors.PayslipComponentNotFound,
-                $"Payslip component '{componentId}' not found on payslip '{Id}'.");
+                "Payslip component not found.");
         _components.Remove(component);
     }
 }

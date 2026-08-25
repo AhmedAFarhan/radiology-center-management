@@ -61,7 +61,7 @@ public sealed class PreAuthorization : AuditableAggregateRoot<Guid>
         long sizeInBytes)
     {
         if (Status != PreAuthorizationStatus.Requested)
-            throw new BusinessRuleViolationException(nameof(AddDocument), DomainErrors.DocumentsRequestedOnly, $"Documents can only be attached while '{Id}' is requested.");
+            throw new BusinessRuleViolationException(nameof(AddDocument), DomainErrors.DocumentsRequestedOnly, "Documents can only be attached while the pre-authorization is requested.");
 
         var document = PreAuthorizationDocument.Create(Id, type, fileName, contentType, storedPath, sizeInBytes);
         _documents.Add(document);
@@ -97,6 +97,6 @@ public sealed class PreAuthorization : AuditableAggregateRoot<Guid>
     private void EnsureRequested()
     {
         if (Status != PreAuthorizationStatus.Requested)
-            throw new BusinessRuleViolationException(nameof(EnsureRequested), DomainErrors.PreAuthorizationAlreadyDecided, $"Pre-authorization '{Id}' is already {Status.Name}.");
+            throw new BusinessRuleViolationException(nameof(EnsureRequested), DomainErrors.PreAuthorizationAlreadyDecided, $"Pre-authorization is already {Status.Name}.");
     }
 }

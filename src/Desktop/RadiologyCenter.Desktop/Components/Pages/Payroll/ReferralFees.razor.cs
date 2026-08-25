@@ -47,10 +47,10 @@ public partial class ReferralFees : ListPageBase<ReferralFeeDto>
     }
 
     private string ResolveDoctor(string doctorId)
-        => _doctorNames.TryGetValue(doctorId, out var name) ? name : doctorId;
+        => _doctorNames.TryGetValue(doctorId, out var name) ? name : "-";
 
     private string ResolveExamType(string examTypeId)
-        => _examTypeNames.TryGetValue(examTypeId, out var name) ? name : examTypeId;
+        => _examTypeNames.TryGetValue(examTypeId, out var name) ? name : "-";
 
     private async Task OpenCreateDialogAsync()
     {

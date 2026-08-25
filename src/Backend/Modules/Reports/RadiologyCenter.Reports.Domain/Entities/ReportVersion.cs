@@ -46,7 +46,7 @@ public sealed class ReportVersion : Entity<Guid>
         Guard.AgainstNull(sectionType, nameof(sectionType));
         Guard.AgainstNullOrWhiteSpace(title, nameof(title));
         var isDuplicate = _sections.Any(s => s.SectionType == sectionType);
-        Guard.Against(isDuplicate, duplicate => duplicate, DomainErrors.DuplicateVersionSection, $"Section '{sectionType.Name}' already exists on version '{Id}'.");
+        Guard.Against(isDuplicate, duplicate => duplicate, DomainErrors.DuplicateVersionSection, "Section already exists on this version.");
 
         var section = ReportSection.Create(Id, sectionType, title, body, position, isLocked);
         _sections.Add(section);
@@ -85,6 +85,6 @@ public sealed class ReportVersion : Entity<Guid>
     private ReportFinding GetFinding(Guid findingId)
     {
         return _findings.FirstOrDefault(f => f.Id == findingId)
-            ?? throw new DomainException(DomainErrors.FindingNotOnVersion, $"Finding '{findingId}' is not on version '{Id}'.");
+            ?? throw new DomainException(DomainErrors.FindingNotOnVersion, "This finding is not on this version.");
     }
 }

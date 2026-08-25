@@ -1,5 +1,6 @@
 @inject ExaminationService ExaminationService
 @inject PatientService PatientService
+@inject ResourceService ResourceService
 @inject InventoryService InventoryService
 @inject AppLocalizer T
 
@@ -35,15 +36,15 @@
                 </MudItem>
                 <MudItem xs="12">
                     <MudText Typo="Typo.caption" Class="text-secondary">@T.VisitDialog.Radiologist</MudText>
-                    <MudText Typo="Typo.subtitle1">@(_visit.RadiologistId ?? "-")</MudText>
+                    <MudText Typo="Typo.subtitle1">@(_radiologistName ?? "-")</MudText>
                 </MudItem>
                 <MudItem xs="12">
                     <MudText Typo="Typo.caption" Class="text-secondary">@T.VisitDialog.Technician</MudText>
-                    <MudText Typo="Typo.subtitle1">@(_visit.TechnicianId ?? "-")</MudText>
+                    <MudText Typo="Typo.subtitle1">@(_technicianName ?? "-")</MudText>
                 </MudItem>
                 <MudItem xs="12">
                     <MudText Typo="Typo.caption" Class="text-secondary">@T.VisitDialog.ReferralDoctor</MudText>
-                    <MudText Typo="Typo.subtitle1">@(string.IsNullOrWhiteSpace(_visit.ReferralDoctorId) ? "-" : _visit.ReferralDoctorId)</MudText>
+                    <MudText Typo="Typo.subtitle1">@(_referralDoctorName ?? "-")</MudText>
                 </MudItem>
                 <MudItem xs="12">
                     <MudText Typo="Typo.caption" Class="text-secondary">@T.VisitDialog.ClinicalIndication</MudText>

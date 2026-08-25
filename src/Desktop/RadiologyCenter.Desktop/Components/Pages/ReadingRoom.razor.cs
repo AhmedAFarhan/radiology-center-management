@@ -230,7 +230,7 @@ public partial class ReadingRoom : ComponentBase, IDisposable
                 {
                     Id = exam.Id,
                     PatientId = exam.PatientId,
-                    PatientName = patient?.FullName ?? $"Patient {exam.PatientId}",
+                    PatientName = patient?.FullName ?? "Unknown Patient",
                     PatientCode = patientCode ?? "-",
                     ExamName = exam.ExaminationTypeName ?? "Examination",
                     StatusKey = exam.StatusKey,

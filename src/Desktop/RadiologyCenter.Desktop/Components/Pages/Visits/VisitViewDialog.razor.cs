@@ -26,6 +26,9 @@ public partial class VisitViewDialog : ComponentBase
 
     private ExaminationDto? _visit;
     private string _patientName = string.Empty;
+    private string? _radiologistName;
+    private string? _technicianName;
+    private string? _referralDoctorName;
     private string? _loadError;
     private bool _loading = true;
     private readonly Dictionary<string, string> _itemNames = new();
@@ -47,15 +50,17 @@ public partial class VisitViewDialog : ComponentBase
             foreach (var item in items.Items)
                 _itemNames[item.Id] = item.Name;
 
-            try
-            {
-                var patient = await PatientService.GetByIdAsync(_visit.PatientId);
-                _patientName = patient.FullName;
-            }
-            catch
-            {
-                _patientName = Visit.PatientId;
-            }
+            var patientTask = ResolvePatientNameAsync(_visit.PatientId);
+            var radiologistTask = ResolveStaffNameAsync(_visit.RadiologistId);
+            var technicianTask = ResolveStaffNameAsync(_visit.TechnicianId);
+            var referralTask = ResolveStaffNameAsync(_visit.ReferralDoctorId);
+
+            await Task.WhenAll(patientTask, radiologistTask, technicianTask, referralTask);
+
+            _patientName = await patientTask;
+            _radiologistName = await radiologistTask;
+            _technicianName = await technicianTask;
+            _referralDoctorName = await referralTask;
         }
         catch (ApiException ex)
         {
@@ -68,6 +73,34 @@ public partial class VisitViewDialog : ComponentBase
         finally
         {
             _loading = false;
+        }
+    }
+
+    private async Task<string> ResolvePatientNameAsync(string patientId)
+    {
+        try
+        {
+            var patient = await PatientService.GetByIdAsync(patientId);
+            return patient.FullName;
+        }
+        catch
+        {
+            return "-";
+        }
+    }
+
+    private async Task<string?> ResolveStaffNameAsync(string? staffId)
+    {
+        if (string.IsNullOrWhiteSpace(staffId))
+            return null;
+        try
+        {
+            var staff = await ResourceService.GetStaffByIdAsync(staffId);
+            return staff.FullName;
+        }
+        catch
+        {
+            return null;
         }
     }
 

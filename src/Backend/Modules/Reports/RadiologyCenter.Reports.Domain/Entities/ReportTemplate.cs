@@ -77,7 +77,7 @@ public sealed class ReportTemplate : SoftDeletableAggregateRoot<Guid>
         Guard.AgainstNull(sectionType, nameof(sectionType));
         Guard.AgainstNullOrWhiteSpace(title, nameof(title));
         Guard.Against(_sections.Any(s => s.SectionType == sectionType),
-            duplicate => duplicate, DomainErrors.DuplicateTemplateSection, $"Section '{sectionType.Name}' already exists on template '{Name}'.");
+            duplicate => duplicate, DomainErrors.DuplicateTemplateSection, $"Section '{sectionType.Name}' already exists on this template.");
 
         var section = ReportTemplateSection.Create(Id, sectionType, title, body, position, isLocked);
         _sections.Add(section);
@@ -87,7 +87,7 @@ public sealed class ReportTemplate : SoftDeletableAggregateRoot<Guid>
     public void RemoveSection(Guid sectionId)
     {
         var section = _sections.FirstOrDefault(s => s.Id == sectionId)
-            ?? throw new DomainException(DomainErrors.SectionNotOnTemplate, $"Section '{sectionId}' is not on template '{Name}'.");
+            ?? throw new DomainException(DomainErrors.SectionNotOnTemplate, "This section is not on this template.");
 
         if (IsSystem)
             throw new BusinessRuleViolationException(nameof(RemoveSection), DomainErrors.SystemTemplateReadOnly, "System templates cannot be modified.");

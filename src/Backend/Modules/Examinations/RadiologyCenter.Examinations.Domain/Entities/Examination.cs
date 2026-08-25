@@ -100,7 +100,7 @@ public sealed class Examination : AuditableAggregateRoot<Guid>
         string? notes = null)
     {
         EnsureNotTerminal();
-        Guard.Against(_items.Any(i => i.ItemId == itemId), isDuplicate => isDuplicate, DomainErrors.DuplicateItem, $"Item '{itemId}' is already on examination '{Id}'.");
+        Guard.Against(_items.Any(i => i.ItemId == itemId), isDuplicate => isDuplicate, DomainErrors.DuplicateItem, "This item is already on this examination.");
 
         var item = ExaminationItem.Create(Id, itemId, quantity, isContrast, isRequired, notes);
         _items.Add(item);
@@ -111,7 +111,7 @@ public sealed class Examination : AuditableAggregateRoot<Guid>
     {
         EnsureNotTerminal();
         var item = GetItem(examinationItemId);
-        Guard.Against(item.IsRequired, isRequired => isRequired, DomainErrors.RequiredItemCannotRemove, $"Item '{item.ItemId}' is required for this examination and cannot be removed.");
+        Guard.Against(item.IsRequired, isRequired => isRequired, DomainErrors.RequiredItemCannotRemove, "This item is required and cannot be removed.");
 
         _items.Remove(item);
     }
@@ -190,7 +190,7 @@ public sealed class Examination : AuditableAggregateRoot<Guid>
     {
         EnsureStatus(ExaminationStatus.CheckedIn);
         Guard.AgainstEmpty(performedByUserId, nameof(performedByUserId));
-        Guard.Against(Remaining, r => r > 0, DomainErrors.OutstandingBalance, $"Examination '{Id}' has an outstanding balance of '{Remaining}' and cannot start until fully paid.");
+        Guard.Against(Remaining, r => r > 0, DomainErrors.OutstandingBalance, $"This examination has an outstanding balance of '{Remaining}' and cannot start until fully paid.");
 
         PerformedByUserId = performedByUserId;
         StartedAt = DateTime.UtcNow;
@@ -274,19 +274,19 @@ public sealed class Examination : AuditableAggregateRoot<Guid>
     private ExaminationItem GetItem(Guid examinationItemId)
     {
         return _items.FirstOrDefault(i => i.Id == examinationItemId)
-            ?? throw new DomainException(DomainErrors.ItemNotOnExamination, $"Item '{examinationItemId}' is not on examination '{Id}'.");
+            ?? throw new DomainException(DomainErrors.ItemNotOnExamination, "This item is not on this examination.");
     }
 
     private void EnsureNotTerminal()
     {
         if (IsTerminal)
-            throw new BusinessRuleViolationException(nameof(EnsureNotTerminal), DomainErrors.ItemsCannotBeModified, $"Examination '{Id}' is '{Status}' and its items can no longer be modified.");
+            throw new BusinessRuleViolationException(nameof(EnsureNotTerminal), DomainErrors.ItemsCannotBeModified, $"This examination is '{Status}' and its items can no longer be modified.");
     }
 
     private void EnsureStatus(params ExaminationStatus[] allowed)
     {
         if (!allowed.Contains(Status))
-            throw new BusinessRuleViolationException(nameof(EnsureStatus), DomainErrors.InvalidStatusTransition, $"Examination '{Id}' cannot transition from status '{Status}'.");
+            throw new BusinessRuleViolationException(nameof(EnsureStatus), DomainErrors.InvalidStatusTransition, $"Cannot transition from status '{Status}'.");
     }
 
     private void EnsureStaffAssigned()
@@ -295,6 +295,6 @@ public sealed class Examination : AuditableAggregateRoot<Guid>
             throw new BusinessRuleViolationException(
                 nameof(EnsureStaffAssigned),
                 DomainErrors.StaffNotAssigned,
-                $"Examination '{Id}' cannot be completed until a radiologist and a technician are assigned.");
+                "Cannot complete until a radiologist and a technician are assigned.");
     }
 }

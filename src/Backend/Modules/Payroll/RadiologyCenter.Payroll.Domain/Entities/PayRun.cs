@@ -54,7 +54,7 @@ public sealed class PayRun : SoftDeletableAggregateRoot<Guid>
             throw new BusinessRuleViolationException(
                 nameof(AddPayslip),
                 DomainErrors.DuplicatePayslip,
-                $"Staff '{staffId}' already has a payslip in pay run '{Id}'.");
+                "This staff member already has a payslip in this pay run.");
 
         var payslip = Payslip.Create(Id, staffId, grossSalary, unpaidLeaveDays, unpaidLeaveDeduction, notes);
         _payslips.Add(payslip);
@@ -65,7 +65,7 @@ public sealed class PayRun : SoftDeletableAggregateRoot<Guid>
     {
         EnsureEditable();
         var payslip = _payslips.FirstOrDefault(p => p.StaffId == staffId)
-            ?? throw new DomainException(DomainErrors.PayslipNotFound, $"Staff '{staffId}' has no payslip in pay run '{Id}'.");
+            ?? throw new DomainException(DomainErrors.PayslipNotFound, "This staff member has no payslip in this pay run.");
         _payslips.Remove(payslip);
     }
 
@@ -96,7 +96,7 @@ public sealed class PayRun : SoftDeletableAggregateRoot<Guid>
             throw new BusinessRuleViolationException(
                 nameof(AddReferralFeeStatement),
                 DomainErrors.DuplicatePayslip,
-                $"Referral doctor '{referralDoctorId}' already has a statement in pay run '{Id}'.");
+                "This referral doctor already has a statement in this pay run.");
 
         var statement = ReferralFeeStatement.Create(Id, referralDoctorId, totalFee, examCount);
         _referralFeeStatements.Add(statement);
@@ -155,7 +155,7 @@ public sealed class PayRun : SoftDeletableAggregateRoot<Guid>
             throw new BusinessRuleViolationException(
                 nameof(EnsureEditable),
                 DomainErrors.PayRunNotEditable,
-                $"Pay run '{Id}' is {Status.Name} and cannot be modified.");
+                $"Pay run is {Status.Name} and cannot be modified.");
     }
 
     private void EnsureStatus(params PayRunStatus[] allowed)
@@ -164,6 +164,6 @@ public sealed class PayRun : SoftDeletableAggregateRoot<Guid>
             throw new BusinessRuleViolationException(
                 nameof(EnsureStatus),
                 DomainErrors.InvalidPayRunTransition,
-                $"Pay run '{Id}' is {Status.Name} and cannot transition to this state.");
+                $"Pay run is {Status.Name} and cannot transition to this state.");
     }
 }

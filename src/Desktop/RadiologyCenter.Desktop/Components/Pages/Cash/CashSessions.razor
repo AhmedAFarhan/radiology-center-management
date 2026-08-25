@@ -38,7 +38,7 @@
     </HeaderContent>
     <RowTemplate>
         <MudTd DataLabel="@T.Cash.OpenedAt">@context.OpenedAt.ToLocalTime().ToString("g")</MudTd>
-        <MudTd DataLabel="@T.Cash.User">@(string.IsNullOrWhiteSpace(context.UserName) ? ShortId(context.UserId) : context.UserName)</MudTd>
+        <MudTd DataLabel="@T.Cash.User">@(string.IsNullOrWhiteSpace(context.UserName) ? "-" : context.UserName)</MudTd>
         <MudTd DataLabel="@T.Common.Status">
             <StatusChip Token="@context.StatusKey">@context.Status</StatusChip>
         </MudTd>

@@ -2,9 +2,6 @@ namespace RadiologyCenter.Desktop.Services;
 
 public static class Formatting
 {
-    public static string ShortId(string id)
-        => id.Length > 8 ? id[..8] : id;
-
     public static string Truncate(string value, int maxLength = 60)
         => value.Length > maxLength ? value[..maxLength] + "…" : value;
 

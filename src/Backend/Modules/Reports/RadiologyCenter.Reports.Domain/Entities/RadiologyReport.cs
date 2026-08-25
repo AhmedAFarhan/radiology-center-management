@@ -181,6 +181,6 @@ public sealed class RadiologyReport : AuditableAggregateRoot<Guid>
     private void EnsureStatus(params ReportStatus[] allowed)
     {
         if (!allowed.Contains(Status))
-            throw new BusinessRuleViolationException(nameof(EnsureStatus), DomainErrors.InvalidStatusTransition, $"Report '{Id}' cannot transition from status '{Status}'.");
+            throw new BusinessRuleViolationException(nameof(EnsureStatus), DomainErrors.InvalidStatusTransition, $"Cannot transition from status '{Status}'.");
     }
 }

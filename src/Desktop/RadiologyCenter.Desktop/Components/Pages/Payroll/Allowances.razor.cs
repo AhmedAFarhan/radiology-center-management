@@ -44,7 +44,7 @@ public partial class Allowances : ListPageBase<AllowanceAssignmentDto>
     }
 
     private string ResolveStaff(string staffId)
-        => _staffNames.TryGetValue(staffId, out var name) ? name : staffId;
+        => _staffNames.TryGetValue(staffId, out var name) ? name : "-";
 
     private async Task OpenCreateDialogAsync()
     {

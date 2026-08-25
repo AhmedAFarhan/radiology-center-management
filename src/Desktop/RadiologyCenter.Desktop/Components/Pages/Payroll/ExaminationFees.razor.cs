@@ -44,7 +44,7 @@ public partial class ExaminationFees : ListPageBase<ExaminationFeeDto>
     }
 
     private string ResolveExamType(string examTypeId)
-        => _examTypeNames.TryGetValue(examTypeId, out var name) ? name : examTypeId;
+        => _examTypeNames.TryGetValue(examTypeId, out var name) ? name : "-";
 
     private async Task OpenCreateDialogAsync()
     {

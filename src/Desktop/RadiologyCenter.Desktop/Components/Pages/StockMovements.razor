@@ -30,7 +30,7 @@
             <MudText Color="@(context.Quantity < 0 ? Color.Error : Color.Success)">@(context.Quantity > 0 ? $"+{context.Quantity}" : context.Quantity.ToString())</MudText>
         </MudTd>
         <MudTd DataLabel="@T.StockMovements.UnitCost" Class="text-right">@(context.UnitCost?.ToString("C") ?? "-")</MudTd>
-        <MudTd DataLabel="@T.StockMovements.Item" Class="mono-text">@ShortId(context.ItemId)</MudTd>
+        <MudTd DataLabel="@T.StockMovements.Item" Class="mono-text">-</MudTd>
         <MudTd DataLabel="@T.StockMovements.Reference">@(context.Reference ?? "-")</MudTd>
         <MudTd DataLabel="@T.StockMovements.Notes">@(context.Notes ?? "-")</MudTd>
     </RowTemplate>

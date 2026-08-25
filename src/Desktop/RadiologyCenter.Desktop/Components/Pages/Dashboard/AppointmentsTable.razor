@@ -1,4 +1,5 @@
 @inject AppLocalizer T
+@using RadiologyCenter.Desktop.Services
 
 <MudCard Elevation="0" Class="dashboard-card h-100">
     <MudCardHeader>
@@ -20,7 +21,7 @@
                     <StatusChip Token="@context.StatusKey">@context.Status</StatusChip>
                 </MudTd>
                 <MudTd DataLabel="@T.Dashboard.ExamPriority">@context.Priority</MudTd>
-                <MudTd DataLabel="@T.Dashboard.ReferringDoctor">@(context.ReferralDoctorId ?? "-")</MudTd>
+                <MudTd DataLabel="@T.Dashboard.ReferringDoctor">@(string.IsNullOrWhiteSpace(context.ReferralDoctorId) ? "-" : "-")</MudTd>
             </RowTemplate>
             <NoRecordsContent>
                 <EmptyState Icon="@Icons.Material.Filled.EventNote" Title="@T.Dashboard.NoRecentExams" Message="@T.Dashboard.ExamsWillAppear" />

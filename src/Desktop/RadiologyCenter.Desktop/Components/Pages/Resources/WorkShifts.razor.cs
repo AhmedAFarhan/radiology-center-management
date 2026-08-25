@@ -46,10 +46,10 @@ public partial class WorkShifts : ListPageBase<WorkShiftDto>
     }
 
     private string ResolveStaff(string staffId)
-        => _staffNames.TryGetValue(staffId, out var name) ? name : staffId;
+        => _staffNames.TryGetValue(staffId, out var name) ? name : "-";
 
     private string ResolveEquipment(string equipmentId)
-        => _equipmentNames.TryGetValue(equipmentId, out var name) ? name : equipmentId;
+        => _equipmentNames.TryGetValue(equipmentId, out var name) ? name : "-";
 
     private async Task OpenCreateDialogAsync()
     {
