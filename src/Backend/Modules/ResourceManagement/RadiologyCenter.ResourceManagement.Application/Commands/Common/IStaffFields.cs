@@ -10,4 +10,5 @@ public interface IStaffFields
     string? Department { get; }
     string? Specialization { get; }
     string? LicenseNumber { get; }
+    string? SalaryCalculationRule { get; }
 }

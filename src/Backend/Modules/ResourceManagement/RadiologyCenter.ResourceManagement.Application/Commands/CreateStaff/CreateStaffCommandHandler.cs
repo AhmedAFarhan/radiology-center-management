@@ -14,6 +14,9 @@ public static class CreateStaffCommandHandler
         CancellationToken ct)
     {
         var position = StaffPosition.FromName<StaffPosition>(command.Position);
+        var salaryCalculationRule = string.IsNullOrWhiteSpace(command.SalaryCalculationRule)
+            ? SalaryCalculationRule.FixedPlusFees
+            : SalaryCalculationRule.FromName<SalaryCalculationRule>(command.SalaryCalculationRule);
 
         var staff = Staff.Create(
             command.UserId,
@@ -23,7 +26,8 @@ public static class CreateStaffCommandHandler
             command.HireDate,
             command.Department,
             command.Specialization,
-            command.LicenseNumber);
+            command.LicenseNumber,
+            salaryCalculationRule);
 
         await staffRepository.AddAsync(staff, ct);
         await unitOfWork.SaveChangesAsync(ct);

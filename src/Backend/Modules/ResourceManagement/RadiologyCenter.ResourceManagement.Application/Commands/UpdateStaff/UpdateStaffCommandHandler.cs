@@ -17,6 +17,9 @@ public static class UpdateStaffCommandHandler
             return Result.Failure(Error.NotFound(ErrorCodes.StaffNotFound, "Staff", command.StaffId));
 
         var position = StaffPosition.FromName<StaffPosition>(command.Position);
+        var salaryCalculationRule = string.IsNullOrWhiteSpace(command.SalaryCalculationRule)
+            ? SalaryCalculationRule.FixedPlusFees
+            : SalaryCalculationRule.FromName<SalaryCalculationRule>(command.SalaryCalculationRule);
 
         staff.Update(
             command.UserId,
@@ -26,7 +29,8 @@ public static class UpdateStaffCommandHandler
             command.HireDate,
             command.Department,
             command.Specialization,
-            command.LicenseNumber);
+            command.LicenseNumber,
+            salaryCalculationRule);
 
         staffRepository.Update(staff);
         await unitOfWork.SaveChangesAsync(ct);

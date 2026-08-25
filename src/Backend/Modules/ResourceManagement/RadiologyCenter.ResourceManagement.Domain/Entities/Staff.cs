@@ -16,6 +16,7 @@ public sealed class Staff : SoftDeletableAggregateRoot<Guid>
     public string? Specialization { get; private set; }
     public string? LicenseNumber { get; private set; }
     public DateTime HireDate { get; private set; }
+    public SalaryCalculationRule SalaryCalculationRule { get; private set; }
     public bool IsActive { get; private set; }
 
     public string FullName => string.Join(' ',
@@ -27,6 +28,7 @@ public sealed class Staff : SoftDeletableAggregateRoot<Guid>
         LastName = null!;
         PhoneNumber = null!;
         Position = null!;
+        SalaryCalculationRule = SalaryCalculationRule.FixedPlusFees;
     }
 
     public static Staff Create(
@@ -37,7 +39,8 @@ public sealed class Staff : SoftDeletableAggregateRoot<Guid>
         DateTime hireDate,
         string? department = null,
         string? specialization = null,
-        string? licenseNumber = null)
+        string? licenseNumber = null,
+        SalaryCalculationRule? salaryCalculationRule = null)
     {
         Guard.AgainstEmpty(userId, nameof(userId));
         Guard.AgainstNullOrWhiteSpace(fullName, nameof(fullName));
@@ -60,6 +63,7 @@ public sealed class Staff : SoftDeletableAggregateRoot<Guid>
             Specialization = specialization?.Trim(),
             LicenseNumber = licenseNumber?.Trim(),
             HireDate = hireDate,
+            SalaryCalculationRule = salaryCalculationRule ?? SalaryCalculationRule.FixedPlusFees,
             IsActive = true
         };
 
@@ -74,7 +78,8 @@ public sealed class Staff : SoftDeletableAggregateRoot<Guid>
         DateTime hireDate,
         string? department = null,
         string? specialization = null,
-        string? licenseNumber = null)
+        string? licenseNumber = null,
+        SalaryCalculationRule? salaryCalculationRule = null)
     {
         Guard.AgainstEmpty(userId, nameof(userId));
         Guard.AgainstNullOrWhiteSpace(fullName, nameof(fullName));
@@ -94,6 +99,7 @@ public sealed class Staff : SoftDeletableAggregateRoot<Guid>
         Specialization = specialization?.Trim();
         LicenseNumber = licenseNumber?.Trim();
         HireDate = hireDate;
+        SalaryCalculationRule = salaryCalculationRule ?? SalaryCalculationRule.FixedPlusFees;
     }
 
     public void Activate()

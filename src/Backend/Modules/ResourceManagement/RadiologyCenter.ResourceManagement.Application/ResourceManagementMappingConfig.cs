@@ -11,7 +11,8 @@ public static class ResourceManagementMappingConfig
     {
         TypeAdapterConfig<Staff, StaffDto>.NewConfig()
             .Map(d => d.Position, s => s.Position.LocalizedName())
-            .Map(d => d.PositionKey, s => s.Position.Name);
+            .Map(d => d.PositionKey, s => s.Position.Name)
+            .Map(d => d.SalaryCalculationRule, s => s.SalaryCalculationRule.Name);
 
         TypeAdapterConfig<Equipment, EquipmentDto>.NewConfig()
             .Map(d => d.Modality, s => s.Modality.LocalizedName())

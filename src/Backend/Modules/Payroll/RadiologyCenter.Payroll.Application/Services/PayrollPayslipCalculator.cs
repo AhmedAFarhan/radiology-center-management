@@ -2,6 +2,8 @@ using RadiologyCenter.BuildingBlocks.Domain.Specifications;
 using RadiologyCenter.Payroll.Application.Abstractions;
 using RadiologyCenter.Payroll.Domain.Common;
 using RadiologyCenter.Payroll.Domain.Enumerations;
+using RadiologyCenter.ResourceManagement.Application.Abstractions;
+using RadiologyCenter.ResourceManagement.Domain.Enumerations;
 
 namespace RadiologyCenter.Payroll.Application.Services;
 
@@ -13,6 +15,7 @@ public class PayrollPayslipCalculator : IPayslipCalculator
     private readonly IExamFeeIncomeResolver _examFeeIncomeResolver;
     private readonly IStaffLeaveResolver _staffLeaveResolver;
     private readonly IStaffWorkHoursResolver _staffWorkHoursResolver;
+    private readonly IStaffRepository _staffRepository;
 
     public PayrollPayslipCalculator(
         ISalaryRepository salaryRepository,
@@ -20,7 +23,8 @@ public class PayrollPayslipCalculator : IPayslipCalculator
         ISalaryComponentRepository salaryComponentRepository,
         IExamFeeIncomeResolver examFeeIncomeResolver,
         IStaffLeaveResolver staffLeaveResolver,
-        IStaffWorkHoursResolver staffWorkHoursResolver)
+        IStaffWorkHoursResolver staffWorkHoursResolver,
+        IStaffRepository staffRepository)
     {
         _salaryRepository = salaryRepository;
         _allowanceAssignmentRepository = allowanceAssignmentRepository;
@@ -28,6 +32,7 @@ public class PayrollPayslipCalculator : IPayslipCalculator
         _examFeeIncomeResolver = examFeeIncomeResolver;
         _staffLeaveResolver = staffLeaveResolver;
         _staffWorkHoursResolver = staffWorkHoursResolver;
+        _staffRepository = staffRepository;
     }
 
     public async Task<PayrollPayslipDraft?> CalculateAsync(Guid staffId, DateTime from, DateTime to, CancellationToken ct)
@@ -49,6 +54,16 @@ public class PayrollPayslipCalculator : IPayslipCalculator
         var components = await BuildComponentsAsync(allowances, from, to, runWorkingDays, ct);
 
         var feeIncome = await _examFeeIncomeResolver.GetFeeIncomeAsync(staffId, from, to, ct);
+
+        var staff = await _staffRepository.GetByIdAsync(staffId, ct);
+        var calculationRule = staff?.SalaryCalculationRule ?? SalaryCalculationRule.FixedPlusFees;
+
+        if (calculationRule == SalaryCalculationRule.HigherOfFixedOrFees)
+        {
+            baseSalary = Math.Max(baseSalary, feeIncome);
+            feeIncome = 0m;
+        }
+
         if (feeIncome > 0)
             components.Add(new PayrollPayslipComponent("Examination Fees", feeIncome, IsDeduction: false));
 

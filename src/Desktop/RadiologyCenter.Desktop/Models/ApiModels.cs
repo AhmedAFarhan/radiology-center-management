@@ -444,7 +444,8 @@ public sealed record StaffDto(
     DateTime HireDate,
     bool IsActive,
     DateTime CreatedAt,
-    string PositionKey = "");
+    string PositionKey = "",
+    string SalaryCalculationRule = "FixedPlusFees");
 
 public sealed class StaffInput
 {
@@ -456,6 +457,7 @@ public sealed class StaffInput
     public string? Department { get; set; }
     public string? Specialization { get; set; }
     public string? LicenseNumber { get; set; }
+    public string? SalaryCalculationRule { get; set; }
 }
 
 public sealed record WorkShiftDto(

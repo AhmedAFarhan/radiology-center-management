@@ -25,5 +25,10 @@ public class StaffConfiguration : IEntityTypeConfiguration<Staff>
 
         builder.Property(s => s.Position)
             .HasConversion(p => p.Value, v => StaffPosition.FromValue<StaffPosition>(v));
+
+        builder.Property(s => s.SalaryCalculationRule)
+            .HasConversion(
+                r => r != null ? r.Value : SalaryCalculationRule.FixedPlusFees.Value,
+                v => v == 0 ? SalaryCalculationRule.FixedPlusFees : SalaryCalculationRule.FromValue<SalaryCalculationRule>(v));
     }
 }

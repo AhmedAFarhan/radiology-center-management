@@ -47,6 +47,7 @@ public class PayslipPdfService : IPayslipPdfService
             StaffSpecialization = staff.Specialization,
             StaffPhoneNumber = staff.PhoneNumber,
             StaffHireDate = staff.HireDate,
+            SalaryCalculationRule = staff.SalaryCalculationRule?.Name ?? "FixedPlusFees",
             RunFrom = payRun.RunFrom,
             RunTo = payRun.RunTo,
             PayRunStatus = payRun.Status.Name,
@@ -161,7 +162,7 @@ public class PayslipPdfService : IPayslipPdfService
             col.Item().PaddingVertical(5).LineHorizontal(1).LineColor(Colors.Grey.Lighten1);
             BuildNetSalary(col.Item(), dto);
 
-            if (!string.IsNullOrWhiteSpace(dto.StaffDepartment) || !string.IsNullOrWhiteSpace(dto.StaffSpecialization))
+            if (!string.IsNullOrWhiteSpace(dto.StaffDepartment) || !string.IsNullOrWhiteSpace(dto.StaffSpecialization) || !string.IsNullOrWhiteSpace(dto.SalaryCalculationRule))
             {
                 col.Item().PaddingTop(20).Padding(10).Column(c =>
                 {
@@ -170,6 +171,8 @@ public class PayslipPdfService : IPayslipPdfService
                         c.Item().PaddingTop(3).Text($"Department: {dto.StaffDepartment}").FontSize(9);
                     if (!string.IsNullOrWhiteSpace(dto.StaffSpecialization))
                         c.Item().Text($"Specialization: {dto.StaffSpecialization}").FontSize(9);
+                    if (!string.IsNullOrWhiteSpace(dto.SalaryCalculationRule))
+                        c.Item().Text($"Salary Rule: {dto.SalaryCalculationRule}").FontSize(9);
                 });
             }
         });

@@ -15,4 +15,5 @@ public record StaffDto(
     DateTime HireDate,
     bool IsActive,
     DateTime CreatedAt,
-    string PositionKey = "");
+    string PositionKey = "",
+    string SalaryCalculationRule = "FixedPlusFees");

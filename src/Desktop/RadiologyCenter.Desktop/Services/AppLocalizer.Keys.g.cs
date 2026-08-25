@@ -2048,9 +2048,12 @@ public sealed class StaffDialogGroup : LocalizerGroup
     internal StaffDialogGroup(AppLocalizer localizer) : base(localizer) { }
     public string Created => Get("staffDialog.created");
     public string CreateStaff => Get("staffDialog.createStaff");
+    public string FixedPlusFees => Get("staffDialog.fixedPlusFees");
     public string FullName => Get("staffDialog.fullName");
+    public string HigherOfFixedOrFees => Get("staffDialog.higherOfFixedOrFees");
     public string LicenseNumber => Get("staffDialog.licenseNumber");
     public string PhoneNumber => Get("staffDialog.phoneNumber");
+    public string SalaryCalculationRule => Get("staffDialog.salaryCalculationRule");
     public string SaveChanges => Get("staffDialog.saveChanges");
     public string SearchError => Get("staffDialog.searchError");
     public string SelectUser => Get("staffDialog.selectUser");

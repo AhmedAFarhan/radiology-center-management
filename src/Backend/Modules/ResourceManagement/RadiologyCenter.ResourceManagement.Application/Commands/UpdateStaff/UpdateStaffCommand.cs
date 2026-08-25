@@ -11,4 +11,5 @@ public record UpdateStaffCommand(
     DateTime HireDate,
     string? Department = null,
     string? Specialization = null,
-    string? LicenseNumber = null) : ICommand, IStaffFields;
+    string? LicenseNumber = null,
+    string? SalaryCalculationRule = null) : ICommand, IStaffFields;

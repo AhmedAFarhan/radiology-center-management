@@ -8,6 +8,7 @@ public record PayslipPdfDto
     public string? StaffSpecialization { get; init; }
     public string StaffPhoneNumber { get; init; } = string.Empty;
     public DateTime StaffHireDate { get; init; }
+    public string SalaryCalculationRule { get; init; } = "FixedPlusFees";
 
     public DateTime RunFrom { get; init; }
     public DateTime RunTo { get; init; }

@@ -61,6 +61,7 @@ public partial class StaffEditorDialog : EditorDialogBase
         _model.Department = Staff.Department;
         _model.Specialization = Staff.Specialization;
         _model.LicenseNumber = Staff.LicenseNumber;
+        _model.SalaryCalculationRule = Staff.SalaryCalculationRule;
 
         try
         {
@@ -106,6 +107,7 @@ public partial class StaffEditorDialog : EditorDialogBase
             Department = _model.Department,
             Specialization = _model.Specialization,
             LicenseNumber = _model.LicenseNumber,
+            SalaryCalculationRule = _model.SalaryCalculationRule,
         };
 
         if (await TrySaveAsync(
@@ -142,6 +144,8 @@ public partial class StaffEditorDialog : EditorDialogBase
 
         [MaxLength(100, ErrorMessage = "License number must be 100 characters or fewer.")]
         public string? LicenseNumber { get; set; }
+
+        public string SalaryCalculationRule { get; set; } = "FixedPlusFees";
 
         public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
         {

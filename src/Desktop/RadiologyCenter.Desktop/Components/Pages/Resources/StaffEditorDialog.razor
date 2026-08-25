@@ -79,6 +79,16 @@
                                   Margin="Margin.Dense"
                                   Immediate="true" />
                 </MudItem>
+                <MudItem xs="12" sm="6">
+                    <MudSelect T="string"
+                               @bind-Value="_model.SalaryCalculationRule"
+                               Label="@T.StaffDialog.SalaryCalculationRule"
+                               Variant="Variant.Outlined"
+                               Margin="Margin.Dense">
+                        <MudSelectItem T="string" Value="@("FixedPlusFees")">@T.StaffDialog.FixedPlusFees</MudSelectItem>
+                        <MudSelectItem T="string" Value="@("HigherOfFixedOrFees")">@T.StaffDialog.HigherOfFixedOrFees</MudSelectItem>
+                    </MudSelect>
+                </MudItem>
             </MudGrid>
         </EditForm>
     </DialogContent>
