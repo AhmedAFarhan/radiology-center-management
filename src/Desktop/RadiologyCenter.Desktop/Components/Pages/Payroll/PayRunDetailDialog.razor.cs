@@ -26,6 +26,7 @@ public partial class PayRunDetailDialog : ComponentBase
 
     private PayRunDto? _payRun;
     private IReadOnlyDictionary<string, string> _staffNames = new Dictionary<string, string>();
+    private IReadOnlyDictionary<string, string> _doctorNames = new Dictionary<string, string>();
     private readonly HashSet<string> _expandedPayslips = new();
     private bool _busy;
 
@@ -50,10 +51,12 @@ public partial class PayRunDetailDialog : ComponentBase
             {
                 var staffTask = ResourceService.GetStaffsPagedAsync(null, null, false, 1, 100);
                 var payRunTask = PayrollService.GetPayRunByIdAsync(PayRunId);
-                await Task.WhenAll(staffTask, payRunTask);
+                var doctorsTask = ResourceService.GetReferralDoctorsPagedAsync(null, null, false, 1, 100);
+                await Task.WhenAll(staffTask, payRunTask, doctorsTask);
 
                 _payRun = await payRunTask;
                 _staffNames = (await staffTask).Items.ToDictionary(s => s.Id, s => s.FullName);
+                _doctorNames = (await doctorsTask).Items.ToDictionary(d => d.Id, d => d.FullName);
             },
             Snackbar,
             () => T.PayRunDialog.LoadError);
@@ -61,6 +64,9 @@ public partial class PayRunDetailDialog : ComponentBase
 
     private string ResolveStaff(string staffId)
         => _staffNames.TryGetValue(staffId, out var name) ? name : staffId;
+
+    private string ResolveDoctor(string doctorId)
+        => _doctorNames.TryGetValue(doctorId, out var name) ? name : doctorId;
 
     private async Task ReloadAsync()
     {
@@ -196,6 +202,21 @@ public partial class PayRunDetailDialog : ComponentBase
             },
             Snackbar,
             () => T.PayRunDialog.PayslipPdfError,
+            busy => _busy = busy);
+    }
+
+    private async Task ExportReferralStatementPdfAsync(ReferralFeeStatementDto statement)
+    {
+        await SafeExecute.RunAsync(async () =>
+            {
+                _busy = true;
+                var pdfBytes = await PayrollService.GetReferralStatementPdfAsync(PayRunId, statement.ReferralDoctorId);
+                var fileName = $"referral-statement-{ResolveDoctor(statement.ReferralDoctorId).Replace(" ", "_")}-{DateTime.Now:yyyyMMdd}.pdf";
+                var path = await FileSaveHelper.SaveAsync(pdfBytes, fileName);
+                Snackbar.Add(T.FormatValue(T.PayRunDialog.ReferralPdfSaved, path), Severity.Success);
+            },
+            Snackbar,
+            () => T.PayRunDialog.ReferralPdfError,
             busy => _busy = busy);
     }
 

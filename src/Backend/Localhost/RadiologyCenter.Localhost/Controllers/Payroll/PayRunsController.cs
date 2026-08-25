@@ -125,4 +125,12 @@ public class PayRunsController : ControllerBase
         var pdfBytes = await pdfService.GeneratePayslipPdfAsync(id, staffId, ct);
         return File(pdfBytes, "application/pdf", $"payslip-{id}-{staffId}.pdf");
     }
+
+    [HasPermission(PayrollReadCode)]
+    [HttpGet("{id:guid}/referral-statements/{doctorId:guid}/pdf")]
+    public async Task<IActionResult> GetReferralStatementPdfAsync(Guid id, Guid doctorId, [FromServices] IReferralFeeStatementPdfService pdfService, CancellationToken ct)
+    {
+        var pdfBytes = await pdfService.GenerateStatementPdfAsync(id, doctorId, ct);
+        return File(pdfBytes, "application/pdf", $"referral-statement-{id}-{doctorId}.pdf");
+    }
 }

@@ -530,6 +530,7 @@ public sealed record PayRunDto(
     DateTime? ProcessedAt,
     string? Notes,
     IReadOnlyList<PayslipDto> Payslips,
+    IReadOnlyList<ReferralFeeStatementDto>? ReferralFeeStatements = null,
     string StatusKey = "");
 
 public sealed record PayslipDto(
@@ -550,6 +551,13 @@ public sealed record PayslipComponentDto(
     string Name,
     decimal Amount,
     bool IsDeduction);
+
+public sealed record ReferralFeeStatementDto(
+    string Id,
+    string PayRunId,
+    string ReferralDoctorId,
+    decimal TotalFee,
+    int ExamCount);
 
 public sealed class CreatePayRunInput
 {

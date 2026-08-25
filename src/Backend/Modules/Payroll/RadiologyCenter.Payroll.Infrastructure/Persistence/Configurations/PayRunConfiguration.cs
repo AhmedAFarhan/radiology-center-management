@@ -27,5 +27,10 @@ public class PayRunConfiguration : IEntityTypeConfiguration<PayRun>
             .WithOne()
             .HasForeignKey(ps => ps.PayRunId)
             .OnDelete(DeleteBehavior.Cascade);
+
+        builder.HasMany(p => p.ReferralFeeStatements)
+            .WithOne()
+            .HasForeignKey(s => s.PayRunId)
+            .OnDelete(DeleteBehavior.Cascade);
     }
 }

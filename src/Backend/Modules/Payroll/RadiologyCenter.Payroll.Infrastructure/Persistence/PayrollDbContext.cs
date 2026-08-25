@@ -14,6 +14,7 @@ public class PayrollDbContext : AppDbContext
     public DbSet<PayRun> PayRuns => Set<PayRun>();
     public DbSet<Payslip> Payslips => Set<Payslip>();
     public DbSet<PayslipComponent> PayslipComponents => Set<PayslipComponent>();
+    public DbSet<ReferralFeeStatement> ReferralFeeStatements => Set<ReferralFeeStatement>();
 
     public PayrollDbContext(DbContextOptions<PayrollDbContext> options) : base(options) { }
 

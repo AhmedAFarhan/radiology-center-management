@@ -56,6 +56,9 @@ public sealed class PayrollService : CrudServiceBase
     public Task<byte[]> GetPayslipPdfAsync(string payRunId, string staffId, CancellationToken ct = default)
         => Api.GetBytesAsync($"{PayRunsRes}/{payRunId}/payslips/{staffId}/pdf", ct);
 
+    public Task<byte[]> GetReferralStatementPdfAsync(string payRunId, string doctorId, CancellationToken ct = default)
+        => Api.GetBytesAsync($"{PayRunsRes}/{payRunId}/referral-statements/{doctorId}/pdf", ct);
+
     // ----- Salary Components -----
     public Task<PagedResult<SalaryComponentDto>> GetSalaryComponentsPagedAsync(
         string? searchTerm,

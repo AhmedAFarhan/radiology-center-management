@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Referral Fee Statement - Mockup</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+  :root {
+    --primary: #4C58E0;
+    --primary-light: #EEF0FF;
+    --grey-50: #F8F9FA;
+    --grey-100: #F1F3F5;
+    --grey-200: #E9ECEF;
+    --grey-400: #ADB5BD;
+    --grey-600: #868E96;
+    --grey-800: #343A40;
+    --green: #2F9E44;
+    --green-dark: #1B7A3D;
+    --red: #E03131;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Inter', sans-serif;
+    background: #E9ECEF;
+    display: flex;
+    justify-content: center;
+    padding: 40px 20px;
+    gap: 40px;
+    flex-wrap: wrap;
+  }
+
+  .page-label {
+    width: 210mm;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--grey-600);
+    margin-bottom: 8px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .page {
+    width: 210mm;
+    min-height: 297mm;
+    background: white;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.12);
+    padding: 20mm 30mm;
+    position: relative;
+  }
+
+  /* ── Header ── */
+  .header {
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+    margin-bottom: 16px;
+  }
+  .header .logo {
+    width: 50px;
+    height: 50px;
+    background: var(--primary);
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: 700;
+    font-size: 11px;
+    flex-shrink: 0;
+  }
+  .header .title-block { flex: 3; }
+  .header .title-block h1 {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--primary);
+    line-height: 1.2;
+  }
+  .header .title-block h2 {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--grey-800);
+    margin-top: 2px;
+  }
+  .header .title-block .period {
+    font-size: 9px;
+    color: var(--grey-600);
+    margin-top: 5px;
+  }
+  .header .status-block {
+    flex: 1;
+    text-align: right;
+  }
+  .header .status-block .label {
+    font-size: 8px;
+    color: var(--grey-600);
+    text-transform: uppercase;
+  }
+  .header .status-block .value {
+    font-size: 10px;
+    font-weight: 700;
+    margin-top: 2px;
+  }
+  .status-computed { color: var(--primary); }
+  .status-approved { color: var(--green); }
+  .status-paid { color: var(--green-dark); }
+
+  /* ── Section Headers ── */
+  .section-header-bar {
+    background: var(--grey-50);
+    padding: 10px 14px;
+    display: flex;
+    justify-content: space-between;
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--primary);
+  }
+
+  .divider {
+    height: 1px;
+    background: var(--grey-200);
+    margin: 0;
+  }
+
+  /* ── Info Rows ── */
+  .info-row {
+    display: flex;
+    padding: 10px 14px;
+    gap: 20px;
+  }
+  .info-col {
+    flex: 2;
+    font-size: 9px;
+    line-height: 1.7;
+    color: var(--grey-800);
+  }
+  .info-col.right { flex: 1; }
+
+  /* ── Tables ── */
+  .table-section {
+    padding: 10px 14px;
+  }
+  .table-section h3 {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--grey-800);
+    margin-bottom: 8px;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  th {
+    font-size: 8px;
+    font-weight: 600;
+    color: var(--grey-800);
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+    padding: 6px 0;
+    text-align: left;
+    border-bottom: 1px solid var(--grey-200);
+  }
+  th:last-child, td:last-child { text-align: right; }
+  td {
+    font-size: 9px;
+    padding: 7px 0;
+    color: var(--grey-800);
+  }
+  tr.total-row td {
+    padding-top: 10px;
+    border-top: 1px solid var(--grey-200);
+    border-bottom: none;
+    font-weight: 700;
+  }
+  .text-primary { color: var(--primary); }
+  .text-green { color: var(--green-dark); }
+  .text-red { color: var(--red); }
+
+  /* ── Total Banner ── */
+  .total-banner {
+    background: var(--grey-50);
+    padding: 15px 14px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 10px;
+  }
+  .total-banner .total-label {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--primary);
+  }
+  .total-banner .total-value {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--primary);
+  }
+
+  /* ── Footer ── */
+  .footer {
+    position: absolute;
+    bottom: 20mm;
+    left: 30mm;
+    right: 30mm;
+    text-align: center;
+    font-size: 8px;
+    color: var(--grey-600);
+  }
+
+  /* ── Payslip Extras ── */
+  .border-left-accent {
+    border-left: 2px solid var(--primary);
+    padding-left: 12px;
+  }
+  .additional-info {
+    padding: 10px 14px;
+    margin-top: 10px;
+  }
+  .additional-info h4 {
+    font-size: 10px;
+    font-weight: 700;
+    color: var(--grey-800);
+    margin-bottom: 4px;
+  }
+  .additional-info p {
+    font-size: 9px;
+    color: var(--grey-800);
+    line-height: 1.7;
+  }
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- REFERRAL FEE STATEMENT                     -->
+<!-- ═══════════════════════════════════════════ -->
+<div>
+  <div class="page-label">Referral Fee Statement</div>
+  <div class="page">
+
+    <!-- Header -->
+    <div class="header">
+      <div class="logo">RC</div>
+      <div class="title-block">
+        <h1>RADIOLOGY CENTER</h1>
+        <h2>REFERRAL FEE STATEMENT</h2>
+        <div class="period">Period: Aug 01, 2026 - Aug 31, 2026</div>
+      </div>
+      <div class="status-block">
+        <div class="label">Status</div>
+        <div class="value status-computed">Computed</div>
+      </div>
+    </div>
+
+    <!-- Doctor Info Bar -->
+    <div class="section-header-bar">
+      <span>Referral Doctor Information</span>
+      <span>Statement Period</span>
+    </div>
+    <div class="divider"></div>
+
+    <div class="info-row">
+      <div class="info-col">
+        <div><strong>Doctor:</strong> Dr. Sarah Al-Mansouri</div>
+        <div><strong>Phone:</strong> +966 55 123 4567</div>
+        <div><strong>Email:</strong> sarah.mansouri@clinic.com</div>
+        <div><strong>Specialization:</strong> Internal Medicine</div>
+      </div>
+      <div class="info-col right">
+        <div><strong>Period:</strong> 2026-08-01 to 2026-08-31</div>
+        <div><strong>Status:</strong> Computed</div>
+      </div>
+    </div>
+    <div class="divider"></div>
+
+    <!-- Exam Breakdown Table -->
+    <div class="table-section" style="margin-top: 10px;">
+      <h3>EXAMINATION FEE BREAKDOWN</h3>
+      <table>
+        <thead>
+          <tr>
+            <th>Exam Type</th>
+            <th>Count</th>
+            <th>Total Fee</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Chest X-Ray</td>
+            <td style="text-align:right">12</td>
+            <td style="text-align:right">600.00</td>
+          </tr>
+          <tr>
+            <td>Abdomen Ultrasound</td>
+            <td style="text-align:right">8</td>
+            <td style="text-align:right">800.00</td>
+          </tr>
+          <tr>
+            <td>MRI Brain</td>
+            <td style="text-align:right">3</td>
+            <td style="text-align:right">1,050.00</td>
+          </tr>
+          <tr>
+            <td>CT Scan Chest</td>
+            <td style="text-align:right">2</td>
+            <td style="text-align:right">500.00</td>
+          </tr>
+          <tr>
+            <td>Mammography</td>
+            <td style="text-align:right">5</td>
+            <td style="text-align:right">375.00</td>
+          </tr>
+          <tr class="total-row">
+            <td>Total</td>
+            <td style="text-align:right">30</td>
+            <td style="text-align:right" class="text-primary">3,325.00</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Total Banner -->
+    <div class="total-banner">
+      <span class="total-label">TOTAL REFERRAL FEES</span>
+      <span class="total-value">3,325.00</span>
+    </div>
+
+    <!-- Footer -->
+    <div class="footer">
+      Generated on Aug 25, 2026 14:30 | This is a system-generated document.
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- PAYSLIP                                    -->
+<!-- ═══════════════════════════════════════════ -->
+<div>
+  <div class="page-label">Payslip</div>
+  <div class="page">
+
+    <!-- Header -->
+    <div class="header">
+      <div class="logo">RC</div>
+      <div class="title-block">
+        <h1>RADIOLOGY CENTER</h1>
+        <h2>PAYSLIP</h2>
+        <div class="period">Period: Aug 01, 2026 - Aug 31, 2026</div>
+      </div>
+      <div class="status-block">
+        <div class="label">Status</div>
+        <div class="value status-approved">Approved</div>
+      </div>
+    </div>
+
+    <!-- Employee Info Bar -->
+    <div class="section-header-bar">
+      <span>Employee Information</span>
+      <span>Pay Period</span>
+    </div>
+    <div class="divider"></div>
+
+    <div class="info-row">
+      <div class="info-col">
+        <div><strong>Name:</strong> Ahmed Hassan</div>
+        <div><strong>Position:</strong> Radiology Technician</div>
+        <div><strong>Phone:</strong> +966 50 987 6543</div>
+      </div>
+      <div class="info-col right">
+        <div><strong>Period:</strong> 2026-08-01 to 2026-08-31</div>
+        <div><strong>Status:</strong> Approved</div>
+      </div>
+    </div>
+    <div class="divider"></div>
+
+    <!-- Earnings -->
+    <div class="table-section">
+      <h3 style="color: var(--green-dark);">EARNINGS</h3>
+      <table>
+        <thead>
+          <tr>
+            <th>Description</th>
+            <th>Amount</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Base Salary</td>
+            <td style="text-align:right">8,000.00</td>
+          </tr>
+          <tr>
+            <td>Transport Allowance</td>
+            <td style="text-align:right">500.00</td>
+          </tr>
+          <tr>
+            <td><strong>Examination Fees</strong></td>
+            <td style="text-align:right"><strong>2,400.00</strong></td>
+          </tr>
+          <tr class="total-row">
+            <td>Total Earnings</td>
+            <td style="text-align:right" class="text-green">10,900.00</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Exam Fee Breakdown (accent border) -->
+    <div class="table-section border-left-accent" style="margin-top: 10px;">
+      <h3 class="text-primary">EXAMINATION FEE BREAKDOWN</h3>
+      <table>
+        <thead>
+          <tr>
+            <th>Exam Type</th>
+            <th>Count</th>
+            <th>Rate</th>
+            <th>Total</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Chest X-Ray</td>
+            <td style="text-align:right">15</td>
+            <td style="text-align:right">80.00</td>
+            <td style="text-align:right">1,200.00</td>
+          </tr>
+          <tr>
+            <td>Abdomen Ultrasound</td>
+            <td style="text-align:right">6</td>
+            <td style="text-align:right">100.00</td>
+            <td style="text-align:right">600.00</td>
+          </tr>
+          <tr>
+            <td>MRI Brain</td>
+            <td style="text-align:right">2</td>
+            <td style="text-align:right">350.00</td>
+            <td style="text-align:right">700.00</td>
+          </tr>
+          <tr class="total-row">
+            <td>Total Exam Fees</td>
+            <td style="text-align:right">23</td>
+            <td></td>
+            <td style="text-align:right" class="text-primary">2,500.00</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="divider" style="margin: 10px 14px;"></div>
+
+    <!-- Deductions -->
+    <div class="table-section">
+      <h3 style="color: var(--red);">DEDUCTIONS</h3>
+      <table>
+        <thead>
+          <tr>
+            <th>Description</th>
+            <th>Amount</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Unpaid Leave (2 days)</td>
+            <td style="text-align:right">-363.64</td>
+          </tr>
+          <tr>
+            <td>Social Insurance</td>
+            <td style="text-align:right">-400.00</td>
+          </tr>
+          <tr class="total-row">
+            <td>Total Deductions</td>
+            <td style="text-align:right" class="text-red">-763.64</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="divider" style="margin: 0 14px;"></div>
+
+    <!-- Net Salary Banner -->
+    <div class="total-banner">
+      <span class="total-label">NET SALARY</span>
+      <span class="total-value">10,136.36</span>
+    </div>
+
+    <!-- Additional Info -->
+    <div class="additional-info">
+      <h4>Additional Information</h4>
+      <p>Department: Radiology</p>
+      <p>Specialization: CT & MRI</p>
+      <p>Salary Rule: FixedPlusFees</p>
+    </div>
+
+    <!-- Footer -->
+    <div class="footer">
+      Generated on Aug 25, 2026 14:30 | This is a system-generated document.
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

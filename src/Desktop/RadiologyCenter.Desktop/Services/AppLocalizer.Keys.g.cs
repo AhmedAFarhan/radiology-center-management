@@ -1371,6 +1371,13 @@ public sealed class PayRunDialogGroup : LocalizerGroup
     public string ExportPdf => Get("payRunDialog.exportPdf");
     public string PayslipPdfSaved => Get("payRunDialog.payslipPdfSaved");
     public string PayslipPdfError => Get("payRunDialog.payslipPdfError");
+    public string ReferralStatements => Get("payRunDialog.referralStatements");
+    public string ReferralDoctor => Get("payRunDialog.referralDoctor");
+    public string ExamCount => Get("payRunDialog.examCount");
+    public string TotalFee => Get("payRunDialog.totalFee");
+    public string ExportReferralPdf => Get("payRunDialog.exportReferralPdf");
+    public string ReferralPdfSaved => Get("payRunDialog.referralPdfSaved");
+    public string ReferralPdfError => Get("payRunDialog.referralPdfError");
 }
 
 public sealed class PayslipGroup : LocalizerGroup

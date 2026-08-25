@@ -9,4 +9,5 @@ public record PayRunDto(
     DateTime? ProcessedAt,
     string? Notes,
     IReadOnlyList<PayslipDto> Payslips,
+    IReadOnlyList<ReferralFeeStatementDto> ReferralFeeStatements,
     string StatusKey = "");

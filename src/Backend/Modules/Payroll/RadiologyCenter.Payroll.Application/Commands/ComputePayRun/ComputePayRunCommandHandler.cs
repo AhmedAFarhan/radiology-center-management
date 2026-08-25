@@ -11,6 +11,7 @@ public static class ComputePayRunCommandHandler
         IPayRunRepository payRunRepository,
         IPayrollStaffDirectory payrollStaffDirectory,
         IPayslipCalculator payslipCalculator,
+        IReferralFeeStatementCalculator referralFeeStatementCalculator,
         IPayrollUnitOfWork unitOfWork,
         ICurrentUser currentUser,
         CancellationToken ct)
@@ -36,6 +37,17 @@ public static class ComputePayRunCommandHandler
                 draft.UnpaidLeaveDays,
                 draft.UnpaidLeaveDeduction,
                 draft.Components.Select(c => (c.Name, c.Amount, c.IsDeduction)).ToList());
+        }
+
+        var referralStatements = await referralFeeStatementCalculator.CalculateAllAsync(
+            payRun.RunFrom, payRun.RunTo, ct);
+
+        foreach (var statement in referralStatements)
+        {
+            payRun.AddReferralFeeStatement(
+                statement.ReferralDoctorId,
+                statement.TotalFee,
+                statement.ExamCount);
         }
 
         payRun.Compute(currentUser.Name ?? currentUser.Id);

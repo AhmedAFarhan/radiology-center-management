@@ -124,6 +124,8 @@ builder.Services.AddScoped<RadiologyCenter.Payroll.Application.Abstractions.IPay
 builder.Services.AddScoped<RadiologyCenter.Payroll.Application.Abstractions.IExaminationTypeDirectory, ExaminationTypeDirectory>();
 builder.Services.AddScoped<RadiologyCenter.Payroll.Application.Abstractions.IReferralDoctorDirectory, ReferralDoctorDirectory>();
 builder.Services.AddScoped<RadiologyCenter.Payroll.Application.Abstractions.IExamFeeIncomeResolver, PayrollFeeIncomeResolver>();
+builder.Services.AddScoped<RadiologyCenter.Payroll.Application.Abstractions.IReferralFeeStatementResolver, ReferralFeeStatementResolver>();
+builder.Services.AddScoped<RadiologyCenter.Payroll.Application.Abstractions.IReferralFeeStatementCalculator, RadiologyCenter.Payroll.Application.Services.ReferralFeeStatementCalculator>();
 builder.Services.AddScoped<RadiologyCenter.Payroll.Application.Abstractions.IStaffLeaveResolver, StaffLeaveDaysResolver>();
 builder.Services.AddScoped<RadiologyCenter.Payroll.Application.Abstractions.IStaffWorkHoursResolver, StaffWorkHoursResolver>();
 builder.Services.AddScoped<RadiologyCenter.Examinations.Application.Abstractions.IAncillaryDirectory, AncillaryDirectory>();

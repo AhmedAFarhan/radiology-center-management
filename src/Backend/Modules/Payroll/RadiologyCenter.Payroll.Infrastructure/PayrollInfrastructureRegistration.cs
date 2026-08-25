@@ -27,6 +27,7 @@ public static class PayrollInfrastructureRegistration
         services.AddScoped<IPayRunRepository, PayRunRepository>();
         services.AddScoped<IPayrollUnitOfWork, PayrollUnitOfWork>();
         services.AddScoped<IPayslipPdfService, PayslipPdfService>();
+        services.AddScoped<IReferralFeeStatementPdfService, ReferralFeeStatementPdfService>();
 
         return services;
     }

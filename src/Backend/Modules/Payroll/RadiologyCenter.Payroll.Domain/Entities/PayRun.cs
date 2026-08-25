@@ -9,6 +9,7 @@ namespace RadiologyCenter.Payroll.Domain.Entities;
 public sealed class PayRun : SoftDeletableAggregateRoot<Guid>
 {
     private readonly List<Payslip> _payslips = [];
+    private readonly List<ReferralFeeStatement> _referralFeeStatements = [];
 
     public DateTime RunFrom { get; private set; }
     public DateTime RunTo { get; private set; }
@@ -18,6 +19,7 @@ public sealed class PayRun : SoftDeletableAggregateRoot<Guid>
     public string? Notes { get; private set; }
 
     public IReadOnlyCollection<Payslip> Payslips => _payslips.AsReadOnly();
+    public IReadOnlyCollection<ReferralFeeStatement> ReferralFeeStatements => _referralFeeStatements.AsReadOnly();
 
     private PayRun()
     {
@@ -82,6 +84,23 @@ public sealed class PayRun : SoftDeletableAggregateRoot<Guid>
             payslip.AddComponent(name, amount, isDeduction);
 
         return payslip;
+    }
+
+    public ReferralFeeStatement AddReferralFeeStatement(
+        Guid referralDoctorId,
+        decimal totalFee,
+        int examCount)
+    {
+        EnsureEditable();
+        if (_referralFeeStatements.Any(s => s.ReferralDoctorId == referralDoctorId))
+            throw new BusinessRuleViolationException(
+                nameof(AddReferralFeeStatement),
+                DomainErrors.DuplicatePayslip,
+                $"Referral doctor '{referralDoctorId}' already has a statement in pay run '{Id}'.");
+
+        var statement = ReferralFeeStatement.Create(Id, referralDoctorId, totalFee, examCount);
+        _referralFeeStatements.Add(statement);
+        return statement;
     }
 
     private bool TryGetPayslip(Guid staffId, out Payslip payslip)
