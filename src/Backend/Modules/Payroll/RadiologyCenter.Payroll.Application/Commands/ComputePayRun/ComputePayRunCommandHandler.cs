@@ -21,7 +21,7 @@ public static class ComputePayRunCommandHandler
             return Result.Failure(Error.NotFound(ErrorCodes.PayRunNotFound, "PayRun", command.PayRunId));
 
         if (payRun.Status != PayRunStatus.Draft)
-            return Result.Failure(Error.Conflict(ErrorCodes.PayRunCannotRecompute, $"Pay run '{command.PayRunId}' is {payRun.Status.Name} and cannot be recomputed."));
+            return Result.Failure(Error.Conflict(ErrorCodes.PayRunCannotRecompute, $"Pay run is {payRun.Status.Name} and cannot be recomputed."));
 
         var staffIds = await payrollStaffDirectory.GetActiveStaffIdsAsync(ct);
 

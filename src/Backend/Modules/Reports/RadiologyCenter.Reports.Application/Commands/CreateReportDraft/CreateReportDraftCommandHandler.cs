@@ -14,7 +14,7 @@ public static class CreateReportDraftCommandHandler
         CancellationToken ct)
     {
         if (await reportRepository.HasReportByExaminationAsync(command.ExaminationId, ct))
-            return Result.Failure<ReportDto>(Error.Conflict(ErrorCodes.ReportAlreadyExists, $"A report already exists for examination '{command.ExaminationId}'."));
+            return Result.Failure<ReportDto>(Error.Conflict(ErrorCodes.ReportAlreadyExists, "A report already exists for this examination."));
 
         if (!await reportDirectory.IsExaminationCompletedAsync(command.ExaminationId, ct))
             return Result.Failure<ReportDto>(Error.Validation(ErrorCodes.ExaminationNotCompleted, "A report draft can only be created for a completed examination."));

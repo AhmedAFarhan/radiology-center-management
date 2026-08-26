@@ -19,7 +19,7 @@ public sealed record Error(ErrorKind Kind, string Code, string Message)
     public static readonly Error None = new(ErrorKind.None, string.Empty, string.Empty);
 
     public static Error NotFound(string entity, object key) =>
-        new(ErrorKind.NotFound, MessageCodes.Shared.KeyNotFound, $"{entity} with key '{key}' not found.");
+        new(ErrorKind.NotFound, MessageCodes.Shared.KeyNotFound, $"{entity} not found.");
 
     public static Error Validation(string code, string message) =>
         new(ErrorKind.Validation, code, message);
@@ -40,7 +40,7 @@ public sealed record Error(ErrorKind Kind, string Code, string Message)
         new(ErrorKind.Failure, "Failure", message);
 
     public static Error NotFound(string code, string entity, object key) =>
-        new(ErrorKind.NotFound, code, $"{entity} with key '{key}' not found.");
+        new(ErrorKind.NotFound, code, $"{entity} not found.");
 
     public static Error Conflict(string code, string message) =>
         new(ErrorKind.Conflict, code, message);

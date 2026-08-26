@@ -22,7 +22,7 @@ public static class RecordClaimSettlementCommandHandler
         if (command.Amount > claim.RemainingOwed)
             return Result.Failure<ClaimDto>(Error.Validation(
                 ErrorCodes.SettlementExceedsRemaining,
-                $"Settlement of {command.Amount} exceeds the remaining {claim.RemainingOwed} owed for claim '{claim.Id}'."));
+                $"Settlement of {command.Amount} exceeds the remaining {claim.RemainingOwed} owed."));
 
         var method = SettlementMethod.FromName<SettlementMethod>(command.Method);
 

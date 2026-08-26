@@ -19,7 +19,7 @@ public static class ExaminationCheckedInEventHandler
         var dto = new ExamCheckedInNotificationDto(
             e.ExaminationId.ToString(),
             e.PatientId.ToString(),
-            patient?.FullName ?? $"Patient {e.PatientId}",
+            patient?.FullName ?? "Unknown Patient",
             patient?.PatientCode ?? "-",
             examType?.Name ?? "Examination",
             "CheckedIn",

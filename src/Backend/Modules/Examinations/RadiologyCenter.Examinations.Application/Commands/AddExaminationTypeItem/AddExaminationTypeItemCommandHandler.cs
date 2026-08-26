@@ -19,7 +19,7 @@ public static class AddExaminationTypeItemCommandHandler
             return Result.Failure<ExaminationTypeItemDto>(Error.NotFound(ErrorCodes.ExaminationTypeNotFound, "ExaminationType", command.ExaminationTypeId));
 
         if (await itemRepository.ExistsByItemAsync(command.ExaminationTypeId, command.ItemId, ct))
-            return Result.Failure<ExaminationTypeItemDto>(Error.Conflict(ErrorCodes.ItemAlreadyInPreferences, $"Item '{command.ItemId}' is already in the preferences for examination type '{type.Code}'."));
+            return Result.Failure<ExaminationTypeItemDto>(Error.Conflict(ErrorCodes.ItemAlreadyInPreferences, $"This item is already in the preferences for examination type '{type.Code}'."));
 
         var item = ExaminationTypeItem.Create(
             command.ExaminationTypeId,

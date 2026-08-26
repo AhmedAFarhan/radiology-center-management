@@ -17,7 +17,7 @@ public static class DeletePayRunCommandHandler
             return Result.Failure(Error.NotFound(ErrorCodes.PayRunNotFound, "PayRun", command.PayRunId));
 
         if (payRun.Status == PayRunStatus.Approved || payRun.Status == PayRunStatus.Paid)
-            return Result.Failure(Error.Conflict(ErrorCodes.PayRunCannotDelete, $"Pay run '{command.PayRunId}' is {payRun.Status.Name} and cannot be deleted."));
+            return Result.Failure(Error.Conflict(ErrorCodes.PayRunCannotDelete, $"Pay run is {payRun.Status.Name} and cannot be deleted."));
 
         payRunRepository.Remove(payRun);
         await unitOfWork.SaveChangesAsync(ct);
