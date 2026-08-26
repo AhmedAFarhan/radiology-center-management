@@ -11,4 +11,5 @@ public sealed record ExamCheckedInNotificationDto(
     string Priority,
     string PriorityKey,
     string? Indication,
-    string? RadiologistId);
+    string? RadiologistId,
+    string? TechnicianId);

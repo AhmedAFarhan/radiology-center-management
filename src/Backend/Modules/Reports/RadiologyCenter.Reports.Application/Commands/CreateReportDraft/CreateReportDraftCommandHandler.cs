@@ -16,8 +16,8 @@ public static class CreateReportDraftCommandHandler
         if (await reportRepository.HasReportByExaminationAsync(command.ExaminationId, ct))
             return Result.Failure<ReportDto>(Error.Conflict(ErrorCodes.ReportAlreadyExists, "A report already exists for this examination."));
 
-        if (!await reportDirectory.IsExaminationCompletedAsync(command.ExaminationId, ct))
-            return Result.Failure<ReportDto>(Error.Validation(ErrorCodes.ExaminationNotCompleted, "A report draft can only be created for a completed examination."));
+        if (!await reportDirectory.IsExaminationInStatusAsync(command.ExaminationId, ct))
+            return Result.Failure<ReportDto>(Error.Validation(ErrorCodes.ExaminationNotCompleted, "A report draft can only be created for an examination in Checked-In status."));
 
         var report = RadiologyReport.Create(command.ExaminationId, command.PatientId, command.RadiologistId);
 

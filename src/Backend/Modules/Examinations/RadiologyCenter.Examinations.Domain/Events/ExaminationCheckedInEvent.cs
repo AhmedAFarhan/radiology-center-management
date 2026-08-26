@@ -11,4 +11,5 @@ public sealed record ExaminationCheckedInEvent(
     ExaminationPriority Priority,
     DateTime? ScheduledAt,
     string? ClinicalIndication,
-    Guid? RadiologistId) : DomainEvent;
+    Guid? RadiologistId,
+    Guid? TechnicianId) : DomainEvent;

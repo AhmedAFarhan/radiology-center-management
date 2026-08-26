@@ -142,6 +142,13 @@ public sealed class Examination : AuditableAggregateRoot<Guid>
         Notes = notes?.Trim();
     }
 
+    public void AssignStaff(Guid? radiologistId, Guid? technicianId)
+    {
+        EnsureNotTerminal();
+        RadiologistId = radiologistId;
+        TechnicianId = technicianId;
+    }
+
     public void UpdatePatient(Guid patientId)
     {
         EnsureStatus(ExaminationStatus.Requested, ExaminationStatus.Scheduled, ExaminationStatus.CheckedIn);
@@ -183,7 +190,7 @@ public sealed class Examination : AuditableAggregateRoot<Guid>
 
         Status = ExaminationStatus.CheckedIn;
         RaiseDomainEvent(new ExaminationCheckedInEvent(
-            Id, PatientId, ExaminationTypeId, Priority, ScheduledAt, ClinicalIndication, RadiologistId));
+            Id, PatientId, ExaminationTypeId, Priority, ScheduledAt, ClinicalIndication, RadiologistId, TechnicianId));
     }
 
     public void Start(Guid performedByUserId)

@@ -156,6 +156,7 @@ public partial class ReadingRoom : ComponentBase, IDisposable
                     PriorityKey = dto.PriorityKey,
                     Indication = dto.Indication ?? string.Empty,
                     AssignedRadiologistId = dto.RadiologistId,
+                    AssignedTechnicianId = dto.TechnicianId,
                 });
 
                 _queue.Sort((a, b) =>
@@ -240,6 +241,7 @@ public partial class ReadingRoom : ComponentBase, IDisposable
                     PriorityKey = exam.PriorityKey,
                     Indication = exam.ClinicalIndication,
                     AssignedRadiologistId = exam.RadiologistId,
+                    AssignedTechnicianId = exam.TechnicianId,
                     ReportStatus = _reportStatusByExam.GetValueOrDefault(exam.Id, "New"),
                     ReportStatusKey = _reportStatusKeyByExam.GetValueOrDefault(exam.Id, "New"),
                     StudyInstanceUid = string.IsNullOrEmpty(exam.StudyInstanceUID) ? null : exam.StudyInstanceUID,
@@ -387,9 +389,25 @@ public partial class ReadingRoom : ComponentBase, IDisposable
 
         if (string.IsNullOrWhiteSpace(_selected.AssignedRadiologistId))
         {
-            _reportError = T.ReadingRoom.ReportNeedsRadiologist;
-            StateHasChanged();
-            return;
+            var parameters = new DialogParameters<AssignStaffDialog>
+            {
+                { d => d.ExaminationId, _selected.Id },
+                { d => d.CurrentRadiologistId, _selected.AssignedRadiologistId },
+                { d => d.CurrentTechnicianId, _selected.AssignedTechnicianId },
+            };
+
+            var dialog = await DialogService.ShowAsync<AssignStaffDialog>(string.Empty, parameters);
+            var result = await dialog.Result;
+
+            if (result is null || result.Canceled)
+                return;
+
+            if (result.Data is { } data)
+            {
+                var type = data.GetType();
+                _selected.AssignedRadiologistId = type.GetProperty("RadiologistId")?.GetValue(data) as string;
+                _selected.AssignedTechnicianId = type.GetProperty("TechnicianId")?.GetValue(data) as string;
+            }
         }
 
         _loadingReport = true;
@@ -822,7 +840,8 @@ public partial class ReadingRoom : ComponentBase, IDisposable
         public string Priority { get; init; } = string.Empty;
         public string PriorityKey { get; init; } = string.Empty;
         public string Indication { get; init; } = string.Empty;
-        public string? AssignedRadiologistId { get; init; }
+        public string? AssignedRadiologistId { get; set; }
+        public string? AssignedTechnicianId { get; set; }
         public string ReportStatus { get; set; } = "New";
         public string ReportStatusKey { get; set; } = "New";
         public string? StudyInstanceUid { get; init; }

@@ -15,6 +15,9 @@ public sealed partial class AppLocalizer
     private AmendReportGroup? _amendReport;
     public AmendReportGroup AmendReport => _amendReport ??= new AmendReportGroup(this);
 
+    private AssignStaffDialogGroup? _assignStaffDialog;
+    public AssignStaffDialogGroup AssignStaffDialog => _assignStaffDialog ??= new AssignStaffDialogGroup(this);
+
     private AnalyticsGroup? _analytics;
     public AnalyticsGroup Analytics => _analytics ??= new AnalyticsGroup(this);
 
@@ -309,6 +312,20 @@ public sealed class AmendReportGroup : LocalizerGroup
     public string Reopened => Get("amendReport.reopened");
     public string Title => Get("amendReport.title");
     public string Unreachable => Get("amendReport.unreachable");
+}
+
+public sealed class AssignStaffDialogGroup : LocalizerGroup
+{
+    internal AssignStaffDialogGroup(AppLocalizer localizer) : base(localizer) { }
+    public string Assign => Get("assignStaffDialog.assign");
+    public string LoadError => Get("assignStaffDialog.loadError");
+    public string Radiologist => Get("assignStaffDialog.radiologist");
+    public string RadiologistRequired => Get("assignStaffDialog.radiologistRequired");
+    public string Technician => Get("assignStaffDialog.technician");
+    public string TechnicianRequired => Get("assignStaffDialog.technicianRequired");
+    public string Title => Get("assignStaffDialog.title");
+    public string UpdateError => Get("assignStaffDialog.updateError");
+    public string Updated => Get("assignStaffDialog.updated");
 }
 
 public sealed class AnalyticsGroup : LocalizerGroup

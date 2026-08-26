@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using RadiologyCenter.BuildingBlocks.Application.Common;
 using RadiologyCenter.BuildingBlocks.Domain.Pagination;
 using RadiologyCenter.BuildingBlocks.Domain.Results;
+using RadiologyCenter.Examinations.Application.Commands.AssignExaminationStaff;
 using RadiologyCenter.Examinations.Application.Commands.AddExaminationItem;
 using RadiologyCenter.Examinations.Application.Commands.AddExaminationTypeItem;
 using RadiologyCenter.Examinations.Application.Commands.CancelExamination;
@@ -61,6 +62,14 @@ public class ExaminationsController : ControllerBase
     [HasPermission(ExaminationsUpdateCode)]
     [HttpPut("{examinationId:guid}")]
     public async Task<IActionResult> UpdateAsync(Guid examinationId, [FromBody] UpdateExaminationCommand command, CancellationToken ct)
+    {
+        var result = await _bus.InvokeAsync<Result>(command with { ExaminationId = examinationId }, ct);
+        return result.ToActionResult();
+    }
+
+    [HasPermission(ExaminationsUpdateCode)]
+    [HttpPut("{examinationId:guid}/staff")]
+    public async Task<IActionResult> AssignStaffAsync(Guid examinationId, [FromBody] AssignExaminationStaffCommand command, CancellationToken ct)
     {
         var result = await _bus.InvokeAsync<Result>(command with { ExaminationId = examinationId }, ct);
         return result.ToActionResult();

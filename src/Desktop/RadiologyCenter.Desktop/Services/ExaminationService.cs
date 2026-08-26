@@ -70,6 +70,9 @@ public sealed class ExaminationService : CrudServiceBase
     public Task UpdateAsync(string id, ExaminationUpdateInput input, CancellationToken ct = default)
         => UpdateEntityAsync(Res, id, input, ct);
 
+    public Task AssignStaffAsync(string id, string? radiologistId, string? technicianId, CancellationToken ct = default)
+        => Api.PutAsync<object>($"{Res}/{id}/staff", new { radiologistId, technicianId }, ct);
+
     public Task ScheduleAsync(string id, DateTime scheduledAt, CancellationToken ct = default)
         => Api.SendAsync($"{Res}/{id}/schedule", new { scheduledAt }, ct);
 

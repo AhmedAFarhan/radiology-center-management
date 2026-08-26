@@ -83,4 +83,8 @@ public class ReportDirectory : IReportDirectory
     public async Task<bool> IsExaminationCompletedAsync(Guid examinationId, CancellationToken ct = default)
         => await _examinationsDb.Examinations
             .AnyAsync(e => e.Id == examinationId && e.Status == ExaminationStatus.Completed, ct);
+
+    public async Task<bool> IsExaminationInStatusAsync(Guid examinationId, CancellationToken ct = default)
+        => await _examinationsDb.Examinations
+                .AnyAsync(e => e.Id == examinationId && e.Status == ExaminationStatus.CheckedIn, ct);
 }

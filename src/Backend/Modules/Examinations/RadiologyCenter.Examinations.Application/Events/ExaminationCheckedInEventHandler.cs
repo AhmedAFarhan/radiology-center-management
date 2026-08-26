@@ -27,7 +27,8 @@ public static class ExaminationCheckedInEventHandler
             e.Priority.Name,
             e.Priority.Name,
             e.ClinicalIndication,
-            e.RadiologistId?.ToString());
+            e.RadiologistId?.ToString(),
+            e.TechnicianId?.ToString());
 
         await notificationService.BroadcastAsync("exams:checkedin", dto, ct);
     }

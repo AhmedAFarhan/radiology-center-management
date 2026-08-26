@@ -1,0 +1,53 @@
+@using RadiologyCenter.Desktop.Models
+@using RadiologyCenter.Desktop.Services
+
+<MudDialog>
+    <DialogContent>
+        <DialogHeader Icon="@Icons.Material.Filled.PersonAdd"
+                      Title="@T.AssignStaffDialog.Title" />
+
+        @if (_loading)
+        {
+            <MudProgressCircular Indeterminate="true" Class="d-flex mx-auto my-4" />
+        }
+        else
+        {
+            <MudGrid Spacing="3">
+                <MudItem xs="12">
+                    <MudSelect T="string"
+                               Label="@T.AssignStaffDialog.Radiologist"
+                               @bind-Value="_radiologistId"
+                               Variant="Variant.Outlined"
+                               FullWidth="true">
+                        @foreach (var r in _radiologists)
+                        {
+                            <MudSelectItem Value="@r.Id">@r.FullName</MudSelectItem>
+                        }
+                    </MudSelect>
+                </MudItem>
+                <MudItem xs="12">
+                    <MudSelect T="string"
+                               Label="@T.AssignStaffDialog.Technician"
+                               @bind-Value="_technicianId"
+                               Variant="Variant.Outlined"
+                               FullWidth="true">
+                        @foreach (var t in _technicians)
+                        {
+                            <MudSelectItem Value="@t.Id">@t.FullName</MudSelectItem>
+                        }
+                    </MudSelect>
+                </MudItem>
+            </MudGrid>
+        }
+    </DialogContent>
+    <DialogActions>
+        <MudButton Color="Color.Default" OnClick="CancelAsync" Disabled="_busy">@T.Common.Cancel</MudButton>
+        <MudButton Color="Color.Primary" Variant="Variant.Filled" OnClick="SubmitAsync" Disabled="_busy || _saving">
+            @if (_saving)
+            {
+                <MudProgressCircular Size="Size.Small" Indeterminate="true" Class="mx-1" />
+            }
+            <text>@T.AssignStaffDialog.Assign</text>
+        </MudButton>
+    </DialogActions>
+</MudDialog>
