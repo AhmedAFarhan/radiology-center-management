@@ -362,7 +362,9 @@
                 {
                     <MudStack Row="true" Spacing="2">
                         <MudButton Variant="Variant.Outlined" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Save" OnClick="SaveAsync" Disabled="_busy">@T.ReadingRoom.SaveDraft</MudButton>
-                        <MudButton Variant="Variant.Text" Color="Color.Default" StartIcon="@Icons.Material.Filled.CancelPresentation" OnClick="OpenCancelAsync" Disabled="_busy">@T.Common.Cancel</MudButton>
+                        <MudTooltip Text="@T.Common.Cancel">
+                            <MudButton Variant="Variant.Text" Color="Color.Default" StartIcon="@Icons.Material.Filled.CancelPresentation" OnClick="OpenCancelAsync" Disabled="_busy" Size="Size.Small" />
+                        </MudTooltip>
                     </MudStack>
                     <MudButton Variant="Variant.Filled" Color="Color.Success" StartIcon="@Icons.Material.Filled.CheckCircle" OnClick="FinalizeAsync" Disabled="_busy">@T.ReadingRoom.SignReport</MudButton>
                 }

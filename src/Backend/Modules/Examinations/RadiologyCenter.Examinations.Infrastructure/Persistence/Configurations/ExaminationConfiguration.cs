@@ -20,12 +20,14 @@ public class ExaminationConfiguration : IEntityTypeConfiguration<Examination>
         builder.Property(e => e.ReferralDoctorId);
         builder.Property(e => e.RadiologistId);
         builder.Property(e => e.TechnicianId);
+        builder.Property(e => e.EquipmentId);
         builder.Property(e => e.ClinicalIndication).IsRequired().HasMaxLength(1000);
         builder.Property(e => e.Priority)
             .HasConversion(p => p.Value, v => ExaminationPriority.FromValue<ExaminationPriority>(v));
         builder.Property(e => e.Status)
             .HasConversion(s => s.Value, v => ExaminationStatus.FromValue<ExaminationStatus>(v));
         builder.Property(e => e.ScheduledAt);
+        builder.Property(e => e.ScheduledEnd);
         builder.Property(e => e.StartedAt);
         builder.Property(e => e.CompletedAt);
         builder.Property(e => e.PerformedByUserId);
@@ -43,6 +45,7 @@ public class ExaminationConfiguration : IEntityTypeConfiguration<Examination>
         builder.HasIndex(e => e.PatientId);
         builder.HasIndex(e => e.ExaminationTypeId);
         builder.HasIndex(e => e.Status);
+        builder.HasIndex(e => new { e.ScheduledAt, e.ScheduledEnd });
 
         builder.HasMany(e => e.Items)
             .WithOne()

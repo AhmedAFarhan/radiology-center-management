@@ -17,10 +17,12 @@ public sealed class Examination : AuditableAggregateRoot<Guid>
     public Guid? ReferralDoctorId { get; private set; }
     public Guid? RadiologistId { get; private set; }
     public Guid? TechnicianId { get; private set; }
+    public Guid? EquipmentId { get; private set; }
     public string ClinicalIndication { get; private set; }
     public ExaminationPriority Priority { get; private set; }
     public ExaminationStatus Status { get; private set; }
     public DateTime? ScheduledAt { get; private set; }
+    public DateTime? ScheduledEnd { get; private set; }
     public DateTime? StartedAt { get; private set; }
     public DateTime? CompletedAt { get; private set; }
     public Guid? PerformedByUserId { get; private set; }
@@ -56,7 +58,8 @@ public sealed class Examination : AuditableAggregateRoot<Guid>
         decimal discount = 0,
         bool isDiscountPercentage = false,
         decimal paid = 0,
-        string? notes = null)
+        string? notes = null,
+        Guid? equipmentId = null)
     {
         Guard.AgainstEmpty(patientId, nameof(patientId));
         Guard.AgainstEmpty(examinationTypeId, nameof(examinationTypeId));
@@ -76,6 +79,7 @@ public sealed class Examination : AuditableAggregateRoot<Guid>
             ReferralDoctorId = referralDoctorId,
             RadiologistId = radiologistId,
             TechnicianId = technicianId,
+            EquipmentId = equipmentId,
             ClinicalIndication = clinicalIndication.Trim(),
             Priority = priority,
             Status = ExaminationStatus.Requested,
@@ -128,7 +132,8 @@ public sealed class Examination : AuditableAggregateRoot<Guid>
         string clinicalIndication,
         ExaminationPriority priority,
         Guid? referralDoctorId = null,
-        string? notes = null)
+        string? notes = null,
+        Guid? equipmentId = null)
     {
         EnsureNotTerminal();
         Guard.AgainstNullOrWhiteSpace(clinicalIndication, nameof(clinicalIndication));
@@ -140,13 +145,15 @@ public sealed class Examination : AuditableAggregateRoot<Guid>
         ClinicalIndication = clinicalIndication.Trim();
         Priority = priority;
         Notes = notes?.Trim();
+        EquipmentId = equipmentId;
     }
 
-    public void AssignStaff(Guid? radiologistId, Guid? technicianId)
+    public void AssignStaff(Guid? radiologistId, Guid? technicianId, Guid? equipmentId)
     {
         EnsureNotTerminal();
         RadiologistId = radiologistId;
         TechnicianId = technicianId;
+        EquipmentId = equipmentId;
     }
 
     public void UpdatePatient(Guid patientId)
@@ -173,15 +180,16 @@ public sealed class Examination : AuditableAggregateRoot<Guid>
         RecalculateRemaining();
     }
 
-    public void Schedule(DateTime scheduledAt)
+    public void Schedule(DateTime scheduledAt, int durationMinutes = 0)
     {
         EnsureStatus(ExaminationStatus.Requested, ExaminationStatus.Scheduled);
         Guard.Against(scheduledAt, s => s == default, DomainErrors.ScheduledTimeDefault, "Scheduled time cannot be the default value.");
         Guard.Against(scheduledAt, s => s < DateTime.UtcNow.AddMinutes(-1), DomainErrors.ScheduledTimePast, "Scheduled time cannot be in the past.");
 
         ScheduledAt = scheduledAt;
+        ScheduledEnd = durationMinutes > 0 ? scheduledAt.AddMinutes(durationMinutes) : null;
         Status = ExaminationStatus.Scheduled;
-        RaiseDomainEvent(new ExaminationScheduledEvent(Id, scheduledAt));
+        RaiseDomainEvent(new ExaminationScheduledEvent(Id, scheduledAt, ScheduledEnd));
     }
 
     public void CheckIn()
@@ -209,6 +217,7 @@ public sealed class Examination : AuditableAggregateRoot<Guid>
     {
         EnsureStatus(ExaminationStatus.InProgress);
         EnsureStaffAssigned();
+        EnsureEquipmentAssigned();
 
         CompletedAt = DateTime.UtcNow;
         Status = ExaminationStatus.Completed;
@@ -303,5 +312,14 @@ public sealed class Examination : AuditableAggregateRoot<Guid>
                 nameof(EnsureStaffAssigned),
                 DomainErrors.StaffNotAssigned,
                 "Cannot complete until a radiologist and a technician are assigned.");
+    }
+
+    private void EnsureEquipmentAssigned()
+    {
+        if (EquipmentId is null)
+            throw new BusinessRuleViolationException(
+                nameof(EnsureEquipmentAssigned),
+                DomainErrors.EquipmentNotAssigned,
+                "Cannot complete until an equipment/device is assigned.");
     }
 }

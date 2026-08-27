@@ -21,4 +21,7 @@ public static class ErrorCodes
     public const string PaidAmountImmutable = "Examination.PaidAmountImmutable";
     public const string InvalidStatusTransition = "Examination.InvalidStatusTransition";
     public const string StaffNotAssigned = "Examination.StaffNotAssigned";
+    public const string EquipmentNotAssigned = "Examination.EquipmentNotAssigned";
+    public const string EquipmentOverlap = "Examination.EquipmentOverlap";
+    public const string RadiologistOverlap = "Examination.RadiologistOverlap";
 }

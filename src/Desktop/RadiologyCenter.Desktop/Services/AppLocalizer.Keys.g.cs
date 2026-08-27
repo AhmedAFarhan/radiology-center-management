@@ -162,6 +162,12 @@ public sealed partial class AppLocalizer
     private ReadingRoomGroup? _readingRoom;
     public ReadingRoomGroup ReadingRoom => _readingRoom ??= new ReadingRoomGroup(this);
 
+    private ExamCalendarGroup? _examCalendar;
+    public ExamCalendarGroup ExamCalendar => _examCalendar ??= new ExamCalendarGroup(this);
+
+    private ScheduleExamGroup? _scheduleExam;
+    public ScheduleExamGroup ScheduleExam => _scheduleExam ??= new ScheduleExamGroup(this);
+
     private ReferralDoctorGroup? _referralDoctor;
     public ReferralDoctorGroup ReferralDoctor => _referralDoctor ??= new ReferralDoctorGroup(this);
 
@@ -318,7 +324,9 @@ public sealed class AssignStaffDialogGroup : LocalizerGroup
 {
     internal AssignStaffDialogGroup(AppLocalizer localizer) : base(localizer) { }
     public string Assign => Get("assignStaffDialog.assign");
+    public string Equipment => Get("assignStaffDialog.equipment");
     public string LoadError => Get("assignStaffDialog.loadError");
+    public string None => Get("assignStaffDialog.none");
     public string Radiologist => Get("assignStaffDialog.radiologist");
     public string RadiologistRequired => Get("assignStaffDialog.radiologistRequired");
     public string Technician => Get("assignStaffDialog.technician");
@@ -1083,6 +1091,7 @@ public sealed class NavGroup : LocalizerGroup
     public string Equipment => Get("nav.equipment");
     public string ExaminationFees => Get("nav.examinationFees");
     public string Examinations => Get("nav.examinations");
+    public string ExamCalendar => Get("nav.examCalendar");
     public string Financials => Get("nav.financials");
     public string Insurance => Get("nav.insurance");
     public string Inventory => Get("nav.inventory");
@@ -1669,6 +1678,50 @@ public sealed class ReadingRoomGroup : LocalizerGroup
     public string TemplateApplied => Get("readingRoom.templateApplied");
     public string Title => Get("readingRoom.title");
     public string Unreachable => Get("readingRoom.unreachable");
+}
+
+public sealed class ExamCalendarGroup : LocalizerGroup
+{
+    internal ExamCalendarGroup(AppLocalizer localizer) : base(localizer) { }
+    public string Available => Get("examCalendar.available");
+    public string CheckedIn => Get("examCalendar.checkedIn");
+    public string DayView => Get("examCalendar.dayView");
+    public string Equipment => Get("examCalendar.equipment");
+    public string EquipmentFilter => Get("examCalendar.equipmentFilter");
+    public string InProgress => Get("examCalendar.inProgress");
+    public string LoadError => Get("examCalendar.loadError");
+    public string ModalityFilter => Get("examCalendar.modalityFilter");
+    public string Next => Get("examCalendar.next");
+    public string Prev => Get("examCalendar.prev");
+    public string ScheduleExam => Get("examCalendar.scheduleExam");
+    public string Scheduled => Get("examCalendar.scheduled");
+    public string Subtitle => Get("examCalendar.subtitle");
+    public string Today => Get("examCalendar.today");
+    public string Title => Get("examCalendar.title");
+    public string WeekView => Get("examCalendar.weekView");
+}
+
+public sealed class ScheduleExamGroup : LocalizerGroup
+{
+    internal ScheduleExamGroup(AppLocalizer localizer) : base(localizer) { }
+    public string Patient => Get("scheduleExam.patient");
+    public string ExaminationType => Get("scheduleExam.examinationType");
+    public string Priority => Get("scheduleExam.priority");
+    public string Routine => Get("scheduleExam.routine");
+    public string Urgent => Get("scheduleExam.urgent");
+    public string Emergency => Get("scheduleExam.emergency");
+    public string Date => Get("scheduleExam.date");
+    public string Time => Get("scheduleExam.time");
+    public string Equipment => Get("scheduleExam.equipment");
+    public string ClinicalIndication => Get("scheduleExam.clinicalIndication");
+    public string Notes => Get("scheduleExam.notes");
+    public string Schedule => Get("scheduleExam.schedule");
+    public string LoadError => Get("scheduleExam.loadError");
+    public string PatientRequired => Get("scheduleExam.patientRequired");
+    public string ExamTypeRequired => Get("scheduleExam.examTypeRequired");
+    public string DateTimeRequired => Get("scheduleExam.dateTimeRequired");
+    public string Created => Get("scheduleExam.created");
+    public string CreateFailed => Get("scheduleExam.createFailed");
 }
 
 public sealed class ReferralDoctorGroup : LocalizerGroup

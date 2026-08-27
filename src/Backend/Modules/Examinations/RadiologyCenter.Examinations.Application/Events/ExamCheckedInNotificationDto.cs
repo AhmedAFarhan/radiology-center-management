@@ -6,6 +6,7 @@ public sealed record ExamCheckedInNotificationDto(
     string PatientName,
     string PatientCode,
     string ExamName,
+    string ExaminationTypeId,
     string StatusKey,
     DateTime? ScheduledAt,
     string Priority,

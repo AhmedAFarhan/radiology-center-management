@@ -20,6 +20,11 @@ public static class CompleteExaminationCommandHandler
                 ErrorCodes.StaffNotAssigned,
                 "A radiologist and a technician must be assigned before the examination can be completed."));
 
+        if (examination.EquipmentId is null)
+            return Result.Failure(Error.Conflict(
+                ErrorCodes.EquipmentNotAssigned,
+                "An equipment/device must be assigned before the examination can be completed."));
+
         examination.Complete();
 
         await unitOfWork.SaveChangesAsync(ct);

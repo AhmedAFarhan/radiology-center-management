@@ -1,0 +1,120 @@
+<MudDialog>
+    <DialogContent>
+        <DialogHeader Icon="@Icons.Material.Filled.EventNote" Title="@T.ExamCalendar.ScheduleExam" />
+
+        @if (_loading)
+        {
+            <MudProgressCircular Indeterminate="true" Class="d-flex mx-auto my-4" />
+        }
+        else
+        {
+            <MudGrid Spacing="3">
+                @* ── Patient ── *@
+                <MudItem xs="12">
+                    <MudAutocomplete T="PatientDto"
+                                     Label="@T.ScheduleExam.Patient"
+                                     SearchFunc="SearchPatients"
+                                     Value="_selectedPatient"
+                                     ValueChanged="OnPatientChanged"
+                                     Variant="Variant.Outlined"
+                                     Dense="true"
+                                     ResetValueOnEmptyText="true"
+                                     CoerceText="true"
+                                     ShowProgressIndicator="true"
+                                     MaxItems="50">
+                        <ItemTemplate>
+                            <MudText Typo="Typo.body2">@context.FullName</MudText>
+                            <MudText Typo="Typo.caption" Class="mud-text-secondary">@context.PatientCode</MudText>
+                        </ItemTemplate>
+                    </MudAutocomplete>
+                </MudItem>
+
+                @* ── Examination Type ── *@
+                <MudItem xs="12" Sm="6">
+                    <MudAutocomplete T="ExaminationTypeDto"
+                                     Label="@T.ScheduleExam.ExaminationType"
+                                     SearchFunc="SearchExamTypes"
+                                     Value="_selectedExamType"
+                                     ValueChanged="OnExamTypeChanged"
+                                     Variant="Variant.Outlined"
+                                     Dense="true"
+                                     ResetValueOnEmptyText="true"
+                                     CoerceText="true"
+                                     ShowProgressIndicator="true"
+                                     MaxItems="50">
+                        <ItemTemplate>
+                            <MudText Typo="Typo.body2">@context.Name</MudText>
+                            <MudText Typo="Typo.caption" Class="mud-text-secondary">@context.Modality · @context.Code</MudText>
+                        </ItemTemplate>
+                    </MudAutocomplete>
+                </MudItem>
+
+                @* ── Priority ── *@
+                <MudItem xs="12" Sm="6">
+                    <MudSelect T="string" @bind-Value="_priority" Label="@T.ScheduleExam.Priority"
+                               Variant="Variant.Outlined" Dense="true">
+                        <MudSelectItem Value="@("Routine")">@T.ScheduleExam.Routine</MudSelectItem>
+                        <MudSelectItem Value="@("Urgent")">@T.ScheduleExam.Urgent</MudSelectItem>
+                        <MudSelectItem Value="@("Emergency")">@T.ScheduleExam.Emergency</MudSelectItem>
+                    </MudSelect>
+                </MudItem>
+
+                @* ── Date & Time ── *@
+                <MudItem xs="12" Sm="6">
+                    <MudDatePicker @bind-Date="_scheduledDate"
+                                   Label="@T.ScheduleExam.Date"
+                                   Variant="Variant.Outlined"
+                                   Dense="true"
+                                   MinDate="DateTime.Today" />
+                </MudItem>
+                <MudItem xs="12" Sm="6">
+                    <MudTimePicker @bind-Time="_scheduledTime"
+                                   Label="@T.ScheduleExam.Time"
+                                   Variant="Variant.Outlined"
+                                   Dense="true" />
+                </MudItem>
+
+                @* ── Equipment (pre-filled) ── *@
+                @if (!string.IsNullOrEmpty(_equipmentName))
+                {
+                    <MudItem xs="12">
+                        <MudField Label="@T.ScheduleExam.Equipment" Variant="Variant.Outlined" Dense="true">
+                            <div class="d-flex align-center gap-2">
+                                <MudIcon Icon="@Icons.Material.Filled.ChevronRight" Size="Size.Small" Color="Color.Primary" />
+                                <MudText Typo="Typo.body2">@_equipmentName</MudText>
+                            </div>
+                        </MudField>
+                    </MudItem>
+                }
+
+                @* ── Clinical Indication ── *@
+                <MudItem xs="12">
+                    <MudTextField T="string" @bind-Value="_clinicalIndication"
+                                  Label="@T.ScheduleExam.ClinicalIndication"
+                                  Variant="Variant.Outlined"
+                                  Dense="true"
+                                  Lines="2" />
+                </MudItem>
+
+                @* ── Notes ── *@
+                <MudItem xs="12">
+                    <MudTextField T="string" @bind-Value="_notes"
+                                  Label="@T.ScheduleExam.Notes"
+                                  Variant="Variant.Outlined"
+                                  Dense="true"
+                                  Lines="2" />
+                </MudItem>
+            </MudGrid>
+        }
+    </DialogContent>
+    <DialogActions>
+        <MudButton Color="Color.Default" OnClick="Cancel" Disabled="_saving">@T.Common.Cancel</MudButton>
+        <MudButton Color="Color.Primary" Variant="Variant.Filled" OnClick="SubmitAsync" Disabled="_saving || _loading">
+            @if (_saving)
+            {
+                <MudProgressCircular Size="Size.Small" Indeterminate="true" Class="mx-1" />
+            }
+            <MudText>@T.ScheduleExam.Schedule</MudText>
+        </MudButton>
+    </DialogActions>
+</MudDialog>

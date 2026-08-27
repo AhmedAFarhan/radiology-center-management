@@ -15,7 +15,7 @@ public static class AssignExaminationStaffCommandHandler
         if (examination is null)
             return Result.Failure(Error.NotFound(ErrorCodes.ExaminationNotFound, "Examination", command.ExaminationId));
 
-        examination.AssignStaff(command.RadiologistId, command.TechnicianId);
+        examination.AssignStaff(command.RadiologistId, command.TechnicianId, command.EquipmentId);
 
         await unitOfWork.SaveChangesAsync(ct);
         return Result.Success();

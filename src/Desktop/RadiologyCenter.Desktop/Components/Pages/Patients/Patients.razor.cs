@@ -118,7 +118,7 @@ public partial class Patients : ComponentBase, IDisposable
         }
         catch (ApiException ex)
         {
-            Snackbar.Add(ex.Message, Severity.Error);
+            Snackbar.Add(SafeExecute.FormatError(ex), Severity.Error);
             _loadError = ex.Message;
             _offline = false;
             return new TableData<PatientDto> { Items = Array.Empty<PatientDto>(), TotalItems = 0 };

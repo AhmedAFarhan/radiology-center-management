@@ -105,4 +105,18 @@ public class ExaminationRepository : BaseRepository<Examination, Guid>, IExamina
                 e.CreatedAt))
             .ToListAsync(ct);
     }
+
+    public async Task<IReadOnlyList<Examination>> GetScheduledInRangeAsync(
+        DateTime start, DateTime end, Guid? excludeId = null, CancellationToken ct = default)
+    {
+        return await DbSet
+            .Where(e => e.ScheduledAt != null
+                && e.ScheduledEnd != null
+                && e.ScheduledAt < end
+                && e.ScheduledEnd > start
+                && e.Status != ExaminationStatus.Completed
+                && e.Status != ExaminationStatus.Cancelled
+                && (!excludeId.HasValue || e.Id != excludeId.Value))
+            .ToListAsync(ct);
+    }
 }

@@ -49,7 +49,7 @@ public partial class CashSessionDetailDialog : ComponentBase
         }
         catch (ApiException ex)
         {
-            Snackbar.Add(ex.Message, Severity.Error);
+            Snackbar.Add(SafeExecute.FormatError(ex), Severity.Error);
             _loadFailed = true;
         }
         catch (Exception)

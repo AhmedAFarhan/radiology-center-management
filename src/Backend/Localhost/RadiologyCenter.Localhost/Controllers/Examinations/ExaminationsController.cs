@@ -5,6 +5,7 @@ using RadiologyCenter.BuildingBlocks.Domain.Results;
 using RadiologyCenter.Examinations.Application.Commands.AssignExaminationStaff;
 using RadiologyCenter.Examinations.Application.Commands.AddExaminationItem;
 using RadiologyCenter.Examinations.Application.Commands.AddExaminationTypeItem;
+using RadiologyCenter.Examinations.Application.Commands.BookExamination;
 using RadiologyCenter.Examinations.Application.Commands.CancelExamination;
 using RadiologyCenter.Examinations.Application.Commands.CheckInExamination;
 using RadiologyCenter.Examinations.Application.Commands.CompleteExamination;
@@ -19,6 +20,8 @@ using RadiologyCenter.Examinations.Application.Commands.UpdateExamination;
 using RadiologyCenter.Examinations.Application.DTOs;
 using RadiologyCenter.Examinations.Application.Queries.GetExaminationById;
 using RadiologyCenter.Examinations.Application.Queries.GetExaminations;
+using RadiologyCenter.Examinations.Application.Queries.GetExaminationsForCalendar;
+using RadiologyCenter.Examinations.Application.Queries.GetAvailableSlots;
 using RadiologyCenter.Examinations.Application.Queries.GetExaminationTypeItems;
 using RadiologyCenter.Localhost.Authorization;
 using RadiologyCenter.Localhost.Extensions;
@@ -54,6 +57,14 @@ public class ExaminationsController : ControllerBase
     [HasPermission(ExaminationsCreateCode)]
     [HttpPost]
     public async Task<IActionResult> CreateAsync([FromBody] CreateExaminationCommand command, CancellationToken ct)
+    {
+        var result = await _bus.InvokeAsync<Result<ExaminationDto>>(command, ct);
+        return result.ToActionResult();
+    }
+
+    [HasPermission(ExaminationsCreateCode)]
+    [HttpPost("book")]
+    public async Task<IActionResult> BookAsync([FromBody] BookExaminationCommand command, CancellationToken ct)
     {
         var result = await _bus.InvokeAsync<Result<ExaminationDto>>(command, ct);
         return result.ToActionResult();
@@ -168,6 +179,34 @@ public class ExaminationsController : ControllerBase
     public async Task<IActionResult> RemoveExaminationTypeItemAsync(Guid examinationTypeId, Guid examinationTypeItemId, CancellationToken ct)
     {
         var result = await _bus.InvokeAsync<Result>(new RemoveExaminationTypeItemCommand(examinationTypeId, examinationTypeItemId), ct);
+        return result.ToActionResult();
+    }
+
+    [HasPermission(ExaminationsReadCode)]
+    [HttpGet("calendar")]
+    public async Task<IActionResult> GetCalendarSlotsAsync(
+        [FromQuery] DateTime startDate,
+        [FromQuery] DateTime endDate,
+        [FromQuery] Guid? equipmentId,
+        [FromQuery] Guid? radiologistId,
+        [FromQuery] string? modality,
+        CancellationToken ct)
+    {
+        var result = await _bus.InvokeAsync<Result<IReadOnlyList<CalendarSlotDto>>>(
+            new GetExaminationsForCalendarQuery(startDate, endDate, equipmentId, radiologistId, modality), ct);
+        return result.ToActionResult();
+    }
+
+    [HasPermission(ExaminationsReadCode)]
+    [HttpGet("available-slots")]
+    public async Task<IActionResult> GetAvailableSlotsAsync(
+        [FromQuery] DateTime date,
+        [FromQuery] Guid equipmentId,
+        [FromQuery] int? intervalMinutes,
+        CancellationToken ct)
+    {
+        var result = await _bus.InvokeAsync<Result<IReadOnlyList<AvailableSlotDto>>>(
+            new GetAvailableSlotsQuery(date, equipmentId, intervalMinutes ?? 30), ct);
         return result.ToActionResult();
     }
 }

@@ -116,7 +116,7 @@ private MudTable<ExaminationDto>? _table;
         }
         catch (ApiException ex)
         {
-            Snackbar.Add(ex.Message, Severity.Error);
+            Snackbar.Add(SafeExecute.FormatError(ex), Severity.Error);
             _loadError = ex.Message;
             _offline = false;
             return new TableData<ExaminationDto> { Items = Array.Empty<ExaminationDto>(), TotalItems = 0 };

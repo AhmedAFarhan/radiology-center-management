@@ -54,6 +54,9 @@ namespace RadiologyCenter.Examinations.Infrastructure.Persistence.Migrations
                         .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
+                    b.Property<Guid?>("EquipmentId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<Guid>("ExaminationTypeId")
                         .HasColumnType("uniqueidentifier");
 
@@ -103,6 +106,9 @@ namespace RadiologyCenter.Examinations.Infrastructure.Persistence.Migrations
                     b.Property<DateTime?>("ScheduledAt")
                         .HasColumnType("datetime2");
 
+                    b.Property<DateTime?>("ScheduledEnd")
+                        .HasColumnType("datetime2");
+
                     b.Property<DateTime?>("StartedAt")
                         .HasColumnType("datetime2");
 
@@ -123,6 +129,8 @@ namespace RadiologyCenter.Examinations.Infrastructure.Persistence.Migrations
                     b.HasIndex("PatientId");
 
                     b.HasIndex("Status");
+
+                    b.HasIndex("ScheduledAt", "ScheduledEnd");
 
                     b.ToTable("Examinations", "Examinations");
                 });
@@ -148,6 +156,10 @@ namespace RadiologyCenter.Examinations.Infrastructure.Persistence.Migrations
                     b.Property<decimal>("Discount")
                         .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
+
+                    b.Property<string>("EquipmentName")
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
 
                     b.Property<Guid?>("ExaminationId")
                         .HasColumnType("uniqueidentifier");

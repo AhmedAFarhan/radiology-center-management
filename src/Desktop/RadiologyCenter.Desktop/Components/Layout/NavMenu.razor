@@ -22,6 +22,7 @@
             @if (Can(ExaminationsPermissions.Read))
             {
                 <MudTooltip Text="@T.Nav.Examinations"><MudNavLink Href="/examinations" Icon="@Icons.Material.Filled.MedicalServices" aria-label="@T.Nav.Examinations" Ripple="false" /></MudTooltip>
+                <MudTooltip Text="@T.Nav.ExamCalendar"><MudNavLink Href="/examinations/calendar" Icon="@Icons.Material.Filled.CalendarMonth" aria-label="@T.Nav.ExamCalendar" Ripple="false" /></MudTooltip>
             }
 
         @if (CanAny(InventoryPermissions.ItemsRead, InventoryPermissions.SuppliersRead, InventoryPermissions.PurchaseOrdersRead, InventoryPermissions.StockRead))
@@ -254,6 +255,9 @@
         {
             <MudNavLink Href="/examinations" Icon="@Icons.Material.Filled.MedicalServices" Ripple="false">
                 @T.Nav.Examinations
+            </MudNavLink>
+            <MudNavLink Href="/examinations/calendar" Icon="@Icons.Material.Filled.CalendarMonth" Ripple="false">
+                @T.Nav.ExamCalendar
             </MudNavLink>
         }
         @if (CanAny(InventoryPermissions.ItemsRead, InventoryPermissions.SuppliersRead, InventoryPermissions.PurchaseOrdersRead, InventoryPermissions.StockRead))

@@ -150,6 +150,7 @@ public partial class ReadingRoom : ComponentBase, IDisposable
                     PatientName = dto.PatientName,
                     PatientCode = dto.PatientCode,
                     ExamName = dto.ExamName,
+                    ExaminationTypeId = dto.ExaminationTypeId,
                     StatusKey = dto.StatusKey,
                     ScheduledAt = dto.ScheduledAt,
                     Priority = dto.Priority,
@@ -234,6 +235,7 @@ public partial class ReadingRoom : ComponentBase, IDisposable
                     PatientName = patient?.FullName ?? "Unknown Patient",
                     PatientCode = patientCode ?? "-",
                     ExamName = exam.ExaminationTypeName ?? "Examination",
+                    ExaminationTypeId = exam.ExaminationTypeId,
                     StatusKey = exam.StatusKey,
                     ScheduledAt = exam.ScheduledAt,
                     CompletedAt = exam.CompletedAt,
@@ -392,6 +394,7 @@ public partial class ReadingRoom : ComponentBase, IDisposable
             var parameters = new DialogParameters<AssignStaffDialog>
             {
                 { d => d.ExaminationId, _selected.Id },
+                { d => d.ExaminationTypeId, _selected.ExaminationTypeId },
                 { d => d.CurrentRadiologistId, _selected.AssignedRadiologistId },
                 { d => d.CurrentTechnicianId, _selected.AssignedTechnicianId },
             };
@@ -553,7 +556,7 @@ public partial class ReadingRoom : ComponentBase, IDisposable
         }
         catch (ApiException ex)
         {
-            Snackbar.Add(ex.Message, Severity.Error);
+            Snackbar.Add(SafeExecute.FormatError(ex), Severity.Error);
         }
         catch (Exception)
         {
@@ -602,7 +605,7 @@ public partial class ReadingRoom : ComponentBase, IDisposable
         }
         catch (ApiException ex)
         {
-            Snackbar.Add(ex.Message, Severity.Error);
+            Snackbar.Add(SafeExecute.FormatError(ex), Severity.Error);
         }
         catch (Exception)
         {
@@ -637,7 +640,7 @@ public partial class ReadingRoom : ComponentBase, IDisposable
         }
         catch (ApiException ex)
         {
-            Snackbar.Add(ex.Message, Severity.Error);
+            Snackbar.Add(SafeExecute.FormatError(ex), Severity.Error);
         }
         catch (Exception)
         {
@@ -666,7 +669,7 @@ public partial class ReadingRoom : ComponentBase, IDisposable
         }
         catch (ApiException ex)
         {
-            Snackbar.Add(ex.Message, Severity.Error);
+            Snackbar.Add(SafeExecute.FormatError(ex), Severity.Error);
         }
         catch (Exception)
         {
@@ -703,7 +706,7 @@ public partial class ReadingRoom : ComponentBase, IDisposable
         }
         catch (ApiException ex)
         {
-            Snackbar.Add(ex.Message, Severity.Error);
+            Snackbar.Add(SafeExecute.FormatError(ex), Severity.Error);
         }
         catch (Exception)
         {
@@ -790,7 +793,7 @@ public partial class ReadingRoom : ComponentBase, IDisposable
         }
         catch (ApiException ex)
         {
-            Snackbar.Add(ex.Message, Severity.Error);
+            Snackbar.Add(SafeExecute.FormatError(ex), Severity.Error);
         }
         catch (Exception)
         {
@@ -834,6 +837,7 @@ public partial class ReadingRoom : ComponentBase, IDisposable
         public string PatientName { get; init; } = string.Empty;
         public string PatientCode { get; init; } = string.Empty;
         public string ExamName { get; init; } = string.Empty;
+        public string ExaminationTypeId { get; init; } = string.Empty;
         public string StatusKey { get; init; } = "Completed";
         public DateTime? ScheduledAt { get; init; }
         public DateTime? CompletedAt { get; init; }

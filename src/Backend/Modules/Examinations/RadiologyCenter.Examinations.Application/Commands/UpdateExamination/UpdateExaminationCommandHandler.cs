@@ -42,7 +42,8 @@ public static class UpdateExaminationCommandHandler
             command.ClinicalIndication,
             priority,
             command.ReferralDoctorId,
-            command.Notes);
+            command.Notes,
+            command.EquipmentId);
 
         if (command.Discount.HasValue || command.IsDiscountPercentage.HasValue || command.Paid.HasValue)
         {
@@ -55,7 +56,7 @@ public static class UpdateExaminationCommandHandler
         if (command.Items is not null)
             ReconcileItems(examination, command.Items);
 
-        var statusError = ApplyStatusTransition(examination, command.Status, command.ScheduledAt);
+        var statusError = await ApplyStatusTransitionAsync(examination, command.Status, command.ScheduledAt, examinationRepository, ct);
         if (statusError is not null)
             return statusError;
 
@@ -63,7 +64,12 @@ public static class UpdateExaminationCommandHandler
         return Result.Success();
     }
 
-    private static Result? ApplyStatusTransition(Examination examination, string? status, DateTime? scheduledAt)
+    private static async Task<Result?> ApplyStatusTransitionAsync(
+        Examination examination,
+        string? status,
+        DateTime? scheduledAt,
+        IExaminationRepository examinationRepository,
+        CancellationToken ct)
     {
         if (string.IsNullOrWhiteSpace(status))
             return null;
@@ -75,6 +81,11 @@ public static class UpdateExaminationCommandHandler
             if (string.Equals(target, ExaminationStatus.Scheduled.Name, StringComparison.Ordinal)
                 && scheduledAt.HasValue)
             {
+                var overlapError = await CheckOverlapForScheduleAsync(examination, scheduledAt.Value, examinationRepository, ct);
+                if (overlapError is not null)
+                    return overlapError;
+
+                var examTypeDir = examinationRepository; // fallback — we resolve duration below
                 examination.Schedule(ClinicClock.ToUtc(scheduledAt.Value));
             }
 
@@ -91,6 +102,10 @@ public static class UpdateExaminationCommandHandler
         if (string.Equals(target, ExaminationStatus.Scheduled.Name, StringComparison.Ordinal)
             && (current == ExaminationStatus.Requested.Name || current == ExaminationStatus.Scheduled.Name))
         {
+            var overlapError = await CheckOverlapForScheduleAsync(examination, scheduledAt ?? DateTime.UtcNow, examinationRepository, ct);
+            if (overlapError is not null)
+                return overlapError;
+
             examination.Schedule(ClinicClock.ToUtc(scheduledAt ?? DateTime.UtcNow));
             return null;
         }
@@ -98,6 +113,35 @@ public static class UpdateExaminationCommandHandler
         return Result.Failure(Error.Conflict(
             ErrorCodes.InvalidStatusTransition,
             $"Cannot change examination status from '{current}' to '{target}'."));
+    }
+
+    private static async Task<Result?> CheckOverlapForScheduleAsync(
+        Examination examination,
+        DateTime scheduledAt,
+        IExaminationRepository examinationRepository,
+        CancellationToken ct)
+    {
+        var scheduledUtc = ClinicClock.ToUtc(scheduledAt);
+        var scheduledEnd = scheduledUtc.AddMinutes(30);
+
+        var (isConflict, resource) = await ExaminationOverlapChecker.FindConflictAsync(
+            examinationRepository,
+            examination.EquipmentId,
+            examination.RadiologistId,
+            scheduledUtc,
+            scheduledEnd,
+            excludeExaminationId: examination.Id,
+            ct);
+
+        if (isConflict)
+        {
+            var errorCode = resource == "equipment" ? ErrorCodes.EquipmentOverlap : ErrorCodes.RadiologistOverlap;
+            return Result.Failure(Error.Conflict(
+                errorCode,
+                $"The {resource} is already booked during the selected time slot."));
+        }
+
+        return null;
     }
 
     private static void ReconcileItems(

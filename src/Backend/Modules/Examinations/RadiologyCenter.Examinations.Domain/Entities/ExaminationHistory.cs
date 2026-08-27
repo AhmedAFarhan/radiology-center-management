@@ -39,6 +39,7 @@ public sealed class ExaminationHistory : Entity<Guid>
     public Guid? PerformedByUserId { get; private set; }
     public string? Notes { get; private set; }
     public string? CancellationReason { get; private set; }
+    public string? EquipmentName { get; private set; }
 
     public IReadOnlyCollection<ExaminationHistoryItem> Items => _items.AsReadOnly();
 
@@ -58,7 +59,8 @@ public sealed class ExaminationHistory : Entity<Guid>
         IReadOnlyDictionary<Guid, ItemSnapshot> itemSnapshots,
         decimal? radiologistFee = null,
         decimal? technicianFee = null,
-        decimal? referralFee = null)
+        decimal? referralFee = null,
+        string? equipmentName = null)
     {
         Guard.AgainstNull(examination, nameof(examination));
         Guard.AgainstNull(type, nameof(type));
@@ -96,7 +98,8 @@ public sealed class ExaminationHistory : Entity<Guid>
             CompletedAt = examination.CompletedAt,
             PerformedByUserId = examination.PerformedByUserId,
             Notes = examination.Notes,
-            CancellationReason = examination.CancellationReason
+            CancellationReason = examination.CancellationReason,
+            EquipmentName = equipmentName
         };
 
         foreach (var item in examination.Items)

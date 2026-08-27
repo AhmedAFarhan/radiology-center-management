@@ -34,7 +34,8 @@ public static class CreateExaminationCommandHandler
             command.Discount,
             command.IsDiscountPercentage,
             command.Paid,
-            command.Notes);
+            command.Notes,
+            command.EquipmentId);
 
         foreach (var seeded in ExaminationItemSeeding.Build(examinationType))
             examination.AddItem(seeded.ItemId, seeded.Quantity, seeded.IsContrast, seeded.IsRequired);

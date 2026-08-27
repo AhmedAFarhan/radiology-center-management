@@ -65,7 +65,7 @@ public partial class ExcelImportDialog : ComponentBase
         }
         catch (ApiException ex)
         {
-            Snackbar.Add(ex.Message, Severity.Error);
+            Snackbar.Add(SafeExecute.FormatError(ex), Severity.Error);
         }
         catch (Exception)
         {

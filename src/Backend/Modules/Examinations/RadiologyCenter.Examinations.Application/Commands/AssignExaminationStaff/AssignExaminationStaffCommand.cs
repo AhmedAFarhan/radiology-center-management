@@ -3,4 +3,5 @@ namespace RadiologyCenter.Examinations.Application.Commands.AssignExaminationSta
 public record AssignExaminationStaffCommand(
     Guid ExaminationId,
     Guid RadiologistId,
-    Guid TechnicianId) : ICommand;
+    Guid TechnicianId,
+    Guid EquipmentId) : ICommand;

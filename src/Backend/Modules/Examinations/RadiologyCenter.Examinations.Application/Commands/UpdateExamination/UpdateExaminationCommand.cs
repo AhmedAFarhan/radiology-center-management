@@ -15,4 +15,5 @@ public record UpdateExaminationCommand(
     Guid? PatientId = null,
     Guid? ExaminationTypeId = null,
     string? Status = null,
-    DateTime? ScheduledAt = null) : ICommand;
+    DateTime? ScheduledAt = null,
+    Guid? EquipmentId = null) : ICommand;

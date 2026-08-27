@@ -10,5 +10,6 @@ public class AssignExaminationStaffCommandValidator : AbstractValidator<AssignEx
         RuleFor(x => x.ExaminationId).NotEmpty().WithErrorCode(SharedCodes.Shared.IdRequired);
         RuleFor(x => x.RadiologistId).NotEmpty().WithErrorCode(SharedCodes.Shared.FieldRequired);
         RuleFor(x => x.TechnicianId).NotEmpty().WithErrorCode(SharedCodes.Shared.FieldRequired);
+        RuleFor(x => x.EquipmentId).NotEmpty().WithErrorCode(SharedCodes.Shared.FieldRequired);
     }
 }

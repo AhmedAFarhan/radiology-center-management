@@ -1,3 +1,4 @@
+using System.Text.Json;
 using MudBlazor;
 
 namespace RadiologyCenter.Desktop.Services;
@@ -23,7 +24,7 @@ public static class SafeExecute
         }
         catch (ApiException ex)
         {
-            snackbar.Add(ex.Message, Severity.Error);
+            snackbar.Add(FormatError(ex), Severity.Error);
             return default;
         }
         catch (Exception)
@@ -46,7 +47,7 @@ public static class SafeExecute
         }
         catch (ApiException ex)
         {
-            snackbar.Add(ex.Message, Severity.Error);
+            snackbar.Add(FormatError(ex), Severity.Error);
             return false;
         }
         catch (Exception)
@@ -61,5 +62,29 @@ public static class SafeExecute
             if (useGlobalBusy)
                 BusyState.Instance.End();
         }
+    }
+
+    internal static string FormatError(ApiException ex)
+    {
+        if (ex.Error?.Details is JsonElement { ValueKind: JsonValueKind.Array } arr)
+        {
+            var messages = arr.EnumerateArray()
+                .Select(e =>
+                {
+                    if (e.TryGetProperty("errorMessage", out var msg))
+                        return msg.GetString();
+                    if (e.TryGetProperty("Message", out var msg2))
+                        return msg2.GetString();
+                    return null;
+                })
+                .Where(m => !string.IsNullOrWhiteSpace(m))
+                .Distinct()
+                .ToList();
+
+            if (messages.Count > 0)
+                return string.Join(Environment.NewLine, messages);
+        }
+
+        return ex.Message;
     }
 }

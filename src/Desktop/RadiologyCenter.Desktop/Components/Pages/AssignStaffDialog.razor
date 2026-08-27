@@ -37,6 +37,19 @@
                         }
                     </MudSelect>
                 </MudItem>
+                <MudItem xs="12">
+                    <MudSelect T="string"
+                               Label="@T.AssignStaffDialog.Equipment"
+                               @bind-Value="_equipmentId"
+                               Variant="Variant.Outlined"
+                               FullWidth="true">
+                        <MudSelectItem Value="@((string?)null)">@T.AssignStaffDialog.None</MudSelectItem>
+                        @foreach (var eq in _filteredEquipments)
+                        {
+                            <MudSelectItem Value="@eq.Id">@eq.Name</MudSelectItem>
+                        }
+                    </MudSelect>
+                </MudItem>
             </MudGrid>
         }
     </DialogContent>

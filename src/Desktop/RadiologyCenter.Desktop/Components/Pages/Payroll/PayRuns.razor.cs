@@ -63,7 +63,7 @@ public partial class PayRuns : ComponentBase, IDisposable
         }
         catch (ApiException ex)
         {
-            Snackbar.Add(ex.Message, Severity.Error);
+            Snackbar.Add(SafeExecute.FormatError(ex), Severity.Error);
             _loadError = ex.Message;
             _offline = false;
             return new TableData<PayRunDto> { Items = Array.Empty<PayRunDto>(), TotalItems = 0 };

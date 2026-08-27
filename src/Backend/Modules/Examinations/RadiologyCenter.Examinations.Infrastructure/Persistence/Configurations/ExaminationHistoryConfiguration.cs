@@ -43,6 +43,7 @@ public class ExaminationHistoryConfiguration : IEntityTypeConfiguration<Examinat
         builder.Property(h => h.PerformedByUserId);
         builder.Property(h => h.Notes).HasMaxLength(500);
         builder.Property(h => h.CancellationReason).HasMaxLength(500);
+        builder.Property(h => h.EquipmentName).HasMaxLength(200);
 
         builder.HasIndex(h => h.ExaminationTypeId);
         builder.HasIndex(h => h.CompletedAt);

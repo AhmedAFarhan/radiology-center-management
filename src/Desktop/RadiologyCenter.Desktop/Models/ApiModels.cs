@@ -217,12 +217,14 @@ public sealed record ExaminationDto(
     string? ReferralDoctorId,
     string? RadiologistId,
     string? TechnicianId,
+    string? EquipmentId,
     string ClinicalIndication,
     string Priority,
     string PriorityKey,
     string Status,
     string StatusKey,
     DateTime? ScheduledAt,
+    DateTime? ScheduledEnd,
     DateTime? StartedAt,
     DateTime? CompletedAt,
     string? PerformedByUserId,
@@ -297,6 +299,7 @@ public sealed class ExaminationInput
     public string ExaminationTypeId { get; set; } = string.Empty;
     public string? RadiologistId { get; set; }
     public string? TechnicianId { get; set; }
+    public string? EquipmentId { get; set; }
     public string? ReferralDoctorId { get; set; }
     public string ClinicalIndication { get; set; } = string.Empty;
     public string Priority { get; set; } = "Routine";
@@ -308,12 +311,27 @@ public sealed class ExaminationInput
     public string? ScheduledAt { get; set; }
 }
 
+public sealed class BookExamInput
+{
+    public string PatientId { get; set; } = string.Empty;
+    public string ExaminationTypeId { get; set; } = string.Empty;
+    public string ScheduledAt { get; set; } = string.Empty;
+    public string? EquipmentId { get; set; }
+    public string? RadiologistId { get; set; }
+    public string? TechnicianId { get; set; }
+    public string? ReferralDoctorId { get; set; }
+    public string? ClinicalIndication { get; set; }
+    public string Priority { get; set; } = "Routine";
+    public string? Notes { get; set; }
+}
+
 public sealed class ExaminationUpdateInput
 {
     public string? PatientId { get; set; }
     public string? ExaminationTypeId { get; set; }
     public string? RadiologistId { get; set; }
     public string? TechnicianId { get; set; }
+    public string? EquipmentId { get; set; }
     public string? ReferralDoctorId { get; set; }
     public string ClinicalIndication { get; set; } = string.Empty;
     public string Priority { get; set; } = "Routine";
@@ -772,6 +790,7 @@ public sealed record ExamCheckedInNotificationDto(
     string PatientName,
     string PatientCode,
     string ExamName,
+    string ExaminationTypeId,
     string StatusKey,
     DateTime? ScheduledAt,
     string Priority,
@@ -779,3 +798,24 @@ public sealed record ExamCheckedInNotificationDto(
     string? Indication,
     string? RadiologistId,
     string? TechnicianId);
+
+public sealed record CalendarSlotDto(
+    string Id,
+    string? EquipmentId,
+    string? EquipmentName,
+    string? RadiologistId,
+    string? RadiologistName,
+    string PatientName,
+    string ExaminationTypeName,
+    string Modality,
+    DateTime ScheduledAt,
+    DateTime? ScheduledEnd,
+    string Status,
+    string Priority);
+
+public sealed record AvailableSlotDto(
+    DateTime StartTime,
+    DateTime EndTime,
+    bool IsAvailable,
+    string? ExaminationId,
+    string? PatientName);

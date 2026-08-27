@@ -22,6 +22,7 @@ public static class ExaminationCheckedInEventHandler
             patient?.FullName ?? "Unknown Patient",
             patient?.PatientCode ?? "-",
             examType?.Name ?? "Examination",
+            e.ExaminationTypeId.ToString(),
             "CheckedIn",
             e.ScheduledAt,
             e.Priority.Name,

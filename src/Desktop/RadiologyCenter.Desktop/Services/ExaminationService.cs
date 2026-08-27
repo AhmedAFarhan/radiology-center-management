@@ -70,11 +70,14 @@ public sealed class ExaminationService : CrudServiceBase
     public Task UpdateAsync(string id, ExaminationUpdateInput input, CancellationToken ct = default)
         => UpdateEntityAsync(Res, id, input, ct);
 
-    public Task AssignStaffAsync(string id, string? radiologistId, string? technicianId, CancellationToken ct = default)
-        => Api.PutAsync<object>($"{Res}/{id}/staff", new { radiologistId, technicianId }, ct);
+    public Task AssignStaffAsync(string id, string? radiologistId, string? technicianId, string? equipmentId = null, CancellationToken ct = default)
+        => Api.PutAsync<object>($"{Res}/{id}/staff", new { radiologistId, technicianId, equipmentId }, ct);
 
     public Task ScheduleAsync(string id, DateTime scheduledAt, CancellationToken ct = default)
         => Api.SendAsync($"{Res}/{id}/schedule", new { scheduledAt }, ct);
+
+    public Task<ExaminationDto> BookAsync(BookExamInput input, CancellationToken ct = default)
+        => CreateEntityAsync<ExaminationDto>($"{Res}/book", input, ct);
 
     public Task CheckInAsync(string id, CancellationToken ct = default)
         => Api.SendAsync($"{Res}/{id}/check-in", ct: ct);
@@ -90,4 +93,22 @@ public sealed class ExaminationService : CrudServiceBase
 
     public Task CancelAsync(string id, string? reason = null, CancellationToken ct = default)
         => Api.SendAsync($"{Res}/{id}/cancel", new { reason }, ct);
+
+    public Task<IReadOnlyList<CalendarSlotDto>> GetCalendarSlotsAsync(
+        DateTime startDate, DateTime endDate,
+        Guid? equipmentId = null, Guid? radiologistId = null, string? modality = null,
+        CancellationToken ct = default)
+    {
+        var query = $"startDate={startDate:O}&endDate={endDate:O}";
+        if (equipmentId.HasValue) query += $"&equipmentId={equipmentId}";
+        if (radiologistId.HasValue) query += $"&radiologistId={radiologistId}";
+        if (!string.IsNullOrEmpty(modality)) query += $"&modality={modality}";
+        return Api.GetAsync<IReadOnlyList<CalendarSlotDto>>($"{Res}/calendar?{query}", ct);
+    }
+
+    public Task<IReadOnlyList<AvailableSlotDto>> GetAvailableSlotsAsync(
+        DateTime date, Guid equipmentId, int intervalMinutes = 30,
+        CancellationToken ct = default)
+        => Api.GetAsync<IReadOnlyList<AvailableSlotDto>>(
+            $"{Res}/available-slots?date={date:O}&equipmentId={equipmentId}&intervalMinutes={intervalMinutes}", ct);
 }

@@ -94,7 +94,7 @@ public abstract class ListPageBase<TItem> : ComponentBase, IDisposable
         }
         catch (ApiException ex)
         {
-            Snackbar.Add(ex.Message, Severity.Error);
+            Snackbar.Add(SafeExecute.FormatError(ex), Severity.Error);
             LoadError = ex.Message;
             Offline = false;
             return new TableData<TItem> { Items = Array.Empty<TItem>(), TotalItems = 0 };
