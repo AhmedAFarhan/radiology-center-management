@@ -37,6 +37,8 @@ public partial class ReadingRoomReportEditor : ComponentBase
     [Inject] private AppLocalizer T { get; set; } = default!;
     [Inject] private ReportService ReportService { get; set; } = default!;
 
+    private bool _busy;
+
     private static string Initials(string name)
     {
         if (string.IsNullOrWhiteSpace(name))
@@ -56,21 +58,16 @@ public partial class ReadingRoomReportEditor : ComponentBase
         if (result?.Canceled != false || result.Data is not string templateId || Report is null)
             return;
 
-        try
+        await SafeExecute.RunAsync(async () =>
         {
             var updated = await ReportService.ApplyTemplateAsync(Report.Id, templateId);
             Report = updated;
             await OnRetry.InvokeAsync();
             Snackbar.Add(T.ReadingRoom.TemplateApplied, Severity.Success);
-        }
-        catch (ApiException ex)
-        {
-            Snackbar.Add(SafeExecute.FormatError(ex), Severity.Error);
-        }
-        catch (Exception)
-        {
-            Snackbar.Add(T.ReadingRoom.Unreachable, Severity.Error);
-        }
+        },
+        Snackbar,
+        () => T.ReadingRoom.Unreachable,
+        busy => _busy = busy);
     }
 
     private async Task OpenVersionsAsync()

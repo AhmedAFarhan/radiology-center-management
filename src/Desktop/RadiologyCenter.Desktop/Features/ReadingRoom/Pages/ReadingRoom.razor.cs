@@ -295,27 +295,30 @@ public partial class ReadingRoom : ComponentBase, IDisposable
         StateHasChanged();
         try
         {
-            var linkedUid = await PacsSync.LinkStudyToExamAsync(
-                item.Id,
-                item.PatientCode,
-                accessionNumber: null,
-                item.PatientName);
+            await SafeExecute.RunAsync(
+                async () =>
+                {
+                    var linkedUid = await PacsSync.LinkStudyToExamAsync(
+                        item.Id,
+                        item.PatientCode,
+                        accessionNumber: null,
+                        item.PatientName);
 
-            if (linkedUid is null)
-            {
-                Snackbar.Add(T.ReadingRoom.NoMatchingStudy, Severity.Warning);
-                return;
-            }
+                    if (linkedUid is null)
+                    {
+                        Snackbar.Add(T.ReadingRoom.NoMatchingStudy, Severity.Warning);
+                        return;
+                    }
 
-            await LoadQueueAsync();
-            var refreshed = _queue.FirstOrDefault(q => q.Id == item.Id);
-            if (refreshed is not null)
-                await SelectExamAsync(refreshed);
-            Snackbar.Add(T.ReadingRoom.ImagesLinked, Severity.Success);
-        }
-        catch (Exception)
-        {
-            Snackbar.Add(T.ReadingRoom.Unreachable, Severity.Error);
+                    await LoadQueueAsync();
+                    var refreshed = _queue.FirstOrDefault(q => q.Id == item.Id);
+                    if (refreshed is not null)
+                        await SelectExamAsync(refreshed);
+                    Snackbar.Add(T.ReadingRoom.ImagesLinked, Severity.Success);
+                },
+                Snackbar,
+                () => T.ReadingRoom.Unreachable,
+                busy => { });
         }
         finally
         {
@@ -522,50 +525,41 @@ public partial class ReadingRoom : ComponentBase, IDisposable
         if (!CanEdit || _report is null)
             return;
 
-        _busy = true;
-        try
-        {
-            ReportDto? latest = null;
-            var touched = 0;
-            foreach (var section in _sections)
+        await SafeExecute.RunAsync(
+            async () =>
             {
-                if (section.Locked)
-                    continue;
-
-                if (!section.Exists && string.IsNullOrWhiteSpace(section.Body))
-                    continue;
-
-                var input = new UpsertReportSectionInput
+                ReportDto? latest = null;
+                var touched = 0;
+                foreach (var section in _sections)
                 {
-                    SectionType = section.Type,
-                    Title = section.Label,
-                    Body = section.Body ?? string.Empty,
-                    Position = section.Position,
-                    IsLocked = false,
-                };
-                latest = await ReportService.UpsertSectionAsync(_report.Id, input);
-                touched++;
-            }
+                    if (section.Locked)
+                        continue;
 
-            if (latest is not null)
-            {
-                _report = latest;
-                BuildEditor(latest);
-                Snackbar.Add(T.ReadingRoom.DraftSaved, Severity.Success);
-            }
-        }
-        catch (ApiException ex)
-        {
-            Snackbar.Add(SafeExecute.FormatError(ex), Severity.Error);
-        }
-        catch (Exception)
-        {
-            Snackbar.Add(T.ReadingRoom.Unreachable, Severity.Error);
-        }
-        finally
-        {
-            _busy = false;
-        }
+                    if (!section.Exists && string.IsNullOrWhiteSpace(section.Body))
+                        continue;
+
+                    var input = new UpsertReportSectionInput
+                    {
+                        SectionType = section.Type,
+                        Title = section.Label,
+                        Body = section.Body ?? string.Empty,
+                        Position = section.Position,
+                        IsLocked = false,
+                    };
+                    latest = await ReportService.UpsertSectionAsync(_report.Id, input);
+                    touched++;
+                }
+
+                if (latest is not null)
+                {
+                    _report = latest;
+                    BuildEditor(latest);
+                    Snackbar.Add(T.ReadingRoom.DraftSaved, Severity.Success);
+                }
+            },
+            Snackbar,
+            () => T.ReadingRoom.Unreachable,
+            busy => _busy = busy);
     }
 
     private async Task FinalizeAsync()
@@ -589,32 +583,23 @@ public partial class ReadingRoom : ComponentBase, IDisposable
         if (result?.Canceled != false)
             return;
 
-        _busy = true;
-        try
-        {
-            _report = await ReportService.FinalizeAsync(_report.Id);
-            BuildEditor(_report);
-            if (_selected is not null)
+        await SafeExecute.RunAsync(
+            async () =>
             {
-                _selected.ReportStatus = "Finalized";
-                _selected.ReportStatusKey = "Finalized";
-                _reportStatusByExam[_selected.Id] = "Finalized";
-                _reportStatusKeyByExam[_selected.Id] = "Finalized";
-            }
-            Snackbar.Add(T.ReadingRoom.ReportSigned, Severity.Success);
-        }
-        catch (ApiException ex)
-        {
-            Snackbar.Add(SafeExecute.FormatError(ex), Severity.Error);
-        }
-        catch (Exception)
-        {
-            Snackbar.Add(T.ReadingRoom.Unreachable, Severity.Error);
-        }
-        finally
-        {
-            _busy = false;
-        }
+                _report = await ReportService.FinalizeAsync(_report.Id);
+                BuildEditor(_report);
+                if (_selected is not null)
+                {
+                    _selected.ReportStatus = "Finalized";
+                    _selected.ReportStatusKey = "Finalized";
+                    _reportStatusByExam[_selected.Id] = "Finalized";
+                    _reportStatusKeyByExam[_selected.Id] = "Finalized";
+                }
+                Snackbar.Add(T.ReadingRoom.ReportSigned, Severity.Success);
+            },
+            Snackbar,
+            () => T.ReadingRoom.Unreachable,
+            busy => _busy = busy);
     }
 
     private async Task AddFindingAsync()
@@ -622,34 +607,25 @@ public partial class ReadingRoom : ComponentBase, IDisposable
         if (!CanEdit || _report is null)
             return;
 
-        _busy = true;
-        try
-        {
-            await ReportService.AddFindingAsync(_report.Id, new AddReportFindingInput
+        await SafeExecute.RunAsync(
+            async () =>
             {
-                Region = _newRegion.Trim(),
-                Description = _newDescription.Trim(),
-                Severity = _newSeverity,
-            });
+                await ReportService.AddFindingAsync(_report.Id, new AddReportFindingInput
+                {
+                    Region = _newRegion.Trim(),
+                    Description = _newDescription.Trim(),
+                    Severity = _newSeverity,
+                });
 
-            _newRegion = string.Empty;
-            _newDescription = string.Empty;
-            _newSeverity = "None";
-            await ReloadReportAsync();
-            Snackbar.Add(T.ReadingRoom.FindingAdded, Severity.Success);
-        }
-        catch (ApiException ex)
-        {
-            Snackbar.Add(SafeExecute.FormatError(ex), Severity.Error);
-        }
-        catch (Exception)
-        {
-            Snackbar.Add(T.ReadingRoom.Unreachable, Severity.Error);
-        }
-        finally
-        {
-            _busy = false;
-        }
+                _newRegion = string.Empty;
+                _newDescription = string.Empty;
+                _newSeverity = "None";
+                await ReloadReportAsync();
+                Snackbar.Add(T.ReadingRoom.FindingAdded, Severity.Success);
+            },
+            Snackbar,
+            () => T.ReadingRoom.Unreachable,
+            busy => _busy = busy);
     }
 
     private async Task AddFindingFromListAsync((string Region, string Description, string Severity) args)
@@ -657,31 +633,22 @@ public partial class ReadingRoom : ComponentBase, IDisposable
         if (!CanEdit || _report is null)
             return;
 
-        _busy = true;
-        try
-        {
-            await ReportService.AddFindingAsync(_report.Id, new AddReportFindingInput
+        await SafeExecute.RunAsync(
+            async () =>
             {
-                Region = args.Region,
-                Description = args.Description,
-                Severity = args.Severity,
-            });
+                await ReportService.AddFindingAsync(_report.Id, new AddReportFindingInput
+                {
+                    Region = args.Region,
+                    Description = args.Description,
+                    Severity = args.Severity,
+                });
 
-            await ReloadReportAsync();
-            Snackbar.Add(T.ReadingRoom.FindingAdded, Severity.Success);
-        }
-        catch (ApiException ex)
-        {
-            Snackbar.Add(SafeExecute.FormatError(ex), Severity.Error);
-        }
-        catch (Exception)
-        {
-            Snackbar.Add(T.ReadingRoom.Unreachable, Severity.Error);
-        }
-        finally
-        {
-            _busy = false;
-        }
+                await ReloadReportAsync();
+                Snackbar.Add(T.ReadingRoom.FindingAdded, Severity.Success);
+            },
+            Snackbar,
+            () => T.ReadingRoom.Unreachable,
+            busy => _busy = busy);
     }
 
     private async Task OnSeverityChangedAsync(ReportFindingDto finding, string severity)
@@ -689,24 +656,20 @@ public partial class ReadingRoom : ComponentBase, IDisposable
         if (_report is null)
             return;
 
-        try
-        {
-            await ReportService.UpdateFindingAsync(_report.Id, finding.Id, new UpdateReportFindingInput
+        await SafeExecute.RunAsync(
+            async () =>
             {
-                Description = finding.Description,
-                Severity = severity,
-            });
-            await ReloadReportAsync();
-            Snackbar.Add(T.ReadingRoom.FindingUpdated, Severity.Success);
-        }
-        catch (ApiException ex)
-        {
-            Snackbar.Add(SafeExecute.FormatError(ex), Severity.Error);
-        }
-        catch (Exception)
-        {
-            Snackbar.Add(T.ReadingRoom.Unreachable, Severity.Error);
-        }
+                await ReportService.UpdateFindingAsync(_report.Id, finding.Id, new UpdateReportFindingInput
+                {
+                    Description = finding.Description,
+                    Severity = severity,
+                });
+                await ReloadReportAsync();
+                Snackbar.Add(T.ReadingRoom.FindingUpdated, Severity.Success);
+            },
+            Snackbar,
+            () => T.ReadingRoom.Unreachable,
+            busy => { });
     }
 
     private async Task OnSeverityChangedFromListAsync((ReportFindingDto Finding, string Severity) args)
@@ -733,20 +696,16 @@ public partial class ReadingRoom : ComponentBase, IDisposable
         if (result?.Canceled != false)
             return;
 
-        try
-        {
-            await ReportService.RemoveFindingAsync(_report.Id, finding.Id);
-            await ReloadReportAsync();
-            Snackbar.Add(T.ReadingRoom.FindingRemoved, Severity.Success);
-        }
-        catch (ApiException ex)
-        {
-            Snackbar.Add(SafeExecute.FormatError(ex), Severity.Error);
-        }
-        catch (Exception)
-        {
-            Snackbar.Add(T.ReadingRoom.Unreachable, Severity.Error);
-        }
+        await SafeExecute.RunAsync(
+            async () =>
+            {
+                await ReportService.RemoveFindingAsync(_report.Id, finding.Id);
+                await ReloadReportAsync();
+                Snackbar.Add(T.ReadingRoom.FindingRemoved, Severity.Success);
+            },
+            Snackbar,
+            () => T.ReadingRoom.Unreachable,
+            busy => { });
     }
 
     private async Task ReloadReportAsync()
@@ -820,20 +779,16 @@ public partial class ReadingRoom : ComponentBase, IDisposable
         if (result?.Canceled != false || result.Data is not string templateId || _report is null)
             return;
 
-        try
-        {
-            _report = await ReportService.ApplyTemplateAsync(_report.Id, templateId);
-            BuildEditor(_report);
-            Snackbar.Add(T.ReadingRoom.TemplateApplied, Severity.Success);
-        }
-        catch (ApiException ex)
-        {
-            Snackbar.Add(SafeExecute.FormatError(ex), Severity.Error);
-        }
-        catch (Exception)
-        {
-            Snackbar.Add(T.ReadingRoom.Unreachable, Severity.Error);
-        }
+        await SafeExecute.RunAsync(
+            async () =>
+            {
+                _report = await ReportService.ApplyTemplateAsync(_report.Id, templateId);
+                BuildEditor(_report);
+                Snackbar.Add(T.ReadingRoom.TemplateApplied, Severity.Success);
+            },
+            Snackbar,
+            () => T.ReadingRoom.Unreachable,
+            busy => { });
     }
 
     private async Task OpenVersionsAsync()

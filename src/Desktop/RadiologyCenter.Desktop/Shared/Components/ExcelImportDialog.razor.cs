@@ -44,8 +44,7 @@ public partial class ExcelImportDialog : ComponentBase
         if (_file is null)
             return;
 
-        _busy = true;
-        try
+        await SafeExecute.RunAsync(async () =>
         {
             await using var stream = _file.OpenReadStream(maxAllowedSize: 10 * 1024 * 1024);
             _result = await ImportFile(_file.Name, stream);
@@ -62,19 +61,10 @@ public partial class ExcelImportDialog : ComponentBase
                 await Imported.InvokeAsync();
                 _file = null;
             }
-        }
-        catch (ApiException ex)
-        {
-            Snackbar.Add(SafeExecute.FormatError(ex), Severity.Error);
-        }
-        catch (Exception)
-        {
-            Snackbar.Add(T.Common.ImportFailed, Severity.Error);
-        }
-        finally
-        {
-            _busy = false;
-        }
+        },
+        Snackbar,
+        () => T.Common.ImportFailed,
+        busy => _busy = busy);
     }
 
     private void Cancel() => MudDialog.Cancel();

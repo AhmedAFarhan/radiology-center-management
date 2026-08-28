@@ -127,10 +127,7 @@ public partial class ScheduleExamDialog : ComponentBase
             return;
         }
 
-        _saving = true;
-        StateHasChanged();
-
-        try
+        await SafeExecute.RunAsync(async () =>
         {
             var scheduledAt = _scheduledDate.Value.Date + _scheduledTime.Value;
 
@@ -148,19 +145,10 @@ public partial class ScheduleExamDialog : ComponentBase
             await ExaminationService.BookAsync(input);
             Snackbar.Add(T.ScheduleExam.Created, Severity.Success);
             MudDialog.Close(DialogResult.Ok(true));
-        }
-        catch (ApiException apiEx)
-        {
-            Snackbar.Add($"{T.ScheduleExam.CreateFailed}: {apiEx.Message}", Severity.Error);
-        }
-        catch (Exception ex)
-        {
-            Snackbar.Add($"{T.ScheduleExam.CreateFailed}: {ex.Message}", Severity.Error);
-        }
-        finally
-        {
-            _saving = false;
-        }
+        },
+        Snackbar,
+        () => T.ScheduleExam.CreateFailed,
+        busy => _saving = busy);
     }
 
     private void Cancel() => MudDialog.Cancel();
