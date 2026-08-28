@@ -14,6 +14,7 @@ using MudBlazor;
 using RadiologyCenter.Desktop;
 using RadiologyCenter.Desktop.Components;
 using RadiologyCenter.Desktop.Models;
+using RadiologyCenter.Desktop.Features.Auth.Models;
 using RadiologyCenter.Desktop.Services;
 
 namespace RadiologyCenter.Desktop.Features.Auth.Components;
@@ -45,16 +46,5 @@ public partial class ChangePasswordDialog : EditorDialogBase
             () => T.ChangePassword.Unreachable);
     }
 
-    private sealed class ChangePasswordModel
-    {
-        [Required(ErrorMessage = "Current password is required.")]
-        public string CurrentPassword { get; set; } = string.Empty;
 
-        [MinLength(8, ErrorMessage = "Password must be at least 8 characters.")]
-        [RegularExpression(@"^(?=.*[A-Za-z])(?=.*\d).{8,}$", ErrorMessage = "Password must contain both letters and digits.")]
-        public string NewPassword { get; set; } = string.Empty;
-
-        [Compare(nameof(NewPassword), ErrorMessage = "Passwords do not match.")]
-        public string ConfirmPassword { get; set; } = string.Empty;
-    }
 }

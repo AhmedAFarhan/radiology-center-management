@@ -14,6 +14,7 @@ using MudBlazor;
 using RadiologyCenter.Desktop;
 using RadiologyCenter.Desktop.Components;
 using RadiologyCenter.Desktop.Models;
+using RadiologyCenter.Desktop.Features.Identity.Models;
 using RadiologyCenter.Desktop.Services;
 
 namespace RadiologyCenter.Desktop.Features.Identity.Pages;
@@ -63,13 +64,5 @@ public partial class RoleEditorDialog : EditorDialogBase
         }
     }
 
-    private sealed class RoleFormModel
-    {
-        [Required(ErrorMessage = "Role name is required.")]
-        [MaxLength(256, ErrorMessage = "Role name must be 256 characters or fewer.")]
-        public string Name { get; set; } = string.Empty;
 
-        [MaxLength(500, ErrorMessage = "Description must be 500 characters or fewer.")]
-        public string? Description { get; set; }
-    }
 }

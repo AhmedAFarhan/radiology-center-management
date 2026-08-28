@@ -1,9 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using Microsoft.AspNetCore.Components;
-using Microsoft.AspNetCore.Components.Forms;
-using MudBlazor;
-using RadiologyCenter.Desktop.Models;
-using RadiologyCenter.Desktop.Services;
+
+using RadiologyCenter.Desktop.Features.Inventory.Models;
 
 namespace RadiologyCenter.Desktop.Features.Inventory.Pages;
 
@@ -59,29 +56,4 @@ public partial class SupplierEditorDialog : EditorDialogBase
         }
     }
 
-    private sealed class SupplierFormModel
-    {
-        [Required(ErrorMessage = "Name is required.")]
-        [MaxLength(200, ErrorMessage = "Name must be 200 characters or fewer.")]
-        public string Name { get; set; } = string.Empty;
-
-        [Required(ErrorMessage = "Phone is required.")]
-        [MaxLength(30, ErrorMessage = "Phone must be 30 characters or fewer.")]
-        public string Phone { get; set; } = string.Empty;
-
-        [MaxLength(100, ErrorMessage = "Contact person must be 100 characters or fewer.")]
-        public string? ContactPerson { get; set; }
-
-        [EmailAddress(ErrorMessage = "Enter a valid email address.")]
-        public string? Email { get; set; }
-
-        [MaxLength(300, ErrorMessage = "Address must be 300 characters or fewer.")]
-        public string? Address { get; set; }
-
-        [MaxLength(50, ErrorMessage = "Tax number must be 50 characters or fewer.")]
-        public string? TaxNumber { get; set; }
-
-        [MaxLength(200, ErrorMessage = "Payment terms must be 200 characters or fewer.")]
-        public string? PaymentTerms { get; set; }
-    }
 }

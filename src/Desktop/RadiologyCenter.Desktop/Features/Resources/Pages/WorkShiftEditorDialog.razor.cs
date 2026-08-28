@@ -14,6 +14,7 @@ using MudBlazor;
 using RadiologyCenter.Desktop;
 using RadiologyCenter.Desktop.Components;
 using RadiologyCenter.Desktop.Models;
+using RadiologyCenter.Desktop.Features.Resources.Models;
 using RadiologyCenter.Desktop.Services;
 
 namespace RadiologyCenter.Desktop.Features.Resources.Pages;
@@ -91,21 +92,9 @@ public partial class WorkShiftEditorDialog : EditorDialogBase
             return;
         }
 
-        if (_model.StartTime is null || _model.EndTime is null)
-        {
-            Snackbar.Add(T.WorkShiftDialog.SelectTimes, Severity.Warning);
-            return;
-        }
-
         if (_model.EndTime <= _model.StartTime)
         {
             Snackbar.Add(T.WorkShiftDialog.EndAfterStart, Severity.Warning);
-            return;
-        }
-
-        if (_model.Date is null)
-        {
-            Snackbar.Add(T.WorkShiftDialog.SelectDate, Severity.Warning);
             return;
         }
 
@@ -128,17 +117,5 @@ public partial class WorkShiftEditorDialog : EditorDialogBase
             Snackbar.Add(IsEdit ? T.WorkShiftDialog.Updated : T.WorkShiftDialog.Created, Severity.Success);
             MudDialog.Close(DialogResult.Ok(true));
         }
-    }
-
-    private sealed class WorkShiftFormModel
-    {
-        public DateTime? Date { get; set; }
-
-        public TimeSpan? StartTime { get; set; }
-
-        public TimeSpan? EndTime { get; set; }
-
-        [MaxLength(500, ErrorMessage = "Notes must be 500 characters or fewer.")]
-        public string? Notes { get; set; }
     }
 }

@@ -13,6 +13,7 @@ using Microsoft.JSInterop;
 using MudBlazor;
 using RadiologyCenter.Desktop;
 using RadiologyCenter.Desktop.Components;
+using RadiologyCenter.Desktop.Features.Payroll.Models;
 using RadiologyCenter.Desktop.Models;
 using RadiologyCenter.Desktop.Services;
 
@@ -119,12 +120,6 @@ public partial class AllowanceEditorDialog : EditorDialogBase
             return;
         }
 
-        if (_model.EffectiveDate is null)
-        {
-            Snackbar.Add(T.AllowanceDialog.SelectEffectiveDate, Severity.Warning);
-            return;
-        }
-
         if (_model.EndDate is { } end && end < _model.EffectiveDate)
         {
             Snackbar.Add(T.AllowanceDialog.EndDateValidation, Severity.Warning);
@@ -156,20 +151,4 @@ public partial class AllowanceEditorDialog : EditorDialogBase
         }
     }
 
-    private sealed class AllowanceFormModel
-    {
-        [Required(ErrorMessage = "Allowance name is required.")]
-        [MaxLength(100, ErrorMessage = "Allowance name must be 100 characters or fewer.")]
-        public string Name { get; set; } = string.Empty;
-
-        public decimal Amount { get; set; }
-
-        public string? Frequency { get; set; }
-
-        public bool IsPerWorkDay { get; set; }
-
-        public DateTime? EffectiveDate { get; set; }
-
-        public DateTime? EndDate { get; set; }
-    }
 }

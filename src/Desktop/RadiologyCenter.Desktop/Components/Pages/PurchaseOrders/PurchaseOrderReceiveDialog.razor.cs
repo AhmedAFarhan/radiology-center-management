@@ -13,6 +13,7 @@ using Microsoft.JSInterop;
 using MudBlazor;
 using RadiologyCenter.Desktop;
 using RadiologyCenter.Desktop.Components;
+using RadiologyCenter.Desktop.Components.Pages.PurchaseOrders.Models;
 using RadiologyCenter.Desktop.Models;
 using RadiologyCenter.Desktop.Services;
 
@@ -113,12 +114,4 @@ public partial class PurchaseOrderReceiveDialog : ComponentBase
     private void CancelAsync()
         => MudDialog.Cancel();
 
-    private sealed class ReceiveLineModel
-    {
-        public string Id { get; set; } = string.Empty;
-        public string ItemId { get; set; } = string.Empty;
-        public int? Quantity { get; set; }
-        public string LotNumber { get; set; } = string.Empty;
-        public DateTime? ExpiryDate { get; set; }
-    }
 }

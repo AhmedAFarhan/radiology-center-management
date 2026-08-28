@@ -14,6 +14,7 @@ using MudBlazor;
 using RadiologyCenter.Desktop;
 using RadiologyCenter.Desktop.Components;
 using RadiologyCenter.Desktop.Models;
+using RadiologyCenter.Desktop.Features.Resources.Models;
 using RadiologyCenter.Desktop.Services;
 
 namespace RadiologyCenter.Desktop.Features.Resources.Pages;
@@ -60,10 +61,4 @@ public partial class EquipmentStatusDialog : ComponentBase
 
     private void CancelAsync()
         => MudDialog.Cancel();
-
-    private sealed class EquipmentStatusModel
-    {
-        [Required(ErrorMessage = "Status is required.")]
-        public string Status { get; set; } = string.Empty;
-    }
 }

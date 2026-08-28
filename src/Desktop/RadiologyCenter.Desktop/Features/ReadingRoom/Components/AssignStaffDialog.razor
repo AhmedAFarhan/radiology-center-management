@@ -12,45 +12,48 @@
         }
         else
         {
-            <MudGrid Spacing="3">
-                <MudItem xs="12">
-                    <MudSelect T="string"
-                               Label="@T.AssignStaffDialog.Radiologist"
-                               @bind-Value="_radiologistId"
-                               Variant="Variant.Outlined"
-                               FullWidth="true">
-                        @foreach (var r in _radiologists)
-                        {
-                            <MudSelectItem Value="@r.Id">@r.FullName</MudSelectItem>
-                        }
-                    </MudSelect>
-                </MudItem>
-                <MudItem xs="12">
-                    <MudSelect T="string"
-                               Label="@T.AssignStaffDialog.Technician"
-                               @bind-Value="_technicianId"
-                               Variant="Variant.Outlined"
-                               FullWidth="true">
-                        @foreach (var t in _technicians)
-                        {
-                            <MudSelectItem Value="@t.Id">@t.FullName</MudSelectItem>
-                        }
-                    </MudSelect>
-                </MudItem>
-                <MudItem xs="12">
-                    <MudSelect T="string"
-                               Label="@T.AssignStaffDialog.Equipment"
-                               @bind-Value="_equipmentId"
-                               Variant="Variant.Outlined"
-                               FullWidth="true">
-                        <MudSelectItem Value="@((string?)null)">@T.AssignStaffDialog.None</MudSelectItem>
-                        @foreach (var eq in _filteredEquipments)
-                        {
-                            <MudSelectItem Value="@eq.Id">@eq.Name</MudSelectItem>
-                        }
-                    </MudSelect>
-                </MudItem>
-            </MudGrid>
+            <EditForm EditContext="_editContext">
+                <LocalizedDataAnnotationsValidator />
+                <MudGrid Spacing="3">
+                    <MudItem xs="12">
+                        <MudSelect T="string"
+                                   Label="@T.AssignStaffDialog.Radiologist"
+                                   @bind-Value="_radiologistId"
+                                   Variant="Variant.Outlined"
+                                   FullWidth="true">
+                            @foreach (var r in _radiologists)
+                            {
+                                <MudSelectItem Value="@r.Id">@r.FullName</MudSelectItem>
+                            }
+                        </MudSelect>
+                    </MudItem>
+                    <MudItem xs="12">
+                        <MudSelect T="string"
+                                   Label="@T.AssignStaffDialog.Technician"
+                                   @bind-Value="_technicianId"
+                                   Variant="Variant.Outlined"
+                                   FullWidth="true">
+                            @foreach (var t in _technicians)
+                            {
+                                <MudSelectItem Value="@t.Id">@t.FullName</MudSelectItem>
+                            }
+                        </MudSelect>
+                    </MudItem>
+                    <MudItem xs="12">
+                        <MudSelect T="string"
+                                   Label="@T.AssignStaffDialog.Equipment"
+                                   @bind-Value="_equipmentId"
+                                   Variant="Variant.Outlined"
+                                   FullWidth="true">
+                            <MudSelectItem Value="@((string?)null)">@T.AssignStaffDialog.None</MudSelectItem>
+                            @foreach (var eq in _filteredEquipments)
+                            {
+                                <MudSelectItem Value="@eq.Id">@eq.Name</MudSelectItem>
+                            }
+                        </MudSelect>
+                    </MudItem>
+                </MudGrid>
+            </EditForm>
         }
     </DialogContent>
     <DialogActions>

@@ -14,6 +14,7 @@ using MudBlazor;
 using RadiologyCenter.Desktop;
 using RadiologyCenter.Desktop.Components;
 using RadiologyCenter.Desktop.Models;
+using RadiologyCenter.Desktop.Features.Resources.Models;
 using RadiologyCenter.Desktop.Services;
 
 namespace RadiologyCenter.Desktop.Features.Resources.Pages;
@@ -63,35 +64,6 @@ public partial class ReferralDoctorEditorDialog : EditorDialogBase
         {
             Snackbar.Add(IsEdit ? T.ReferralDoctorDialog.Updated : T.ReferralDoctorDialog.Created, Severity.Success);
             MudDialog.Close(DialogResult.Ok(true));
-        }
-    }
-
-    private sealed class ReferralDoctorFormModel : IValidatableObject
-    {
-        [Required(ErrorMessage = "Full name is required.")]
-        [MaxLength(300, ErrorMessage = "Full name must be 300 characters or fewer.")]
-        public string FullName { get; set; } = string.Empty;
-
-        [Required(ErrorMessage = "Phone number is required.")]
-        [MaxLength(30, ErrorMessage = "Phone number must be 30 characters or fewer.")]
-        public string Phone { get; set; } = string.Empty;
-
-        [MaxLength(200, ErrorMessage = "Email must be 200 characters or fewer.")]
-        public string? Email { get; set; }
-
-        [MaxLength(200, ErrorMessage = "Specialization must be 200 characters or fewer.")]
-        public string? Specialization { get; set; }
-
-        [MaxLength(200, ErrorMessage = "Hospital must be 200 characters or fewer.")]
-        public string? Hospital { get; set; }
-
-        public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
-        {
-            if (FullName.Trim().Split(' ', StringSplitOptions.RemoveEmptyEntries).Length < 2)
-                yield return new ValidationResult("Full name must include at least a first and last name.", new[] { nameof(FullName) });
-
-            if (!string.IsNullOrWhiteSpace(Phone) && !EgyptianPhoneNumber.IsValid(Phone))
-                yield return new ValidationResult("Phone number must be a valid Egyptian number (e.g. 01012345678).", new[] { nameof(Phone) });
         }
     }
 }

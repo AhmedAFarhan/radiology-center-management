@@ -13,6 +13,7 @@ using Microsoft.JSInterop;
 using MudBlazor;
 using RadiologyCenter.Desktop;
 using RadiologyCenter.Desktop.Components;
+using RadiologyCenter.Desktop.Components.Pages.PurchaseOrders.Models;
 using RadiologyCenter.Desktop.Models;
 using RadiologyCenter.Desktop.Services;
 
@@ -82,20 +83,4 @@ public partial class PurchaseOrderEditorDialog : EditorDialogBase
             () => T.PoDialog.UnreachableRetry);
     }
 
-    private sealed class PurchaseOrderFormModel
-    {
-        [Required(ErrorMessage = "Supplier is required.")]
-        public string SupplierId { get; set; } = string.Empty;
-
-        public DateTime? ExpectedDeliveryAt { get; set; }
-        public string? Notes { get; set; }
-        public List<PurchaseOrderLineModel> Items { get; set; } = new();
-    }
-
-    private sealed class PurchaseOrderLineModel
-    {
-        public string ItemId { get; set; } = string.Empty;
-        public int QuantityOrdered { get; set; }
-        public decimal UnitCost { get; set; }
-    }
 }

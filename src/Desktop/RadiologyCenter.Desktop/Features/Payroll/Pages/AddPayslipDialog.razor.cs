@@ -1,33 +1,32 @@
-﻿using System.Net.Http;
-using System.Net.Http.Json;
-using System.ComponentModel.DataAnnotations;
-using System.Security.Claims;
-using Microsoft.AspNetCore.Authorization;
+﻿using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Components;
-using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Components.Forms;
-using Microsoft.AspNetCore.Components.Routing;
-using Microsoft.AspNetCore.Components.Web;
-using Microsoft.AspNetCore.Components.Web.Virtualization;
-using Microsoft.JSInterop;
 using MudBlazor;
-using RadiologyCenter.Desktop;
-using RadiologyCenter.Desktop.Components;
+using RadiologyCenter.Desktop.Features.Payroll.Models;
 using RadiologyCenter.Desktop.Models;
-using RadiologyCenter.Desktop.Services;
 
 namespace RadiologyCenter.Desktop.Features.Payroll.Pages;
 
 public partial class AddPayslipDialog : ComponentBase
 {
-[Parameter] public Func<string?, CancellationToken, Task<IEnumerable<StaffDto>>> StaffSearchFunc { get; set; } = default!;
+    [Parameter] public Func<string?, CancellationToken, Task<IEnumerable<StaffDto>>> StaffSearchFunc { get; set; } = default!;
 
     [CascadingParameter] public IMudDialogInstance MudDialog { get; set; } = default!;
 
+    private readonly AddPayslipFormModel _model = new();
+    private EditContext _editContext = default!;
     private StaffDto? _selectedStaff;
+
+    protected override void OnInitialized()
+    {
+        _editContext = new EditContext(_model);
+    }
 
     private void SubmitAsync()
     {
+        if (!_editContext.Validate())
+            return;
+
         if (_selectedStaff is null)
         {
             Snackbar.Add(T.Payslip.SelectEmployee, Severity.Warning);
@@ -39,4 +38,5 @@ public partial class AddPayslipDialog : ComponentBase
 
     private void CancelAsync()
         => MudDialog.Cancel();
+
 }

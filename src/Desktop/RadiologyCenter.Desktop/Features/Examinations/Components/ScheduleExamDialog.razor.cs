@@ -1,7 +1,11 @@
-﻿using Microsoft.AspNetCore.Components;
+﻿using System.ComponentModel.DataAnnotations;
+using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Forms;
 using MudBlazor;
 using RadiologyCenter.Desktop.Models;
 using RadiologyCenter.Desktop.Services;
+
+using RadiologyCenter.Desktop.Features.Examinations.Models;
 
 namespace RadiologyCenter.Desktop.Features.Examinations.Components;
 
@@ -21,6 +25,8 @@ public partial class ScheduleExamDialog : ComponentBase
     [Inject] private ISnackbar Snackbar { get; set; } = default!;
     [Inject] private AppLocalizer T { get; set; } = default!;
 
+    private readonly ScheduleExamFormModel _model = new();
+    private EditContext _editContext = default!;
     private bool _loading = true;
     private bool _saving;
 
@@ -38,6 +44,8 @@ public partial class ScheduleExamDialog : ComponentBase
 
     protected override async Task OnInitializedAsync()
     {
+        _editContext = new EditContext(_model);
+
         _scheduledDate = ScheduledDate ?? DateTime.Today;
         _scheduledTime = ScheduledTime ?? TimeSpan.FromHours(9);
         _equipmentName = EquipmentName;
@@ -104,6 +112,9 @@ public partial class ScheduleExamDialog : ComponentBase
 
     private async Task SubmitAsync()
     {
+        if (!_editContext.Validate())
+            return;
+
         if (_selectedPatient is null)
         {
             Snackbar.Add(T.ScheduleExam.PatientRequired, Severity.Warning);
@@ -113,12 +124,6 @@ public partial class ScheduleExamDialog : ComponentBase
         if (_selectedExamType is null)
         {
             Snackbar.Add(T.ScheduleExam.ExamTypeRequired, Severity.Warning);
-            return;
-        }
-
-        if (_scheduledDate is null || _scheduledTime is null)
-        {
-            Snackbar.Add(T.ScheduleExam.DateTimeRequired, Severity.Warning);
             return;
         }
 
@@ -159,5 +164,6 @@ public partial class ScheduleExamDialog : ComponentBase
     }
 
     private void Cancel() => MudDialog.Cancel();
+
 }
 

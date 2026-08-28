@@ -1,20 +1,6 @@
-﻿using System.Net.Http;
-using System.Net.Http.Json;
-using System.ComponentModel.DataAnnotations;
-using System.Security.Claims;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Components;
-using Microsoft.AspNetCore.Components.Authorization;
-using Microsoft.AspNetCore.Components.Forms;
-using Microsoft.AspNetCore.Components.Routing;
-using Microsoft.AspNetCore.Components.Web;
-using Microsoft.AspNetCore.Components.Web.Virtualization;
-using Microsoft.JSInterop;
-using MudBlazor;
-using RadiologyCenter.Desktop;
-using RadiologyCenter.Desktop.Components;
-using RadiologyCenter.Desktop.Models;
-using RadiologyCenter.Desktop.Services;
+﻿using System.ComponentModel.DataAnnotations;
+
+using RadiologyCenter.Desktop.Features.Notifications.Models;
 
 namespace RadiologyCenter.Desktop.Features.Notifications.Pages;
 
@@ -127,38 +113,4 @@ public partial class SendNotificationDialog : ComponentBase
         return input;
     }
 
-    private sealed class SendNotificationFormModel
-    {
-        [Required(ErrorMessage = "Recipient is required.")]
-        [MaxLength(500, ErrorMessage = "Recipient must be 500 characters or fewer.")]
-        public string Recipient { get; set; } = string.Empty;
-
-        [Required(ErrorMessage = "Channel is required.")]
-        public string Channel { get; set; } = "Sms";
-
-        public string? TemplateCode { get; set; }
-        public string? Subject { get; set; }
-        public string? Body { get; set; }
-        public string? ReferenceId { get; set; }
-        public string? Placeholders { get; set; }
-
-        public Dictionary<string, string> PlaceholdersSplit()
-        {
-            var result = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
-
-            if (string.IsNullOrWhiteSpace(Placeholders))
-                return result;
-
-            foreach (var pair in Placeholders.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries))
-            {
-                var eq = pair.IndexOf('=');
-                if (eq <= 0)
-                    continue;
-
-                result[pair[..eq].Trim()] = pair[(eq + 1)..].Trim();
-            }
-
-            return result;
-        }
-    }
 }

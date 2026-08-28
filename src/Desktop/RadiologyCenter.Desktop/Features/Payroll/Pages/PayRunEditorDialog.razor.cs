@@ -13,6 +13,7 @@ using Microsoft.JSInterop;
 using MudBlazor;
 using RadiologyCenter.Desktop;
 using RadiologyCenter.Desktop.Components;
+using RadiologyCenter.Desktop.Features.Payroll.Models;
 using RadiologyCenter.Desktop.Models;
 using RadiologyCenter.Desktop.Services;
 
@@ -61,12 +62,4 @@ public partial class PayRunEditorDialog : EditorDialogBase
         }
     }
 
-    private sealed class PayRunFormModel
-    {
-        public DateTime? RunFrom { get; set; }
-
-        public DateTime? RunTo { get; set; }
-
-        public string? Notes { get; set; }
-    }
 }

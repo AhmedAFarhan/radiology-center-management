@@ -39,6 +39,7 @@
                                    Label="@T.Leave.StartDate"
                                    Variant="Variant.Outlined"
                                    Margin="Margin.Dense"
+                                   For="@(() => _model.StartDate)"
                                    Class="w-100" />
                 </MudItem>
                 <MudItem xs="12" sm="6">
@@ -46,6 +47,7 @@
                                    Label="@T.Leave.EndDate"
                                    Variant="Variant.Outlined"
                                    Margin="Margin.Dense"
+                                   For="@(() => _model.EndDate)"
                                    Class="w-100" />
                 </MudItem>
                 <MudItem xs="12">

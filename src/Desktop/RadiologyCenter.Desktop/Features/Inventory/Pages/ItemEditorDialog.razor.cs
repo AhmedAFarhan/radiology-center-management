@@ -1,20 +1,6 @@
-﻿using System.Net.Http;
-using System.Net.Http.Json;
-using System.ComponentModel.DataAnnotations;
-using System.Security.Claims;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Components;
-using Microsoft.AspNetCore.Components.Authorization;
-using Microsoft.AspNetCore.Components.Forms;
-using Microsoft.AspNetCore.Components.Routing;
-using Microsoft.AspNetCore.Components.Web;
-using Microsoft.AspNetCore.Components.Web.Virtualization;
-using Microsoft.JSInterop;
-using MudBlazor;
-using RadiologyCenter.Desktop;
-using RadiologyCenter.Desktop.Components;
-using RadiologyCenter.Desktop.Models;
-using RadiologyCenter.Desktop.Services;
+﻿using System.ComponentModel.DataAnnotations;
+
+using RadiologyCenter.Desktop.Features.Inventory.Models;
 
 namespace RadiologyCenter.Desktop.Features.Inventory.Pages;
 
@@ -83,30 +69,4 @@ public partial class ItemEditorDialog : EditorDialogBase
         }
     }
 
-    private sealed class ItemFormModel : IValidatableObject
-    {
-        [Required(ErrorMessage = "Name is required.")]
-        public string Name { get; set; } = string.Empty;
-
-        [Required(ErrorMessage = "Category is required.")]
-        public string Category { get; set; } = string.Empty;
-
-        [Required(ErrorMessage = "Unit is required.")]
-        public string Unit { get; set; } = string.Empty;
-
-        public string? Brand { get; set; }
-        public int ReorderLevel { get; set; }
-        public int ReorderQuantity { get; set; }
-        public string LotTracked { get; set; } = "No";
-        public string? StorageInstructions { get; set; }
-
-        public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
-        {
-            if (ReorderLevel < 0)
-                yield return new ValidationResult("Reorder level cannot be negative.", new[] { nameof(ReorderLevel) });
-
-            if (ReorderQuantity < 0)
-                yield return new ValidationResult("Reorder quantity cannot be negative.", new[] { nameof(ReorderQuantity) });
-        }
-    }
 }

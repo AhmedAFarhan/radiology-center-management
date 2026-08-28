@@ -13,6 +13,7 @@ using Microsoft.JSInterop;
 using MudBlazor;
 using RadiologyCenter.Desktop;
 using RadiologyCenter.Desktop.Components;
+using RadiologyCenter.Desktop.Features.Payroll.Models;
 using RadiologyCenter.Desktop.Models;
 using RadiologyCenter.Desktop.Services;
 
@@ -86,12 +87,6 @@ public partial class SalaryEditorDialog : EditorDialogBase
             return;
         }
 
-        if (_model.EffectiveDate is null)
-        {
-            Snackbar.Add(T.SalaryDialog.SelectEffectiveDate, Severity.Warning);
-            return;
-        }
-
         var input = new SalaryInput
         {
             StaffId = IsEdit ? _staffId : _selectedStaff!.Id,
@@ -111,13 +106,4 @@ public partial class SalaryEditorDialog : EditorDialogBase
         }
     }
 
-    private sealed class SalaryFormModel
-    {
-        public decimal BaseSalary { get; set; }
-
-        [Required(ErrorMessage = "Salary type is required.")]
-        public string SalaryType { get; set; } = "Monthly";
-
-        public DateTime? EffectiveDate { get; set; }
-    }
 }

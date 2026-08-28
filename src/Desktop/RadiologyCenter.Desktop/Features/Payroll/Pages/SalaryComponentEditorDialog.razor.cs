@@ -13,6 +13,7 @@ using Microsoft.JSInterop;
 using MudBlazor;
 using RadiologyCenter.Desktop;
 using RadiologyCenter.Desktop.Components;
+using RadiologyCenter.Desktop.Features.Payroll.Models;
 using RadiologyCenter.Desktop.Models;
 using RadiologyCenter.Desktop.Services;
 
@@ -79,21 +80,4 @@ public partial class SalaryComponentEditorDialog : EditorDialogBase
         }
     }
 
-    private sealed class SalaryComponentFormModel
-    {
-        [Required(ErrorMessage = "Name is required.")]
-        [MaxLength(100, ErrorMessage = "Name must be 100 characters or fewer.")]
-        public string Name { get; set; } = string.Empty;
-
-        [Required(ErrorMessage = "Kind is required.")]
-        public string Kind { get; set; } = "Earning";
-
-        public string? Frequency { get; set; }
-
-        public bool IsPercentage { get; set; }
-
-        public bool IsPerWorkDay { get; set; }
-
-        public decimal DefaultValue { get; set; }
-    }
 }

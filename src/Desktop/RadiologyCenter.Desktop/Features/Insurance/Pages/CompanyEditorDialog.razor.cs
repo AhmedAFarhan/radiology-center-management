@@ -16,6 +16,8 @@ using RadiologyCenter.Desktop.Components;
 using RadiologyCenter.Desktop.Models;
 using RadiologyCenter.Desktop.Services;
 
+using RadiologyCenter.Desktop.Features.Insurance.Models;
+
 namespace RadiologyCenter.Desktop.Features.Insurance.Pages;
 
 public partial class CompanyEditorDialog : ComponentBase
@@ -74,22 +76,4 @@ public partial class CompanyEditorDialog : ComponentBase
     private void CancelAsync()
         => MudDialog.Cancel();
 
-    private sealed class CompanyFormModel
-    {
-        [Required(ErrorMessage = "Name is required.")]
-        [MaxLength(200, ErrorMessage = "Name must be 200 characters or fewer.")]
-        public string Name { get; set; } = string.Empty;
-
-        [MaxLength(50, ErrorMessage = "Tax number must be 50 characters or fewer.")]
-        public string? TaxId { get; set; }
-
-        [MaxLength(30, ErrorMessage = "Phone must be 30 characters or fewer.")]
-        public string? Phone { get; set; }
-
-        [EmailAddress(ErrorMessage = "Enter a valid email address.")]
-        public string? Email { get; set; }
-
-        [MaxLength(300, ErrorMessage = "Address must be 300 characters or fewer.")]
-        public string? Address { get; set; }
-    }
 }

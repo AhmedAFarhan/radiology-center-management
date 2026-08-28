@@ -13,6 +13,7 @@ using Microsoft.JSInterop;
 using MudBlazor;
 using RadiologyCenter.Desktop;
 using RadiologyCenter.Desktop.Components;
+using RadiologyCenter.Desktop.Features.Payroll.Models;
 using RadiologyCenter.Desktop.Models;
 using RadiologyCenter.Desktop.Services;
 
@@ -135,10 +136,4 @@ public partial class ReferralFeeEditorDialog : EditorDialogBase
         }
     }
 
-    private sealed class ReferralFeeFormModel
-    {
-        public decimal Amount { get; set; }
-
-        public bool IsPercentage { get; set; }
-    }
 }

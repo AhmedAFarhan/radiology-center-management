@@ -14,6 +14,7 @@ using MudBlazor;
 using RadiologyCenter.Desktop;
 using RadiologyCenter.Desktop.Components;
 using RadiologyCenter.Desktop.Models;
+using RadiologyCenter.Desktop.Features.Auth.Models;
 using RadiologyCenter.Desktop.Services;
 
 namespace RadiologyCenter.Desktop.Features.Auth.Components;
@@ -57,12 +58,5 @@ public partial class LoginDialog : ComponentBase
             busy => _busy = busy);
     }
 
-    private sealed class LoginModel
-    {
-        [Required(ErrorMessage = "Username is required.")]
-        public string UserName { get; set; } = string.Empty;
 
-        [Required(ErrorMessage = "Password is required.")]
-        public string Password { get; set; } = string.Empty;
-    }
 }

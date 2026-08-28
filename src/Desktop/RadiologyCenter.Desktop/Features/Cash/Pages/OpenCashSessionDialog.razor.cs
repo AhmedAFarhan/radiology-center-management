@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Forms;
 using MudBlazor;
 using RadiologyCenter.Desktop.Models;
+using RadiologyCenter.Desktop.Features.Cash.Models;
 using RadiologyCenter.Desktop.Services;
 
 namespace RadiologyCenter.Desktop.Features.Cash.Pages;
@@ -35,12 +36,5 @@ public partial class OpenCashSessionDialog : EditorDialogBase
         }
     }
 
-    private sealed class OpenSessionFormModel
-    {
-        [Range(0, (double)decimal.MaxValue, ErrorMessage = "Opening float must be a valid amount.")]
-        public decimal OpeningFloat { get; set; }
 
-        [MaxLength(500, ErrorMessage = "Notes must be 500 characters or fewer.")]
-        public string? Notes { get; set; }
-    }
 }

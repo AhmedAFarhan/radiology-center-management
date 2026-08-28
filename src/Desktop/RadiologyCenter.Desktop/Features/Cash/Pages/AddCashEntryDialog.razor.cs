@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Forms;
 using MudBlazor;
 using RadiologyCenter.Desktop.Models;
+using RadiologyCenter.Desktop.Features.Cash.Models;
 using RadiologyCenter.Desktop.Services;
 
 namespace RadiologyCenter.Desktop.Features.Cash.Pages;
@@ -56,19 +57,5 @@ public partial class AddCashEntryDialog : EditorDialogBase
         }
     }
 
-    private sealed class AddEntryFormModel
-    {
-        public string Direction { get; set; } = "In";
 
-        public string Reason { get; set; } = "Payment";
-
-        [Range(0.01, (double)decimal.MaxValue, ErrorMessage = "Amount must be greater than zero.")]
-        public decimal Amount { get; set; }
-
-        [MaxLength(100, ErrorMessage = "Reference must be 100 characters or fewer.")]
-        public string? ReferenceId { get; set; }
-
-        [MaxLength(500, ErrorMessage = "Description must be 500 characters or fewer.")]
-        public string? Description { get; set; }
-    }
 }

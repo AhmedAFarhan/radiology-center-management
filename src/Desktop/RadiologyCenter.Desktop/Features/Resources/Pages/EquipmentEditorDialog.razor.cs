@@ -14,6 +14,7 @@ using MudBlazor;
 using RadiologyCenter.Desktop;
 using RadiologyCenter.Desktop.Components;
 using RadiologyCenter.Desktop.Models;
+using RadiologyCenter.Desktop.Features.Resources.Models;
 using RadiologyCenter.Desktop.Services;
 
 namespace RadiologyCenter.Desktop.Features.Resources.Pages;
@@ -69,20 +70,5 @@ public partial class EquipmentEditorDialog : EditorDialogBase
             Snackbar.Add(IsEdit ? T.EquipmentDialog.Updated : T.EquipmentDialog.Created, Severity.Success);
             MudDialog.Close(DialogResult.Ok(true));
         }
-    }
-
-    private sealed class EquipmentFormModel
-    {
-        [Required(ErrorMessage = "Name is required.")]
-        [MaxLength(200, ErrorMessage = "Name must be 200 characters or fewer.")]
-        public string Name { get; set; } = string.Empty;
-
-        [Required(ErrorMessage = "Modality is required.")]
-        public string Modality { get; set; } = string.Empty;
-
-        [MaxLength(100, ErrorMessage = "Serial number must be 100 characters or fewer.")]
-        public string? SerialNumber { get; set; }
-
-        public DateTime? PurchaseDate { get; set; }
     }
 }

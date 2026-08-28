@@ -14,6 +14,7 @@ using MudBlazor;
 using RadiologyCenter.Desktop;
 using RadiologyCenter.Desktop.Components;
 using RadiologyCenter.Desktop.Models;
+using RadiologyCenter.Desktop.Features.Identity.Models;
 using RadiologyCenter.Desktop.Services;
 
 namespace RadiologyCenter.Desktop.Features.Identity.Pages;
@@ -64,12 +65,5 @@ public partial class UserLockDialog : ComponentBase
     private void CancelAsync()
         => MudDialog.Cancel();
 
-    private sealed class UserLockModel
-    {
-        [Required(ErrorMessage = "Lock until date is required.")]
-        public DateTime? LockUntilDate { get; set; }
 
-        [Required(ErrorMessage = "Lock until time is required.")]
-        public TimeSpan? LockUntilTime { get; set; }
-    }
 }

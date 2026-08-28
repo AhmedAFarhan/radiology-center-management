@@ -4,16 +4,19 @@
 <MudDialog>
     <DialogContent>
         <DialogHeader Icon="@Icons.Material.Filled.ReceiptLong" Title="@T.Payslip.AddTitle" />
-        <MudAutocomplete T="StaffDto"
-                         @bind-Value="_selectedStaff"
-                         Label="@T.Payslip.EmployeeSearch"
-                         Variant="Variant.Outlined"
-                         Margin="Margin.Dense"
-                         MinCharacters="1"
-                         DebounceInterval="300"
-                         SearchFunc="StaffSearchFunc"
-                         ToStringFunc="@(s => s is null ? string.Empty : s.FullName)"
-                         Clearable="true" />
+        <EditForm EditContext="_editContext">
+            <LocalizedDataAnnotationsValidator />
+            <MudAutocomplete T="StaffDto"
+                             @bind-Value="_selectedStaff"
+                             Label="@T.Payslip.EmployeeSearch"
+                             Variant="Variant.Outlined"
+                             Margin="Margin.Dense"
+                             MinCharacters="1"
+                             DebounceInterval="300"
+                             SearchFunc="StaffSearchFunc"
+                             ToStringFunc="@(s => s is null ? string.Empty : s.FullName)"
+                             Clearable="true" />
+        </EditForm>
     </DialogContent>
     <DialogActions>
         <MudButton Color="Color.Default" OnClick="CancelAsync">@T.Common.Cancel</MudButton>

@@ -14,6 +14,7 @@ using MudBlazor;
 using RadiologyCenter.Desktop;
 using RadiologyCenter.Desktop.Components;
 using RadiologyCenter.Desktop.Models;
+using RadiologyCenter.Desktop.Features.Visits.Models;
 using RadiologyCenter.Desktop.Services;
 
 namespace RadiologyCenter.Desktop.Features.Visits.Pages;
@@ -267,34 +268,5 @@ public partial class VisitEditorDialog : ComponentBase, IDisposable
 
     private void CancelAsync()
         => MudDialog.Cancel();
-
-    private sealed class VisitFormModel
-    {
-        public string? RadiologistId { get; set; }
-
-        public string? TechnicianId { get; set; }
-
-        [Required(ErrorMessage = "Patient is required.")]
-        public PatientDto? Patient { get; set; }
-
-        [Required(ErrorMessage = "Examination type is required.")]
-        public ExaminationTypeDto? ExaminationType { get; set; }
-
-        [Required(ErrorMessage = "Clinical indication is required.")]
-        [MaxLength(1000, ErrorMessage = "Clinical indication must be 1000 characters or fewer.")]
-        public string ClinicalIndication { get; set; } = string.Empty;
-
-        public string Priority { get; set; } = "Routine";
-        public string Status { get; set; } = "Scheduled";
-
-        public DateTime? ScheduledDate { get; set; }
-
-        public TimeSpan? ScheduledTime { get; set; }
-
-        public decimal Discount { get; set; }
-        public bool IsDiscountPercentage { get; set; }
-        public decimal Paid { get; set; }
-        public string? Notes { get; set; }
-    }
 }
 

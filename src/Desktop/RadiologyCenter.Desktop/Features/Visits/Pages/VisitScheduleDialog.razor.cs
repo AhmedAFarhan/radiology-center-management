@@ -14,6 +14,7 @@ using MudBlazor;
 using RadiologyCenter.Desktop;
 using RadiologyCenter.Desktop.Components;
 using RadiologyCenter.Desktop.Models;
+using RadiologyCenter.Desktop.Features.Visits.Models;
 using RadiologyCenter.Desktop.Services;
 
 namespace RadiologyCenter.Desktop.Features.Visits.Pages;
@@ -58,13 +59,4 @@ public partial class VisitScheduleDialog : ComponentBase
 
     private void CancelAsync()
         => MudDialog.Cancel();
-
-    private sealed class VisitScheduleModel
-    {
-        [Required(ErrorMessage = "Scheduled date is required.")]
-        public DateTime? ScheduledDate { get; set; }
-
-        [Required(ErrorMessage = "Scheduled time is required.")]
-        public TimeSpan? ScheduledTime { get; set; }
-    }
 }

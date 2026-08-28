@@ -8,103 +8,106 @@
         }
         else
         {
-            <MudGrid Spacing="3">
-                @* ── Patient ── *@
-                <MudItem xs="12">
-                    <MudAutocomplete T="PatientDto"
-                                     Label="@T.ScheduleExam.Patient"
-                                     SearchFunc="SearchPatients"
-                                     Value="_selectedPatient"
-                                     ValueChanged="OnPatientChanged"
-                                     Variant="Variant.Outlined"
-                                     Dense="true"
-                                     ResetValueOnEmptyText="true"
-                                     CoerceText="true"
-                                     ShowProgressIndicator="true"
-                                     MaxItems="50">
-                        <ItemTemplate>
-                            <MudText Typo="Typo.body2">@context.FullName</MudText>
-                            <MudText Typo="Typo.caption" Class="mud-text-secondary">@context.PatientCode</MudText>
-                        </ItemTemplate>
-                    </MudAutocomplete>
-                </MudItem>
-
-                @* ── Examination Type ── *@
-                <MudItem xs="12" Sm="6">
-                    <MudAutocomplete T="ExaminationTypeDto"
-                                     Label="@T.ScheduleExam.ExaminationType"
-                                     SearchFunc="SearchExamTypes"
-                                     Value="_selectedExamType"
-                                     ValueChanged="OnExamTypeChanged"
-                                     Variant="Variant.Outlined"
-                                     Dense="true"
-                                     ResetValueOnEmptyText="true"
-                                     CoerceText="true"
-                                     ShowProgressIndicator="true"
-                                     MaxItems="50">
-                        <ItemTemplate>
-                            <MudText Typo="Typo.body2">@context.Name</MudText>
-                            <MudText Typo="Typo.caption" Class="mud-text-secondary">@context.Modality · @context.Code</MudText>
-                        </ItemTemplate>
-                    </MudAutocomplete>
-                </MudItem>
-
-                @* ── Priority ── *@
-                <MudItem xs="12" Sm="6">
-                    <MudSelect T="string" @bind-Value="_priority" Label="@T.ScheduleExam.Priority"
-                               Variant="Variant.Outlined" Dense="true">
-                        <MudSelectItem Value="@("Routine")">@T.ScheduleExam.Routine</MudSelectItem>
-                        <MudSelectItem Value="@("Urgent")">@T.ScheduleExam.Urgent</MudSelectItem>
-                        <MudSelectItem Value="@("Emergency")">@T.ScheduleExam.Emergency</MudSelectItem>
-                    </MudSelect>
-                </MudItem>
-
-                @* ── Date & Time ── *@
-                <MudItem xs="12" Sm="6">
-                    <MudDatePicker @bind-Date="_scheduledDate"
-                                   Label="@T.ScheduleExam.Date"
-                                   Variant="Variant.Outlined"
-                                   Dense="true"
-                                   MinDate="DateTime.Today" />
-                </MudItem>
-                <MudItem xs="12" Sm="6">
-                    <MudTimePicker @bind-Time="_scheduledTime"
-                                   Label="@T.ScheduleExam.Time"
-                                   Variant="Variant.Outlined"
-                                   Dense="true" />
-                </MudItem>
-
-                @* ── Equipment (pre-filled) ── *@
-                @if (!string.IsNullOrEmpty(_equipmentName))
-                {
+            <EditForm EditContext="_editContext">
+                <LocalizedDataAnnotationsValidator />
+                <MudGrid Spacing="3">
+                    @* ── Patient ── *@
                     <MudItem xs="12">
-                        <MudField Label="@T.ScheduleExam.Equipment" Variant="Variant.Outlined" Dense="true">
-                            <div class="d-flex align-center gap-2">
-                                <MudIcon Icon="@Icons.Material.Filled.ChevronRight" Size="Size.Small" Color="Color.Primary" />
-                                <MudText Typo="Typo.body2">@_equipmentName</MudText>
-                            </div>
-                        </MudField>
+                        <MudAutocomplete T="PatientDto"
+                                         Label="@T.ScheduleExam.Patient"
+                                         SearchFunc="SearchPatients"
+                                         Value="_selectedPatient"
+                                         ValueChanged="OnPatientChanged"
+                                         Variant="Variant.Outlined"
+                                         Dense="true"
+                                         ResetValueOnEmptyText="true"
+                                         CoerceText="true"
+                                         ShowProgressIndicator="true"
+                                         MaxItems="50">
+                        <ItemTemplate Context="patient">
+                            <MudText Typo="Typo.body2">@patient.FullName</MudText>
+                            <MudText Typo="Typo.caption" Class="mud-text-secondary">@patient.PatientCode</MudText>
+                        </ItemTemplate>
+                        </MudAutocomplete>
                     </MudItem>
-                }
 
-                @* ── Clinical Indication ── *@
-                <MudItem xs="12">
-                    <MudTextField T="string" @bind-Value="_clinicalIndication"
-                                  Label="@T.ScheduleExam.ClinicalIndication"
-                                  Variant="Variant.Outlined"
-                                  Dense="true"
-                                  Lines="2" />
-                </MudItem>
+                    @* ── Examination Type ── *@
+                    <MudItem xs="12" Sm="6">
+                        <MudAutocomplete T="ExaminationTypeDto"
+                                         Label="@T.ScheduleExam.ExaminationType"
+                                         SearchFunc="SearchExamTypes"
+                                         Value="_selectedExamType"
+                                         ValueChanged="OnExamTypeChanged"
+                                         Variant="Variant.Outlined"
+                                         Dense="true"
+                                         ResetValueOnEmptyText="true"
+                                         CoerceText="true"
+                                         ShowProgressIndicator="true"
+                                         MaxItems="50">
+                        <ItemTemplate Context="examType">
+                            <MudText Typo="Typo.body2">@examType.Name</MudText>
+                            <MudText Typo="Typo.caption" Class="mud-text-secondary">@examType.Modality · @examType.Code</MudText>
+                        </ItemTemplate>
+                        </MudAutocomplete>
+                    </MudItem>
 
-                @* ── Notes ── *@
-                <MudItem xs="12">
-                    <MudTextField T="string" @bind-Value="_notes"
-                                  Label="@T.ScheduleExam.Notes"
-                                  Variant="Variant.Outlined"
-                                  Dense="true"
-                                  Lines="2" />
-                </MudItem>
-            </MudGrid>
+                    @* ── Priority ── *@
+                    <MudItem xs="12" Sm="6">
+                        <MudSelect T="string" @bind-Value="_priority" Label="@T.ScheduleExam.Priority"
+                                   Variant="Variant.Outlined" Dense="true">
+                            <MudSelectItem Value="@("Routine")">@T.ScheduleExam.Routine</MudSelectItem>
+                            <MudSelectItem Value="@("Urgent")">@T.ScheduleExam.Urgent</MudSelectItem>
+                            <MudSelectItem Value="@("Emergency")">@T.ScheduleExam.Emergency</MudSelectItem>
+                        </MudSelect>
+                    </MudItem>
+
+                    @* ── Date & Time ── *@
+                    <MudItem xs="12" Sm="6">
+                        <MudDatePicker @bind-Date="_scheduledDate"
+                                       Label="@T.ScheduleExam.Date"
+                                       Variant="Variant.Outlined"
+                                       Dense="true"
+                                       MinDate="DateTime.Today" />
+                    </MudItem>
+                    <MudItem xs="12" Sm="6">
+                        <MudTimePicker @bind-Time="_scheduledTime"
+                                       Label="@T.ScheduleExam.Time"
+                                       Variant="Variant.Outlined"
+                                       Dense="true" />
+                    </MudItem>
+
+                    @* ── Equipment (pre-filled) ── *@
+                    @if (!string.IsNullOrEmpty(_equipmentName))
+                    {
+                        <MudItem xs="12">
+                            <MudField Label="@T.ScheduleExam.Equipment" Variant="Variant.Outlined" Dense="true">
+                                <div class="d-flex align-center gap-2">
+                                    <MudIcon Icon="@Icons.Material.Filled.ChevronRight" Size="Size.Small" Color="Color.Primary" />
+                                    <MudText Typo="Typo.body2">@_equipmentName</MudText>
+                                </div>
+                            </MudField>
+                        </MudItem>
+                    }
+
+                    @* ── Clinical Indication ── *@
+                    <MudItem xs="12">
+                        <MudTextField T="string" @bind-Value="_clinicalIndication"
+                                      Label="@T.ScheduleExam.ClinicalIndication"
+                                      Variant="Variant.Outlined"
+                                      Dense="true"
+                                      Lines="2" />
+                    </MudItem>
+
+                    @* ── Notes ── *@
+                    <MudItem xs="12">
+                        <MudTextField T="string" @bind-Value="_notes"
+                                      Label="@T.ScheduleExam.Notes"
+                                      Variant="Variant.Outlined"
+                                      Dense="true"
+                                      Lines="2" />
+                    </MudItem>
+                </MudGrid>
+            </EditForm>
         }
     </DialogContent>
     <DialogActions>

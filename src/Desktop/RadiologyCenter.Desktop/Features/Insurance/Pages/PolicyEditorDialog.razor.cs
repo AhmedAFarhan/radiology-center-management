@@ -5,6 +5,8 @@ using MudBlazor;
 using RadiologyCenter.Desktop.Models;
 using RadiologyCenter.Desktop.Services;
 
+using RadiologyCenter.Desktop.Features.Insurance.Models;
+
 namespace RadiologyCenter.Desktop.Features.Insurance.Pages;
 
 public partial class PolicyEditorDialog : EditorDialogBase
@@ -73,37 +75,4 @@ public partial class PolicyEditorDialog : EditorDialogBase
         }
     }
 
-    private sealed class PolicyFormModel : IValidatableObject
-    {
-        public string PatientId { get; set; } = string.Empty;
-        public string CompanyId { get; set; } = string.Empty;
-
-        [Required(ErrorMessage = "Policy number is required.")]
-        [MaxLength(100, ErrorMessage = "Policy number must be 100 characters or fewer.")]
-        public string PolicyNumber { get; set; } = string.Empty;
-
-        [Range(0, 100, ErrorMessage = "Coverage must be between 0 and 100.")]
-        public decimal CoveragePercent { get; set; } = 100;
-
-        public DateTime? EffectiveFrom { get; set; } = DateTime.Today;
-        public DateTime? EffectiveTo { get; set; }
-        public bool IsGovernment { get; set; }
-
-        public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
-        {
-            if (string.IsNullOrWhiteSpace(PatientId))
-                yield return new ValidationResult("Patient is required.", new[] { nameof(PatientId) });
-
-            if (string.IsNullOrWhiteSpace(CompanyId))
-                yield return new ValidationResult("Insurance company is required.", new[] { nameof(CompanyId) });
-
-            if (EffectiveFrom is null)
-                yield return new ValidationResult("Effective From is required.", new[] { nameof(EffectiveFrom) });
-
-            if (EffectiveTo is not null && EffectiveFrom is not null && EffectiveTo.Value.Date < EffectiveFrom.Value.Date)
-                yield return new ValidationResult(
-                    "Effective To cannot be before Effective From.",
-                    new[] { nameof(EffectiveTo) });
-        }
-    }
 }

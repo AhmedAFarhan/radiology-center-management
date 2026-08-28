@@ -5,6 +5,8 @@ using MudBlazor;
 using RadiologyCenter.Desktop.Models;
 using RadiologyCenter.Desktop.Services;
 
+using RadiologyCenter.Desktop.Features.Insurance.Models;
+
 namespace RadiologyCenter.Desktop.Features.Insurance.Pages;
 
 public partial class PreAuthDialog : EditorDialogBase
@@ -92,9 +94,4 @@ public partial class PreAuthDialog : EditorDialogBase
         }
     }
 
-    private sealed class PreAuthFormModel
-    {
-        [Range(0, double.MaxValue, ErrorMessage = "Estimated amount must be zero or greater.")]
-        public decimal EstimatedAmount { get; set; }
-    }
 }

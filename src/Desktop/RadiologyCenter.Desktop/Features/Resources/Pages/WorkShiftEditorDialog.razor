@@ -25,6 +25,7 @@
                                    Label="@T.WorkShiftDialog.ShiftDate"
                                    Variant="Variant.Outlined"
                                    Margin="Margin.Dense"
+                                   For="@(() => _model.Date)"
                                    Class="w-100" />
                 </MudItem>
                 <MudItem xs="12" sm="3">
@@ -32,6 +33,7 @@
                                    Label="@T.WorkShiftDialog.StartTime"
                                    Variant="Variant.Outlined"
                                    Margin="Margin.Dense"
+                                   For="@(() => _model.StartTime)"
                                    Class="w-100" />
                 </MudItem>
                 <MudItem xs="12" sm="3">
@@ -39,6 +41,7 @@
                                    Label="@T.WorkShiftDialog.EndTime"
                                    Variant="Variant.Outlined"
                                    Margin="Margin.Dense"
+                                   For="@(() => _model.EndTime)"
                                    Class="w-100" />
                 </MudItem>
                 <MudItem xs="12">

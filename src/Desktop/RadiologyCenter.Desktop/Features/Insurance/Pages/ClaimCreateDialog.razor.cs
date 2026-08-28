@@ -5,6 +5,8 @@ using MudBlazor;
 using RadiologyCenter.Desktop.Models;
 using RadiologyCenter.Desktop.Services;
 
+using RadiologyCenter.Desktop.Features.Insurance.Models;
+
 namespace RadiologyCenter.Desktop.Features.Insurance.Pages;
 
 public partial class ClaimCreateDialog : EditorDialogBase
@@ -112,9 +114,4 @@ public partial class ClaimCreateDialog : EditorDialogBase
         }
     }
 
-    private sealed class ClaimFormModel
-    {
-        [Range(0, double.MaxValue, ErrorMessage = "Billed amount must be zero or greater.")]
-        public decimal BilledAmount { get; set; }
-    }
 }

@@ -14,6 +14,7 @@ using MudBlazor;
 using RadiologyCenter.Desktop;
 using RadiologyCenter.Desktop.Components;
 using RadiologyCenter.Desktop.Models;
+using RadiologyCenter.Desktop.Features.Resources.Models;
 using RadiologyCenter.Desktop.Services;
 
 namespace RadiologyCenter.Desktop.Features.Resources.Pages;
@@ -84,12 +85,6 @@ public partial class LeaveEditorDialog : EditorDialogBase
             return;
         }
 
-        if (_model.StartDate is null || _model.EndDate is null)
-        {
-            Snackbar.Add(T.LeaveDialog.SelectDates, Severity.Warning);
-            return;
-        }
-
         if (_model.EndDate < _model.StartDate)
         {
             Snackbar.Add(T.LeaveDialog.EndAfterStart, Severity.Warning);
@@ -114,18 +109,5 @@ public partial class LeaveEditorDialog : EditorDialogBase
             Snackbar.Add(IsEdit ? T.LeaveDialog.Updated : T.LeaveDialog.Created, Severity.Success);
             MudDialog.Close(DialogResult.Ok(true));
         }
-    }
-
-    private sealed class LeaveFormModel
-    {
-        [Required(ErrorMessage = "Leave type is required.")]
-        public string LeaveType { get; set; } = string.Empty;
-
-        public DateTime? StartDate { get; set; }
-
-        public DateTime? EndDate { get; set; }
-
-        [MaxLength(500, ErrorMessage = "Reason must be 500 characters or fewer.")]
-        public string? Reason { get; set; }
     }
 }

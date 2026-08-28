@@ -1,6 +1,9 @@
-﻿using Microsoft.AspNetCore.Components;
+﻿using System.ComponentModel.DataAnnotations;
+using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Forms;
 using MudBlazor;
 using RadiologyCenter.Desktop.Models;
+using RadiologyCenter.Desktop.Features.ReadingRoom.Models;
 using RadiologyCenter.Desktop.Services;
 
 namespace RadiologyCenter.Desktop.Features.ReadingRoom.Components;
@@ -20,6 +23,8 @@ public partial class AssignStaffDialog : ComponentBase
     [Inject] private ISnackbar Snackbar { get; set; } = default!;
     [Inject] private AppLocalizer T { get; set; } = default!;
 
+    private readonly AssignStaffFormModel _model = new();
+    private EditContext _editContext = default!;
     private IReadOnlyList<StaffDto> _radiologists = Array.Empty<StaffDto>();
     private IReadOnlyList<StaffDto> _technicians = Array.Empty<StaffDto>();
     private IReadOnlyList<EquipmentDto> _filteredEquipments = Array.Empty<EquipmentDto>();
@@ -32,6 +37,8 @@ public partial class AssignStaffDialog : ComponentBase
 
     protected override async Task OnInitializedAsync()
     {
+        _editContext = new EditContext(_model);
+
         try
         {
             var staffTask = ResourceService.GetStaffsPagedAsync(null, null, false, 1, 200);
@@ -86,6 +93,9 @@ public partial class AssignStaffDialog : ComponentBase
 
     private async Task SubmitAsync()
     {
+        if (!_editContext.Validate())
+            return;
+
         if (string.IsNullOrWhiteSpace(_radiologistId))
         {
             Snackbar.Add(T.AssignStaffDialog.RadiologistRequired, Severity.Warning);

@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Forms;
 using MudBlazor;
 using RadiologyCenter.Desktop.Models;
+using RadiologyCenter.Desktop.Features.Cash.Models;
 using RadiologyCenter.Desktop.Services;
 
 namespace RadiologyCenter.Desktop.Features.Cash.Pages;
@@ -47,18 +48,5 @@ public partial class CloseCashSessionDialog : EditorDialogBase
         }
     }
 
-    private sealed class CloseSessionFormModel
-    {
-        [Range(0, (double)decimal.MaxValue, ErrorMessage = "Counted total must be a valid amount.")]
-        public decimal CountedTotal { get; set; }
 
-        [MaxLength(100, ErrorMessage = "Receiving user ID must be 100 characters or fewer.")]
-        public string? ReceivingUserId { get; set; }
-
-        [Range(0, (double)decimal.MaxValue, ErrorMessage = "Receiving opening float must be a valid amount.")]
-        public decimal? ReceivingOpeningFloat { get; set; }
-
-        [MaxLength(1000, ErrorMessage = "Notes must be 1000 characters or fewer.")]
-        public string? Notes { get; set; }
-    }
 }
