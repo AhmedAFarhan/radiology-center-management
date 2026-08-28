@@ -1,0 +1,106 @@
+﻿using System.Net.Http;
+using System.Net.Http.Json;
+using System.ComponentModel.DataAnnotations;
+using System.Security.Claims;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Authorization;
+using Microsoft.AspNetCore.Components.Forms;
+using Microsoft.AspNetCore.Components.Routing;
+using Microsoft.AspNetCore.Components.Web;
+using Microsoft.AspNetCore.Components.Web.Virtualization;
+using Microsoft.JSInterop;
+using MudBlazor;
+using RadiologyCenter.Desktop;
+using RadiologyCenter.Desktop.Components;
+using RadiologyCenter.Desktop.Models;
+using RadiologyCenter.Desktop.Features.Identity.Models;
+using RadiologyCenter.Desktop.Services;
+
+namespace RadiologyCenter.Desktop.Features.Identity.Components;
+
+public partial class UserEditorDialog : EditorDialogBase
+{
+[Parameter] public UserDto? User { get; set; }
+
+    private readonly UserFormModel _model = new();
+    private EditContext _editContext = default!;
+    private List<RoleDto> _roles = new();
+    private bool _showPassword;
+
+    private bool IsEdit => User is not null;
+
+    protected override async Task OnInitializedAsync()
+    {
+        _editContext = new EditContext(_model);
+
+        await SafeExecute.RunAsync(async () =>
+            {
+                var roles = await IdentityService.GetRolesPagedAsync(null, "Name", false, 1, 100);
+                _roles = roles.Items.ToList();
+            },
+            Snackbar,
+            () => T.UserDialog.LoadRolesError);
+
+        if (User is null)
+            return;
+
+        _model.UserName = User.UserName;
+        _model.Email = User.Email;
+        _model.Password = "placeholder";
+        _model.FirstName = User.FirstName;
+        _model.LastName = User.LastName;
+        _model.PhoneNumber = User.PhoneNumber;
+    }
+
+    private async Task SubmitAsync()
+    {
+        if (!_editContext.Validate())
+            return;
+
+        await TrySaveAsync(async () =>
+            {
+                if (IsEdit)
+                {
+                    await IdentityService.UpdateUserProfileAsync(User!.Id, new UpdateUserProfileInput
+                    {
+                        FirstName = _model.FirstName,
+                        LastName = _model.LastName,
+                        PhoneNumber = _model.PhoneNumber,
+                    });
+                    Snackbar.Add(T.UserDialog.ProfileUpdated, Severity.Success);
+                }
+                else
+                {
+                    if (string.IsNullOrWhiteSpace(_model.Password))
+                    {
+                        Snackbar.Add(T.UserDialog.PasswordRequired, Severity.Warning);
+                        return;
+                    }
+
+                    if (!_model.SelectedRoleIds.Any())
+                    {
+                        Snackbar.Add(T.UserDialog.SelectRole, Severity.Warning);
+                        return;
+                    }
+
+                    await IdentityService.CreateUserAsync(new CreateUserInput
+                    {
+                        UserName = _model.UserName,
+                        Email = _model.Email,
+                        FirstName = _model.FirstName,
+                        LastName = _model.LastName,
+                        PhoneNumber = _model.PhoneNumber ?? string.Empty,
+                        Password = _model.Password,
+                        RoleIds = _model.SelectedRoleIds.ToList(),
+                    });
+                    Snackbar.Add(T.UserDialog.Created, Severity.Success);
+                }
+
+                MudDialog.Close(DialogResult.Ok(true));
+            },
+            () => T.UserDialog.UnreachableRetry);
+    }
+
+
+}

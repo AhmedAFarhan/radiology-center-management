@@ -1,4 +1,4 @@
-﻿using RadiologyCenter.Desktop.Models;
+﻿using RadiologyCenter.Desktop.Features.Notifications.Models;
 
 namespace RadiologyCenter.Desktop.Features.Notifications.Services;
 

@@ -1,4 +1,4 @@
-﻿using RadiologyCenter.Desktop.Models;
+﻿using RadiologyCenter.Desktop.Features.Cash.Models;
 
 namespace RadiologyCenter.Desktop.Features.Cash.Services;
 

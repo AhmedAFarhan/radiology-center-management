@@ -1,4 +1,4 @@
-﻿using RadiologyCenter.Desktop.Models;
+﻿using RadiologyCenter.Desktop.Features.Analytics.Models;
 
 namespace RadiologyCenter.Desktop.Features.Analytics.Services;
 

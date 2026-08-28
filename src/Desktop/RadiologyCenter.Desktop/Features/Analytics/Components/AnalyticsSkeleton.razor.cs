@@ -13,7 +13,7 @@ using Microsoft.JSInterop;
 using MudBlazor;
 using RadiologyCenter.Desktop;
 using RadiologyCenter.Desktop.Components;
-using RadiologyCenter.Desktop.Models;
+using RadiologyCenter.Desktop.Features.Analytics.Models;
 using RadiologyCenter.Desktop.Services;
 
 namespace RadiologyCenter.Desktop.Features.Analytics.Components;

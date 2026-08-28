@@ -1,4 +1,4 @@
-﻿using RadiologyCenter.Desktop.Models;
+﻿using RadiologyCenter.Desktop.Features.Insurance.Models;
 
 namespace RadiologyCenter.Desktop.Features.Insurance.Services;
 

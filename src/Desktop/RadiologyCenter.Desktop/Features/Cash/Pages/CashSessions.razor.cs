@@ -1,5 +1,5 @@
 ﻿using MudBlazor;
-using RadiologyCenter.Desktop.Models;
+using RadiologyCenter.Desktop.Features.Cash.Models;
 using RadiologyCenter.Desktop.Services;
 
 namespace RadiologyCenter.Desktop.Features.Cash.Pages;
