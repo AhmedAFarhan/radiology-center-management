@@ -1,11 +1,6 @@
 @page "/patients"
 @attribute [Authorize]
-@inject PatientService PatientService
-@inject IDialogService DialogService
-@inject ISnackbar Snackbar
-@inject AppLocalizer T
-@inject NavigationManager NavigationManager
-@implements IDisposable
+@inherits ListPageBase<PatientDto>
 
 <PageHeader Icon="@Icons.Material.Filled.People" Title="@T.Patients.Title"
             Subtitle="@T.Patients.Subtitle"
@@ -24,7 +19,7 @@
     </AuthorizeView>
 </PageHeader>
 
-<MudTable Breakpoint="Breakpoint.Sm" T="PatientDto" @ref="_table" ServerData="LoadServerData" Dense="true" Hover="true" Striped="true" Elevation="1" RowsPerPage="10" FixedHeader="true" Class="table-scroll">
+<MudTable Breakpoint="Breakpoint.Sm" T="PatientDto" @ref="Table" ServerData="LoadServerData" Dense="true" Hover="true" Striped="true" Elevation="1" RowsPerPage="10" FixedHeader="true" Class="table-scroll">
     <HeaderContent>
         <MudTh><MudTableSortLabel T="PatientDto" SortLabel="@("PatientCode")">@T.Patients.Code</MudTableSortLabel></MudTh>
         <MudTh><MudTableSortLabel T="PatientDto" SortLabel="@("LastName")">@T.Common.Name</MudTableSortLabel></MudTh>
@@ -43,57 +38,32 @@
         <MudTd DataLabel="@T.Patients.Phone">@context.PhoneNumber</MudTd>
         <MudTd DataLabel="@T.Patients.Registered">@context.CreatedAt.ToLocalTime().ToString("dd MMM yyyy")</MudTd>
         <MudTd DataLabel="@T.Common.Status">
-            <MudChip T="string" Size="Size.Small" Color="@(context.IsActive ? Color.Success : Color.Default)">@(context.IsActive ? T.Common.Active : T.Common.Inactive)</MudChip>
+            <ActiveStatusChip IsActive="context.IsActive" ActiveLabel="@T.Common.Active" InactiveLabel="@T.Common.Inactive" />
         </MudTd>
         <MudTd DataLabel="@T.Common.Actions">
-            <AuthorizeView Policy="@PatientsPermissions.Update">
-                <Authorized Context="auth">
-                    <MudTooltip Placement="Placement.Bottom" Text="@T.Common.Edit">
-                        <MudIconButton Icon="@Icons.Material.Filled.Edit" Size="Size.Small" Color="Color.Default" aria-label="@T.Common.Edit" OnClick="@(() => OpenEditDialogAsync(context))" />
-                    </MudTooltip>
-                    <MudTooltip Placement="Placement.Bottom" Text="@T.Patients.ToggleStatus">
-                        <MudIconButton Icon="@(context.IsActive ? Icons.Material.Filled.Block : Icons.Material.Filled.CheckCircle)"
-                                       Size="Size.Small"
-                                       Color="@(context.IsActive ? Color.Default : Color.Success)"
-                                       aria-label="@T.Patients.ToggleStatus"
-                                       OnClick="@(() => ToggleActiveAsync(context))" />
-                    </MudTooltip>
-                </Authorized>
-            </AuthorizeView>
-            <AuthorizeView Policy="@PatientsPermissions.Delete">
-                <Authorized Context="auth">
-                    <MudTooltip Placement="Placement.Bottom" Text="@T.Common.Delete">
-                        <MudIconButton Icon="@Icons.Material.Filled.Delete" Size="Size.Small" Color="Color.Error" aria-label="@T.Common.Delete" OnClick="@(() => DeletePatientAsync(context))" />
-                    </MudTooltip>
-                </Authorized>
-            </AuthorizeView>
+            <RowActions IsActive="context.IsActive"
+                        EditLabel="@T.Common.Edit"
+                        ToggleLabel="@T.Patients.ToggleStatus"
+                        DeleteLabel="@T.Common.Delete"
+                        EditPolicy="@PatientsPermissions.Update"
+                        TogglePolicy="@PatientsPermissions.Update"
+                        DeletePolicy="@PatientsPermissions.Delete"
+                        OnEdit="@(() => OpenEditDialogAsync(context))"
+                        OnToggle="@(() => ToggleActiveAsync(context))"
+                        OnDelete="@(() => DeletePatientAsync(context))" />
         </MudTd>
     </RowTemplate>
     <NoRecordsContent>
-        @if (_loadError is not null)
-        {
-            <ErrorState Icon="@(_offline ? Icons.Material.Filled.CloudOff : Icons.Material.Filled.ErrorOutline)"
-                        Title="@T.Patients.LoadErrorTitle"
-                        Message="@_loadError"
-                        Action="ReloadAsync" />
-        }
-        else
-        {
-        <AuthorizeView Policy="@PatientsPermissions.Create">
-            <Authorized Context="auth">
-                <EmptyState Icon="@Icons.Material.Filled.Person"
-                            Title="@T.Patients.EmptyTitle"
-                            Message="@T.Patients.EmptyMessage"
-                            ActionLabel="@T.Patients.EmptyAction"
-                            Action="OpenCreateDialogAsync" />
-            </Authorized>
-            <NotAuthorized>
-                <EmptyState Icon="@Icons.Material.Filled.Person"
-                            Title="@T.Patients.EmptyTitle"
-                            Message="@T.Patients.EmptyMessage" />
-            </NotAuthorized>
-        </AuthorizeView>
-        }
+        <TableNoRecords LoadError="@LoadError"
+                        Offline="@Offline"
+                        ErrorTitle="@T.Patients.LoadErrorTitle"
+                        EmptyIcon="@Icons.Material.Filled.Person"
+                        EmptyTitle="@T.Patients.EmptyTitle"
+                        EmptyMessage="@T.Patients.EmptyMessage"
+                        EmptyActionLabel="@T.Patients.EmptyAction"
+                        ActionPolicy="@PatientsPermissions.Create"
+                        OnReload="ReloadAsync"
+                        OnEmptyAction="OpenCreateDialogAsync" />
     </NoRecordsContent>
     <PagerContent>
         <MudTablePager PageSizeOptions="@(new[] { 10, 25, 50 })" />

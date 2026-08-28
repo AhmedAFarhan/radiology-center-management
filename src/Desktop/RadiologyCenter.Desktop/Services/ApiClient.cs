@@ -23,6 +23,8 @@ public sealed class ApiException : Exception
 
 public sealed class ApiClient
 {
+    // Development only — HTTP sends tokens/passwords in cleartext.
+    // For production, switch to HTTPS and configure via appsettings or environment variable.
     public const string BaseUrl = "http://localhost:5224";
     public const string HttpClientName = "Api";
 

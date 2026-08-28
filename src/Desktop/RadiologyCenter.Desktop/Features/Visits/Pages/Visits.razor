@@ -1,17 +1,11 @@
 @page "/visits"
 @attribute [Authorize]
-@inject ExaminationService ExaminationService
-@inject PatientService PatientService
-@inject InsuranceService InsuranceService
-@inject IDialogService DialogService
-@inject ISnackbar Snackbar
-@inject NavigationManager Navigation
-@inject AppLocalizer T
-@implements IDisposable
+@inherits ListPageBase<ExaminationDto>
 
 <PageHeader Icon="@Icons.Material.Filled.EventNote" Title="@T.Visits.Title"
             Subtitle="@T.Visits.Subtitle"
             SearchValueChanged="OnSearchChanged"
+            SearchValue="@SearchQuery"
             SearchPlaceholder="@T.Visits.SearchPlaceholder"
             OnRefresh="ReloadAsync">
     <AuthorizeView Policy="@AppointmentsPermissions.Create">
@@ -21,7 +15,7 @@
     </AuthorizeView>
 </PageHeader>
 
-<MudTable Breakpoint="Breakpoint.Sm" T="ExaminationDto" @ref="_table" ServerData="LoadServerData" Dense="true" Hover="true" Striped="true" Elevation="1" RowsPerPage="10" FixedHeader="true" Class="table-scroll">
+<MudTable Breakpoint="Breakpoint.Sm" T="ExaminationDto" @ref="Table" ServerData="LoadServerData" Dense="true" Hover="true" Striped="true" Elevation="1" RowsPerPage="10" FixedHeader="true" Class="table-scroll">
     <HeaderContent>
         <MudTh><MudTableSortLabel T="ExaminationDto" SortLabel="@("PatientId")">@T.Visits.Patient</MudTableSortLabel></MudTh>
         <MudTh><MudTableSortLabel T="ExaminationDto" SortLabel="@("ExaminationTypeName")">@T.Visits.Examination</MudTableSortLabel></MudTh>
@@ -126,34 +120,18 @@
         </MudTd>
     </RowTemplate>
     <NoRecordsContent>
-        @if (_loadError is not null)
-        {
-            <ErrorState Icon="@(_offline ? Icons.Material.Filled.CloudOff : Icons.Material.Filled.ErrorOutline)"
-                        Title="@T.Visits.LoadErrorTitle"
-                        Message="@_loadError"
-                        Action="ReloadAsync" />
-        }
-        else
-        {
-        <AuthorizeView Policy="@AppointmentsPermissions.Create">
-            <Authorized Context="auth">
-                <EmptyState Icon="@Icons.Material.Filled.MedicalServices"
-                            Title="@T.Visits.EmptyTitle"
-                            Message="@T.Visits.EmptyMessage"
-                            ActionLabel="@T.Visits.EmptyAction"
-                            Action="OpenCreateDialogAsync" />
-            </Authorized>
-            <NotAuthorized>
-                <EmptyState Icon="@Icons.Material.Filled.MedicalServices"
-                            Title="@T.Visits.EmptyTitle"
-                            Message="@T.Visits.EmptyMessage" />
-            </NotAuthorized>
-        </AuthorizeView>
-        }
+        <TableNoRecords LoadError="@LoadError"
+                        Offline="@Offline"
+                        ErrorTitle="@T.Visits.LoadErrorTitle"
+                        EmptyIcon="@Icons.Material.Filled.MedicalServices"
+                        EmptyTitle="@T.Visits.EmptyTitle"
+                        EmptyMessage="@T.Visits.EmptyMessage"
+                        EmptyActionLabel="@T.Visits.EmptyAction"
+                        ActionPolicy="@AppointmentsPermissions.Create"
+                        OnReload="ReloadAsync"
+                        OnEmptyAction="OpenCreateDialogAsync" />
     </NoRecordsContent>
     <PagerContent>
         <MudTablePager PageSizeOptions="@(new[] { 10, 25, 50 })" />
     </PagerContent>
 </MudTable>
-
-

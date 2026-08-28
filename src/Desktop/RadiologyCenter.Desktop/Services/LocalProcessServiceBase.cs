@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.Net.Http;
 using System.Text.RegularExpressions;
 
 namespace RadiologyCenter.Desktop;
@@ -16,6 +17,8 @@ public abstract class LocalProcessServiceBase : IDisposable
     private Task? _startupTask;
     private string? _startupError;
 
+    protected IHttpClientFactory? HttpClientFactory { get; }
+
     public bool IsReady => _startupTask is { IsCompletedSuccessfully: true };
     public string? StartupError => _startupError;
 
@@ -25,8 +28,9 @@ public abstract class LocalProcessServiceBase : IDisposable
     protected abstract int StartupTimeoutMs { get; }
     protected abstract int HealthCheckIntervalMs { get; }
 
-    protected LocalProcessServiceBase()
+    protected LocalProcessServiceBase(IHttpClientFactory? httpClientFactory = null)
     {
+        HttpClientFactory = httpClientFactory;
         AppDomain.CurrentDomain.ProcessExit += (_, _) => Dispose();
     }
 
@@ -105,7 +109,8 @@ public abstract class LocalProcessServiceBase : IDisposable
 
             try
             {
-                using var httpClient = new HttpClient { Timeout = TimeSpan.FromSeconds(2) };
+                using var httpClient = HttpClientFactory?.CreateClient() ?? new HttpClient();
+                httpClient.Timeout = TimeSpan.FromSeconds(2);
                 var response = await httpClient.GetAsync(HealthCheckUrl);
                 if (response.IsSuccessStatusCode)
                     return true;

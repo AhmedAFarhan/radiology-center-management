@@ -1,55 +1,29 @@
-using System.Net.Http;
-using System.Net.Http.Json;
-using System.ComponentModel.DataAnnotations;
-using System.Security.Claims;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Components;
-using Microsoft.AspNetCore.Components.Authorization;
-using Microsoft.AspNetCore.Components.Forms;
-using Microsoft.AspNetCore.Components.Routing;
-using Microsoft.AspNetCore.Components.Web;
-using Microsoft.AspNetCore.Components.Web.Virtualization;
-using Microsoft.JSInterop;
 using MudBlazor;
-using RadiologyCenter.Desktop;
 using RadiologyCenter.Desktop.Models;
 using RadiologyCenter.Desktop.Services;
+using RadiologyCenter.Desktop.Shared.Components;
 
 namespace RadiologyCenter.Desktop.Features.Patients.Pages;
 
-public partial class Patients : ComponentBase, IDisposable
+public partial class Patients : ListPageBase<PatientDto>
 {
-    private MudTable<PatientDto>? _table;
-    private string? _search;
-    private CancellationTokenSource? _searchCts;
-    private string? _loadError;
-    private bool _offline;
-    private string? _openPatientId;
+    [Inject] private PatientService PatientService { get; set; } = default!;
 
-    [SupplyParameterFromQuery(Name = "q")]
-    public string? SearchQuery { get; set; }
+    protected override string BaseRoute => "/patients";
 
-    [SupplyParameterFromQuery(Name = "open")]
-    public string? OpenId { get; set; }
+    protected override string UnreachableMessage => T.Patients.Unreachable;
 
-    protected override void OnParametersSet()
-    {
-        base.OnParametersSet();
-        if (!string.IsNullOrWhiteSpace(OpenId) && Guid.TryParse(OpenId, out _))
-            _openPatientId = OpenId;
-    }
+    protected override async Task<PagedResult<PatientDto>> LoadPageAsync(
+        string? search,
+        string? sortBy,
+        bool sortDescending,
+        int page,
+        int pageSize,
+        CancellationToken ct)
+        => await PatientService.GetPagedAsync(search, sortBy, sortDescending, page, pageSize, ct);
 
-    protected override async Task OnAfterRenderAsync(bool firstRender)
-    {
-        if (_openPatientId is not null)
-        {
-            var id = _openPatientId;
-            _openPatientId = null;
-            await OpenPatientAsync(id);
-        }
-    }
-
-    private async Task OpenPatientAsync(string id)
+    protected override async Task OpenByDeepLinkAsync(string id)
     {
         PatientDto? patient = null;
         var ok = await SafeExecute.RunAsync(
@@ -60,12 +34,11 @@ public partial class Patients : ComponentBase, IDisposable
         if (ok && patient is not null)
         {
             var parameters = new DialogParameters { ["Patient"] = patient };
-            var options = new DialogOptions { MaxWidth = MaxWidth.Medium, FullWidth = true, NoHeader = true };
-            var dialog = await DialogService.ShowAsync<PatientEditorDialog>(T.Patients.EditPatient, parameters, options);
+            var dialog = await DialogService.ShowAsync<PatientEditorDialog>(T.Patients.EditPatient, parameters, EditorDialogOptions);
             await ReloadIfSavedAsync(dialog);
         }
 
-        NavigationManager.NavigateTo("/patients", replace: true);
+        NavigationManager.NavigateTo(BaseRoute, replace: true);
     }
 
     private async Task ExportToExcelAsync()
@@ -73,7 +46,7 @@ public partial class Patients : ComponentBase, IDisposable
         await SafeExecute.RunAsync(
             async () =>
             {
-                var content = await PatientService.ExportAsync(_search);
+                var content = await PatientService.ExportAsync(Search);
                 var path = await FileSaveHelper.SaveAsync(content, "patients.xlsx");
                 Snackbar.Add(T.FormatValue(T.Common.SavedTo, path), Severity.Success);
             },
@@ -93,86 +66,17 @@ public partial class Patients : ComponentBase, IDisposable
         await DialogService.ShowAsync<ExcelImportDialog>(string.Empty, parameters, options);
     }
 
-    private async Task<TableData<PatientDto>> LoadServerData(TableState state, CancellationToken ct)
-    {
-        try
-        {
-            var page = await PatientService.GetPagedAsync(
-                _search,
-                state.SortLabel,
-                state.SortDirection == SortDirection.Descending,
-                state.Page + 1,
-                state.PageSize,
-                ct);
-
-            _loadError = null;
-            _offline = false;
-            return new TableData<PatientDto> { Items = page.Items, TotalItems = page.TotalCount };
-        }
-        catch (OperationCanceledException)
-        {
-            if (ct.IsCancellationRequested)
-                return new TableData<PatientDto> { Items = Array.Empty<PatientDto>(), TotalItems = 0 };
-            throw;
-        }
-        catch (ApiException ex)
-        {
-            Snackbar.Add(SafeExecute.FormatError(ex), Severity.Error);
-            _loadError = ex.Message;
-            _offline = false;
-            return new TableData<PatientDto> { Items = Array.Empty<PatientDto>(), TotalItems = 0 };
-        }
-        catch (Exception)
-        {
-            Snackbar.Add(T.Patients.Unreachable, Severity.Error);
-            _loadError = T.Patients.Unreachable;
-            _offline = true;
-            return new TableData<PatientDto> { Items = Array.Empty<PatientDto>(), TotalItems = 0 };
-        }
-    }
-
-    private async Task OnSearchChanged(string? value)
-    {
-        _search = value;
-
-        _searchCts?.Cancel();
-        var cts = _searchCts = new CancellationTokenSource();
-        try
-        {
-            await Task.Delay(400, cts.Token);
-        }
-        catch (TaskCanceledException)
-        {
-            return;
-        }
-
-        if (_table is not null)
-            await _table.ReloadServerData();
-    }
-
-    private Task ReloadAsync()
-        => _table is null ? Task.CompletedTask : _table.ReloadServerData();
-
     private async Task OpenCreateDialogAsync()
     {
-        var options = new DialogOptions { MaxWidth = MaxWidth.Medium, FullWidth = true, NoHeader = true };
-        var dialog = await DialogService.ShowAsync<PatientEditorDialog>(T.Patients.NewPatient, options);
+        var dialog = await DialogService.ShowAsync<PatientEditorDialog>(T.Patients.NewPatient, EditorDialogOptions);
         await ReloadIfSavedAsync(dialog);
     }
 
     private async Task OpenEditDialogAsync(PatientDto patient)
     {
         var parameters = new DialogParameters { ["Patient"] = patient };
-        var options = new DialogOptions { MaxWidth = MaxWidth.Medium, FullWidth = true, NoHeader = true };
-        var dialog = await DialogService.ShowAsync<PatientEditorDialog>(T.Patients.EditPatient, parameters, options);
+        var dialog = await DialogService.ShowAsync<PatientEditorDialog>(T.Patients.EditPatient, parameters, EditorDialogOptions);
         await ReloadIfSavedAsync(dialog);
-    }
-
-    private async Task ReloadIfSavedAsync(IDialogReference dialog)
-    {
-        var result = await dialog.Result;
-        if (result is { Canceled: false })
-            await ReloadAsync();
     }
 
     private async Task ToggleActiveAsync(PatientDto patient)
@@ -239,6 +143,4 @@ public partial class Patients : ComponentBase, IDisposable
 
         return "-";
     }
-
-    public void Dispose() => _searchCts?.Cancel();
 }

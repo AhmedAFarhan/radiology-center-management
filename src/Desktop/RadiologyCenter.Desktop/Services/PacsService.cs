@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.Net.Http;
 using System.Text.Json;
 
 namespace RadiologyCenter.Desktop.Services;
@@ -51,7 +52,8 @@ public sealed class PacsService : LocalProcessServiceBase, IDisposable
 
     protected override int HealthCheckIntervalMs => 500;
 
-    public PacsService()
+    public PacsService(IHttpClientFactory? httpClientFactory = null)
+        : base(httpClientFactory)
     {
         Instance = this;
     }
@@ -61,7 +63,8 @@ public sealed class PacsService : LocalProcessServiceBase, IDisposable
 
     public async Task<IReadOnlyList<PacsStudy>> GetStudiesAsync(string? patientId, CancellationToken ct = default)
     {
-        using var httpClient = new HttpClient { Timeout = TimeSpan.FromSeconds(10) };
+        using var httpClient = HttpClientFactory?.CreateClient() ?? new HttpClient();
+        httpClient.Timeout = TimeSpan.FromSeconds(10);
         var url = $"{HttpEndpoint}/dicom-web/studies";
         if (!string.IsNullOrWhiteSpace(patientId))
             url += $"?PatientID={Uri.EscapeDataString(patientId.Trim())}";

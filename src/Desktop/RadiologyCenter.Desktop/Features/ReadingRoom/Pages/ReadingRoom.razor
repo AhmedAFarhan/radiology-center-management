@@ -52,7 +52,7 @@
                 @foreach (var item in Queue)
                 {
                     var current = item;
-                    <button type="button"
+                    <button type="button" @key="item.Id"
                             class="rr-worklist-item @(IsSelected(current) ? "selected" : string.Empty)"
                             @onclick="() => SelectExamAsync(current)">
                         <div class="rr-item-top">

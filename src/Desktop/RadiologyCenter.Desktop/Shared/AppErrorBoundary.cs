@@ -62,7 +62,7 @@ public sealed class AppErrorBoundary : ErrorBoundary, IDisposable
         builder.AddContent(seq++, T.Error.Details);
         builder.CloseElement();
         builder.OpenElement(seq++, "pre");
-        builder.AddContent(seq++, exception.Message);
+        builder.AddContent(seq++, exception.GetType().Name);
         builder.CloseElement();
         builder.CloseElement();
         builder.OpenElement(seq++, "div");
