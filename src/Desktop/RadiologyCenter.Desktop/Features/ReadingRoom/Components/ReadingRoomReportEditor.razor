@@ -1,0 +1,120 @@
+@if (Report is null)
+{
+    <div class="rr-report-empty">
+        <EmptyState Icon="@Icons.Material.Filled.Assignment"
+                    Title="@T.ReadingRoom.NoReport"
+                    Message="@(Loading ? T.Common.Loading : T.ReadingRoom.SelectStudyToRead)" />
+    </div>
+}
+else if (Error is not null)
+{
+    <div class="rr-report-empty">
+        <ErrorState Icon="@Icons.Material.Filled.ErrorOutline"
+                    Title="@T.ReadingRoom.ReportLoadErrorTitle"
+                    Message="@Error"
+                    RetryLabel="@T.Common.Retry"
+                    Action="OnRetry" />
+    </div>
+}
+else
+{
+    <div class="rr-pane-header">
+        <MudStack Row="true" AlignItems="AlignItems.Center" Spacing="1">
+            <MudAvatar Size="Size.Small" Color="Color.Primary" Class="text-subtitle2">@Initials(PatientName)</MudAvatar>
+            <div>
+                <MudText Typo="Typo.subtitle1" Class="font-weight-medium">@PatientName</MudText>
+                <MudText Typo="Typo.caption" Class="text-secondary">@PatientCode • v@(Report.CurrentVersionNumber)</MudText>
+            </div>
+        </MudStack>
+        <StatusChip Token="@Report.StatusKey">@Report.Status</StatusChip>
+    </div>
+
+    <div class="rr-patient-summary">
+        <div class="rr-summary-block">
+            <span class="rr-summary-label">@T.ReadingRoom.ClinicalIndication</span>
+            <span class="rr-summary-value">@(string.IsNullOrWhiteSpace(Indication) ? T.Common.None : Indication)</span>
+        </div>
+        <MudStack Row="true" Spacing="2">
+            <div class="rr-summary-cell"><span class="rr-summary-label">@T.ReadingRoom.Exam</span><span>@ExamName- @Priority</span></div>
+            <div class="rr-summary-cell"><span class="rr-summary-label">@T.Common.Status</span><span>@Report.Status</span></div>
+        </MudStack>
+    </div>
+
+    <MudDivider />
+
+    <div class="rr-report-body">
+        @if (!string.IsNullOrWhiteSpace(Report.CancelReason) && Report.StatusKey == "Cancelled")
+        {
+            <MudAlert Severity="Severity.Error" Variant="Variant.Outlined" Dense="true" Class="mb-3">
+                @(T.FormatValue(T.ReadingRoom.CancelledWithReason, Report.CancelReason))
+            </MudAlert>
+        }
+
+        <div class="d-flex align-center mb-1">
+            <MudText Typo="Typo.subtitle1" Class="font-weight-medium">@T.ReadingRoom.Sections</MudText>
+            <MudSpacer />
+            @if (CanEdit)
+            {
+                <MudTooltip Placement="Placement.Bottom" Text="@T.ReportTemplate.Title">
+                    <MudIconButton Icon="@Icons.Material.Filled.Newspaper"
+                                   Size="Size.Small"
+                                   aria-label="@T.ReportTemplate.Title"
+                                   OnClick="OpenTemplatePicker" />
+                </MudTooltip>
+            }
+            <MudTooltip Placement="Placement.Bottom" Text="@T.ReportVersions.Title">
+                <MudIconButton Icon="@Icons.Material.Filled.History"
+                               Size="Size.Small"
+                               aria-label="@T.ReportVersions.Title"
+                               OnClick="OpenVersionsAsync" />
+            </MudTooltip>
+        </div>
+
+        @foreach (var section in Sections)
+        {
+            var currentSection = section;
+            <MudTextField T="string"
+                          @bind-Value="currentSection.Body"
+                          Label="@currentSection.Label"
+                          Variant="Variant.Outlined"
+                          Margin="Margin.Dense"
+                          Lines="@(currentSection.Position == 3 ? 5 : 3)"
+                          Disabled="@(!CanEdit || currentSection.Locked)"
+                          Immediate="true"
+                          Class="mb-3" />
+        }
+
+        <MudDivider Class="my-3" />
+
+        <ReadingRoomFindingsList Findings="Findings"
+                                  SeverityOptions="SeverityOptions"
+                                  CanEdit="CanEdit"
+                                  OnSeverityChanged="OnSeverityChanged"
+                                  OnRemoveFinding="OnRemoveFinding"
+                                  OnAddFinding="OnAddFinding" />
+    </div>
+
+    <div class="rr-report-actions">
+        @if (CanEdit)
+        {
+            <MudStack Row="true" Spacing="2">
+                <MudButton Variant="Variant.Outlined" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Save" OnClick="OnSave" Disabled="Busy">@T.ReadingRoom.SaveDraft</MudButton>
+                <MudTooltip Text="@T.Common.Cancel">
+                    <MudButton Variant="Variant.Text" Color="Color.Default" StartIcon="@Icons.Material.Filled.CancelPresentation" OnClick="OnCancel" Disabled="Busy" Size="Size.Small" />
+                </MudTooltip>
+            </MudStack>
+            <MudButton Variant="Variant.Filled" Color="Color.Success" StartIcon="@Icons.Material.Filled.CheckCircle" OnClick="OnFinalize" Disabled="Busy">@T.ReadingRoom.SignReport</MudButton>
+        }
+        else if (Report.StatusKey == "Finalized")
+        {
+            <MudStack Row="true" Spacing="2">
+                <MudButton Variant="Variant.Outlined" Color="Color.Primary" StartIcon="@Icons.Material.Filled.EditNote" OnClick="OnAmend" Disabled="Busy">@T.ReadingRoom.Amend</MudButton>
+                <MudChip T="string" Color="Color.Success" Size="Size.Medium" Variant="Variant.Filled" Label="true">@(T.FormatValue(T.ReadingRoom.SignedAt, Report.FinalizedAt?.ToString("yyyy-MM-dd") ?? "-"))</MudChip>
+            </MudStack>
+        }
+        else if (Report.StatusKey == "Cancelled")
+        {
+            <MudChip T="string" Color="Color.Error" Size="Size.Medium" Variant="Variant.Outlined">@T.ReadingRoom.Cancelled</MudChip>
+        }
+    </div>
+}

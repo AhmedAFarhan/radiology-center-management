@@ -1,4 +1,4 @@
-using System.Net.Http;
+﻿using System.Net.Http;
 using System.Net.Http.Json;
 using System.ComponentModel.DataAnnotations;
 using System.Security.Claims;
@@ -15,7 +15,7 @@ using RadiologyCenter.Desktop;
 using RadiologyCenter.Desktop.Components;
 using RadiologyCenter.Desktop.Models;
 using RadiologyCenter.Desktop.Services;
-using RadiologyCenter.Desktop.Components.Pages.Auth;
+using RadiologyCenter.Desktop.Features.Auth.Components;
 
 namespace RadiologyCenter.Desktop.Components.Pages;
 

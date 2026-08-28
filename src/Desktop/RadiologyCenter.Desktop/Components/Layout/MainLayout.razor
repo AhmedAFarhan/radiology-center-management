@@ -1,6 +1,6 @@
-@inherits LayoutComponentBase
+﻿@inherits LayoutComponentBase
 @using RadiologyCenter.Desktop.Components.Pages
-@using RadiologyCenter.Desktop.Components.Pages.Auth
+@using RadiologyCenter.Desktop.Features.Auth.Components
 @using RadiologyCenter.Desktop.Models
 @inject NavigationManager Navigation
 @inject AuthService AuthService
@@ -30,112 +30,29 @@
             <MudTooltip Placement="Placement.Bottom" Text="@T.Layout.ToggleNav">
                 <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" OnClick="ToggleSidebar" aria-label="@T.Layout.ToggleNav" />
             </MudTooltip>
-            <div class="global-search" @onclick="OnSearchBoxClick">
-                <MudTextField T="string"
-                              @ref="_searchField"
-                              Placeholder="@T.Layout.SearchPlaceholder"
-                              Variant="Variant.Outlined"
-                              Margin="Margin.Dense"
-                              Immediate="true"
-                              Adornment="Adornment.Start"
-                              AdornmentIcon="@Icons.Material.Filled.Search"
-                              Value="@_searchText"
-                              ValueChanged="@(v => OnSearchTextChanged(v))"
-                              OnKeyDown="OnSearchKeyDown"
-                              OnBlur="OnSearchBlur"
-                              Class="header-search app-bar-search global-search-input" />
 
-                @if (_resultsOpen)
-                {
-                    <div class="global-search-overlay" @onmousedown="CloseSearch"></div>
-                    <div class="global-search-results">
-                        @if (_searching && _flatItems.Count > 0)
-                        {
-                            <div class="global-search-loading">
-                                <MudProgressCircular Size="Size.Small" Color="Color.Primary" Indeterminate="true" />
-                            </div>
-                        }
+            <GlobalSearch @ref="_globalSearch"
+                          SearchText="@_searchText"
+                          SearchTextChanged="OnSearchTextChanged"
+                          ResultsOpen="@_resultsOpen"
+                          Searching="@_searching"
+                          SearchError="@_searchError"
+                          ShowRecents="@_showRecents"
+                          RecentSearches="@_recentSearches"
+                          Results="@_results"
+                          FlatItems="@_flatItems"
+                          SelectedIndex="@_selectedIndex"
+                          HighlightWords="@_highlightWords"
+                          UserName="@_userName"
+                          SearchKeyDown="OnSearchKeyDown"
+                          SearchBlur="OnSearchBlur"
+                          SearchBoxClick="OnSearchBoxClick"
+                          RecentClicked="RecentClickedAsync"
+                          RetrySearch="RetrySearchAsync"
+                          ActivateItem="OnActivateItem"
+                          ViewAll="OnViewAll"
+                          CloseSearch="CloseSearch" />
 
-                        @if (_showRecents)
-                        {
-                            @if (_recentSearches.Count > 0)
-                            {
-                                <div class="global-search-group">
-                                    <div class="global-search-group-title">@T.Search.Recents</div>
-                                    @foreach (var term in _recentSearches)
-                                    {
-                                        <button type="button"
-                                                class="global-search-item"
-                                                @onmousedown:preventDefault="true"
-                                                @onmousedown="() => RecentClickedAsync(term)">
-                                            <span class="global-search-item-title">
-                                                <MudIcon Icon="@Icons.Material.Filled.History" Size="Size.Small" Class="me-1 global-search-recent-icon" />
-                                                @term
-                                            </span>
-                                        </button>
-                                    }
-                                </div>
-                            }
-                            else
-                            {
-                                <div class="global-search-status">@T.Search.TypeHint</div>
-                            }
-                        }
-                        else if (_searching && _flatItems.Count == 0)
-                        {
-                            <div class="global-search-status">@T.Common.Loading</div>
-                        }
-                        else if (_searchError)
-                        {
-                            <div class="global-search-status">
-                                @T.Search.Error
-                                <button type="button"
-                                        class="global-search-retry"
-                                        @onmousedown:preventDefault="true"
-                                        @onmousedown="RetrySearchAsync">@T.Search.Retry</button>
-                            </div>
-                        }
-                        else if (_searchText.Trim().Length < 2)
-                        {
-                            <div class="global-search-status">@T.Search.TypeHint</div>
-                        }
-                        else if (_flatItems.Count == 0)
-                        {
-                            <div class="global-search-status">@T.Search.NoResults</div>
-                        }
-                        else
-                        {
-                            @foreach (var group in _results!.Where(g => g.Items.Count > 0))
-                            {
-                                <div class="global-search-group">
-                                    <div class="global-search-group-head">
-                                        <span class="global-search-group-title">@GroupLabel(group.EntityType)</span>
-                                        <span class="global-search-group-count">@group.Count</span>
-                                        <button type="button"
-                                                class="global-search-viewall"
-                                                @onmousedown:preventDefault="true"
-                                                @onmousedown="() => ViewAllAsync(group.EntityType)">@T.Search.ViewAll</button>
-                                    </div>
-                                    @foreach (var item in group.Items)
-                                    {
-                                        <button type="button"
-                                                class="global-search-item @(IsSelected(item) ? "selected" : "")"
-                                                @onmousedown:preventDefault="true"
-                                                @onmousedown="() => ActivateAsync(new SearchFlatItem(group.EntityType, item))"
-                                                @onmouseenter="() => SelectItem(item)">
-                                            <span class="global-search-item-title">@Highlighted(item.Title)</span>
-                                            @if (!string.IsNullOrWhiteSpace(item.Subtitle))
-                                            {
-                                                <span class="global-search-item-subtitle">@item.Subtitle</span>
-                                            }
-                                        </button>
-                                    }
-                                </div>
-                            }
-                        }
-                    </div>
-                }
-            </div>
             <MudSpacer />
             <MudTooltip Placement="Placement.Bottom" Text="@T.Layout.Notifications">
                 <MudIconButton Icon="@Icons.Material.Filled.Notifications" Color="Color.Inherit" aria-label="@T.Layout.Notifications" OnClick="OnNotifications" />
@@ -193,4 +110,3 @@
         </div>
     }
 </div>
-

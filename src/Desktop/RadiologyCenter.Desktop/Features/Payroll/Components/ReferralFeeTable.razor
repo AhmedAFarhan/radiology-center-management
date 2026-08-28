@@ -1,0 +1,28 @@
+@inject AppLocalizer T
+
+<MudGrid Spacing="2" Class="mb-2">
+    <MudItem xs="12" sm="6">
+        <MudText Typo="Typo.subtitle1" Class="font-weight-medium">@T.PayRunDialog.ReferralStatements</MudText>
+    </MudItem>
+</MudGrid>
+
+<MudTable Breakpoint="Breakpoint.Sm" T="ReferralFeeStatementDto" Items="Statements" Dense="true" Hover="true" Elevation="0" Class="rounded" Style="border:1px solid rgba(0,0,0,.12)">
+    <HeaderContent>
+        <MudTh>@T.PayRunDialog.ReferralDoctor</MudTh>
+        <MudTh Class="text-right">@T.PayRunDialog.ExamCount</MudTh>
+        <MudTh Class="text-right">@T.PayRunDialog.TotalFee</MudTh>
+        <MudTh Class="text-center">@T.Common.Actions</MudTh>
+    </HeaderContent>
+    <RowTemplate Context="stmt">
+        <MudTd DataLabel="@T.PayRunDialog.ReferralDoctor">
+            <MudText Class="font-weight-medium">@ResolveDoctor(stmt.ReferralDoctorId)</MudText>
+        </MudTd>
+        <MudTd DataLabel="@T.PayRunDialog.ExamCount" Class="text-right">@stmt.ExamCount</MudTd>
+        <MudTd DataLabel="@T.PayRunDialog.TotalFee" Class="text-right"><MudText Typo="Typo.body2" Class="font-weight-medium">@stmt.TotalFee.ToString("N2")</MudText></MudTd>
+        <MudTd DataLabel="@T.Common.Actions" Class="text-center">
+            <MudTooltip Text="@T.PayRunDialog.ExportReferralPdf">
+                <MudIconButton Icon="@Icons.Material.Filled.PictureAsPdf" Size="Size.Small" Color="Color.Info" aria-label="@T.PayRunDialog.ExportReferralPdf" OnClick="@(() => OnExportPdf.InvokeAsync(stmt))" Disabled="Busy" />
+            </MudTooltip>
+        </MudTd>
+    </RowTemplate>
+</MudTable>

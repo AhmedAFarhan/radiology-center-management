@@ -1,6 +1,5 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;
-using RadiologyCenter.BuildingBlocks.Application.Abstractions;
 using RadiologyCenter.Identity.Application.Localization;
 using RadiologyCenter.Identity.Application.Abstractions;
 using RadiologyCenter.Identity.Application.DTOs;

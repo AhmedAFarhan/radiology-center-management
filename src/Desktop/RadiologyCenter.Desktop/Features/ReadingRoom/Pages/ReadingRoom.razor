@@ -1,0 +1,194 @@
+@page "/radiologist"
+@attribute [Authorize]
+
+<PageHeader Icon="@Icons.Material.Filled.Biotech" Title="@T.ReadingRoom.Title"
+            Subtitle="@T.ReadingRoom.Subtitle"
+            ShowSearch="false"
+            OnRefresh="RefreshQueueAsync">
+    <MudChip T="string" Color="Color.Primary" Size="Size.Medium" Label="true" Variant="Variant.Outlined">
+        @PendingCount @T.ReadingRoom.Pending
+    </MudChip>
+    <MudChip T="string" Color="Color.Secondary" Size="Size.Medium" Label="true" Variant="Variant.Outlined">
+        @ImagedCount @T.ReadingRoom.Imaged
+    </MudChip>
+</PageHeader>
+
+<div class="reading-room @(_worklistCollapsed ? "wl-collapsed" : string.Empty) @(_reportCollapsed ? "rpt-collapsed" : string.Empty)">
+    <section class="reading-room-pane rr-worklist">
+        <div class="rr-pane-header">
+            <MudText Typo="Typo.subtitle1" Class="font-weight-medium">@T.ReadingRoom.ReadingQueue</MudText>
+            <MudTextField T="string"
+                          Value="@_filter"
+                          ValueChanged="OnFilterChanged"
+                          Placeholder="@T.ReadingRoom.FilterPlaceholder"
+                          Variant="Variant.Outlined"
+                          Margin="Margin.Dense"
+                          Immediate="true"
+                          Adornment="Adornment.Start"
+                          AdornmentIcon="@Icons.Material.Filled.Search"
+                          Class="rr-search" />
+        </div>
+        <div class="rr-worklist-items">
+            @if (_loadingQueue)
+            {
+                <MudProgressCircular Size="Size.Large" Class="mx-auto d-block my-8" Indeterminate="true" />
+            }
+            else if (_queueError is not null)
+            {
+                <ErrorState Icon="@Icons.Material.Filled.CloudOff"
+                            Title="@T.ReadingRoom.QueueLoadErrorTitle"
+                            Message="@_queueError"
+                            RetryLabel="@T.Common.Retry"
+                            Action="LoadQueueAsync" />
+            }
+            else if (!Queue.Any())
+            {
+                <EmptyState Icon="@Icons.Material.Filled.MedicalServices"
+                            Title="@T.ReadingRoom.NoImagedStudies"
+                            Message="@T.ReadingRoom.NoImagedStudiesMessage" />
+            }
+            else
+            {
+                @foreach (var item in Queue)
+                {
+                    var current = item;
+                    <button type="button"
+                            class="rr-worklist-item @(IsSelected(current) ? "selected" : string.Empty)"
+                            @onclick="() => SelectExamAsync(current)">
+                        <div class="rr-item-top">
+                            <span class="rr-prio @PriorityClass(current.Priority)" title="@current.Priority" aria-hidden="true"></span>
+                            <span class="rr-item-name">@current.PatientName</span>
+                            <span class="rr-item-time">@current.DateLabel</span>
+                        </div>
+                        <div class="rr-item-exam">
+                            <MudIcon Icon="@Icons.Material.Filled.MedicalServices" Size="Size.Small" />
+                            <span>@current.ExamName</span>
+                        </div>
+                        <div class="rr-item-meta">
+                            <StatusChip Token="@current.ReportStatusKey">@current.ReportStatus</StatusChip>
+                            <StatusChip Token="@current.PriorityKey">@current.Priority</StatusChip>
+                            @if (current.StudyInstanceUid is null)
+                            {
+                                @if (IsLinking(current))
+                                {
+                                    <MudProgressCircular Size="Size.Small" Indeterminate="true" Class="rr-link-busy" />
+                                }
+                                else
+                                {
+                                    <button type="button"
+                                            class="rr-link-btn"
+                                            title="@T.ReadingRoom.LoadImages"
+                                            aria-label="@T.ReadingRoom.LoadImages"
+                                            @onclick="() => LinkImagesAsync(current)"
+                                            @onclick:stopPropagation="true">
+                                        <MudIcon Icon="@Icons.Material.Filled.ImageSearch" Size="Size.Small" />
+                                        <span>@T.ReadingRoom.LoadImages</span>
+                                    </button>
+                                }
+                            }
+                        </div>
+                    </button>
+                }
+            }
+        </div>
+    </section>
+
+    <section class="reading-room-pane rr-viewer @(_viewerFullscreen ? "fullscreen" : string.Empty)">
+        <div class="rr-pane-header">
+            <MudStack Row="true" AlignItems="AlignItems.Center" Spacing="1">
+                <MudIcon Icon="@Icons.Material.Filled.Monitor" Size="Size.Small" />
+                <MudText Typo="Typo.subtitle1" Class="font-weight-medium">@T.ReadingRoom.ImageViewer</MudText>
+            </MudStack>
+            <MudStack Row="true" AlignItems="AlignItems.Center" Spacing="1" Class="rr-pane-toggles">
+                <MudTooltip Placement="Placement.Bottom" Text="@(_worklistCollapsed ? T.ReadingRoom.ShowWorklist : T.ReadingRoom.HideWorklist)">
+                    <MudIconButton Icon="@(_worklistCollapsed
+                                               ? (T.IsRTL ? Icons.Material.Filled.ChevronLeft : Icons.Material.Filled.ChevronRight)
+                                               : (T.IsRTL ? Icons.Material.Filled.ChevronRight : Icons.Material.Filled.ChevronLeft))"
+                                   Size="Size.Small"
+                                   Color="Color.Default"
+                                   aria-label="@(_worklistCollapsed ? T.ReadingRoom.ShowWorklist : T.ReadingRoom.HideWorklist)"
+                                   OnClick="ToggleWorklist" />
+                </MudTooltip>
+                <MudTooltip Placement="Placement.Bottom" Text="@(_reportCollapsed ? T.ReadingRoom.ShowReport : T.ReadingRoom.HideReport)">
+                    <MudIconButton Icon="@(_reportCollapsed
+                                               ? (T.IsRTL ? Icons.Material.Filled.ChevronRight : Icons.Material.Filled.ChevronLeft)
+                                               : (T.IsRTL ? Icons.Material.Filled.ChevronLeft : Icons.Material.Filled.ChevronRight))"
+                                   Size="Size.Small"
+                                   Color="Color.Default"
+                                   aria-label="@(_reportCollapsed ? T.ReadingRoom.ShowReport : T.ReadingRoom.HideReport)"
+                                   OnClick="ToggleReport" />
+                </MudTooltip>
+                <MudTooltip Placement="Placement.Bottom" Text="@(_viewerFullscreen ? T.ReadingRoom.ExitFullscreen : T.ReadingRoom.Fullscreen)">
+                    <MudIconButton Icon="@(_viewerFullscreen ? Icons.Material.Filled.CloseFullscreen : Icons.Material.Filled.OpenInFull)"
+                                   Size="Size.Small"
+                                   Color="Color.Default"
+                                   aria-label="@(_viewerFullscreen ? T.ReadingRoom.ExitFullscreen : T.ReadingRoom.Fullscreen)"
+                                   OnClick="ToggleViewerFullscreen" />
+                </MudTooltip>
+            </MudStack>
+            <span class="rr-modality">@(Selected?.ExamName ?? "-")</span>
+        </div>
+        <div class="rr-viewer-stage">
+            @if (Selected is null)
+            {
+                <EmptyState Icon="@Icons.Material.Filled.Biotech"
+                            Title="@T.ReadingRoom.NoStudySelected"
+                            Message="@T.ReadingRoom.SelectStudyMessage" />
+            }
+            else if (SelectedStudyUrl is { } viewerUrl)
+            {
+                <iframe class="rr-ohif-frame" src="@viewerUrl" title="@Selected.ExamName" allowfullscreen></iframe>
+            }
+            else
+            {
+                <div class="rr-placeholder">
+                    <MudIcon Icon="@Icons.Material.Filled.Biotech" Size="Size.Large" Class="rr-placeholder-icon" />
+                    <MudText Typo="Typo.h6" Class="text-secondary">@Selected.PatientName</MudText>
+                    <MudText Typo="Typo.body2" Class="text-secondary">@Selected.ExamName - @Selected.PatientCode</MudText>
+                    <MudText Typo="Typo.body2" Class="text-secondary">@Selected.Priority @T.ReadingRoom.Priority</MudText>
+                    <MudText Typo="Typo.caption" Class="mt-2">@T.ReadingRoom.NoImagedStudiesMessage</MudText>
+                </div>
+            }
+        </div>
+        @if (Selected is not null && SelectedStudyUrl is null)
+        {
+            <div class="rr-thumbnails">
+                <span class="rr-thumbs-label">@T.ReadingRoom.Series</span>
+                @for (var i = 1; i <= SeriesCount; i++)
+                {
+                    var index = i;
+                    <button type="button"
+                            class="rr-thumb @(index == _selectedSeries ? "selected" : string.Empty)"
+                            title="@(T.FormatValue(T.ReadingRoom.SeriesThumbTitle, index))"
+                            @onclick="() => _selectedSeries = index">
+                        <MudText Typo="Typo.caption">S@index</MudText>
+                    </button>
+                }
+            </div>
+        }
+    </section>
+
+    <section class="reading-room-pane rr-report">
+        <ReadingRoomReportEditor Report="_report"
+                                  Loading="_loadingReport"
+                                  Error="_reportError"
+                                  CanEdit="CanEdit"
+                                  Busy="_busy"
+                                  PatientName="@(Selected?.PatientName ?? string.Empty)"
+                                  PatientCode="@(Selected?.PatientCode ?? string.Empty)"
+                                  ExamName="@(Selected?.ExamName ?? string.Empty)"
+                                  Priority="@(Selected?.Priority ?? string.Empty)"
+                                  Indication="@(Selected?.Indication)"
+                                  Sections="_sections"
+                                  Findings="_findings"
+                                  SeverityOptions="_severityOptions"
+                                  OnRetry="ReloadSelectedAsync"
+                                  OnSave="SaveAsync"
+                                  OnCancel="OpenCancelAsync"
+                                  OnFinalize="FinalizeAsync"
+                                  OnAmend="OpenAmendAsync"
+                                  OnSeverityChanged="OnSeverityChangedFromListAsync"
+                                  OnRemoveFinding="RemoveFindingAsync"
+                                  OnAddFinding="AddFindingFromListAsync" />
+    </section>
+</div>

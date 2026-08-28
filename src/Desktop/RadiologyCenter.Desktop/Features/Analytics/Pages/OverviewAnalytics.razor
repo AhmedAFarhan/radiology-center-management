@@ -1,0 +1,100 @@
+﻿@page "/analytics/overview"
+@attribute [Authorize]
+@inherits AnalyticsPageBase
+@using RadiologyCenter.Desktop.Features.Analytics.Components
+@using RadiologyCenter.Desktop.Features.Dashboard.Pages
+@using RadiologyCenter.Desktop.Models
+@inject AppLocalizer T
+
+<PageHeader Icon="@Icons.Material.Filled.Insights" Title="@T.Overview.Title" Subtitle="@T.Overview.Subtitle" OnRefresh="() => ReloadAsync()" ShowSearch="false" />
+
+<PeriodSelector Class="mb-4" />
+
+@if (Loading)
+{
+    <AnalyticsSkeleton />
+}
+else if (Error)
+{
+    <ErrorState Title="@T.Overview.LoadErrorTitle" Message="@T.Overview.LoadErrorMsg" Detail="@LastError" Action="ReloadAsync" RetryLabel="@T.Overview.Retry" />
+}
+else
+{
+    <div class="profit-hero mb-4">
+        <div class="profit-hero-body">
+            <div class="profit-hero-label">@T.Overview.NetProfit</div>
+            <div class="profit-hero-value">@AnalyticsFormat.Money(_profit!.NetProfit)</div>
+            <div class="profit-hero-sub">
+                @(T.FormatValue(T.Overview.GeneratedRevenue, AnalyticsFormat.Money(_profit.RevenueCollected)))
+            </div>
+        </div>
+        <div class="profit-hero-metrics">
+            <div class="hero-metric">
+                <div class="hero-metric-label">@T.Overview.Margin</div>
+                <div class="hero-metric-value">@AnalyticsFormat.Percent(_profit.NetMargin)</div>
+            </div>
+            <div class="hero-metric">
+                <div class="hero-metric-label">@T.Overview.Billed</div>
+                <div class="hero-metric-value">@AnalyticsFormat.MoneyCompact(_profit.TotalBilled, T.Overview.FormatThousand, T.Overview.FormatMillion)</div>
+            </div>
+            <div class="hero-metric">
+                <div class="hero-metric-label">@T.Overview.TotalCosts</div>
+                <div class="hero-metric-value">@AnalyticsFormat.MoneyCompact(_profit.TotalCosts, T.Overview.FormatThousand, T.Overview.FormatMillion)</div>
+            </div>
+        </div>
+    </div>
+
+    <MudGrid Spacing="3">
+        <MudItem xs="12" sm="6" lg="3">
+            <StatCard Label="@T.Overview.RevenueCollected" Value="@AnalyticsFormat.Money(_financial!.TotalCollected)" Icon="@Icons.Material.Filled.Payments" Color="Color.Primary" TrendText="@T.Overview.NetInvoicesPayments" TrendUp="true" />
+        </MudItem>
+        <MudItem xs="12" sm="6" lg="3">
+            <StatCard Label="@T.Overview.TotalBilled" Value="@AnalyticsFormat.Money(_financial.TotalBilled)" Icon="@Icons.Material.Filled.ReceiptLong" Color="Color.Secondary" TrendText="@ExamCountLabel()" TrendUp="true" />
+        </MudItem>
+        <MudItem xs="12" sm="6" lg="3">
+            <StatCard Label="@T.Overview.OutstandingReceivable" Value="@AnalyticsFormat.Money(_financial.Receivables)" Icon="@Icons.Material.Filled.Wallet" Color="Color.Warning" TrendText="@(T.FormatValue(T.Overview.AvgPerExam, AnalyticsFormat.Money(_financial.AvgPerExam)))" TrendUp="false" />
+        </MudItem>
+        <MudItem xs="12" sm="6" lg="3">
+            <StatCard Label="@T.Overview.DiscountsGiven" Value="@AnalyticsFormat.Money(_financial.TotalDiscounts)" Icon="@Icons.Material.Filled.LocalOffer" Color="Color.Info" TrendText="@T.Overview.RevenueStream" TrendUp="true" />
+        </MudItem>
+    </MudGrid>
+
+    <MudGrid Spacing="3" Class="mt-1">
+        <MudItem xs="12" lg="8">
+            <ChartCard Title="@T.Overview.RevenueTrend" Subtitle="@T.Overview.CollectedVsBilledByMonth">
+                <RevenueTrendChart Items="@_financial!.RevenueByMonth" />
+            </ChartCard>
+        </MudItem>
+        <MudItem xs="12" lg="4">
+            <ChartCard Title="@T.Overview.CostStructure" Subtitle="@T.Overview.WhereTheMoneyGoes">
+                <DonutChart Items="@BuildCostBreakdown()" />
+            </ChartCard>
+        </MudItem>
+        <MudItem xs="12" lg="5">
+            <ChartCard Title="@T.Overview.ReceivableAging" Subtitle="@T.Overview.OutstandingBalances">
+                <DonutChart Items="@BuildReceivableSlices()" Height="260px" />
+            </ChartCard>
+        </MudItem>
+        <MudItem xs="12" lg="7">
+            <ChartCard Title="@T.Overview.NetIncomeWaterfall" Subtitle="@T.Overview.FromRevenueToProfit">
+                <div class="waterfall">
+                    @foreach (var row in BuildWaterfall())
+                    {
+                        <div class="waterfall-row">
+                            <div class="waterfall-label">@row.Label</div>
+                            <div class="waterfall-track">
+                                <div class="waterfall-fill" style="@($"width:{row.Percent}%;background:{row.Color}")"></div>
+                            </div>
+                            <div class="waterfall-value">@AnalyticsFormat.Money(row.Value)</div>
+                        </div>
+                    }
+                </div>
+            </ChartCard>
+        </MudItem>
+    </MudGrid>
+}
+
+
+
+
+

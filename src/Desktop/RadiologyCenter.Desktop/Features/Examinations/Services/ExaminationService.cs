@@ -1,0 +1,114 @@
+﻿using RadiologyCenter.Desktop.Models;
+
+namespace RadiologyCenter.Desktop.Features.Examinations.Services;
+
+public sealed class ExaminationService : CrudServiceBase
+{
+    private const string TypesRes = "api/catalog/examination-types";
+    private const string Res = "api/examinations";
+
+    public ExaminationService(ApiClient api) : base(api) { }
+
+    public Task<PagedResult<ExaminationTypeDto>> GetTypesPagedAsync(
+        string? searchTerm,
+        string? sortBy,
+        bool sortDescending,
+        int pageNumber,
+        int pageSize,
+        CancellationToken ct = default)
+        => FetchPageAsync<ExaminationTypeDto>(TypesRes, searchTerm, sortBy, sortDescending, pageNumber, pageSize, ct);
+
+    public Task<ExaminationTypeDto> GetTypeByIdAsync(string id, CancellationToken ct = default)
+        => FetchByIdAsync<ExaminationTypeDto>(TypesRes, id, ct);
+
+    public Task<ExaminationTypeDto> CreateTypeAsync(ExaminationTypeInput input, CancellationToken ct = default)
+        => CreateEntityAsync<ExaminationTypeDto>(TypesRes, input, ct);
+
+    public Task UpdateTypeAsync(string id, ExaminationTypeInput input, CancellationToken ct = default)
+        => UpdateEntityAsync(TypesRes, id, input, ct);
+
+    public Task ActivateTypeAsync(string id, CancellationToken ct = default)
+        => SetEntityActiveAsync(TypesRes, id, true, ct);
+
+    public Task DeactivateTypeAsync(string id, CancellationToken ct = default)
+        => SetEntityActiveAsync(TypesRes, id, false, ct);
+
+    public Task DeleteTypeAsync(string id, CancellationToken ct = default)
+        => DeleteEntityAsync(TypesRes, id, ct);
+
+    public Task<byte[]> ExportTypesAsync(string? searchTerm, CancellationToken ct = default)
+        => Api.PostBytesAsync($"{TypesRes}/export", new
+        {
+            searchTerm,
+            pagination = new { pageNumber = 1, pageSize = 50_000 },
+        }, ct);
+
+    public Task<byte[]> DownloadTypesImportTemplateAsync(CancellationToken ct = default)
+        => Api.GetBytesAsync($"{TypesRes}/import-template", ct);
+
+    public Task<ExcelImportResultDto> ImportTypesAsync(string fileName, Stream content, CancellationToken ct = default)
+        => Api.PostFormAsync<ExcelImportResultDto>(
+            $"{TypesRes}/import",
+            file: ("file", fileName, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", content),
+            ct: ct);
+
+    public Task<PagedResult<ExaminationDto>> GetPagedAsync(
+        string? searchTerm,
+        string? sortBy,
+        bool sortDescending,
+        int pageNumber,
+        int pageSize,
+        CancellationToken ct = default)
+        => FetchPageAsync<ExaminationDto>(Res, searchTerm, sortBy, sortDescending, pageNumber, pageSize, ct);
+
+    public Task<ExaminationDto> GetByIdAsync(string id, CancellationToken ct = default)
+        => FetchByIdAsync<ExaminationDto>(Res, id, ct);
+
+    public Task<ExaminationDto> CreateAsync(ExaminationInput input, CancellationToken ct = default)
+        => CreateEntityAsync<ExaminationDto>(Res, input, ct);
+
+    public Task UpdateAsync(string id, ExaminationUpdateInput input, CancellationToken ct = default)
+        => UpdateEntityAsync(Res, id, input, ct);
+
+    public Task AssignStaffAsync(string id, string? radiologistId, string? technicianId, string? equipmentId = null, CancellationToken ct = default)
+        => Api.PutAsync<object>($"{Res}/{id}/staff", new { radiologistId, technicianId, equipmentId }, ct);
+
+    public Task ScheduleAsync(string id, DateTime scheduledAt, CancellationToken ct = default)
+        => Api.SendAsync($"{Res}/{id}/schedule", new { scheduledAt }, ct);
+
+    public Task<ExaminationDto> BookAsync(BookExamInput input, CancellationToken ct = default)
+        => CreateEntityAsync<ExaminationDto>($"{Res}/book", input, ct);
+
+    public Task CheckInAsync(string id, CancellationToken ct = default)
+        => Api.SendAsync($"{Res}/{id}/check-in", ct: ct);
+
+    public Task StartAsync(string id, CancellationToken ct = default)
+        => Api.SendAsync($"{Res}/{id}/start", ct: ct);
+
+    public Task CompleteAsync(string id, CancellationToken ct = default)
+        => Api.SendAsync($"{Res}/{id}/complete", ct: ct);
+
+    public Task RecordPacsImagesAsync(string id, string studyInstanceUID, string? accessionNumber = null, CancellationToken ct = default)
+        => Api.SendAsync($"{Res}/{id}/pacs-images", new { studyInstanceUID, accessionNumber }, ct);
+
+    public Task CancelAsync(string id, string? reason = null, CancellationToken ct = default)
+        => Api.SendAsync($"{Res}/{id}/cancel", new { reason }, ct);
+
+    public Task<IReadOnlyList<CalendarSlotDto>> GetCalendarSlotsAsync(
+        DateTime startDate, DateTime endDate,
+        Guid? equipmentId = null, Guid? radiologistId = null, string? modality = null,
+        CancellationToken ct = default)
+    {
+        var query = $"startDate={startDate:O}&endDate={endDate:O}";
+        if (equipmentId.HasValue) query += $"&equipmentId={equipmentId}";
+        if (radiologistId.HasValue) query += $"&radiologistId={radiologistId}";
+        if (!string.IsNullOrEmpty(modality)) query += $"&modality={modality}";
+        return Api.GetAsync<IReadOnlyList<CalendarSlotDto>>($"{Res}/calendar?{query}", ct);
+    }
+
+    public Task<IReadOnlyList<AvailableSlotDto>> GetAvailableSlotsAsync(
+        DateTime date, Guid equipmentId, int intervalMinutes = 30,
+        CancellationToken ct = default)
+        => Api.GetAsync<IReadOnlyList<AvailableSlotDto>>(
+            $"{Res}/available-slots?date={date:O}&equipmentId={equipmentId}&intervalMinutes={intervalMinutes}", ct);
+}

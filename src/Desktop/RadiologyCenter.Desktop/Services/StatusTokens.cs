@@ -1,5 +1,4 @@
-using Color = MudBlazor.Color;
-
+﻿
 namespace RadiologyCenter.Desktop.Services;
 
 public static class StatusTokens

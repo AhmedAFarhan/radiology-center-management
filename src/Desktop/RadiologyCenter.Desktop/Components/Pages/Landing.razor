@@ -1,6 +1,6 @@
-@page "/"
-@layout Layout.LandingLayout
-@using RadiologyCenter.Desktop.Components.Pages.Auth
+﻿@page "/"
+@layout Shared.Layout.LandingLayout
+@using RadiologyCenter.Desktop.Features.Auth.Components
 @using Microsoft.AspNetCore.Components.Authorization
 @inject NavigationManager Navigation
 @inject AuthenticationStateProvider AuthState
@@ -83,8 +83,10 @@ else
     </div>
 
     <div class="landing-footer">
-        <span>© @DateTime.Now.Year @T.Landing.Footer</span>
+        <span>Â© @DateTime.Now.Year @T.Landing.Footer</span>
     </div>
 </div>
 }
+
+
 

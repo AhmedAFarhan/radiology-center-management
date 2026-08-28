@@ -1,0 +1,107 @@
+@inject PayrollService PayrollService
+@inject ResourceService ResourceService
+@inject ISnackbar Snackbar
+@inject IDialogService DialogService
+@inject AppLocalizer T
+
+<MudDialog>
+    <DialogContent>
+        <DialogHeader Icon="@Icons.Material.Filled.ReceiptLong" Title="@(_payRun is null ? T.PayRunDialog.Title : T.FormatValue(T.PayRunDialog.DetailTitle, _payRun.RunFrom.ToString("yyyy-MM-dd"), _payRun.RunTo.ToString("yyyy-MM-dd")))" />
+        @if (_payRun is null)
+        {
+            <DialogSkeleton Rows="6" />
+        }
+        else
+        {
+            <MudGrid Spacing="2">
+                <MudItem xs="12">
+                    <MudPaper Elevation="0" Class="pa-4 rounded" Style="border:1px solid rgba(0,0,0,.12)">
+                        <MudGrid Spacing="2">
+                            <MudItem xs="12" sm="6" md="3">
+                                <MudText Typo="Typo.caption" Class="text-secondary">@T.PayRunDialog.Period</MudText>
+                                <MudText Typo="Typo.body1" Class="font-weight-medium">@_payRun.RunFrom.ToString("yyyy-MM-dd") → @_payRun.RunTo.ToString("yyyy-MM-dd")</MudText>
+                            </MudItem>
+                            <MudItem xs="12" sm="6" md="3">
+                                <MudText Typo="Typo.caption" Class="text-secondary">@T.Common.Status</MudText>
+                                <StatusChip Token="@_payRun.StatusKey">@_payRun.Status</StatusChip>
+                            </MudItem>
+                            <MudItem xs="12" sm="6" md="3">
+                                <MudText Typo="Typo.caption" Class="text-secondary">@T.PayRunDialog.Processed</MudText>
+                                <MudText Typo="Typo.body2">@(_payRun.ProcessedAt?.ToString("g") ?? T.PayRunDialog.NotProcessed)</MudText>
+                                @if (!string.IsNullOrWhiteSpace(_payRun.ProcessedBy))
+                                {
+                                    <MudText Typo="Typo.caption" Class="text-secondary">@(T.FormatValue(T.PayRunDialog.By, _payRun.ProcessedBy))</MudText>
+                                }
+                            </MudItem>
+                            <MudItem xs="12" sm="6" md="3">
+                                <MudText Typo="Typo.caption" Class="text-secondary">@T.PayRunDialog.Employees</MudText>
+                                <MudText Typo="Typo.body1" Class="font-weight-medium">@_payRun.Payslips.Count</MudText>
+                            </MudItem>
+                        </MudGrid>
+                        @if (!string.IsNullOrWhiteSpace(_payRun.Notes))
+                        {
+                            <MudDivider Class="my-2" />
+                            <MudText Typo="Typo.body2" Class="text-secondary">@_payRun.Notes</MudText>
+                        }
+                    </MudPaper>
+                </MudItem>
+
+                <MudItem xs="12">
+                    <PayslipTable Payslips="_payRun.Payslips"
+                                  CanEdit="CanEditPayslips"
+                                  Busy="_busy"
+                                  StaffNames="_staffNames"
+                                  OnAddPayslip="AddPayslipAsync"
+                                  OnRemovePayslip="RemovePayslipAsync"
+                                  OnExportPdf="ExportPayslipPdfAsync" />
+                </MudItem>
+
+                @if (_payRun.ReferralFeeStatements?.Count > 0)
+                {
+                    <MudItem xs="12">
+                        <ReferralFeeTable Statements="_payRun.ReferralFeeStatements"
+                                           DoctorNames="_doctorNames"
+                                           Busy="_busy"
+                                           OnExportPdf="ExportReferralStatementPdfAsync" />
+                    </MudItem>
+                }
+
+                <MudItem xs="12">
+                    <MudDivider Class="my-1" />
+                    <MudGrid Spacing="2">
+                        <MudItem xs="12">
+                            <MudText Typo="Typo.caption" Class="text-secondary">
+                                @T.PayRunDialog.Workflow
+                            </MudText>
+                        </MudItem>
+                        <MudItem xs="12" Class="d-flex flex-wrap gap-2">
+                            @if (CanCompute)
+                            {
+                                <MudButton Variant="Variant.Filled" Color="Color.Info" StartIcon="@Icons.Material.Filled.Calculate" OnClick="ComputeAsync" Disabled="_busy">@T.PayRunDialog.Compute</MudButton>
+                            }
+                            @if (CanApprove)
+                            {
+                                <MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.CheckCircle" OnClick="ApproveAsync" Disabled="_busy">@T.PayRunDialog.Approve</MudButton>
+                            }
+                            @if (CanReject)
+                            {
+                                <MudButton Variant="Variant.Outlined" Color="Color.Error" StartIcon="@Icons.Material.Filled.Cancel" OnClick="RejectAsync" Disabled="_busy">@T.PayRunDialog.Reject</MudButton>
+                            }
+                            @if (CanRestart)
+                            {
+                                <MudButton Variant="Variant.Outlined" Color="Color.Warning" StartIcon="@Icons.Material.Filled.RestartAlt" OnClick="RestartAsync" Disabled="_busy">@T.PayRunDialog.Restart</MudButton>
+                            }
+                            @if (CanPay)
+                            {
+                                <MudButton Variant="Variant.Filled" Color="Color.Success" StartIcon="@Icons.Material.Filled.Payments" OnClick="PayAsync" Disabled="_busy">@T.PayRunDialog.Pay</MudButton>
+                            }
+                        </MudItem>
+                    </MudGrid>
+                </MudItem>
+            </MudGrid>
+        }
+    </DialogContent>
+    <DialogActions>
+        <MudButton Color="Color.Default" OnClick="CloseAsync" Disabled="_busy">@T.Common.Close</MudButton>
+    </DialogActions>
+</MudDialog>

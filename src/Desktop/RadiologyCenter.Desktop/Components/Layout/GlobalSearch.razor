@@ -1,0 +1,109 @@
+@using Microsoft.AspNetCore.Components.Web
+@inject AppLocalizer T
+
+<div class="global-search" @onclick="HandleSearchBoxClick">
+    <MudTextField T="string"
+                  @ref="_searchField"
+                  Placeholder="@T.Layout.SearchPlaceholder"
+                  Variant="Variant.Outlined"
+                  Margin="Margin.Dense"
+                  Immediate="true"
+                  Adornment="Adornment.Start"
+                  AdornmentIcon="@Icons.Material.Filled.Search"
+                  Value="@SearchText"
+                  ValueChanged="@(v => SearchTextChanged.InvokeAsync(v))"
+                  OnKeyDown="HandleSearchKeyDown"
+                  OnBlur="HandleSearchBlur"
+                  Class="header-search app-bar-search global-search-input" />
+
+    @if (ResultsOpen)
+    {
+        <div class="global-search-overlay" @onmousedown="HandleCloseSearch"></div>
+        <div class="global-search-results">
+            @if (Searching && FlatItems.Count > 0)
+            {
+                <div class="global-search-loading">
+                    <MudProgressCircular Size="Size.Small" Color="Color.Primary" Indeterminate="true" />
+                </div>
+            }
+
+            @if (ShowRecents)
+            {
+                @if (RecentSearches.Count > 0)
+                {
+                    <div class="global-search-group">
+                        <div class="global-search-group-title">@T.Search.Recents</div>
+                        @foreach (var term in RecentSearches)
+                        {
+                            <button type="button"
+                                    class="global-search-item"
+                                    @onmousedown:preventDefault="true"
+                                    @onmousedown="() => OnRecentClicked(term)">
+                                <span class="global-search-item-title">
+                                    <MudIcon Icon="@Icons.Material.Filled.History" Size="Size.Small" Class="me-1 global-search-recent-icon" />
+                                    @term
+                                </span>
+                            </button>
+                        }
+                    </div>
+                }
+                else
+                {
+                    <div class="global-search-status">@T.Search.TypeHint</div>
+                }
+            }
+            else if (Searching && FlatItems.Count == 0)
+            {
+                <div class="global-search-status">@T.Common.Loading</div>
+            }
+            else if (SearchError)
+            {
+                <div class="global-search-status">
+                    @T.Search.Error
+                    <button type="button"
+                            class="global-search-retry"
+                            @onmousedown:preventDefault="true"
+                            @onmousedown="HandleRetrySearch">@T.Search.Retry</button>
+                </div>
+            }
+            else if (SearchText.Trim().Length < 2)
+            {
+                <div class="global-search-status">@T.Search.TypeHint</div>
+            }
+            else if (FlatItems.Count == 0)
+            {
+                <div class="global-search-status">@T.Search.NoResults</div>
+            }
+            else
+            {
+                @foreach (var group in Results!.Where(g => g.Items.Count > 0))
+                {
+                    <div class="global-search-group">
+                        <div class="global-search-group-head">
+                            <span class="global-search-group-title">@GroupLabel(group.EntityType)</span>
+                            <span class="global-search-group-count">@group.Count</span>
+                            <button type="button"
+                                    class="global-search-viewall"
+                                    @onmousedown:preventDefault="true"
+                                    @onmousedown="() => OnViewAll(group.EntityType)">@T.Search.ViewAll</button>
+                        </div>
+                        @foreach (var item in group.Items)
+                        {
+                            <button type="button"
+                                    class="global-search-item @(IsSelected(item) ? "selected" : "")"
+                                    @onmousedown:preventDefault="true"
+                                    @onmousedown="() => OnActivateItem(new SearchFlatItem(group.EntityType, item))"
+                                    @onmouseenter="() => SelectItem(item)">
+                                <span class="global-search-item-title">@Highlighted(item.Title)</span>
+                                @if (!string.IsNullOrWhiteSpace(item.Subtitle))
+                                {
+                                    <span class="global-search-item-subtitle">@item.Subtitle</span>
+                                }
+                            </button>
+                        }
+                    </div>
+                }
+            }
+        </div>
+    }
+</div>

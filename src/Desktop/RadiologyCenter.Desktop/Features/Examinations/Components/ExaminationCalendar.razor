@@ -1,0 +1,144 @@
+@page "/examinations/calendar"
+@attribute [Authorize]
+
+<PageHeader Icon="@Icons.Material.Filled.CalendarMonth" Title="@T.ExamCalendar.Title"
+            Subtitle="@T.ExamCalendar.Subtitle"
+            OnRefresh="LoadDataAsync">
+
+    <MudButtonGroup Variant="Variant.Outlined" Size="Size.Small" Class="me-2">
+        <MudButton OnClick="PreviousDay" StartIcon="@Icons.Material.Filled.ChevronLeft" Size="Size.Small">@T.ExamCalendar.Prev</MudButton>
+        <MudButton OnClick="GoToToday" Size="Size.Small">@T.ExamCalendar.Today</MudButton>
+        <MudButton OnClick="NextDay" EndIcon="@Icons.Material.Filled.ChevronRight" Size="Size.Small">@T.ExamCalendar.Next</MudButton>
+    </MudButtonGroup>
+
+    <MudSelect T="string" Value="@_viewMode" ValueChanged="OnViewModeChanged" Variant="Variant.Outlined" Dense="true" Class="me-2" Style="width: 100px;">
+        <MudSelectItem Value="@("day")">@T.ExamCalendar.DayView</MudSelectItem>
+        <MudSelectItem Value="@("week")">@T.ExamCalendar.WeekView</MudSelectItem>
+    </MudSelect>
+
+    <MudSelect T="string?" Value="@_selectedModality" ValueChanged="OnModalityChanged" Variant="Variant.Outlined" Dense="true" Placeholder="@T.ExamCalendar.ModalityFilter" Clearable="true" Class="me-2" Style="width: 150px;">
+        @foreach (var m in _modalities)
+        {
+            <MudSelectItem Value="@((string?)m)">@m</MudSelectItem>
+        }
+    </MudSelect>
+
+    <MudSelect T="string?" Value="@_selectedEquipmentId" ValueChanged="OnEquipmentChanged" Variant="Variant.Outlined" Dense="true" Placeholder="@T.ExamCalendar.EquipmentFilter" Clearable="true" Style="width: 200px;">
+        @foreach (var eq in _equipments)
+        {
+            <MudSelectItem Value="@((string?)eq.Id)">@eq.Name</MudSelectItem>
+        }
+    </MudSelect>
+</PageHeader>
+
+@if (_loading)
+{
+    <MudProgressCircular Indeterminate="true" Class="d-flex mx-auto my-4" />
+}
+else
+{
+    <div class="cal-container">
+        @* ── Day tabs (week view) ── *@
+        @if (_viewMode == "week" && _weekDays.Any())
+        {
+            <div class="cal-day-tabs">
+                @foreach (var day in _weekDays)
+                {
+                    <button class="cal-day-tab @(day.Date == _currentDate.Date ? "active" : "")"
+                            @onclick="() => SelectDayAsync(day.Date)">
+                        <span class="cal-day-name">@day.ToString("ddd")</span>
+                        <span class="cal-day-num">@day.Day</span>
+                    </button>
+                }
+            </div>
+        }
+
+        <MudPaper Elevation="1" Class="cal-paper">
+            <div class="cal-scroll-wrapper">
+                @* ── Left: resource names (fixed) ── *@
+                <div class="cal-resource-col">
+                    <div class="cal-resource-header">
+                        <MudText Typo="Typo.caption" Class="cal-header-label">@T.ExamCalendar.Equipment</MudText>
+                    </div>
+                    @foreach (var resource in _resources)
+                    {
+                        <div class="cal-resource-row">
+                            <div class="cal-resource-indicator" style="background: @GetModalityColor(resource.Type);"></div>
+                            <div class="cal-resource-info">
+                                <MudText Typo="Typo.body2" Class="cal-resource-name">@resource.Name</MudText>
+                                <MudText Typo="Typo.caption" Class="cal-resource-type">@resource.Type</MudText>
+                            </div>
+                        </div>
+                    }
+                </div>
+
+                @* ── Right: scrollable time grid ── *@
+                <div class="cal-time-grid" @ref="_timeGridRef">
+                    @* Time headers *@
+                    <div class="cal-time-headers">
+                        @foreach (var time in _timeHeaders)
+                        {
+                            <div class="cal-time-header-cell">
+                                <MudText Typo="Typo.caption" Class="cal-time-label">@time</MudText>
+                            </div>
+                        }
+                    </div>
+
+                    @* Slot rows *@
+                    @foreach (var resource in _resources)
+                    {
+                        <div class="cal-slot-row">
+                            @foreach (var slot in resource.Slots)
+                            {
+                                var statusClass = GetSlotStatusClass(slot);
+                                <div class="cal-slot-cell @statusClass @(slot.IsAvailable ? "available" : "occupied")"
+                                     @onclick="() => OnSlotClick(slot)">
+                                    @if (!slot.IsAvailable && slot.Exam is not null)
+                                    {
+                                        <div class="cal-slot-content">
+                                            <MudText Typo="Typo.caption" Class="cal-slot-patient">@slot.Exam.PatientName</MudText>
+                                            <MudText Typo="Typo.caption" Class="cal-slot-type">@slot.Exam.ExaminationTypeName</MudText>
+                                            <MudText Typo="Typo.caption" Class="cal-slot-time">@slot.StartTime.ToString("HH:mm") – @slot.EndTime.ToString("HH:mm")</MudText>
+                                        </div>
+                                    }
+                                    else
+                                    {
+                                        <div class="cal-slot-empty">
+                                            <MudIcon Icon="@Icons.Material.Filled.Add" Size="Size.Small" Class="cal-slot-add-icon" />
+                                        </div>
+                                    }
+                                </div>
+                            }
+                        </div>
+                    }
+
+                    @* Current time indicator *@
+                    @if (_currentTimeLeft.HasValue)
+                    {
+                        <div class="cal-now-line" style="left: @_currentTimeLeft.Value.ToString("F0")px;"></div>
+                    }
+                </div>
+            </div>
+        </MudPaper>
+
+        @* ── Legend ── *@
+        <div class="cal-legend">
+            <div class="cal-legend-item">
+                <span class="cal-legend-dot" style="background: #E8F5E9; border: 1px solid #A5D6A7;"></span>
+                <MudText Typo="Typo.caption">@T.ExamCalendar.Available</MudText>
+            </div>
+            <div class="cal-legend-item">
+                <span class="cal-legend-dot" style="background: #BBDEFB; border-left: 3px solid #1976D2;"></span>
+                <MudText Typo="Typo.caption">@T.ExamCalendar.Scheduled</MudText>
+            </div>
+            <div class="cal-legend-item">
+                <span class="cal-legend-dot" style="background: #FFE0B2; border-left: 3px solid #F57C00;"></span>
+                <MudText Typo="Typo.caption">@T.ExamCalendar.CheckedIn</MudText>
+            </div>
+            <div class="cal-legend-item">
+                <span class="cal-legend-dot" style="background: #E1BEE7; border-left: 3px solid #7B1FA2;"></span>
+                <MudText Typo="Typo.caption">@T.ExamCalendar.InProgress</MudText>
+            </div>
+        </div>
+    </div>
+}

@@ -47,7 +47,7 @@ public partial class App : Application
                         new Label
                         {
                             Text = "EGcare",
-                            TextColor = Colors.White,
+                            TextColor = Microsoft.Maui.Graphics.Colors.White,
                             FontFamily = "RobotoSlab",
                             FontAttributes = FontAttributes.Bold,
                             FontSize = 14,
@@ -55,8 +55,8 @@ public partial class App : Application
                         },
                     },
                 },
-                ForegroundColor = Colors.White,
-                BackgroundColor = Color.FromArgb("#4C58E0"),
+                ForegroundColor = Microsoft.Maui.Graphics.Colors.White,
+                BackgroundColor = Microsoft.Maui.Graphics.Color.FromArgb("#4C58E0"),
             },
         };
         CenterWindowOnLaunch(window);

@@ -1,0 +1,71 @@
+﻿@page "/analytics/operations"
+@attribute [Authorize]
+@inherits AnalyticsPageBase
+@using RadiologyCenter.Desktop.Features.Analytics.Components
+@using RadiologyCenter.Desktop.Features.Dashboard.Pages
+@using RadiologyCenter.Desktop.Models
+@inject AppLocalizer T
+
+<PageHeader Icon="@Icons.Material.Filled.Construction" Title="@T.Operational.Title" Subtitle="@T.Operational.Subtitle" OnRefresh="() => ReloadAsync()" ShowSearch="false" />
+
+<PeriodSelector Class="mb-4" />
+
+@if (Loading)
+{
+    <AnalyticsSkeleton ShowHero="false" />
+}
+else if (Error)
+{
+    <ErrorState Title="@T.Operational.LoadErrorTitle" Message="@T.Operational.LoadErrorMsg" Detail="@LastError" Action="ReloadAsync" RetryLabel="@T.Operational.Retry" />
+}
+else
+{
+    <MudGrid Spacing="3">
+        <MudItem xs="12" sm="6" lg="3">
+            <StatCard Label="@T.Operational.TotalExams" Value="@AnalyticsFormat.Count(_data!.TotalExams)" Icon="@Icons.Material.Filled.MedicalServices" Color="Color.Primary" TrendText="@T.Operational.Registered" TrendUp="true" />
+        </MudItem>
+        <MudItem xs="12" sm="6" lg="3">
+            <StatCard Label="@T.Operational.Completed" Value="@AnalyticsFormat.Count(_data.CompletedExams)" Icon="@Icons.Material.Filled.CheckCircle" Color="Color.Success" TrendText="@T.Operational.FinishedReading" TrendUp="true" />
+        </MudItem>
+        <MudItem xs="12" sm="6" lg="3">
+            <StatCard Label="@T.Operational.Cancelled" Value="@AnalyticsFormat.Count(_data.CancelledExams)" Icon="@Icons.Material.Filled.Cancel" Color="Color.Error" TrendText="@T.Operational.DidNotComplete" TrendUp="false" />
+        </MudItem>
+        <MudItem xs="12" sm="6" lg="3">
+            <StatCard Label="@T.Operational.CompletionRate" Value="@AnalyticsFormat.Percent(_data.CompletionRate)" Icon="@Icons.Material.Filled.PieChart" Color="Color.Info" TrendText="@T.Operational.CompletedOverTerminal" TrendUp="true" />
+        </MudItem>
+        <MudItem xs="12" sm="6" lg="3">
+            <StatCard Label="@T.Operational.AvgDuration" Value="@FormatMinutes(_data.AvgDurationMinutes)" Icon="@Icons.Material.Filled.Timer" Color="Color.Warning" TrendText="@T.Operational.ExamToCompletion" TrendUp="false" />
+        </MudItem>
+        <MudItem xs="12" sm="6" lg="3">
+            <StatCard Label="@T.Operational.AvgTimeToStart" Value="@FormatMinutes(_data.AvgTimeToStartMinutes)" Icon="@Icons.Material.Filled.Schedule" Color="Color.Secondary" TrendText="@T.Operational.ScheduledToStarted" TrendUp="false" />
+        </MudItem>
+    </MudGrid>
+
+    <MudGrid Spacing="3" Class="mt-1">
+        <MudItem xs="12" lg="7">
+            <ChartCard Title="@T.Operational.VolumeByMonth" Subtitle="@T.Operational.TotalVsCompletedExams">
+                <VolumeBarChart Items="@_data!.VolumeByMonth" />
+            </ChartCard>
+        </MudItem>
+        <MudItem xs="12" lg="5">
+            <ChartCard Title="@T.Operational.StatusFunnel" Subtitle="@T.Operational.ExamsInEachState">
+                <ListBarChart Items="@BuildFunnel()" SeriesName="@T.Operational.Count" />
+            </ChartCard>
+        </MudItem>
+        <MudItem xs="12" lg="6">
+            <ChartCard Title="@T.Operational.VolumeByModality" Subtitle="@T.Operational.TotalVsCompleted">
+                <ModalityVolumeChart Items="@_data!.VolumeByModality" />
+            </ChartCard>
+        </MudItem>
+        <MudItem xs="12" lg="6">
+            <ChartCard Title="@T.Operational.WorkloadByPriority" Subtitle="@T.Operational.DistributionOfExamPriority">
+                <DonutChart Items="@BuildPriority()" Height="300px" />
+            </ChartCard>
+        </MudItem>
+    </MudGrid>
+}
+
+
+
+
+
