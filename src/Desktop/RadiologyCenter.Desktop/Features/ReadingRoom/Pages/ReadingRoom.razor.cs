@@ -69,15 +69,25 @@ public partial class ReadingRoom : ComponentBase, IDisposable
         }
     }
 
-    private record CanonicalSection(string Type, string Label, int Position);
+    private record CanonicalSection(string Type, int Position);
 
     private static readonly CanonicalSection[] CanonicalTypes =
     {
-        new("ClinicalIndication", "Clinical Indication", 1),
-        new("Technique", "Technique", 2),
-        new("Findings", "Findings", 3),
-        new("Impression", "Impression / Conclusion", 4),
-        new("Recommendation", "Recommendation", 5),
+        new("ClinicalIndication", 1),
+        new("Technique", 2),
+        new("Findings", 3),
+        new("Impression", 4),
+        new("Recommendation", 5),
+    };
+
+    private string GetCanonicalLabel(string type) => type switch
+    {
+        "ClinicalIndication" => T.ReadingRoom.ClinicalIndication,
+        "Technique" => T.ReadingRoom.Technique,
+        "Findings" => T.ReadingRoom.Findings,
+        "Impression" => T.ReadingRoom.Impression,
+        "Recommendation" => T.ReadingRoom.Recommendation,
+        _ => type,
     };
 
     private IEnumerable<QueueExam> Queue
@@ -232,9 +242,9 @@ public partial class ReadingRoom : ComponentBase, IDisposable
                 {
                     Id = exam.Id,
                     PatientId = exam.PatientId,
-                    PatientName = patient?.FullName ?? "Unknown Patient",
+                    PatientName = patient?.FullName ?? T.ReadingRoom.UnknownPatient,
                     PatientCode = patientCode ?? "-",
-                    ExamName = exam.ExaminationTypeName ?? "Examination",
+                    ExamName = exam.ExaminationTypeName ?? T.Common.Examination,
                     ExaminationTypeId = exam.ExaminationTypeId,
                     StatusKey = exam.StatusKey,
                     ScheduledAt = exam.ScheduledAt,
@@ -477,7 +487,7 @@ public partial class ReadingRoom : ComponentBase, IDisposable
                 _sections.Add(new SectionEditor
                 {
                     Type = section.SectionType,
-                    Label = section.Title ?? canonical.Label,
+                    Label = section.Title ?? GetCanonicalLabel(canonical.Type),
                     Body = section.Body ?? string.Empty,
                     Position = section.Position,
                     Locked = section.IsLocked,
@@ -489,7 +499,7 @@ public partial class ReadingRoom : ComponentBase, IDisposable
                 _sections.Add(new SectionEditor
                 {
                     Type = canonical.Type,
-                    Label = canonical.Label,
+                    Label = GetCanonicalLabel(canonical.Type),
                     Body = string.Empty,
                     Position = canonical.Position,
                     Locked = false,

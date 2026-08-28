@@ -4,7 +4,7 @@ namespace RadiologyCenter.Desktop.Features.Inventory.Models;
 
 internal sealed class PurchaseOrderFormModel
 {
-    [Required(ErrorMessage = "Supplier is required.")]
+    [Required(ErrorMessage = "validation.supplierRequired")]
     public string SupplierId { get; set; } = string.Empty;
 
     public DateTime? ExpectedDeliveryAt { get; set; }

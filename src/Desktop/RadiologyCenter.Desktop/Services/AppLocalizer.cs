@@ -135,13 +135,35 @@ public sealed partial class AppLocalizer
             try
             {
                 var json = File.ReadAllText(path);
-                var dict = JsonSerializer.Deserialize<Dictionary<string, string>>(json, JsonOptions);
-                if (dict is not null && dict.Count > 0)
-                    _resources[culture] = dict;
+                var nested = JsonSerializer.Deserialize<Dictionary<string, JsonElement>>(json, JsonOptions);
+                if (nested is null || nested.Count == 0)
+                    continue;
+
+                var flat = new Dictionary<string, string>(StringComparer.Ordinal);
+                Flatten(nested, null, flat);
+                _resources[culture] = flat;
             }
             catch (JsonException)
             {
                 // A malformed resource file must not prevent the app from starting.
+            }
+        }
+    }
+
+    private static void Flatten(Dictionary<string, JsonElement> nodes, string? prefix, Dictionary<string, string> flat)
+    {
+        foreach (var kv in nodes)
+        {
+            var key = prefix is null ? kv.Key : $"{prefix}.{kv.Key}";
+            if (kv.Value.ValueKind == JsonValueKind.Object)
+            {
+                var obj = kv.Value.Deserialize<Dictionary<string, JsonElement>>(JsonOptions);
+                if (obj is not null)
+                    Flatten(obj, key, flat);
+            }
+            else
+            {
+                flat[key] = kv.Value.GetString() ?? string.Empty;
             }
         }
     }

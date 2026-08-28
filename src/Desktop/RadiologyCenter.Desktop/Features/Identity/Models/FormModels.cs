@@ -4,27 +4,27 @@ namespace RadiologyCenter.Desktop.Features.Identity.Models;
 
 internal sealed class UserFormModel
 {
-    [Required(ErrorMessage = "Username is required.")]
-    [MaxLength(256, ErrorMessage = "Username must be 256 characters or fewer.")]
+    [Required(ErrorMessage = "validation.usernameRequired")]
+    [MaxLength(256, ErrorMessage = "validation.usernameMaxLength")]
     public string UserName { get; set; } = string.Empty;
 
-    [Required(ErrorMessage = "Email is required.")]
-    [EmailAddress(ErrorMessage = "Enter a valid email address.")]
+    [Required(ErrorMessage = "validation.emailRequired")]
+    [EmailAddress(ErrorMessage = "validation.emailInvalid")]
     public string Email { get; set; } = string.Empty;
 
-    [Required(ErrorMessage = "First name is required.")]
-    [MaxLength(200, ErrorMessage = "First name must be 200 characters or fewer.")]
+    [Required(ErrorMessage = "validation.firstNameRequired")]
+    [MaxLength(200, ErrorMessage = "validation.firstNameMaxLength")]
     public string FirstName { get; set; } = string.Empty;
 
-    [Required(ErrorMessage = "Last name is required.")]
-    [MaxLength(200, ErrorMessage = "Last name must be 200 characters or fewer.")]
+    [Required(ErrorMessage = "validation.lastNameRequired")]
+    [MaxLength(200, ErrorMessage = "validation.lastNameMaxLength")]
     public string LastName { get; set; } = string.Empty;
 
     public string? PhoneNumber { get; set; }
 
-    [Required(ErrorMessage = "Password is required.")]
-    [MinLength(8, ErrorMessage = "Password must be at least 8 characters.")]
-    [RegularExpression(@"^(?=.*[A-Za-z])(?=.*\d).{8,}$", ErrorMessage = "Password must contain both letters and digits.")]
+    [Required(ErrorMessage = "validation.passwordRequired")]
+    [MinLength(8, ErrorMessage = "validation.passwordMinLength")]
+    [RegularExpression(@"^(?=.*[A-Za-z])(?=.*\d).{8,}$", ErrorMessage = "validation.passwordLettersDigits")]
     public string Password { get; set; } = string.Empty;
 
     public IReadOnlyCollection<string> SelectedRoleIds { get; set; } = new List<string>();
@@ -32,19 +32,19 @@ internal sealed class UserFormModel
 
 internal sealed class UserLockModel
 {
-    [Required(ErrorMessage = "Lock until date is required.")]
+    [Required(ErrorMessage = "validation.lockUntilDateRequired")]
     public DateTime? LockUntilDate { get; set; }
 
-    [Required(ErrorMessage = "Lock until time is required.")]
+    [Required(ErrorMessage = "validation.lockUntilTimeRequired")]
     public TimeSpan? LockUntilTime { get; set; }
 }
 
 internal sealed class RoleFormModel
 {
-    [Required(ErrorMessage = "Role name is required.")]
-    [MaxLength(256, ErrorMessage = "Role name must be 256 characters or fewer.")]
+    [Required(ErrorMessage = "validation.roleNameRequired")]
+    [MaxLength(256, ErrorMessage = "validation.roleNameMaxLength")]
     public string Name { get; set; } = string.Empty;
 
-    [MaxLength(500, ErrorMessage = "Description must be 500 characters or fewer.")]
+    [MaxLength(500, ErrorMessage = "validation.descriptionMaxLength")]
     public string? Description { get; set; }
 }

@@ -4,15 +4,15 @@ namespace RadiologyCenter.Desktop.Features.Examinations.Models;
 
 internal sealed class TypeFormModel
 {
-    [Required(ErrorMessage = "Name is required.")]
-    [MaxLength(200, ErrorMessage = "Name must be 200 characters or fewer.")]
+    [Required(ErrorMessage = "validation.nameRequired")]
+    [MaxLength(200, ErrorMessage = "validation.nameMaxLength200")]
     public string Name { get; set; } = string.Empty;
 
-    [Required(ErrorMessage = "Modality is required.")]
+    [Required(ErrorMessage = "validation.modalityRequired")]
     public string Modality { get; set; } = string.Empty;
 
-    [Required(ErrorMessage = "Body part is required.")]
-    [MaxLength(200, ErrorMessage = "Body part must be 200 characters or fewer.")]
+    [Required(ErrorMessage = "validation.bodyPartRequired")]
+    [MaxLength(200, ErrorMessage = "validation.bodyPartMaxLength")]
     public string BodyPart { get; set; } = string.Empty;
 
     public int StandardDurationMinutes { get; set; }
@@ -33,9 +33,9 @@ internal sealed class TypeItemModel
 
 internal sealed class ScheduleExamFormModel
 {
-    [Required(ErrorMessage = "Scheduled date is required.")]
+    [Required(ErrorMessage = "validation.scheduledDateRequired")]
     public DateTime? ScheduledDate { get; set; }
 
-    [Required(ErrorMessage = "Scheduled time is required.")]
+    [Required(ErrorMessage = "validation.scheduledTimeRequired")]
     public TimeSpan? ScheduledTime { get; set; }
 }

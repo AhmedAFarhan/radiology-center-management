@@ -35,7 +35,7 @@
         </MudTd>
         <MudTd DataLabel="@T.Allowance.Allowance">@context.Name</MudTd>
         <MudTd DataLabel="@T.Allowance.Amount" Class="text-right">@context.Amount.ToString("N2")</MudTd>
-        <MudTd DataLabel="@T.Allowance.Frequency">@(string.IsNullOrWhiteSpace(context.Frequency) ? "-" : FormatFrequency(context.Frequency))</MudTd>
+        <MudTd DataLabel="@T.Allowance.Frequency">@(string.IsNullOrWhiteSpace(context.Frequency) ? "-" : Formatting.FormatFrequency(T, context.Frequency))</MudTd>
         <MudTd DataLabel="@T.Allowance.PerWorkDay">
             @if (context.IsPerWorkDay)
             {

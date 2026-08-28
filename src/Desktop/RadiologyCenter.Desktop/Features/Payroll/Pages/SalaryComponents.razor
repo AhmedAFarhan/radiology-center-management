@@ -47,7 +47,7 @@
                 <StatusChip Token="Fixed">@T.SalaryComponent.Fixed</StatusChip>
             }
         </MudTd>
-        <MudTd DataLabel="@T.SalaryComponent.Frequency">@(string.IsNullOrWhiteSpace(context.Frequency) ? "-" : FormatFrequency(context.Frequency))</MudTd>
+        <MudTd DataLabel="@T.SalaryComponent.Frequency">@(string.IsNullOrWhiteSpace(context.Frequency) ? "-" : Formatting.FormatFrequency(T, context.Frequency))</MudTd>
         <MudTd DataLabel="@T.SalaryComponent.Default" Class="text-right">@(context.IsPercentage ? $"{context.DefaultValue:N2}%" : context.DefaultValue.ToString("N2"))</MudTd>
         <MudTd DataLabel="@T.Common.Status">
             <ActiveStatusChip IsActive="context.IsActive" ActiveLabel="@T.Common.Active" InactiveLabel="@T.Common.Inactive" />

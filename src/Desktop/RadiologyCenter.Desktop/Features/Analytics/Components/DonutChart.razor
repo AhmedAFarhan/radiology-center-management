@@ -10,7 +10,7 @@ else
     <ApexChart TItem="AnalyticsSlice" Height="Height" Options="_options">
         <ApexPointSeries TItem="AnalyticsSlice"
                          Items="Items"
-                         Name="Value"
+                         Name="@T.Analytics.Value"
                          SeriesType="SeriesType.Donut"
                          XValue="@(s => s.Label)"
                          YValue="@(s => s.Value)" />

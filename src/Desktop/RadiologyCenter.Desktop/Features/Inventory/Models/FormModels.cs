@@ -1,16 +1,17 @@
 using System.ComponentModel.DataAnnotations;
+using RadiologyCenter.Desktop.Shared.Components;
 
 namespace RadiologyCenter.Desktop.Features.Inventory.Models;
 
 internal sealed class ItemFormModel : IValidatableObject
 {
-    [Required(ErrorMessage = "Name is required.")]
+    [Required(ErrorMessage = "validation.nameRequired")]
     public string Name { get; set; } = string.Empty;
 
-    [Required(ErrorMessage = "Category is required.")]
+    [Required(ErrorMessage = "validation.categoryRequired")]
     public string Category { get; set; } = string.Empty;
 
-    [Required(ErrorMessage = "Unit is required.")]
+    [Required(ErrorMessage = "validation.unitRequired")]
     public string Unit { get; set; } = string.Empty;
 
     public string? Brand { get; set; }
@@ -22,16 +23,16 @@ internal sealed class ItemFormModel : IValidatableObject
     public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
     {
         if (ReorderLevel < 0)
-            yield return new ValidationResult("Reorder level cannot be negative.", new[] { nameof(ReorderLevel) });
+            yield return new ValidationResult(ValidationKeys.ReorderLevelNonNegative, new[] { nameof(ReorderLevel) });
 
         if (ReorderQuantity < 0)
-            yield return new ValidationResult("Reorder quantity cannot be negative.", new[] { nameof(ReorderQuantity) });
+            yield return new ValidationResult(ValidationKeys.ReorderQuantityNonNegative, new[] { nameof(ReorderQuantity) });
     }
 }
 
 internal sealed class IssueStockModel
 {
-    [Range(1, int.MaxValue, ErrorMessage = "Quantity must be at least 1.")]
+    [Range(1, int.MaxValue, ErrorMessage = "validation.quantityMinOne")]
     public int? Quantity { get; set; }
 
     public string? Reference { get; set; }
@@ -41,26 +42,26 @@ internal sealed class IssueStockModel
 
 internal sealed class SupplierFormModel
 {
-    [Required(ErrorMessage = "Name is required.")]
-    [MaxLength(200, ErrorMessage = "Name must be 200 characters or fewer.")]
+    [Required(ErrorMessage = "validation.nameRequired")]
+    [MaxLength(200, ErrorMessage = "validation.nameMaxLength200")]
     public string Name { get; set; } = string.Empty;
 
-    [Required(ErrorMessage = "Phone is required.")]
-    [MaxLength(30, ErrorMessage = "Phone must be 30 characters or fewer.")]
+    [Required(ErrorMessage = "validation.phoneRequired")]
+    [MaxLength(30, ErrorMessage = "validation.phoneMaxLength")]
     public string Phone { get; set; } = string.Empty;
 
-    [MaxLength(100, ErrorMessage = "Contact person must be 100 characters or fewer.")]
+    [MaxLength(100, ErrorMessage = "validation.contactPersonMaxLength")]
     public string? ContactPerson { get; set; }
 
-    [EmailAddress(ErrorMessage = "Enter a valid email address.")]
+    [EmailAddress(ErrorMessage = "validation.emailInvalid")]
     public string? Email { get; set; }
 
-    [MaxLength(300, ErrorMessage = "Address must be 300 characters or fewer.")]
+    [MaxLength(300, ErrorMessage = "validation.addressMaxLength")]
     public string? Address { get; set; }
 
-    [MaxLength(50, ErrorMessage = "Tax number must be 50 characters or fewer.")]
+    [MaxLength(50, ErrorMessage = "validation.taxNumberMaxLength")]
     public string? TaxNumber { get; set; }
 
-    [MaxLength(200, ErrorMessage = "Payment terms must be 200 characters or fewer.")]
+    [MaxLength(200, ErrorMessage = "validation.paymentTermsMaxLength")]
     public string? PaymentTerms { get; set; }
 }

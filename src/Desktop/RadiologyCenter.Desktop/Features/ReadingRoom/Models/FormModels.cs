@@ -4,9 +4,9 @@ namespace RadiologyCenter.Desktop.Features.ReadingRoom.Models;
 
 internal sealed class AssignStaffFormModel
 {
-    [Required(ErrorMessage = "Radiologist is required.")]
+    [Required(ErrorMessage = "validation.radiologistRequired")]
     public string? RadiologistId { get; set; }
 
-    [Required(ErrorMessage = "Technician is required.")]
+    [Required(ErrorMessage = "validation.technicianRequired")]
     public string? TechnicianId { get; set; }
 }

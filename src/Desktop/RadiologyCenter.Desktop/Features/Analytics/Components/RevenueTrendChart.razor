@@ -11,13 +11,13 @@ else
     <ApexChart TItem="RevenuePointDto" Height="Height" Options="_options">
         <ApexPointSeries TItem="RevenuePointDto"
                          Items="Items"
-                         Name="Collected"
+                         Name="@T.Analytics.Collected"
                          SeriesType="SeriesType.Area"
                          XValue="@(r => r.Month)"
                          YValue="@(r => r.Collected)" />
         <ApexPointSeries TItem="RevenuePointDto"
                          Items="Items"
-                         Name="Billed"
+                         Name="@T.Analytics.Billed"
                          SeriesType="SeriesType.Area"
                          XValue="@(r => r.Month)"
                          YValue="@(r => r.Billed)" />

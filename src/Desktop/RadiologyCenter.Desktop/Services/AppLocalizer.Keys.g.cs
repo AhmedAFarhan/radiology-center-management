@@ -358,6 +358,13 @@ public sealed class AnalyticsGroup : LocalizerGroup
     public string ThisMonth => Get("analytics.thisMonth");
     public string ThisYear => Get("analytics.thisYear");
     public string Today => Get("analytics.today");
+    public string ExamsPerMachine => Get("analytics.examsPerMachine");
+    public string ActiveMachines => Get("analytics.activeMachines");
+    public string Total => Get("analytics.total");
+    public string Completed => Get("analytics.completed");
+    public string Collected => Get("analytics.collected");
+    public string Billed => Get("analytics.billed");
+    public string Value => Get("analytics.value");
 }
 
 public sealed class BootSplashGroup : LocalizerGroup
@@ -590,6 +597,11 @@ public sealed class CommonGroup : LocalizerGroup
     public string EmptyTitle => Get("common.emptyTitle");
     public string ErrorTitle => Get("common.errorTitle");
     public string ExportToExcel => Get("common.exportToExcel");
+    public string Examination => Get("common.examination");
+    public string FrequencyAnnual => Get("common.frequencyAnnual");
+    public string FrequencyMonthly => Get("common.frequencyMonthly");
+    public string FrequencyOneTime => Get("common.frequencyOneTime");
+    public string FrequencyQuarterly => Get("common.frequencyQuarterly");
     public string Import => Get("common.import");
     public string ImportExcelHint => Get("common.importExcelHint");
     public string ImportFailed => Get("common.importFailed");
@@ -696,6 +708,8 @@ public sealed class EquipmentGroup : LocalizerGroup
     public string SerialNumber => Get("equipment.serialNumber");
     public string SetStatus => Get("equipment.setStatus");
     public string SetStatusTitle => Get("equipment.setStatusTitle");
+    public string StatusOutOfService => Get("equipment.statusOutOfService");
+    public string StatusUnderMaintenance => Get("equipment.statusUnderMaintenance");
     public string Subtitle => Get("equipment.subtitle");
     public string Title => Get("equipment.title");
     public string ToggleStatus => Get("equipment.toggleStatus");
@@ -1638,6 +1652,7 @@ public sealed class ReadingRoomGroup : LocalizerGroup
     public string Imaged => Get("readingRoom.imaged");
     public string ImagesLinked => Get("readingRoom.imagesLinked");
     public string ImageViewer => Get("readingRoom.imageViewer");
+    public string Impression => Get("readingRoom.impression");
     public string Keep => Get("readingRoom.keep");
     public string LoadImages => Get("readingRoom.loadImages");
     public string NoDraftMessage => Get("readingRoom.noDraftMessage");
@@ -1651,6 +1666,7 @@ public sealed class ReadingRoomGroup : LocalizerGroup
     public string Priority => Get("readingRoom.priority");
     public string QueueLoadErrorTitle => Get("readingRoom.queueLoadErrorTitle");
     public string ReadingQueue => Get("readingRoom.readingQueue");
+    public string Recommendation => Get("readingRoom.recommendation");
     public string RegionAnatomy => Get("readingRoom.regionAnatomy");
     public string Remove => Get("readingRoom.remove");
     public string RemoveFinding => Get("readingRoom.removeFinding");
@@ -1676,7 +1692,9 @@ public sealed class ReadingRoomGroup : LocalizerGroup
     public string StartReport => Get("readingRoom.startReport");
     public string Subtitle => Get("readingRoom.subtitle");
     public string TemplateApplied => Get("readingRoom.templateApplied");
+    public string Technique => Get("readingRoom.technique");
     public string Title => Get("readingRoom.title");
+    public string UnknownPatient => Get("readingRoom.unknownPatient");
     public string Unreachable => Get("readingRoom.unreachable");
 }
 

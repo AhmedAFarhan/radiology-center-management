@@ -11,13 +11,13 @@ else
     <ApexChart TItem="ModalityVolumeDto" Height="Height" Options="_options">
         <ApexPointSeries TItem="ModalityVolumeDto"
                          Items="Items"
-                         Name="Total"
+                         Name="@T.Analytics.Total"
                          SeriesType="SeriesType.Bar"
                          XValue="@(m => m.Modality)"
                          YValue="@(m => m.Total)" />
         <ApexPointSeries TItem="ModalityVolumeDto"
                          Items="Items"
-                         Name="Completed"
+                         Name="@T.Analytics.Completed"
                          SeriesType="SeriesType.Bar"
                          XValue="@(m => m.Modality)"
                          YValue="@(m => m.Completed)" />

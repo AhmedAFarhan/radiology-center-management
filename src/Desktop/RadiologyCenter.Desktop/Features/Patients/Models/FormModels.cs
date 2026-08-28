@@ -1,22 +1,23 @@
 using System.ComponentModel.DataAnnotations;
+using RadiologyCenter.Desktop.Shared.Components;
 
 namespace RadiologyCenter.Desktop.Features.Patients.Models;
 
 internal sealed class PatientFormModel : IValidatableObject
 {
-    [Required(ErrorMessage = "Full name is required.")]
+    [Required(ErrorMessage = "validation.fullNameRequired")]
     public string FullName { get; set; } = string.Empty;
 
-    [Required(ErrorMessage = "Gender is required.")]
+    [Required(ErrorMessage = "validation.genderRequired")]
     public string Gender { get; set; } = string.Empty;
 
     public DateTime? DateOfBirth { get; set; }
     public int? Age { get; set; }
 
-    [Required(ErrorMessage = "Phone number is required.")]
+    [Required(ErrorMessage = "validation.phoneNumberRequired")]
     public string PhoneNumber { get; set; } = string.Empty;
 
-    [EmailAddress(ErrorMessage = "Enter a valid email address.")]
+    [EmailAddress(ErrorMessage = "validation.emailInvalid")]
     public string? Email { get; set; }
 
     public string? Address { get; set; }
@@ -29,23 +30,23 @@ internal sealed class PatientFormModel : IValidatableObject
     {
         if (DateOfBirth is null && Age is null)
             yield return new ValidationResult(
-                "Either date of birth or age must be provided.",
+                ValidationKeys.DobOrAgeRequired,
                 new[] { nameof(DateOfBirth) });
 
         if (DateOfBirth is not null && DateOfBirth.Value.Date > DateTime.UtcNow.Date)
             yield return new ValidationResult(
-                "Date of birth cannot be in the future.",
+                ValidationKeys.DobNotFuture,
                 new[] { nameof(DateOfBirth) });
 
         if (Age is not null && Age.Value is < 0 or > 150)
             yield return new ValidationResult(
-                "Age must be between 0 and 150.",
+                ValidationKeys.AgeRange,
                 new[] { nameof(Age) });
 
         var parts = FullName?.Split(' ', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
         if (parts is null || parts.Length < 2)
             yield return new ValidationResult(
-                "Full name must contain at least a first name and a last name.",
+                ValidationKeys.FullNameFirstLast,
                 new[] { nameof(FullName) });
     }
 }

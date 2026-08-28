@@ -11,7 +11,7 @@ else
     <ApexChart TItem="RevenueByModalityDto" Height="Height" Options="_options">
         <ApexPointSeries TItem="RevenueByModalityDto"
                          Items="Items"
-                         Name="Collected"
+                         Name="@T.Analytics.Collected"
                          SeriesType="SeriesType.Bar"
                          XValue="@(m => m.Modality)"
                          YValue="@(m => m.Collected)" />

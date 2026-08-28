@@ -9,14 +9,14 @@ internal sealed class VisitFormModel
 
     public string? TechnicianId { get; set; }
 
-    [Required(ErrorMessage = "Patient is required.")]
+    [Required(ErrorMessage = "validation.patientRequired")]
     public PatientDto? Patient { get; set; }
 
-    [Required(ErrorMessage = "Examination type is required.")]
+    [Required(ErrorMessage = "validation.examinationTypeRequired")]
     public ExaminationTypeDto? ExaminationType { get; set; }
 
-    [Required(ErrorMessage = "Clinical indication is required.")]
-    [MaxLength(1000, ErrorMessage = "Clinical indication must be 1000 characters or fewer.")]
+    [Required(ErrorMessage = "validation.clinicalIndicationRequired")]
+    [MaxLength(1000, ErrorMessage = "validation.clinicalIndicationMaxLength")]
     public string ClinicalIndication { get; set; } = string.Empty;
 
     public string Priority { get; set; } = "Routine";
@@ -34,9 +34,9 @@ internal sealed class VisitFormModel
 
 internal sealed class VisitScheduleModel
 {
-    [Required(ErrorMessage = "Scheduled date is required.")]
+    [Required(ErrorMessage = "validation.scheduledDateRequired")]
     public DateTime? ScheduledDate { get; set; }
 
-    [Required(ErrorMessage = "Scheduled time is required.")]
+    [Required(ErrorMessage = "validation.scheduledTimeRequired")]
     public TimeSpan? ScheduledTime { get; set; }
 }

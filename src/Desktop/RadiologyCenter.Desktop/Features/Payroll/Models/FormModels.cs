@@ -7,20 +7,20 @@ internal sealed class SalaryFormModel
 {
     public decimal BaseSalary { get; set; }
 
-    [Required(ErrorMessage = "Salary type is required.")]
+    [Required(ErrorMessage = "validation.salaryTypeRequired")]
     public string SalaryType { get; set; } = "Monthly";
 
-    [Required(ErrorMessage = "Effective date is required.")]
+    [Required(ErrorMessage = "validation.effectiveDateRequired")]
     public DateTime? EffectiveDate { get; set; }
 }
 
 internal sealed class SalaryComponentFormModel
 {
-    [Required(ErrorMessage = "Name is required.")]
-    [MaxLength(100, ErrorMessage = "Name must be 100 characters or fewer.")]
+    [Required(ErrorMessage = "validation.nameRequired")]
+    [MaxLength(100, ErrorMessage = "validation.nameMaxLength100")]
     public string Name { get; set; } = string.Empty;
 
-    [Required(ErrorMessage = "Kind is required.")]
+    [Required(ErrorMessage = "validation.kindRequired")]
     public string Kind { get; set; } = "Earning";
 
     public string? Frequency { get; set; }
@@ -34,8 +34,8 @@ internal sealed class SalaryComponentFormModel
 
 internal sealed class AllowanceFormModel
 {
-    [Required(ErrorMessage = "Allowance name is required.")]
-    [MaxLength(100, ErrorMessage = "Allowance name must be 100 characters or fewer.")]
+    [Required(ErrorMessage = "validation.allowanceNameRequired")]
+    [MaxLength(100, ErrorMessage = "validation.allowanceNameMaxLength")]
     public string Name { get; set; } = string.Empty;
 
     public decimal Amount { get; set; }
@@ -44,7 +44,7 @@ internal sealed class AllowanceFormModel
 
     public bool IsPerWorkDay { get; set; }
 
-    [Required(ErrorMessage = "Effective date is required.")]
+    [Required(ErrorMessage = "validation.effectiveDateRequired")]
     public DateTime? EffectiveDate { get; set; }
 
     public DateTime? EndDate { get; set; }
@@ -52,7 +52,7 @@ internal sealed class AllowanceFormModel
 
 internal sealed class ExaminationFeeFormModel
 {
-    [Required(ErrorMessage = "Role is required.")]
+    [Required(ErrorMessage = "validation.roleRequired")]
     public string Role { get; set; } = "Radiologist";
 
     public decimal Amount { get; set; }
@@ -69,7 +69,7 @@ internal sealed class ReferralFeeFormModel
 
 internal sealed class AddPayslipFormModel
 {
-    [Required(ErrorMessage = "Employee is required.")]
+    [Required(ErrorMessage = "validation.employeeRequired")]
     public StaffDto? SelectedStaff { get; set; }
 }
 

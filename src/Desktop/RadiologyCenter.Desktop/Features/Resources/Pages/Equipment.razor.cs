@@ -99,10 +99,10 @@ public partial class Equipment : ListPageBase<EquipmentDto>
             () => T.Equipment.Unreachable);
     }
 
-    private static string FormatStatus(string status) => status switch
+    private string FormatStatus(string status) => status switch
     {
-        "UnderMaintenance" => "Under Maintenance",
-        "OutOfService" => "Out of Service",
+        "UnderMaintenance" => T.Equipment.StatusUnderMaintenance,
+        "OutOfService" => T.Equipment.StatusOutOfService,
         _ => status,
     };
 }
