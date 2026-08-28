@@ -1,0 +1,39 @@
+@inject BackendStatusService Backend
+@inject AppLocalizer T
+@inject IJSRuntime JS
+
+<MudRTLProvider RightToLeft="@T.IsRTL">
+    <MudThemeProvider Theme="@AppTheme.Default" IsDarkMode="false" />
+    <MudPopoverProvider />
+    <MudDialogProvider />
+    <MudSnackbarProvider />
+
+    @if (Backend.IsReady)
+    {
+        <CascadingAuthenticationState>
+            <AppErrorBoundary>
+                <Router AppAssembly="typeof(MauiProgram).Assembly" NotFoundPage="typeof(Pages.NotFound)" @key="_languageKey">
+                    <Found Context="routeData">
+                        <AuthorizeRouteView RouteData="routeData" DefaultLayout="typeof(MainLayout)">
+                            <NotAuthorized>
+                                <RedirectToLogin />
+                            </NotAuthorized>
+                            <Authorizing>
+                                <div class="d-flex align-items-center justify-content-center" style="height: 100vh;">
+                                    <MudSkeleton SkeletonType="SkeletonType.Rectangle" Width="320px" Height="180px" Animation="Animation.Pulse" Style="border-radius:12px" />
+                                </div>
+                            </Authorizing>
+                        </AuthorizeRouteView>
+                        <FocusOnNavigate RouteData="routeData" Selector="h1" />
+                    </Found>
+                </Router>
+            </AppErrorBoundary>
+        </CascadingAuthenticationState>
+    }
+    else
+    {
+        <BootSplash />
+    }
+</MudRTLProvider>
+
+

@@ -9,7 +9,11 @@
             SearchValue="@SearchQuery"
             SearchPlaceholder="@T.ReferralDoctor.SearchPlaceholder"
             OnRefresh="ReloadAsync">
-    <MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Add" OnClick="OpenCreateDialogAsync">@T.ReferralDoctor.Add</MudButton>
+    <AuthorizeView Policy="@ResourcesPermissions.ReferralDoctorsCreate">
+        <Authorized Context="auth">
+            <MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Add" OnClick="OpenCreateDialogAsync">@T.ReferralDoctor.Add</MudButton>
+        </Authorized>
+    </AuthorizeView>
 </PageHeader>
 
 <MudTable Breakpoint="Breakpoint.Sm" T="ReferralDoctorDto" @ref="Table" ServerData="LoadServerData" Dense="true" Hover="true" Striped="true" Elevation="1" RowsPerPage="10" FixedHeader="true" Class="table-scroll">
@@ -34,13 +38,27 @@
             <ActiveStatusChip IsActive="context.IsActive" ActiveLabel="@T.Common.Active" InactiveLabel="@T.Common.Inactive" />
         </MudTd>
         <MudTd DataLabel="@T.Common.Actions">
-            <RowActions IsActive="context.IsActive"
-                        EditLabel="@T.Common.Edit"
-                        ToggleLabel="@T.ReferralDoctor.ToggleStatus"
-                        DeleteLabel="@T.Common.Delete"
-                        OnEdit="@(() => OpenEditDialogAsync(context))"
-                        OnToggle="@(() => ToggleActiveAsync(context))"
-                        OnDelete="@(() => DeleteDoctorAsync(context))" />
+            <AuthorizeView Policy="@ResourcesPermissions.ReferralDoctorsUpdate">
+                <Authorized Context="auth">
+                    <MudTooltip Placement="Placement.Bottom" Text="@T.Common.Edit">
+                        <MudIconButton Icon="@Icons.Material.Filled.Edit" Size="Size.Small" Color="Color.Default" aria-label="@T.Common.Edit" OnClick="@(() => OpenEditDialogAsync(context))" />
+                    </MudTooltip>
+                    <MudTooltip Placement="Placement.Bottom" Text="@T.ReferralDoctor.ToggleStatus">
+                        <MudIconButton Icon="@(context.IsActive ? Icons.Material.Filled.Block : Icons.Material.Filled.CheckCircle)"
+                                       Size="Size.Small"
+                                       Color="@(context.IsActive ? Color.Default : Color.Success)"
+                                       aria-label="@T.ReferralDoctor.ToggleStatus"
+                                       OnClick="@(() => ToggleActiveAsync(context))" />
+                    </MudTooltip>
+                </Authorized>
+            </AuthorizeView>
+            <AuthorizeView Policy="@ResourcesPermissions.ReferralDoctorsDelete">
+                <Authorized Context="auth">
+                    <MudTooltip Placement="Placement.Bottom" Text="@T.Common.Delete">
+                        <MudIconButton Icon="@Icons.Material.Filled.Delete" Size="Size.Small" Color="Color.Error" aria-label="@T.Common.Delete" OnClick="@(() => DeleteDoctorAsync(context))" />
+                    </MudTooltip>
+                </Authorized>
+            </AuthorizeView>
         </MudTd>
     </RowTemplate>
     <NoRecordsContent>

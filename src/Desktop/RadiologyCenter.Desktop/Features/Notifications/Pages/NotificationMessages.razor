@@ -26,7 +26,11 @@
             <MudSelectItem Value="@status.Key">@status.Value</MudSelectItem>
         }
     </MudSelect>
-    <MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Send" OnClick="OpenSendDialogAsync">@T.SendDialog.Title</MudButton>
+    <AuthorizeView Policy="@NotificationPermissions.MessagesSend">
+        <Authorized>
+            <MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Send" OnClick="OpenSendDialogAsync">@T.SendDialog.Title</MudButton>
+        </Authorized>
+    </AuthorizeView>
 </PageHeader>
 
 <MudTable Breakpoint="Breakpoint.Sm" T="NotificationMessageDto" @ref="Table" ServerData="LoadServerData" Dense="true" Hover="true" Striped="true" Elevation="1" RowsPerPage="10" FixedHeader="true" Class="table-scroll">

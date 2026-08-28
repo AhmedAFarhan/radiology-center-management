@@ -86,4 +86,9 @@
     <ProjectReference Include="..\..\Backend\Localhost\RadiologyCenter.Localhost\RadiologyCenter.Localhost.csproj" ReferenceOutputAssembly="false" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Helpers\" />
+    <Folder Include="Security\" />
+  </ItemGroup>
+
 </Project>

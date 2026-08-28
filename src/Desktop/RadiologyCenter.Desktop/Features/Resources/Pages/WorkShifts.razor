@@ -8,7 +8,11 @@
             SearchValueChanged="OnSearchChanged"
             SearchPlaceholder="@T.WorkShift.SearchPlaceholder"
             OnRefresh="ReloadAsync">
-    <MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Add" OnClick="OpenCreateDialogAsync">@T.WorkShift.Add</MudButton>
+    <AuthorizeView Policy="@ResourcesPermissions.ShiftsCreate">
+        <Authorized Context="auth">
+            <MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Add" OnClick="OpenCreateDialogAsync">@T.WorkShift.Add</MudButton>
+        </Authorized>
+    </AuthorizeView>
 </PageHeader>
 
 <MudTable Breakpoint="Breakpoint.Sm" T="WorkShiftDto" @ref="Table" ServerData="LoadServerData" Dense="true" Hover="true" Striped="true" Elevation="1" RowsPerPage="10" FixedHeader="true" Class="table-scroll">
@@ -32,12 +36,20 @@
         <MudTd DataLabel="@T.WorkShift.Equipment">@(string.IsNullOrWhiteSpace(context.EquipmentId) ? "-" : ResolveEquipment(context.EquipmentId))</MudTd>
         <MudTd DataLabel="@T.WorkShift.Notes">@(string.IsNullOrWhiteSpace(context.Notes) ? "-" : context.Notes)</MudTd>
         <MudTd DataLabel="@T.Common.Actions">
-            <MudTooltip Placement="Placement.Bottom" Text="@T.Common.Edit">
-                <MudIconButton Icon="@Icons.Material.Filled.Edit" Size="Size.Small" Color="Color.Default" aria-label="@T.Common.Edit" OnClick="@(() => OpenEditDialogAsync(context))" />
-            </MudTooltip>
-            <MudTooltip Placement="Placement.Bottom" Text="@T.Common.Delete">
-                <MudIconButton Icon="@Icons.Material.Filled.Delete" Size="Size.Small" Color="Color.Error" aria-label="@T.Common.Delete" OnClick="@(() => DeleteShiftAsync(context))" />
-            </MudTooltip>
+            <AuthorizeView Policy="@ResourcesPermissions.ShiftsUpdate">
+                <Authorized Context="auth">
+                    <MudTooltip Placement="Placement.Bottom" Text="@T.Common.Edit">
+                        <MudIconButton Icon="@Icons.Material.Filled.Edit" Size="Size.Small" Color="Color.Default" aria-label="@T.Common.Edit" OnClick="@(() => OpenEditDialogAsync(context))" />
+                    </MudTooltip>
+                </Authorized>
+            </AuthorizeView>
+            <AuthorizeView Policy="@ResourcesPermissions.ShiftsDelete">
+                <Authorized Context="auth">
+                    <MudTooltip Placement="Placement.Bottom" Text="@T.Common.Delete">
+                        <MudIconButton Icon="@Icons.Material.Filled.Delete" Size="Size.Small" Color="Color.Error" aria-label="@T.Common.Delete" OnClick="@(() => DeleteShiftAsync(context))" />
+                    </MudTooltip>
+                </Authorized>
+            </AuthorizeView>
         </MudTd>
     </RowTemplate>
     <NoRecordsContent>

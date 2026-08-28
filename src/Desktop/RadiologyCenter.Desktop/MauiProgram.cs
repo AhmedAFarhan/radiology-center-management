@@ -5,7 +5,7 @@ using MudBlazor.Utilities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Components.Authorization;
 using RadiologyCenter.Desktop.Services;
-using RadiologyCenter.Desktop.Services.Authorization;
+using RadiologyCenter.Desktop.Security.Authorization;
 
 namespace RadiologyCenter.Desktop;
 

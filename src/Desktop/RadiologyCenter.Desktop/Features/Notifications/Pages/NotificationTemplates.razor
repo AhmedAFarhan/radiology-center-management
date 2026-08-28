@@ -38,6 +38,9 @@
                         EditLabel="@T.Common.Edit"
                         ToggleLabel="@T.Notifications.ToggleStatus"
                         DeleteLabel="@T.Common.Delete"
+                        EditPolicy="@NotificationPermissions.TemplatesManage"
+                        TogglePolicy="@NotificationPermissions.TemplatesManage"
+                        DeletePolicy="@NotificationPermissions.TemplatesManage"
                         OnEdit="@(() => OpenEditDialogAsync(context))"
                         OnToggle="@(() => ToggleActiveAsync(context))"
                         OnDelete="@(() => DeleteTemplateAsync(context))" />

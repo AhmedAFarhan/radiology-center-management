@@ -14,7 +14,11 @@
             SearchValueChanged="OnSearchChanged"
             SearchPlaceholder="@T.Visits.SearchPlaceholder"
             OnRefresh="ReloadAsync">
-    <MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Add" OnClick="OpenCreateDialogAsync">@T.Visits.NewVisit</MudButton>
+    <AuthorizeView Policy="@AppointmentsPermissions.Create">
+        <Authorized Context="auth">
+            <MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Add" OnClick="OpenCreateDialogAsync">@T.Visits.NewVisit</MudButton>
+        </Authorized>
+    </AuthorizeView>
 </PageHeader>
 
 <MudTable Breakpoint="Breakpoint.Sm" T="ExaminationDto" @ref="_table" ServerData="LoadServerData" Dense="true" Hover="true" Striped="true" Elevation="1" RowsPerPage="10" FixedHeader="true" Class="table-scroll">
@@ -61,39 +65,63 @@
             }
             @if (context.StatusKey is "Requested" or "Scheduled" or "CheckedIn")
             {
-                <MudTooltip Placement="Placement.Bottom" Text="@T.Visits.EditVisit">
-                    <MudIconButton Icon="@Icons.Material.Filled.Edit" Size="Size.Small" Color="Color.Primary" aria-label="@T.Visits.EditVisit" OnClick="@(() => OpenEditDialogAsync(context))" />
-                </MudTooltip>
+                <AuthorizeView Policy="@AppointmentsPermissions.Update">
+                    <Authorized Context="auth">
+                        <MudTooltip Placement="Placement.Bottom" Text="@T.Visits.EditVisit">
+                            <MudIconButton Icon="@Icons.Material.Filled.Edit" Size="Size.Small" Color="Color.Primary" aria-label="@T.Visits.EditVisit" OnClick="@(() => OpenEditDialogAsync(context))" />
+                        </MudTooltip>
+                    </Authorized>
+                </AuthorizeView>
             }
             @if (context.StatusKey == "Requested")
             {
-                <MudTooltip Placement="Placement.Bottom" Text="@T.Visits.Schedule">
-                    <MudIconButton Icon="@Icons.Material.Filled.Schedule" Size="Size.Small" Color="Color.Info" aria-label="@T.Visits.Schedule" OnClick="@(() => OpenScheduleDialogAsync(context))" />
-                </MudTooltip>
+                <AuthorizeView Policy="@AppointmentsPermissions.Update">
+                    <Authorized Context="auth">
+                        <MudTooltip Placement="Placement.Bottom" Text="@T.Visits.Schedule">
+                            <MudIconButton Icon="@Icons.Material.Filled.Schedule" Size="Size.Small" Color="Color.Info" aria-label="@T.Visits.Schedule" OnClick="@(() => OpenScheduleDialogAsync(context))" />
+                        </MudTooltip>
+                    </Authorized>
+                </AuthorizeView>
             }
             @if (context.StatusKey == "Scheduled")
             {
-                <MudTooltip Placement="Placement.Bottom" Text="@T.Visits.CheckIn">
-                    <MudIconButton Icon="@Icons.Material.Filled.Login" Size="Size.Small" Color="Color.Primary" aria-label="@T.Visits.CheckIn" OnClick="@(() => CheckInAsync(context))" />
-                </MudTooltip>
+                <AuthorizeView Policy="@AppointmentsPermissions.Confirm">
+                    <Authorized Context="auth">
+                        <MudTooltip Placement="Placement.Bottom" Text="@T.Visits.CheckIn">
+                            <MudIconButton Icon="@Icons.Material.Filled.Login" Size="Size.Small" Color="Color.Primary" aria-label="@T.Visits.CheckIn" OnClick="@(() => CheckInAsync(context))" />
+                        </MudTooltip>
+                    </Authorized>
+                </AuthorizeView>
             }
             @if (context.StatusKey == "CheckedIn")
             {
-                <MudTooltip Placement="Placement.Bottom" Text="@T.Visits.Start">
-                    <MudIconButton Icon="@Icons.Material.Filled.PlayArrow" Size="Size.Small" Color="Color.Secondary" aria-label="@T.Visits.Start" OnClick="@(() => StartAsync(context))" />
-                </MudTooltip>
+                <AuthorizeView Policy="@AppointmentsPermissions.Confirm">
+                    <Authorized Context="auth">
+                        <MudTooltip Placement="Placement.Bottom" Text="@T.Visits.Start">
+                            <MudIconButton Icon="@Icons.Material.Filled.PlayArrow" Size="Size.Small" Color="Color.Secondary" aria-label="@T.Visits.Start" OnClick="@(() => StartAsync(context))" />
+                        </MudTooltip>
+                    </Authorized>
+                </AuthorizeView>
             }
             @if (context.StatusKey == "InProgress")
             {
-                <MudTooltip Placement="Placement.Bottom" Text="@T.Visits.Complete">
-                    <MudIconButton Icon="@Icons.Material.Filled.CheckCircle" Size="Size.Small" Color="Color.Success" aria-label="@T.Visits.Complete" OnClick="@(() => CompleteAsync(context))" />
-                </MudTooltip>
+                <AuthorizeView Policy="@AppointmentsPermissions.Confirm">
+                    <Authorized Context="auth">
+                        <MudTooltip Placement="Placement.Bottom" Text="@T.Visits.Complete">
+                            <MudIconButton Icon="@Icons.Material.Filled.CheckCircle" Size="Size.Small" Color="Color.Success" aria-label="@T.Visits.Complete" OnClick="@(() => CompleteAsync(context))" />
+                        </MudTooltip>
+                    </Authorized>
+                </AuthorizeView>
             }
             @if (context.StatusKey is not "Completed" and not "Cancelled")
             {
-                <MudTooltip Placement="Placement.Bottom" Text="@T.Common.Cancel">
-                    <MudIconButton Icon="@Icons.Material.Filled.Cancel" Size="Size.Small" Color="Color.Error" aria-label="@T.Common.Cancel" OnClick="@(() => CancelAsync(context))" />
-                </MudTooltip>
+                <AuthorizeView Policy="@AppointmentsPermissions.Delete">
+                    <Authorized Context="auth">
+                        <MudTooltip Placement="Placement.Bottom" Text="@T.Common.Cancel">
+                            <MudIconButton Icon="@Icons.Material.Filled.Cancel" Size="Size.Small" Color="Color.Error" aria-label="@T.Common.Cancel" OnClick="@(() => CancelAsync(context))" />
+                        </MudTooltip>
+                    </Authorized>
+                </AuthorizeView>
             }
         </MudTd>
     </RowTemplate>
@@ -107,11 +135,20 @@
         }
         else
         {
-        <EmptyState Icon="@Icons.Material.Filled.MedicalServices"
-                    Title="@T.Visits.EmptyTitle"
-                    Message="@T.Visits.EmptyMessage"
-                    ActionLabel="@T.Visits.EmptyAction"
-                    Action="OpenCreateDialogAsync" />
+        <AuthorizeView Policy="@AppointmentsPermissions.Create">
+            <Authorized Context="auth">
+                <EmptyState Icon="@Icons.Material.Filled.MedicalServices"
+                            Title="@T.Visits.EmptyTitle"
+                            Message="@T.Visits.EmptyMessage"
+                            ActionLabel="@T.Visits.EmptyAction"
+                            Action="OpenCreateDialogAsync" />
+            </Authorized>
+            <NotAuthorized>
+                <EmptyState Icon="@Icons.Material.Filled.MedicalServices"
+                            Title="@T.Visits.EmptyTitle"
+                            Message="@T.Visits.EmptyMessage" />
+            </NotAuthorized>
+        </AuthorizeView>
         }
     </NoRecordsContent>
     <PagerContent>

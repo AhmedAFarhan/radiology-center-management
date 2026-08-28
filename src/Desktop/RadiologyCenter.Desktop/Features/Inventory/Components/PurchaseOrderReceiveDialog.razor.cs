@@ -12,7 +12,6 @@ using Microsoft.AspNetCore.Components.Web.Virtualization;
 using Microsoft.JSInterop;
 using MudBlazor;
 using RadiologyCenter.Desktop;
-using RadiologyCenter.Desktop.Components;
 using RadiologyCenter.Desktop.Features.Inventory.Models;
 using RadiologyCenter.Desktop.Models;
 using RadiologyCenter.Desktop.Services;

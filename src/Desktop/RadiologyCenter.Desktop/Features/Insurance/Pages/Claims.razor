@@ -8,7 +8,11 @@
             SearchValueChanged="OnSearchChanged"
             SearchPlaceholder="@T.Claim.SearchPlaceholder"
             OnRefresh="ReloadAsync">
-    <MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Add" OnClick="OpenCreateDialogAsync">@T.Claim.CreateClaim</MudButton>
+    <AuthorizeView Policy="@InsurancePermissions.ClaimsCreate">
+        <Authorized>
+            <MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Add" OnClick="OpenCreateDialogAsync">@T.Claim.CreateClaim</MudButton>
+        </Authorized>
+    </AuthorizeView>
 </PageHeader>
 
 <MudTable Breakpoint="Breakpoint.Sm" T="ClaimListItemDto" @ref="Table" ServerData="LoadServerData" Dense="true" Hover="true" Striped="true" Elevation="1" RowsPerPage="10" FixedHeader="true" Class="table-scroll">

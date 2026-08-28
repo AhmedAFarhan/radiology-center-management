@@ -1,4 +1,4 @@
-﻿using System.Net.Http;
+using System.Net.Http;
 using System.Net.Http.Json;
 using System.ComponentModel.DataAnnotations;
 using System.Security.Claims;
@@ -12,7 +12,6 @@ using Microsoft.AspNetCore.Components.Web.Virtualization;
 using Microsoft.JSInterop;
 using MudBlazor;
 using RadiologyCenter.Desktop;
-using RadiologyCenter.Desktop.Components;
 using RadiologyCenter.Desktop.Models;
 using RadiologyCenter.Desktop.Services;
 using ApexCharts;
