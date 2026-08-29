@@ -1890,8 +1890,8 @@ public sealed class RolesGroup : LocalizerGroup
 
     private PermissionGroup? _permission;
     public PermissionGroup Permission => _permission ??= new PermissionGroup(Localizer);
-    private PermissiongroupGroup? _permissiongroup;
-    public PermissiongroupGroup Permissiongroup => _permissiongroup ??= new PermissiongroupGroup(Localizer);
+    private PermissionGroupGroup? _permissiongroup;
+    public PermissionGroupGroup Permissiongroup => _permissiongroup ??= new PermissionGroupGroup(Localizer);
 
     public sealed class PermissionGroup : LocalizerGroup
     {
@@ -1967,9 +1967,9 @@ public sealed class RolesGroup : LocalizerGroup
         public string Usersupdate => Get("roles.permission.usersupdate");
     }
 
-    public sealed class PermissiongroupGroup : LocalizerGroup
+    public sealed class PermissionGroupGroup : LocalizerGroup
     {
-        internal PermissiongroupGroup(AppLocalizer localizer) : base(localizer) { }
+        internal PermissionGroupGroup(AppLocalizer localizer) : base(localizer) { }
         public string Appointments => Get("roles.permissiongroup.appointments");
         public string Cash => Get("roles.permissiongroup.cash");
         public string Examinations => Get("roles.permissiongroup.examinations");

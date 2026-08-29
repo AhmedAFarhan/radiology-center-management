@@ -30,4 +30,28 @@ public static class ConfirmDialogs
         var result = await dialog.Result;
         return result is { Canceled: false };
     }
+
+    public static async Task<bool> ConfirmAsync(
+        IDialogService dialogService,
+        AppLocalizer T,
+        string title,
+        string message,
+        string confirmText,
+        string icon,
+        MudBlazor.Color color)
+    {
+        var parameters = new DialogParameters
+        {
+            ["Title"] = title,
+            ["Message"] = message,
+            ["Icon"] = icon,
+            ["Color"] = color,
+            ["ConfirmText"] = confirmText,
+            ["CancelText"] = T.Common.Cancel,
+        };
+        var options = new DialogOptions { MaxWidth = MaxWidth.Small, FullWidth = true, NoHeader = true };
+        var dialog = await dialogService.ShowAsync<ConfirmDialog>(string.Empty, parameters, options);
+        var result = await dialog.Result;
+        return result?.Canceled != true;
+    }
 }

@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Text;
 
@@ -72,6 +73,7 @@ internal static class DpapiProtector
             // DPAPI unavailable (e.g. elevated process restrictions) - fall through to plaintext.
         }
 
+        Debug.WriteLine("[DpapiProtector] DPAPI unavailable – falling back to plaintext protection.");
         return PlainPrefix + value;
     }
 

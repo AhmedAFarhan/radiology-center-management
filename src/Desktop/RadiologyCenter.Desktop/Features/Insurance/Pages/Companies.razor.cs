@@ -92,6 +92,12 @@ public partial class Companies : ComponentBase, IDisposable
             _offline = false;
             _loaded = true;
         }
+        catch (OperationCanceledException)
+        {
+            if (ct.IsCancellationRequested)
+                return;
+            throw;
+        }
         catch (ApiException ex)
         {
             Snackbar.Add(SafeExecute.FormatError(ex), Severity.Error);

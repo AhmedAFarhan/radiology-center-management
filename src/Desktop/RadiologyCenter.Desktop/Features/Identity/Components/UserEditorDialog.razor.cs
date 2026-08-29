@@ -46,7 +46,7 @@ public partial class UserEditorDialog : EditorDialogBase
 
         _model.UserName = User.UserName;
         _model.Email = User.Email;
-        _model.Password = "placeholder";
+        _model.Password = string.Empty;
         _model.FirstName = User.FirstName;
         _model.LastName = User.LastName;
         _model.PhoneNumber = User.PhoneNumber;

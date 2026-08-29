@@ -11,6 +11,7 @@
 @inject SearchHistoryService SearchHistory
 @inject ConnectionMonitorService Connection
 @inject IJSRuntime JS
+@inject GlobalSearchService SearchSvc
 
 <div class="app-shell @SidebarModeClass" @onkeydown="HandleGlobalKeyDown">
     @if (ShowSidebarScrim)
@@ -32,18 +33,18 @@
             </MudTooltip>
 
             <GlobalSearch @ref="_globalSearch"
-                          SearchText="@_searchText"
+                          SearchText="@SearchSvc.SearchText"
                           SearchTextChanged="OnSearchTextChanged"
-                          ResultsOpen="@_resultsOpen"
-                          Searching="@_searching"
-                          SearchError="@_searchError"
-                          ShowRecents="@_showRecents"
-                          RecentSearches="@_recentSearches"
-                          Results="@_results"
-                          FlatItems="@_flatItems"
-                          SelectedIndex="@_selectedIndex"
-                          HighlightWords="@_highlightWords"
-                          UserName="@_userName"
+                          ResultsOpen="@SearchSvc.ResultsOpen"
+                          Searching="@SearchSvc.Searching"
+                          SearchError="@SearchSvc.SearchError"
+                          ShowRecents="@SearchSvc.ShowRecents"
+                          RecentSearches="@SearchSvc.RecentSearches"
+                          Results="@SearchSvc.Results"
+                          FlatItems="@SearchSvc.FlatItems"
+                          SelectedIndex="@SearchSvc.SelectedIndex"
+                          HighlightWords="@SearchSvc.HighlightWords"
+                          UserName="@SearchSvc.UserName"
                           SearchKeyDown="OnSearchKeyDown"
                           SearchBlur="OnSearchBlur"
                           SearchBoxClick="OnSearchBoxClick"

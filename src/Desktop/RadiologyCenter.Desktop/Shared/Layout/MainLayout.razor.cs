@@ -24,6 +24,7 @@ public partial class MainLayout : LayoutComponentBase, IDisposable
 [CascadingParameter]
     private Task<AuthenticationState>? AuthStateTask { get; set; }
 
+private bool _shouldRender = true;
 private bool _drawerOpen = true;
     private bool _loggingOut;
     private string _userName = string.Empty;
@@ -53,11 +54,19 @@ private bool _drawerOpen = true;
 
     private bool ShowSidebarScrim => _sidebarMode == SidebarMode.Overlay && _drawerOpen;
 
+    protected override bool ShouldRender()
+    {
+        var render = _shouldRender;
+        _shouldRender = false;
+        return render;
+    }
+
     private void ToggleSidebar()
     {
         _drawerOpen = !_drawerOpen;
         if (_sidebarMode == SidebarMode.Wide)
             _userOpen = _drawerOpen;
+        _shouldRender = true;
         StateHasChanged();
     }
 
@@ -66,6 +75,7 @@ private bool _drawerOpen = true;
         if (_sidebarMode == SidebarMode.Overlay)
         {
             _drawerOpen = false;
+            _shouldRender = true;
             StateHasChanged();
         }
     }
@@ -90,23 +100,11 @@ private bool _drawerOpen = true;
         else if (mode == SidebarMode.Compact)
             _drawerOpen = false;
 
+        _shouldRender = true;
         StateHasChanged();
     }
 
-    // ── Search state (delegated to GlobalSearch component) ──
-
     private GlobalSearch? _globalSearch;
-    private string _searchText = string.Empty;
-    private IReadOnlyList<GlobalSearchGroupDto>? _results;
-    private readonly List<SearchFlatItem> _flatItems = new();
-    private CancellationTokenSource? _searchCts;
-    private bool _resultsOpen;
-    private bool _searching;
-    private bool _searchError;
-    private bool _showRecents;
-    private int _selectedIndex = -1;
-    private List<string> _highlightWords = new();
-    private IReadOnlyList<string> _recentSearches = Array.Empty<string>();
 
     protected override void OnParametersSet()
     {
@@ -118,9 +116,12 @@ private bool _drawerOpen = true;
     protected override void OnInitialized()
     {
         base.OnInitialized();
+        _shouldRender = true;
         BusyState.Instance.Changed += OnBusyChanged;
         Connection.Start();
         Navigation.LocationChanged += OnLocationChanged;
+        SearchSvc.UserName = _userName;
+        SearchSvc.OnStateChanged += HandleSearchStateChanged;
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -138,16 +139,25 @@ private bool _drawerOpen = true;
         if (_sidebarMode == SidebarMode.Overlay && _drawerOpen)
         {
             _drawerOpen = false;
+            _shouldRender = true;
             InvokeAsync(StateHasChanged);
         }
     }
 
     private void OnBusyChanged() => InvokeAsync(StateHasChanged);
 
+    private Task HandleSearchStateChanged()
+    {
+        _shouldRender = true;
+        return InvokeAsync(StateHasChanged);
+    }
+
     public void Dispose()
     {
         Navigation.LocationChanged -= OnLocationChanged;
         BusyState.Instance.Changed -= OnBusyChanged;
+        SearchSvc.OnStateChanged -= HandleSearchStateChanged;
+        SearchSvc.Dispose();
         _ = JS.InvokeVoidAsync("untrackSidebarResize");
         _jsRef?.Dispose();
     }
@@ -164,6 +174,8 @@ private async Task RefreshUserAsync(Task<AuthenticationState> task)
         _userEmail = user.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value ?? string.Empty;
         var lastName = user.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Surname)?.Value ?? string.Empty;
         _userFullName = string.Join(' ', new[] { _displayName, lastName }.Where(p => !string.IsNullOrWhiteSpace(p)));
+        SearchSvc.UserName = _userName;
+        _shouldRender = true;
     }
 
 private async Task OnLogout()
@@ -184,6 +196,7 @@ private async Task OnLogout()
         if (result is { Canceled: false })
         {
             _loggingOut = true;
+            _shouldRender = true;
             StateHasChanged();
 
             try
@@ -229,241 +242,25 @@ private string GetInitial()
         if (_globalSearch is not null)
             await _globalSearch.FocusAsync();
 
-        if (string.IsNullOrWhiteSpace(_searchText))
-            ShowRecents();
+        if (string.IsNullOrWhiteSpace(SearchSvc.SearchText))
+            SearchSvc.ShowRecentSearches();
     }
 
-    // ── Search orchestration ──
+    private void OnSearchBoxClick() => SearchSvc.OnSearchBoxClick();
 
-    private void OnSearchBoxClick()
-    {
-        if (string.IsNullOrWhiteSpace(_searchText) && !_searching && !_resultsOpen)
-            ShowRecents();
-    }
+    private async Task OnSearchTextChanged(string? value) => await SearchSvc.OnSearchTextChanged(value);
 
-    private void ShowRecents()
-    {
-        _recentSearches = SearchHistory.Get(_userName);
-        _results = null;
-        _flatItems.Clear();
-        _searching = false;
-        _searchError = false;
-        _selectedIndex = -1;
-        _showRecents = true;
-        _resultsOpen = true;
-        StateHasChanged();
-    }
+    private async Task OnSearchKeyDown(KeyboardEventArgs e) => await SearchSvc.OnSearchKeyDown(e);
 
-    private async Task OnSearchTextChanged(string? value)
-    {
-        _searchText = value ?? string.Empty;
-        _highlightWords = ParseWords(_searchText);
-        _searchCts?.Cancel();
-        var cts = _searchCts = new CancellationTokenSource();
-        _selectedIndex = -1;
-        _showRecents = false;
+    private void OnSearchBlur(FocusEventArgs e) => SearchSvc.OnSearchBlur(e);
 
-        if (string.IsNullOrWhiteSpace(_searchText))
-        {
-            _results = null;
-            _flatItems.Clear();
-            _resultsOpen = false;
-            _searching = false;
-            _searchError = false;
-            StateHasChanged();
-            return;
-        }
+    private void CloseSearch() => SearchSvc.CloseSearch();
 
-        _resultsOpen = true;
-        StateHasChanged();
+    private async Task RecentClickedAsync(string term) => await SearchSvc.OnRecentClicked(term);
 
-        if (_searchText.Trim().Length < 2)
-        {
-            _results = null;
-            _flatItems.Clear();
-            return;
-        }
+    private async Task RetrySearchAsync() => await SearchSvc.RetrySearchAsync();
 
-        await RunSearchAsync(cts);
-    }
+    private async Task OnActivateItem(SearchFlatItem item) => await SearchSvc.OnActivateItem(item);
 
-    private async Task RunSearchAsync(CancellationTokenSource cts)
-    {
-        try
-        {
-            await Task.Delay(250, cts.Token);
-        }
-        catch (TaskCanceledException)
-        {
-            return;
-        }
-
-        if (cts.IsCancellationRequested)
-            return;
-
-        _searching = true;
-        _searchError = false;
-        StateHasChanged();
-
-        try
-        {
-            var groups = await SearchService.SearchAsync(_searchText.Trim(), 5, cts.Token);
-            if (cts.IsCancellationRequested)
-                return;
-            _results = groups;
-            RebuildFlatList();
-        }
-        catch (OperationCanceledException)
-        {
-            if (cts.IsCancellationRequested)
-                return;
-            _searchError = true;
-        }
-        catch (ApiException)
-        {
-            if (cts.IsCancellationRequested)
-                return;
-            _searchError = true;
-        }
-        catch (Exception)
-        {
-            if (cts.IsCancellationRequested)
-                return;
-            _searchError = true;
-        }
-        finally
-        {
-            if (!cts.IsCancellationRequested)
-            {
-                _searching = false;
-                StateHasChanged();
-            }
-        }
-    }
-
-    private async Task RetrySearchAsync()
-    {
-        _searchCts?.Cancel();
-        var cts = _searchCts = new CancellationTokenSource();
-        _searchError = false;
-        _resultsOpen = true;
-        StateHasChanged();
-        await RunSearchAsync(cts);
-    }
-
-    private async Task RecentClickedAsync(string term)
-        => await OnSearchTextChanged(term);
-
-    private void RebuildFlatList()
-    {
-        _flatItems.Clear();
-        _selectedIndex = -1;
-        if (_results is null)
-            return;
-
-        foreach (var group in _results)
-        {
-            foreach (var item in group.Items)
-                _flatItems.Add(new SearchFlatItem(group.EntityType, item));
-        }
-    }
-
-    private async Task OnSearchKeyDown(KeyboardEventArgs e)
-    {
-        switch (e.Key)
-        {
-            case "ArrowDown":
-                if (_showRecents && _recentSearches.Count > 0)
-                {
-                    _selectedIndex = 0;
-                    break;
-                }
-
-                if (_flatItems.Count > 0)
-                    _selectedIndex = Math.Min(_selectedIndex + 1, _flatItems.Count - 1);
-                StateHasChanged();
-                break;
-            case "ArrowUp":
-                if (_flatItems.Count > 0)
-                    _selectedIndex = Math.Max(_selectedIndex - 1, 0);
-                StateHasChanged();
-                break;
-            case "Enter":
-                if (_selectedIndex >= 0 && _selectedIndex < _flatItems.Count)
-                    await OnActivateItem(_flatItems[_selectedIndex]);
-                else if (_showRecents && _recentSearches.Count > 0)
-                    await RecentClickedAsync(_recentSearches[0]);
-                break;
-            case "Escape":
-                CloseSearch();
-                break;
-        }
-    }
-
-    private void OnSearchBlur(FocusEventArgs e)
-    {
-        if (_resultsOpen)
-            CloseSearch();
-    }
-
-    private async Task OnActivateItem(SearchFlatItem item)
-    {
-        SearchHistory.Add(_userName, _searchText.Trim());
-        var route = GetRoute(item);
-        CloseSearch();
-        if (route is not null)
-            Navigation.NavigateTo(route);
-        await Task.CompletedTask;
-    }
-
-    private async Task OnViewAll(string entityType)
-    {
-        SearchHistory.Add(_userName, _searchText.Trim());
-        var route = GetListRoute(entityType);
-        CloseSearch();
-        if (route is not null)
-            Navigation.NavigateTo(route + $"?q={Uri.EscapeDataString(_searchText.Trim())}");
-        await Task.CompletedTask;
-    }
-
-    private void CloseSearch()
-    {
-        _resultsOpen = false;
-        _showRecents = false;
-        _selectedIndex = -1;
-        StateHasChanged();
-    }
-
-    private static string? GetRoute(SearchFlatItem item)
-        => item.EntityType switch
-        {
-            "patient" => $"/patients?open={item.Item.Id}",
-            "staff" => $"/resources/staff?open={item.Item.Id}",
-            "referralDoctor" => $"/resources/referral-doctors?open={item.Item.Id}",
-            "item" => $"/inventory/items?open={item.Item.Id}",
-            "supplier" => $"/inventory/suppliers?open={item.Item.Id}",
-            "insuranceCompany" => $"/insurance/companies?open={item.Item.Id}",
-            "insurancePolicy" => $"/insurance/policies?open={item.Item.Id}",
-            "user" => $"/users?open={item.Item.Id}",
-            "examinationType" => $"/examinations?open={item.Item.Id}",
-            _ => null,
-        };
-
-    private static string? GetListRoute(string entityType)
-        => entityType switch
-        {
-            "patient" => "/patients",
-            "staff" => "/resources/staff",
-            "referralDoctor" => "/resources/referral-doctors",
-            "item" => "/inventory/items",
-            "supplier" => "/inventory/suppliers",
-            "insuranceCompany" => "/insurance/companies",
-            "insurancePolicy" => "/insurance/policies",
-            "user" => "/users",
-            "examinationType" => "/examinations",
-            _ => null,
-        };
-
-    private static List<string> ParseWords(string text)
-        => text.Split(' ', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries).ToList();
+    private async Task OnViewAll(string entityType) => await SearchSvc.OnViewAll(entityType);
 }

@@ -1,7 +1,7 @@
 @using Microsoft.AspNetCore.Components.Web
 @inject AppLocalizer T
 
-<div class="global-search" @onclick="HandleSearchBoxClick">
+<div class="global-search" @onclick="HandleSearchBoxClick" role="search" aria-label="@T.Layout.SearchPlaceholder">
     <MudTextField T="string"
                   @ref="_searchField"
                   Placeholder="@T.Layout.SearchPlaceholder"
@@ -19,7 +19,7 @@
     @if (ResultsOpen)
     {
         <div class="global-search-overlay" @onmousedown="HandleCloseSearch"></div>
-        <div class="global-search-results">
+        <div class="global-search-results" role="listbox">
             @if (Searching && FlatItems.Count > 0)
             {
                 <div class="global-search-loading">
@@ -37,6 +37,7 @@
                         {
                             <button type="button"
                                     class="global-search-item"
+                                    role="option"
                                     @onmousedown:preventDefault="true"
                                     @onmousedown="() => OnRecentClicked(term)">
                                 <span class="global-search-item-title">
@@ -91,6 +92,8 @@
                         {
                             <button type="button"
                                     class="global-search-item @(IsSelected(item) ? "selected" : "")"
+                                    role="option"
+                                    aria-selected="@(IsSelected(item) ? "true" : "false")"
                                     @onmousedown:preventDefault="true"
                                     @onmousedown="() => OnActivateItem(new SearchFlatItem(group.EntityType, item))"
                                     @onmouseenter="() => SelectItem(item)">

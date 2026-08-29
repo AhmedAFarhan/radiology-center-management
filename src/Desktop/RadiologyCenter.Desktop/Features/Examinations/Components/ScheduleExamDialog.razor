@@ -8,7 +8,7 @@
         }
         else
         {
-            <EditForm EditContext="_editContext">
+            <EditForm EditContext="_editContext" OnValidSubmit="SubmitAsync">
                 <LocalizedDataAnnotationsValidator />
                 <MudGrid Spacing="3">
                     @* ── Patient ── *@
@@ -112,7 +112,7 @@
     </DialogContent>
     <DialogActions>
         <MudButton Color="Color.Default" OnClick="Cancel" Disabled="_saving">@T.Common.Cancel</MudButton>
-        <MudButton Color="Color.Primary" Variant="Variant.Filled" OnClick="SubmitAsync" Disabled="_saving || _loading">
+        <MudButton Color="Color.Primary" Variant="Variant.Filled" ButtonType="ButtonType.Submit" Disabled="_saving || _loading">
             @if (_saving)
             {
                 <MudProgressCircular Size="Size.Small" Indeterminate="true" Class="mx-1" />

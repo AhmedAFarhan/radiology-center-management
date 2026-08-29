@@ -1,5 +1,6 @@
 namespace RadiologyCenter.Desktop.Security;
 
+using System.Globalization;
 using RadiologyCenter.Desktop.Models;
 
 public sealed record AuthTokens(
@@ -40,8 +41,8 @@ public sealed class TokenStorage
         return new AuthTokens(
             accessToken,
             refreshToken,
-            DateTime.Parse(Preferences.Default.Get(ExpiresAtKey, DateTime.MinValue.ToString("o"))),
-            DateTime.Parse(Preferences.Default.Get(RefreshExpiresAtKey, DateTime.MinValue.ToString("o"))),
+            DateTime.Parse(Preferences.Default.Get(ExpiresAtKey, DateTime.MinValue.ToString("o")), CultureInfo.InvariantCulture),
+            DateTime.Parse(Preferences.Default.Get(RefreshExpiresAtKey, DateTime.MinValue.ToString("o")), CultureInfo.InvariantCulture),
             Preferences.Default.Get(UsernameKey, string.Empty),
             Preferences.Default.Get(MustChangePasswordKey, false));
     }

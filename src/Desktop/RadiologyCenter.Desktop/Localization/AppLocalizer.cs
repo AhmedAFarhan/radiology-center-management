@@ -41,21 +41,6 @@ public sealed partial class AppLocalizer
         return fallback ?? key;
     }
 
-    public string Format(string key, params object?[] args)
-    {
-        var template = Get(key);
-        if (args.Length == 0)
-            return template;
-        try
-        {
-            return string.Format(template, args);
-        }
-        catch (FormatException)
-        {
-            return template;
-        }
-    }
-
     public string FormatValue(string template, params object?[] args)
     {
         if (args.Length == 0)

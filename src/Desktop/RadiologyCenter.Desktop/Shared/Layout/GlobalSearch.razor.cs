@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
 using MudBlazor;
 using RadiologyCenter.Desktop.Models;
+using RadiologyCenter.Desktop.Services;
 
 namespace RadiologyCenter.Desktop.Shared.Layout;
 
@@ -161,5 +162,3 @@ public partial class GlobalSearch
         };
     }
 }
-
-public sealed record SearchFlatItem(string EntityType, GlobalSearchItemDto Item);
