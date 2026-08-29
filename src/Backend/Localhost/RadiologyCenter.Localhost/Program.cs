@@ -43,6 +43,8 @@ using RadiologyCenter.Cash.Infrastructure.Persistence;
 using RadiologyCenter.Notification.Application;
 using RadiologyCenter.Notification.Infrastructure;
 using RadiologyCenter.Notification.Infrastructure.Persistence;
+using RadiologyCenter.Localhost.Localization;
+using RadiologyCenter.BuildingBlocks.Application.Localization;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -54,7 +56,6 @@ builder.Services.AddControllers(options =>
     options.JsonSerializerOptions.Converters.Add(new System.Text.Json.Serialization.JsonStringEnumConverter());
 });
 
-builder.Services.AddLocalization();
 builder.Services.AddCors(options =>
 {
     options.AddDefaultPolicy(policy =>
@@ -65,9 +66,8 @@ builder.Services.AddCors(options =>
               .SetIsOriginAllowed(_ => true);
     });
 });
-builder.Services.AddSingleton<Microsoft.Extensions.Localization.IStringLocalizerFactory, RadiologyCenter.Localhost.Localization.JsonStringLocalizerFactory>();
-builder.Services.AddSingleton<RadiologyCenter.BuildingBlocks.Application.Localization.ITranslator, RadiologyCenter.Localhost.Localization.JsonTranslator>();
-builder.Services.Configure<Microsoft.AspNetCore.Builder.RequestLocalizationOptions>(options =>
+builder.Services.AddSingleton<ITranslator, JsonTranslator>();
+builder.Services.Configure<RequestLocalizationOptions>(options =>
 {
     var supportedCultures = new[] { new System.Globalization.CultureInfo("en"), new System.Globalization.CultureInfo("ar") };
     options.DefaultRequestCulture = new Microsoft.AspNetCore.Localization.RequestCulture("en");

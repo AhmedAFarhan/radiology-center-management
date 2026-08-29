@@ -501,6 +501,121 @@
       "group": "Notifications"
     }
   },
+  "enums": {
+    "BloodType": {
+      "A+": "A+", "A-": "A-", "B+": "B+", "B-": "B-",
+      "AB+": "AB+", "AB-": "AB-", "O+": "O+", "O-": "O-"
+    },
+    "Gender": {
+      "Male": "Male", "Female": "Female", "Other": "Other"
+    },
+    "ExaminationPriority": {
+      "Routine": "Routine", "Urgent": "Urgent", "Stat": "Stat"
+    },
+    "ExaminationStatus": {
+      "Requested": "Requested", "Scheduled": "Scheduled", "CheckedIn": "CheckedIn",
+      "InProgress": "InProgress", "Completed": "Completed", "Cancelled": "Cancelled"
+    },
+    "CashEntryDirection": {
+      "In": "In", "Out": "Out"
+    },
+    "CashEntryReason": {
+      "Opening": "Opening", "Payment": "Payment", "Refund": "Refund",
+      "Deposit": "Deposit", "Payout": "Payout", "Adjustment": "Adjustment"
+    },
+    "CashSessionStatus": {
+      "Open": "Open", "Closed": "Closed"
+    },
+    "EquipmentModality": {
+      "XRay": "XRay", "CT": "CT", "MRI": "MRI", "Ultrasound": "Ultrasound",
+      "Mammography": "Mammography", "Fluoroscopy": "Fluoroscopy", "DEXA": "DEXA", "Other": "Other"
+    },
+    "EquipmentStatus": {
+      "Operational": "Operational", "UnderMaintenance": "UnderMaintenance",
+      "OutOfService": "OutOfService", "Retired": "Retired"
+    },
+    "LeaveType": {
+      "Annual": "Annual", "Sick": "Sick", "Unpaid": "Unpaid", "Maternity": "Maternity", "Other": "Other"
+    },
+    "StaffPosition": {
+      "Technician": "Technician", "Radiologist": "Radiologist",
+      "Receptionist": "Receptionist", "Nurse": "Nurse", "Other": "Other"
+    },
+    "Modality": {
+      "XRay": "XRay", "CT": "CT", "MRI": "MRI", "Ultrasound": "Ultrasound",
+      "Mammography": "Mammography", "Fluoroscopy": "Fluoroscopy", "DEXA": "DEXA", "Other": "Other"
+    },
+    "ClaimRejectionCode": {
+      "MissingInformation": "MissingInformation", "PreAuthorizationNotApproved": "PreAuthorizationNotApproved",
+      "PolicyNotActive": "PolicyNotActive", "CoverageExcluded": "CoverageExcluded",
+      "LimitExceeded": "LimitExceeded", "DuplicateClaim": "DuplicateClaim", "Other": "Other"
+    },
+    "ClaimStatus": {
+      "Draft": "Draft", "Submitted": "Submitted", "Adjudicated": "Adjudicated",
+      "Approved": "Approved", "Rejected": "Rejected", "Paid": "Paid"
+    },
+    "DocumentType": {
+      "InsuranceCard": "InsuranceCard", "NationalId": "NationalId",
+      "GovernmentApproval": "GovernmentApproval", "Other": "Other"
+    },
+    "PolicyStatus": {
+      "Active": "Active", "Inactive": "Inactive", "Expired": "Expired"
+    },
+    "PreAuthorizationStatus": {
+      "Requested": "Requested", "Approved": "Approved", "Denied": "Denied", "Expired": "Expired"
+    },
+    "SettlementMethod": {
+      "Cash": "Cash", "BankTransfer": "BankTransfer", "Cheque": "Cheque", "Electronic": "Electronic"
+    },
+    "NotificationChannel": {
+      "Sms": "Sms", "Email": "Email", "Push": "Push"
+    },
+    "NotificationStatus": {
+      "Pending": "Pending", "Sent": "Sent", "Failed": "Failed"
+    },
+    "ComponentKind": {
+      "Earning": "Earning", "Deduction": "Deduction"
+    },
+    "ExamFeeRole": {
+      "Radiologist": "Radiologist", "Technician": "Technician"
+    },
+    "Frequency": {
+      "OneTime": "OneTime", "Monthly": "Monthly", "Quarterly": "Quarterly", "Annual": "Annual"
+    },
+    "PayRunStatus": {
+      "Draft": "Draft", "Computed": "Computed", "Approved": "Approved", "Paid": "Paid", "Rejected": "Rejected"
+    },
+    "SalaryType": {
+      "Monthly": "Monthly", "Hourly": "Hourly"
+    },
+    "FindingSeverity": {
+      "None": "None", "Mild": "Mild", "Moderate": "Moderate", "Severe": "Severe", "Critical": "Critical"
+    },
+    "ReportSectionType": {
+      "ClinicalIndication": "ClinicalIndication", "Technique": "Technique",
+      "Findings": "Findings", "Impression": "Impression", "Recommendation": "Recommendation"
+    },
+    "ReportStatus": {
+      "Draft": "Draft", "Finalized": "Finalized", "Cancelled": "Cancelled"
+    },
+    "ItemCategory": {
+      "ContrastMedia": "ContrastMedia", "Drug": "Drug", "MedicalSupply": "MedicalSupply",
+      "Consumable": "Consumable", "Other": "Other"
+    },
+    "PurchaseOrderStatus": {
+      "Draft": "Draft", "Ordered": "Ordered", "PartiallyReceived": "PartiallyReceived",
+      "Received": "Received", "Cancelled": "Cancelled"
+    },
+    "StockMovementType": {
+      "Receive": "Receive", "Issue": "Issue", "Adjustment": "Adjustment",
+      "ReturnToSupplier": "ReturnToSupplier", "Disposal": "Disposal"
+    },
+    "UnitType": {
+      "Piece": "Piece", "Box": "Box", "Bottle": "Bottle", "Vial": "Vial",
+      "Ampoule": "Ampoule", "Pack": "Pack", "Tube": "Tube", "Roll": "Roll",
+      "Sheet": "Sheet", "Kit": "Kit"
+    }
+  },
   "codes": {
     "Shared.IdRequired": "Id is required.",
     "Shared.FieldRequired": "This field is required.",
@@ -544,6 +659,248 @@
     "Shared.MustBeGreaterThanZero": "{0} must be greater than zero.",
     "Shared.CannotBeDefaultValue": "{0} cannot be the default value.",
     "Shared.CannotBeEmpty": "{0} cannot be empty.",
-    "Shared.MustBeOneOf": "{0} must be one of: {1}."
+    "Shared.MustBeOneOf": "{0} must be one of: {1}.",
+    "Catalog.ExaminationTypeNotFound": "Examination type not found.",
+    "Catalog.ExaminationTypeInUse": "Examination type is in use and cannot be deleted.",
+    "Catalog.StandardDurationNegative": "Standard duration cannot be negative.",
+    "Catalog.PriceNegative": "Price cannot be negative.",
+    "Cash.SessionNotFound": "Cash session not found.",
+    "Cash.HandoverNotFound": "Cash handover not found.",
+    "Cash.EntryNotOwnSession": "Cash entry does not belong to this session.",
+    "Cash.CloseNotOwnSession": "Cannot close a session owned by another user.",
+    "Cash.AddEntryToClosedSession": "Cannot add entries to a closed session.",
+    "Cash.HandoverRequiresClosedSession": "Handover requires a closed session.",
+    "Cash.HandoverAlreadyApproved": "Cash handover has already been approved.",
+    "Cash.HandoverApprovedByCloser": "The closer cannot approve their own handover.",
+    "Cash.CloseSessionNotOpen": "Session is not open.",
+    "Cash.ReceiverAlreadyOpenSession": "Receiver already has an open session.",
+    "Cash.SessionAlreadyOpen": "You already have an open session.",
+    "Cash.NoActiveTransaction": "No active transaction found.",
+    "Cash.OpeningFloatNegative": "Opening float cannot be negative.",
+    "Cash.CountedTotalNegative": "Counted total cannot be negative.",
+    "Cash.ExpectedTotalNegative": "Expected total cannot be negative.",
+    "Cash.EntryAmountPositive": "Entry amount must be positive.",
+    "Examination.ScheduledTimePast": "Scheduled time cannot be in the past.",
+    "Examination.PercentageDiscountMax": "Percentage discount cannot exceed 100.",
+    "Examination.DuplicateItem": "Duplicate examination item.",
+    "Examination.ExaminationNotFound": "Examination not found.",
+    "Examination.ExaminationTypeNotFound": "Examination type not found.",
+    "Examination.ExaminationTypeItemNotFound": "Examination type item not found.",
+    "Examination.ItemAlreadyInPreferences": "Item already exists in preferences.",
+    "Examination.PaymentForCancelledExamination": "Cannot record payment for a cancelled examination.",
+    "Examination.PaymentExceedsRemaining": "Payment exceeds remaining balance.",
+    "Examination.AuthenticationRequired": "Authentication is required to perform this action.",
+    "Examination.PaidAmountImmutable": "Paid amount cannot be modified after initial payment.",
+    "Examination.InvalidStatusTransition": "Invalid status transition.",
+    "Examination.StaffNotAssigned": "No staff member is assigned to this examination.",
+    "Examination.EquipmentNotAssigned": "No equipment is assigned to this examination.",
+    "Examination.EquipmentOverlap": "Equipment is already booked for this time slot.",
+    "Examination.RadiologistOverlap": "Radiologist is already booked for this time slot.",
+    "Examination.PriceNegative": "Price cannot be negative.",
+    "Examination.DiscountNegative": "Discount cannot be negative.",
+    "Examination.PaidAmountNegative": "Paid amount cannot be negative.",
+    "Examination.ScheduledTimeDefault": "Scheduled time cannot be default.",
+    "Examination.PaymentNegative": "Payment amount cannot be negative.",
+    "Examination.RefundNegative": "Refund amount cannot be negative.",
+    "Examination.RefundExceedsPaid": "Refund exceeds paid amount.",
+    "Examination.RequiredItemCannotRemove": "Required item cannot be removed.",
+    "Examination.ItemNotOnExamination": "Item is not on this examination.",
+    "Examination.ItemsCannotBeModified": "Items cannot be modified in the current status.",
+    "Examination.OutstandingBalance": "There is an outstanding balance.",
+    "Examination.RadiologistFeeNegative": "Radiologist fee cannot be negative.",
+    "Examination.TechnicianFeeNegative": "Technician fee cannot be negative.",
+    "Examination.ReferralFeeNegative": "Referral fee cannot be negative.",
+    "Examination.RemainingAmountNegative": "Remaining amount cannot be negative.",
+    "Examination.UnitCostNegative": "Unit cost cannot be negative.",
+    "Identity.PasswordDifferent": "New password must be different from the current password.",
+    "Identity.RoleNameExists": "Role name already exists.",
+    "Identity.AtLeastOneRole": "At least one role must be assigned.",
+    "Identity.RoleIdsNotEmpty": "Role IDs list cannot be empty.",
+    "Identity.EmailRegistered": "Email is already registered.",
+    "Identity.UsernameTaken": "Username is already taken.",
+    "Identity.UserNotFound": "User not found.",
+    "Identity.RoleNotFound": "Role not found.",
+    "Identity.PermissionNotFound": "Permission not found.",
+    "Identity.CurrentPasswordIncorrect": "Current password is incorrect.",
+    "Identity.InvalidCredentials": "Invalid credentials.",
+    "Identity.AccountLockedOut": "Account is locked out.",
+    "Identity.RefreshTokenExpired": "Refresh token has expired.",
+    "Identity.InvalidRefreshToken": "Invalid refresh token.",
+    "Identity.AccountDeactivated": "Account has been deactivated.",
+    "Insurance.ClaimNotFound": "Insurance claim not found.",
+    "Insurance.PolicyNotFound": "Insurance policy not found.",
+    "Insurance.PreAuthorizationNotFound": "Pre-authorization not found.",
+    "Insurance.CompanyNotFound": "Insurance company not found.",
+    "Insurance.PolicyDocumentNotFound": "Policy document not found.",
+    "Insurance.PreAuthorizationDocumentNotFound": "Pre-authorization document not found.",
+    "Insurance.ApprovedAmountRequired": "Approved amount is required.",
+    "Insurance.RejectionCodeRequired": "Rejection code is required.",
+    "Insurance.RejectionReasonRequired": "Rejection reason is required.",
+    "Insurance.DenialReasonRequired": "Denial reason is required.",
+    "Insurance.UnsupportedDecision": "Unsupported decision type.",
+    "Insurance.UnsupportedPolicyAction": "Unsupported policy action.",
+    "Insurance.PolicyNotActive": "Insurance policy is not active.",
+    "Insurance.PolicyPatientMismatch": "Policy does not belong to this patient.",
+    "Insurance.ClaimAlreadyExists": "A claim already exists for this examination.",
+    "Insurance.PreAuthorizationAlreadyExists": "A pre-authorization already exists for this examination.",
+    "Insurance.PreAuthorizationExaminationMismatch": "Pre-authorization does not match this examination.",
+    "Insurance.PreAuthorizationPatientMismatch": "Pre-authorization does not belong to this patient.",
+    "Insurance.PreAuthorizationPolicyMismatch": "Pre-authorization does not match this policy.",
+    "Insurance.PreAuthorizationNotApproved": "Pre-authorization has not been approved.",
+    "Insurance.PreAuthorizationNoApprovedAmount": "Pre-authorization has no approved amount.",
+    "Insurance.BilledAmountExceedsApproved": "Billed amount exceeds approved amount.",
+    "Insurance.SettlementExceedsRemaining": "Settlement exceeds remaining balance.",
+    "Insurance.CompanyNameExists": "Company name already exists.",
+    "Insurance.PolicyNumberExists": "Policy number already exists.",
+    "Insurance.InvalidDocumentType": "Invalid document type.",
+    "Insurance.BilledAmountNegative": "Billed amount cannot be negative.",
+    "Insurance.PayerShareNegative": "Payer share cannot be negative.",
+    "Insurance.PatientShareNegative": "Patient share cannot be negative.",
+    "Insurance.SharesExceedBilled": "Shares exceed billed amount.",
+    "Insurance.ClaimSubmitInvalidStatus": "Claim cannot be submitted in the current status.",
+    "Insurance.ClaimNotSubmittedAdjudication": "Claim must be submitted before adjudication.",
+    "Insurance.ApprovedAmountNegative": "Approved amount cannot be negative.",
+    "Insurance.ApprovedAmountExceedsPayerShare": "Approved amount exceeds payer share.",
+    "Insurance.ClaimNotRejectedResubmit": "Claim must be rejected before resubmission.",
+    "Insurance.ClaimNotApprovedSettlement": "Claim must be approved before settlement.",
+    "Insurance.SettlementAmountPositive": "Settlement amount must be positive.",
+    "Insurance.SettlementExceedsOwed": "Settlement exceeds amount owed.",
+    "Insurance.CoveragePercentRange": "Coverage percentage must be between 0 and 100.",
+    "Insurance.UpdateExpiredPolicy": "Cannot update an expired policy.",
+    "Insurance.ReactivateExpiredPolicy": "Cannot reactivate an expired policy.",
+    "Insurance.DocumentSizePositive": "Document size must be positive.",
+    "Insurance.EstimatedAmountNegative": "Estimated amount cannot be negative.",
+    "Insurance.DocumentsRequestedOnly": "Only requested documents can be uploaded.",
+    "Insurance.GovernmentDocRequired": "Government document is required.",
+    "Insurance.PreAuthorizationAlreadyDecided": "Pre-authorization has already been decided.",
+    "Inventory.PurchaseOrderItemsRequired": "Purchase order must have at least one item.",
+    "Inventory.PurchaseOrderDuplicateItems": "Purchase order contains duplicate items.",
+    "Inventory.ReceiveItemsRequired": "Receive must have at least one item.",
+    "Inventory.ReceiveDuplicateItems": "Receive contains duplicate items.",
+    "Inventory.ExpiryDatePast": "Expiry date cannot be in the past.",
+    "Inventory.ItemNotFound": "Inventory item not found.",
+    "Inventory.SupplierNotFound": "Supplier not found.",
+    "Inventory.PurchaseOrderNotFound": "Purchase order not found.",
+    "Inventory.InsufficientStock": "Insufficient stock.",
+    "Inventory.InvalidReceipt": "Invalid receipt.",
+    "Inventory.ReorderLevelNegative": "Reorder level cannot be negative.",
+    "Inventory.ReorderQuantityNegative": "Reorder quantity cannot be negative.",
+    "Inventory.DuplicateItem": "Duplicate inventory item.",
+    "Inventory.ItemNotOnPurchaseOrder": "Item is not on this purchase order.",
+    "Inventory.PurchaseOrderCannotCancel": "Purchase order cannot be cancelled.",
+    "Inventory.ReceiptsOrderedOnly": "Only ordered items can be received.",
+    "Inventory.PurchaseOrderNotDraft": "Purchase order is not in draft status.",
+    "Inventory.UnitCostNegative": "Unit cost cannot be negative.",
+    "Inventory.ReceiptExceedsRemaining": "Receipt exceeds remaining quantity.",
+    "Inventory.BatchExpiryDatePast": "Batch expiry date is in the past.",
+    "Inventory.InsufficientBatchStock": "Insufficient batch stock.",
+    "Inventory.MovementQuantityZero": "Movement quantity cannot be zero.",
+    "Notification.TemplateCodeOrBodyRequired": "Template code or body is required.",
+    "Notification.TemplateNotFound": "Notification template not found.",
+    "Notification.InvalidChannel": "Invalid notification channel.",
+    "Notification.InactiveTemplate": "Notification template is inactive.",
+    "Notification.TemplateCodeExists": "Template code already exists.",
+    "Notification.SendFailed": "Failed to send notification.",
+    "Notification.DeliveryFailed": "Notification delivery failed.",
+    "Patient.NameRequired": "Patient name is required.",
+    "Patient.DobOrAgeRequired": "Date of birth or age is required.",
+    "Patient.DateOfBirthFuture": "Date of birth cannot be in the future.",
+    "Patient.AgeOutOfRange": "Age must be between 0 and 150.",
+    "Patient.BloodTypeInvalid": "Invalid blood type.",
+    "Patient.PatientNotFound": "Patient not found.",
+    "Payroll.PayRunNotFound": "Pay run not found.",
+    "Payroll.StaffNotFound": "Staff member not found.",
+    "Payroll.SalaryComponentNotFound": "Salary component not found.",
+    "Payroll.ExaminationTypeNotFound": "Examination type not found.",
+    "Payroll.ReferralDoctorNotFound": "Referral doctor not found.",
+    "Payroll.PayslipCalculationFailed": "Payslip calculation failed.",
+    "Payroll.PayRunCannotRecompute": "Pay run cannot be recomputed.",
+    "Payroll.PayRunCannotDelete": "Pay run cannot be deleted.",
+    "Payroll.PayRunOverlapExists": "Pay run period overlaps with an existing pay run.",
+    "Payroll.PayslipComponentNotFound": "Payslip component not found.",
+    "Payroll.RunToBeforeRunFrom": "Pay run end date cannot be before start date.",
+    "Payroll.GrossSalaryNegative": "Gross salary cannot be negative.",
+    "Payroll.UnpaidLeaveDaysNegative": "Unpaid leave days cannot be negative.",
+    "Payroll.UnpaidLeaveDeductionNegative": "Unpaid leave deduction cannot be negative.",
+    "Payroll.DuplicatePayslip": "Duplicate payslip for this staff member.",
+    "Payroll.PayslipNotFound": "Payslip not found.",
+    "Payroll.PayRunNotEditable": "Pay run is not editable.",
+    "Payroll.InvalidPayRunTransition": "Invalid pay run status transition.",
+    "Payroll.AllowanceAmountNegative": "Allowance amount cannot be negative.",
+    "Payroll.EndDateBeforeEffectiveDate": "End date cannot be before effective date.",
+    "Payroll.ExaminationFeeNegative": "Examination fee cannot be negative.",
+    "Payroll.PercentageFeeMax": "Percentage fee cannot exceed 100.",
+    "Payroll.ReferralFeeNegative": "Referral fee cannot be negative.",
+    "Payroll.BaseSalaryNegative": "Base salary cannot be negative.",
+    "Payroll.DefaultValueNegative": "Default value cannot be negative.",
+    "Report.ReportNotFound": "Report not found.",
+    "Report.ReportTemplateNotFound": "Report template not found.",
+    "Report.ReportAlreadyExists": "Report already exists.",
+    "Report.ExaminationNotCompleted": "Examination has not been completed.",
+    "Report.SystemTemplateReadOnly": "System template is read-only.",
+    "Report.SystemTemplateCannotDelete": "System template cannot be deleted.",
+    "Report.TemplateNameExists": "Template name already exists.",
+    "Report.ReportContentDraftOnly": "Report content can only be edited in draft status.",
+    "Report.FindingsRequired": "Findings are required.",
+    "Report.ImpressionRequired": "Impression is required.",
+    "Report.SectionLocked": "Report section is locked.",
+    "Report.InvalidStatusTransition": "Invalid status transition.",
+    "Report.DuplicateTemplateSection": "Duplicate template section.",
+    "Report.DuplicateVersionSection": "Duplicate version section.",
+    "Report.SectionNotOnTemplate": "Section is not on this template.",
+    "Report.FindingNotOnVersion": "Finding is not on this version.",
+    "WorkShift.EndTimeAfterStart": "End time must be after start time.",
+    "Leave.EndDateOnOrAfterStart": "End date must be on or after start date.",
+    "ResourceManagement.EquipmentNotFound": "Equipment not found.",
+    "ResourceManagement.ReferralDoctorNotFound": "Referral doctor not found.",
+    "ResourceManagement.StaffNotFound": "Staff member not found.",
+    "ResourceManagement.LeaveNotFound": "Leave record not found.",
+    "ResourceManagement.WorkShiftNotFound": "Work shift not found.",
+    "ResourceManagement.LeaveOverlap": "Leave period overlaps with existing leave.",
+    "ResourceManagement.ReferralDoctorPhoneExists": "Referral doctor phone number already exists.",
+    "ResourceManagement.ResourceAlreadyBooked": "Resource is already booked for this time slot.",
+    "Leave.EndDateBeforeStartDate": "End date cannot be before start date.",
+    "WorkShift.StartTimeBeforeEndTime": "Start time cannot be after end time.",
+    "Excel.Patient.Code": "Code",
+    "Excel.Patient.FullName": "Full Name",
+    "Excel.Patient.Gender": "Gender",
+    "Excel.Patient.DateOfBirth": "Date of Birth",
+    "Excel.Patient.Age": "Age",
+    "Excel.Patient.PhoneNumber": "Phone",
+    "Excel.Patient.Email": "Email",
+    "Excel.Patient.Address": "Address",
+    "Excel.Patient.NationalId": "National ID",
+    "Excel.Patient.BloodType": "Blood Type",
+    "Excel.Patient.Allergies": "Allergies",
+    "Excel.Patient.MedicalHistory": "Medical History",
+    "Excel.Error.DuplicateNationalId": "A patient with this National ID already exists.",
+    "Excel.Patient.Instructions.AutoCode": "Patient Code is generated automatically by the system - do not add it to the file.",
+    "Excel.Patient.Instructions.AllowedValues": "Gender must be Male or Female; Blood Type one of A+, A-, B+, B-, AB+, AB-, O+, O- (both optional).",
+    "Excel.Patient.Instructions.DuplicateRule": "Rows whose National ID already exists are skipped and reported at the end.",
+    "Excel.ExamType.Code": "Code",
+    "Excel.ExamType.Name": "Name",
+    "Excel.ExamType.Modality": "Modality",
+    "Excel.ExamType.BodyPart": "Body Part",
+    "Excel.ExamType.Duration": "Duration (min)",
+    "Excel.ExamType.Price": "Price",
+    "Excel.ExamType.RequiresPreparation": "Requires Preparation",
+    "Excel.ExamType.RequiresConsent": "Requires Consent",
+    "Excel.Error.InvalidModality": "Modality must be one of the values listed in the Modality sheet.",
+    "Excel.Error.InvalidNumber": "Numeric value is invalid.",
+    "Excel.ExamType.Instructions.AutoCode": "Examination Type code is generated automatically by the system - do not add it to the file.",
+    "Excel.ExamType.Instructions.AllowedValues": "Modality must exactly match one of the values listed on the 'Modality' sheet - a dropdown is provided in Excel.",
+    "Excel.Item.Name": "Name",
+    "Excel.Item.Brand": "Brand",
+    "Excel.Item.Category": "Category",
+    "Excel.Item.Unit": "Unit",
+    "Excel.Item.ReorderLevel": "Reorder Level",
+    "Excel.Item.ReorderQuantity": "Reorder Quantity",
+    "Excel.Item.LotTracked": "Lot Tracked",
+    "Excel.Item.StorageInstructions": "Storage Instructions",
+    "Excel.Error.InvalidCategory": "Category must be one of the values listed on the Category sheet.",
+    "Excel.Error.InvalidUnit": "Unit must be one of the values listed on the Unit sheet.",
+    "Excel.Item.Instructions.RequiredColumns": "Name, Category and Unit are required; all other columns are optional.",
+    "Excel.Item.Instructions.AllowedValues": "Category and Unit must exactly match one of the values listed on their sheets - dropdowns are provided in Excel.",
+    "Excel.Item.Instructions.YesNoFormat": "The Lot Tracked column accepts only Yes or No."
   }
 }

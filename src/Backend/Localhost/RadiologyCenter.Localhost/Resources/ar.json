@@ -501,6 +501,123 @@
       "group": "الإشعارات"
     }
   },
+  "enums": {
+    "BloodType": {
+      "A+": "A+", "A-": "A-", "B+": "B+", "B-": "B-",
+      "AB+": "AB+", "AB-": "AB-", "O+": "O+", "O-": "O-"
+    },
+    "Gender": {
+      "Male": "ذكر", "Female": "أنثى", "Other": "أخرى"
+    },
+    "ExaminationPriority": {
+      "Routine": "روتيني", "Urgent": "عاجل", "Stat": "فوري"
+    },
+    "ExaminationStatus": {
+      "Requested": "مطلوب", "Scheduled": "مجدول", "CheckedIn": "تم التسجيل",
+      "InProgress": "قيد التنفيذ", "Completed": "مكتمل", "Cancelled": "ملغي"
+    },
+    "CashEntryDirection": {
+      "In": "وارد", "Out": "صادر"
+    },
+    "CashEntryReason": {
+      "Opening": "افتتاحي", "Payment": "دفعة", "Refund": "استرداد",
+      "Deposit": "إيداع", "Payout": "صرف", "Adjustment": "تسوية"
+    },
+    "CashSessionStatus": {
+      "Open": "مفتوحة", "Closed": "مغلقة"
+    },
+    "EquipmentModality": {
+      "XRay": "أشعة سينية", "CT": "أشعة مقطعية", "MRI": "رنين مغناطيسي",
+      "Ultrasound": "موجات فوق صوتية", "Mammography": "ماموجرام",
+      "Fluoroscopy": "تنظير فلوري", "DEXA": "ديكسا", "Other": "أخرى"
+    },
+    "EquipmentStatus": {
+      "Operational": "تشغيلي", "UnderMaintenance": "قيد الصيانة",
+      "OutOfService": "خارج الخدمة", "Retired": "متقاعد"
+    },
+    "LeaveType": {
+      "Annual": "سنوية", "Sick": "مرضية", "Unpaid": "بدون أجر", "Maternity": "أمومة", "Other": "أخرى"
+    },
+    "StaffPosition": {
+      "Technician": "فني", "Radiologist": "أخصائي أشعة",
+      "Receptionist": "استقبال", "Nurse": "ممرض", "Other": "أخرى"
+    },
+    "Modality": {
+      "XRay": "أشعة سينية", "CT": "أشعة مقطعية", "MRI": "رنين مغناطيسي",
+      "Ultrasound": "موجات فوق صوتية", "Mammography": "أشعة ثديية",
+      "Fluoroscopy": "تنظيم فلوري", "DEXA": "قياس كثافة العظام", "Other": "أخرى"
+    },
+    "ClaimRejectionCode": {
+      "MissingInformation": "معلومات ناقصة", "PreAuthorizationNotApproved": "التفويض المسبق غير معتمد",
+      "PolicyNotActive": "البوليصة غير نشطة", "CoverageExcluded": "التغطية مستثناة",
+      "LimitExceeded": "تجاوز الحد", "DuplicateClaim": "مطالبة مكررة", "Other": "أخرى"
+    },
+    "ClaimStatus": {
+      "Draft": "مسودة", "Submitted": "مقدمة", "Adjudicated": "تم البت",
+      "Approved": "معتمدة", "Rejected": "مرفوضة", "Paid": "مدفوعة"
+    },
+    "DocumentType": {
+      "InsuranceCard": "بطاقة تأمين", "NationalId": "بطاقة وطنية",
+      "GovernmentApproval": "موافقة حكومية", "Other": "أخرى"
+    },
+    "PolicyStatus": {
+      "Active": "نشطة", "Inactive": "غير نشطة", "Expired": "منتهية"
+    },
+    "PreAuthorizationStatus": {
+      "Requested": "مطلوب", "Approved": "معتمد", "Denied": "مرفوض", "Expired": "منتهي"
+    },
+    "SettlementMethod": {
+      "Cash": "نقدي", "BankTransfer": "تحويل بنكي", "Cheque": "شيك", "Electronic": "إلكتروني"
+    },
+    "NotificationChannel": {
+      "Sms": "رسالة نصية", "Email": "بريد إلكتروني", "Push": "إشعار فوري"
+    },
+    "NotificationStatus": {
+      "Pending": "قيد الانتظار", "Sent": "مرسل", "Failed": "فشل"
+    },
+    "ComponentKind": {
+      "Earning": "استحقاق", "Deduction": "خصم"
+    },
+    "ExamFeeRole": {
+      "Radiologist": "أخصائي أشعة", "Technician": "فني"
+    },
+    "Frequency": {
+      "OneTime": "مرة واحدة", "Monthly": "شهري", "Quarterly": "ربع سنوي", "Annual": "سنوي"
+    },
+    "PayRunStatus": {
+      "Draft": "مسودة", "Computed": "محسوبة", "Approved": "معتمدة", "Paid": "مدفوعة", "Rejected": "مرفوضة"
+    },
+    "SalaryType": {
+      "Monthly": "شهري", "Hourly": "بالساعة"
+    },
+    "FindingSeverity": {
+      "None": "لا شيء", "Mild": "خفيف", "Moderate": "متوسط", "Severe": "شديد", "Critical": "حرج"
+    },
+    "ReportSectionType": {
+      "ClinicalIndication": "السبب السريري", "Technique": "التقنية",
+      "Findings": "النتائج", "Impression": "الانطباع", "Recommendation": "التوصيات"
+    },
+    "ReportStatus": {
+      "Draft": "مسودة", "Finalized": "نهائي", "Cancelled": "ملغي"
+    },
+    "ItemCategory": {
+      "ContrastMedia": "مادة تباين", "Drug": "دواء", "MedicalSupply": "مستلزمات طبية",
+      "Consumable": "مستهلكات", "Other": "أخرى"
+    },
+    "PurchaseOrderStatus": {
+      "Draft": "مسودة", "Ordered": "مطلوب", "PartiallyReceived": "استلام جزئي",
+      "Received": "مستلم", "Cancelled": "ملغي"
+    },
+    "StockMovementType": {
+      "Receive": "استلام", "Issue": "صرف", "Adjustment": "تسوية",
+      "ReturnToSupplier": "إرجاع للمورد", "Disposal": "إتلاف"
+    },
+    "UnitType": {
+      "Piece": "قطعة", "Box": "علبة", "Bottle": "زجاجة", "Vial": "قارورة",
+      "Ampoule": "أمبولة", "Pack": "عبوة", "Tube": "أنبوب", "Roll": "لفة",
+      "Sheet": "ورقة", "Kit": "طقم"
+    }
+  },
   "codes": {
     "Shared.IdRequired": "المعرّف مطلوب.",
     "Shared.FieldRequired": "هذا الحقل مطلوب.",
@@ -544,6 +661,207 @@
     "Shared.MustBeGreaterThanZero": "يجب أن يكون {0} أكبر من صفر.",
     "Shared.CannotBeDefaultValue": "{0} لا يمكن أن يكون القيمة الافتراضية.",
     "Shared.CannotBeEmpty": "{0} لا يمكن أن يكون فارغاً.",
-    "Shared.MustBeOneOf": "يجب أن يكون {0} واحداً من: {1}."
+    "Shared.MustBeOneOf": "يجب أن يكون {0} واحداً من: {1}.",
+    "Catalog.ExaminationTypeNotFound": "لم يتم العثور على نوع الفحص.",
+    "Catalog.ExaminationTypeInUse": "نوع الفحص قيد الاستخدام ولا يمكن حذفه.",
+    "Catalog.StandardDurationNegative": "المدة القياسية لا يمكن أن تكون سالبة.",
+    "Catalog.PriceNegative": "السعر لا يمكن أن يكون سالباً.",
+    "Cash.SessionNotFound": "لم يتم العثور على الجلسة النقدية.",
+    "Cash.HandoverNotFound": "لم يتم العثور على التوريد النقدي.",
+    "Cash.EntryNotOwnSession": "الحركة النقدية لا تنتمي إلى هذه الجلسة.",
+    "Cash.CloseNotOwnSession": "لا يمكن إغلاق جلسة تابعة لمستخدم آخر.",
+    "Cash.AddEntryToClosedSession": "لا يمكن إضافة حركات إلى جلسة مغلقة.",
+    "Cash.HandoverRequiresClosedSession": "التوريد النقدي يتطلب جلسة مغلقة.",
+    "Cash.HandoverAlreadyApproved": "تم اعتماد التوريد النقدي بالفعل.",
+    "Cash.HandoverApprovedByCloser": "لا يمكن للمغلق اعتماد توریده الخاص.",
+    "Cash.CloseSessionNotOpen": "الجلسة ليست مفتوحة.",
+    "Cash.ReceiverAlreadyOpenSession": "المستلم لديه بالفعل جلسة مفتوحة.",
+    "Cash.SessionAlreadyOpen": "لديك بالفعل جلسة مفتوحة.",
+    "Cash.NoActiveTransaction": "لم يتم العثور على معاملة نشطة.",
+    "Cash.OpeningFloatNegative": "الرصيد الافتتاحي لا يمكن أن يكون سالباً.",
+    "Cash.CountedTotalNegative": "الإجمالي المعدود لا يمكن أن يكون سالباً.",
+    "Cash.ExpectedTotalNegative": "الإجمالي المتوقع لا يمكن أن يكون سالباً.",
+    "Cash.EntryAmountPositive": "مبلغ الحركة يجب أن يكون موجباً.",
+    "Examination.ScheduledTimePast": "الوقت المجدول لا يمكن أن يكون في الماضي.",
+    "Examination.PercentageDiscountMax": "نسبة الخصم لا يمكن أن تتجاوز 100.",
+    "Examination.DuplicateItem": "عنصر فحص مكرر.",
+    "Examination.ExaminationNotFound": "لم يتم العثور على الفحص.",
+    "Examination.ExaminationTypeNotFound": "لم يتم العثور على نوع الفحص.",
+    "Examination.ExaminationTypeItemNotFound": "لم يتم العثور على عنصر نوع الفحص.",
+    "Examination.ItemAlreadyInPreferences": "العنصر موجود بالفعل في التفضيلات.",
+    "Examination.PaymentForCancelledExamination": "لا يمكن تسجيل دفعة لفحص تم إلغاؤه.",
+    "Examination.PaymentExceedsRemaining": "المبلغ المدفوع يتجاوز الرصيد المتبقي.",
+    "Examination.AuthenticationRequired": "المصادقة مطلوبة لتنفيذ هذا الإجراء.",
+    "Examination.PaidAmountImmutable": "لا يمكن تعديل المبلغ المدفوع بعد الدفعة الأولى.",
+    "Examination.InvalidStatusTransition": "انتقال حالة غير صالح.",
+    "Examination.StaffNotAssigned": "لم يتم تعيين موظف لهذا الفحص.",
+    "Examination.EquipmentNotAssigned": "لم يتم تعيين جهاز لهذا الفحص.",
+    "Examination.EquipmentOverlap": "الجهاز محجوز بالفعل لهذه الفترة الزمنية.",
+    "Examination.RadiologistOverlap": "الطبيب الأشعى محجوز بالفعل لهذه الفترة الزمنية.",
+    "Examination.PriceNegative": "السعر لا يمكن أن يكون سالباً.",
+    "Examination.DiscountNegative": "الخصم لا يمكن أن يكون سالباً.",
+    "Examination.PaidAmountNegative": "المبلغ المدفوع لا يمكن أن يكون سالباً.",
+    "Examination.ScheduledTimeDefault": "الوقت المجدول لا يمكن أن يكون القيمة الافتراضية.",
+    "Examination.PaymentNegative": "مبلغ الدفعة لا يمكن أن يكون سالباً.",
+    "Examination.RefundNegative": "مبلغ الاسترداد لا يمكن أن يكون سالباً.",
+    "Examination.RefundExceedsPaid": "الاسترداد يتجاوز المبلغ المدفوع.",
+    "Examination.RequiredItemCannotRemove": "لا يمكن إزالة العنصر المطلوب.",
+    "Examination.ItemNotOnExamination": "العنصر ليس على هذا الفحص.",
+    "Examination.ItemsCannotBeModified": "لا يمكن تعديل العناصر في الحالة الحالية.",
+    "Examination.OutstandingBalance": "يوجد رصيد مستحق.",
+    "Examination.RadiologistFeeNegative": "رسوم الطبيب الأشعى لا يمكن أن تكون سالبة.",
+    "Examination.TechnicianFeeNegative": "رسوم التقني لا يمكن أن تكون سالبة.",
+    "Examination.ReferralFeeNegative": "رسوم الإحالة لا يمكن أن تكون سالبة.",
+    "Examination.RemainingAmountNegative": "المبلغ المتبقي لا يمكن أن يكون سالباً.",
+    "Examination.UnitCostNegative": "تكلفة الوحدة لا يمكن أن تكون سالبة.",
+    "Identity.PasswordDifferent": "كلمة المرور الجديدة يجب أن تكون مختلفة عن الحالية.",
+    "Identity.RoleNameExists": "اسم الدور موجود بالفعل.",
+    "Identity.AtLeastOneRole": "يجب تعيين دور واحد على الأقل.",
+    "Identity.RoleIdsNotEmpty": "قائمة معرفات الأدوار لا يمكن أن تكون فارغة.",
+    "Identity.EmailRegistered": "البريد الإلكتروني مسجل بالفعل.",
+    "Identity.UsernameTaken": "اسم المستخدم محجوز بالفعل.",
+    "Identity.UserNotFound": "لم يتم العثور على المستخدم.",
+    "Identity.RoleNotFound": "لم يتم العثور على الدور.",
+    "Identity.PermissionNotFound": "لم يتم العثور على الصلاحية.",
+    "Identity.CurrentPasswordIncorrect": "كلمة المرور الحالية غير صحيحة.",
+    "Identity.InvalidCredentials": "بيانات اعتماد غير صالحة.",
+    "Identity.AccountLockedOut": "الحساب مقفل.",
+    "Identity.RefreshTokenExpired": "رمز التحديث منتهي الصلاحية.",
+    "Identity.InvalidRefreshToken": "رمز تحديث غير صالح.",
+    "Identity.AccountDeactivated": "تم تعطيل الحساب.",
+    "Insurance.ClaimNotFound": "لم يتم العثور على مطالبة التأمين.",
+    "Insurance.PolicyNotFound": "لم يتم العثور على وثيقة التأمين.",
+    "Insurance.PreAuthorizationNotFound": "لم يتم العثور على الموافقة المسبقة.",
+    "Insurance.CompanyNotFound": "لم يتم العثور على شركة التأمين.",
+    "Insurance.PolicyDocumentNotFound": "لم يتم العثور على مستند الوثيقة.",
+    "Insurance.PreAuthorizationDocumentNotFound": "لم يتم العثور على مستند الموافقة المسبقة.",
+    "Insurance.ApprovedAmountRequired": "المبلغ المعتمد مطلوب.",
+    "Insurance.RejectionCodeRequired": "رمز الرفض مطلوب.",
+    "Insurance.RejectionReasonRequired": "سبب الرفض مطلوب.",
+    "Insurance.DenialReasonRequired": "سبب الرفض مطلوب.",
+    "Insurance.UnsupportedDecision": "نوع قرار غير مدعوم.",
+    "Insurance.UnsupportedPolicyAction": "إجراء وثيقة غير مدعوم.",
+    "Insurance.PolicyNotActive": "وثيقة التأمين غير نشطة.",
+    "Insurance.PolicyPatientMismatch": "الوثيقة لا تنتمي إلى هذا المريض.",
+    "Insurance.ClaimAlreadyExists": "توجد مطالبة بالفعل لهذا الفحص.",
+    "Insurance.PreAuthorizationAlreadyExists": "توجد موافقة مسبقة بالفعل لهذا الفحص.",
+    "Insurance.PreAuthorizationExaminationMismatch": "الموافقة المسبقة لا تطابق هذا الفحص.",
+    "Insurance.PreAuthorizationPatientMismatch": "الموافقة المسبقة لا تنتمي إلى هذا المريض.",
+    "Insurance.PreAuthorizationPolicyMismatch": "الموافقة المسبقة لا تطابق هذه الوثيقة.",
+    "Insurance.PreAuthorizationNotApproved": "الموافقة المسبقة لم يتم اعتمادها.",
+    "Insurance.PreAuthorizationNoApprovedAmount": "الموافقة المسبقة ليس لها مبلغ معتمد.",
+    "Insurance.BilledAmountExceedsApproved": "المبلغ المفوّض يتجاوز المبلغ المعتمد.",
+    "Insurance.SettlementExceedsRemaining": "التسوية تتجاوز الرصيد المتبقي.",
+    "Insurance.CompanyNameExists": "اسم الشركة موجود بالفعل.",
+    "Insurance.PolicyNumberExists": "رقم الوثيقة موجود بالفعل.",
+    "Insurance.InvalidDocumentType": "نوع مستند غير صالح.",
+    "Insurance.BilledAmountNegative": "المبلغ المفوّض لا يمكن أن يكون سالباً.",
+    "Insurance.PayerShareNegative": "حصة الدافع لا يمكن أن تكون سالبة.",
+    "Insurance.PatientShareNegative": "حصة المريض لا يمكن أن تكون سالبة.",
+    "Insurance.SharesExceedBilled": "الحصص تتجاوز المبلغ المفوّض.",
+    "Insurance.ClaimSubmitInvalidStatus": "لا يمكن تقديم المطالبة في الحالة الحالية.",
+    "Insurance.ClaimNotSubmittedAdjudication": "يجب تقديم المطالبة قبل البت فيها.",
+    "Insurance.ApprovedAmountNegative": "المبلغ المعتمد لا يمكن أن يكون سالباً.",
+    "Insurance.ApprovedAmountExceedsPayerShare": "المبلغ المعتمد يتجاوز حصة الدافع.",
+    "Insurance.ClaimNotRejectedResubmit": "يجب رفض المطالبة قبل إعادة إرسالها.",
+    "Insurance.ClaimNotApprovedSettlement": "يجب اعتماد المطالبة قبل التسوية.",
+    "Insurance.SettlementAmountPositive": "مبلغ التسوية يجب أن يكون موجباً.",
+    "Insurance.SettlementExceedsOwed": "التسوية تتجاوز المبلغ المستحق.",
+    "Insurance.CoveragePercentRange": "نسبة التغطية يجب أن تكون بين 0 و 100.",
+    "Insurance.UpdateExpiredPolicy": "لا يمكن تعديل وثيقة منتهية الصلاحية.",
+    "Insurance.ReactivateExpiredPolicy": "لا يمكن إعادة تفعيل وثيقة منتهية الصلاحية.",
+    "Insurance.DocumentSizePositive": "حجم المستند يجب أن يكون موجباً.",
+    "Insurance.EstimatedAmountNegative": "المبلغ التقديري لا يمكن أن يكون سالباً.",
+    "Insurance.DocumentsRequestedOnly": "يمكن رفع المستندات المطلوبة فقط.",
+    "Insurance.GovernmentDocRequired": "المستند الرسمي مطلوب.",
+    "Insurance.PreAuthorizationAlreadyDecided": "تم البت في الموافقة المسبقة بالفعل.",
+    "Inventory.PurchaseOrderItemsRequired": "يجب أن يحتوي أمر الشراء على عنصر واحد على الأقل.",
+    "Inventory.PurchaseOrderDuplicateItems": "يحتوي أمر الشراء على عناصر مكررة.",
+    "Inventory.ReceiveItemsRequired": "يجب أن يحتوي الاستلام على عنصر واحد على الأقل.",
+    "Inventory.ReceiveDuplicateItems": "يحتوي الاستلام على عناصر مكررة.",
+    "Inventory.ExpiryDatePast": "تاريخ انتهاء الصلاحية لا يمكن أن يكون في الماضي.",
+    "Inventory.ItemNotFound": "لم يتم العثور على صنف المخزون.",
+    "Inventory.SupplierNotFound": "لم يتم العثور على المورد.",
+    "Inventory.PurchaseOrderNotFound": "لم يتم العثور على أمر الشراء.",
+    "Inventory.InsufficientStock": "مخزون غير كافٍ.",
+    "Inventory.InvalidReceipt": "إيصال غير صالح.",
+    "Inventory.ReorderLevelNegative": "مستوى إعادة الطلب لا يمكن أن يكون سالباً.",
+    "Inventory.ReorderQuantityNegative": "كمية إعادة الطلب لا يمكن أن تكون سالبة.",
+    "Inventory.DuplicateItem": "صنف مخزون مكرر.",
+    "Inventory.ItemNotOnPurchaseOrder": "العنصر ليس على هذا أمر الشراء.",
+    "Inventory.PurchaseOrderCannotCancel": "لا يمكن إلغاء أمر الشراء.",
+    "Inventory.ReceiptsOrderedOnly": "يمكن استلام العناصر المطلوبة فقط.",
+    "Inventory.PurchaseOrderNotDraft": "أمر الشراء ليس في حالة مسودة.",
+    "Inventory.UnitCostNegative": "تكلفة الوحدة لا يمكن أن تكون سالبة.",
+    "Inventory.ReceiptExceedsRemaining": "الإيصال يتجاوز الكمية المتبقية.",
+    "Inventory.BatchExpiryDatePast": "تاريخ انتهاء صلاحية الدفعة في الماضي.",
+    "Inventory.InsufficientBatchStock": "مخزون الدفعة غير كافٍ.",
+    "Inventory.MovementQuantityZero": "كمية الحركة لا يمكن أن تكون صفر.",
+    "Notification.TemplateCodeOrBodyRequired": "رمز القالب أو النص مطلوب.",
+    "Notification.TemplateNotFound": "لم يتم العثور على قالب الإشعار.",
+    "Notification.InvalidChannel": "قناة إشعار غير صالحة.",
+    "Notification.InactiveTemplate": "قالب الإشعار غير نشط.",
+    "Notification.TemplateCodeExists": "رمز القالب موجود بالفعل.",
+    "Notification.SendFailed": "فشل إرسال الإشعار.",
+    "Notification.DeliveryFailed": "فشل توصيل الإشعار.",
+    "Patient.NameRequired": "اسم المريض مطلوب.",
+    "Patient.DobOrAgeRequired": "تاريخ الميلاد أو العمر مطلوب.",
+    "Patient.DateOfBirthFuture": "تاريخ الميلاد لا يمكن أن يكون في المستقبل.",
+    "Patient.AgeOutOfRange": "يجب أن يكون العمر بين 0 و 150.",
+    "Patient.BloodTypeInvalid": "فصيلة دم غير صالحة.",
+    "Patient.PatientNotFound": "لم يتم العثور على المريض.",
+    "Payroll.PayRunNotFound": "لم يتم العثور على دفعة الرواتب.",
+    "Payroll.StaffNotFound": "لم يتم العثور على الموظف.",
+    "Payroll.SalaryComponentNotFound": "لم يتم العثور على مكون الراتب.",
+    "Payroll.ExaminationTypeNotFound": "لم يتم العثور على نوع الفحص.",
+    "Payroll.ReferralDoctorNotFound": "لم يتم العثور على الطبيب المحول.",
+    "Payroll.PayslipCalculationFailed":"فشل احتساب قسيمة الراتب.",
+    "Payroll.PayRunCannotRecompute": "لا يمكن إعادة احتساب دفعة الرواتب.",
+    "Payroll.PayRunCannotDelete": "لا يمكن حذف دفعة الرواتب.",
+    "Payroll.PayRunOverlapExists": "فترة دفعة الرواتب تتداخل مع دفعة موجودة.",
+    "Payroll.PayslipComponentNotFound": "لم يتم العثور على مكون قسيمة الراتب.",
+    "Payroll.RunToBeforeRunFrom": "تاريخ نهاية دفعة الرواتب لا يمكن أن يكون قبل تاريخ البداية.",
+    "Payroll.GrossSalaryNegative": "الراتب الإجمالي لا يمكن أن يكون سالباً.",
+    "Payroll.UnpaidLeaveDaysNegative": "أيام الإجازة غير المدفوعة لا يمكن أن تكون سالبة.",
+    "Payroll.UnpaidLeaveDeductionNegative": "خصم الإجازة غير المدفوعة لا يمكن أن يكون سالباً.",
+    "Payroll.DuplicatePayslip": "قسيمة راتب مكررة لهذا الموظف.",
+    "Payroll.PayslipNotFound": "لم يتم العثور على قسيمة الراتب.",
+    "Payroll.PayRunNotEditable": "دفعة الرواتب غير قابلة للتعديل.",
+    "Payroll.InvalidPayRunTransition": "انتقال حالة غير صالح لدفعة الرواتب.",
+    "Payroll.AllowanceAmountNegative": "مبلغ البدلات لا يمكن أن يكون سالباً.",
+    "Payroll.EndDateBeforeEffectiveDate": "تاريخ الانتهاء لا يمكن أن يكون قبل تاريخ السريان.",
+    "Payroll.ExaminationFeeNegative": "رسوم الفحص لا يمكن أن تكون سالبة.",
+    "Payroll.PercentageFeeMax": "الرسوم النسبية لا يمكن أن تتجاوز 100.",
+    "Payroll.ReferralFeeNegative": "رسوم الإحالة لا يمكن أن تكون سالبة.",
+    "Payroll.BaseSalaryNegative": "الراتب الأساسي لا يمكن أن يكون سالباً.",
+    "Payroll.DefaultValueNegative": "القيمة الافتراضية لا يمكن أن تكون سالبة.",
+    "Report.ReportNotFound": "لم يتم العثور على التقرير.",
+    "Report.ReportTemplateNotFound": "لم يتم العثور على قالب التقرير.",
+    "Report.ReportAlreadyExists": "التقرير موجود بالفعل.",
+    "Report.ExaminationNotCompleted": "لم يتم إكمال الفحص.",
+    "Report.SystemTemplateReadOnly": "القالب النظامي للقراءة فقط.",
+    "Report.SystemTemplateCannotDelete": "لا يمكن حذف القالب النظامي.",
+    "Report.TemplateNameExists": "اسم القالب موجود بالفعل.",
+    "Report.ReportContentDraftOnly": "يمكن تعديل محتوى التقرير في حالة المسودة فقط.",
+    "Report.FindingsRequired": "الملاحظات مطلوبة.",
+    "Report.ImpressionRequired": "الانطباع مطلوب.",
+    "Report.SectionLocked": "قسم التقرير مقفل.",
+    "Report.InvalidStatusTransition": "انتقال حالة غير صالح.",
+    "Report.DuplicateTemplateSection": "قسم قالب مكرر.",
+    "Report.DuplicateVersionSection": "قسم إصدار مكرر.",
+    "Report.SectionNotOnTemplate": "القسم ليس على هذا القالب.",
+    "Report.FindingNotOnVersion": "الملاحظة ليست على هذا الإصدار.",
+    "WorkShift.EndTimeAfterStart": "وقت النهاية يجب أن يكون بعد وقت البداية.",
+    "Leave.EndDateOnOrAfterStart": "يجب أن يكون تاريخ الانتهاء في تاريخ البداية أو بعده.",
+    "ResourceManagement.EquipmentNotFound": "لم يتم العثور على الجهاز.",
+    "ResourceManagement.ReferralDoctorNotFound": "لم يتم العثور على الطبيب المحول.",
+    "ResourceManagement.StaffNotFound": "لم يتم العثور على الموظف.",
+    "ResourceManagement.LeaveNotFound": "لم يتم العثور على سجل الإجازة.",
+    "ResourceManagement.WorkShiftNotFound": "لم يتم العثور على وردية العمل.",
+    "ResourceManagement.LeaveOverlap": "فترة الإجازة تتداخل مع إجازة موجودة.",
+    "ResourceManagement.ReferralDoctorPhoneExists": "رقم هاتف الطبيب المحول موجود بالفعل.",
+    "ResourceManagement.ResourceAlreadyBooked": "الموارد محجوزة بالفعل لهذه الفترة الزمنية.",
+    "Leave.EndDateBeforeStartDate": "تاريخ الانتهاء لا يمكن أن يكون قبل تاريخ البداية.",
+    "WorkShift.StartTimeBeforeEndTime": "وقت البداية لا يمكن أن يكون بعد وقت النهاية."
   }
 }

@@ -15,7 +15,7 @@ public class CreateExaminationCommandValidator : AbstractValidator<CreateExamina
         RuleFor(x => x.ClinicalIndication).NotEmpty().WithErrorCode(SharedCodes.Shared.FieldRequired).MaximumLength(1000).WithErrorCode(SharedCodes.Shared.TextTooLong);
         RuleFor(x => x.Priority).NotEmpty().WithErrorCode(SharedCodes.Shared.FieldRequired).IsEnumerationMember<ExaminationPriority, CreateExaminationCommand>("Priority");
         RuleFor(x => x.Discount).GreaterThanOrEqualTo(0).WithErrorCode(SharedCodes.Shared.CannotBeNegative);
-        RuleFor(x => x.Discount).LessThanOrEqualTo(100).When(x => x.IsDiscountPercentage);
+        RuleFor(x => x.Discount).LessThanOrEqualTo(100).When(x => x.IsDiscountPercentage).WithErrorCode(ErrorCodes.PercentageDiscountMax);
         RuleFor(x => x.Paid).GreaterThanOrEqualTo(0).WithErrorCode(SharedCodes.Shared.CannotBeNegative);
         RuleFor(x => x.Notes).MaximumLength(500).WithErrorCode(SharedCodes.Shared.TextTooLong).When(x => !string.IsNullOrWhiteSpace(x.Notes));
         RuleFor(x => x.Status)

@@ -36,7 +36,7 @@ public class ExceptionMiddleware
             var message = Translator.LocalizeCode(MessageCodes.Shared.ValidationFailed, ex.Message);
             var details = ex.Errors.ToDictionary(
                 kvp => kvp.Key,
-                kvp => (object)kvp.Value.Select(Translator.Localize).ToArray());
+                kvp => (object)kvp.Value.ToArray());
             await WriteResponse(context, HttpStatusCode.BadRequest,
                 ApiResponse.Fail(message, new ApiError { Code = "Validation", Message = message, Details = details }));
         }
