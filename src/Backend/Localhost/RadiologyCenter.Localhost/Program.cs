@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 using RadiologyCenter.BuildingBlocks.Application;
 using RadiologyCenter.BuildingBlocks.Infrastructure;
+using RadiologyCenter.BuildingBlocks.Infrastructure.Messaging;
 using RadiologyCenter.BuildingBlocks.Infrastructure.Persistence;
 using RadiologyCenter.Identity.Application;
 using RadiologyCenter.Identity.Domain.Entities;
@@ -104,7 +105,6 @@ builder.Services.AddSwaggerGen(options =>
 builder.Host.ConfigureWolverine(builder.Configuration.GetConnectionString("DefaultConnection"));
 
 builder.Services.AddApplication();
-builder.Services.AddMapster();
 builder.Services.AddInfrastructure(builder.Configuration);
 builder.Services.AddIdentityApplication();
 builder.Services.AddIdentityInfrastructure(builder.Configuration);

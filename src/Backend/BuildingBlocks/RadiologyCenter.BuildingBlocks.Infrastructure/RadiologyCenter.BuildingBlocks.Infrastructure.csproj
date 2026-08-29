@@ -7,7 +7,10 @@
   <ItemGroup>
     <PackageReference Include="ClosedXML" Version="0.104.2" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="10.0.10" />
+    <PackageReference Include="WolverineFx" Version="6.24.0" />
     <PackageReference Include="WolverineFx.EntityFrameworkCore" Version="6.24.0" />
+    <PackageReference Include="WolverineFx.FluentValidation" Version="6.24.0" />
+    <PackageReference Include="WolverineFx.SqlServer" Version="6.24.0" />
   </ItemGroup>
 
   <ItemGroup>

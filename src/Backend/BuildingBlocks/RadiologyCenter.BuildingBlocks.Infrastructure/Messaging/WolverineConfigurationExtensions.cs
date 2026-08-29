@@ -4,8 +4,9 @@ using Wolverine;
 using Wolverine.EntityFrameworkCore;
 using Wolverine.FluentValidation;
 using Wolverine.SqlServer;
+using RadiologyCenter.BuildingBlocks.Application;
 
-namespace RadiologyCenter.BuildingBlocks.Application;
+namespace RadiologyCenter.BuildingBlocks.Infrastructure.Messaging;
 
 public static class WolverineConfigurationExtensions
 {

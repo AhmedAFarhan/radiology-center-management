@@ -2,7 +2,6 @@ using System.Data.Common;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
 using RadiologyCenter.BuildingBlocks.Application.Abstractions;
-using RadiologyCenter.BuildingBlocks.Domain.Entities;
 using RadiologyCenter.BuildingBlocks.Domain.Exceptions;
 using RadiologyCenter.BuildingBlocks.Domain.Localization;
 
@@ -24,7 +23,6 @@ public class UnitOfWork<TContext> : IUnitOfWork, IUnitOfWork<TContext>
     {
         try
         {
-            await DispatchDomainEventsAsync(ct);
             var result = await _context.SaveChangesAsync(ct);
 
             if (_context.Database.CurrentTransaction is null)
@@ -47,19 +45,6 @@ public class UnitOfWork<TContext> : IUnitOfWork, IUnitOfWork<TContext>
         return new DbUnitOfWorkTransaction(transaction, this, _eventDispatcher);
     }
 
-    private async Task DispatchDomainEventsAsync(CancellationToken ct)
-    {
-        var entries = _context.ChangeTracker
-            .Entries<IAggregateRoot>()
-            .Where(e => e.Entity.DomainEvents.Count > 0)
-            .Select(e => e.Entity)
-            .ToArray();
-
-        foreach (var entity in entries)
-        {
-            await _eventDispatcher.DispatchAsync(entity, _context, ct);
-        }
-    }
 }
 
 internal sealed class DbUnitOfWorkTransaction : IUnitOfWorkTransaction
@@ -85,8 +70,8 @@ internal sealed class DbUnitOfWorkTransaction : IUnitOfWorkTransaction
         try
         {
             await _unitOfWork.SaveChangesAsync(ct);
-            await _eventDispatcher.FlushAsync(ct);
             await _transaction.CommitAsync(ct);
+            await _eventDispatcher.FlushAsync(ct);
         }
         catch
         {
