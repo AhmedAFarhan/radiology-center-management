@@ -13,7 +13,19 @@
             }
             @if (Can(AppointmentsPermissions.Read))
             {
-                <MudTooltip Text="@T.Nav.Visits"><MudNavLink Href="/visits" Icon="@Icons.Material.Filled.EventNote" aria-label="@T.Nav.Visits" Ripple="false" /></MudTooltip>
+                <MudTooltip Text="@T.Nav.Visits">
+                    <MudMenu Icon="@Icons.Material.Filled.EventNote" aria-label="@T.Nav.Visits"
+                             IconSize="Size.Medium"
+                             Class="collapsed-nav-menu"
+                             AnchorOrigin="Origin.CenterRight"
+                             TransformOrigin="Origin.TopLeft"
+                             Dense="true"
+                             OffsetX="12"
+                             Direction="Direction.Left">
+                        <MudMenuItem Icon="@Icons.Material.Filled.EventNote" OnClick="@(() => Go("/visits"))">@T.Nav.Visits</MudMenuItem>
+                        <MudMenuItem Icon="@Icons.Material.Filled.CalendarMonth" OnClick="@(() => Go("/examinations/calendar"))">@T.Nav.VisitsCalendar</MudMenuItem>
+                    </MudMenu>
+                </MudTooltip>
             }
             @if (Can(ReportsPermissions.Read))
             {
@@ -21,8 +33,7 @@
             }
             @if (Can(ExaminationsPermissions.Read))
             {
-                <MudTooltip Text="@T.Nav.Examinations"><MudNavLink Href="/examinations" Icon="@Icons.Material.Filled.MedicalServices" aria-label="@T.Nav.Examinations" Ripple="false" /></MudTooltip>
-                <MudTooltip Text="@T.Nav.ExamCalendar"><MudNavLink Href="/examinations/calendar" Icon="@Icons.Material.Filled.CalendarMonth" aria-label="@T.Nav.ExamCalendar" Ripple="false" /></MudTooltip>
+                <MudTooltip Text="@T.Nav.Examinations">            <MudNavLink Href="/examinations" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.MedicalServices" aria-label="@T.Nav.Examinations" Ripple="false" /></MudTooltip>
             }
 
         @if (CanAny(InventoryPermissions.ItemsRead, InventoryPermissions.SuppliersRead, InventoryPermissions.PurchaseOrdersRead, InventoryPermissions.StockRead))
@@ -241,9 +252,10 @@
         }
         @if (Can(AppointmentsPermissions.Read))
         {
-            <MudNavLink Href="/visits" Icon="@Icons.Material.Filled.EventNote" Ripple="false">
-                @T.Nav.Visits
-            </MudNavLink>
+            <MudNavGroup Title="@T.Nav.Visits" Icon="@Icons.Material.Filled.EventNote" Ripple="false">
+                <MudNavLink Href="/visits" Icon="@Icons.Material.Filled.EventNote" Ripple="false">@T.Nav.Visits</MudNavLink>
+                <MudNavLink Href="/examinations/calendar" Icon="@Icons.Material.Filled.CalendarMonth" Ripple="false">@T.Nav.VisitsCalendar</MudNavLink>
+            </MudNavGroup>
         }
         @if (Can(ReportsPermissions.Read))
         {
@@ -253,11 +265,8 @@
         }
         @if (Can(ExaminationsPermissions.Read))
         {
-            <MudNavLink Href="/examinations" Icon="@Icons.Material.Filled.MedicalServices" Ripple="false">
+            <MudNavLink Href="/examinations" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.MedicalServices" Ripple="false">
                 @T.Nav.Examinations
-            </MudNavLink>
-            <MudNavLink Href="/examinations/calendar" Icon="@Icons.Material.Filled.CalendarMonth" Ripple="false">
-                @T.Nav.ExamCalendar
             </MudNavLink>
         }
         @if (CanAny(InventoryPermissions.ItemsRead, InventoryPermissions.SuppliersRead, InventoryPermissions.PurchaseOrdersRead, InventoryPermissions.StockRead))

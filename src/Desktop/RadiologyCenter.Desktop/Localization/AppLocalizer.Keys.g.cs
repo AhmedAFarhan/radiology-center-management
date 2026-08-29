@@ -1134,6 +1134,7 @@ public sealed class NavGroup : LocalizerGroup
     public string Templates => Get("nav.templates");
     public string Users => Get("nav.users");
     public string Visits => Get("nav.visits");
+    public string VisitsCalendar => Get("nav.visitsCalendar");
     public string WorkShifts => Get("nav.workShifts");
 }
 
