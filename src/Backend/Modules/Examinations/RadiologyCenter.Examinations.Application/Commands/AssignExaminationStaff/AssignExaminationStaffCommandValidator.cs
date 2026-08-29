@@ -1,5 +1,5 @@
 using FluentValidation;
-using SharedCodes = RadiologyCenter.BuildingBlocks.Application.Localization.ErrorCodes;
+using RadiologyCenter.Examinations.Application.Localization;
 
 namespace RadiologyCenter.Examinations.Application.Commands.AssignExaminationStaff;
 
@@ -7,9 +7,9 @@ public class AssignExaminationStaffCommandValidator : AbstractValidator<AssignEx
 {
     public AssignExaminationStaffCommandValidator()
     {
-        RuleFor(x => x.ExaminationId).NotEmpty().WithErrorCode(SharedCodes.Shared.IdRequired);
-        RuleFor(x => x.RadiologistId).NotEmpty().WithErrorCode(SharedCodes.Shared.FieldRequired);
-        RuleFor(x => x.TechnicianId).NotEmpty().WithErrorCode(SharedCodes.Shared.FieldRequired);
-        RuleFor(x => x.EquipmentId).NotEmpty().WithErrorCode(SharedCodes.Shared.FieldRequired);
+        RuleFor(x => x.ExaminationId).NotEmpty().WithErrorCode(ErrorCodes.ExaminationIdRequired);
+        RuleFor(x => x.RadiologistId).NotEmpty().WithErrorCode(ErrorCodes.RadiologistIdRequired);
+        RuleFor(x => x.TechnicianId).NotEmpty().WithErrorCode(ErrorCodes.TechnicianIdRequired);
+        RuleFor(x => x.EquipmentId).NotEmpty().WithErrorCode(ErrorCodes.EquipmentIdRequired);
     }
 }

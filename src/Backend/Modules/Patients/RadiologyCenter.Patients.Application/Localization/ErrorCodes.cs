@@ -9,6 +9,14 @@ namespace RadiologyCenter.Patients.Application.Localization;
 public static class ErrorCodes
 {
     public const string NameRequired = "Patient.NameRequired";
+    public const string PatientIdRequired = "Patient.PatientIdRequired";
+    public const string FullNameTooLong = "Patient.FullNameTooLong";
+    public const string FullNameTwoParts = "Patient.FullNameTwoParts";
+    public const string GenderRequired = "Patient.GenderRequired";
+    public const string PhoneNumberRequired = "Patient.PhoneNumberRequired";
+    public const string PhoneNumberTooLong = "Patient.PhoneNumberTooLong";
+    public const string EmailInvalid = "Patient.EmailInvalid";
+    public const string PhoneNumberInvalid = "Patient.PhoneNumberInvalid";
     public const string DobOrAgeRequired = "Patient.DobOrAgeRequired";
     public const string DateOfBirthFuture = "Patient.DateOfBirthFuture";
     public const string AgeOutOfRange = "Patient.AgeOutOfRange";

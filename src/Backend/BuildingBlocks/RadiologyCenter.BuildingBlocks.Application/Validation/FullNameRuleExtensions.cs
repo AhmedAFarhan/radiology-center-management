@@ -1,5 +1,4 @@
 using FluentValidation;
-using RadiologyCenter.BuildingBlocks.Application.Localization;
 using RadiologyCenter.BuildingBlocks.Domain.Common;
 
 namespace RadiologyCenter.BuildingBlocks.Application.Validation;
@@ -7,8 +6,9 @@ namespace RadiologyCenter.BuildingBlocks.Application.Validation;
 public static class FullNameRuleExtensions
 {
     public static IRuleBuilderOptions<T, string> ContainsAtLeastTwoNameParts<T>(
-        this IRuleBuilder<T, string> ruleBuilder) =>
+        this IRuleBuilder<T, string> ruleBuilder,
+        string errorCode = "Shared.FullNameTwoParts") =>
         ruleBuilder.Must(PersonName.ContainsAtLeastTwoTokens)
             .WithMessage("Full name must contain at least a first name and a last name.")
-            .WithErrorCode(ErrorCodes.Shared.FullNameTwoParts);
+            .WithErrorCode(errorCode);
 }

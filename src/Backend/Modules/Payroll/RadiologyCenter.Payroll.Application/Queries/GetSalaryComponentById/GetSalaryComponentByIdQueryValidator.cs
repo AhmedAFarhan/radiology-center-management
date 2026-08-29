@@ -1,9 +1,11 @@
-using FluentValidation;
 using RadiologyCenter.BuildingBlocks.Application.Validation;
-using ErrorCodes = RadiologyCenter.BuildingBlocks.Application.Localization.ErrorCodes;
+using RadiologyCenter.Payroll.Application.Localization;
 
 namespace RadiologyCenter.Payroll.Application.Queries.GetSalaryComponentById;
 
 public class GetSalaryComponentByIdQueryValidator : EntityIdQueryValidatorBase<GetSalaryComponentByIdQuery>
 {
+    public GetSalaryComponentByIdQueryValidator() : base(ErrorCodes.SalaryComponentIdRequired)
+    {
+    }
 }

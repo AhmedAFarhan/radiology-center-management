@@ -1,5 +1,5 @@
 using FluentValidation;
-using SharedCodes = RadiologyCenter.BuildingBlocks.Application.Localization.ErrorCodes;
+using RadiologyCenter.Payroll.Application.Localization;
 
 namespace RadiologyCenter.Payroll.Application.Commands.PayPayRun;
 
@@ -7,6 +7,6 @@ public class PayPayRunCommandValidator : AbstractValidator<PayPayRunCommand>
 {
     public PayPayRunCommandValidator()
     {
-        RuleFor(x => x.PayRunId).NotEmpty().WithErrorCode(SharedCodes.Shared.IdRequired);
+        RuleFor(x => x.PayRunId).NotEmpty().WithErrorCode(ErrorCodes.PayRunIdRequired);
     }
 }

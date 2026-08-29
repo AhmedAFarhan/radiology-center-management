@@ -1,5 +1,5 @@
 using FluentValidation;
-using SharedCodes = RadiologyCenter.BuildingBlocks.Application.Localization.ErrorCodes;
+using RadiologyCenter.Examinations.Application.Localization;
 
 namespace RadiologyCenter.Examinations.Application.Commands.CheckInExamination;
 
@@ -7,6 +7,6 @@ public class CheckInExaminationCommandValidator : AbstractValidator<CheckInExami
 {
     public CheckInExaminationCommandValidator()
     {
-        RuleFor(x => x.ExaminationId).NotEmpty().WithErrorCode(SharedCodes.Shared.IdRequired);
+        RuleFor(x => x.ExaminationId).NotEmpty().WithErrorCode(ErrorCodes.ExaminationIdRequired);
     }
 }

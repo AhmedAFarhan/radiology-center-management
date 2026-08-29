@@ -1,7 +1,6 @@
 using FluentValidation;
 using RadiologyCenter.Identity.Application.Localization;
 using RadiologyCenter.Identity.Application.Abstractions;
-using SharedCodes = RadiologyCenter.BuildingBlocks.Application.Localization.ErrorCodes;
 
 namespace RadiologyCenter.Identity.Application.Commands.UpdateRole;
 

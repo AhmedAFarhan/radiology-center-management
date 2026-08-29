@@ -1,8 +1,10 @@
-using RadiologyCenter.BuildingBlocks.Application.Validation;
-using ErrorCodes = RadiologyCenter.BuildingBlocks.Application.Localization.ErrorCodes;
+using RadiologyCenter.Inventory.Application.Localization;
 
 namespace RadiologyCenter.Inventory.Application.Queries.GetSupplierById;
 
-public class GetSupplierByIdQueryValidator : EntityIdQueryValidatorBase<GetSupplierByIdQuery>
+public class GetSupplierByIdQueryValidator : BuildingBlocks.Application.Validation.EntityIdQueryValidatorBase<GetSupplierByIdQuery>
 {
+    public GetSupplierByIdQueryValidator() : base(ErrorCodes.SupplierIdRequired)
+    {
+    }
 }

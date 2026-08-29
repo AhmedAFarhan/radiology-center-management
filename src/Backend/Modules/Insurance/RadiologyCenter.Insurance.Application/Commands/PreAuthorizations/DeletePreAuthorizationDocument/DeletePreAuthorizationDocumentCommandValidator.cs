@@ -1,5 +1,4 @@
 using FluentValidation;
-using SharedCodes = RadiologyCenter.BuildingBlocks.Application.Localization.ErrorCodes;
 
 namespace RadiologyCenter.Insurance.Application.Commands.PreAuthorizations.DeletePreAuthorizationDocument;
 
@@ -7,7 +6,7 @@ public class DeletePreAuthorizationDocumentCommandValidator : AbstractValidator<
 {
     public DeletePreAuthorizationDocumentCommandValidator()
     {
-        RuleFor(x => x.PreAuthorizationId).NotEmpty().WithErrorCode(SharedCodes.Shared.IdRequired);
-        RuleFor(x => x.DocumentId).NotEmpty().WithErrorCode(SharedCodes.Shared.IdRequired);
+        RuleFor(x => x.PreAuthorizationId).NotEmpty().WithErrorCode(ErrorCodes.PreAuthorizationIdRequired);
+        RuleFor(x => x.DocumentId).NotEmpty().WithErrorCode(ErrorCodes.DocumentIdRequired);
     }
 }

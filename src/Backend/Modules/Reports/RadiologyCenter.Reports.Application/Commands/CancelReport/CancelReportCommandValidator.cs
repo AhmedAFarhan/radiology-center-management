@@ -1,5 +1,5 @@
 using FluentValidation;
-using SharedCodes = RadiologyCenter.BuildingBlocks.Application.Localization.ErrorCodes;
+using RadiologyCenter.Reports.Application.Localization;
 
 namespace RadiologyCenter.Reports.Application.Commands.CancelReport;
 
@@ -7,7 +7,7 @@ public class CancelReportCommandValidator : AbstractValidator<CancelReportComman
 {
     public CancelReportCommandValidator()
     {
-        RuleFor(x => x.ReportId).NotEmpty().WithErrorCode(SharedCodes.Shared.IdRequired);
-        RuleFor(x => x.Reason).MaximumLength(1000).WithErrorCode(SharedCodes.Shared.TextTooLong).When(x => !string.IsNullOrWhiteSpace(x.Reason));
+        RuleFor(x => x.ReportId).NotEmpty().WithErrorCode(ErrorCodes.ReportIdRequired);
+        RuleFor(x => x.Reason).MaximumLength(1000).WithErrorCode(ErrorCodes.DescriptionTooLong).When(x => !string.IsNullOrWhiteSpace(x.Reason));
     }
 }

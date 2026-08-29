@@ -1,5 +1,5 @@
 using FluentValidation;
-using ErrorCodes = RadiologyCenter.BuildingBlocks.Application.Localization.ErrorCodes;
+using RadiologyCenter.Notification.Application.Localization;
 
 namespace RadiologyCenter.Notification.Application.Commands.NotificationTemplates.DeleteNotificationTemplate;
 
@@ -7,6 +7,6 @@ public class DeleteNotificationTemplateCommandValidator : AbstractValidator<Dele
 {
     public DeleteNotificationTemplateCommandValidator()
     {
-        RuleFor(x => x.Id).NotEmpty().WithErrorCode(ErrorCodes.Shared.FieldRequired);
+        RuleFor(x => x.Id).NotEmpty().WithErrorCode(ErrorCodes.TemplateIdRequired);
     }
 }

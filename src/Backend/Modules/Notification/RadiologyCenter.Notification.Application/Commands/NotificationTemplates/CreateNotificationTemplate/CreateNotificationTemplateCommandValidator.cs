@@ -1,5 +1,5 @@
 using FluentValidation;
-using ErrorCodes = RadiologyCenter.BuildingBlocks.Application.Localization.ErrorCodes;
+using RadiologyCenter.Notification.Application.Localization;
 
 namespace RadiologyCenter.Notification.Application.Commands.NotificationTemplates.CreateNotificationTemplate;
 
@@ -7,9 +7,9 @@ public class CreateNotificationTemplateCommandValidator : AbstractValidator<Crea
 {
     public CreateNotificationTemplateCommandValidator()
     {
-        RuleFor(x => x.Code).NotEmpty().WithErrorCode(ErrorCodes.Shared.FieldRequired).MaximumLength(100).WithErrorCode(ErrorCodes.Shared.TextTooLong);
-        RuleFor(x => x.Name).NotEmpty().WithErrorCode(ErrorCodes.Shared.FieldRequired).MaximumLength(200).WithErrorCode(ErrorCodes.Shared.TextTooLong);
-        RuleFor(x => x.Subject).NotEmpty().WithErrorCode(ErrorCodes.Shared.FieldRequired).MaximumLength(400).WithErrorCode(ErrorCodes.Shared.TextTooLong);
-        RuleFor(x => x.Body).NotEmpty().WithErrorCode(ErrorCodes.Shared.FieldRequired);
+        RuleFor(x => x.Code).NotEmpty().WithErrorCode(ErrorCodes.TemplateCodeRequired).MaximumLength(100).WithErrorCode(ErrorCodes.TemplateCodeTooLong);
+        RuleFor(x => x.Name).NotEmpty().WithErrorCode(ErrorCodes.TemplateNameRequired).MaximumLength(200).WithErrorCode(ErrorCodes.TemplateNameTooLong);
+        RuleFor(x => x.Subject).NotEmpty().WithErrorCode(ErrorCodes.TemplateSubjectRequired).MaximumLength(400).WithErrorCode(ErrorCodes.TemplateSubjectTooLong);
+        RuleFor(x => x.Body).NotEmpty().WithErrorCode(ErrorCodes.TemplateBodyRequired);
     }
 }

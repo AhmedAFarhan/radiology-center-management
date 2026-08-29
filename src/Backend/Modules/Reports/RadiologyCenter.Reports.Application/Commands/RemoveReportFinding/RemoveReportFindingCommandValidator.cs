@@ -1,5 +1,5 @@
 using FluentValidation;
-using SharedCodes = RadiologyCenter.BuildingBlocks.Application.Localization.ErrorCodes;
+using RadiologyCenter.Reports.Application.Localization;
 
 namespace RadiologyCenter.Reports.Application.Commands.RemoveReportFinding;
 
@@ -7,7 +7,7 @@ public class RemoveReportFindingCommandValidator : AbstractValidator<RemoveRepor
 {
     public RemoveReportFindingCommandValidator()
     {
-        RuleFor(x => x.ReportId).NotEmpty().WithErrorCode(SharedCodes.Shared.IdRequired);
-        RuleFor(x => x.FindingId).NotEmpty().WithErrorCode(SharedCodes.Shared.IdRequired);
+        RuleFor(x => x.ReportId).NotEmpty().WithErrorCode(ErrorCodes.ReportIdRequired);
+        RuleFor(x => x.FindingId).NotEmpty().WithErrorCode(ErrorCodes.FindingIdRequired);
     }
 }

@@ -10,4 +10,13 @@ public static class ErrorCodes
 {
     public const string ExaminationTypeNotFound = "Catalog.ExaminationTypeNotFound";
     public const string ExaminationTypeInUse = "Catalog.ExaminationTypeInUse";
+    public const string ExaminationTypeIdRequired = "Catalog.ExaminationTypeIdRequired";
+    public const string ExaminationTypeNameRequired = "Catalog.ExaminationTypeNameRequired";
+    public const string ExaminationTypeNameTooLong = "Catalog.ExaminationTypeNameTooLong";
+    public const string ExaminationTypeModalityRequired = "Catalog.ExaminationTypeModalityRequired";
+    public const string ExaminationTypeModalityInvalid = "Catalog.ExaminationTypeModalityInvalid";
+    public const string ExaminationTypeBodyPartRequired = "Catalog.ExaminationTypeBodyPartRequired";
+    public const string ExaminationTypeBodyPartTooLong = "Catalog.ExaminationTypeBodyPartTooLong";
+    public const string ExaminationTypeDurationCannotBeNegative = "Catalog.ExaminationTypeDurationCannotBeNegative";
+    public const string ExaminationTypePriceCannotBeNegative = "Catalog.ExaminationTypePriceCannotBeNegative";
 }

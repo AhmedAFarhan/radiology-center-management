@@ -1,5 +1,5 @@
 using FluentValidation;
-using SharedCodes = RadiologyCenter.BuildingBlocks.Application.Localization.ErrorCodes;
+using RadiologyCenter.Identity.Application.Localization;
 
 namespace RadiologyCenter.Identity.Application.Commands.RemovePermissionFromRole;
 
@@ -7,7 +7,7 @@ public class RemovePermissionFromRoleCommandValidator : AbstractValidator<Remove
 {
     public RemovePermissionFromRoleCommandValidator()
     {
-        RuleFor(x => x.RoleId).NotEmpty().WithErrorCode(SharedCodes.Shared.IdRequired);
-        RuleFor(x => x.PermissionCode).NotEmpty().WithErrorCode(SharedCodes.Shared.FieldRequired);
+        RuleFor(x => x.RoleId).NotEmpty().WithErrorCode(ErrorCodes.RoleIdRequired);
+        RuleFor(x => x.PermissionCode).NotEmpty().WithErrorCode(ErrorCodes.PermissionCodeRequired);
     }
 }

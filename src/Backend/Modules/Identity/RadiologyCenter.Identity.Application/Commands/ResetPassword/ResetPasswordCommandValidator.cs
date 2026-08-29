@@ -1,6 +1,6 @@
 using FluentValidation;
+using RadiologyCenter.Identity.Application.Localization;
 using RadiologyCenter.BuildingBlocks.Application.Validation;
-using SharedCodes = RadiologyCenter.BuildingBlocks.Application.Localization.ErrorCodes;
 
 namespace RadiologyCenter.Identity.Application.Commands.ResetPassword;
 
@@ -8,7 +8,7 @@ public class ResetPasswordCommandValidator : AbstractValidator<ResetPasswordComm
 {
     public ResetPasswordCommandValidator()
     {
-        RuleFor(x => x.UserId).NotEmpty().WithErrorCode(SharedCodes.Shared.IdRequired);
-        RuleFor(x => x.NewPassword).NotEmpty().WithErrorCode(SharedCodes.Shared.FieldRequired).StrongPassword();
+        RuleFor(x => x.UserId).NotEmpty().WithErrorCode(ErrorCodes.UserIdRequired);
+        RuleFor(x => x.NewPassword).NotEmpty().WithErrorCode(ErrorCodes.NewPasswordRequired).StrongPassword();
     }
 }

@@ -1,9 +1,9 @@
 using FluentValidation;
-using SharedCodes = RadiologyCenter.BuildingBlocks.Application.Localization.ErrorCodes;
+using RadiologyCenter.Identity.Application.Localization;
 
 namespace RadiologyCenter.Identity.Application.Commands.DeactivateUser;
 
 public class DeactivateUserCommandValidator : AbstractValidator<DeactivateUserCommand>
 {
-    public DeactivateUserCommandValidator() => RuleFor(x => x.UserId).NotEmpty().WithErrorCode(SharedCodes.Shared.IdRequired);
+    public DeactivateUserCommandValidator() => RuleFor(x => x.UserId).NotEmpty().WithErrorCode(ErrorCodes.UserIdRequired);
 }

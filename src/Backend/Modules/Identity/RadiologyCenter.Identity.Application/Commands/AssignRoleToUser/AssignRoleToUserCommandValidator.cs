@@ -1,5 +1,5 @@
 using FluentValidation;
-using SharedCodes = RadiologyCenter.BuildingBlocks.Application.Localization.ErrorCodes;
+using RadiologyCenter.Identity.Application.Localization;
 
 namespace RadiologyCenter.Identity.Application.Commands.AssignRoleToUser;
 
@@ -7,7 +7,7 @@ public class AssignRoleToUserCommandValidator : AbstractValidator<AssignRoleToUs
 {
     public AssignRoleToUserCommandValidator()
     {
-        RuleFor(x => x.UserId).NotEmpty().WithErrorCode(SharedCodes.Shared.IdRequired);
-        RuleFor(x => x.RoleId).NotEmpty().WithErrorCode(SharedCodes.Shared.IdRequired);
+        RuleFor(x => x.UserId).NotEmpty().WithErrorCode(ErrorCodes.UserIdRequired);
+        RuleFor(x => x.RoleId).NotEmpty().WithErrorCode(ErrorCodes.RoleIdRequired);
     }
 }

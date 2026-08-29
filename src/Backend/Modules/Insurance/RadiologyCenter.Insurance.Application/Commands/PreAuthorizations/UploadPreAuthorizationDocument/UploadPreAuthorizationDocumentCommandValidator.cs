@@ -1,5 +1,4 @@
 using FluentValidation;
-using SharedCodes = RadiologyCenter.BuildingBlocks.Application.Localization.ErrorCodes;
 
 namespace RadiologyCenter.Insurance.Application.Commands.PreAuthorizations.UploadPreAuthorizationDocument;
 
@@ -7,11 +6,11 @@ public class UploadPreAuthorizationDocumentCommandValidator : AbstractValidator<
 {
     public UploadPreAuthorizationDocumentCommandValidator()
     {
-        RuleFor(x => x.PreAuthorizationId).NotEmpty().WithErrorCode(SharedCodes.Shared.IdRequired);
-        RuleFor(x => x.Type).NotEmpty().WithErrorCode(SharedCodes.Shared.FieldRequired);
-        RuleFor(x => x.FileName).NotEmpty().WithErrorCode(SharedCodes.Shared.FieldRequired).MaximumLength(255).WithErrorCode(SharedCodes.Shared.TextTooLong);
-        RuleFor(x => x.ContentType).NotEmpty().WithErrorCode(SharedCodes.Shared.FieldRequired);
-        RuleFor(x => x.SizeInBytes).GreaterThan(0).WithErrorCode(SharedCodes.Shared.ValueMustBePositive);
-        RuleFor(x => x.Content).NotNull().WithErrorCode(SharedCodes.Shared.FieldRequired);
+        RuleFor(x => x.PreAuthorizationId).NotEmpty().WithErrorCode(ErrorCodes.PreAuthorizationIdRequired);
+        RuleFor(x => x.Type).NotEmpty().WithErrorCode(ErrorCodes.DocumentTypeRequired);
+        RuleFor(x => x.FileName).NotEmpty().WithErrorCode(ErrorCodes.FileNameRequired).MaximumLength(255).WithErrorCode(ErrorCodes.FileNameTooLong);
+        RuleFor(x => x.ContentType).NotEmpty().WithErrorCode(ErrorCodes.ContentTypeRequired);
+        RuleFor(x => x.SizeInBytes).GreaterThan(0).WithErrorCode(ErrorCodes.SizeMustBePositive);
+        RuleFor(x => x.Content).NotNull().WithErrorCode(ErrorCodes.ContentRequired);
     }
 }

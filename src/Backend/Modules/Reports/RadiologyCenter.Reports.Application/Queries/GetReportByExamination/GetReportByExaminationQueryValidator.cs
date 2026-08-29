@@ -1,5 +1,5 @@
 using FluentValidation;
-using SharedCodes = RadiologyCenter.BuildingBlocks.Application.Localization.ErrorCodes;
+using RadiologyCenter.Reports.Application.Localization;
 
 namespace RadiologyCenter.Reports.Application.Queries.GetReportByExamination;
 
@@ -7,6 +7,6 @@ public class GetReportByExaminationQueryValidator : AbstractValidator<GetReportB
 {
     public GetReportByExaminationQueryValidator()
     {
-        RuleFor(x => x.ExaminationId).NotEmpty().WithErrorCode(SharedCodes.Shared.IdRequired);
+        RuleFor(x => x.ExaminationId).NotEmpty().WithErrorCode(ErrorCodes.ExaminationIdRequired);
     }
 }

@@ -1,5 +1,4 @@
 using FluentValidation;
-using SharedCodes = RadiologyCenter.BuildingBlocks.Application.Localization.ErrorCodes;
 
 namespace RadiologyCenter.Insurance.Application.Queries.Policies.GetPolicyDocuments;
 
@@ -7,6 +6,6 @@ public class GetPolicyDocumentsQueryValidator : AbstractValidator<GetPolicyDocum
 {
     public GetPolicyDocumentsQueryValidator()
     {
-        RuleFor(x => x.PolicyId).NotEmpty().WithErrorCode(SharedCodes.Shared.IdRequired);
+        RuleFor(x => x.PolicyId).NotEmpty().WithErrorCode(ErrorCodes.PolicyIdRequired);
     }
 }

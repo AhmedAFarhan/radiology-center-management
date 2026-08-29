@@ -24,4 +24,26 @@ public static class ErrorCodes
     public const string InvalidRefreshToken = "Identity.InvalidRefreshToken";
     public const string AccountDeactivated = "Identity.AccountDeactivated";
     public const string LockoutEndMustBeFuture = "Identity.LockoutEndMustBeFuture";
+
+    public const string UserIdRequired = "Identity.UserIdRequired";
+    public const string RoleIdRequired = "Identity.RoleIdRequired";
+    public const string PermissionCodeRequired = "Identity.PermissionCodeRequired";
+    public const string CurrentPasswordRequired = "Identity.CurrentPasswordRequired";
+    public const string NewPasswordRequired = "Identity.NewPasswordRequired";
+    public const string PasswordRequired = "Identity.PasswordRequired";
+    public const string RoleNameRequired = "Identity.RoleNameRequired";
+    public const string RoleNameTooLong = "Identity.RoleNameTooLong";
+    public const string UserNameRequired = "Identity.UserNameRequired";
+    public const string UserNameTooLong = "Identity.UserNameTooLong";
+    public const string EmailRequired = "Identity.EmailRequired";
+    public const string EmailInvalid = "Identity.EmailInvalid";
+    public const string EmailTooLong = "Identity.EmailTooLong";
+    public const string FirstNameRequired = "Identity.FirstNameRequired";
+    public const string FirstNameTooLong = "Identity.FirstNameTooLong";
+    public const string LastNameRequired = "Identity.LastNameRequired";
+    public const string LastNameTooLong = "Identity.LastNameTooLong";
+    public const string PhoneNumberRequired = "Identity.PhoneNumberRequired";
+    public const string PhoneNumberTooLong = "Identity.PhoneNumberTooLong";
+    public const string RefreshTokenRequired = "Identity.RefreshTokenRequired";
+    public const string TokenRequired = "Identity.TokenRequired";
 }

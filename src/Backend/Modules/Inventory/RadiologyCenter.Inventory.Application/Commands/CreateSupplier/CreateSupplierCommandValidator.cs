@@ -1,6 +1,6 @@
 using FluentValidation;
 using RadiologyCenter.BuildingBlocks.Application.Validation;
-using ErrorCodes = RadiologyCenter.BuildingBlocks.Application.Localization.ErrorCodes;
+using RadiologyCenter.Inventory.Application.Localization;
 
 namespace RadiologyCenter.Inventory.Application.Commands.CreateSupplier;
 
@@ -8,12 +8,12 @@ public class CreateSupplierCommandValidator : AbstractValidator<CreateSupplierCo
 {
     public CreateSupplierCommandValidator()
     {
-        RuleFor(x => x.Name).NotEmpty().WithErrorCode(ErrorCodes.Shared.FieldRequired).MaximumLength(200).WithErrorCode(ErrorCodes.Shared.TextTooLong);
-        RuleFor(x => x.Phone).NotEmpty().WithErrorCode(ErrorCodes.Shared.FieldRequired).IsEgyptianPhoneNumber().MaximumLength(30).WithErrorCode(ErrorCodes.Shared.TextTooLong);
-        RuleFor(x => x.ContactPerson).MaximumLength(100).WithErrorCode(ErrorCodes.Shared.TextTooLong).When(x => !string.IsNullOrWhiteSpace(x.ContactPerson));
-        RuleFor(x => x.Email).EmailAddress().WithErrorCode(ErrorCodes.Shared.InvalidEmail).When(x => !string.IsNullOrWhiteSpace(x.Email));
-        RuleFor(x => x.Address).MaximumLength(300).WithErrorCode(ErrorCodes.Shared.TextTooLong).When(x => !string.IsNullOrWhiteSpace(x.Address));
-        RuleFor(x => x.TaxNumber).MaximumLength(50).WithErrorCode(ErrorCodes.Shared.TextTooLong).When(x => !string.IsNullOrWhiteSpace(x.TaxNumber));
-        RuleFor(x => x.PaymentTerms).MaximumLength(200).WithErrorCode(ErrorCodes.Shared.TextTooLong).When(x => !string.IsNullOrWhiteSpace(x.PaymentTerms));
+        RuleFor(x => x.Name).NotEmpty().WithErrorCode(ErrorCodes.SupplierNameRequired).MaximumLength(200).WithErrorCode(ErrorCodes.SupplierNameTooLong);
+        RuleFor(x => x.Phone).NotEmpty().WithErrorCode(ErrorCodes.SupplierPhoneRequired).IsEgyptianPhoneNumber().MaximumLength(30).WithErrorCode(ErrorCodes.SupplierPhoneTooLong);
+        RuleFor(x => x.ContactPerson).MaximumLength(100).WithErrorCode(ErrorCodes.SupplierContactPersonTooLong).When(x => !string.IsNullOrWhiteSpace(x.ContactPerson));
+        RuleFor(x => x.Email).EmailAddress().WithErrorCode(ErrorCodes.SupplierEmailInvalid).When(x => !string.IsNullOrWhiteSpace(x.Email));
+        RuleFor(x => x.Address).MaximumLength(300).WithErrorCode(ErrorCodes.SupplierAddressTooLong).When(x => !string.IsNullOrWhiteSpace(x.Address));
+        RuleFor(x => x.TaxNumber).MaximumLength(50).WithErrorCode(ErrorCodes.SupplierTaxNumberTooLong).When(x => !string.IsNullOrWhiteSpace(x.TaxNumber));
+        RuleFor(x => x.PaymentTerms).MaximumLength(200).WithErrorCode(ErrorCodes.SupplierPaymentTermsTooLong).When(x => !string.IsNullOrWhiteSpace(x.PaymentTerms));
     }
 }

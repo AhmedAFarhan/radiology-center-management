@@ -1,9 +1,9 @@
 using FluentValidation;
-using ErrorCodes = RadiologyCenter.BuildingBlocks.Application.Localization.ErrorCodes;
+using RadiologyCenter.Identity.Application.Localization;
 
 namespace RadiologyCenter.Identity.Application.Commands.CreateRole;
 
 public class CreateRoleCommandValidator : AbstractValidator<CreateRoleCommand>
 {
-    public CreateRoleCommandValidator() => RuleFor(x => x.Name).NotEmpty().WithErrorCode(ErrorCodes.Shared.FieldRequired).MaximumLength(100).WithErrorCode(ErrorCodes.Shared.TextTooLong);
+    public CreateRoleCommandValidator() => RuleFor(x => x.Name).NotEmpty().WithErrorCode(ErrorCodes.RoleNameRequired).MaximumLength(100).WithErrorCode(ErrorCodes.RoleNameTooLong);
 }

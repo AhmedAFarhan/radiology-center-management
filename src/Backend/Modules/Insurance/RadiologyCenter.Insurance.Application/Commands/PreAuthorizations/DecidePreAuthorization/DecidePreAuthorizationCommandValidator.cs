@@ -1,5 +1,4 @@
 using FluentValidation;
-using SharedCodes = RadiologyCenter.BuildingBlocks.Application.Localization.ErrorCodes;
 
 namespace RadiologyCenter.Insurance.Application.Commands.PreAuthorizations.DecidePreAuthorization;
 
@@ -7,11 +6,11 @@ public class DecidePreAuthorizationCommandValidator : AbstractValidator<DecidePr
 {
     public DecidePreAuthorizationCommandValidator()
     {
-        RuleFor(x => x.PreAuthorizationId).NotEmpty().WithErrorCode(SharedCodes.Shared.IdRequired);
-        RuleFor(x => x.Decision).IsInEnum().WithErrorCode(SharedCodes.Shared.InvalidEnumValue);
-        RuleFor(x => x.ApprovedAmount).GreaterThanOrEqualTo(0).WithErrorCode(SharedCodes.Shared.CannotBeNegative).When(x => x.ApprovedAmount.HasValue);
+        RuleFor(x => x.PreAuthorizationId).NotEmpty().WithErrorCode(ErrorCodes.PreAuthorizationIdRequired);
+        RuleFor(x => x.Decision).IsInEnum().WithErrorCode(ErrorCodes.DecisionInvalid);
+        RuleFor(x => x.ApprovedAmount).GreaterThanOrEqualTo(0).WithErrorCode(ErrorCodes.ApprovedAmountCannotBeNegative).When(x => x.ApprovedAmount.HasValue);
         RuleFor(x => x.RejectionReason)
-            .NotEmpty().WithErrorCode(SharedCodes.Shared.FieldRequired)
+            .NotEmpty().WithErrorCode(ErrorCodes.RejectionReasonRequired)
             .When(x => x.Decision == PreAuthorizationDecision.Deny);
     }
 }

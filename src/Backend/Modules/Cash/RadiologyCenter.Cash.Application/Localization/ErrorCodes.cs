@@ -20,4 +20,15 @@ public static class ErrorCodes
     public const string ReceiverAlreadyOpenSession = "Cash.ReceiverAlreadyOpenSession";
     public const string SessionAlreadyOpen = "Cash.SessionAlreadyOpen";
     public const string NoActiveTransaction = "Cash.NoActiveTransaction";
+
+    public const string SessionIdRequired = "Cash.SessionIdRequired";
+    public const string DirectionInvalid = "Cash.DirectionInvalid";
+    public const string ReasonInvalid = "Cash.ReasonInvalid";
+    public const string AmountMustBePositive = "Cash.AmountMustBePositive";
+    public const string DescriptionTooLong = "Cash.DescriptionTooLong";
+    public const string ReferenceIdTooLong = "Cash.ReferenceIdTooLong";
+    public const string CountedTotalCannotBeNegative = "Cash.CountedTotalCannotBeNegative";
+    public const string ReceivingOpeningFloatCannotBeNegative = "Cash.ReceivingOpeningFloatCannotBeNegative";
+    public const string NotesTooLong = "Cash.NotesTooLong";
+    public const string OpeningFloatCannotBeNegative = "Cash.OpeningFloatCannotBeNegative";
 }

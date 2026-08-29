@@ -1,8 +1,10 @@
-using RadiologyCenter.BuildingBlocks.Application.Validation;
-using ErrorCodes = RadiologyCenter.BuildingBlocks.Application.Localization.ErrorCodes;
+using RadiologyCenter.Inventory.Application.Localization;
 
 namespace RadiologyCenter.Inventory.Application.Queries.GetPurchaseOrderById;
 
-public class GetPurchaseOrderByIdQueryValidator : EntityIdQueryValidatorBase<GetPurchaseOrderByIdQuery>
+public class GetPurchaseOrderByIdQueryValidator : BuildingBlocks.Application.Validation.EntityIdQueryValidatorBase<GetPurchaseOrderByIdQuery>
 {
+    public GetPurchaseOrderByIdQueryValidator() : base(ErrorCodes.PurchaseOrderIdRequired)
+    {
+    }
 }

@@ -1,6 +1,5 @@
 using System.Text.RegularExpressions;
 using FluentValidation;
-using RadiologyCenter.BuildingBlocks.Application.Localization;
 
 namespace RadiologyCenter.BuildingBlocks.Application.Validation;
 
@@ -27,8 +26,10 @@ public static class EgyptianPhoneNumberRule
         return PhoneRegex.IsMatch(normalized);
     }
 
-    public static IRuleBuilderOptions<T, string?> IsEgyptianPhoneNumber<T>(this IRuleBuilder<T, string?> ruleBuilder) =>
+    public static IRuleBuilderOptions<T, string?> IsEgyptianPhoneNumber<T>(
+        this IRuleBuilder<T, string?> ruleBuilder,
+        string errorCode = "Shared.InvalidPhoneNumber") =>
         ruleBuilder.Must(IsValidEgyptianPhoneNumber)
             .WithMessage("Phone number must be a valid Egyptian number (e.g. 01012345678).")
-            .WithErrorCode(ErrorCodes.Shared.InvalidPhoneNumber);
+            .WithErrorCode(errorCode);
 }

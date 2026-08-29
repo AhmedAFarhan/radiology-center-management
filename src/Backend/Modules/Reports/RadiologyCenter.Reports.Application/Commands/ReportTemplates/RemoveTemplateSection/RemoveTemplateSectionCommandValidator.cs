@@ -1,5 +1,5 @@
 using FluentValidation;
-using SharedCodes = RadiologyCenter.BuildingBlocks.Application.Localization.ErrorCodes;
+using RadiologyCenter.Reports.Application.Localization;
 
 namespace RadiologyCenter.Reports.Application.Commands.ReportTemplates.RemoveTemplateSection;
 
@@ -7,7 +7,7 @@ public class RemoveTemplateSectionCommandValidator : AbstractValidator<RemoveTem
 {
     public RemoveTemplateSectionCommandValidator()
     {
-        RuleFor(x => x.TemplateId).NotEmpty().WithErrorCode(SharedCodes.Shared.IdRequired);
-        RuleFor(x => x.SectionId).NotEmpty().WithErrorCode(SharedCodes.Shared.IdRequired);
+        RuleFor(x => x.TemplateId).NotEmpty().WithErrorCode(ErrorCodes.TemplateIdRequired);
+        RuleFor(x => x.SectionId).NotEmpty().WithErrorCode(ErrorCodes.FindingIdRequired);
     }
 }

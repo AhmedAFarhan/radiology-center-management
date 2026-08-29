@@ -1,9 +1,9 @@
 using FluentValidation;
-using ErrorCodes = RadiologyCenter.BuildingBlocks.Application.Localization.ErrorCodes;
+using RadiologyCenter.Payroll.Application.Localization;
 
 namespace RadiologyCenter.Payroll.Application.Commands.ActivateSalaryComponent;
 
 public class ActivateSalaryComponentCommandValidator : AbstractValidator<ActivateSalaryComponentCommand>
 {
-    public ActivateSalaryComponentCommandValidator() => RuleFor(x => x.Id).NotEmpty().WithErrorCode(ErrorCodes.Shared.FieldRequired);
+    public ActivateSalaryComponentCommandValidator() => RuleFor(x => x.Id).NotEmpty().WithErrorCode(ErrorCodes.SalaryComponentIdRequired);
 }

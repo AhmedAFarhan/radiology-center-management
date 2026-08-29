@@ -1,7 +1,7 @@
 using FluentValidation;
 using RadiologyCenter.BuildingBlocks.Application.Validation;
 using RadiologyCenter.ResourceManagement.Domain.Enumerations;
-using SharedCodes = RadiologyCenter.BuildingBlocks.Application.Localization.ErrorCodes;
+using ErrorCodes = RadiologyCenter.ResourceManagement.Application.Localization.ErrorCodes;
 
 namespace RadiologyCenter.ResourceManagement.Application.Commands.SetEquipmentStatus;
 
@@ -9,7 +9,7 @@ public class SetEquipmentStatusCommandValidator : AbstractValidator<SetEquipment
 {
     public SetEquipmentStatusCommandValidator()
     {
-        RuleFor(x => x.EquipmentId).NotEmpty().WithErrorCode(SharedCodes.Shared.IdRequired);
-        RuleFor(x => x.Status).NotEmpty().WithErrorCode(SharedCodes.Shared.FieldRequired).IsEnumerationMember<EquipmentStatus, SetEquipmentStatusCommand>("Status");
+        RuleFor(x => x.EquipmentId).NotEmpty().WithErrorCode(ErrorCodes.EquipmentIdRequired);
+        RuleFor(x => x.Status).NotEmpty().WithErrorCode(ErrorCodes.StatusRequired).IsEnumerationMember<EquipmentStatus, SetEquipmentStatusCommand>("Status");
     }
 }

@@ -1,6 +1,6 @@
 using FluentValidation;
-using RadiologyCenter.BuildingBlocks.Application.Localization;
 using RadiologyCenter.Cash.Application.Commands.Sessions.Common;
+using RadiologyCenter.Cash.Application.Localization;
 
 namespace RadiologyCenter.Cash.Application.Commands.Sessions.AddCashEntry;
 
@@ -8,11 +8,11 @@ public class AddCashEntryCommandValidator : AbstractValidator<AddCashEntryComman
 {
     public AddCashEntryCommandValidator()
     {
-        RuleFor(x => x.CashSessionId).NotEmpty().WithErrorCode(ErrorCodes.Shared.IdRequired);
-        RuleFor(x => x.Direction).IsInEnum().WithErrorCode(ErrorCodes.Shared.InvalidEnumValue);
-        RuleFor(x => x.Reason).IsInEnum().WithErrorCode(ErrorCodes.Shared.InvalidEnumValue);
-        RuleFor(x => x.Amount).GreaterThan(0).WithErrorCode(ErrorCodes.Shared.ValueMustBePositive);
-        RuleFor(x => x.Description).MaximumLength(500).WithErrorCode(ErrorCodes.Shared.TextTooLong);
-        RuleFor(x => x.ReferenceId).MaximumLength(100).WithErrorCode(ErrorCodes.Shared.TextTooLong);
+        RuleFor(x => x.CashSessionId).NotEmpty().WithErrorCode(ErrorCodes.SessionIdRequired);
+        RuleFor(x => x.Direction).IsInEnum().WithErrorCode(ErrorCodes.DirectionInvalid);
+        RuleFor(x => x.Reason).IsInEnum().WithErrorCode(ErrorCodes.ReasonInvalid);
+        RuleFor(x => x.Amount).GreaterThan(0).WithErrorCode(ErrorCodes.AmountMustBePositive);
+        RuleFor(x => x.Description).MaximumLength(500).WithErrorCode(ErrorCodes.DescriptionTooLong);
+        RuleFor(x => x.ReferenceId).MaximumLength(100).WithErrorCode(ErrorCodes.ReferenceIdTooLong);
     }
 }

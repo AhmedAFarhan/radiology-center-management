@@ -24,4 +24,28 @@ public static class ErrorCodes
     public const string EquipmentNotAssigned = "Examination.EquipmentNotAssigned";
     public const string EquipmentOverlap = "Examination.EquipmentOverlap";
     public const string RadiologistOverlap = "Examination.RadiologistOverlap";
+
+    public const string ExaminationIdRequired = "Examination.ExaminationIdRequired";
+    public const string ItemIdRequired = "Examination.ItemIdRequired";
+    public const string QuantityMustBePositive = "Examination.QuantityMustBePositive";
+    public const string NotesTooLong = "Examination.NotesTooLong";
+    public const string RadiologistIdRequired = "Examination.RadiologistIdRequired";
+    public const string TechnicianIdRequired = "Examination.TechnicianIdRequired";
+    public const string EquipmentIdRequired = "Examination.EquipmentIdRequired";
+    public const string PatientIdRequired = "Examination.PatientIdRequired";
+    public const string ExaminationTypeIdRequired = "Examination.ExaminationTypeIdRequired";
+    public const string ScheduledAtRequired = "Examination.ScheduledAtRequired";
+    public const string PriorityRequired = "Examination.PriorityRequired";
+    public const string ClinicalIndicationRequired = "Examination.ClinicalIndicationRequired";
+    public const string ClinicalIndicationTooLong = "Examination.ClinicalIndicationTooLong";
+    public const string DiscountCannotBeNegative = "Examination.DiscountCannotBeNegative";
+    public const string PaidCannotBeNegative = "Examination.PaidCannotBeNegative";
+    public const string DescriptionTooLong = "Examination.DescriptionTooLong";
+    public const string StudyInstanceUidTooLong = "Examination.StudyInstanceUidTooLong";
+    public const string AccessionNumberTooLong = "Examination.AccessionNumberTooLong";
+    public const string ExaminationItemIdRequired = "Examination.ExaminationItemIdRequired";
+    public const string ExaminationTypeItemIdRequired = "Examination.ExaminationTypeItemIdRequired";
+    public const string RequestRequired = "Examination.RequestRequired";
+    public const string PageNumberMustBePositive = "Examination.PageNumberMustBePositive";
+    public const string PageSizeMustBeBetween = "Examination.PageSizeMustBeBetween";
 }

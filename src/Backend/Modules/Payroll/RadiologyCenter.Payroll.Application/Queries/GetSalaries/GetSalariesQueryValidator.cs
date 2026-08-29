@@ -1,5 +1,5 @@
 using FluentValidation;
-using ErrorCodes = RadiologyCenter.BuildingBlocks.Application.Localization.ErrorCodes;
+using RadiologyCenter.Payroll.Application.Localization;
 
 namespace RadiologyCenter.Payroll.Application.Queries.GetSalaries;
 
@@ -7,8 +7,8 @@ public class GetSalariesQueryValidator : AbstractValidator<GetSalariesQuery>
 {
     public GetSalariesQueryValidator()
     {
-        RuleFor(x => x.Request).NotNull().WithErrorCode(ErrorCodes.Shared.FieldRequired);
-        RuleFor(x => x.Request.Pagination.PageNumber).GreaterThan(0).WithErrorCode(ErrorCodes.Shared.ValueMustBePositive).When(x => x.Request is not null);
-        RuleFor(x => x.Request.Pagination.PageSize).InclusiveBetween(1, 100).WithErrorCode(ErrorCodes.Shared.MustBeBetween).When(x => x.Request is not null);
+        RuleFor(x => x.Request).NotNull().WithErrorCode(ErrorCodes.RequestRequired);
+        RuleFor(x => x.Request.Pagination.PageNumber).GreaterThan(0).WithErrorCode(ErrorCodes.PageNumberMustBePositive).When(x => x.Request is not null);
+        RuleFor(x => x.Request.Pagination.PageSize).InclusiveBetween(1, 100).WithErrorCode(ErrorCodes.PageSizeMustBeBetween).When(x => x.Request is not null);
     }
 }
