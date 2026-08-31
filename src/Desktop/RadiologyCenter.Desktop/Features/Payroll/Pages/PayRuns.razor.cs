@@ -12,6 +12,7 @@ using Microsoft.AspNetCore.Components.Web.Virtualization;
 using Microsoft.JSInterop;
 using MudBlazor;
 using RadiologyCenter.Desktop;
+using RadiologyCenter.Desktop.Features.Payroll.Models;
 using RadiologyCenter.Desktop.Models;
 using RadiologyCenter.Desktop.Services;
 
@@ -19,7 +20,7 @@ namespace RadiologyCenter.Desktop.Features.Payroll.Pages;
 
 public partial class PayRuns : ComponentBase, IDisposable
 {
-    private MudTable<PayRunDto>? _table;
+    private MudTable<PayRunListItemDto>? _table;
     private string? _search;
     private CancellationTokenSource? _searchCts;
     private string? _loadError;
@@ -27,7 +28,7 @@ public partial class PayRuns : ComponentBase, IDisposable
     private bool _statsLoaded;
     private PayRunStats _stats = new();
 
-    private async Task<TableData<PayRunDto>> LoadServerData(TableState state, CancellationToken ct)
+    private async Task<TableData<PayRunListItemDto>> LoadServerData(TableState state, CancellationToken ct)
     {
         try
         {
@@ -52,12 +53,12 @@ public partial class PayRuns : ComponentBase, IDisposable
 
             _loadError = null;
             _offline = false;
-            return new TableData<PayRunDto> { Items = page.Items, TotalItems = page.TotalCount };
+            return new TableData<PayRunListItemDto> { Items = page.Items, TotalItems = page.TotalCount };
         }
         catch (OperationCanceledException)
         {
             if (ct.IsCancellationRequested)
-                return new TableData<PayRunDto> { Items = Array.Empty<PayRunDto>(), TotalItems = 0 };
+                return new TableData<PayRunListItemDto> { Items = Array.Empty<PayRunListItemDto>(), TotalItems = 0 };
             throw;
         }
         catch (ApiException ex)
@@ -65,14 +66,14 @@ public partial class PayRuns : ComponentBase, IDisposable
             Snackbar.Add(SafeExecute.FormatError(ex), Severity.Error);
             _loadError = ex.Message;
             _offline = false;
-            return new TableData<PayRunDto> { Items = Array.Empty<PayRunDto>(), TotalItems = 0 };
+            return new TableData<PayRunListItemDto> { Items = Array.Empty<PayRunListItemDto>(), TotalItems = 0 };
         }
         catch (Exception)
         {
             Snackbar.Add(T.Payroll.Unreachable, Severity.Error);
             _loadError = T.Payroll.Unreachable;
             _offline = true;
-            return new TableData<PayRunDto> { Items = Array.Empty<PayRunDto>(), TotalItems = 0 };
+            return new TableData<PayRunListItemDto> { Items = Array.Empty<PayRunListItemDto>(), TotalItems = 0 };
         }
     }
 
@@ -105,7 +106,7 @@ public partial class PayRuns : ComponentBase, IDisposable
         await ReloadIfSavedAsync(dialog);
     }
 
-    private async Task OpenDetailDialogAsync(PayRunDto payRun)
+    private async Task OpenDetailDialogAsync(PayRunListItemDto payRun)
     {
         var parameters = new DialogParameters { ["PayRunId"] = payRun.Id };
         var options = new DialogOptions { MaxWidth = MaxWidth.Large, FullWidth = true, NoHeader = true };
@@ -120,7 +121,7 @@ public partial class PayRuns : ComponentBase, IDisposable
             await ReloadAsync();
     }
 
-    private async Task DeletePayRunAsync(PayRunDto payRun)
+    private async Task DeletePayRunAsync(PayRunListItemDto payRun)
     {
         var parameters = new DialogParameters
         {

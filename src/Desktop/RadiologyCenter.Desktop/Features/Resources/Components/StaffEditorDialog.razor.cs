@@ -12,6 +12,7 @@ using Microsoft.AspNetCore.Components.Web.Virtualization;
 using Microsoft.JSInterop;
 using MudBlazor;
 using RadiologyCenter.Desktop;
+using RadiologyCenter.Desktop.Features.Identity.Models;
 using RadiologyCenter.Desktop.Models;
 using RadiologyCenter.Desktop.Features.Resources.Models;
 using RadiologyCenter.Desktop.Services;
@@ -26,20 +27,20 @@ public partial class StaffEditorDialog : EditorDialogBase
 
     private readonly StaffFormModel _model = new();
     private EditContext _editContext = default!;
-    private UserDto? _selectedUser;
+    private UserListItemDto? _selectedUser;
 
     private bool IsEdit => Staff is not null;
 
-    private async Task<IEnumerable<UserDto>> SearchUsersAsync(string? value, CancellationToken ct)
+    private async Task<IEnumerable<UserListItemDto>> SearchUsersAsync(string? value, CancellationToken ct)
     {
         if (string.IsNullOrWhiteSpace(value))
-            return Array.Empty<UserDto>();
+            return Array.Empty<UserListItemDto>();
 
         var page = await SafeExecute.RunAsync(
             () => IdentityService.GetUsersPagedAsync(value, "LastName", false, 1, 20, ct),
             Snackbar,
             () => T.StaffDialog.SearchError);
-        return page?.Items ?? Array.Empty<UserDto>();
+        return page?.Items ?? Array.Empty<UserListItemDto>();
     }
 
     protected override async Task OnInitializedAsync()
@@ -65,11 +66,21 @@ public partial class StaffEditorDialog : EditorDialogBase
 
         try
         {
-            _selectedUser = await IdentityService.GetUserByIdAsync(Staff.UserId);
+            var user = await IdentityService.GetUserByIdAsync(Staff.UserId);
+            _selectedUser = new UserListItemDto(
+                user.Id,
+                user.UserName,
+                user.Email,
+                user.FirstName,
+                user.LastName,
+                user.PhoneNumber,
+                user.IsActive,
+                user.LastLoginAt,
+                user.CreatedAt);
         }
         catch (Exception)
         {
-            _selectedUser = new UserDto(
+            _selectedUser = new UserListItemDto(
                 Staff.UserId,
                 string.Empty,
                 string.Empty,
@@ -77,10 +88,6 @@ public partial class StaffEditorDialog : EditorDialogBase
                 string.Empty,
                 null,
                 true,
-                false,
-                false,
-                false,
-                null,
                 null,
                 default);
         }

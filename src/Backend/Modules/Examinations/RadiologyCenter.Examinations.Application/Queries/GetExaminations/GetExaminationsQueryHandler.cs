@@ -7,7 +7,7 @@ namespace RadiologyCenter.Examinations.Application.Queries.GetExaminations;
 
 public static class GetExaminationsQueryHandler
 {
-    public static async Task<Result<PagedResult<ExaminationDto>>> HandleAsync(
+    public static async Task<Result<PagedResult<ExaminationListItemDto>>> HandleAsync(
         GetExaminationsQuery query,
         IExaminationRepository examinationRepository,
         IExaminationTypeDirectory examinationTypeDirectory,
@@ -20,10 +20,10 @@ public static class GetExaminationsQueryHandler
         var typeLookup = types.ToDictionary(t => t.Id);
 
         var dtos = paged.Items
-            .Select(e => e.ToDto(typeLookup.TryGetValue(e.ExaminationTypeId, out var t) ? t.Name : string.Empty))
+            .Select(e => e.ToListItemDto(typeLookup.TryGetValue(e.ExaminationTypeId, out var t) ? t.Name : string.Empty))
             .ToList();
 
-        return Result.Success(new PagedResult<ExaminationDto>(
+        return Result.Success(new PagedResult<ExaminationListItemDto>(
             dtos,
             paged.TotalCount,
             paged.PageNumber,

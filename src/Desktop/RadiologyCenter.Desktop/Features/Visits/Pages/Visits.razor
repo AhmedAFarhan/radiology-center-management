@@ -1,6 +1,6 @@
 @page "/visits"
 @attribute [Authorize]
-@inherits ListPageBase<ExaminationDto>
+@inherits ListPageBase<ExaminationListItemDto>
 
 <PageHeader Icon="@Icons.Material.Filled.EventNote" Title="@T.Visits.Title"
             Subtitle="@T.Visits.Subtitle"
@@ -15,14 +15,14 @@
     </AuthorizeView>
 </PageHeader>
 
-<MudTable Breakpoint="Breakpoint.Sm" T="ExaminationDto" @ref="Table" ServerData="LoadServerData" Dense="true" Hover="true" Striped="true" Elevation="1" RowsPerPage="10" FixedHeader="true" Class="table-scroll">
+<MudTable Breakpoint="Breakpoint.Sm" T="ExaminationListItemDto" @ref="Table" ServerData="LoadServerData" Dense="true" Hover="true" Striped="true" Elevation="1" RowsPerPage="10" FixedHeader="true" Class="table-scroll">
     <HeaderContent>
-        <MudTh><MudTableSortLabel T="ExaminationDto" SortLabel="@("PatientId")">@T.Visits.Patient</MudTableSortLabel></MudTh>
-        <MudTh><MudTableSortLabel T="ExaminationDto" SortLabel="@("ExaminationTypeName")">@T.Visits.Examination</MudTableSortLabel></MudTh>
-        <MudTh><MudTableSortLabel T="ExaminationDto" SortLabel="@("Priority")">@T.Visits.Priority</MudTableSortLabel></MudTh>
-        <MudTh><MudTableSortLabel T="ExaminationDto" SortLabel="@("Status")">@T.Common.Status</MudTableSortLabel></MudTh>
-        <MudTh><MudTableSortLabel T="ExaminationDto" SortLabel="@("ScheduledAt")">@T.Visits.Scheduled</MudTableSortLabel></MudTh>
-        <MudTh Class="text-right"><MudTableSortLabel T="ExaminationDto" SortLabel="@("Remaining")">@T.Visits.Balance</MudTableSortLabel></MudTh>
+        <MudTh><MudTableSortLabel T="ExaminationListItemDto" SortLabel="@("PatientId")">@T.Visits.Patient</MudTableSortLabel></MudTh>
+        <MudTh><MudTableSortLabel T="ExaminationListItemDto" SortLabel="@("ExaminationTypeName")">@T.Visits.Examination</MudTableSortLabel></MudTh>
+        <MudTh><MudTableSortLabel T="ExaminationListItemDto" SortLabel="@("Priority")">@T.Visits.Priority</MudTableSortLabel></MudTh>
+        <MudTh><MudTableSortLabel T="ExaminationListItemDto" SortLabel="@("Status")">@T.Common.Status</MudTableSortLabel></MudTh>
+        <MudTh><MudTableSortLabel T="ExaminationListItemDto" SortLabel="@("ScheduledAt")">@T.Visits.Scheduled</MudTableSortLabel></MudTh>
+        <MudTh Class="text-right"><MudTableSortLabel T="ExaminationListItemDto" SortLabel="@("Remaining")">@T.Visits.Balance</MudTableSortLabel></MudTh>
         <MudTh>@T.Common.Actions</MudTh>
     </HeaderContent>
     <RowTemplate>

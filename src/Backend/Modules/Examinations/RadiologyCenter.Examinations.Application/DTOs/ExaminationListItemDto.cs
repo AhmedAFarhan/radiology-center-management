@@ -1,0 +1,28 @@
+namespace RadiologyCenter.Examinations.Application.DTOs;
+
+public record ExaminationListItemDto(
+    Guid Id,
+    Guid PatientId,
+    Guid ExaminationTypeId,
+    string ExaminationTypeName,
+    Guid? ReferralDoctorId,
+    Guid? RadiologistId,
+    Guid? TechnicianId,
+    Guid? EquipmentId,
+    string ClinicalIndication,
+    string Priority,
+    string PriorityKey,
+    string Status,
+    string StatusKey,
+    DateTime? ScheduledAt,
+    DateTime? ScheduledEnd,
+    DateTime? StartedAt,
+    DateTime? CompletedAt,
+    decimal Price,
+    decimal Discount,
+    bool IsDiscountPercentage,
+    decimal Paid,
+    decimal Remaining,
+    string? Notes,
+    int ItemCount,
+    string? StudyInstanceUID);

@@ -7,15 +7,15 @@ namespace RadiologyCenter.Identity.Application.Queries.GetUsers;
 
 public static class GetUsersQueryHandler
 {
-    public static async Task<Result<PagedResult<UserDto>>> HandleAsync(
+    public static async Task<Result<PagedResult<UserListItemDto>>> HandleAsync(
         GetUsersQuery query,
         IUserRepository userRepository,
         CancellationToken ct)
     {
         var paged = await userRepository.GetPagedAsync(query.Request, ct);
-        var dtos = paged.Items.Select(u => u.Adapt<UserDto>()).ToList();
+        var dtos = paged.Items.Select(u => u.Adapt<UserListItemDto>()).ToList();
 
-        return Result.Success(new PagedResult<UserDto>(
+        return Result.Success(new PagedResult<UserListItemDto>(
             dtos,
             paged.TotalCount,
             paged.PageNumber,

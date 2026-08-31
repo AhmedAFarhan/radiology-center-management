@@ -9,14 +9,14 @@ public sealed class IdentityService : CrudServiceBase
 
     public IdentityService(ApiClient api) : base(api) { }
 
-    public Task<PagedResult<UserDto>> GetUsersPagedAsync(
+    public Task<PagedResult<UserListItemDto>> GetUsersPagedAsync(
         string? searchTerm,
         string? sortBy,
         bool sortDescending,
         int pageNumber,
         int pageSize,
         CancellationToken ct = default)
-        => FetchPageAsync<UserDto>(UsersRes, searchTerm, sortBy, sortDescending, pageNumber, pageSize, ct);
+        => FetchPageAsync<UserListItemDto>(UsersRes, searchTerm, sortBy, sortDescending, pageNumber, pageSize, ct);
 
     public Task<UserDto> GetUserByIdAsync(string id, CancellationToken ct = default)
         => FetchByIdAsync<UserDto>(UsersRes, id, ct);

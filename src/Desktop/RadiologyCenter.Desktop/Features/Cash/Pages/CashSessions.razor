@@ -2,7 +2,7 @@
 @using RadiologyCenter.Desktop.Services
 @page "/cash/sessions"
 @attribute [Authorize]
-@inherits ListPageBase<CashSessionDto>
+@inherits ListPageBase<CashSessionListItemDto>
 @inject CashService CashService
 @inject EnumOptionsService EnumOptionsService
 @inject UserTimezoneService TimezoneService
@@ -27,15 +27,15 @@
     </AuthorizeView>
 </PageHeader>
 
-<MudTable Breakpoint="Breakpoint.Sm" T="CashSessionDto" @ref="Table" ServerData="LoadServerData" Dense="true" Hover="true" Striped="true" Elevation="1" RowsPerPage="10" FixedHeader="true" Class="table-scroll">
+<MudTable Breakpoint="Breakpoint.Sm" T="CashSessionListItemDto" @ref="Table" ServerData="LoadServerData" Dense="true" Hover="true" Striped="true" Elevation="1" RowsPerPage="10" FixedHeader="true" Class="table-scroll">
     <HeaderContent>
-        <MudTh><MudTableSortLabel T="CashSessionDto" SortLabel="@("OpenedAt")">@T.Cash.OpenedAt</MudTableSortLabel></MudTh>
+        <MudTh><MudTableSortLabel T="CashSessionListItemDto" SortLabel="@("OpenedAt")">@T.Cash.OpenedAt</MudTableSortLabel></MudTh>
         <MudTh>@T.Cash.User</MudTh>
-        <MudTh><MudTableSortLabel T="CashSessionDto" SortLabel="@("Status")">@T.Common.Status</MudTableSortLabel></MudTh>
-        <MudTh Class="text-right"><MudTableSortLabel T="CashSessionDto" SortLabel="@("OpeningFloat")">@T.Cash.OpeningFloat</MudTableSortLabel></MudTh>
+        <MudTh><MudTableSortLabel T="CashSessionListItemDto" SortLabel="@("Status")">@T.Common.Status</MudTableSortLabel></MudTh>
+        <MudTh Class="text-right"><MudTableSortLabel T="CashSessionListItemDto" SortLabel="@("OpeningFloat")">@T.Cash.OpeningFloat</MudTableSortLabel></MudTh>
         <MudTh Class="text-right">@T.Cash.Balance</MudTh>
         <MudTh Class="text-center">@T.Cash.Entries</MudTh>
-        <MudTh><MudTableSortLabel T="CashSessionDto" SortLabel="@("OpenedAt")">@T.Cash.ClosedAt</MudTableSortLabel></MudTh>
+        <MudTh><MudTableSortLabel T="CashSessionListItemDto" SortLabel="@("OpenedAt")">@T.Cash.ClosedAt</MudTableSortLabel></MudTh>
         <MudTh Class="text-center">@T.Common.Actions</MudTh>
     </HeaderContent>
     <RowTemplate>

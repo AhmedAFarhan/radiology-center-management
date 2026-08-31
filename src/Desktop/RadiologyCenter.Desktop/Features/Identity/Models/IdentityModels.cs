@@ -19,6 +19,21 @@ public sealed record UserDto(
     public bool IsLocked => LockoutEnd is { } end && end > DateTimeOffset.UtcNow;
 }
 
+public sealed record UserListItemDto(
+    string Id,
+    string UserName,
+    string Email,
+    string FirstName,
+    string LastName,
+    string? PhoneNumber,
+    bool IsActive,
+    DateTime? LastLoginAt,
+    DateTime CreatedAt)
+{
+    public string FullName => string.Join(' ', new[] { FirstName, LastName }.Where(p => !string.IsNullOrWhiteSpace(p)));
+    public bool IsLocked => false;
+}
+
 public sealed class CreateUserInput
 {
     public string UserName { get; set; } = string.Empty;

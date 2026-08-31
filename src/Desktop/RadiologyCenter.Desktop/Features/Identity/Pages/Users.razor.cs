@@ -12,13 +12,14 @@ using Microsoft.AspNetCore.Components.Web.Virtualization;
 using Microsoft.JSInterop;
 using MudBlazor;
 using RadiologyCenter.Desktop;
+using RadiologyCenter.Desktop.Features.Identity.Models;
 using RadiologyCenter.Desktop.Models;
 using RadiologyCenter.Desktop.Services;
 using RadiologyCenter.Desktop.Features.Auth.Components;
 
 namespace RadiologyCenter.Desktop.Features.Identity.Pages;
 
-public partial class Users : ListPageBase<UserDto>
+public partial class Users : ListPageBase<UserListItemDto>
 {
     private string? _currentUserName;
 
@@ -26,7 +27,7 @@ public partial class Users : ListPageBase<UserDto>
 
     protected override string UnreachableMessage => T.Users.Unreachable;
 
-    protected override async Task<PagedResult<UserDto>> LoadPageAsync(
+    protected override async Task<PagedResult<UserListItemDto>> LoadPageAsync(
         string? search,
         string? sortBy,
         bool sortDescending,
@@ -56,8 +57,18 @@ public partial class Users : ListPageBase<UserDto>
     protected override void OnInitialized()
         => _currentUserName = TokenStorage.GetTokens()?.Username;
 
-    private bool IsCurrentUser(UserDto user)
+    private bool IsCurrentUser(UserListItemDto user)
         => string.Equals(user.UserName, _currentUserName, StringComparison.OrdinalIgnoreCase);
+
+    private async Task<UserDto?> LoadUserDetailAsync(string id)
+    {
+        UserDto? user = null;
+        await SafeExecute.RunAsync(
+            async () => { user = await IdentityService.GetUserByIdAsync(id); },
+            Snackbar,
+            () => T.Users.Unreachable);
+        return user;
+    }
 
     private async Task OpenCreateDialogAsync()
     {
@@ -66,39 +77,47 @@ public partial class Users : ListPageBase<UserDto>
         await ReloadIfSavedAsync(dialog);
     }
 
-    private async Task OpenEditDialogAsync(UserDto user)
+    private async Task OpenEditDialogAsync(UserListItemDto user)
     {
-        var parameters = new DialogParameters { ["User"] = user };
+        var detail = await LoadUserDetailAsync(user.Id);
+        if (detail is null) return;
+        var parameters = new DialogParameters { ["User"] = detail };
         var options = new DialogOptions { MaxWidth = MaxWidth.Medium, FullWidth = true, NoHeader = true };
         var dialog = await DialogService.ShowAsync<UserEditorDialog>(T.FormatValue(T.UserDialog.EditTitle, user.UserName), parameters, options);
         await ReloadIfSavedAsync(dialog);
     }
 
-    private async Task OpenRolesDialogAsync(UserDto user)
+    private async Task OpenRolesDialogAsync(UserListItemDto user)
     {
-        var parameters = new DialogParameters { ["User"] = user };
+        var detail = await LoadUserDetailAsync(user.Id);
+        if (detail is null) return;
+        var parameters = new DialogParameters { ["User"] = detail };
         var options = new DialogOptions { MaxWidth = MaxWidth.Small, FullWidth = true, NoHeader = true };
         var dialog = await DialogService.ShowAsync<UserRolesDialog>(T.FormatValue(T.UserDialog.RolesTitle, user.UserName), parameters, options);
         await ReloadIfSavedAsync(dialog);
     }
 
-    private async Task OpenLockDialogAsync(UserDto user)
+    private async Task OpenLockDialogAsync(UserListItemDto user)
     {
-        var parameters = new DialogParameters { ["User"] = user };
+        var detail = await LoadUserDetailAsync(user.Id);
+        if (detail is null) return;
+        var parameters = new DialogParameters { ["User"] = detail };
         var options = new DialogOptions { MaxWidth = MaxWidth.Small, FullWidth = true, NoHeader = true };
         var dialog = await DialogService.ShowAsync<UserLockDialog>(T.FormatValue(T.UserDialog.LockTitle, user.UserName), parameters, options);
         await ReloadIfSavedAsync(dialog);
     }
 
-    private async Task OpenResetPasswordDialogAsync(UserDto user)
+    private async Task OpenResetPasswordDialogAsync(UserListItemDto user)
     {
-        var parameters = new DialogParameters { ["User"] = user };
+        var detail = await LoadUserDetailAsync(user.Id);
+        if (detail is null) return;
+        var parameters = new DialogParameters { ["User"] = detail };
         var options = new DialogOptions { MaxWidth = MaxWidth.Small, FullWidth = true, NoHeader = true };
         var dialog = await DialogService.ShowAsync<ResetPasswordDialog>(T.FormatValue(T.UserDialog.ResetPasswordTitle, user.UserName), parameters, options);
         await ReloadIfSavedAsync(dialog);
     }
 
-    private async Task ActivateAsync(UserDto user)
+    private async Task ActivateAsync(UserListItemDto user)
     {
         if (!await ConfirmDialogs.ConfirmStatusChangeAsync(DialogService, T, T.Users.Activate, user.UserName, activating: true))
             return;
@@ -113,7 +132,7 @@ public partial class Users : ListPageBase<UserDto>
             () => T.Users.Unreachable);
     }
 
-    private async Task DeactivateAsync(UserDto user)
+    private async Task DeactivateAsync(UserListItemDto user)
     {
         var parameters = new DialogParameters
         {
@@ -141,7 +160,7 @@ public partial class Users : ListPageBase<UserDto>
             () => T.Users.Unreachable);
     }
 
-    private async Task UnlockAsync(UserDto user)
+    private async Task UnlockAsync(UserListItemDto user)
     {
         await SafeExecute.RunAsync(async () =>
             {
@@ -153,11 +172,7 @@ public partial class Users : ListPageBase<UserDto>
             () => T.Users.Unreachable);
     }
 
-    private string StatusText(UserDto user)
-    {
-        if (user.IsLocked)
-            return T.Users.Locked;
-        return user.IsActive ? T.Common.Active : T.Common.Inactive;
-    }
+    private string StatusText(UserListItemDto user)
+        => user.IsActive ? T.Common.Active : T.Common.Inactive;
 }
 

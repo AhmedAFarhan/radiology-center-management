@@ -2,7 +2,7 @@
 @page "/users"
 @attribute [Authorize]
 @using RadiologyCenter.Desktop.Features.Auth.Components
-@inherits ListPageBase<UserDto>
+@inherits ListPageBase<UserListItemDto>
 @inject IdentityService IdentityService
 @inject TokenStorage TokenStorage
 @inject UserTimezoneService TimezoneService
@@ -20,14 +20,14 @@
     </AuthorizeView>
 </PageHeader>
 
-<MudTable Breakpoint="Breakpoint.Sm" T="UserDto" @ref="Table" ServerData="LoadServerData" Dense="true" Hover="true" Striped="true" Elevation="1" RowsPerPage="10" FixedHeader="true" Class="table-scroll">
+<MudTable Breakpoint="Breakpoint.Sm" T="UserListItemDto" @ref="Table" ServerData="LoadServerData" Dense="true" Hover="true" Striped="true" Elevation="1" RowsPerPage="10" FixedHeader="true" Class="table-scroll">
     <HeaderContent>
-        <MudTh><MudTableSortLabel T="UserDto" SortLabel="@("UserName")">@T.Users.Username</MudTableSortLabel></MudTh>
-        <MudTh><MudTableSortLabel T="UserDto" SortLabel="@("LastName")">@T.Common.Name</MudTableSortLabel></MudTh>
-        <MudTh><MudTableSortLabel T="UserDto" SortLabel="@("Email")">@T.Users.Email</MudTableSortLabel></MudTh>
-        <MudTh><MudTableSortLabel T="UserDto" SortLabel="@("PhoneNumber")">@T.Users.Phone</MudTableSortLabel></MudTh>
+        <MudTh><MudTableSortLabel T="UserListItemDto" SortLabel="@("UserName")">@T.Users.Username</MudTableSortLabel></MudTh>
+        <MudTh><MudTableSortLabel T="UserListItemDto" SortLabel="@("LastName")">@T.Common.Name</MudTableSortLabel></MudTh>
+        <MudTh><MudTableSortLabel T="UserListItemDto" SortLabel="@("Email")">@T.Users.Email</MudTableSortLabel></MudTh>
+        <MudTh><MudTableSortLabel T="UserListItemDto" SortLabel="@("PhoneNumber")">@T.Users.Phone</MudTableSortLabel></MudTh>
         <MudTh>@T.Common.Status</MudTh>
-        <MudTh><MudTableSortLabel T="UserDto" SortLabel="@("LastLoginAt")">@T.Users.LastLogin</MudTableSortLabel></MudTh>
+        <MudTh><MudTableSortLabel T="UserListItemDto" SortLabel="@("LastLoginAt")">@T.Users.LastLogin</MudTableSortLabel></MudTh>
         <MudTh>@T.Common.Actions</MudTh>
     </HeaderContent>
     <RowTemplate>
@@ -42,7 +42,7 @@
         <MudTd DataLabel="@T.Users.Email">@context.Email</MudTd>
         <MudTd DataLabel="@T.Users.Phone">@(string.IsNullOrWhiteSpace(context.PhoneNumber) ? "-" : context.PhoneNumber)</MudTd>
         <MudTd DataLabel="@T.Common.Status">
-            <StatusChip Token="@(context.IsLocked ? "Locked" : context.IsActive ? "Active" : "Inactive")">@StatusText(context)</StatusChip>
+            <StatusChip Token="@(context.IsActive ? "Active" : "Inactive")">@StatusText(context)</StatusChip>
         </MudTd>
         <MudTd DataLabel="@T.Users.LastLogin">@TimezoneHelper.FormatOptional(context.LastLoginAt, TimezoneService.GetTimeZoneId())</MudTd>
         <MudTd DataLabel="@T.Common.Actions">

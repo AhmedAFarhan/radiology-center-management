@@ -14,6 +14,18 @@ public sealed record CashSessionDto(
     int EntryCount,
     string StatusKey = "");
 
+public sealed record CashSessionListItemDto(
+    string Id,
+    string UserId,
+    string UserName,
+    string Status,
+    decimal OpeningFloat,
+    decimal Balance,
+    DateTime OpenedAt,
+    DateTime? ClosedAt,
+    int EntryCount,
+    string StatusKey = "");
+
 public sealed class OpenCashSessionInput
 {
     public decimal OpeningFloat { get; set; }

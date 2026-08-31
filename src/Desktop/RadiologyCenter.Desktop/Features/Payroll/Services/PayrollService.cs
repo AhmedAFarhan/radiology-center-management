@@ -14,14 +14,14 @@ public sealed class PayrollService : CrudServiceBase
     public PayrollService(ApiClient api) : base(api) { }
 
     // ----- Pay Runs -----
-    public Task<PagedResult<PayRunDto>> GetPayRunsPagedAsync(
+    public Task<PagedResult<PayRunListItemDto>> GetPayRunsPagedAsync(
         string? searchTerm,
         string? sortBy,
         bool sortDescending,
         int pageNumber,
         int pageSize,
         CancellationToken ct = default)
-        => FetchPageAsync<PayRunDto>(PayRunsRes, searchTerm, sortBy, sortDescending, pageNumber, pageSize, ct);
+        => FetchPageAsync<PayRunListItemDto>(PayRunsRes, searchTerm, sortBy, sortDescending, pageNumber, pageSize, ct);
 
     public Task<PayRunDto> GetPayRunByIdAsync(string id, CancellationToken ct = default)
         => FetchByIdAsync<PayRunDto>(PayRunsRes, id, ct);

@@ -31,6 +31,33 @@ public sealed record ExaminationDto(
     DateTime? ImagesReceivedAt,
     IReadOnlyList<ExaminationItemDto> Items);
 
+public sealed record ExaminationListItemDto(
+    string Id,
+    string PatientId,
+    string ExaminationTypeId,
+    string ExaminationTypeName,
+    string? ReferralDoctorId,
+    string? RadiologistId,
+    string? TechnicianId,
+    string? EquipmentId,
+    string ClinicalIndication,
+    string Priority,
+    string PriorityKey,
+    string Status,
+    string StatusKey,
+    DateTime? ScheduledAt,
+    DateTime? ScheduledEnd,
+    DateTime? StartedAt,
+    DateTime? CompletedAt,
+    decimal Price,
+    decimal Discount,
+    bool IsDiscountPercentage,
+    decimal Paid,
+    decimal Remaining,
+    string? Notes,
+    int ItemCount,
+    string? StudyInstanceUID);
+
 public sealed record ExaminationItemDto(
     string Id,
     string ItemId,

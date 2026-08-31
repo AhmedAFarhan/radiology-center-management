@@ -18,7 +18,7 @@ public sealed class CashService : CrudServiceBase
     public Task<CashSessionDto> GetByIdAsync(string id, CancellationToken ct = default)
         => FetchByIdAsync<CashSessionDto>(SessionsRes, id, ct);
 
-    public Task<PagedResult<CashSessionDto>> GetSessionsPagedAsync(
+    public Task<PagedResult<CashSessionListItemDto>> GetSessionsPagedAsync(
         string? searchTerm,
         string? sortBy,
         bool sortDescending,
@@ -31,7 +31,7 @@ public sealed class CashService : CrudServiceBase
             ? $"{SessionsRes}/all"
             : $"{SessionsRes}/all?status={Uri.EscapeDataString(status)}";
 
-        return Api.PostAsync<PagedResult<CashSessionDto>>(url, PagedQuery(searchTerm, sortBy, sortDescending, pageNumber, pageSize), ct);
+        return Api.PostAsync<PagedResult<CashSessionListItemDto>>(url, PagedQuery(searchTerm, sortBy, sortDescending, pageNumber, pageSize), ct);
     }
 
     public Task<IReadOnlyList<CashEntryDto>> GetEntriesAsync(string sessionId, CancellationToken ct = default)

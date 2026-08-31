@@ -62,13 +62,13 @@
     </MudGrid>
 }
 
-<MudTable Breakpoint="Breakpoint.Sm" T="PayRunDto" @ref="_table" ServerData="LoadServerData" Dense="true" Hover="true" Striped="true" Elevation="1" RowsPerPage="10" FixedHeader="true" Class="table-scroll">
+<MudTable Breakpoint="Breakpoint.Sm" T="PayRunListItemDto" @ref="_table" ServerData="LoadServerData" Dense="true" Hover="true" Striped="true" Elevation="1" RowsPerPage="10" FixedHeader="true" Class="table-scroll">
     <HeaderContent>
-        <MudTh><MudTableSortLabel T="PayRunDto" SortLabel="@("RunFrom")">@T.Payroll.Period</MudTableSortLabel></MudTh>
-        <MudTh><MudTableSortLabel T="PayRunDto" SortLabel="@("Status")">@T.Common.Status</MudTableSortLabel></MudTh>
+        <MudTh><MudTableSortLabel T="PayRunListItemDto" SortLabel="@("RunFrom")">@T.Payroll.Period</MudTableSortLabel></MudTh>
+        <MudTh><MudTableSortLabel T="PayRunListItemDto" SortLabel="@("Status")">@T.Common.Status</MudTableSortLabel></MudTh>
         <MudTh>@T.Payroll.Employees</MudTh>
         <MudTh Class="text-right">@T.Payroll.NetPay</MudTh>
-        <MudTh><MudTableSortLabel T="PayRunDto" SortLabel="@("ProcessedAt")">@T.Payroll.Processed</MudTableSortLabel></MudTh>
+        <MudTh><MudTableSortLabel T="PayRunListItemDto" SortLabel="@("ProcessedAt")">@T.Payroll.Processed</MudTableSortLabel></MudTh>
         <MudTh>@T.Payroll.Notes</MudTh>
         <MudTh>@T.Common.Actions</MudTh>
     </HeaderContent>
@@ -79,8 +79,8 @@
         <MudTd DataLabel="@T.Common.Status">
             <StatusChip Token="@context.StatusKey">@context.Status</StatusChip>
         </MudTd>
-        <MudTd DataLabel="@T.Payroll.Employees">@context.Payslips.Count</MudTd>
-        <MudTd DataLabel="@T.Payroll.NetPay" Class="text-right">@context.Payslips.Sum(p => p.NetSalary).ToString("N2")</MudTd>
+        <MudTd DataLabel="@T.Payroll.Employees">@context.EmployeeCount</MudTd>
+        <MudTd DataLabel="@T.Payroll.NetPay" Class="text-right">@context.TotalNetPay.ToString("N2")</MudTd>
         <MudTd DataLabel="@T.Payroll.Processed">@TimezoneHelper.FormatOptional(context.ProcessedAt, TimezoneService.GetTimeZoneId())</MudTd>
         <MudTd DataLabel="@T.Payroll.Notes">@(string.IsNullOrWhiteSpace(context.Notes) ? "-" : context.Notes)</MudTd>
         <MudTd DataLabel="@T.Common.Actions">

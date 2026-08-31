@@ -52,14 +52,14 @@ public sealed class ExaminationService : CrudServiceBase
             file: ("file", fileName, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", content),
             ct: ct);
 
-    public Task<PagedResult<ExaminationDto>> GetPagedAsync(
+    public Task<PagedResult<ExaminationListItemDto>> GetPagedAsync(
         string? searchTerm,
         string? sortBy,
         bool sortDescending,
         int pageNumber,
         int pageSize,
         CancellationToken ct = default)
-        => FetchPageAsync<ExaminationDto>(Res, searchTerm, sortBy, sortDescending, pageNumber, pageSize, ct);
+        => FetchPageAsync<ExaminationListItemDto>(Res, searchTerm, sortBy, sortDescending, pageNumber, pageSize, ct);
 
     public Task<ExaminationDto> GetByIdAsync(string id, CancellationToken ct = default)
         => FetchByIdAsync<ExaminationDto>(Res, id, ct);

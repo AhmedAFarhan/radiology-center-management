@@ -4,7 +4,7 @@ using RadiologyCenter.Desktop.Services;
 
 namespace RadiologyCenter.Desktop.Features.Cash.Pages;
 
-public partial class CashSessions : ListPageBase<CashSessionDto>
+public partial class CashSessions : ListPageBase<CashSessionListItemDto>
 {
     private string _status = string.Empty;
     private IReadOnlyList<EnumOptionDto> _statusOptions = Array.Empty<EnumOptionDto>();
@@ -25,7 +25,7 @@ public partial class CashSessions : ListPageBase<CashSessionDto>
         }
     }
 
-    protected override async Task<PagedResult<CashSessionDto>> LoadPageAsync(
+    protected override async Task<PagedResult<CashSessionListItemDto>> LoadPageAsync(
         string? search,
         string? sortBy,
         bool sortDescending,
@@ -56,7 +56,7 @@ public partial class CashSessions : ListPageBase<CashSessionDto>
             await ReloadAsync();
     }
 
-    private async Task OpenDetailAsync(CashSessionDto session)
+    private async Task OpenDetailAsync(CashSessionListItemDto session)
     {
         var parameters = new DialogParameters { ["SessionId"] = session.Id };
         var options = new DialogOptions { MaxWidth = MaxWidth.Large, FullWidth = true, NoHeader = true };

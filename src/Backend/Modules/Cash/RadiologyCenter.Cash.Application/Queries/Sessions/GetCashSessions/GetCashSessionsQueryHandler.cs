@@ -7,7 +7,7 @@ namespace RadiologyCenter.Cash.Application.Queries.Sessions.GetCashSessions;
 
 public static class GetCashSessionsQueryHandler
 {
-    public static async Task<Result<PagedResult<CashSessionDto>>> HandleAsync(
+    public static async Task<Result<PagedResult<CashSessionListItemDto>>> HandleAsync(
         GetCashSessionsQuery query,
         ICashSessionRepository sessionRepository,
         ICashEntryRepository entryRepository,
@@ -29,13 +29,13 @@ public static class GetCashSessionsQueryHandler
         var items = paged.Items.Select(s =>
         {
             movements.TryGetValue(s.Id, out var movement);
-            return s.ToDto(
+            return s.ToListItemDto(
                 s.OpeningFloat + movement.Movement,
                 userNames.GetValueOrDefault(s.UserId) ?? string.Empty,
                 movement.Count);
         }).ToList();
 
-        return Result.Success(new PagedResult<CashSessionDto>(
+        return Result.Success(new PagedResult<CashSessionListItemDto>(
             items,
             paged.TotalCount,
             paged.PageNumber,

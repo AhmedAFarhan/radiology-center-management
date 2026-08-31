@@ -10,5 +10,9 @@ public static class IdentityMappingConfig
     {
         TypeAdapterConfig<Role, RoleDto>.NewConfig()
             .Map(d => d.Permissions, s => s.Permissions.Select(p => p.Code).ToList());
+
+        TypeAdapterConfig<User, UserListItemDto>.NewConfig()
+            .Map(d => d.FirstName, s => s.FirstName)
+            .Map(d => d.LastName, s => s.LastName);
     }
 }

@@ -12,6 +12,18 @@ public sealed record PayRunDto(
     IReadOnlyList<ReferralFeeStatementDto>? ReferralFeeStatements = null,
     string StatusKey = "");
 
+public sealed record PayRunListItemDto(
+    string Id,
+    DateTime RunFrom,
+    DateTime RunTo,
+    string Status,
+    string? ProcessedBy,
+    DateTime? ProcessedAt,
+    string? Notes,
+    int EmployeeCount,
+    decimal TotalNetPay,
+    string StatusKey = "");
+
 public sealed record PayslipDto(
     string Id,
     string PayRunId,

@@ -1,12 +1,13 @@
 using Microsoft.AspNetCore.Components;
 using MudBlazor;
+using RadiologyCenter.Desktop.Features.Examinations.Models;
 using RadiologyCenter.Desktop.Models;
 using RadiologyCenter.Desktop.Services;
 using RadiologyCenter.Desktop.Shared.Components;
 
 namespace RadiologyCenter.Desktop.Features.Visits.Pages;
 
-public partial class Visits : ListPageBase<ExaminationDto>
+public partial class Visits : ListPageBase<ExaminationListItemDto>
 {
     [Inject] private ExaminationService ExaminationService { get; set; } = default!;
     [Inject] private PatientService PatientService { get; set; } = default!;
@@ -33,7 +34,7 @@ public partial class Visits : ListPageBase<ExaminationDto>
         }
     }
 
-    protected override async Task<PagedResult<ExaminationDto>> LoadPageAsync(
+    protected override async Task<PagedResult<ExaminationListItemDto>> LoadPageAsync(
         string? search,
         string? sortBy,
         bool sortDescending,
@@ -64,7 +65,7 @@ public partial class Visits : ListPageBase<ExaminationDto>
         }
     }
 
-    private bool HasInsurance(ExaminationDto visit)
+    private bool HasInsurance(ExaminationListItemDto visit)
         => _insuranceCache.TryGetValue(visit.PatientId, out var insured) && insured;
 
     private string ResolvePatientName(string patientId)
@@ -90,44 +91,60 @@ public partial class Visits : ListPageBase<ExaminationDto>
         return result is { Canceled: false };
     }
 
+    private async Task<ExaminationDto?> LoadDetailAsync(string id)
+    {
+        ExaminationDto? detail = null;
+        await SafeExecute.RunAsync(
+            async () => { detail = await ExaminationService.GetByIdAsync(id); },
+            Snackbar,
+            () => T.Visits.Unreachable);
+        return detail;
+    }
+
     private async Task OpenCreateDialogAsync()
     {
         var dialog = await DialogService.ShowAsync<VisitEditorDialog>(T.Visits.NewVisit, EditorDialogOptions);
         await ReloadIfSavedAsync(dialog);
     }
 
-    private async Task OpenEditDialogAsync(ExaminationDto visit)
+    private async Task OpenEditDialogAsync(ExaminationListItemDto visit)
     {
-        var parameters = new DialogParameters { ["Visit"] = visit };
+        var detail = await LoadDetailAsync(visit.Id);
+        if (detail is null) return;
+        var parameters = new DialogParameters { ["Visit"] = detail };
         var dialog = await DialogService.ShowAsync<VisitEditorDialog>(T.Visits.EditVisit, parameters, EditorDialogOptions);
         await ReloadIfSavedAsync(dialog);
     }
 
-    private async Task OpenScheduleDialogAsync(ExaminationDto visit)
+    private async Task OpenScheduleDialogAsync(ExaminationListItemDto visit)
     {
         if (!await ConfirmAsync(T.Visits.ScheduleConfirm, Icons.Material.Filled.Schedule, MudBlazor.Color.Info))
             return;
-        var parameters = new DialogParameters { ["Visit"] = visit };
+        var detail = await LoadDetailAsync(visit.Id);
+        if (detail is null) return;
+        var parameters = new DialogParameters { ["Visit"] = detail };
         var options = new DialogOptions { MaxWidth = MaxWidth.Small, FullWidth = true, NoHeader = true };
         var dialog = await DialogService.ShowAsync<VisitScheduleDialog>(T.Visits.ScheduleVisit, parameters, options);
         await ReloadIfSavedAsync(dialog);
     }
 
-    private async Task OpenViewDialogAsync(ExaminationDto visit)
+    private async Task OpenViewDialogAsync(ExaminationListItemDto visit)
     {
-        var parameters = new DialogParameters { ["Visit"] = visit };
+        var detail = await LoadDetailAsync(visit.Id);
+        if (detail is null) return;
+        var parameters = new DialogParameters { ["Visit"] = detail };
         var dialog = await DialogService.ShowAsync<VisitViewDialog>(T.Visits.VisitDetails, parameters, EditorDialogOptions);
         await ReloadIfSavedAsync(dialog);
     }
 
-    private async Task OpenInsuranceAsync(ExaminationDto visit)
+    private async Task OpenInsuranceAsync(ExaminationListItemDto visit)
     {
         if (!await ConfirmAsync(T.Visits.InsuranceConfirm, Icons.Material.Filled.Approval, MudBlazor.Color.Info))
             return;
         NavigationManager.NavigateTo("/insurance/preauthorizations");
     }
 
-    private async Task CheckInAsync(ExaminationDto visit)
+    private async Task CheckInAsync(ExaminationListItemDto visit)
     {
         if (!await ConfirmAsync(T.Visits.CheckInConfirm, Icons.Material.Filled.Login, MudBlazor.Color.Primary))
             return;
@@ -141,7 +158,7 @@ public partial class Visits : ListPageBase<ExaminationDto>
             () => T.Visits.Unreachable);
     }
 
-    private async Task StartAsync(ExaminationDto visit)
+    private async Task StartAsync(ExaminationListItemDto visit)
     {
         if (!await ConfirmAsync(T.Visits.StartConfirm, Icons.Material.Filled.PlayArrow, MudBlazor.Color.Secondary))
             return;
@@ -155,7 +172,7 @@ public partial class Visits : ListPageBase<ExaminationDto>
             () => T.Visits.Unreachable);
     }
 
-    private async Task CompleteAsync(ExaminationDto visit)
+    private async Task CompleteAsync(ExaminationListItemDto visit)
     {
         if (!await ConfirmAsync(T.Visits.CompleteConfirm, Icons.Material.Filled.CheckCircle, MudBlazor.Color.Success))
             return;
@@ -169,11 +186,13 @@ public partial class Visits : ListPageBase<ExaminationDto>
             () => T.Visits.Unreachable);
     }
 
-    private async Task CancelAsync(ExaminationDto visit)
+    private async Task CancelAsync(ExaminationListItemDto visit)
     {
         if (!await ConfirmAsync(T.Visits.CancelConfirm, Icons.Material.Filled.Cancel, MudBlazor.Color.Error))
             return;
-        var parameters = new DialogParameters { ["Visit"] = visit };
+        var detail = await LoadDetailAsync(visit.Id);
+        if (detail is null) return;
+        var parameters = new DialogParameters { ["Visit"] = detail };
         var options = new DialogOptions { MaxWidth = MaxWidth.Small, FullWidth = true, NoHeader = true };
         var dialog = await DialogService.ShowAsync<CancelVisitDialog>(T.Visits.CancelVisit, parameters, options);
         await ReloadIfSavedAsync(dialog);

@@ -2,10 +2,9 @@
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Forms;
 using MudBlazor;
+using RadiologyCenter.Desktop.Features.Examinations.Models;
 using RadiologyCenter.Desktop.Features.Insurance.Models;
 using RadiologyCenter.Desktop.Services;
-
-using RadiologyCenter.Desktop.Features.Insurance.Models;
 
 namespace RadiologyCenter.Desktop.Features.Insurance.Components;
 
@@ -15,7 +14,7 @@ public partial class PreAuthDialog : EditorDialogBase
     private EditContext _editContext = default!;
     private PatientDto? _selectedPatient;
     private InsurancePolicyDto? _selectedPolicy;
-    private ExaminationDto? _selectedExamination;
+    private ExaminationListItemDto? _selectedExamination;
 
     protected override void OnInitialized()
         => _editContext = new EditContext(_model);
@@ -51,19 +50,19 @@ public partial class PreAuthDialog : EditorDialogBase
         return policies.Where(p => p.PolicyNumber.Contains(value, StringComparison.OrdinalIgnoreCase));
     }
 
-    private async Task<IEnumerable<ExaminationDto>> SearchExaminationsAsync(string? value, CancellationToken ct)
+    private async Task<IEnumerable<ExaminationListItemDto>> SearchExaminationsAsync(string? value, CancellationToken ct)
     {
         if (_selectedPatient is null)
         {
             Snackbar.Add(T.PreAuthDialog.SelectPatientFirst, Severity.Info);
-            return Array.Empty<ExaminationDto>();
+            return Array.Empty<ExaminationListItemDto>();
         }
 
         var page = await SafeExecute.RunAsync(
             () => ExaminationService.GetPagedAsync(value, "ScheduledAt", false, 1, 50, ct),
             Snackbar,
             () => T.PreAuthDialog.UnableSearchExaminations);
-        return page?.Items.Where(e => e.PatientId == _selectedPatient.Id) ?? Array.Empty<ExaminationDto>();
+        return page?.Items.Where(e => e.PatientId == _selectedPatient.Id) ?? Array.Empty<ExaminationListItemDto>();
     }
 
     private async Task SubmitAsync()

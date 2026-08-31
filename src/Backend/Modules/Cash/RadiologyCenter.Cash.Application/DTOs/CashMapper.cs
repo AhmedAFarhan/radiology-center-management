@@ -47,4 +47,17 @@ internal static class CashMapper
             session.Notes,
             entryCount,
             session.Status.Name);
+
+    public static CashSessionListItemDto ToListItemDto(this CashSession session, decimal balance, string userName, int entryCount) =>
+        new(
+            session.Id,
+            session.UserId,
+            userName,
+            session.Status.LocalizedName(),
+            session.OpeningFloat,
+            balance,
+            session.OpenedAt,
+            session.ClosedAt,
+            entryCount,
+            session.Status.Name);
 }
