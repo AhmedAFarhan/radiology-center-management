@@ -58,6 +58,7 @@ public sealed class AppAuthenticationStateProvider : AuthenticationStateProvider
             new(ClaimTypes.Email, claims.Get("email") ?? string.Empty),
             new(ClaimTypes.GivenName, claims.Get("firstName") ?? string.Empty),
             new(ClaimTypes.Surname, claims.Get("lastName") ?? string.Empty),
+            new(AppClaimTypes.Timezone, claims.Get(AppClaimTypes.Timezone) ?? "Africa/Cairo"),
         };
 
         foreach (var permission in claims.GetAll(AppClaimTypes.Permission))

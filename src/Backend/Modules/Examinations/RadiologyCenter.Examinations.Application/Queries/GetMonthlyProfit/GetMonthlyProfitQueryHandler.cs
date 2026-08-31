@@ -1,3 +1,4 @@
+using RadiologyCenter.BuildingBlocks.Application.Abstractions;
 using RadiologyCenter.Examinations.Application.Abstractions;
 using RadiologyCenter.Examinations.Application.DTOs;
 using RadiologyCenter.Examinations.Domain.Common;
@@ -10,12 +11,16 @@ public static class GetMonthlyProfitQueryHandler
         GetMonthlyProfitQuery query,
         IExaminationHistoryRepository historyRepository,
         IProfitSourceResolver profitSourceResolver,
+        ITimezoneConverter timezone,
         CancellationToken ct)
     {
-        var from = query.From?.Date ?? DateTime.Today.AddMonths(-1).AddDays(1);
-        var to = query.To?.Date.AddDays(1) ?? DateTime.Today.AddDays(1);
+        var today = timezone.GetLocalDate(DateTime.UtcNow);
+        var fromDate = query.From?.Date ?? today.AddMonths(-1).AddDays(1).ToDateTime(TimeOnly.MinValue);
+        var toDate = query.To?.Date.AddDays(1) ?? today.AddDays(1).ToDateTime(TimeOnly.MinValue);
 
-        var histories = await historyRepository.GetByCompletedRangeAsync(from, to, ct);
+        var fromUtc = timezone.ToUtc(fromDate);
+        var toUtc = timezone.ToUtc(toDate);
+        var histories = await historyRepository.GetByCompletedRangeAsync(fromUtc, toUtc, ct);
 
         var collected = histories.Sum(h => h.Paid);
         var billed = histories.Sum(Billable);
@@ -23,16 +28,16 @@ public static class GetMonthlyProfitQueryHandler
         var staffCaseFees = histories.Sum(h => (h.RadiologistFee ?? 0m) + (h.TechnicianFee ?? 0m));
         var referralFees = histories.Sum(h => h.ReferralFee ?? 0m);
 
-        var laborCost = await profitSourceResolver.GetLaborCostForAsync(from, to, ct);
-        var (materialCost, materialTracked) = await profitSourceResolver.GetMaterialCostForAsync(from, to, ct);
+        var laborCost = await profitSourceResolver.GetLaborCostForAsync(fromUtc, toUtc, ct);
+        var (materialCost, materialTracked) = await profitSourceResolver.GetMaterialCostForAsync(fromUtc, toUtc, ct);
 
         var totalCosts = staffCaseFees + referralFees + laborCost + materialCost;
         var netProfit = collected - totalCosts;
         var netMargin = collected == 0m ? 0m : Math.Round(netProfit / collected, 4);
 
         return Result.Success(new ProfitAnalyticsDto(
-            from,
-            to.AddDays(-1),
+            fromUtc,
+            toUtc.AddDays(-1),
             Math.Round(collected, 2, MidpointRounding.AwayFromZero),
             Math.Round(billed, 2, MidpointRounding.AwayFromZero),
             Math.Round(discounts, 2, MidpointRounding.AwayFromZero),

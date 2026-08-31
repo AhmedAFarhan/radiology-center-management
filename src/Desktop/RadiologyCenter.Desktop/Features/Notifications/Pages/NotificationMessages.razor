@@ -1,9 +1,11 @@
 @using static RadiologyCenter.Desktop.Services.Formatting
+@using RadiologyCenter.Desktop.Services
 @page "/notifications/messages"
 @attribute [Authorize]
 @inherits ListPageBase<NotificationMessageDto>
 @inject NotificationService NotificationService
 @inject EnumOptionsService EnumOptionsService
+@inject UserTimezoneService TimezoneService
 
 <PageHeader Icon="@Icons.Material.Filled.Notifications" Title="@T.Notifications.MessagesTitle"
             Subtitle="@T.Notifications.MessagesSubtitle"
@@ -45,7 +47,7 @@
         <MudTh>@T.Common.Actions</MudTh>
     </HeaderContent>
     <RowTemplate>
-        <MudTd DataLabel="@T.Notifications.SentAt">@context.CreatedAt.ToLocalTime().ToString("g")</MudTd>
+        <MudTd DataLabel="@T.Notifications.SentAt">@TimezoneHelper.Format(context.CreatedAt, TimezoneService.GetTimeZoneId())</MudTd>
         <MudTd DataLabel="@T.Notifications.Channel">
             <MudChip T="string" Size="Size.Small" Color="@ChannelColor(context.Channel)" Variant="Variant.Outlined">@context.Channel</MudChip>
         </MudTd>

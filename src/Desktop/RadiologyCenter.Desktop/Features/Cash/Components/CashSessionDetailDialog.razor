@@ -1,8 +1,10 @@
 @using static RadiologyCenter.Desktop.Services.Formatting
+@using RadiologyCenter.Desktop.Services
 @inject CashService CashService
 @inject IDialogService DialogService
 @inject ISnackbar Snackbar
 @inject AppLocalizer T
+@inject UserTimezoneService TimezoneService
 
 <MudDialog>
     <DialogContent>
@@ -35,11 +37,11 @@
                             </MudItem>
                             <MudItem xs="12" sm="6">
                                 <MudText Typo="Typo.caption" Class="text-secondary">@T.CashSession.OpenedAt</MudText>
-                                <MudText Typo="Typo.body2">@Session.OpenedAt.ToLocalTime().ToString("g")</MudText>
+                                <MudText Typo="Typo.body2">@TimezoneHelper.Format(Session.OpenedAt, TimezoneService.GetTimeZoneId())</MudText>
                             </MudItem>
                             <MudItem xs="12" sm="6">
                                 <MudText Typo="Typo.caption" Class="text-secondary">@T.CashSession.ClosedAt</MudText>
-                                <MudText Typo="Typo.body2">@(Session.ClosedAt?.ToLocalTime().ToString("g") ?? T.CashSession.NotClosed)</MudText>
+                                <MudText Typo="Typo.body2">@(Session.ClosedAt.HasValue ? TimezoneHelper.Format(Session.ClosedAt.Value, TimezoneService.GetTimeZoneId()) : T.CashSession.NotClosed)</MudText>
                             </MudItem>
                         </MudGrid>
                         @if (!string.IsNullOrWhiteSpace(Session.Notes))
@@ -80,7 +82,7 @@
                                 </MudItem>
                                 <MudItem xs="12" sm="6" md="3">
                                     <MudText Typo="Typo.caption" Class="text-secondary">@T.CashSession.Approved</MudText>
-                                    <MudText Typo="Typo.body2">@(_handover.ApprovedAt?.ToLocalTime().ToString("g") ?? T.CashSession.NotApproved)</MudText>
+                                    <MudText Typo="Typo.body2">@(_handover.ApprovedAt.HasValue ? TimezoneHelper.Format(_handover.ApprovedAt.Value, TimezoneService.GetTimeZoneId()) : T.CashSession.NotApproved)</MudText>
                                 </MudItem>
                                 <MudItem xs="12" sm="6">
                                     <MudText Typo="Typo.caption" Class="text-secondary">@T.CashSession.ClosedBy</MudText>
@@ -130,7 +132,7 @@
                                 <MudTh>@T.CashSession.Description</MudTh>
                             </HeaderContent>
                             <RowTemplate Context="entry">
-                                <MudTd DataLabel="@T.Common.Date">@entry.OccurredAt.ToLocalTime().ToString("g")</MudTd>
+                                <MudTd DataLabel="@T.Common.Date">@TimezoneHelper.Format(entry.OccurredAt, TimezoneService.GetTimeZoneId())</MudTd>
                                 <MudTd DataLabel="@T.CashSession.Direction">
                                     <StatusChip Token="@entry.DirectionKey">@entry.Direction</StatusChip>
                                 </MudTd>

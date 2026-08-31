@@ -4,4 +4,5 @@ public static class AppClaimTypes
 {
     public const string Permission = "permission";
     public const string IsAdmin = "isAdmin";
+    public const string Timezone = "timezone";
 }

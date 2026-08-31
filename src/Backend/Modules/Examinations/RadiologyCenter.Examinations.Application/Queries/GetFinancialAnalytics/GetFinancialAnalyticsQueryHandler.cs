@@ -1,3 +1,4 @@
+using RadiologyCenter.BuildingBlocks.Application.Abstractions;
 using RadiologyCenter.Examinations.Application.Abstractions;
 using RadiologyCenter.Examinations.Application.DTOs;
 using RadiologyCenter.Examinations.Domain.Common;
@@ -14,6 +15,7 @@ public static class GetFinancialAnalyticsQueryHandler
         GetFinancialAnalyticsQuery query,
         IExaminationRepository examinationRepository,
         IExaminationTypeDirectory examinationTypeDirectory,
+        ITimezoneConverter timezone,
         CancellationToken ct)
     {
         var projections = await examinationRepository.GetFinancialProjectionAsync(query.From, query.To, ct);
@@ -43,14 +45,14 @@ public static class GetFinancialAnalyticsQueryHandler
             .Select(g => new RevenueByModalityDto(g.Key, g.Sum(p => p.Paid), g.Count()))
             .ToList();
 
-        var now = DateTime.Today;
+        var now = timezone.GetLocalDate(DateTime.UtcNow);
         var aging = new List<ReceivableBucketDto>();
         var receivableExams = projections.Where(p => p.Remaining > 0).ToList();
 
-        aging.Add(Bucket(receivableExams, "Current (0-30d)", e => e.CompletedAt is null || (now - e.CompletedAt!.Value.Date).Days <= CurrentBucketDays));
-        aging.Add(Bucket(receivableExams, "31-60d", e => e.CompletedAt is not null && (now - e.CompletedAt.Value.Date).Days is > CurrentBucketDays and <= ThirtyDayBucketDays));
-        aging.Add(Bucket(receivableExams, "61-90d", e => e.CompletedAt is not null && (now - e.CompletedAt.Value.Date).Days is > ThirtyDayBucketDays and <= NinetyDayBucketDays));
-        aging.Add(Bucket(receivableExams, "90d+", e => e.CompletedAt is not null && (now - e.CompletedAt.Value.Date).Days > NinetyDayBucketDays));
+        aging.Add(Bucket(receivableExams, "Current (0-30d)", e => e.CompletedAt is null || (now.DayNumber - timezone.GetLocalDate(e.CompletedAt!.Value).DayNumber) <= CurrentBucketDays));
+        aging.Add(Bucket(receivableExams, "31-60d", e => e.CompletedAt is not null && (now.DayNumber - timezone.GetLocalDate(e.CompletedAt.Value).DayNumber) is > CurrentBucketDays and <= ThirtyDayBucketDays));
+        aging.Add(Bucket(receivableExams, "61-90d", e => e.CompletedAt is not null && (now.DayNumber - timezone.GetLocalDate(e.CompletedAt.Value).DayNumber) is > ThirtyDayBucketDays and <= NinetyDayBucketDays));
+        aging.Add(Bucket(receivableExams, "90d+", e => e.CompletedAt is not null && (now.DayNumber - timezone.GetLocalDate(e.CompletedAt.Value).DayNumber) > NinetyDayBucketDays));
 
         return Result.Success(new FinancialAnalyticsDto(
             examCount,

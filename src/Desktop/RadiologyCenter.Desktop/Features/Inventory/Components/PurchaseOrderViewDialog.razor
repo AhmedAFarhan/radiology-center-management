@@ -1,6 +1,8 @@
+@using RadiologyCenter.Desktop.Services
 @inject InventoryService InventoryService
 @inject ISnackbar Snackbar
 @inject AppLocalizer T
+@inject UserTimezoneService TimezoneService
 
 <MudDialog>
     <DialogContent>
@@ -56,7 +58,7 @@
                 @T.PoDialog.ExpectedDelivery @(_po.ExpectedDeliveryAt?.ToString("dd MMM yyyy") ?? T.PoDialog.NotSet)
                 @if (_po.ReceivedAt is not null)
                 {
-                    <text> · @T.PoDialog.ReceivedAt @_po.ReceivedAt.Value.ToLocalTime().ToString("dd MMM yyyy HH:mm")</text>
+                    <text> · @T.PoDialog.ReceivedAt @TimezoneHelper.Format(_po.ReceivedAt.Value, TimezoneService.GetTimeZoneId(), "dd MMM yyyy HH:mm")</text>
                 }
             </MudText>
         }

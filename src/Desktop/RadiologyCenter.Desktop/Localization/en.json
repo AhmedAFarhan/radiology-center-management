@@ -1141,7 +1141,8 @@
         "profileUpdated": "User profile updated.",
         "lockUntilTime": "Lock Until Time",
         "passwordHelper": "Minimum 8 characters and must contain both letters and digits.",
-        "newTitle": "New User"
+        "newTitle": "New User",
+        "timeZone": "Time Zone"
     },
     "roles": {
         "created": "Created",
@@ -1974,7 +1975,8 @@
         "scheduledDateRequired": "Scheduled date is required.",
         "scheduledTimeRequired": "Scheduled time is required.",
         "statusRequired": "Status is required.",
-        "quantityMinOne": "Quantity must be at least 1."
+        "quantityMinOne": "Quantity must be at least 1.",
+        "timezoneRequired": "Time zone is required."
     },
     "analytics": {
         "thisMonth": "This month",

@@ -1,3 +1,4 @@
+using RadiologyCenter.BuildingBlocks.Application.Abstractions;
 using RadiologyCenter.Examinations.Application.Commands.CreateExamination;
 using RadiologyCenter.Examinations.Application.Localization;
 using RadiologyCenter.Examinations.Application.Abstractions;
@@ -14,6 +15,7 @@ public static class UpdateExaminationCommandHandler
         IExaminationTypeDirectory examinationTypeDirectory,
         IExaminationRepository examinationRepository,
         IExaminationsUnitOfWork unitOfWork,
+        ITimezoneConverter timezone,
         CancellationToken ct)
     {
         var examination = await examinationRepository.GetWithItemsAsync(command.ExaminationId, ct);
@@ -56,7 +58,7 @@ public static class UpdateExaminationCommandHandler
         if (command.Items is not null)
             ReconcileItems(examination, command.Items);
 
-        var statusError = await ApplyStatusTransitionAsync(examination, command.Status, command.ScheduledAt, examinationRepository, ct);
+        var statusError = await ApplyStatusTransitionAsync(examination, command.Status, command.ScheduledAt, examinationRepository, timezone, ct);
         if (statusError is not null)
             return statusError;
 
@@ -69,6 +71,7 @@ public static class UpdateExaminationCommandHandler
         string? status,
         DateTime? scheduledAt,
         IExaminationRepository examinationRepository,
+        ITimezoneConverter timezone,
         CancellationToken ct)
     {
         if (string.IsNullOrWhiteSpace(status))
@@ -81,12 +84,15 @@ public static class UpdateExaminationCommandHandler
             if (string.Equals(target, ExaminationStatus.Scheduled.Name, StringComparison.Ordinal)
                 && scheduledAt.HasValue)
             {
+                var localNow = timezone.ToLocal(DateTime.UtcNow);
+                if (scheduledAt.Value < localNow.AddMinutes(-1))
+                    return Result.Failure(Error.Conflict(ErrorCodes.ScheduledTimePast, "Scheduled time cannot be in the past."));
+
                 var overlapError = await CheckOverlapForScheduleAsync(examination, scheduledAt.Value, examinationRepository, ct);
                 if (overlapError is not null)
                     return overlapError;
 
-                var examTypeDir = examinationRepository; // fallback — we resolve duration below
-                examination.Schedule(ClinicClock.ToUtc(scheduledAt.Value));
+                examination.Schedule(scheduledAt.Value);
             }
 
             return null;
@@ -102,11 +108,16 @@ public static class UpdateExaminationCommandHandler
         if (string.Equals(target, ExaminationStatus.Scheduled.Name, StringComparison.Ordinal)
             && (current == ExaminationStatus.Requested.Name || current == ExaminationStatus.Scheduled.Name))
         {
-            var overlapError = await CheckOverlapForScheduleAsync(examination, scheduledAt ?? DateTime.UtcNow, examinationRepository, ct);
+            var scheduledLocal = scheduledAt ?? DateTime.UtcNow;
+            var localNow = timezone.ToLocal(DateTime.UtcNow);
+            if (scheduledLocal < localNow.AddMinutes(-1))
+                return Result.Failure(Error.Conflict(ErrorCodes.ScheduledTimePast, "Scheduled time cannot be in the past."));
+
+            var overlapError = await CheckOverlapForScheduleAsync(examination, scheduledLocal, examinationRepository, ct);
             if (overlapError is not null)
                 return overlapError;
 
-            examination.Schedule(ClinicClock.ToUtc(scheduledAt ?? DateTime.UtcNow));
+            examination.Schedule(scheduledLocal);
             return null;
         }
 
@@ -121,14 +132,13 @@ public static class UpdateExaminationCommandHandler
         IExaminationRepository examinationRepository,
         CancellationToken ct)
     {
-        var scheduledUtc = ClinicClock.ToUtc(scheduledAt);
-        var scheduledEnd = scheduledUtc.AddMinutes(30);
+        var scheduledEnd = scheduledAt.AddMinutes(30);
 
         var (isConflict, resource) = await ExaminationOverlapChecker.FindConflictAsync(
             examinationRepository,
             examination.EquipmentId,
             examination.RadiologistId,
-            scheduledUtc,
+            scheduledAt,
             scheduledEnd,
             excludeExaminationId: examination.Id,
             ct);

@@ -39,6 +39,7 @@ public class TokenService : ITokenService
             new(JwtRegisteredClaimNames.Email, user.Email!),
             new("firstName", user.FirstName),
             new("lastName", user.LastName),
+            new("timezone", user.TimeZoneId),
         };
 
         foreach (var role in user.AssignedRoles)

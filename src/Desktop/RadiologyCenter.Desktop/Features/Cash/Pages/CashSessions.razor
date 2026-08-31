@@ -1,9 +1,11 @@
 @using static RadiologyCenter.Desktop.Services.Formatting
+@using RadiologyCenter.Desktop.Services
 @page "/cash/sessions"
 @attribute [Authorize]
 @inherits ListPageBase<CashSessionDto>
 @inject CashService CashService
 @inject EnumOptionsService EnumOptionsService
+@inject UserTimezoneService TimezoneService
 
 <PageHeader Icon="@Icons.Material.Filled.AccountBalanceWallet" Title="@T.Cash.Title"
             Subtitle="@T.Cash.Subtitle"
@@ -37,7 +39,7 @@
         <MudTh Class="text-center">@T.Common.Actions</MudTh>
     </HeaderContent>
     <RowTemplate>
-        <MudTd DataLabel="@T.Cash.OpenedAt">@context.OpenedAt.ToLocalTime().ToString("g")</MudTd>
+        <MudTd DataLabel="@T.Cash.OpenedAt">@TimezoneHelper.Format(context.OpenedAt, TimezoneService.GetTimeZoneId())</MudTd>
         <MudTd DataLabel="@T.Cash.User">@(string.IsNullOrWhiteSpace(context.UserName) ? "-" : context.UserName)</MudTd>
         <MudTd DataLabel="@T.Common.Status">
             <StatusChip Token="@context.StatusKey">@context.Status</StatusChip>
@@ -47,7 +49,7 @@
             <MudText Class="font-weight-medium" Color="@(context.Balance < 0 ? Color.Error : Color.Default)">@context.Balance.ToString("C")</MudText>
         </MudTd>
         <MudTd DataLabel="@T.Cash.Entries" Class="text-center">@context.EntryCount</MudTd>
-        <MudTd DataLabel="@T.Cash.ClosedAt">@(context.ClosedAt?.ToLocalTime().ToString("g") ?? "-")</MudTd>
+        <MudTd DataLabel="@T.Cash.ClosedAt">@TimezoneHelper.FormatOptional(context.ClosedAt, TimezoneService.GetTimeZoneId())</MudTd>
         <MudTd DataLabel="@T.Common.Actions" Class="text-center">
             <MudTooltip Placement="Placement.Bottom" Text="@T.Cash.View">
                 <MudIconButton Icon="@Icons.Material.Filled.Visibility" Size="Size.Small" Color="Color.Default" aria-label="@T.Cash.View" OnClick="@(() => OpenDetailAsync(context))" />

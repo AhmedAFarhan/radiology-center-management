@@ -1,7 +1,7 @@
+using RadiologyCenter.BuildingBlocks.Application.Abstractions;
 using RadiologyCenter.Examinations.Application.Localization;
 using RadiologyCenter.Examinations.Application.Abstractions;
 using RadiologyCenter.Examinations.Application.DTOs;
-using RadiologyCenter.Examinations.Application.Scheduling;
 using RadiologyCenter.Examinations.Domain.Entities;
 using RadiologyCenter.Examinations.Domain.Enumerations;
 
@@ -14,11 +14,19 @@ public static class CreateExaminationCommandHandler
         IExaminationTypeDirectory examinationTypeDirectory,
         IExaminationRepository examinationRepository,
         IExaminationsUnitOfWork unitOfWork,
+        ITimezoneConverter timezone,
         CancellationToken ct)
     {
         var examinationType = await examinationTypeDirectory.GetWithItemsAsync(command.ExaminationTypeId, ct);
         if (examinationType is null)
             return Result.Failure<ExaminationDto>(Error.NotFound(ErrorCodes.ExaminationTypeNotFound, "ExaminationType", command.ExaminationTypeId));
+
+        if (command.ScheduledAt.HasValue)
+        {
+            var localNow = timezone.ToLocal(DateTime.UtcNow);
+            if (command.ScheduledAt.Value < localNow.AddMinutes(-1))
+                return Result.Failure<ExaminationDto>(Error.Conflict(ErrorCodes.ScheduledTimePast, "Scheduled time cannot be in the past."));
+        }
 
         var priority = ExaminationPriority.FromName<ExaminationPriority>(command.Priority);
 
@@ -44,10 +52,8 @@ public static class CreateExaminationCommandHandler
             examination.CheckIn();
         else
         {
-            var scheduledAtUtc = command.ScheduledAt.HasValue
-                ? ClinicClock.ToUtc(command.ScheduledAt.Value)
-                : DateTime.UtcNow;
-            examination.Schedule(scheduledAtUtc);
+            var scheduledAt = command.ScheduledAt ?? DateTime.UtcNow;
+            examination.Schedule(scheduledAt);
         }
 
         await examinationRepository.AddAsync(examination, ct);

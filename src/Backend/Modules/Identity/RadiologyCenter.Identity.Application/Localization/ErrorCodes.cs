@@ -44,6 +44,8 @@ public static class ErrorCodes
     public const string LastNameTooLong = "Identity.LastNameTooLong";
     public const string PhoneNumberRequired = "Identity.PhoneNumberRequired";
     public const string PhoneNumberTooLong = "Identity.PhoneNumberTooLong";
+    public const string TimeZoneRequired = "Identity.TimeZoneRequired";
+    public const string TimeZoneTooLong = "Identity.TimeZoneTooLong";
     public const string RefreshTokenRequired = "Identity.RefreshTokenRequired";
     public const string TokenRequired = "Identity.TokenRequired";
 }

@@ -1,3 +1,4 @@
+using RadiologyCenter.BuildingBlocks.Application.Abstractions;
 using RadiologyCenter.Examinations.Application.Abstractions;
 using RadiologyCenter.Examinations.Application.Commands.CreateExamination;
 using RadiologyCenter.Examinations.Application.DTOs;
@@ -15,22 +16,26 @@ public static class BookExaminationCommandHandler
         IExaminationTypeDirectory examinationTypeDirectory,
         IExaminationRepository examinationRepository,
         IExaminationsUnitOfWork unitOfWork,
+        ITimezoneConverter timezone,
         CancellationToken ct)
     {
         var examinationType = await examinationTypeDirectory.GetWithItemsAsync(command.ExaminationTypeId, ct);
         if (examinationType is null)
             return Result.Failure<ExaminationDto>(Error.NotFound(ErrorCodes.ExaminationTypeNotFound, "ExaminationType", command.ExaminationTypeId));
 
-        var scheduledAtUtc = ClinicClock.ToUtc(command.ScheduledAt);
+        var localNow = timezone.ToLocal(DateTime.UtcNow);
+        if (command.ScheduledAt < localNow.AddMinutes(-1))
+            return Result.Failure<ExaminationDto>(Error.Conflict(ErrorCodes.ScheduledTimePast, "Scheduled time cannot be in the past."));
+
         var scheduledEnd = examinationType.StandardDurationMinutes > 0
-            ? scheduledAtUtc.AddMinutes(examinationType.StandardDurationMinutes)
-            : scheduledAtUtc.AddMinutes(30);
+            ? command.ScheduledAt.AddMinutes(examinationType.StandardDurationMinutes)
+            : command.ScheduledAt.AddMinutes(30);
 
         if (command.EquipmentId.HasValue)
         {
             var (isConflict, resource) = await ExaminationOverlapChecker.FindConflictAsync(
                 examinationRepository, command.EquipmentId, command.RadiologistId,
-                scheduledAtUtc, scheduledEnd, excludeExaminationId: null, ct);
+                command.ScheduledAt, scheduledEnd, excludeExaminationId: null, ct);
 
             if (isConflict)
             {
@@ -59,7 +64,7 @@ public static class BookExaminationCommandHandler
         foreach (var seeded in ExaminationItemSeeding.Build(examinationType))
             examination.AddItem(seeded.ItemId, seeded.Quantity, seeded.IsContrast, seeded.IsRequired);
 
-        examination.Schedule(scheduledAtUtc, examinationType.StandardDurationMinutes);
+        examination.Schedule(command.ScheduledAt, examinationType.StandardDurationMinutes);
 
         await examinationRepository.AddAsync(examination, ct);
         await unitOfWork.SaveChangesAsync(ct);

@@ -12,6 +12,7 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
 
         builder.Property(u => u.FirstName).HasMaxLength(100).IsRequired();
         builder.Property(u => u.LastName).HasMaxLength(100).IsRequired();
+        builder.Property(u => u.TimeZoneId).HasMaxLength(100).IsRequired().HasDefaultValue("Africa/Cairo");
         builder.Property(u => u.ProfilePictureUrl).HasMaxLength(500);
         builder.Property(u => u.CreatedAt).IsRequired();
 

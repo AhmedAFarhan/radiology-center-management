@@ -49,6 +49,7 @@ public static class MauiProgram
         builder.Services.AddScoped<AppAuthenticationStateProvider>();
         builder.Services.AddScoped<AuthenticationStateProvider>(sp => sp.GetRequiredService<AppAuthenticationStateProvider>());
         builder.Services.AddScoped<PermissionService>();
+        builder.Services.AddScoped<UserTimezoneService>();
         builder.Services.AddScoped<ApiClient>();
         builder.Services.AddScoped<EnumOptionsService>();
         builder.Services.AddScoped<ReturnUrlService>();

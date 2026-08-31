@@ -145,11 +145,10 @@ public partial class VisitEditorDialog : ComponentBase, IDisposable
             _model.Paid = Visit.Paid;
             _model.Status = Visit.StatusKey;
 
-            if (Visit.ScheduledAt is { } scheduledUtc)
+            if (Visit.ScheduledAt is { } scheduledLocal)
             {
-                var local = ToClinicLocal(scheduledUtc);
-                _model.ScheduledDate = local.Date;
-                _model.ScheduledTime = local.TimeOfDay;
+                _model.ScheduledDate = scheduledLocal.Date;
+                _model.ScheduledTime = scheduledLocal.TimeOfDay;
             }
 
             await SafeExecute.RunAsync(async () =>

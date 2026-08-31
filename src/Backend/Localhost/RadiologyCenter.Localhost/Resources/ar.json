@@ -924,6 +924,8 @@
     "Identity.LastNameTooLong": "اسم العائلة طويل جدًا.",
     "Identity.PhoneNumberRequired": "رقم الهاتف مطلوب.",
     "Identity.PhoneNumberTooLong": "رقم الهاتف طويل جدًا.",
+    "Identity.TimeZoneRequired": "المنطقة الزمنية مطلوبة.",
+    "Identity.TimeZoneTooLong": "المنطقة الزمنية طويلة جدًا.",
     "Identity.RefreshTokenRequired": "رمز التحديث مطلوب.",
     "Identity.TokenRequired": "الرمز مطلوب.",
     "Insurance.ClaimIdRequired": "معرف المطالبة مطلوب.",

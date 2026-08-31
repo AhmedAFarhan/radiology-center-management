@@ -1,9 +1,11 @@
+@using RadiologyCenter.Desktop.Services
 @page "/payroll/payruns"
 @attribute [Authorize]
 @inject PayrollService PayrollService
 @inject IDialogService DialogService
 @inject ISnackbar Snackbar
 @inject AppLocalizer T
+@inject UserTimezoneService TimezoneService
 @implements IDisposable
 
 <PageHeader Icon="@Icons.Material.Filled.ReceiptLong" Title="@T.Payroll.PayRunsTitle"
@@ -79,7 +81,7 @@
         </MudTd>
         <MudTd DataLabel="@T.Payroll.Employees">@context.Payslips.Count</MudTd>
         <MudTd DataLabel="@T.Payroll.NetPay" Class="text-right">@context.Payslips.Sum(p => p.NetSalary).ToString("N2")</MudTd>
-        <MudTd DataLabel="@T.Payroll.Processed">@(context.ProcessedAt?.ToString("g") ?? "-")</MudTd>
+        <MudTd DataLabel="@T.Payroll.Processed">@TimezoneHelper.FormatOptional(context.ProcessedAt, TimezoneService.GetTimeZoneId())</MudTd>
         <MudTd DataLabel="@T.Payroll.Notes">@(string.IsNullOrWhiteSpace(context.Notes) ? "-" : context.Notes)</MudTd>
         <MudTd DataLabel="@T.Common.Actions">
             <MudTooltip Placement="Placement.Bottom" Text="@T.Payroll.View">

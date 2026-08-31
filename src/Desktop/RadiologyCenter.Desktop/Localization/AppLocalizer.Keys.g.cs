@@ -2305,6 +2305,7 @@ public sealed class UserDialogGroup : LocalizerGroup
     public string SelectDateTime => Get("userDialog.selectDateTime");
     public string SelectRole => Get("userDialog.selectRole");
     public string SystemRole => Get("userDialog.systemRole");
+    public string TimeZone => Get("userDialog.timeZone");
     public string Unreachable => Get("userDialog.unreachable");
     public string UnreachableRetry => Get("userDialog.unreachableRetry");
     public string Username => Get("userDialog.username");
@@ -2432,6 +2433,7 @@ public sealed class ValidationGroup : LocalizerGroup
     public string SupplierRequired => Get("validation.supplierRequired");
     public string TaxNumberMaxLength => Get("validation.taxNumberMaxLength");
     public string TechnicianRequired => Get("validation.technicianRequired");
+    public string TimezoneRequired => Get("validation.timezoneRequired");
     public string UnitRequired => Get("validation.unitRequired");
     public string UsernameMaxLength => Get("validation.usernameMaxLength");
     public string UsernameRequired => Get("validation.usernameRequired");

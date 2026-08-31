@@ -42,6 +42,7 @@ public static class InfrastructureServiceRegistration
 
         services.AddSingleton<IClock, SystemClock>();
         services.AddScoped<ICurrentUser, CurrentUserService>();
+        services.AddScoped<ITimezoneConverter, UserTimezoneConverter>();
         services.AddScoped<IDomainEventDispatcher, DomainEventDispatcher>();
         services.AddScoped<INumberSequenceGenerator, NumberSequenceGenerator>();
         services.AddSingleton<IExcelService, ExcelService>();

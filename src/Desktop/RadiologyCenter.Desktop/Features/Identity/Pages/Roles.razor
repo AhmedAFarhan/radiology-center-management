@@ -1,7 +1,9 @@
+@using RadiologyCenter.Desktop.Services
 @page "/roles"
 @attribute [Authorize]
 @inherits ListPageBase<RoleDto>
 @inject IdentityService IdentityService
+@inject UserTimezoneService TimezoneService
 
 <PageHeader Icon="@Icons.Material.Filled.Security" Title="@T.Roles.Title"
             Subtitle="@T.Roles.Subtitle"
@@ -35,7 +37,7 @@
         <MudTd DataLabel="@T.Roles.Permissions">
             <MudChip T="string" Size="Size.Small" Color="@(context.Permissions.Count == 0 ? Color.Default : Color.Success)">@(T.FormatValue(T.Roles.PermissionCount, context.Permissions.Count))</MudChip>
         </MudTd>
-        <MudTd DataLabel="@T.Roles.Created">@context.CreatedAt.ToString("g")</MudTd>
+        <MudTd DataLabel="@T.Roles.Created">@TimezoneHelper.Format(context.CreatedAt, TimezoneService.GetTimeZoneId())</MudTd>
         <MudTd DataLabel="@T.Common.Actions">
             <AuthorizeView Policy="@RolesPermissions.Update">
                 <Authorized Context="auth">

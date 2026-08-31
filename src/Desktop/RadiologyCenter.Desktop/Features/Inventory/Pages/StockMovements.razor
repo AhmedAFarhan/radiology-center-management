@@ -1,8 +1,10 @@
 @using static RadiologyCenter.Desktop.Services.Formatting
+@using RadiologyCenter.Desktop.Services
 @page "/inventory/stock-movements"
 @attribute [Authorize]
 @inherits ListPageBase<StockMovementDto>
 @inject InventoryService InventoryService
+@inject UserTimezoneService TimezoneService
 
 <PageHeader Icon="@Icons.Material.Filled.SwapVert" Title="@T.StockMovements.Title"
             Subtitle="@T.StockMovements.Subtitle"
@@ -22,7 +24,7 @@
         <MudTh>@T.StockMovements.Notes</MudTh>
     </HeaderContent>
     <RowTemplate>
-        <MudTd DataLabel="@T.Common.Date">@context.CreatedAt.ToLocalTime().ToString("dd MMM yyyy HH:mm")</MudTd>
+        <MudTd DataLabel="@T.Common.Date">@TimezoneHelper.Format(context.CreatedAt, TimezoneService.GetTimeZoneId(), "dd MMM yyyy HH:mm")</MudTd>
         <MudTd DataLabel="@T.Common.Type">
             <StatusChip Token="@context.MovementTypeKey">@context.MovementType</StatusChip>
         </MudTd>

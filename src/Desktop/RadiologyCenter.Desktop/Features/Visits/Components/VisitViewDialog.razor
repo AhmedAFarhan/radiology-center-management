@@ -1,8 +1,10 @@
+@using RadiologyCenter.Desktop.Services
 @inject ExaminationService ExaminationService
 @inject PatientService PatientService
 @inject ResourceService ResourceService
 @inject InventoryService InventoryService
 @inject AppLocalizer T
+@inject UserTimezoneService TimezoneService
 
 <MudDialog>
     <DialogContent>
@@ -52,15 +54,15 @@
                 </MudItem>
                 <MudItem xs="12" sm="4">
                     <MudText Typo="Typo.caption" Class="text-secondary">@T.VisitDialog.Scheduled</MudText>
-                    <MudText Typo="Typo.body1">@(_visit.ScheduledAt?.ToString("g") ?? "-")</MudText>
+                    <MudText Typo="Typo.body1">@(_visit.ScheduledAt.HasValue ? _visit.ScheduledAt.Value.ToString("g") : "-")</MudText>
                 </MudItem>
                 <MudItem xs="12" sm="4">
                     <MudText Typo="Typo.caption" Class="text-secondary">@T.VisitDialog.Started</MudText>
-                    <MudText Typo="Typo.body1">@(_visit.StartedAt?.ToString("g") ?? "-")</MudText>
+                    <MudText Typo="Typo.body1">@TimezoneHelper.FormatOptional(_visit.StartedAt, TimezoneService.GetTimeZoneId())</MudText>
                 </MudItem>
                 <MudItem xs="12" sm="4">
                     <MudText Typo="Typo.caption" Class="text-secondary">@T.VisitDialog.Completed</MudText>
-                    <MudText Typo="Typo.body1">@(_visit.CompletedAt?.ToString("g") ?? "-")</MudText>
+                    <MudText Typo="Typo.body1">@TimezoneHelper.FormatOptional(_visit.CompletedAt, TimezoneService.GetTimeZoneId())</MudText>
                 </MudItem>
 
                 @if (!string.IsNullOrWhiteSpace(_visit.CancellationReason))

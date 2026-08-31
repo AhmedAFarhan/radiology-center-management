@@ -7,6 +7,7 @@ public record UserDto(
     string FirstName,
     string LastName,
     string? PhoneNumber,
+    string TimeZoneId,
     bool IsActive,
     bool EmailConfirmed,
     bool TwoFactorEnabled,

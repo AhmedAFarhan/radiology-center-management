@@ -1805,7 +1805,8 @@
         "systemRole": "دور النظام",
         "unreachable": "تعذر الوصول إلى الخادم.",
         "unreachableRetry": "تعذر الوصول إلى الخادم. يرجى المحاولة مرة أخرى.",
-        "username": "اسم المستخدم"
+        "username": "اسم المستخدم",
+        "timeZone": "المنطقة الزمنية"
     },
     "users": {
         "activate": "تفعيل",
@@ -1911,6 +1912,7 @@
         "policyNumberRequired": "رقم الوثيقة مطلوب.",
         "positionRequired": "الوظيفة مطلوبة.",
         "quantityMinOne": "يجب أن تكون الكمية 1 على الأقل.",
+        "timezoneRequired": "المنطقة الزمنية مطلوبة.",
         "radiologistRequired": "أخصائي الأشعة مطلوب.",
         "reasonMaxLength": "يجب ألا يتجاوز السبب 500 حرف.",
         "receivingOpeningFloatInvalid": "يجب أن يكون رصيد الاستلام الافتتاحي مبلغًا صحيحًا.",

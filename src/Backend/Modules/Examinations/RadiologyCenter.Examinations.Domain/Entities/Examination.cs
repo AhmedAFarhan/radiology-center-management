@@ -180,17 +180,16 @@ public sealed class Examination : AuditableAggregateRoot<Guid>
         RecalculateRemaining();
     }
 
-    public void Schedule(DateTime scheduledAt, int durationMinutes = 0)
-    {
-        EnsureStatus(ExaminationStatus.Requested, ExaminationStatus.Scheduled);
-        Guard.Against(scheduledAt, s => s == default, DomainErrors.ScheduledTimeDefault, "Scheduled time cannot be the default value.");
-        Guard.Against(scheduledAt, s => s < DateTime.UtcNow.AddMinutes(-1), DomainErrors.ScheduledTimePast, "Scheduled time cannot be in the past.");
+        public void Schedule(DateTime scheduledAt, int durationMinutes = 0)
+        {
+            EnsureStatus(ExaminationStatus.Requested, ExaminationStatus.Scheduled);
+            Guard.Against(scheduledAt, s => s == default, DomainErrors.ScheduledTimeDefault, "Scheduled time cannot be the default value.");
 
-        ScheduledAt = scheduledAt;
-        ScheduledEnd = durationMinutes > 0 ? scheduledAt.AddMinutes(durationMinutes) : null;
-        Status = ExaminationStatus.Scheduled;
-        RaiseDomainEvent(new ExaminationScheduledEvent(Id, scheduledAt, ScheduledEnd));
-    }
+            ScheduledAt = scheduledAt;
+            ScheduledEnd = durationMinutes > 0 ? scheduledAt.AddMinutes(durationMinutes) : null;
+            Status = ExaminationStatus.Scheduled;
+            RaiseDomainEvent(new ExaminationScheduledEvent(Id, scheduledAt, ScheduledEnd));
+        }
 
     public void CheckIn()
     {

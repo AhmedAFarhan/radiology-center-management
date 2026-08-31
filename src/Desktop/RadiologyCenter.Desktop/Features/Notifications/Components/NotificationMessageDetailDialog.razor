@@ -1,5 +1,7 @@
 @using static RadiologyCenter.Desktop.Services.Formatting
+@using RadiologyCenter.Desktop.Services
 @inject AppLocalizer T
+@inject UserTimezoneService TimezoneService
 
 <MudDialog>
     <DialogContent>
@@ -41,7 +43,7 @@
             </MudItem>
             <MudItem xs="6">
                 <MudText Typo="Typo.caption" Color="Color.Secondary">@T.MessageDialog.SentAt</MudText>
-                <MudText>@(Message.SentAtUtc?.ToLocalTime().ToString("g") ?? "-")</MudText>
+                <MudText>@TimezoneHelper.FormatOptional(Message.SentAtUtc, TimezoneService.GetTimeZoneId())</MudText>
             </MudItem>
             @if (!string.IsNullOrWhiteSpace(Message.FailureReason))
             {

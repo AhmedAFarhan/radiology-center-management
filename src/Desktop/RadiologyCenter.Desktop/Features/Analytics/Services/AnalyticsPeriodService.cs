@@ -1,4 +1,6 @@
-﻿namespace RadiologyCenter.Desktop.Features.Analytics.Services;
+﻿using RadiologyCenter.Desktop.Services;
+
+namespace RadiologyCenter.Desktop.Features.Analytics.Services;
 
 public enum AnalyticsRangePreset
 {
@@ -13,6 +15,7 @@ public enum AnalyticsRangePreset
 public sealed class AnalyticsPeriodService
 {
     private readonly AppLocalizer _t;
+    private readonly UserTimezoneService _timezoneService;
 
     public AnalyticsRangePreset Selected { get; private set; } = AnalyticsRangePreset.Last30Days;
 
@@ -33,9 +36,10 @@ public sealed class AnalyticsPeriodService
 
     public event Action? Changed;
 
-    public AnalyticsPeriodService(AppLocalizer t)
+    public AnalyticsPeriodService(AppLocalizer t, UserTimezoneService timezoneService)
     {
         _t = t;
+        _timezoneService = timezoneService;
         Apply(AnalyticsRangePreset.Last30Days);
     }
 
@@ -52,7 +56,7 @@ public sealed class AnalyticsPeriodService
     private void Apply(AnalyticsRangePreset preset)
     {
         Selected = preset;
-        var today = DateTime.Today;
+        var today = TimezoneHelper.GetToday(_timezoneService.GetTimeZoneId()).ToDateTime(TimeOnly.MinValue);
 
         var from = preset switch
         {

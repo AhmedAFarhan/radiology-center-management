@@ -100,6 +100,4 @@ public partial class UserEditorDialog : EditorDialogBase
             },
             () => T.UserDialog.UnreachableRetry);
     }
-
-
 }

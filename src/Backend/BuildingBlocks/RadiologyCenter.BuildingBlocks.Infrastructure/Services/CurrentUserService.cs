@@ -18,6 +18,9 @@ public class CurrentUserService : ICurrentUser
     public string? Name =>
         _httpContextAccessor.HttpContext?.User.Identity?.Name;
 
+    public string? TimeZoneId =>
+        _httpContextAccessor.HttpContext?.User.FindFirst("timezone")?.Value ?? "Africa/Cairo";
+
     public bool IsAuthenticated =>
         _httpContextAccessor.HttpContext?.User.Identity?.IsAuthenticated ?? false;
 }

@@ -1,9 +1,11 @@
-﻿@page "/users"
+﻿@using RadiologyCenter.Desktop.Services
+@page "/users"
 @attribute [Authorize]
 @using RadiologyCenter.Desktop.Features.Auth.Components
 @inherits ListPageBase<UserDto>
 @inject IdentityService IdentityService
 @inject TokenStorage TokenStorage
+@inject UserTimezoneService TimezoneService
 
 <PageHeader Icon="@Icons.Material.Filled.Person" Title="@T.Users.Title"
             Subtitle="@T.Users.Subtitle"
@@ -42,7 +44,7 @@
         <MudTd DataLabel="@T.Common.Status">
             <StatusChip Token="@(context.IsLocked ? "Locked" : context.IsActive ? "Active" : "Inactive")">@StatusText(context)</StatusChip>
         </MudTd>
-        <MudTd DataLabel="@T.Users.LastLogin">@(context.LastLoginAt?.ToString("g") ?? "-")</MudTd>
+        <MudTd DataLabel="@T.Users.LastLogin">@TimezoneHelper.FormatOptional(context.LastLoginAt, TimezoneService.GetTimeZoneId())</MudTd>
         <MudTd DataLabel="@T.Common.Actions">
             <AuthorizeView Policy="@UsersPermissions.Update">
                 <Authorized Context="auth">

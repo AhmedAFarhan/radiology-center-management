@@ -1,6 +1,8 @@
+@using RadiologyCenter.Desktop.Services
 @page "/patients"
 @attribute [Authorize]
 @inherits ListPageBase<PatientDto>
+@inject UserTimezoneService TimezoneService
 
 <PageHeader Icon="@Icons.Material.Filled.People" Title="@T.Patients.Title"
             Subtitle="@T.Patients.Subtitle"
@@ -36,7 +38,7 @@
         <MudTd DataLabel="@T.Patients.Gender">@context.Gender</MudTd>
         <MudTd DataLabel="@T.Patients.Age">@FormatAge(context.Age, context.DateOfBirth)</MudTd>
         <MudTd DataLabel="@T.Patients.Phone">@context.PhoneNumber</MudTd>
-        <MudTd DataLabel="@T.Patients.Registered">@context.CreatedAt.ToLocalTime().ToString("dd MMM yyyy")</MudTd>
+        <MudTd DataLabel="@T.Patients.Registered">@TimezoneHelper.Format(context.CreatedAt, TimezoneService.GetTimeZoneId(), "dd MMM yyyy")</MudTd>
         <MudTd DataLabel="@T.Common.Status">
             <ActiveStatusChip IsActive="context.IsActive" ActiveLabel="@T.Common.Active" InactiveLabel="@T.Common.Inactive" />
         </MudTd>

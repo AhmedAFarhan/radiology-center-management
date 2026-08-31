@@ -963,6 +963,8 @@
     "Identity.LastNameTooLong": "Last name is too long.",
     "Identity.PhoneNumberRequired": "Phone number is required.",
     "Identity.PhoneNumberTooLong": "Phone number is too long.",
+    "Identity.TimeZoneRequired": "Time zone is required.",
+    "Identity.TimeZoneTooLong": "Time zone is too long.",
     "Identity.RefreshTokenRequired": "Refresh token is required.",
     "Identity.TokenRequired": "Token is required.",
     "Insurance.ClaimIdRequired": "Claim ID is required.",

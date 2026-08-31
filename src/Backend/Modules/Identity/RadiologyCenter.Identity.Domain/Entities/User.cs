@@ -10,6 +10,7 @@ public sealed class User : IdentityUser<Guid>, IAggregateRoot
 {
     public string FirstName { get; private set; }
     public string LastName { get; private set; }
+    public string TimeZoneId { get; private set; }
     public bool IsActive { get; private set; }
     public bool MustChangePassword { get; private set; }
     public DateTime? LastLoginAt { get; private set; }
@@ -34,15 +35,17 @@ public sealed class User : IdentityUser<Guid>, IAggregateRoot
     {
         FirstName = null!;
         LastName = null!;
+        TimeZoneId = "Africa/Cairo";
     }
 
-    public static User Create(string userName, string email, string firstName, string lastName, string phoneNumber)
+    public static User Create(string userName, string email, string firstName, string lastName, string phoneNumber, string timeZoneId = "Africa/Cairo")
     {
         Guard.AgainstNullOrWhiteSpace(userName, nameof(userName));
         Guard.AgainstNullOrWhiteSpace(email, nameof(email));
         Guard.AgainstNullOrWhiteSpace(firstName, nameof(firstName));
         Guard.AgainstNullOrWhiteSpace(lastName, nameof(lastName));
         Guard.AgainstNullOrWhiteSpace(phoneNumber, nameof(phoneNumber));
+        Guard.AgainstNullOrWhiteSpace(timeZoneId, nameof(timeZoneId));
 
         var user = new User
         {
@@ -54,6 +57,7 @@ public sealed class User : IdentityUser<Guid>, IAggregateRoot
             FirstName = firstName,
             LastName = lastName,
             PhoneNumber = phoneNumber,
+            TimeZoneId = timeZoneId,
             IsActive = true,
             LockoutEnabled = true,
             SecurityStamp = Guid.NewGuid().ToString("D"),
@@ -73,6 +77,12 @@ public sealed class User : IdentityUser<Guid>, IAggregateRoot
         FirstName = firstName;
         LastName = lastName;
         PhoneNumber = phoneNumber;
+    }
+
+    public void UpdateTimeZone(string timeZoneId)
+    {
+        Guard.AgainstNullOrWhiteSpace(timeZoneId, nameof(timeZoneId));
+        TimeZoneId = timeZoneId;
     }
 
     public void ConfirmEmail() => EmailConfirmed = true;

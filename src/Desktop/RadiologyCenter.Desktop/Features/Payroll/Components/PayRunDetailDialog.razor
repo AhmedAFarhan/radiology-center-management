@@ -1,8 +1,10 @@
+@using RadiologyCenter.Desktop.Services
 @inject PayrollService PayrollService
 @inject ResourceService ResourceService
 @inject ISnackbar Snackbar
 @inject IDialogService DialogService
 @inject AppLocalizer T
+@inject UserTimezoneService TimezoneService
 
 <MudDialog>
     <DialogContent>
@@ -27,7 +29,7 @@
                             </MudItem>
                             <MudItem xs="12" sm="6" md="3">
                                 <MudText Typo="Typo.caption" Class="text-secondary">@T.PayRunDialog.Processed</MudText>
-                                <MudText Typo="Typo.body2">@(_payRun.ProcessedAt?.ToString("g") ?? T.PayRunDialog.NotProcessed)</MudText>
+                                <MudText Typo="Typo.body2">@(_payRun.ProcessedAt.HasValue ? TimezoneHelper.Format(_payRun.ProcessedAt.Value, TimezoneService.GetTimeZoneId()) : T.PayRunDialog.NotProcessed)</MudText>
                                 @if (!string.IsNullOrWhiteSpace(_payRun.ProcessedBy))
                                 {
                                     <MudText Typo="Typo.caption" Class="text-secondary">@(T.FormatValue(T.PayRunDialog.By, _payRun.ProcessedBy))</MudText>
