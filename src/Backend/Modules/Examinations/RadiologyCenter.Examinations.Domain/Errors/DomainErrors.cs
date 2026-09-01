@@ -28,7 +28,6 @@ public static class DomainErrors
     public const string RadiologistFeeNegative = "Examination.RadiologistFeeNegative";
     public const string TechnicianFeeNegative = "Examination.TechnicianFeeNegative";
     public const string ReferralFeeNegative = "Examination.ReferralFeeNegative";
-    public const string RemainingAmountNegative = "Examination.RemainingAmountNegative";
     public const string UnitCostNegative = "Examination.UnitCostNegative";
     public const string EquipmentNotAssigned = "Examination.EquipmentNotAssigned";
 }

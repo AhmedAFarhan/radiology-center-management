@@ -121,13 +121,4 @@ public sealed class ExaminationHistory : Entity<Guid>
 
         return history;
     }
-
-    public void UpdatePaymentSnapshot(decimal paid, decimal remaining)
-    {
-        Guard.Against(paid, p => p < 0, DomainErrors.PaidAmountNegative, "Paid amount cannot be negative.");
-        Guard.Against(remaining, r => r < 0, DomainErrors.RemainingAmountNegative, "Remaining amount cannot be negative.");
-
-        Paid = paid;
-        Remaining = remaining;
-    }
 }
