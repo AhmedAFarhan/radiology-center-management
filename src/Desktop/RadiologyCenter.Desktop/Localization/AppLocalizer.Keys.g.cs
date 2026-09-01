@@ -81,6 +81,12 @@ public sealed partial class AppLocalizer
     private InsuranceGroup? _insurance;
     public InsuranceGroup Insurance => _insurance ??= new InsuranceGroup(this);
 
+    private InsuranceAnalyticsGroup? _insuranceAnalytics;
+    public InsuranceAnalyticsGroup InsuranceAnalytics => _insuranceAnalytics ??= new InsuranceAnalyticsGroup(this);
+
+    private CashFlowGroup? _cashFlow;
+    public CashFlowGroup CashFlow => _cashFlow ??= new CashFlowGroup(this);
+
     private InventoryGroup? _inventory;
     public InventoryGroup Inventory => _inventory ??= new InventoryGroup(this);
 
@@ -907,6 +913,64 @@ public sealed class InsuranceGroup : LocalizerGroup
     public string Unreachable => Get("insurance.unreachable");
 }
 
+public sealed class InsuranceAnalyticsGroup : LocalizerGroup
+{
+    internal InsuranceAnalyticsGroup(AppLocalizer localizer) : base(localizer) { }
+    public string Title => Get("insuranceAnalytics.title");
+    public string Subtitle => Get("insuranceAnalytics.subtitle");
+    public string TotalClaims => Get("insuranceAnalytics.totalClaims");
+    public string ApprovalRate => Get("insuranceAnalytics.approvalRate");
+    public string TotalBilled => Get("insuranceAnalytics.totalBilled");
+    public string Outstanding => Get("insuranceAnalytics.outstanding");
+    public string DraftClaims => Get("insuranceAnalytics.draftClaims");
+    public string SubmittedClaims => Get("insuranceAnalytics.submittedClaims");
+    public string ApprovedClaims => Get("insuranceAnalytics.approvedClaims");
+    public string RejectedClaims => Get("insuranceAnalytics.rejectedClaims");
+    public string PaidClaims => Get("insuranceAnalytics.paidClaims");
+    public string ClaimsBreakdown => Get("insuranceAnalytics.claimsBreakdown");
+    public string ByStatus => Get("insuranceAnalytics.byStatus");
+    public string ClaimDetails => Get("insuranceAnalytics.claimDetails");
+    public string AllClaims => Get("insuranceAnalytics.allClaims");
+    public string Patient => Get("insuranceAnalytics.patient");
+    public string Company => Get("insuranceAnalytics.company");
+    public string Policy => Get("insuranceAnalytics.policy");
+    public string Billed => Get("insuranceAnalytics.billed");
+    public string Payer => Get("insuranceAnalytics.payer");
+    public string Status => Get("insuranceAnalytics.status");
+    public string Settled => Get("insuranceAnalytics.settled");
+    public string Remaining => Get("insuranceAnalytics.remaining");
+    public string LoadErrorTitle => Get("insuranceAnalytics.loadErrorTitle");
+    public string LoadErrorMsg => Get("insuranceAnalytics.loadErrorMsg");
+    public string Retry => Get("insuranceAnalytics.retry");
+}
+
+public sealed class CashFlowGroup : LocalizerGroup
+{
+    internal CashFlowGroup(AppLocalizer localizer) : base(localizer) { }
+    public string Title => Get("cashFlow.title");
+    public string Subtitle => Get("cashFlow.subtitle");
+    public string TotalInflows => Get("cashFlow.totalInflows");
+    public string TotalOutflows => Get("cashFlow.totalOutflows");
+    public string NetCashFlow => Get("cashFlow.netCashFlow");
+    public string TotalSessions => Get("cashFlow.totalSessions");
+    public string MonthlyBreakdown => Get("cashFlow.monthlyBreakdown");
+    public string InflowsVsOutflows => Get("cashFlow.inflowsVsOutflows");
+    public string ByReason => Get("cashFlow.byReason");
+    public string EntryBreakdown => Get("cashFlow.entryBreakdown");
+    public string SessionSummaries => Get("cashFlow.sessionSummaries");
+    public string AllSessions => Get("cashFlow.allSessions");
+    public string User => Get("cashFlow.user");
+    public string OpeningFloat => Get("cashFlow.openingFloat");
+    public string Balance => Get("cashFlow.balance");
+    public string Entries => Get("cashFlow.entries");
+    public string Opened => Get("cashFlow.opened");
+    public string Closed => Get("cashFlow.closed");
+    public string Status => Get("cashFlow.status");
+    public string LoadErrorTitle => Get("cashFlow.loadErrorTitle");
+    public string LoadErrorMsg => Get("cashFlow.loadErrorMsg");
+    public string Retry => Get("cashFlow.retry");
+}
+
 public sealed class InventoryGroup : LocalizerGroup
 {
     internal InventoryGroup(AppLocalizer localizer) : base(localizer) { }
@@ -1108,6 +1172,8 @@ public sealed class NavGroup : LocalizerGroup
     public string ExamCalendar => Get("nav.examCalendar");
     public string Financials => Get("nav.financials");
     public string Insurance => Get("nav.insurance");
+    public string InsuranceAnalytics => Get("nav.insuranceAnalytics");
+    public string CashFlow => Get("nav.cashFlow");
     public string Inventory => Get("nav.inventory");
     public string Leave => Get("nav.leave");
     public string Messages => Get("nav.messages");

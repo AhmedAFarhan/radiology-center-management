@@ -50,7 +50,7 @@ public class ExaminationsController : ControllerBase
     [HttpPost("all")]
     public async Task<IActionResult> GetAllAsync([FromBody] QueryRequest request, CancellationToken ct)
     {
-        var result = await _bus.InvokeAsync<Result<PagedResult<ExaminationDto>>>(new GetExaminationsQuery(request), ct);
+        var result = await _bus.InvokeAsync<Result<PagedResult<ExaminationListItemDto>>>(new GetExaminationsQuery(request), ct);
         return result.ToActionResult();
     }
 

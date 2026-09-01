@@ -6,7 +6,11 @@
 @using RadiologyCenter.Desktop.Models
 @inject AppLocalizer T
 
-<PageHeader Icon="@Icons.Material.Filled.Insights" Title="@T.Overview.Title" Subtitle="@T.Overview.Subtitle" OnRefresh="() => ReloadAsync()" ShowSearch="false" />
+<PageHeader Icon="@Icons.Material.Filled.Insights" Title="@T.Overview.Title" Subtitle="@T.Overview.Subtitle" OnRefresh="() => ReloadAsync()" ShowSearch="false">
+    <RightContent>
+        <ExportButton Loading="@_exporting" OnExport="ExportAsync" />
+    </RightContent>
+</PageHeader>
 
 <PeriodSelector Class="mb-4" />
 

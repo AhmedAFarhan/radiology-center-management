@@ -1,0 +1,126 @@
+@page "/analytics/insurance"
+@attribute [Authorize]
+@inherits AnalyticsPageBase
+@using RadiologyCenter.Desktop.Features.Analytics.Components
+@inject AppLocalizer T
+@inject IJSRuntime JS
+
+<PageHeader Icon="@Icons.Material.Filled.Security" Title="@T.InsuranceAnalytics.Title" Subtitle="@T.InsuranceAnalytics.Subtitle" OnRefresh="() => ReloadAsync()" ShowSearch="false">
+    <RightContent>
+        <ExportButton Loading="@_exporting" OnExport="ExportAsync" />
+    </RightContent>
+</PageHeader>
+
+<PeriodSelector Class="mb-4" />
+
+@if (Loading)
+{
+    <AnalyticsSkeleton />
+}
+else if (Error)
+{
+    <ErrorState Title="@T.Overview.LoadErrorTitle" Message="@T.Overview.LoadErrorMsg" Detail="@LastError" Action="ReloadAsync" RetryLabel="@T.Overview.Retry" />
+}
+else
+{
+    <MudGrid Spacing="3">
+        <MudItem xs="12" sm="6" lg="3">
+            <StatCard Label="@T.InsuranceAnalytics.TotalClaims" Value="@(_data!.TotalClaims.ToString())" Icon="@Icons.Material.Filled.Assignment" Color="Color.Primary" />
+        </MudItem>
+        <MudItem xs="12" sm="6" lg="3">
+            <StatCard Label="@T.InsuranceAnalytics.ApprovalRate" Value="@($"{_data.ApprovalRate:P0}")" Icon="@Icons.Material.Filled.CheckCircle" Color="Color.Success" />
+        </MudItem>
+        <MudItem xs="12" sm="6" lg="3">
+            <StatCard Label="@T.InsuranceAnalytics.TotalBilled" Value="@AnalyticsFormat.Money(_data.TotalBilledAmount)" Icon="@Icons.Material.Filled.ReceiptLong" Color="Color.Secondary" />
+        </MudItem>
+        <MudItem xs="12" sm="6" lg="3">
+            <StatCard Label="@T.InsuranceAnalytics.Outstanding" Value="@AnalyticsFormat.Money(_data.OutstandingAmount)" Icon="@Icons.Material.Filled.Wallet" Color="Color.Warning" />
+        </MudItem>
+    </MudGrid>
+
+    <MudGrid Spacing="3" Class="mt-1">
+        <MudItem xs="12" sm="6" lg="3">
+            <StatCard Label="@T.InsuranceAnalytics.DraftClaims" Value="@(_data.DraftClaims.ToString())" Icon="@Icons.Material.Filled.EditNote" Color="Color.Default" />
+        </MudItem>
+        <MudItem xs="12" sm="6" lg="3">
+            <StatCard Label="@T.InsuranceAnalytics.SubmittedClaims" Value="@(_data.SubmittedClaims.ToString())" Icon="@Icons.Material.Filled.Send" Color="Color.Info" />
+        </MudItem>
+        <MudItem xs="12" sm="6" lg="3">
+            <StatCard Label="@T.InsuranceAnalytics.ApprovedClaims" Value="@(_data.ApprovedClaims.ToString())" Icon="@Icons.Material.Filled.TaskAlt" Color="Color.Success" />
+        </MudItem>
+        <MudItem xs="12" sm="6" lg="3">
+            <StatCard Label="@T.InsuranceAnalytics.PaidClaims" Value="@(_data.PaidClaims.ToString())" Icon="@Icons.Material.Filled.Paid" Color="Color.Primary" />
+        </MudItem>
+    </MudGrid>
+
+    <MudGrid Spacing="3" Class="mt-1">
+        <MudItem xs="12" sm="6" lg="4">
+            <ChartCard Title="@T.InsuranceAnalytics.ClaimsBreakdown" Subtitle="@T.InsuranceAnalytics.ByStatus">
+                <DonutChart Items="@BuildClaimsSlices()" Height="260px" />
+            </ChartCard>
+        </MudItem>
+        <MudItem xs="12" lg="8">
+            <ChartCard Title="@T.InsuranceAnalytics.ClaimDetails" Subtitle="@T.InsuranceAnalytics.AllClaims">
+                <MudDataGrid T="InsuranceClaimRowDto" Items="@_data.ClaimRows" Dense="true" Hover="true" Striped="true">
+                    <Columns>
+                        <PropertyColumn Property="x => x.PatientName" Title="@T.InsuranceAnalytics.Patient" />
+                        <PropertyColumn Property="x => x.InsuranceCompany" Title="@T.InsuranceAnalytics.Company" />
+                        <PropertyColumn Property="x => x.PolicyNumber" Title="@T.InsuranceAnalytics.Policy" />
+                        <TemplateColumn Title="@T.InsuranceAnalytics.Billed">
+                            <CellTemplate>@AnalyticsFormat.Money(context.Item.BilledAmount)</CellTemplate>
+                        </TemplateColumn>
+                        <TemplateColumn Title="@T.InsuranceAnalytics.Payer">
+                            <CellTemplate>@AnalyticsFormat.Money(context.Item.PayerShare)</CellTemplate>
+                        </TemplateColumn>
+                        <PropertyColumn Property="x => x.Status" Title="@T.InsuranceAnalytics.Status" />
+                        <TemplateColumn Title="@T.InsuranceAnalytics.Settled">
+                            <CellTemplate>@AnalyticsFormat.Money(context.Item.SettledAmount)</CellTemplate>
+                        </TemplateColumn>
+                        <TemplateColumn Title="@T.InsuranceAnalytics.Remaining">
+                            <CellTemplate>@AnalyticsFormat.Money(context.Item.RemainingOwed)</CellTemplate>
+                        </TemplateColumn>
+                    </Columns>
+                </MudDataGrid>
+            </ChartCard>
+        </MudItem>
+    </MudGrid>
+}
+
+@code {
+    private InsuranceAnalyticsDto? _data;
+    private bool _exporting;
+
+    [Inject]
+    private AnalyticsService Api { get; set; } = null!;
+
+    protected override async Task LoadAsync(DateTime from, DateTime to)
+    {
+        _data = await Api.GetInsuranceAsync(from, to);
+    }
+
+    private IReadOnlyList<AnalyticsSlice> BuildClaimsSlices() => new[]
+    {
+        new AnalyticsSlice(T.InsuranceAnalytics.DraftClaims, _data!.DraftClaims),
+        new AnalyticsSlice(T.InsuranceAnalytics.SubmittedClaims, _data.SubmittedClaims),
+        new AnalyticsSlice(T.InsuranceAnalytics.ApprovedClaims, _data.ApprovedClaims),
+        new AnalyticsSlice(T.InsuranceAnalytics.RejectedClaims, _data.RejectedClaims),
+        new AnalyticsSlice(T.InsuranceAnalytics.PaidClaims, _data.PaidClaims),
+    };
+
+    private async Task ExportAsync(string format)
+    {
+        _exporting = true;
+        StateHasChanged();
+        try
+        {
+            var bytes = await Api.ExportAsync("insurance", Period.From, Period.To, format);
+            var fileName = $"InsuranceReport_{Period.From:yyyyMMdd}-{Period.To:yyyyMMdd}.{format.ToLowerInvariant()}";
+            var contentType = format == "Pdf" ? "application/pdf" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
+            await JS.InvokeVoidAsync("downloadFile", fileName, contentType, bytes);
+        }
+        finally
+        {
+            _exporting = false;
+        }
+    }
+}

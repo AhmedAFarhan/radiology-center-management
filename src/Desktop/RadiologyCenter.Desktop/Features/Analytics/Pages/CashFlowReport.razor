@@ -1,0 +1,115 @@
+@page "/analytics/cash-flow"
+@attribute [Authorize]
+@inherits AnalyticsPageBase
+@using RadiologyCenter.Desktop.Features.Analytics.Components
+@inject AppLocalizer T
+@inject IJSRuntime JS
+
+<PageHeader Icon="@Icons.Material.Filled.AccountBalance" Title="@T.CashFlow.Title" Subtitle="@T.CashFlow.Subtitle" OnRefresh="() => ReloadAsync()" ShowSearch="false">
+    <RightContent>
+        <ExportButton Loading="@_exporting" OnExport="ExportAsync" />
+    </RightContent>
+</PageHeader>
+
+<PeriodSelector Class="mb-4" />
+
+@if (Loading)
+{
+    <AnalyticsSkeleton />
+}
+else if (Error)
+{
+    <ErrorState Title="@T.Overview.LoadErrorTitle" Message="@T.Overview.LoadErrorMsg" Detail="@LastError" Action="ReloadAsync" RetryLabel="@T.Overview.Retry" />
+}
+else
+{
+    <MudGrid Spacing="3">
+        <MudItem xs="12" sm="6" lg="3">
+            <StatCard Label="@T.CashFlow.TotalInflows" Value="@AnalyticsFormat.Money(_data!.TotalInflows)" Icon="@Icons.Material.Filled.ArrowDownward" Color="Color.Success" />
+        </MudItem>
+        <MudItem xs="12" sm="6" lg="3">
+            <StatCard Label="@T.CashFlow.TotalOutflows" Value="@AnalyticsFormat.Money(_data.TotalOutflows)" Icon="@Icons.Material.Filled.ArrowUpward" Color="Color.Error" />
+        </MudItem>
+        <MudItem xs="12" sm="6" lg="3">
+            <StatCard Label="@T.CashFlow.NetCashFlow" Value="@AnalyticsFormat.Money(_data.NetCashFlow)" Icon="@Icons.Material.Filled.Balance" Color="Color.Primary" />
+        </MudItem>
+        <MudItem xs="12" sm="6" lg="3">
+            <StatCard Label="@T.CashFlow.TotalSessions" Value="@(_data.TotalSessions.ToString())" Icon="@Icons.Material.Filled.PointOfSale" Color="Color.Secondary" />
+        </MudItem>
+    </MudGrid>
+
+    <MudGrid Spacing="3" Class="mt-1">
+        <MudItem xs="12" lg="8">
+            <ChartCard Title="@T.CashFlow.MonthlyBreakdown" Subtitle="@T.CashFlow.InflowsVsOutflows">
+                <RevenueTrendChart Items="@BuildMonthlyPoints()" />
+            </ChartCard>
+        </MudItem>
+        <MudItem xs="12" lg="4">
+            <ChartCard Title="@T.CashFlow.ByReason" Subtitle="@T.CashFlow.EntryBreakdown">
+                <DonutChart Items="@BuildReasonSlices()" Height="260px" />
+            </ChartCard>
+        </MudItem>
+    </MudGrid>
+
+    <MudGrid Spacing="3" Class="mt-1">
+        <MudItem xs="12">
+            <ChartCard Title="@T.CashFlow.SessionSummaries" Subtitle="@T.CashFlow.AllSessions">
+                <MudDataGrid T="CashFlowSessionSummaryDto" Items="@_data.SessionSummaries" Dense="true" Hover="true" Striped="true">
+                    <Columns>
+                        <PropertyColumn Property="x => x.UserName" Title="@T.CashFlow.User" />
+                        <TemplateColumn Title="@T.CashFlow.OpeningFloat">
+                            <CellTemplate>@AnalyticsFormat.Money(context.Item.OpeningFloat)</CellTemplate>
+                        </TemplateColumn>
+                        <TemplateColumn Title="@T.CashFlow.Balance">
+                            <CellTemplate>@AnalyticsFormat.Money(context.Item.Balance)</CellTemplate>
+                        </TemplateColumn>
+                        <PropertyColumn Property="x => x.EntryCount" Title="@T.CashFlow.Entries" />
+                        <TemplateColumn Title="@T.CashFlow.Opened">
+                            <CellTemplate>@context.Item.OpenedAt.ToString("MMM dd, yyyy HH:mm")</CellTemplate>
+                        </TemplateColumn>
+                        <TemplateColumn Title="@T.CashFlow.Closed">
+                            <CellTemplate>@(context.Item.ClosedAt?.ToString("MMM dd, yyyy HH:mm") ?? "-")</CellTemplate>
+                        </TemplateColumn>
+                        <PropertyColumn Property="x => x.Status" Title="@T.CashFlow.Status" />
+                    </Columns>
+                </MudDataGrid>
+            </ChartCard>
+        </MudItem>
+    </MudGrid>
+}
+
+@code {
+    private CashFlowReportDto? _data;
+    private bool _exporting;
+
+    [Inject]
+    private AnalyticsService Api { get; set; } = null!;
+
+    protected override async Task LoadAsync(DateTime from, DateTime to)
+    {
+        _data = await Api.GetCashFlowAsync(from, to);
+    }
+
+    private IReadOnlyList<RevenuePointDto> BuildMonthlyPoints()
+        => _data!.ByMonth.Select(m => new RevenuePointDto(m.Month, m.Inflows, m.Outflows)).ToList();
+
+    private IReadOnlyList<AnalyticsSlice> BuildReasonSlices()
+        => _data!.ByReason.Select(r => new AnalyticsSlice(r.Reason, r.InflowAmount + r.OutflowAmount)).ToList();
+
+    private async Task ExportAsync(string format)
+    {
+        _exporting = true;
+        StateHasChanged();
+        try
+        {
+            var bytes = await Api.ExportAsync("cash-flow", Period.From, Period.To, format);
+            var fileName = $"CashFlowReport_{Period.From:yyyyMMdd}-{Period.To:yyyyMMdd}.{format.ToLowerInvariant()}";
+            var contentType = format == "Pdf" ? "application/pdf" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
+            await JS.InvokeVoidAsync("downloadFile", fileName, contentType, bytes);
+        }
+        finally
+        {
+            _exporting = false;
+        }
+    }
+}

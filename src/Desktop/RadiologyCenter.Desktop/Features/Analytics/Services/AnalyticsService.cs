@@ -23,6 +23,15 @@ public sealed class AnalyticsService
     public Task<IReadOnlyList<FinancialExamRowDto>> GetFinancialExamsAsync(DateTime from, DateTime to, CancellationToken ct = default)
         => _api.GetAsync<IReadOnlyList<FinancialExamRowDto>>(BuildPath("api/analytics/financial/exams", from, to), ct);
 
+    public Task<InsuranceAnalyticsDto> GetInsuranceAsync(DateTime from, DateTime to, CancellationToken ct = default)
+        => _api.GetAsync<InsuranceAnalyticsDto>(BuildPath("api/analytics/insurance", from, to), ct);
+
+    public Task<CashFlowReportDto> GetCashFlowAsync(DateTime from, DateTime to, CancellationToken ct = default)
+        => _api.GetAsync<CashFlowReportDto>(BuildPath("api/analytics/cash-flow", from, to), ct);
+
+    public Task<byte[]> ExportAsync(string reportType, DateTime from, DateTime to, string format = "Excel", CancellationToken ct = default)
+        => _api.GetBytesAsync(BuildPath($"api/analytics/export/{reportType}", from, to) + $"&format={format}", ct);
+
     private static string BuildPath(string path, DateTime from, DateTime to)
     {
         var fromText = from == DateTime.MinValue ? string.Empty : from.ToString("s");

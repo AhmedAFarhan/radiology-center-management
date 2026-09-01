@@ -1,0 +1,31 @@
+@using MudBlazor
+
+<MudTooltip Text="@Tooltip">
+    <MudButtonGroup Variant="Variant.Outlined" Size="Size.Small">
+        <MudButton StartIcon="@Icons.Material.Filled.FileDownload" OnClick="DownloadAsync" Disabled="Loading">
+            @if (Loading)
+            {
+                <MudProgressCircular Size="Size.Small" Indeterminate="true" />
+            }
+            else
+            {
+                @Label
+            }
+        </MudButton>
+        <MudMenu Icon="@Icons.Material.Filled.ArrowDropDown" Dense="true">
+            <MudMenuItem Icon="@Icons.Material.Filled.TableChart" OnClick="DownloadExcel">Excel</MudMenuItem>
+            <MudMenuItem Icon="@Icons.Material.Filled.PictureAsPdf" OnClick="DownloadPdf">PDF</MudMenuItem>
+        </MudMenu>
+    </MudButtonGroup>
+</MudTooltip>
+
+@code {
+    [Parameter] public string Label { get; set; } = "Export";
+    [Parameter] public string Tooltip { get; set; } = "Download report";
+    [Parameter] public bool Loading { get; set; }
+    [Parameter] public EventCallback<string> OnExport { get; set; }
+
+    private async Task DownloadAsync() => await OnExport.InvokeAsync("Excel");
+    private async Task DownloadExcel() => await OnExport.InvokeAsync("Excel");
+    private async Task DownloadPdf() => await OnExport.InvokeAsync("Pdf");
+}

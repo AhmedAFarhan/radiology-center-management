@@ -208,6 +208,8 @@
                     <MudMenuItem Icon="@Icons.Material.Filled.AccountBalanceWallet" OnClick="@(() => Go("/analytics/financial"))">@T.Nav.Financials</MudMenuItem>
                     <MudMenuItem Icon="@Icons.Material.Filled.Construction" OnClick="@(() => Go("/analytics/operations"))">@T.Nav.Operations</MudMenuItem>
                     <MudMenuItem Icon="@Icons.Material.Filled.Groups" OnClick="@(() => Go("/analytics/staff"))">@T.Nav.StaffMachines</MudMenuItem>
+                    <MudMenuItem Icon="@Icons.Material.Filled.Security" OnClick="@(() => Go("/analytics/insurance"))">@T.Nav.Insurance</MudMenuItem>
+                    <MudMenuItem Icon="@Icons.Material.Filled.AccountBalance" OnClick="@(() => Go("/analytics/cash-flow"))">@T.Nav.CashFlow</MudMenuItem>
                 </MudMenu>
             </MudTooltip>
         }
@@ -373,6 +375,8 @@
                 <MudNavLink Href="/analytics/financial" Icon="@Icons.Material.Filled.AccountBalanceWallet" Ripple="false">@T.Nav.Financials</MudNavLink>
                 <MudNavLink Href="/analytics/operations" Icon="@Icons.Material.Filled.Construction" Ripple="false">@T.Nav.Operations</MudNavLink>
                 <MudNavLink Href="/analytics/staff" Icon="@Icons.Material.Filled.Groups" Ripple="false">@T.Nav.StaffMachines</MudNavLink>
+                <MudNavLink Href="/analytics/insurance" Icon="@Icons.Material.Filled.Security" Ripple="false">@T.Nav.Insurance</MudNavLink>
+                <MudNavLink Href="/analytics/cash-flow" Icon="@Icons.Material.Filled.AccountBalance" Ripple="false">@T.Nav.CashFlow</MudNavLink>
             </MudNavGroup>
         }
         @if (CanAny(UsersPermissions.Read, RolesPermissions.Read))

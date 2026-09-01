@@ -23,7 +23,11 @@ public partial class StaffMachineAnalytics : AnalyticsPageBase
 [Inject]
     private AnalyticsService Api { get; set; } = null!;
 
+    [Inject]
+    private IJSRuntime JS { get; set; } = null!;
+
     private StaffMachineAnalyticsDto? _data;
+    private bool _exporting;
 
     protected override async Task LoadAsync(DateTime from, DateTime to)
     {
@@ -44,5 +48,22 @@ public partial class StaffMachineAnalytics : AnalyticsPageBase
         => (_data?.ReferralDoctors ?? Array.Empty<ReferralDoctorPerformanceDto>())
             .Select(r => new AnalyticsSlice(r.Name, r.ReferredExams))
             .ToList();
+
+    private async Task ExportAsync(string format)
+    {
+        _exporting = true;
+        StateHasChanged();
+        try
+        {
+            var bytes = await Api.ExportAsync("staff", Period.From, Period.To, format);
+            var fileName = $"StaffReport_{Period.From:yyyyMMdd}-{Period.To:yyyyMMdd}.{format.ToLowerInvariant()}";
+            var contentType = format == "Pdf" ? "application/pdf" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
+            await JS.InvokeVoidAsync("downloadFile", fileName, contentType, bytes);
+        }
+        finally
+        {
+            _exporting = false;
+        }
+    }
 }
 

@@ -23,8 +23,12 @@ public partial class OverviewAnalytics : AnalyticsPageBase
 [Inject]
     private AnalyticsService Api { get; set; } = null!;
 
+    [Inject]
+    private IJSRuntime JS { get; set; } = null!;
+
     private ProfitAnalyticsDto? _profit;
     private FinancialAnalyticsDto? _financial;
+    private bool _exporting;
 
     protected override async Task LoadAsync(DateTime from, DateTime to)
     {
@@ -75,6 +79,23 @@ public partial class OverviewAnalytics : AnalyticsPageBase
 
     private WaterfallRow Build(string label, decimal value, int percent, string color)
         => new WaterfallRow(label, value, Math.Clamp(percent, 0, 100), color);
+
+    private async Task ExportAsync(string format)
+    {
+        _exporting = true;
+        StateHasChanged();
+        try
+        {
+            var bytes = await Api.ExportAsync("profit", Period.From, Period.To, format);
+            var fileName = $"OverviewReport_{Period.From:yyyyMMdd}-{Period.To:yyyyMMdd}.{format.ToLowerInvariant()}";
+            var contentType = format == "Pdf" ? "application/pdf" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
+            await JS.InvokeVoidAsync("downloadFile", fileName, contentType, bytes);
+        }
+        finally
+        {
+            _exporting = false;
+        }
+    }
 
     private sealed record WaterfallRow(string Label, decimal Value, int Percent, string Color);
 }

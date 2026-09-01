@@ -23,7 +23,11 @@ public partial class OperationalAnalytics : AnalyticsPageBase
 [Inject]
     private AnalyticsService Api { get; set; } = null!;
 
+    [Inject]
+    private IJSRuntime JS { get; set; } = null!;
+
     private OperationalAnalyticsDto? _data;
+    private bool _exporting;
 
     protected override async Task LoadAsync(DateTime from, DateTime to)
     {
@@ -41,5 +45,22 @@ public partial class OperationalAnalytics : AnalyticsPageBase
         => (_data?.VolumeByPriority ?? Array.Empty<PriorityVolumeDto>())
             .Select(p => new AnalyticsSlice(p.Priority, p.Count))
             .ToList();
+
+    private async Task ExportAsync(string format)
+    {
+        _exporting = true;
+        StateHasChanged();
+        try
+        {
+            var bytes = await Api.ExportAsync("operational", Period.From, Period.To, format);
+            var fileName = $"OperationalReport_{Period.From:yyyyMMdd}-{Period.To:yyyyMMdd}.{format.ToLowerInvariant()}";
+            var contentType = format == "Pdf" ? "application/pdf" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
+            await JS.InvokeVoidAsync("downloadFile", fileName, contentType, bytes);
+        }
+        finally
+        {
+            _exporting = false;
+        }
+    }
 }
 

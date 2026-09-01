@@ -26,9 +26,13 @@ public partial class FinancialAnalytics : AnalyticsPageBase
     [Inject]
     private InsuranceService Insurance { get; set; } = null!;
 
+    [Inject]
+    private IJSRuntime JS { get; set; } = null!;
+
     private FinancialAnalyticsDto? _data;
     private IReadOnlyList<FinancialExamRowDto>? _exams;
     private InsuranceStatsDto? _insuranceStats;
+    private bool _exporting;
 
     protected override async Task LoadAsync(DateTime from, DateTime to)
     {
@@ -54,5 +58,22 @@ public partial class FinancialAnalytics : AnalyticsPageBase
         => _data!.TotalBilled > 0
             ? AnalyticsFormat.Percent(_data.TotalCollected / _data.TotalBilled)
             : "-";
+
+    private async Task ExportAsync(string format)
+    {
+        _exporting = true;
+        StateHasChanged();
+        try
+        {
+            var bytes = await Api.ExportAsync("financial", Period.From, Period.To, format);
+            var fileName = $"FinancialReport_{Period.From:yyyyMMdd}-{Period.To:yyyyMMdd}.{format.ToLowerInvariant()}";
+            var contentType = format == "Pdf" ? "application/pdf" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
+            await JS.InvokeVoidAsync("downloadFile", fileName, contentType, bytes);
+        }
+        finally
+        {
+            _exporting = false;
+        }
+    }
 }
 
