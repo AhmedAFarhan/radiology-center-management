@@ -11,6 +11,7 @@ public static class ExportInsuranceReportQueryHandler
         IInsuranceAnalyticsDataSource dataSource,
         ITimezoneConverter timezone,
         IAnalyticsReportService reportService,
+        IAnalyticsPdfService pdfService,
         CancellationToken ct)
     {
         var insuranceResult = await GetInsuranceAnalyticsQueryHandler.HandleAsync(
@@ -23,7 +24,9 @@ public static class ExportInsuranceReportQueryHandler
         var from = query.From ?? today.AddMonths(-1).AddDays(1).ToDateTime(TimeOnly.MinValue);
         var to = query.To ?? today.AddDays(1).ToDateTime(TimeOnly.MinValue);
 
-        var content = reportService.ExportInsurance(insuranceResult.Value, from, to);
+        var content = query.Format == ReportFormat.Pdf
+            ? pdfService.BuildInsurancePdf(insuranceResult.Value, from, to)
+            : reportService.ExportInsurance(insuranceResult.Value, from, to);
         return Result.Success(content);
     }
 }

@@ -72,4 +72,10 @@ public class ClaimRepository : BaseRepository<Claim, Guid>, IClaimRepository
             .Include(c => c.Settlements)
             .Include(c => c.Rejections)
             .FirstOrDefaultAsync(c => c.ExaminationId == examinationId, ct);
+
+    public async Task<IReadOnlyList<Claim>> GetByDateRangeAsync(DateTime from, DateTime to, CancellationToken ct = default) =>
+        await DbSet
+            .Include(c => c.Settlements)
+            .Where(c => c.CreatedAt >= from && c.CreatedAt < to)
+            .ToListAsync(ct);
 }

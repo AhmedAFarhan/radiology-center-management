@@ -13,6 +13,7 @@ public static class ExportOperationalReportQueryHandler
         IExaminationTypeDirectory examinationTypeDirectory,
         ITimezoneConverter timezone,
         IAnalyticsReportService reportService,
+        IAnalyticsPdfService pdfService,
         CancellationToken ct)
     {
         var operationalResult = await GetOperationalAnalyticsQueryHandler.HandleAsync(
@@ -25,7 +26,9 @@ public static class ExportOperationalReportQueryHandler
         var from = query.From ?? today.AddMonths(-1).AddDays(1).ToDateTime(TimeOnly.MinValue);
         var to = query.To ?? today.AddDays(1).ToDateTime(TimeOnly.MinValue);
 
-        var content = reportService.ExportOperational(operationalResult.Value, from, to);
+        var content = query.Format == ReportFormat.Pdf
+            ? pdfService.BuildOperationalPdf(operationalResult.Value, from, to)
+            : reportService.ExportOperational(operationalResult.Value, from, to);
         return Result.Success(content);
     }
 }

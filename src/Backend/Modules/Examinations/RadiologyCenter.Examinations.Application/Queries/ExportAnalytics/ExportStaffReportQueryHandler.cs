@@ -13,6 +13,7 @@ public static class ExportStaffReportQueryHandler
         IAncillaryDirectory ancillaryDirectory,
         ITimezoneConverter timezone,
         IAnalyticsReportService reportService,
+        IAnalyticsPdfService pdfService,
         CancellationToken ct)
     {
         var staffResult = await GetStaffMachineAnalyticsQueryHandler.HandleAsync(
@@ -25,7 +26,9 @@ public static class ExportStaffReportQueryHandler
         var from = query.From ?? today.AddMonths(-1).AddDays(1).ToDateTime(TimeOnly.MinValue);
         var to = query.To ?? today.AddDays(1).ToDateTime(TimeOnly.MinValue);
 
-        var content = reportService.ExportStaffMachine(staffResult.Value, from, to);
+        var content = query.Format == ReportFormat.Pdf
+            ? pdfService.BuildStaffMachinePdf(staffResult.Value, from, to)
+            : reportService.ExportStaffMachine(staffResult.Value, from, to);
         return Result.Success(content);
     }
 }

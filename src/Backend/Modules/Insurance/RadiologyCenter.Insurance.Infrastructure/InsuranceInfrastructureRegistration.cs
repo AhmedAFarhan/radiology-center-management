@@ -27,6 +27,7 @@ public static class InsuranceInfrastructureRegistration
         services.AddScoped<IInsurancePolicyRepository, InsurancePolicyRepository>();
         services.AddScoped<IPreAuthorizationRepository, PreAuthorizationRepository>();
         services.AddScoped<IClaimRepository, ClaimRepository>();
+        services.AddScoped<ISettlementRepository, SettlementRepository>();
         services.AddScoped<IPolicyDocumentRepository, PolicyDocumentRepository>();
         services.AddScoped<IPreAuthorizationDocumentRepository, PreAuthorizationDocumentRepository>();
         services.AddScoped<IInsuranceDocumentStorage, InsuranceDocumentStorage>();

@@ -13,6 +13,7 @@ public static class ExportProfitReportQueryHandler
         IProfitSourceResolver profitSourceResolver,
         ITimezoneConverter timezone,
         IAnalyticsReportService reportService,
+        IAnalyticsPdfService pdfService,
         CancellationToken ct)
     {
         var profitResult = await GetMonthlyProfitQueryHandler.HandleAsync(
@@ -25,7 +26,9 @@ public static class ExportProfitReportQueryHandler
         var from = query.From ?? today.AddMonths(-1).AddDays(1).ToDateTime(TimeOnly.MinValue);
         var to = query.To ?? today.AddDays(1).ToDateTime(TimeOnly.MinValue);
 
-        var content = reportService.ExportProfit(profitResult.Value, from, to);
+        var content = query.Format == ReportFormat.Pdf
+            ? pdfService.BuildProfitPdf(profitResult.Value, from, to)
+            : reportService.ExportProfit(profitResult.Value, from, to);
         return Result.Success(content);
     }
 }

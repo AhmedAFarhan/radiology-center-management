@@ -10,6 +10,7 @@ public static class ExportCashFlowReportQueryHandler
         ICashFlowDataSource dataSource,
         ITimezoneConverter timezone,
         IAnalyticsReportService reportService,
+        IAnalyticsPdfService pdfService,
         CancellationToken ct)
     {
         var cashFlowResult = await GetCashFlowReportQueryHandler.HandleAsync(
@@ -22,7 +23,9 @@ public static class ExportCashFlowReportQueryHandler
         var from = query.From ?? today.AddMonths(-1).AddDays(1).ToDateTime(TimeOnly.MinValue);
         var to = query.To ?? today.AddDays(1).ToDateTime(TimeOnly.MinValue);
 
-        var content = reportService.ExportCashFlow(cashFlowResult.Value, from, to);
+        var content = query.Format == ReportFormat.Pdf
+            ? pdfService.BuildCashFlowPdf(cashFlowResult.Value, from, to)
+            : reportService.ExportCashFlow(cashFlowResult.Value, from, to);
         return Result.Success(content);
     }
 }

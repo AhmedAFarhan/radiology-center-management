@@ -9,4 +9,5 @@ public interface ICashSessionRepository : IBaseRepository<CashSession, Guid>
 {
     Task<CashSession?> GetOpenSessionByUserAsync(Guid userId, CancellationToken ct = default);
     Task<PagedResult<CashSession>> GetPagedWithStatusAsync(QueryRequest request, CashSessionStatus? status, CancellationToken ct = default);
+    Task<IReadOnlyList<CashSession>> GetByDateRangeAsync(DateTime from, DateTime to, CancellationToken ct = default);
 }

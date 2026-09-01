@@ -38,4 +38,9 @@ public class CashEntryRepository : BaseRepository<CashEntry, Guid>, ICashEntryRe
 
         return rows.ToDictionary(r => r.SessionId, r => (r.Movement, r.Count));
     }
+
+    public async Task<IReadOnlyList<CashEntry>> GetByDateRangeAsync(DateTime from, DateTime to, CancellationToken ct = default) =>
+        await DbSet
+            .Where(e => !e.IsDeleted && e.OccurredAt >= from && e.OccurredAt < to)
+            .ToListAsync(ct);
 }

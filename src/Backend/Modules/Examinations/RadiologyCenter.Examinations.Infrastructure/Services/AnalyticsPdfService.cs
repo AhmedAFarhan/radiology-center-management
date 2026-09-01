@@ -6,14 +6,31 @@ using RadiologyCenter.Examinations.Application.Reports;
 
 namespace RadiologyCenter.Examinations.Infrastructure.Services;
 
-public sealed class AnalyticsPdfService
+public sealed class AnalyticsPdfService : IAnalyticsPdfService
 {
     private const string PrimaryColor = "#4C58E0";
 
-    public byte[] BuildFinancialPdf(FinancialAnalyticsDto data, DateTime from, DateTime to)
+    ReportContentDto IAnalyticsPdfService.BuildFinancialPdf(FinancialAnalyticsDto data, DateTime from, DateTime to)
+        => BuildFinancialPdf(data, from, to);
+
+    ReportContentDto IAnalyticsPdfService.BuildOperationalPdf(OperationalAnalyticsDto data, DateTime from, DateTime to)
+        => BuildOperationalPdf(data, from, to);
+
+    ReportContentDto IAnalyticsPdfService.BuildStaffMachinePdf(StaffMachineAnalyticsDto data, DateTime from, DateTime to)
+        => BuildStaffMachinePdf(data, from, to);
+
+    ReportContentDto IAnalyticsPdfService.BuildProfitPdf(ProfitAnalyticsDto data, DateTime from, DateTime to)
+        => BuildProfitPdf(data, from, to);
+
+    ReportContentDto IAnalyticsPdfService.BuildInsurancePdf(InsuranceAnalyticsDto data, DateTime from, DateTime to)
+        => BuildInsurancePdf(data, from, to);
+
+    ReportContentDto IAnalyticsPdfService.BuildCashFlowPdf(CashFlowReportDto data, DateTime from, DateTime to)
+        => BuildCashFlowPdf(data, from, to);
+
+    public ReportContentDto BuildFinancialPdf(FinancialAnalyticsDto data, DateTime from, DateTime to)
     {
-        QuestPDF.Settings.License = LicenseType.Community;
-        var document = Document.Create(container =>
+        var bytes = BuildPdf(container =>
         {
             container.Page(page =>
             {
@@ -105,16 +122,12 @@ public sealed class AnalyticsPdfService
                 page.Footer().Element(BuildFooter);
             });
         });
-
-        using var stream = new MemoryStream();
-        document.GeneratePdf(stream);
-        return stream.ToArray();
+        return new ReportContentDto(bytes, $"FinancialReport_{from:yyyyMMdd}-{to:yyyyMMdd}.pdf", "application/pdf");
     }
 
-    public byte[] BuildOperationalPdf(OperationalAnalyticsDto data, DateTime from, DateTime to)
+    public ReportContentDto BuildOperationalPdf(OperationalAnalyticsDto data, DateTime from, DateTime to)
     {
-        QuestPDF.Settings.License = LicenseType.Community;
-        var document = Document.Create(container =>
+        var bytes = BuildPdf(container =>
         {
             container.Page(page =>
             {
@@ -160,16 +173,12 @@ public sealed class AnalyticsPdfService
                 page.Footer().Element(BuildFooter);
             });
         });
-
-        using var stream = new MemoryStream();
-        document.GeneratePdf(stream);
-        return stream.ToArray();
+        return new ReportContentDto(bytes, $"OperationalReport_{from:yyyyMMdd}-{to:yyyyMMdd}.pdf", "application/pdf");
     }
 
-    public byte[] BuildStaffMachinePdf(StaffMachineAnalyticsDto data, DateTime from, DateTime to)
+    public ReportContentDto BuildStaffMachinePdf(StaffMachineAnalyticsDto data, DateTime from, DateTime to)
     {
-        QuestPDF.Settings.License = LicenseType.Community;
-        var document = Document.Create(container =>
+        var bytes = BuildPdf(container =>
         {
             container.Page(page =>
             {
@@ -254,16 +263,12 @@ public sealed class AnalyticsPdfService
                 page.Footer().Element(BuildFooter);
             });
         });
-
-        using var stream = new MemoryStream();
-        document.GeneratePdf(stream);
-        return stream.ToArray();
+        return new ReportContentDto(bytes, $"StaffReport_{from:yyyyMMdd}-{to:yyyyMMdd}.pdf", "application/pdf");
     }
 
-    public byte[] BuildProfitPdf(ProfitAnalyticsDto data, DateTime from, DateTime to)
+    public ReportContentDto BuildProfitPdf(ProfitAnalyticsDto data, DateTime from, DateTime to)
     {
-        QuestPDF.Settings.License = LicenseType.Community;
-        var document = Document.Create(container =>
+        var bytes = BuildPdf(container =>
         {
             container.Page(page =>
             {
@@ -335,16 +340,12 @@ public sealed class AnalyticsPdfService
                 page.Footer().Element(BuildFooter);
             });
         });
-
-        using var stream = new MemoryStream();
-        document.GeneratePdf(stream);
-        return stream.ToArray();
+        return new ReportContentDto(bytes, $"ProfitReport_{from:yyyyMMdd}-{to:yyyyMMdd}.pdf", "application/pdf");
     }
 
-    public byte[] BuildInsurancePdf(InsuranceAnalyticsDto data, DateTime from, DateTime to)
+    public ReportContentDto BuildInsurancePdf(InsuranceAnalyticsDto data, DateTime from, DateTime to)
     {
-        QuestPDF.Settings.License = LicenseType.Community;
-        var document = Document.Create(container =>
+        var bytes = BuildPdf(container =>
         {
             container.Page(page =>
             {
@@ -401,16 +402,12 @@ public sealed class AnalyticsPdfService
                 page.Footer().Element(BuildFooter);
             });
         });
-
-        using var stream = new MemoryStream();
-        document.GeneratePdf(stream);
-        return stream.ToArray();
+        return new ReportContentDto(bytes, $"InsuranceReport_{from:yyyyMMdd}-{to:yyyyMMdd}.pdf", "application/pdf");
     }
 
-    public byte[] BuildCashFlowPdf(CashFlowReportDto data, DateTime from, DateTime to)
+    public ReportContentDto BuildCashFlowPdf(CashFlowReportDto data, DateTime from, DateTime to)
     {
-        QuestPDF.Settings.License = LicenseType.Community;
-        var document = Document.Create(container =>
+        var bytes = BuildPdf(container =>
         {
             container.Page(page =>
             {
@@ -484,6 +481,13 @@ public sealed class AnalyticsPdfService
                 page.Footer().Element(BuildFooter);
             });
         });
+        return new ReportContentDto(bytes, $"CashFlowReport_{from:yyyyMMdd}-{to:yyyyMMdd}.pdf", "application/pdf");
+    }
+
+    private static byte[] BuildPdf(Action<IDocumentContainer> content)
+    {
+        QuestPDF.Settings.License = LicenseType.Community;
+        var document = Document.Create(content);
 
         using var stream = new MemoryStream();
         document.GeneratePdf(stream);

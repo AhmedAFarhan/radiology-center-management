@@ -140,6 +140,7 @@ builder.Services.AddScoped<RadiologyCenter.Insurance.Application.Abstractions.II
 builder.Services.AddScoped<RadiologyCenter.Cash.Application.Abstractions.ICashDirectory, CashDirectory>();
 builder.Services.AddScoped<IPaymentCashEntryRecorder, PaymentCashEntryRecorder>();
 builder.Services.AddScoped<RadiologyCenter.Examinations.Application.Reports.IAnalyticsReportService, RadiologyCenter.Examinations.Application.Reports.AnalyticsReportService>();
+builder.Services.AddScoped<RadiologyCenter.Examinations.Application.Reports.IAnalyticsPdfService, RadiologyCenter.Examinations.Infrastructure.Services.AnalyticsPdfService>();
 builder.Services.AddScoped<RadiologyCenter.Examinations.Application.Queries.ExportAnalytics.IInsuranceAnalyticsDataSource, InsuranceAnalyticsDataSource>();
 builder.Services.AddScoped<RadiologyCenter.Examinations.Application.Queries.ExportAnalytics.ICashFlowDataSource, CashFlowDataSource>();
 builder.Services.AddSingleton<RadiologyCenter.Localhost.Services.GlobalSearch.GlobalSearchService>();

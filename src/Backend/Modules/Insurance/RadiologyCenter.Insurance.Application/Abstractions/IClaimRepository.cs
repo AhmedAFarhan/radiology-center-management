@@ -6,4 +6,5 @@ public interface IClaimRepository : IBaseRepository<Claim, Guid>
 {
     Task<Claim?> GetByIdForUpdateAsync(Guid id, CancellationToken ct = default);
     Task<Claim?> GetByExaminationIdAsync(Guid examinationId, CancellationToken ct = default);
+    Task<IReadOnlyList<Claim>> GetByDateRangeAsync(DateTime from, DateTime to, CancellationToken ct = default);
 }

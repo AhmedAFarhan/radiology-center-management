@@ -49,4 +49,10 @@ public class CashSessionRepository : BaseRepository<CashSession, Guid>, ICashSes
 
         return PagedResult<CashSession>.Create(items, totalCount, request.Pagination.PageNumber, request.Pagination.PageSize);
     }
+
+    public async Task<IReadOnlyList<CashSession>> GetByDateRangeAsync(DateTime from, DateTime to, CancellationToken ct = default) =>
+        await DbSet
+            .Where(s => s.OpenedAt >= from && s.OpenedAt < to)
+            .OrderByDescending(s => s.OpenedAt)
+            .ToListAsync(ct);
 }

@@ -13,6 +13,7 @@ public static class ExportFinancialReportQueryHandler
         IExaminationTypeDirectory examinationTypeDirectory,
         ITimezoneConverter timezone,
         IAnalyticsReportService reportService,
+        IAnalyticsPdfService pdfService,
         CancellationToken ct)
     {
         var financialResult = await GetFinancialAnalyticsQueryHandler.HandleAsync(
@@ -25,7 +26,9 @@ public static class ExportFinancialReportQueryHandler
         var from = query.From ?? today.AddMonths(-1).AddDays(1).ToDateTime(TimeOnly.MinValue);
         var to = query.To ?? today.AddDays(1).ToDateTime(TimeOnly.MinValue);
 
-        var content = reportService.ExportFinancial(financialResult.Value, from, to);
+        var content = query.Format == ReportFormat.Pdf
+            ? pdfService.BuildFinancialPdf(financialResult.Value, from, to)
+            : reportService.ExportFinancial(financialResult.Value, from, to);
         return Result.Success(content);
     }
 }
