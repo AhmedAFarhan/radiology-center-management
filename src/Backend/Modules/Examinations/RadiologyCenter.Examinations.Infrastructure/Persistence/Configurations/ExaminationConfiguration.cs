@@ -42,6 +42,8 @@ public class ExaminationConfiguration : IEntityTypeConfiguration<Examination>
         builder.Property(e => e.Paid).HasPrecision(18, 2).IsRequired();
         builder.Property(e => e.Remaining).HasPrecision(18, 2).IsRequired();
 
+        builder.Property(e => e.RowVersion).IsRowVersion();
+
         builder.HasIndex(e => e.PatientId);
         builder.HasIndex(e => e.ExaminationTypeId);
         builder.HasIndex(e => e.Status);

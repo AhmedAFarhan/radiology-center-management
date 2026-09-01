@@ -3,6 +3,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using RadiologyCenter.BuildingBlocks.Infrastructure.Persistence.Interceptors;
 using RadiologyCenter.Examinations.Application.Abstractions;
+using RadiologyCenter.Examinations.Infrastructure.Adapters;
 using RadiologyCenter.Examinations.Infrastructure.Persistence;
 using RadiologyCenter.Examinations.Infrastructure.Repositories;
 
@@ -23,6 +24,7 @@ public static class ExaminationsInfrastructureRegistration
         services.AddScoped<IExaminationHistoryRepository, ExaminationHistoryRepository>();
         services.AddScoped<IExaminationTypeItemRepository, ExaminationTypeItemRepository>();
         services.AddScoped<IExaminationsUnitOfWork, ExaminationsUnitOfWork>();
+        services.AddScoped<RadiologyCenter.Payroll.Application.Abstractions.IExamFeeIncomeResolver, PayrollFeeIncomeResolver>();
 
         return services;
     }

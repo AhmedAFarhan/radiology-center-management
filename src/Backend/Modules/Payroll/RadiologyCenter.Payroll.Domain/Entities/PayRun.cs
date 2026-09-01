@@ -3,6 +3,7 @@ using RadiologyCenter.BuildingBlocks.Domain.Exceptions;
 using RadiologyCenter.BuildingBlocks.Domain.SoftDeletable;
 using RadiologyCenter.Payroll.Domain.Enumerations;
 using RadiologyCenter.Payroll.Domain.Errors;
+using RadiologyCenter.Payroll.Domain.Events;
 
 namespace RadiologyCenter.Payroll.Domain.Entities;
 
@@ -17,6 +18,7 @@ public sealed class PayRun : SoftDeletableAggregateRoot<Guid>
     public string? ProcessedBy { get; private set; }
     public DateTime? ProcessedAt { get; private set; }
     public string? Notes { get; private set; }
+    public byte[] RowVersion { get; private set; } = Array.Empty<byte>();
 
     public IReadOnlyCollection<Payslip> Payslips => _payslips.AsReadOnly();
     public IReadOnlyCollection<ReferralFeeStatement> ReferralFeeStatements => _referralFeeStatements.AsReadOnly();
@@ -95,7 +97,7 @@ public sealed class PayRun : SoftDeletableAggregateRoot<Guid>
         if (_referralFeeStatements.Any(s => s.ReferralDoctorId == referralDoctorId))
             throw new BusinessRuleViolationException(
                 nameof(AddReferralFeeStatement),
-                DomainErrors.DuplicatePayslip,
+                DomainErrors.DuplicateReferralFeeStatement,
                 "This referral doctor already has a statement in this pay run.");
 
         var statement = ReferralFeeStatement.Create(Id, referralDoctorId, totalFee, examCount);
@@ -115,6 +117,7 @@ public sealed class PayRun : SoftDeletableAggregateRoot<Guid>
         Status = PayRunStatus.Computed;
         ProcessedBy = by;
         ProcessedAt = DateTime.UtcNow;
+        RaiseDomainEvent(new PayRunComputedEvent(Id, by));
     }
 
     public void Approve(string? by = null)
@@ -123,6 +126,7 @@ public sealed class PayRun : SoftDeletableAggregateRoot<Guid>
         Status = PayRunStatus.Approved;
         ProcessedBy = by;
         ProcessedAt = DateTime.UtcNow;
+        RaiseDomainEvent(new PayRunApprovedEvent(Id, by));
     }
 
     public void Reject(string? by = null)
@@ -131,14 +135,16 @@ public sealed class PayRun : SoftDeletableAggregateRoot<Guid>
         Status = PayRunStatus.Rejected;
         ProcessedBy = by;
         ProcessedAt = DateTime.UtcNow;
+        RaiseDomainEvent(new PayRunRejectedEvent(Id, by));
     }
 
     public void Restart(string? by = null)
     {
         EnsureStatus(PayRunStatus.Rejected);
-        Status = PayRunStatus.Draft;
+        Status = PayRunStatus.Computed;
         ProcessedBy = by;
-        ProcessedAt = null;
+        ProcessedAt = DateTime.UtcNow;
+        RaiseDomainEvent(new PayRunComputedEvent(Id, by));
     }
 
     public void Pay(string? by = null)
@@ -147,6 +153,7 @@ public sealed class PayRun : SoftDeletableAggregateRoot<Guid>
         Status = PayRunStatus.Paid;
         ProcessedBy = by;
         ProcessedAt = DateTime.UtcNow;
+        RaiseDomainEvent(new PayRunPaidEvent(Id, by));
     }
 
     private void EnsureEditable()

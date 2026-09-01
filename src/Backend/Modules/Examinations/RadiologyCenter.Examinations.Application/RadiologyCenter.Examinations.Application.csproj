@@ -4,6 +4,7 @@
     <ProjectReference Include="..\RadiologyCenter.Examinations.Domain\RadiologyCenter.Examinations.Domain.csproj" />
     <ProjectReference Include="..\..\Catalog\RadiologyCenter.Catalog.Domain\RadiologyCenter.Catalog.Domain.csproj" />
     <ProjectReference Include="..\..\..\BuildingBlocks\RadiologyCenter.BuildingBlocks.Application\RadiologyCenter.BuildingBlocks.Application.csproj" />
+    <ProjectReference Include="..\..\Patients\RadiologyCenter.Patients.Application\RadiologyCenter.Patients.Application.csproj" />
   </ItemGroup>
 
   <PropertyGroup>

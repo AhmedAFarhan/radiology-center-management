@@ -24,6 +24,8 @@ public class CashSessionConfiguration : IEntityTypeConfiguration<CashSession>
         builder.Property(s => s.ClosedAt).IsRequired(false);
         builder.Property(s => s.Notes).HasMaxLength(1000);
 
+        builder.Property(s => s.RowVersion).IsRowVersion();
+
         builder.HasIndex(s => s.UserId);
         builder.HasIndex(s => s.Status);
     }

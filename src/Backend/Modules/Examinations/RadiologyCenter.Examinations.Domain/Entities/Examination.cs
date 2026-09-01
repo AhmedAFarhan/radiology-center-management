@@ -1,6 +1,6 @@
-using RadiologyCenter.BuildingBlocks.Domain.Auditing;
 using RadiologyCenter.BuildingBlocks.Domain.Common;
 using RadiologyCenter.BuildingBlocks.Domain.Exceptions;
+using RadiologyCenter.BuildingBlocks.Domain.SoftDeletable;
 using RadiologyCenter.Examinations.Domain.Common;
 using RadiologyCenter.Examinations.Domain.Enumerations;
 using RadiologyCenter.Examinations.Domain.Errors;
@@ -8,7 +8,7 @@ using RadiologyCenter.Examinations.Domain.Events;
 
 namespace RadiologyCenter.Examinations.Domain.Entities;
 
-public sealed class Examination : AuditableAggregateRoot<Guid>
+public sealed class Examination : SoftDeletableAggregateRoot<Guid>
 {
     private readonly List<ExaminationItem> _items = [];
 
@@ -36,6 +36,7 @@ public sealed class Examination : AuditableAggregateRoot<Guid>
     public string? StudyInstanceUID { get; private set; }
     public string? AccessionNumber { get; private set; }
     public DateTime? ImagesReceivedAt { get; private set; }
+    public byte[] RowVersion { get; private set; } = Array.Empty<byte>();
 
     public IReadOnlyCollection<ExaminationItem> Items => _items.AsReadOnly();
 
@@ -172,8 +173,11 @@ public sealed class Examination : AuditableAggregateRoot<Guid>
 
         if (examinationTypeId != ExaminationTypeId)
         {
+            var oldTypeId = ExaminationTypeId;
+            var itemCount = _items.Count;
             _items.Clear();
             ExaminationTypeId = examinationTypeId;
+            RaiseDomainEvent(new ExaminationTypeChangedEvent(Id, oldTypeId, examinationTypeId, itemCount));
         }
 
         Price = price;
@@ -200,16 +204,17 @@ public sealed class Examination : AuditableAggregateRoot<Guid>
             Id, PatientId, ExaminationTypeId, Priority, ScheduledAt, ClinicalIndication, RadiologistId, TechnicianId));
     }
 
-    public void Start(Guid performedByUserId)
+    public void Start(Guid performedByUserId, bool skipPaymentCheck = false)
     {
         EnsureStatus(ExaminationStatus.CheckedIn);
         Guard.AgainstEmpty(performedByUserId, nameof(performedByUserId));
-        Guard.Against(Remaining, r => r > 0, DomainErrors.OutstandingBalance, $"This examination has an outstanding balance of '{Remaining}' and cannot start until fully paid.");
+        if (!skipPaymentCheck)
+            Guard.Against(Remaining, r => r > 0, DomainErrors.OutstandingBalance, $"This examination has an outstanding balance of '{Remaining}' and cannot start until fully paid.");
 
         PerformedByUserId = performedByUserId;
         StartedAt = DateTime.UtcNow;
         Status = ExaminationStatus.InProgress;
-        RaiseDomainEvent(new ExaminationStartedEvent(Id, performedByUserId));
+        RaiseDomainEvent(new ExaminationStartedEvent(Id, PatientId, ExaminationTypeId, performedByUserId));
     }
 
     public void Complete()

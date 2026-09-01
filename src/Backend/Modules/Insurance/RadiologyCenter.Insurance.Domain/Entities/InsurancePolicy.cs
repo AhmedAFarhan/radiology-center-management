@@ -54,6 +54,8 @@ public sealed class InsurancePolicy : AuditableAggregateRoot<Guid>
         Guard.AgainstEmpty(patientId, nameof(patientId));
         Guard.AgainstNullOrWhiteSpace(policyNumber, nameof(policyNumber));
         Guard.Against(coveragePercent, p => p < 0 || p > InsurancePolicy.PercentageCap, DomainErrors.CoveragePercentRange, "Coverage percent must be between 0 and 100.");
+        if (effectiveTo.HasValue && effectiveTo.Value <= effectiveFrom)
+            throw new DomainException(DomainErrors.EffectiveToBeforeEffectiveFrom, "EffectiveTo must be after EffectiveFrom.");
 
         return new InsurancePolicy
         {
@@ -75,6 +77,8 @@ public sealed class InsurancePolicy : AuditableAggregateRoot<Guid>
             throw new BusinessRuleViolationException(nameof(UpdateCoverage), DomainErrors.UpdateExpiredPolicy, "Cannot update an expired policy.");
 
         Guard.Against(coveragePercent, p => p < 0 || p > InsurancePolicy.PercentageCap, DomainErrors.CoveragePercentRange, "Coverage percent must be between 0 and 100.");
+        if (effectiveTo.HasValue && effectiveTo.Value <= EffectiveFrom)
+            throw new DomainException(DomainErrors.EffectiveToBeforeEffectiveFrom, "EffectiveTo must be after EffectiveFrom.");
 
         CoveragePercent = coveragePercent;
         if (effectiveTo.HasValue)

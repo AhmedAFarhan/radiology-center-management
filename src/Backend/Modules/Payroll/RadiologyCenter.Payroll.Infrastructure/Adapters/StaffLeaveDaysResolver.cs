@@ -5,7 +5,7 @@ using RadiologyCenter.ResourceManagement.Application.Abstractions;
 using RadiologyCenter.ResourceManagement.Domain.Entities;
 using RadiologyCenter.ResourceManagement.Domain.Enumerations;
 
-namespace RadiologyCenter.Localhost.Extensions;
+namespace RadiologyCenter.Payroll.Infrastructure.Adapters;
 
 public class StaffLeaveDaysResolver : IStaffLeaveResolver
 {

@@ -3,6 +3,7 @@
   <ItemGroup>
     <ProjectReference Include="..\RadiologyCenter.Examinations.Application\RadiologyCenter.Examinations.Application.csproj" />
     <ProjectReference Include="..\..\..\BuildingBlocks\RadiologyCenter.BuildingBlocks.Infrastructure\RadiologyCenter.BuildingBlocks.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\Payroll\RadiologyCenter.Payroll.Application\RadiologyCenter.Payroll.Application.csproj" />
   </ItemGroup>
 
   <PropertyGroup>

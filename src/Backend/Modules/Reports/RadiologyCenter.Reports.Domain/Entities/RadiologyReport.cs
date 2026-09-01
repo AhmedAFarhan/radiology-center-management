@@ -136,7 +136,7 @@ public sealed class RadiologyReport : AuditableAggregateRoot<Guid>
         var amendment = ReportVersion.Create(Id, nextNumber, reason);
         foreach (var section in source.Sections)
         {
-            amendment.AddSection(section.SectionType, section.Title, section.Body, section.Position, section.IsLocked);
+            amendment.AddSection(section.SectionType, section.Title, section.Body, section.Position, isLocked: false);
         }
         foreach (var finding in source.Findings)
         {

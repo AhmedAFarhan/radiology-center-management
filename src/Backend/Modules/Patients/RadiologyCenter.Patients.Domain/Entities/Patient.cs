@@ -1,3 +1,4 @@
+using System.Text.RegularExpressions;
 using RadiologyCenter.BuildingBlocks.Domain.Common;
 using RadiologyCenter.BuildingBlocks.Domain.Exceptions;
 using RadiologyCenter.BuildingBlocks.Domain.SoftDeletable;
@@ -57,6 +58,7 @@ public sealed class Patient : SoftDeletableAggregateRoot<Guid>
         Guard.AgainstNullOrWhiteSpace(phoneNumber, nameof(phoneNumber));
         Guard.AgainstNull(gender, nameof(gender));
         ValidateBirthDetails(dateOfBirth, age);
+        ValidateContactInfo(phoneNumber, email);
 
         var (firstName, middleName, lastName) = PersonName.Split(fullName);
 
@@ -100,6 +102,7 @@ public sealed class Patient : SoftDeletableAggregateRoot<Guid>
         Guard.AgainstNullOrWhiteSpace(phoneNumber, nameof(phoneNumber));
         Guard.AgainstNull(gender, nameof(gender));
         ValidateBirthDetails(dateOfBirth, age);
+        ValidateContactInfo(phoneNumber, email);
 
         var (firstName, middleName, lastName) = PersonName.Split(fullName);
 
@@ -137,6 +140,9 @@ public sealed class Patient : SoftDeletableAggregateRoot<Guid>
         Age = dateOfBirth.HasValue ? CalculateAge(dateOfBirth.Value) : age;
     }
 
+    private static readonly Regex PhoneRegex = new(@"^\+?[\d\s\-()]{7,20}$", RegexOptions.Compiled);
+    private static readonly Regex EmailRegex = new(@"^[^@\s]+@[^@\s]+\.[^@\s]+$", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+
     private static void ValidateBirthDetails(DateTime? dateOfBirth, int? age)
     {
         if (dateOfBirth is null && age is null)
@@ -147,6 +153,15 @@ public sealed class Patient : SoftDeletableAggregateRoot<Guid>
 
         if (age is not null)
             Guard.Against(age.Value, a => a is < 0 or > 150, DomainErrors.AgeOutOfRange, "Age must be between 0 and 150.");
+    }
+
+    private static void ValidateContactInfo(string phoneNumber, string? email)
+    {
+        if (!PhoneRegex.IsMatch(phoneNumber))
+            throw new DomainException(DomainErrors.InvalidPhoneNumber, "Phone number format is invalid.");
+
+        if (!string.IsNullOrWhiteSpace(email) && !EmailRegex.IsMatch(email))
+            throw new DomainException(DomainErrors.InvalidEmail, "Email format is invalid.");
     }
 
     private static int CalculateAge(DateTime dateOfBirth)

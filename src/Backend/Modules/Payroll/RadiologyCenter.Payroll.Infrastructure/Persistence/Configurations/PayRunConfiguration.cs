@@ -23,6 +23,8 @@ public class PayRunConfiguration : IEntityTypeConfiguration<PayRun>
         builder.Property(p => p.ProcessedAt).IsRequired(false);
         builder.Property(p => p.Notes).HasMaxLength(1000).IsRequired(false);
 
+        builder.Property(p => p.RowVersion).IsRowVersion();
+
         builder.HasMany(p => p.Payslips)
             .WithOne()
             .HasForeignKey(ps => ps.PayRunId)

@@ -1,7 +1,7 @@
 using RadiologyCenter.Payroll.Application.Abstractions;
 using RadiologyCenter.ResourceManagement.Application.Abstractions;
 
-namespace RadiologyCenter.Localhost.Extensions;
+namespace RadiologyCenter.Payroll.Infrastructure.Adapters;
 
 public class ReferralDoctorDirectory : IReferralDoctorDirectory
 {

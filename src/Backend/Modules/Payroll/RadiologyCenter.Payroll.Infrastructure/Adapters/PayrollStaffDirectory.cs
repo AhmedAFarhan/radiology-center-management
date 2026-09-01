@@ -1,9 +1,8 @@
-using RadiologyCenter.BuildingBlocks.Domain.Specifications;
 using RadiologyCenter.Payroll.Application.Abstractions;
 using RadiologyCenter.ResourceManagement.Application.Abstractions;
 using RadiologyCenter.ResourceManagement.Domain.Entities;
 
-namespace RadiologyCenter.Localhost.Extensions;
+namespace RadiologyCenter.Payroll.Infrastructure.Adapters;
 
 public class PayrollStaffDirectory : IPayrollStaffDirectory
 {
@@ -16,7 +15,7 @@ public class PayrollStaffDirectory : IPayrollStaffDirectory
 
     public async Task<IReadOnlyList<Guid>> GetActiveStaffIdsAsync(CancellationToken ct = default)
     {
-        var spec = new DynamicSpecification<Staff>(staff => staff.IsActive);
+        var spec = new BuildingBlocks.Domain.Specifications.DynamicSpecification<Staff>(staff => staff.IsActive);
         var staff = await _staffRepository.FindAsync(spec, ct);
         return staff.Select(s => s.Id).ToList();
     }

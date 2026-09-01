@@ -10,4 +10,6 @@ public static class DomainErrors
     public const string DobOrAgeRequired = "Patient.DobOrAgeRequired";
     public const string DateOfBirthFuture = "Patient.DateOfBirthFuture";
     public const string AgeOutOfRange = "Patient.AgeOutOfRange";
+    public const string InvalidPhoneNumber = "Patient.InvalidPhoneNumber";
+    public const string InvalidEmail = "Patient.InvalidEmail";
 }

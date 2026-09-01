@@ -9,4 +9,8 @@ public static class DomainErrors
 {
     public const string EndDateBeforeStartDate = "Leave.EndDateBeforeStartDate";
     public const string StartTimeBeforeEndTime = "WorkShift.StartTimeBeforeEndTime";
+    public const string StaffNotActive = "Staff.StaffNotActive";
+    public const string EquipmentNotOperational = "Equipment.EquipmentNotOperational";
+    public const string DuplicateWorkShift = "WorkShift.DuplicateWorkShift";
+    public const string LeaveOverlap = "Leave.LeaveOverlap";
 }

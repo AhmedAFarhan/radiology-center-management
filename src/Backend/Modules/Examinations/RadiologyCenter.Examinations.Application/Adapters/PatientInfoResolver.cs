@@ -1,7 +1,7 @@
 using RadiologyCenter.Examinations.Application.Abstractions;
 using RadiologyCenter.Patients.Application.Abstractions;
 
-namespace RadiologyCenter.Localhost.Extensions;
+namespace RadiologyCenter.Examinations.Application.Adapters;
 
 public sealed class PatientInfoResolver : IPatientInfoResolver
 {

@@ -27,4 +27,5 @@ public static class DomainErrors
     public const string DocumentsRequestedOnly = "Insurance.DocumentsRequestedOnly";
     public const string GovernmentDocRequired = "Insurance.GovernmentDocRequired";
     public const string PreAuthorizationAlreadyDecided = "Insurance.PreAuthorizationAlreadyDecided";
+    public const string EffectiveToBeforeEffectiveFrom = "Insurance.EffectiveToBeforeEffectiveFrom";
 }

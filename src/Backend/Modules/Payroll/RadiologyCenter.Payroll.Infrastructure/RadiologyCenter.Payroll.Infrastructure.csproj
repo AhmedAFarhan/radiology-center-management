@@ -4,6 +4,8 @@
     <ProjectReference Include="..\RadiologyCenter.Payroll.Application\RadiologyCenter.Payroll.Application.csproj" />
     <ProjectReference Include="..\..\..\BuildingBlocks\RadiologyCenter.BuildingBlocks.Infrastructure\RadiologyCenter.BuildingBlocks.Infrastructure.csproj" />
     <ProjectReference Include="..\..\ResourceManagement\RadiologyCenter.ResourceManagement.Application\RadiologyCenter.ResourceManagement.Application.csproj" />
+    <ProjectReference Include="..\..\Examinations\RadiologyCenter.Examinations.Application\RadiologyCenter.Examinations.Application.csproj" />
+    <ProjectReference Include="..\..\Catalog\RadiologyCenter.Catalog.Application\RadiologyCenter.Catalog.Application.csproj" />
   </ItemGroup>
 
   <ItemGroup>

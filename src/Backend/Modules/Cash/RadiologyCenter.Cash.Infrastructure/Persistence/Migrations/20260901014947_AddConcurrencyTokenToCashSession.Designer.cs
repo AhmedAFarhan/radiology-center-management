@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using RadiologyCenter.Cash.Infrastructure.Persistence;
 
@@ -11,9 +12,11 @@ using RadiologyCenter.Cash.Infrastructure.Persistence;
 namespace RadiologyCenter.Cash.Infrastructure.Persistence.Migrations
 {
     [DbContext(typeof(CashDbContext))]
-    partial class CashDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260901014947_AddConcurrencyTokenToCashSession")]
+    partial class AddConcurrencyTokenToCashSession
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

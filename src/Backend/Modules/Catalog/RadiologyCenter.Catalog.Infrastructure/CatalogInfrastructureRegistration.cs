@@ -3,6 +3,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using RadiologyCenter.BuildingBlocks.Infrastructure.Persistence.Interceptors;
 using RadiologyCenter.Catalog.Application.Abstractions;
+using RadiologyCenter.Catalog.Application.Adapters;
 using RadiologyCenter.Catalog.Infrastructure.Persistence;
 using RadiologyCenter.Catalog.Infrastructure.Repositories;
 
@@ -21,6 +22,7 @@ public static class CatalogInfrastructureRegistration
 
         services.AddScoped<IExaminationTypeRepository, ExaminationTypeRepository>();
         services.AddScoped<ICatalogUnitOfWork, CatalogUnitOfWork>();
+        services.AddScoped<IExaminationTypeUsageChecker, ExaminationTypeUsageChecker>();
 
         return services;
     }

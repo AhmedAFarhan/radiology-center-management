@@ -3,7 +3,7 @@ using RadiologyCenter.Examinations.Application.Abstractions;
 using RadiologyCenter.Examinations.Domain.Entities;
 using RadiologyCenter.Payroll.Application.Abstractions;
 
-namespace RadiologyCenter.Localhost.Extensions;
+namespace RadiologyCenter.Examinations.Infrastructure.Adapters;
 
 public class PayrollFeeIncomeResolver : IExamFeeIncomeResolver
 {

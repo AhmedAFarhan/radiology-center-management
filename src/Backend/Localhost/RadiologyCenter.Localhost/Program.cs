@@ -130,24 +130,16 @@ builder.Services.AddNotificationApplication();
 builder.Services.AddNotificationInfrastructure(builder.Configuration);
 builder.Services.AddScoped<IItemSnapshotResolver, ItemSnapshotResolver>();
 builder.Services.AddScoped<IExaminationFeeResolver, ExaminationFeeResolver>();
-builder.Services.AddScoped<RadiologyCenter.Payroll.Application.Abstractions.IPayrollStaffDirectory, PayrollStaffDirectory>();
-builder.Services.AddScoped<RadiologyCenter.Payroll.Application.Abstractions.IExaminationTypeDirectory, ExaminationTypeDirectory>();
-builder.Services.AddScoped<RadiologyCenter.Payroll.Application.Abstractions.IReferralDoctorDirectory, ReferralDoctorDirectory>();
-builder.Services.AddScoped<RadiologyCenter.Payroll.Application.Abstractions.IExamFeeIncomeResolver, PayrollFeeIncomeResolver>();
 builder.Services.AddScoped<RadiologyCenter.Payroll.Application.Abstractions.IReferralFeeStatementResolver, ReferralFeeStatementResolver>();
 builder.Services.AddScoped<RadiologyCenter.Payroll.Application.Abstractions.IReferralFeeStatementCalculator, RadiologyCenter.Payroll.Application.Services.ReferralFeeStatementCalculator>();
-builder.Services.AddScoped<RadiologyCenter.Payroll.Application.Abstractions.IStaffLeaveResolver, StaffLeaveDaysResolver>();
-builder.Services.AddScoped<RadiologyCenter.Payroll.Application.Abstractions.IStaffWorkHoursResolver, StaffWorkHoursResolver>();
 builder.Services.AddScoped<RadiologyCenter.Examinations.Application.Abstractions.IAncillaryDirectory, AncillaryDirectory>();
 builder.Services.AddScoped<RadiologyCenter.Examinations.Application.Abstractions.IExaminationTypeDirectory, ExaminationTypeInfoDirectory>();
-builder.Services.AddScoped<RadiologyCenter.Catalog.Application.Abstractions.IExaminationTypeUsageChecker, ExaminationTypeUsageChecker>();
 builder.Services.AddScoped<RadiologyCenter.Examinations.Application.Abstractions.IProfitSourceResolver, ProfitSourceResolver>();
-builder.Services.AddScoped<RadiologyCenter.Examinations.Application.Abstractions.IPatientInfoResolver, PatientInfoResolver>();
 builder.Services.AddScoped<RadiologyCenter.Reports.Application.Abstractions.IReportDirectory, ReportDirectory>();
 builder.Services.AddScoped<RadiologyCenter.Insurance.Application.Abstractions.IInsuranceDirectory, InsuranceDirectory>();
 builder.Services.AddScoped<RadiologyCenter.Cash.Application.Abstractions.ICashDirectory, CashDirectory>();
-        builder.Services.AddScoped<IPaymentCashEntryRecorder, PaymentCashEntryRecorder>();
-        builder.Services.AddSingleton<RadiologyCenter.Localhost.Services.GlobalSearch.GlobalSearchService>();
+builder.Services.AddScoped<IPaymentCashEntryRecorder, PaymentCashEntryRecorder>();
+builder.Services.AddSingleton<RadiologyCenter.Localhost.Services.GlobalSearch.GlobalSearchService>();
 
 var app = builder.Build();
 

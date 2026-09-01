@@ -1,7 +1,7 @@
 using RadiologyCenter.Catalog.Application.Abstractions;
 using RadiologyCenter.Examinations.Application.Abstractions;
 
-namespace RadiologyCenter.Localhost.Extensions;
+namespace RadiologyCenter.Catalog.Application.Adapters;
 
 public class ExaminationTypeUsageChecker : IExaminationTypeUsageChecker
 {

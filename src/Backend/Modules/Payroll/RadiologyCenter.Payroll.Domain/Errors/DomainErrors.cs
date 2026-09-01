@@ -23,4 +23,5 @@ public static class DomainErrors
     public const string ReferralFeeNegative = "Payroll.ReferralFeeNegative";
     public const string BaseSalaryNegative = "Payroll.BaseSalaryNegative";
     public const string DefaultValueNegative = "Payroll.DefaultValueNegative";
+    public const string DuplicateReferralFeeStatement = "Payroll.DuplicateReferralFeeStatement";
 }

@@ -3,14 +3,13 @@ using RadiologyCenter.Payroll.Application.Abstractions;
 using RadiologyCenter.ResourceManagement.Application.Abstractions;
 using RadiologyCenter.ResourceManagement.Domain.Entities;
 
-namespace RadiologyCenter.Localhost.Extensions;
+namespace RadiologyCenter.Payroll.Infrastructure.Adapters;
 
 public class StaffWorkHoursResolver : IStaffWorkHoursResolver
 {
     private readonly IWorkShiftRepository _workShiftRepository;
 
-    public StaffWorkHoursResolver(IWorkShiftRepository workShiftRepository)
-        => _workShiftRepository = workShiftRepository;
+    public StaffWorkHoursResolver(IWorkShiftRepository workShiftRepository) => _workShiftRepository = workShiftRepository;
 
     public async Task<decimal> GetWorkedHoursAsync(Guid staffId, DateTime from, DateTime to, CancellationToken ct = default)
     {

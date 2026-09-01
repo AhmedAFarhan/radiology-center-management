@@ -3,6 +3,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using RadiologyCenter.BuildingBlocks.Infrastructure.Persistence.Interceptors;
 using RadiologyCenter.Payroll.Application.Abstractions;
+using RadiologyCenter.Payroll.Infrastructure.Adapters;
 using RadiologyCenter.Payroll.Infrastructure.Persistence;
 using RadiologyCenter.Payroll.Infrastructure.Repositories;
 using RadiologyCenter.Payroll.Infrastructure.Services;
@@ -29,6 +30,12 @@ public static class PayrollInfrastructureRegistration
         services.AddScoped<IPayrollUnitOfWork, PayrollUnitOfWork>();
         services.AddScoped<IPayslipPdfService, PayslipPdfService>();
         services.AddScoped<IReferralFeeStatementPdfService, ReferralFeeStatementPdfService>();
+
+        services.AddScoped<IPayrollStaffDirectory, PayrollStaffDirectory>();
+        services.AddScoped<IReferralDoctorDirectory, ReferralDoctorDirectory>();
+        services.AddScoped<IStaffLeaveResolver, StaffLeaveDaysResolver>();
+        services.AddScoped<IStaffWorkHoursResolver, StaffWorkHoursResolver>();
+        services.AddScoped<IExaminationTypeDirectory, ExaminationTypeDirectory>();
 
         return services;
     }
