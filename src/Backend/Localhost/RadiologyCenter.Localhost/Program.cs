@@ -79,6 +79,12 @@ builder.Services.Configure<RequestLocalizationOptions>(options =>
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddHealthChecks();
+builder.Services.AddOpenApiDocument(options =>
+{
+    options.DocumentName = "v1";
+    options.Title = "Radiology Center API";
+    options.Version = "v1";
+});
 builder.Services.AddSwaggerGen(options =>
 {
     options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
@@ -187,6 +193,7 @@ app.UseMiddleware<ExceptionMiddleware>();
 
 if (app.Environment.IsDevelopment())
 {
+    app.UseOpenApi();
     app.UseSwagger();
     app.UseSwaggerUI();
 }

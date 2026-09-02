@@ -12,10 +12,20 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
     <PackageReference Include="Swashbuckle.AspNetCore" Version="7.3.1" />
+    <PackageReference Include="NSwag.MSBuild" Version="14.4.0" />
+    <PackageReference Include="NSwag.AspNetCore" Version="14.4.0" />
     <PackageReference Include="WolverineFx.RuntimeCompilation" Version="6.24.0" />
   </ItemGroup>
 
-  <ItemGroup>
+  <Target Name="NSwag" AfterTargets="Build">
+    <PropertyGroup>
+      <_NSwagExe>dotnet &quot;$(NuGetPackageRoot)nswag.msbuild\14.4.0\tools\Net90\dotnet-nswag.dll&quot;</_NSwagExe>
+      <_SwaggerJson>GeneratedClients/swagger.json</_SwaggerJson>
+    </PropertyGroup>
+    <MakeDir Directories="GeneratedClients" />
+    <Exec Command="$(_NSwagExe) aspnetcore2openapi /Project:RadiologyCenter.Localhost.csproj /Output:$(_SwaggerJson) /NoBuild:true" Condition="Exists('bin/$(Configuration)/net10.0/RadiologyCenter.Localhost.dll')" />
+    <Exec Command="$(_NSwagExe) openapi2csclient /Input:$(_SwaggerJson) /Output:GeneratedClients/ApiClient.cs /Namespace:RadiologyCenter.Localhost.GeneratedClients /GenerateClientInterfaces:true /UseBaseUrl:true /GenerateExceptionClasses:true" Condition="Exists('$(_SwaggerJson)')" />
+  </Target>  <ItemGroup>
     <Content Update="Resources\*.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
