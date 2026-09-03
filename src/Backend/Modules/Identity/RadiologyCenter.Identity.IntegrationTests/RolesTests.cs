@@ -7,7 +7,7 @@ namespace Tests;
 
 public class RolesTests : TestBase
 {
-    private const string BaseUrl = "api/roles";
+    private const string RolesUrl = "api/roles";
 
     public RolesTests(CustomWebApplicationFactory factory) : base(factory) { }
 
@@ -15,7 +15,7 @@ public class RolesTests : TestBase
     public async Task GetById_ExistingRole_ReturnsOk()
     {
         var roleId = await CreateTestRoleAsync();
-        var response = await Client.GetAsync($"{BaseUrl}/{roleId}");
+        var response = await Client.GetAsync($"{RolesUrl}/{roleId}");
         response.StatusCode.Should().Be(HttpStatusCode.OK);
         var body = await response.Content.ReadFromJsonAsync<ApiResponse<RoleDto>>();
         body!.Success.Should().BeTrue();
@@ -26,14 +26,14 @@ public class RolesTests : TestBase
     public async Task GetById_NonexistentRole_ReturnsNotFound()
     {
         var fakeId = Guid.NewGuid();
-        var response = await Client.GetAsync($"{BaseUrl}/{fakeId}");
+        var response = await Client.GetAsync($"{RolesUrl}/{fakeId}");
         response.StatusCode.Should().Be(HttpStatusCode.NotFound);
     }
 
     [Fact]
     public async Task GetById_InvalidGuid_ReturnsBadRequest()
     {
-        var response = await Client.GetAsync($"{BaseUrl}/not-a-guid");
+        var response = await Client.GetAsync($"{RolesUrl}/not-a-guid");
         response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
     }
 
@@ -41,7 +41,7 @@ public class RolesTests : TestBase
     public async Task GetAll_ReturnsPagedResult()
     {
         var request = new { PageNumber = 1, PageSize = 10 };
-        var response = await Client.PostAsJsonAsync($"{BaseUrl}/all", request);
+        var response = await Client.PostAsJsonAsync($"{RolesUrl}/all", request);
         response.StatusCode.Should().Be(HttpStatusCode.OK);
         var body = await response.Content.ReadFromJsonAsync<ApiResponse<PagedResultDto<RoleDto>>>();
         body!.Success.Should().BeTrue();
@@ -52,7 +52,7 @@ public class RolesTests : TestBase
     public async Task Create_ValidRole_ReturnsOk()
     {
         var command = new { Name = $"TestRole_{Guid.NewGuid():N}", Description = "A test role" };
-        var response = await Client.PostAsJsonAsync(BaseUrl, command);
+        var response = await Client.PostAsJsonAsync(RolesUrl, command);
         response.StatusCode.Should().Be(HttpStatusCode.OK);
         var body = await response.Content.ReadFromJsonAsync<ApiResponse>();
         body!.Success.Should().BeTrue();
@@ -62,8 +62,8 @@ public class RolesTests : TestBase
     public async Task Create_DuplicateName_ReturnsConflict()
     {
         var name = $"DupRole_{Guid.NewGuid():N}";
-        await Client.PostAsJsonAsync(BaseUrl, new { Name = name, Description = (string?)null });
-        var response = await Client.PostAsJsonAsync(BaseUrl, new { Name = name, Description = (string?)null });
+        await Client.PostAsJsonAsync(RolesUrl, new { Name = name, Description = (string?)null });
+        var response = await Client.PostAsJsonAsync(RolesUrl, new { Name = name, Description = (string?)null });
         response.StatusCode.Should().Be(HttpStatusCode.Conflict);
     }
 
@@ -71,7 +71,7 @@ public class RolesTests : TestBase
     public async Task Create_EmptyName_ReturnsBadRequest()
     {
         var command = new { Name = "", Description = (string?)null };
-        var response = await Client.PostAsJsonAsync(BaseUrl, command);
+        var response = await Client.PostAsJsonAsync(RolesUrl, command);
         response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
     }
 
@@ -79,7 +79,7 @@ public class RolesTests : TestBase
     public async Task Create_NameTooLong_ReturnsBadRequest()
     {
         var command = new { Name = new string('A', 101), Description = (string?)null };
-        var response = await Client.PostAsJsonAsync(BaseUrl, command);
+        var response = await Client.PostAsJsonAsync(RolesUrl, command);
         response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
     }
 
@@ -88,7 +88,7 @@ public class RolesTests : TestBase
     {
         var roleId = await CreateTestRoleAsync();
         var command = new { RoleId = roleId, Name = $"Updated_{Guid.NewGuid():N}", Description = "Updated desc" };
-        var response = await Client.PutAsJsonAsync($"{BaseUrl}/{roleId}", command);
+        var response = await Client.PutAsJsonAsync($"{RolesUrl}/{roleId}", command);
         response.StatusCode.Should().Be(HttpStatusCode.OK);
     }
 
@@ -97,7 +97,7 @@ public class RolesTests : TestBase
     {
         var fakeId = Guid.NewGuid();
         var command = new { RoleId = fakeId, Name = "Updated", Description = (string?)null };
-        var response = await Client.PutAsJsonAsync($"{BaseUrl}/{fakeId}", command);
+        var response = await Client.PutAsJsonAsync($"{RolesUrl}/{fakeId}", command);
         response.StatusCode.Should().Be(HttpStatusCode.NotFound);
     }
 
@@ -106,15 +106,16 @@ public class RolesTests : TestBase
     {
         var name1 = $"Role1_{Guid.NewGuid():N}";
         var name2 = $"Role2_{Guid.NewGuid():N}";
-        await Client.PostAsJsonAsync(BaseUrl, new { Name = name1, Description = (string?)null });
-        var role2Response = await Client.PostAsJsonAsync(BaseUrl, new { Name = name2, Description = (string?)null });
-        var role2Body = await role2Response.Content.ReadFromJsonAsync<ApiResponse>();
-        var allResponse = await Client.PostAsJsonAsync($"{BaseUrl}/all", new { PageNumber = 1, PageSize = 100 });
+        await Client.PostAsJsonAsync(RolesUrl, new { Name = name1, Description = (string?)null });
+        var role2Response = await Client.PostAsJsonAsync(RolesUrl, new { Name = name2, Description = (string?)null });
+        role2Response.StatusCode.Should().Be(HttpStatusCode.OK);
+        var allResponse = await Client.PostAsJsonAsync($"{RolesUrl}/all", new { PageNumber = 1, PageSize = 100, SearchTerm = name2 });
+        allResponse.StatusCode.Should().Be(HttpStatusCode.OK);
         var allBody = await allResponse.Content.ReadFromJsonAsync<ApiResponse<PagedResultDto<RoleDto>>>();
-        var roleId2 = allBody!.Data!.Items.First(r => r.Name == name2).Id;
+        var roleId2 = allBody!.Data!.Items.Single(r => r.Name == name2).Id;
 
         var command = new { RoleId = roleId2, Name = name1, Description = (string?)null };
-        var response = await Client.PutAsJsonAsync($"{BaseUrl}/{roleId2}", command);
+        var response = await Client.PutAsJsonAsync($"{RolesUrl}/{roleId2}", command);
         response.StatusCode.Should().Be(HttpStatusCode.Conflict);
     }
 
@@ -122,13 +123,15 @@ public class RolesTests : TestBase
     public async Task Update_SameName_NoConflict()
     {
         var name = $"SameName_{Guid.NewGuid():N}";
-        await Client.PostAsJsonAsync(BaseUrl, new { Name = name, Description = "desc" });
-        var allResponse = await Client.PostAsJsonAsync($"{BaseUrl}/all", new { PageNumber = 1, PageSize = 100 });
+        var createResponse = await Client.PostAsJsonAsync(RolesUrl, new { Name = name, Description = "desc" });
+        createResponse.StatusCode.Should().Be(HttpStatusCode.OK);
+        var allResponse = await Client.PostAsJsonAsync($"{RolesUrl}/all", new { PageNumber = 1, PageSize = 100, SearchTerm = name });
+        allResponse.StatusCode.Should().Be(HttpStatusCode.OK);
         var allBody = await allResponse.Content.ReadFromJsonAsync<ApiResponse<PagedResultDto<RoleDto>>>();
-        var roleId = allBody!.Data!.Items.First(r => r.Name == name).Id;
+        var roleId = allBody!.Data!.Items.Single(r => r.Name == name).Id;
 
         var command = new { RoleId = roleId, Name = name, Description = "updated" };
-        var response = await Client.PutAsJsonAsync($"{BaseUrl}/{roleId}", command);
+        var response = await Client.PutAsJsonAsync($"{RolesUrl}/{roleId}", command);
         response.StatusCode.Should().Be(HttpStatusCode.OK);
     }
 
@@ -137,7 +140,7 @@ public class RolesTests : TestBase
     {
         var roleId = await CreateTestRoleAsync();
         var command = new { PermissionCode = "users.read" };
-        var response = await Client.PostAsJsonAsync($"{BaseUrl}/{roleId}/permissions", command);
+        var response = await Client.PostAsJsonAsync($"{RolesUrl}/{roleId}/permissions", command);
         response.StatusCode.Should().Be(HttpStatusCode.OK);
     }
 
@@ -146,7 +149,7 @@ public class RolesTests : TestBase
     {
         var fakeId = Guid.NewGuid();
         var command = new { PermissionCode = "users.read" };
-        var response = await Client.PostAsJsonAsync($"{BaseUrl}/{fakeId}/permissions", command);
+        var response = await Client.PostAsJsonAsync($"{RolesUrl}/{fakeId}/permissions", command);
         response.StatusCode.Should().Be(HttpStatusCode.NotFound);
     }
 
@@ -155,7 +158,7 @@ public class RolesTests : TestBase
     {
         var roleId = await CreateTestRoleAsync();
         var command = new { PermissionCode = "nonexistent.permission" };
-        var response = await Client.PostAsJsonAsync($"{BaseUrl}/{roleId}/permissions", command);
+        var response = await Client.PostAsJsonAsync($"{RolesUrl}/{roleId}/permissions", command);
         response.StatusCode.Should().Be(HttpStatusCode.NotFound);
     }
 
@@ -164,7 +167,7 @@ public class RolesTests : TestBase
     {
         var roleId = await CreateTestRoleAsync();
         var command = new { PermissionCode = "" };
-        var response = await Client.PostAsJsonAsync($"{BaseUrl}/{roleId}/permissions", command);
+        var response = await Client.PostAsJsonAsync($"{RolesUrl}/{roleId}/permissions", command);
         response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
     }
 
@@ -172,8 +175,8 @@ public class RolesTests : TestBase
     public async Task RemovePermission_ExistingPermission_ReturnsOk()
     {
         var roleId = await CreateTestRoleAsync();
-        await Client.PostAsJsonAsync($"{BaseUrl}/{roleId}/permissions", new { PermissionCode = "users.read" });
-        var response = await Client.DeleteAsync($"{BaseUrl}/{roleId}/permissions/users.read");
+        await Client.PostAsJsonAsync($"{RolesUrl}/{roleId}/permissions", new { PermissionCode = "users.read" });
+        var response = await Client.DeleteAsync($"{RolesUrl}/{roleId}/permissions/users.read");
         response.StatusCode.Should().Be(HttpStatusCode.OK);
     }
 
@@ -181,7 +184,7 @@ public class RolesTests : TestBase
     public async Task RemovePermission_NonexistentRole_ReturnsNotFound()
     {
         var fakeId = Guid.NewGuid();
-        var response = await Client.DeleteAsync($"{BaseUrl}/{fakeId}/permissions/users.read");
+        var response = await Client.DeleteAsync($"{RolesUrl}/{fakeId}/permissions/users.read");
         response.StatusCode.Should().Be(HttpStatusCode.NotFound);
     }
 
@@ -189,7 +192,7 @@ public class RolesTests : TestBase
     public async Task RemovePermission_InvalidPermissionCode_ReturnsNotFound()
     {
         var roleId = await CreateTestRoleAsync();
-        var response = await Client.DeleteAsync($"{BaseUrl}/{roleId}/permissions/nonexistent.permission");
+        var response = await Client.DeleteAsync($"{RolesUrl}/{roleId}/permissions/nonexistent.permission");
         response.StatusCode.Should().Be(HttpStatusCode.NotFound);
     }
 
@@ -197,19 +200,21 @@ public class RolesTests : TestBase
     public async Task AddPermission_DuplicatePermission_NoError()
     {
         var roleId = await CreateTestRoleAsync();
-        await Client.PostAsJsonAsync($"{BaseUrl}/{roleId}/permissions", new { PermissionCode = "users.read" });
-        var response = await Client.PostAsJsonAsync($"{BaseUrl}/{roleId}/permissions", new { PermissionCode = "users.read" });
+        await Client.PostAsJsonAsync($"{RolesUrl}/{roleId}/permissions", new { PermissionCode = "users.read" });
+        var response = await Client.PostAsJsonAsync($"{RolesUrl}/{roleId}/permissions", new { PermissionCode = "users.read" });
         response.StatusCode.Should().Be(HttpStatusCode.OK);
     }
 
     private async Task<Guid> CreateTestRoleAsync()
     {
         var command = new { Name = $"TestRole_{Guid.NewGuid():N}", Description = "Test role" };
-        await Client.PostAsJsonAsync(BaseUrl, command);
-        var allResponse = await Client.PostAsJsonAsync($"{BaseUrl}/all", new { PageNumber = 1, PageSize = 1 });
-        allResponse.EnsureSuccessStatusCode();
+        var createResponse = await Client.PostAsJsonAsync(RolesUrl, command);
+        createResponse.StatusCode.Should().Be(HttpStatusCode.OK);
+
+        var allResponse = await Client.PostAsJsonAsync($"{RolesUrl}/all", new { PageNumber = 1, PageSize = 10, SearchTerm = command.Name });
+        allResponse.StatusCode.Should().Be(HttpStatusCode.OK);
         var allBody = await allResponse.Content.ReadFromJsonAsync<ApiResponse<PagedResultDto<RoleDto>>>();
-        return allBody!.Data!.Items.First().Id;
+        return allBody!.Data!.Items.Single(r => r.Name == command.Name).Id;
     }
 
     private sealed class ApiResponse

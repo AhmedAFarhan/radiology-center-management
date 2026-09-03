@@ -689,12 +689,13 @@ public class ResourceManagementTests : TestBase
             HireDate = DateTime.UtcNow.Date.AddDays(-5)
         };
         var response = await Client.PostAsJsonAsync(StaffBaseUrl, command);
-        response.EnsureSuccessStatusCode();
-        var allResponse = await Client.PostAsJsonAsync($"{StaffBaseUrl}/all",
-            new { Pagination = new { PageNumber = 1, PageSize = 1 }, SearchTerm = command.FullName });
-        allResponse.EnsureSuccessStatusCode();
-        var allBody = await allResponse.Content.ReadFromJsonAsync<ApiResponse<PagedResultDto<StaffDto>>>();
-        return allBody!.Data!.Items.First().Id;
+        if (response.StatusCode != HttpStatusCode.OK)
+        {
+            var errorBody = await response.Content.ReadAsStringAsync();
+            throw new InvalidOperationException($"Expected OK but got {response.StatusCode}: {errorBody}");
+        }
+        var result = await response.Content.ReadFromJsonAsync<ApiResponse<StaffDto>>();
+        return result!.Data!.Id;
     }
 
     private async Task<Guid> CreateTestEquipmentAsync()
@@ -706,12 +707,13 @@ public class ResourceManagementTests : TestBase
             SerialNumber = $"SN-{Guid.NewGuid():N}"
         };
         var response = await Client.PostAsJsonAsync(EquipmentBaseUrl, command);
-        response.EnsureSuccessStatusCode();
-        var allResponse = await Client.PostAsJsonAsync($"{EquipmentBaseUrl}/all",
-            new { Pagination = new { PageNumber = 1, PageSize = 1 }, SearchTerm = command.Name });
-        allResponse.EnsureSuccessStatusCode();
-        var allBody = await allResponse.Content.ReadFromJsonAsync<ApiResponse<PagedResultDto<EquipmentDto>>>();
-        return allBody!.Data!.Items.First().Id;
+        if (response.StatusCode != HttpStatusCode.OK)
+        {
+            var errorBody = await response.Content.ReadAsStringAsync();
+            throw new InvalidOperationException($"Expected OK but got {response.StatusCode}: {errorBody}");
+        }
+        var result = await response.Content.ReadFromJsonAsync<ApiResponse<EquipmentDto>>();
+        return result!.Data!.Id;
     }
 
     private async Task<Guid> CreateTestReferralDoctorAsync()
@@ -722,12 +724,13 @@ public class ResourceManagementTests : TestBase
             Phone = $"010{Random.Shared.Next(10000000, 99999999)}"
         };
         var response = await Client.PostAsJsonAsync(ReferralDoctorsBaseUrl, command);
-        response.EnsureSuccessStatusCode();
-        var allResponse = await Client.PostAsJsonAsync($"{ReferralDoctorsBaseUrl}/all",
-            new { Pagination = new { PageNumber = 1, PageSize = 1 }, SearchTerm = command.FullName });
-        allResponse.EnsureSuccessStatusCode();
-        var allBody = await allResponse.Content.ReadFromJsonAsync<ApiResponse<PagedResultDto<ReferralDoctorDto>>>();
-        return allBody!.Data!.Items.First().Id;
+        if (response.StatusCode != HttpStatusCode.OK)
+        {
+            var errorBody = await response.Content.ReadAsStringAsync();
+            throw new InvalidOperationException($"Expected OK but got {response.StatusCode}: {errorBody}");
+        }
+        var result = await response.Content.ReadFromJsonAsync<ApiResponse<ReferralDoctorDto>>();
+        return result!.Data!.Id;
     }
 
     private async Task<Guid> CreateTestLeaveAsync()
@@ -741,12 +744,13 @@ public class ResourceManagementTests : TestBase
             EndDate = DateTime.UtcNow.Date.AddDays(35)
         };
         var response = await Client.PostAsJsonAsync(LeavesBaseUrl, command);
-        response.EnsureSuccessStatusCode();
-        var allResponse = await Client.PostAsJsonAsync($"{LeavesBaseUrl}/all",
-            new { Pagination = new { PageNumber = 1, PageSize = 1 } });
-        allResponse.EnsureSuccessStatusCode();
-        var allBody = await allResponse.Content.ReadFromJsonAsync<ApiResponse<PagedResultDto<LeaveDto>>>();
-        return allBody!.Data!.Items.First().Id;
+        if (response.StatusCode != HttpStatusCode.OK)
+        {
+            var errorBody = await response.Content.ReadAsStringAsync();
+            throw new InvalidOperationException($"Expected OK but got {response.StatusCode}: {errorBody}");
+        }
+        var result = await response.Content.ReadFromJsonAsync<ApiResponse<LeaveDto>>();
+        return result!.Data!.Id;
     }
 
     private async Task<Guid> CreateTestWorkShiftAsync()
@@ -761,12 +765,13 @@ public class ResourceManagementTests : TestBase
             EndTime = new TimeSpan(16, 0, 0)
         };
         var response = await Client.PostAsJsonAsync(WorkShiftsBaseUrl, command);
-        response.EnsureSuccessStatusCode();
-        var allResponse = await Client.PostAsJsonAsync($"{WorkShiftsBaseUrl}/all",
-            new { Pagination = new { PageNumber = 1, PageSize = 1 } });
-        allResponse.EnsureSuccessStatusCode();
-        var allBody = await allResponse.Content.ReadFromJsonAsync<ApiResponse<PagedResultDto<WorkShiftDto>>>();
-        return allBody!.Data!.Items.First().Id;
+        if (response.StatusCode != HttpStatusCode.OK)
+        {
+            var errorBody = await response.Content.ReadAsStringAsync();
+            throw new InvalidOperationException($"Expected OK but got {response.StatusCode}: {errorBody}");
+        }
+        var result = await response.Content.ReadFromJsonAsync<ApiResponse<WorkShiftDto>>();
+        return result!.Data!.Id;
     }
 
     #endregion

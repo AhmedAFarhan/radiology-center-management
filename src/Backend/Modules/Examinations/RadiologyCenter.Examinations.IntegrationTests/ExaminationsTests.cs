@@ -7,7 +7,9 @@ namespace Tests;
 
 public class ExaminationsTests : TestBase
 {
-    private const string BaseUrl = "api/examinations";
+    private const string ExaminationsUrl = "api/examinations";
+    private const string CatalogExaminationTypesUrl = "api/catalog/examination-types";
+    private const string InventoryItemsUrl = "api/inventory/items";
 
     public ExaminationsTests(CustomWebApplicationFactory factory) : base(factory) { }
 
@@ -26,7 +28,7 @@ public class ExaminationsTests : TestBase
             IsDiscountPercentage = false,
             Paid = 0m
         };
-        var response = await Client.PostAsJsonAsync(BaseUrl, command);
+        var response = await Client.PostAsJsonAsync(ExaminationsUrl, command);
         response.StatusCode.Should().Be(HttpStatusCode.OK);
         var body = await response.Content.ReadFromJsonAsync<ApiResponse<ExaminationDto>>();
         body!.Success.Should().BeTrue();
@@ -43,7 +45,7 @@ public class ExaminationsTests : TestBase
             ClinicalIndication = "Test indication",
             Priority = "Routine"
         };
-        var response = await Client.PostAsJsonAsync(BaseUrl, command);
+        var response = await Client.PostAsJsonAsync(ExaminationsUrl, command);
         response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
     }
 
@@ -57,7 +59,7 @@ public class ExaminationsTests : TestBase
             ClinicalIndication = "Test indication",
             Priority = "Routine"
         };
-        var response = await Client.PostAsJsonAsync(BaseUrl, command);
+        var response = await Client.PostAsJsonAsync(ExaminationsUrl, command);
         response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
     }
 
@@ -72,7 +74,7 @@ public class ExaminationsTests : TestBase
             ExaminationTypeId = examinationTypeId,
             Priority = "Routine"
         };
-        var response = await Client.PostAsJsonAsync(BaseUrl, command);
+        var response = await Client.PostAsJsonAsync(ExaminationsUrl, command);
         response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
     }
 
@@ -87,7 +89,7 @@ public class ExaminationsTests : TestBase
             ExaminationTypeId = examinationTypeId,
             ClinicalIndication = "Test indication"
         };
-        var response = await Client.PostAsJsonAsync(BaseUrl, command);
+        var response = await Client.PostAsJsonAsync(ExaminationsUrl, command);
         response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
     }
 
@@ -106,7 +108,7 @@ public class ExaminationsTests : TestBase
             IsDiscountPercentage = false,
             Paid = 0m
         };
-        var response = await Client.PostAsJsonAsync(BaseUrl, command);
+        var response = await Client.PostAsJsonAsync(ExaminationsUrl, command);
         response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
     }
 
@@ -114,7 +116,7 @@ public class ExaminationsTests : TestBase
     public async Task GetById_Existing_ReturnsOk()
     {
         var examId = await CreateTestExaminationAsync();
-        var response = await Client.GetAsync($"{BaseUrl}/{examId}");
+        var response = await Client.GetAsync($"{ExaminationsUrl}/{examId}");
         response.StatusCode.Should().Be(HttpStatusCode.OK);
         var body = await response.Content.ReadFromJsonAsync<ApiResponse<ExaminationDto>>();
         body!.Success.Should().BeTrue();
@@ -125,7 +127,7 @@ public class ExaminationsTests : TestBase
     public async Task GetById_Nonexistent_ReturnsNotFound()
     {
         var fakeId = Guid.NewGuid();
-        var response = await Client.GetAsync($"{BaseUrl}/{fakeId}");
+        var response = await Client.GetAsync($"{ExaminationsUrl}/{fakeId}");
         response.StatusCode.Should().Be(HttpStatusCode.NotFound);
     }
 
@@ -134,7 +136,7 @@ public class ExaminationsTests : TestBase
     {
         await CreateTestExaminationAsync();
         var request = new { PageNumber = 1, PageSize = 10 };
-        var response = await Client.PostAsJsonAsync($"{BaseUrl}/all", request);
+        var response = await Client.PostAsJsonAsync($"{ExaminationsUrl}/all", request);
         response.StatusCode.Should().Be(HttpStatusCode.OK);
         var body = await response.Content.ReadFromJsonAsync<ApiResponse<PagedResultDto<ExaminationListItemDto>>>();
         body!.Success.Should().BeTrue();
@@ -146,7 +148,7 @@ public class ExaminationsTests : TestBase
     {
         var examId = await CreateTestExaminationAsync();
         var command = new { ScheduledAt = DateTime.UtcNow.AddHours(2) };
-        var response = await Client.PostAsJsonAsync($"{BaseUrl}/{examId}/schedule", command);
+        var response = await Client.PostAsJsonAsync($"{ExaminationsUrl}/{examId}/schedule", command);
         response.StatusCode.Should().Be(HttpStatusCode.OK);
     }
 
@@ -154,7 +156,7 @@ public class ExaminationsTests : TestBase
     public async Task CheckIn_ReturnsOk()
     {
         var examId = await CreateTestExaminationAsync();
-        var response = await Client.PostAsync($"{BaseUrl}/{examId}/check-in", null);
+        var response = await Client.PostAsync($"{ExaminationsUrl}/{examId}/check-in", null);
         response.StatusCode.Should().Be(HttpStatusCode.OK);
     }
 
@@ -162,7 +164,7 @@ public class ExaminationsTests : TestBase
     public async Task Start_ReturnsOk()
     {
         var examId = await CreateTestExaminationAsync(status: "CheckedIn", paid: 0m);
-        var response = await Client.PostAsync($"{BaseUrl}/{examId}/start", null);
+        var response = await Client.PostAsync($"{ExaminationsUrl}/{examId}/start", null);
         response.StatusCode.Should().Be(HttpStatusCode.OK);
     }
 
@@ -179,8 +181,8 @@ public class ExaminationsTests : TestBase
             technicianId: technicianId,
             equipmentId: equipmentId);
 
-        await Client.PostAsync($"{BaseUrl}/{examId}/start", null);
-        var response = await Client.PostAsync($"{BaseUrl}/{examId}/complete", null);
+        await Client.PostAsync($"{ExaminationsUrl}/{examId}/start", null);
+        var response = await Client.PostAsync($"{ExaminationsUrl}/{examId}/complete", null);
         response.StatusCode.Should().Be(HttpStatusCode.OK);
     }
 
@@ -188,7 +190,7 @@ public class ExaminationsTests : TestBase
     public async Task Cancel_ReturnsOk()
     {
         var examId = await CreateTestExaminationAsync();
-        var response = await Client.PostAsJsonAsync($"{BaseUrl}/{examId}/cancel", new { });
+        var response = await Client.PostAsJsonAsync($"{ExaminationsUrl}/{examId}/cancel", new { });
         response.StatusCode.Should().Be(HttpStatusCode.OK);
     }
 
@@ -197,9 +199,9 @@ public class ExaminationsTests : TestBase
     {
         var examId = await CreateTestExaminationAsync();
         var command = new { Reason = "Patient request" };
-        var response = await Client.PostAsJsonAsync($"{BaseUrl}/{examId}/cancel", command);
+        var response = await Client.PostAsJsonAsync($"{ExaminationsUrl}/{examId}/cancel", command);
         response.StatusCode.Should().Be(HttpStatusCode.OK);
-        var getResponse = await Client.GetAsync($"{BaseUrl}/{examId}");
+        var getResponse = await Client.GetAsync($"{ExaminationsUrl}/{examId}");
         var body = await getResponse.Content.ReadFromJsonAsync<ApiResponse<ExaminationDto>>();
         body!.Data!.CancellationReason.Should().Be("Patient request");
     }
@@ -209,7 +211,7 @@ public class ExaminationsTests : TestBase
     {
         var examId = await CreateTestExaminationAsync(paid: 0m);
         var command = new { Amount = 50m, Description = "Partial payment" };
-        var response = await Client.PostAsJsonAsync($"{BaseUrl}/{examId}/payments", command);
+        var response = await Client.PostAsJsonAsync($"{ExaminationsUrl}/{examId}/payments", command);
         response.StatusCode.Should().Be(HttpStatusCode.OK);
     }
 
@@ -218,7 +220,7 @@ public class ExaminationsTests : TestBase
     {
         var examId = await CreateTestExaminationAsync(paid: 0m);
         var command = new { Amount = 999999m, Description = "Oversized payment" };
-        var response = await Client.PostAsJsonAsync($"{BaseUrl}/{examId}/payments", command);
+        var response = await Client.PostAsJsonAsync($"{ExaminationsUrl}/{examId}/payments", command);
         response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
     }
 
@@ -235,7 +237,7 @@ public class ExaminationsTests : TestBase
             IsRequired = false,
             Notes = (string?)null
         };
-        var response = await Client.PostAsJsonAsync($"{BaseUrl}/{examId}/items", command);
+        var response = await Client.PostAsJsonAsync($"{ExaminationsUrl}/{examId}/items", command);
         response.StatusCode.Should().Be(HttpStatusCode.OK);
     }
 
@@ -255,12 +257,12 @@ public class ExaminationsTests : TestBase
             IsDiscountPercentage = false,
             Paid = 0m
         };
-        var createResponse = await Client.PostAsJsonAsync(BaseUrl, createCommand);
+        var createResponse = await Client.PostAsJsonAsync(ExaminationsUrl, createCommand);
         createResponse.StatusCode.Should().Be(HttpStatusCode.OK);
         var createBody = await createResponse.Content.ReadFromJsonAsync<ApiResponse<ExaminationDto>>();
         var examId = createBody!.Data!.Id;
 
-        var getResponse = await Client.GetAsync($"{BaseUrl}/{examId}");
+        var getResponse = await Client.GetAsync($"{ExaminationsUrl}/{examId}");
         getResponse.StatusCode.Should().Be(HttpStatusCode.OK);
         var getBody = await getResponse.Content.ReadFromJsonAsync<ApiResponse<ExaminationDto>>();
         getBody!.Data!.PatientId.Should().Be(patientId);
@@ -282,16 +284,16 @@ public class ExaminationsTests : TestBase
             technicianId: technicianId,
             equipmentId: equipmentId);
 
-        var checkInResponse = await Client.PostAsync($"{BaseUrl}/{examId}/check-in", null);
+        var checkInResponse = await Client.PostAsync($"{ExaminationsUrl}/{examId}/check-in", null);
         checkInResponse.StatusCode.Should().Be(HttpStatusCode.OK);
 
-        var startResponse = await Client.PostAsync($"{BaseUrl}/{examId}/start", null);
+        var startResponse = await Client.PostAsync($"{ExaminationsUrl}/{examId}/start", null);
         startResponse.StatusCode.Should().Be(HttpStatusCode.OK);
 
-        var completeResponse = await Client.PostAsync($"{BaseUrl}/{examId}/complete", null);
+        var completeResponse = await Client.PostAsync($"{ExaminationsUrl}/{examId}/complete", null);
         completeResponse.StatusCode.Should().Be(HttpStatusCode.OK);
 
-        var verifyResponse = await Client.GetAsync($"{BaseUrl}/{examId}");
+        var verifyResponse = await Client.GetAsync($"{ExaminationsUrl}/{examId}");
         verifyResponse.StatusCode.Should().Be(HttpStatusCode.OK);
         var body = await verifyResponse.Content.ReadFromJsonAsync<ApiResponse<ExaminationDto>>();
         body!.Data!.Status.Should().Be("Completed");
@@ -302,7 +304,7 @@ public class ExaminationsTests : TestBase
     public async Task Cancel_NonexistentExamination_ReturnsNotFound()
     {
         var fakeId = Guid.NewGuid();
-        var response = await Client.PostAsJsonAsync($"{BaseUrl}/{fakeId}/cancel", new { });
+        var response = await Client.PostAsJsonAsync($"{ExaminationsUrl}/{fakeId}/cancel", new { });
         response.StatusCode.Should().Be(HttpStatusCode.NotFound);
     }
 
@@ -318,7 +320,7 @@ public class ExaminationsTests : TestBase
             IsContrast = false,
             IsRequired = false
         };
-        var response = await Client.PostAsJsonAsync($"{BaseUrl}/{fakeId}/items", command);
+        var response = await Client.PostAsJsonAsync($"{ExaminationsUrl}/{fakeId}/items", command);
         response.StatusCode.Should().Be(HttpStatusCode.NotFound);
     }
 
@@ -327,7 +329,7 @@ public class ExaminationsTests : TestBase
     {
         var fakeId = Guid.NewGuid();
         var command = new { Amount = 10m };
-        var response = await Client.PostAsJsonAsync($"{BaseUrl}/{fakeId}/payments", command);
+        var response = await Client.PostAsJsonAsync($"{ExaminationsUrl}/{fakeId}/payments", command);
         response.StatusCode.Should().Be(HttpStatusCode.NotFound);
     }
 
@@ -336,7 +338,7 @@ public class ExaminationsTests : TestBase
     {
         var examId = await CreateTestExaminationAsync(paid: 0m);
         var command = new { Amount = 0m };
-        var response = await Client.PostAsJsonAsync($"{BaseUrl}/{examId}/payments", command);
+        var response = await Client.PostAsJsonAsync($"{ExaminationsUrl}/{examId}/payments", command);
         response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
     }
 
@@ -344,7 +346,7 @@ public class ExaminationsTests : TestBase
     public async Task Start_WithOutstandingBalance_ReturnsError()
     {
         var examId = await CreateTestExaminationAsync(status: "CheckedIn");
-        var response = await Client.PostAsync($"{BaseUrl}/{examId}/start", null);
+        var response = await Client.PostAsync($"{ExaminationsUrl}/{examId}/start", null);
         response.StatusCode.Should().NotBe(HttpStatusCode.OK);
     }
 
@@ -361,7 +363,7 @@ public class ExaminationsTests : TestBase
             Priority = "Routine",
             ClinicalIndication = "Book test"
         };
-        var response = await Client.PostAsJsonAsync($"{BaseUrl}/book", command);
+        var response = await Client.PostAsJsonAsync($"{ExaminationsUrl}/book", command);
         response.StatusCode.Should().Be(HttpStatusCode.OK);
         var body = await response.Content.ReadFromJsonAsync<ApiResponse<ExaminationDto>>();
         body!.Success.Should().BeTrue();
@@ -390,7 +392,7 @@ public class ExaminationsTests : TestBase
             EquipmentId = equipmentId,
             Status = status
         };
-        var response = await Client.PostAsJsonAsync(BaseUrl, command);
+        var response = await Client.PostAsJsonAsync(ExaminationsUrl, command);
         response.EnsureSuccessStatusCode();
         var body = await response.Content.ReadFromJsonAsync<ApiResponse<ExaminationDto>>();
         return body!.Data!.Id;
@@ -398,7 +400,7 @@ public class ExaminationsTests : TestBase
 
     private async Task<Guid> GetOrCreateExaminationTypeAsync()
     {
-        var response = await Client.PostAsJsonAsync("api/examination-types/all", new { PageNumber = 1, PageSize = 1 });
+        var response = await Client.PostAsJsonAsync($"{CatalogExaminationTypesUrl}/all", new { PageNumber = 1, PageSize = 1 });
         if (response.IsSuccessStatusCode)
         {
             var body = await response.Content.ReadFromJsonAsync<ApiResponse<PagedResultDto<ExaminationTypeListItemDto>>>();
@@ -418,10 +420,10 @@ public class ExaminationsTests : TestBase
             RequiresConsent = false,
             RequiresContrast = false
         };
-        var createResponse = await Client.PostAsJsonAsync("api/examination-types", createTypeCommand);
+        var createResponse = await Client.PostAsJsonAsync(CatalogExaminationTypesUrl, createTypeCommand);
         createResponse.EnsureSuccessStatusCode();
 
-        var allResponse = await Client.PostAsJsonAsync("api/examination-types/all", new { PageNumber = 1, PageSize = 1 });
+        var allResponse = await Client.PostAsJsonAsync($"{CatalogExaminationTypesUrl}/all", new { PageNumber = 1, PageSize = 1 });
         allResponse.EnsureSuccessStatusCode();
         var allBody = await allResponse.Content.ReadFromJsonAsync<ApiResponse<PagedResultDto<ExaminationTypeListItemDto>>>();
         return allBody!.Data!.Items.First().Id;
@@ -429,7 +431,7 @@ public class ExaminationsTests : TestBase
 
     private async Task<Guid> GetOrCreateItemAsync()
     {
-        var response = await Client.PostAsJsonAsync("api/items/all", new { PageNumber = 1, PageSize = 1 });
+        var response = await Client.PostAsJsonAsync($"{InventoryItemsUrl}/all", new { PageNumber = 1, PageSize = 1 });
         if (response.IsSuccessStatusCode)
         {
             var body = await response.Content.ReadFromJsonAsync<ApiResponse<PagedResultDto<ItemListItemDto>>>();
@@ -444,10 +446,10 @@ public class ExaminationsTests : TestBase
             Unit = "unit",
             UnitPrice = 10m
         };
-        var createResponse = await Client.PostAsJsonAsync("api/items", createCommand);
+        var createResponse = await Client.PostAsJsonAsync(InventoryItemsUrl, createCommand);
         createResponse.EnsureSuccessStatusCode();
 
-        var allResponse = await Client.PostAsJsonAsync("api/items/all", new { PageNumber = 1, PageSize = 1 });
+        var allResponse = await Client.PostAsJsonAsync($"{InventoryItemsUrl}/all", new { PageNumber = 1, PageSize = 1 });
         allResponse.EnsureSuccessStatusCode();
         var allBody = await allResponse.Content.ReadFromJsonAsync<ApiResponse<PagedResultDto<ItemListItemDto>>>();
         return allBody!.Data!.Items.First().Id;
@@ -547,7 +549,7 @@ public class ExaminationsTests : TestBase
             TechnicianId = technicianId,
             EquipmentId = equipmentId
         };
-        var response = await Client.PutAsJsonAsync($"{BaseUrl}/{examId}/staff", command);
+        var response = await Client.PutAsJsonAsync($"{ExaminationsUrl}/{examId}/staff", command);
         response.StatusCode.Should().Be(HttpStatusCode.OK);
     }
 
@@ -560,7 +562,7 @@ public class ExaminationsTests : TestBase
         {
             TechnicianId = technicianId
         };
-        var response = await Client.PutAsJsonAsync($"{BaseUrl}/{examId}/staff", command);
+        var response = await Client.PutAsJsonAsync($"{ExaminationsUrl}/{examId}/staff", command);
         response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
     }
 
@@ -573,7 +575,7 @@ public class ExaminationsTests : TestBase
             StudyInstanceUID = "1.2.3.4.5.6.7.8.9",
             AccessionNumber = $"ACC_{Guid.NewGuid():N}"
         };
-        var response = await Client.PostAsJsonAsync($"{BaseUrl}/{examId}/pacs-images", command);
+        var response = await Client.PostAsJsonAsync($"{ExaminationsUrl}/{examId}/pacs-images", command);
         response.StatusCode.Should().Be(HttpStatusCode.OK);
     }
 
@@ -581,7 +583,7 @@ public class ExaminationsTests : TestBase
     public async Task GetExaminationTypeItems_ReturnsOk()
     {
         var examinationTypeId = await GetOrCreateExaminationTypeAsync();
-        var response = await Client.GetAsync($"{BaseUrl}/examination-types/{examinationTypeId}/items");
+        var response = await Client.GetAsync($"{ExaminationsUrl}/examination-types/{examinationTypeId}/items");
         response.StatusCode.Should().Be(HttpStatusCode.OK);
         var body = await response.Content.ReadFromJsonAsync<ApiResponse<List<ExaminationTypeItemDto>>>();
         body!.Success.Should().BeTrue();
@@ -599,7 +601,7 @@ public class ExaminationsTests : TestBase
             Quantity = 2,
             Notes = "Test item notes"
         };
-        var response = await Client.PostAsJsonAsync($"{BaseUrl}/examination-types/{examinationTypeId}/items", command);
+        var response = await Client.PostAsJsonAsync($"{ExaminationsUrl}/examination-types/{examinationTypeId}/items", command);
         response.StatusCode.Should().Be(HttpStatusCode.OK);
     }
 
@@ -608,7 +610,7 @@ public class ExaminationsTests : TestBase
     {
         var startDate = DateTime.UtcNow.Date;
         var endDate = startDate.AddDays(7);
-        var url = $"{BaseUrl}/calendar?startDate={startDate:O}&endDate={endDate:O}";
+        var url = $"{ExaminationsUrl}/calendar?startDate={startDate:O}&endDate={endDate:O}";
         var response = await Client.GetAsync(url);
         response.StatusCode.Should().Be(HttpStatusCode.OK);
         var body = await response.Content.ReadFromJsonAsync<ApiResponse<List<CalendarItemDto>>>();
@@ -621,7 +623,7 @@ public class ExaminationsTests : TestBase
     {
         var date = DateTime.UtcNow.Date.AddDays(1);
         var equipmentId = Guid.NewGuid();
-        var url = $"{BaseUrl}/available-slots?date={date:O}&equipmentId={equipmentId}";
+        var url = $"{ExaminationsUrl}/available-slots?date={date:O}&equipmentId={equipmentId}";
         var response = await Client.GetAsync(url);
         response.StatusCode.Should().Be(HttpStatusCode.OK);
         var body = await response.Content.ReadFromJsonAsync<ApiResponse<List<AvailableSlotDto>>>();

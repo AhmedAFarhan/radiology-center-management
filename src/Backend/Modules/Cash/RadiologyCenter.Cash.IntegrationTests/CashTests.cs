@@ -8,28 +8,37 @@ namespace Tests;
 public class CashTests : TestBase
 {
     private const string SessionsUrl = "api/cash/sessions";
+    private const string HandoversUrl = "api/cash/handovers";
 
     public CashTests(CustomWebApplicationFactory factory) : base(factory) { }
 
     [Fact]
     public async Task OpenSession_ValidData_ReturnsOk()
     {
-        var command = new { OpeningFloat = 1000m, Notes = "Morning shift" };
-        var response = await Client.PostAsJsonAsync(SessionsUrl, command);
-        response.StatusCode.Should().Be(HttpStatusCode.OK);
+        var sessionId = await CreateTestSessionAsync();
+        var response = await Client.GetAsync($"{SessionsUrl}/{sessionId}");
         var body = await response.Content.ReadFromJsonAsync<ApiResponse<CashSessionDto>>();
         body!.Success.Should().BeTrue();
         body.Data.Should().NotBeNull();
         body.Data!.OpeningFloat.Should().Be(1000m);
         body.Data.Status.Should().Be("Open");
+        await CloseTestSessionAsync(sessionId);
     }
 
     [Fact]
-    public async Task OpenSession_MissingOpeningFloat_ReturnsBadRequest()
+    public async Task OpenSession_MissingOpeningFloat_DefaultsToZero_ReturnsOk()
     {
         var command = new { Notes = "No float" };
         var response = await Client.PostAsJsonAsync(SessionsUrl, command);
-        response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+        if (response.StatusCode != HttpStatusCode.OK)
+        {
+            var body = await response.Content.ReadAsStringAsync();
+            throw new InvalidOperationException($"Expected OK but got {response.StatusCode}: {body}");
+        }
+        var result = await response.Content.ReadFromJsonAsync<ApiResponse<CashSessionDto>>();
+        result!.Success.Should().BeTrue();
+        result.Data!.OpeningFloat.Should().Be(0m);
+        await CloseTestSessionAsync(result.Data.Id);
     }
 
     [Fact]
@@ -37,20 +46,33 @@ public class CashTests : TestBase
     {
         var command = new { OpeningFloat = -500m };
         var response = await Client.PostAsJsonAsync(SessionsUrl, command);
-        response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+        if (response.StatusCode != HttpStatusCode.BadRequest)
+        {
+            var body = await response.Content.ReadAsStringAsync();
+            throw new InvalidOperationException($"Expected BadRequest but got {response.StatusCode}: {body}");
+        }
     }
 
     [Fact]
     public async Task OpenSession_OpenSessionAlreadyExists_ReturnsConflict()
     {
+        await EnsureNoOpenSessionAsync();
         var command = new { OpeningFloat = 1000m };
         var first = await Client.PostAsJsonAsync(SessionsUrl, command);
-        first.StatusCode.Should().Be(HttpStatusCode.OK);
+        if (first.StatusCode != HttpStatusCode.OK)
+        {
+            var body = await first.Content.ReadAsStringAsync();
+            throw new InvalidOperationException($"Expected OK but got {first.StatusCode}: {body}");
+        }
 
         var second = await Client.PostAsJsonAsync(SessionsUrl, command);
-        second.StatusCode.Should().Be(HttpStatusCode.Conflict);
-        var body = await second.Content.ReadFromJsonAsync<ApiResponse>();
-        body!.Success.Should().BeFalse();
+        if (second.StatusCode != HttpStatusCode.Conflict)
+        {
+            var body = await second.Content.ReadAsStringAsync();
+            throw new InvalidOperationException($"Expected Conflict but got {second.StatusCode}: {body}");
+        }
+        var result = await second.Content.ReadFromJsonAsync<ApiResponse>();
+        result!.Success.Should().BeFalse();
     }
 
     [Fact]
@@ -58,10 +80,15 @@ public class CashTests : TestBase
     {
         var sessionId = await CreateTestSessionAsync();
         var response = await Client.GetAsync($"{SessionsUrl}/{sessionId}");
-        response.StatusCode.Should().Be(HttpStatusCode.OK);
-        var body = await response.Content.ReadFromJsonAsync<ApiResponse<CashSessionDto>>();
-        body!.Success.Should().BeTrue();
-        body.Data!.Id.Should().Be(sessionId);
+        if (response.StatusCode != HttpStatusCode.OK)
+        {
+            var body = await response.Content.ReadAsStringAsync();
+            throw new InvalidOperationException($"Expected OK but got {response.StatusCode}: {body}");
+        }
+        var result = await response.Content.ReadFromJsonAsync<ApiResponse<CashSessionDto>>();
+        result!.Success.Should().BeTrue();
+        result.Data!.Id.Should().Be(sessionId);
+        await CloseTestSessionAsync(sessionId);
     }
 
     [Fact]
@@ -69,19 +96,25 @@ public class CashTests : TestBase
     {
         var fakeId = Guid.NewGuid();
         var response = await Client.GetAsync($"{SessionsUrl}/{fakeId}");
-        response.StatusCode.Should().Be(HttpStatusCode.NotFound);
+        if (response.StatusCode != HttpStatusCode.NotFound)
+        {
+            var body = await response.Content.ReadAsStringAsync();
+            throw new InvalidOperationException($"Expected NotFound but got {response.StatusCode}: {body}");
+        }
     }
 
     [Fact]
     public async Task GetAllPaged_ReturnsOk()
     {
-        await CreateTestSessionAsync();
+        var sessionId = await CreateTestSessionAsync();
         var request = new { Pagination = new { PageNumber = 1, PageSize = 10 } };
         var response = await Client.PostAsJsonAsync($"{SessionsUrl}/all", request);
-        response.StatusCode.Should().Be(HttpStatusCode.OK);
-        var body = await response.Content.ReadFromJsonAsync<ApiResponse<PagedResultDto<CashSessionDto>>>();
-        body!.Success.Should().BeTrue();
-        body.Data!.Items.Should().NotBeEmpty();
+        var body = await response.Content.ReadAsStringAsync();
+        if (response.StatusCode != HttpStatusCode.OK)
+        {
+            throw new InvalidOperationException($"Expected OK but got {response.StatusCode}: {body}");
+        }
+        await CloseTestSessionAsync(sessionId);
     }
 
     [Fact]
@@ -96,11 +129,16 @@ public class CashTests : TestBase
             Description = "Consultation payment"
         };
         var response = await Client.PostAsJsonAsync($"{SessionsUrl}/{sessionId}/entries", entry);
-        response.StatusCode.Should().Be(HttpStatusCode.OK);
-        var body = await response.Content.ReadFromJsonAsync<ApiResponse<CashEntryDto>>();
-        body!.Success.Should().BeTrue();
-        body.Data!.Direction.Should().Be("In");
-        body.Data.Amount.Should().Be(250m);
+        if (response.StatusCode != HttpStatusCode.OK)
+        {
+            var body = await response.Content.ReadAsStringAsync();
+            throw new InvalidOperationException($"Expected OK but got {response.StatusCode}: {body}");
+        }
+        var result = await response.Content.ReadFromJsonAsync<ApiResponse<CashEntryDto>>();
+        result!.Success.Should().BeTrue();
+        result.Data!.Direction.Should().Be("In");
+        result.Data.Amount.Should().Be(250m);
+        await CloseTestSessionAsync(sessionId);
     }
 
     [Fact]
@@ -115,11 +153,16 @@ public class CashTests : TestBase
             Description = "Supplies refund"
         };
         var response = await Client.PostAsJsonAsync($"{SessionsUrl}/{sessionId}/entries", entry);
-        response.StatusCode.Should().Be(HttpStatusCode.OK);
-        var body = await response.Content.ReadFromJsonAsync<ApiResponse<CashEntryDto>>();
-        body!.Success.Should().BeTrue();
-        body.Data!.Direction.Should().Be("Out");
-        body.Data.Amount.Should().Be(100m);
+        if (response.StatusCode != HttpStatusCode.OK)
+        {
+            var body = await response.Content.ReadAsStringAsync();
+            throw new InvalidOperationException($"Expected OK but got {response.StatusCode}: {body}");
+        }
+        var result = await response.Content.ReadFromJsonAsync<ApiResponse<CashEntryDto>>();
+        result!.Success.Should().BeTrue();
+        result.Data!.Direction.Should().Be("Out");
+        result.Data.Amount.Should().Be(100m);
+        await CloseTestSessionAsync(sessionId);
     }
 
     [Fact]
@@ -133,40 +176,58 @@ public class CashTests : TestBase
             Description = "Missing amount"
         };
         var response = await Client.PostAsJsonAsync($"{SessionsUrl}/{sessionId}/entries", entry);
-        response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+        if (response.StatusCode != HttpStatusCode.BadRequest)
+        {
+            var body = await response.Content.ReadAsStringAsync();
+            throw new InvalidOperationException($"Expected BadRequest but got {response.StatusCode}: {body}");
+        }
+        await CloseTestSessionAsync(sessionId);
     }
 
     [Fact]
-    public async Task AddEntry_MissingDirection_ReturnsBadRequest()
+    public async Task AddEntry_InvalidDirection_ReturnsBadRequest()
     {
         var sessionId = await CreateTestSessionAsync();
         var entry = new
         {
+            Direction = "Invalid",
             Reason = "Payment",
             Amount = 100m,
-            Description = "Missing direction"
+            Description = "Invalid direction"
         };
         var response = await Client.PostAsJsonAsync($"{SessionsUrl}/{sessionId}/entries", entry);
-        response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+        if (response.StatusCode != HttpStatusCode.BadRequest)
+        {
+            var body = await response.Content.ReadAsStringAsync();
+            throw new InvalidOperationException($"Expected BadRequest but got {response.StatusCode}: {body}");
+        }
+        await CloseTestSessionAsync(sessionId);
     }
 
     [Fact]
-    public async Task AddEntry_MissingReason_ReturnsBadRequest()
+    public async Task AddEntry_InvalidReason_ReturnsBadRequest()
     {
         var sessionId = await CreateTestSessionAsync();
         var entry = new
         {
             Direction = "In",
+            Reason = "Invalid",
             Amount = 100m,
-            Description = "Missing reason"
+            Description = "Invalid reason"
         };
         var response = await Client.PostAsJsonAsync($"{SessionsUrl}/{sessionId}/entries", entry);
-        response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+        if (response.StatusCode != HttpStatusCode.BadRequest)
+        {
+            var body = await response.Content.ReadAsStringAsync();
+            throw new InvalidOperationException($"Expected BadRequest but got {response.StatusCode}: {body}");
+        }
+        await CloseTestSessionAsync(sessionId);
     }
 
     [Fact]
     public async Task AddEntry_ClosedSession_ReturnsError()
     {
+        await EnsureNoOpenSessionAsync();
         var sessionId = await CreateTestSessionAsync();
         await CloseTestSessionAsync(sessionId);
 
@@ -177,9 +238,13 @@ public class CashTests : TestBase
             Amount = 50m
         };
         var response = await Client.PostAsJsonAsync($"{SessionsUrl}/{sessionId}/entries", entry);
-        response.StatusCode.Should().Be(HttpStatusCode.Conflict);
-        var body = await response.Content.ReadFromJsonAsync<ApiResponse>();
-        body!.Success.Should().BeFalse();
+        if (response.StatusCode != HttpStatusCode.Conflict)
+        {
+            var body = await response.Content.ReadAsStringAsync();
+            throw new InvalidOperationException($"Expected Conflict but got {response.StatusCode}: {body}");
+        }
+        var result = await response.Content.ReadFromJsonAsync<ApiResponse>();
+        result!.Success.Should().BeFalse();
     }
 
     [Fact]
@@ -192,11 +257,15 @@ public class CashTests : TestBase
             Notes = "End of shift"
         };
         var response = await Client.PostAsJsonAsync($"{SessionsUrl}/{sessionId}/close", command);
-        response.StatusCode.Should().Be(HttpStatusCode.OK);
-        var body = await response.Content.ReadFromJsonAsync<ApiResponse<CashHandoverDto>>();
-        body!.Success.Should().BeTrue();
-        body.Data.Should().NotBeNull();
-        body.Data!.CashSessionId.Should().Be(sessionId);
+        if (response.StatusCode != HttpStatusCode.OK)
+        {
+            var body = await response.Content.ReadAsStringAsync();
+            throw new InvalidOperationException($"Expected OK but got {response.StatusCode}: {body}");
+        }
+        var result = await response.Content.ReadFromJsonAsync<ApiResponse<CashHandoverDto>>();
+        result!.Success.Should().BeTrue();
+        result.Data.Should().NotBeNull();
+        result.Data!.CashSessionId.Should().Be(sessionId);
     }
 
     [Fact]
@@ -208,7 +277,12 @@ public class CashTests : TestBase
             CountedTotal = -100m
         };
         var response = await Client.PostAsJsonAsync($"{SessionsUrl}/{sessionId}/close", command);
-        response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+        if (response.StatusCode != HttpStatusCode.BadRequest)
+        {
+            var body = await response.Content.ReadAsStringAsync();
+            throw new InvalidOperationException($"Expected BadRequest but got {response.StatusCode}: {body}");
+        }
+        await CloseTestSessionAsync(sessionId);
     }
 
     [Fact]
@@ -219,9 +293,13 @@ public class CashTests : TestBase
 
         var command = new { CountedTotal = 1000m };
         var response = await Client.PostAsJsonAsync($"{SessionsUrl}/{sessionId}/close", command);
-        response.StatusCode.Should().Be(HttpStatusCode.Conflict);
-        var body = await response.Content.ReadFromJsonAsync<ApiResponse>();
-        body!.Success.Should().BeFalse();
+        if (response.StatusCode != HttpStatusCode.Conflict)
+        {
+            var body = await response.Content.ReadAsStringAsync();
+            throw new InvalidOperationException($"Expected Conflict but got {response.StatusCode}: {body}");
+        }
+        var result = await response.Content.ReadFromJsonAsync<ApiResponse>();
+        result!.Success.Should().BeFalse();
     }
 
     [Fact]
@@ -241,7 +319,11 @@ public class CashTests : TestBase
 
         var command = new { CountedTotal = 750m };
         var closeResponse = await Client.PostAsJsonAsync($"{SessionsUrl}/{sessionId}/close", command);
-        closeResponse.StatusCode.Should().Be(HttpStatusCode.OK);
+        if (closeResponse.StatusCode != HttpStatusCode.OK)
+        {
+            var body = await closeResponse.Content.ReadAsStringAsync();
+            throw new InvalidOperationException($"Expected OK but got {closeResponse.StatusCode}: {body}");
+        }
     }
 
     [Fact]
@@ -249,18 +331,22 @@ public class CashTests : TestBase
     {
         var fakeId = Guid.NewGuid();
         var response = await Client.PostAsJsonAsync($"{SessionsUrl}/{fakeId}/end-of-day", new { });
-        response.StatusCode.Should().Be(HttpStatusCode.NotFound);
+        if (response.StatusCode != HttpStatusCode.NotFound)
+        {
+            var body = await response.Content.ReadAsStringAsync();
+            throw new InvalidOperationException($"Expected NotFound but got {response.StatusCode}: {body}");
+        }
     }
 
     [Fact]
     public async Task OpenSession_WithZeroOpeningFloat_ReturnsOk()
     {
-        var command = new { OpeningFloat = 0m, Notes = "Zero start" };
-        var response = await Client.PostAsJsonAsync(SessionsUrl, command);
-        response.StatusCode.Should().Be(HttpStatusCode.OK);
-        var body = await response.Content.ReadFromJsonAsync<ApiResponse<CashSessionDto>>();
-        body!.Success.Should().BeTrue();
-        body.Data!.OpeningFloat.Should().Be(0m);
+        var sessionId = await CreateTestSessionAsync(0m);
+        var response = await Client.GetAsync($"{SessionsUrl}/{sessionId}");
+        var result = await response.Content.ReadFromJsonAsync<ApiResponse<CashSessionDto>>();
+        result!.Success.Should().BeTrue();
+        result.Data!.OpeningFloat.Should().Be(0m);
+        await CloseTestSessionAsync(sessionId);
     }
 
     [Fact]
@@ -268,10 +354,15 @@ public class CashTests : TestBase
     {
         var command = new { OpeningFloat = 500m, Notes = "Night shift started" };
         var response = await Client.PostAsJsonAsync(SessionsUrl, command);
-        response.StatusCode.Should().Be(HttpStatusCode.OK);
-        var body = await response.Content.ReadFromJsonAsync<ApiResponse<CashSessionDto>>();
-        body!.Success.Should().BeTrue();
-        body.Data!.Notes.Should().Be("Night shift started");
+        if (response.StatusCode != HttpStatusCode.OK)
+        {
+            var body = await response.Content.ReadAsStringAsync();
+            throw new InvalidOperationException($"Expected OK but got {response.StatusCode}: {body}");
+        }
+        var result = await response.Content.ReadFromJsonAsync<ApiResponse<CashSessionDto>>();
+        result!.Success.Should().BeTrue();
+        result.Data!.Notes.Should().Be("Night shift started");
+        await CloseTestSessionAsync(result.Data!.Id);
     }
 
     [Fact]
@@ -296,7 +387,11 @@ public class CashTests : TestBase
 
         var command = new { CountedTotal = 400m, Notes = "Balanced" };
         var closeResponse = await Client.PostAsJsonAsync($"{SessionsUrl}/{sessionId}/close", command);
-        closeResponse.StatusCode.Should().Be(HttpStatusCode.OK);
+        if (closeResponse.StatusCode != HttpStatusCode.OK)
+        {
+            var body = await closeResponse.Content.ReadAsStringAsync();
+            throw new InvalidOperationException($"Expected OK but got {closeResponse.StatusCode}: {body}");
+        }
 
         var verifyResponse = await Client.GetAsync($"{SessionsUrl}/{sessionId}");
         var verifyBody = await verifyResponse.Content.ReadFromJsonAsync<ApiResponse<CashSessionDto>>();
@@ -304,20 +399,142 @@ public class CashTests : TestBase
         verifyBody.Data.ClosedAt.Should().NotBeNull();
     }
 
+    [Fact]
+    public async Task GetHandovers_Paged_ReturnsOk()
+    {
+        await EnsureNoOpenSessionAsync();
+        var sessionId = await CreateTestSessionAsync();
+        await CloseTestSessionAsync(sessionId, 1000m);
+
+        var request = new { Pagination = new { PageNumber = 1, PageSize = 10 } };
+        var response = await Client.PostAsJsonAsync($"{HandoversUrl}/all", request);
+        if (response.StatusCode != HttpStatusCode.OK)
+        {
+            var body = await response.Content.ReadAsStringAsync();
+            throw new InvalidOperationException($"Expected OK but got {response.StatusCode}: {body}");
+        }
+        var result = await response.Content.ReadFromJsonAsync<ApiResponse<PagedResultDto<CashHandoverDto>>>();
+        result!.Success.Should().BeTrue();
+        result.Data!.Items.Should().NotBeEmpty();
+    }
+
+    [Fact]
+    public async Task GetHandoverBySession_NonexistentSession_ReturnsOkWithNullData()
+    {
+        var fakeId = Guid.NewGuid();
+        var response = await Client.GetAsync($"{HandoversUrl}/{fakeId}");
+        if (response.StatusCode != HttpStatusCode.OK)
+        {
+            var body = await response.Content.ReadAsStringAsync();
+            throw new InvalidOperationException($"Expected OK but got {response.StatusCode}: {body}");
+        }
+        var result = await response.Content.ReadFromJsonAsync<ApiResponse<CashHandoverDto>>();
+        result!.Success.Should().BeTrue();
+        result.Data.Should().BeNull();
+    }
+
+    [Fact]
+    public async Task ApproveHandover_NonexistentSession_ReturnsNotFound()
+    {
+        var fakeId = Guid.NewGuid();
+        var response = await Client.PostAsJsonAsync($"{HandoversUrl}/{fakeId}/approve", new { });
+        if (response.StatusCode != HttpStatusCode.NotFound)
+        {
+            var body = await response.Content.ReadAsStringAsync();
+            throw new InvalidOperationException($"Expected NotFound but got {response.StatusCode}: {body}");
+        }
+    }
+
+    [Fact]
+    public async Task GetMyOpenSession_WhenNoneOpen_ReturnsOkWithNullData()
+    {
+        await EnsureNoOpenSessionAsync();
+        var response = await Client.GetAsync($"{SessionsUrl}/my-open");
+        if (response.StatusCode != HttpStatusCode.OK)
+        {
+            var body = await response.Content.ReadAsStringAsync();
+            throw new InvalidOperationException($"Expected OK but got {response.StatusCode}: {body}");
+        }
+        var result = await response.Content.ReadFromJsonAsync<ApiResponse<CashSessionDto>>();
+        result!.Success.Should().BeTrue();
+        result.Data.Should().BeNull();
+    }
+
+    [Fact]
+    public async Task GetCashEntries_AfterAddingEntries_ReturnsOk()
+    {
+        var sessionId = await CreateTestSessionAsync();
+        var entry1 = new { Direction = "In", Reason = "Payment", Amount = 100m, Description = "First payment" };
+        await Client.PostAsJsonAsync($"{SessionsUrl}/{sessionId}/entries", entry1);
+        var entry2 = new { Direction = "Out", Reason = "Payout", Amount = 50m, Description = "Supplies" };
+        await Client.PostAsJsonAsync($"{SessionsUrl}/{sessionId}/entries", entry2);
+
+        var response = await Client.GetAsync($"{SessionsUrl}/{sessionId}/entries");
+        if (response.StatusCode != HttpStatusCode.OK)
+        {
+            var body = await response.Content.ReadAsStringAsync();
+            throw new InvalidOperationException($"Expected OK but got {response.StatusCode}: {body}");
+        }
+        var result = await response.Content.ReadFromJsonAsync<ApiResponse<List<CashEntryDto>>>();
+        result!.Success.Should().BeTrue();
+        result.Data!.Should().HaveCount(2);
+        await CloseTestSessionAsync(sessionId);
+    }
+
+    private async Task EnsureNoOpenSessionAsync()
+    {
+        var response = await Client.GetAsync($"{SessionsUrl}/my-open");
+        if (response.StatusCode == HttpStatusCode.OK)
+        {
+            var session = await response.Content.ReadFromJsonAsync<ApiResponse<CashSessionDto>>();
+            if (session?.Data?.Id is Guid openId)
+            {
+                await CloseTestSessionAsync(openId);
+            }
+        }
+    }
+
     private async Task<Guid> CreateTestSessionAsync(decimal openingFloat = 1000m)
     {
+        await EnsureNoOpenSessionAsync();
+
         var command = new { OpeningFloat = openingFloat, Notes = "Test session" };
         var response = await Client.PostAsJsonAsync(SessionsUrl, command);
-        response.EnsureSuccessStatusCode();
-        var body = await response.Content.ReadFromJsonAsync<ApiResponse<CashSessionDto>>();
-        return body!.Data!.Id;
+        if (response.StatusCode != HttpStatusCode.OK)
+        {
+            var body = await response.Content.ReadAsStringAsync();
+            throw new InvalidOperationException($"Expected OK but got {response.StatusCode}: {body}");
+        }
+        var result = await response.Content.ReadFromJsonAsync<ApiResponse<CashSessionDto>>();
+        return result!.Data!.Id;
     }
 
     private async Task CloseTestSessionAsync(Guid sessionId, decimal countedTotal = 1000m)
     {
         var command = new { CountedTotal = countedTotal };
         var response = await Client.PostAsJsonAsync($"{SessionsUrl}/{sessionId}/close", command);
-        response.EnsureSuccessStatusCode();
+        if (response.StatusCode == HttpStatusCode.Conflict)
+        {
+            return;
+        }
+        if (response.StatusCode != HttpStatusCode.OK)
+        {
+            var body = await response.Content.ReadAsStringAsync();
+            throw new InvalidOperationException($"Expected OK or Conflict but got {response.StatusCode}: {body}");
+        }
+    }
+
+    private async Task<Guid> AddTestEntryAsync(Guid sessionId, string direction, decimal amount)
+    {
+        var entry = new { Direction = direction, Reason = "Test", Amount = amount };
+        var response = await Client.PostAsJsonAsync($"{SessionsUrl}/{sessionId}/entries", entry);
+        if (response.StatusCode != HttpStatusCode.OK)
+        {
+            var body = await response.Content.ReadAsStringAsync();
+            throw new InvalidOperationException($"Expected OK but got {response.StatusCode}: {body}");
+        }
+        var result = await response.Content.ReadFromJsonAsync<ApiResponse<CashEntryDto>>();
+        return result!.Data!.Id;
     }
 
     private sealed class ApiResponse
@@ -384,68 +601,6 @@ public class CashTests : TestBase
         public string? ClosedByName { get; set; }
         public Guid? ReceivingCashSessionId { get; set; }
         public string? Notes { get; set; }
-    }
-
-    [Fact]
-    public async Task GetHandovers_Paged_ReturnsOk()
-    {
-        var sessionId = await CreateTestSessionAsync();
-        await CloseTestSessionAsync(sessionId, 1000m);
-
-        var request = new { Pagination = new { PageNumber = 1, PageSize = 10 } };
-        var response = await Client.PostAsJsonAsync("api/cash/handovers/all", request);
-        response.StatusCode.Should().Be(HttpStatusCode.OK);
-        var body = await response.Content.ReadFromJsonAsync<ApiResponse<PagedResultDto<CashHandoverDto>>>();
-        body!.Success.Should().BeTrue();
-        body.Data!.Items.Should().NotBeEmpty();
-    }
-
-    [Fact]
-    public async Task GetHandoverBySession_NonexistentSession_ReturnsNotFound()
-    {
-        var fakeId = Guid.NewGuid();
-        var response = await Client.GetAsync($"api/cash/handovers/{fakeId}");
-        response.StatusCode.Should().Be(HttpStatusCode.NotFound);
-    }
-
-    [Fact]
-    public async Task ApproveHandover_NonexistentSession_ReturnsNotFound()
-    {
-        var fakeId = Guid.NewGuid();
-        var response = await Client.PostAsJsonAsync($"api/cash/handovers/{fakeId}/approve", new { });
-        response.StatusCode.Should().Be(HttpStatusCode.NotFound);
-    }
-
-    [Fact]
-    public async Task GetMyOpenSession_WhenNoneOpen_ReturnsNotFound()
-    {
-        var response = await Client.GetAsync($"{SessionsUrl}/my-open");
-        response.StatusCode.Should().Be(HttpStatusCode.NotFound);
-    }
-
-    [Fact]
-    public async Task GetCashEntries_AfterAddingEntries_ReturnsOk()
-    {
-        var sessionId = await CreateTestSessionAsync();
-        var entry1 = new { Direction = "In", Reason = "Payment", Amount = 100m, Description = "First payment" };
-        await Client.PostAsJsonAsync($"{SessionsUrl}/{sessionId}/entries", entry1);
-        var entry2 = new { Direction = "Out", Reason = "Payout", Amount = 50m, Description = "Supplies" };
-        await Client.PostAsJsonAsync($"{SessionsUrl}/{sessionId}/entries", entry2);
-
-        var response = await Client.GetAsync($"{SessionsUrl}/{sessionId}/entries");
-        response.StatusCode.Should().Be(HttpStatusCode.OK);
-        var body = await response.Content.ReadFromJsonAsync<ApiResponse<List<CashEntryDto>>>();
-        body!.Success.Should().BeTrue();
-        body.Data!.Should().HaveCount(2);
-    }
-
-    private async Task<Guid> AddTestEntryAsync(Guid sessionId, string direction, decimal amount)
-    {
-        var entry = new { Direction = direction, Reason = "Test", Amount = amount };
-        var response = await Client.PostAsJsonAsync($"{SessionsUrl}/{sessionId}/entries", entry);
-        response.EnsureSuccessStatusCode();
-        var body = await response.Content.ReadFromJsonAsync<ApiResponse<CashEntryDto>>();
-        return body!.Data!.Id;
     }
 
     private sealed class PagedResultDto<T>

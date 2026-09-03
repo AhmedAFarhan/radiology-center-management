@@ -7,14 +7,14 @@ namespace Tests;
 
 public class PermissionsTests : TestBase
 {
-    private const string BaseUrl = "api/permissions";
+    private const string PermissionsUrl = "api/permissions";
 
     public PermissionsTests(CustomWebApplicationFactory factory) : base(factory) { }
 
     [Fact]
     public async Task GetAll_ReturnsPermissionsList()
     {
-        var response = await Client.GetAsync(BaseUrl);
+        var response = await Client.GetAsync(PermissionsUrl);
         response.StatusCode.Should().Be(HttpStatusCode.OK);
         var body = await response.Content.ReadFromJsonAsync<ApiResponse<List<PermissionDto>>>();
         body!.Success.Should().BeTrue();
@@ -24,7 +24,7 @@ public class PermissionsTests : TestBase
     [Fact]
     public async Task GetAll_PermissionsHaveCodeAndName()
     {
-        var response = await Client.GetAsync(BaseUrl);
+        var response = await Client.GetAsync(PermissionsUrl);
         response.EnsureSuccessStatusCode();
         var body = await response.Content.ReadFromJsonAsync<ApiResponse<List<PermissionDto>>>();
         foreach (var permission in body!.Data!)
@@ -37,7 +37,7 @@ public class PermissionsTests : TestBase
     [Fact]
     public async Task GetAll_ContainsExpectedPermissionCodes()
     {
-        var response = await Client.GetAsync(BaseUrl);
+        var response = await Client.GetAsync(PermissionsUrl);
         response.EnsureSuccessStatusCode();
         var body = await response.Content.ReadFromJsonAsync<ApiResponse<List<PermissionDto>>>();
         var codes = body!.Data!.Select(p => p.Code).ToList();
@@ -49,7 +49,7 @@ public class PermissionsTests : TestBase
     [Fact]
     public async Task GetAll_PermissionsHaveGroup()
     {
-        var response = await Client.GetAsync(BaseUrl);
+        var response = await Client.GetAsync(PermissionsUrl);
         response.EnsureSuccessStatusCode();
         var body = await response.Content.ReadFromJsonAsync<ApiResponse<List<PermissionDto>>>();
         body!.Data!.Should().OnlyContain(p => p.Group != null);

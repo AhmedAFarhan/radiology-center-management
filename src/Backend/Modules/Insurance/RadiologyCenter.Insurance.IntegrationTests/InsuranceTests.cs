@@ -371,22 +371,24 @@ public class InsuranceTests : TestBase
     {
         var command = new { Name = $"TestCompany_{Guid.NewGuid():N}", TaxId = $"TAX-{Guid.NewGuid():N}", Address = "Test Address", Phone = "0123456789", Email = $"test_{Guid.NewGuid():N}@company.com" };
         var response = await Client.PostAsJsonAsync(CompaniesUrl, command);
-        response.EnsureSuccessStatusCode();
-        var allResponse = await Client.GetAsync(CompaniesUrl);
-        allResponse.EnsureSuccessStatusCode();
-        var allBody = await allResponse.Content.ReadFromJsonAsync<ApiResponse<List<CompanyDto>>>();
-        return allBody!.Data!.Last().Id;
+        if (response.StatusCode != HttpStatusCode.OK)
+            throw new Exception($"CreateTestCompanyAsync failed: expected OK but got {response.StatusCode}");
+        var body = await response.Content.ReadFromJsonAsync<ApiResponse<Guid>>();
+        if (body == null || !body.Success || body.Data == Guid.Empty)
+            throw new Exception($"CreateTestCompanyAsync returned unsuccessful response: {body?.Message ?? "null"}");
+        return body.Data;
     }
 
     private async Task<Guid> CreateTestPolicyForPatientAsync(Guid companyId, Guid patientId)
     {
         var command = new { CompanyId = companyId, PatientId = patientId, PolicyNumber = $"POL-{Guid.NewGuid():N}", CoveragePercent = 75m, EffectiveFrom = DateTime.UtcNow, IsGovernment = false };
         var response = await Client.PostAsJsonAsync(PoliciesUrl, command);
-        response.EnsureSuccessStatusCode();
-        var byPatientResponse = await Client.GetAsync($"{PoliciesUrl}/by-patient/{patientId}");
-        byPatientResponse.EnsureSuccessStatusCode();
-        var body = await byPatientResponse.Content.ReadFromJsonAsync<ApiResponse<List<PolicyDto>>>();
-        return body!.Data!.Last().Id;
+        if (response.StatusCode != HttpStatusCode.OK)
+            throw new Exception($"CreateTestPolicyForPatientAsync failed: expected OK but got {response.StatusCode}");
+        var body = await response.Content.ReadFromJsonAsync<ApiResponse<Guid>>();
+        if (body == null || !body.Success || body.Data == Guid.Empty)
+            throw new Exception($"CreateTestPolicyForPatientAsync returned unsuccessful response: {body?.Message ?? "null"}");
+        return body.Data;
     }
 
     private async Task<Guid> CreateTestPolicyAsync()
@@ -404,11 +406,12 @@ public class InsuranceTests : TestBase
         var examinationId = Guid.NewGuid();
         var preAuthCommand = new { ExaminationId = examinationId, PatientId = patientId, PolicyId = policyId, EstimatedAmount = 1000m };
         var preAuthResponse = await Client.PostAsJsonAsync(PreAuthUrl, preAuthCommand);
-        preAuthResponse.EnsureSuccessStatusCode();
-        var byExamResponse = await Client.GetAsync($"{PreAuthUrl}/by-examination/{examinationId}");
-        byExamResponse.EnsureSuccessStatusCode();
-        var preAuthBody = await byExamResponse.Content.ReadFromJsonAsync<ApiResponse<List<PreAuthorizationDto>>>();
-        var preAuthId = preAuthBody!.Data!.Last().Id;
+        if (preAuthResponse.StatusCode != HttpStatusCode.OK)
+            throw new Exception($"CreateClaimPrerequisitesAsync (pre-auth) failed: expected OK but got {preAuthResponse.StatusCode}");
+        var preAuthBody = await preAuthResponse.Content.ReadFromJsonAsync<ApiResponse<Guid>>();
+        if (preAuthBody == null || !preAuthBody.Success || preAuthBody.Data == Guid.Empty)
+            throw new Exception($"CreateClaimPrerequisitesAsync (pre-auth) returned unsuccessful response: {preAuthBody?.Message ?? "null"}");
+        var preAuthId = preAuthBody.Data;
         return (policyId, patientId, examinationId, preAuthId);
     }
 
@@ -429,11 +432,12 @@ public class InsuranceTests : TestBase
         }
         var command = new { ExaminationId = examinationId, PatientId = patientId.Value, PolicyId = policyId.Value, PreAuthorizationId = preAuthId.Value, BilledAmount = 500m };
         var response = await Client.PostAsJsonAsync(ClaimsUrl, command);
-        response.EnsureSuccessStatusCode();
-        var byExamResponse = await Client.GetAsync($"{ClaimsUrl}/by-examination/{examinationId}");
-        byExamResponse.EnsureSuccessStatusCode();
-        var body = await byExamResponse.Content.ReadFromJsonAsync<ApiResponse<List<ClaimDto>>>();
-        return body!.Data!.Last().Id;
+        if (response.StatusCode != HttpStatusCode.OK)
+            throw new Exception($"CreateTestClaimForExaminationAsync failed: expected OK but got {response.StatusCode}");
+        var body = await response.Content.ReadFromJsonAsync<ApiResponse<Guid>>();
+        if (body == null || !body.Success || body.Data == Guid.Empty)
+            throw new Exception($"CreateTestClaimForExaminationAsync returned unsuccessful response: {body?.Message ?? "null"}");
+        return body.Data;
     }
 
     private async Task<(Guid PreAuthId, Guid ExaminationId)> CreateTestPreAuthorizationAsync()
@@ -444,12 +448,12 @@ public class InsuranceTests : TestBase
         var examinationId = Guid.NewGuid();
         var command = new { ExaminationId = examinationId, PatientId = patientId, PolicyId = policyId, EstimatedAmount = 1000m };
         var response = await Client.PostAsJsonAsync(PreAuthUrl, command);
-        response.EnsureSuccessStatusCode();
-        var byExamResponse = await Client.GetAsync($"{PreAuthUrl}/by-examination/{examinationId}");
-        byExamResponse.EnsureSuccessStatusCode();
-        var body = await byExamResponse.Content.ReadFromJsonAsync<ApiResponse<List<PreAuthorizationDto>>>();
-        var preAuthId = body!.Data!.Last().Id;
-        return (preAuthId, examinationId);
+        if (response.StatusCode != HttpStatusCode.OK)
+            throw new Exception($"CreateTestPreAuthorizationAsync failed: expected OK but got {response.StatusCode}");
+        var body = await response.Content.ReadFromJsonAsync<ApiResponse<Guid>>();
+        if (body == null || !body.Success || body.Data == Guid.Empty)
+            throw new Exception($"CreateTestPreAuthorizationAsync returned unsuccessful response: {body?.Message ?? "null"}");
+        return (body.Data, examinationId);
     }
 
     // ── DTOs ─────────────────────────────────────────────────────────────

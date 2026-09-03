@@ -37,7 +37,7 @@ public class CashSessionsController : ControllerBase
     [HttpPost("all")]
     public async Task<IActionResult> GetAllAsync([FromBody] QueryRequest request, [FromQuery] string? status, CancellationToken ct)
     {
-        var result = await _bus.InvokeAsync<Result<PagedResult<CashSessionDto>>>(new GetCashSessionsQuery(request, status), ct);
+        var result = await _bus.InvokeAsync<Result<PagedResult<CashSessionListItemDto>>>(new GetCashSessionsQuery(request, status), ct);
         return result.ToActionResult();
     }
 

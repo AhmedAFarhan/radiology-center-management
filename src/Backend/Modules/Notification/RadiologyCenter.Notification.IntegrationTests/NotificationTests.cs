@@ -210,12 +210,22 @@ public class NotificationTests : TestBase
     [Fact]
     public async Task SendNotification_WithTemplateCode_ReturnsOk()
     {
-        var code = await CreateTestTemplateAsync();
+        var templateCode = $"TPL_{Guid.NewGuid():N}";
+        var createCommand = new
+        {
+            Code = templateCode,
+            Name = $"Template {Guid.NewGuid():N}",
+            Subject = "Test Subject",
+            Body = "Test Body"
+        };
+        var createResponse = await Client.PostAsJsonAsync(TemplatesUrl, createCommand);
+        createResponse.StatusCode.Should().Be(HttpStatusCode.OK);
+
         var command = new
         {
             Recipient = "patient@example.com",
             Channel = "Email",
-            TemplateCode = code,
+            TemplateCode = templateCode,
             Placeholders = new Dictionary<string, string> { { "Date", "2026-09-15" } }
         };
 
@@ -321,20 +331,22 @@ public class NotificationTests : TestBase
 
     // ──────────────────── Helpers ────────────────────────────────────────
 
-    private async Task<string> CreateTestTemplateAsync()
+    private async Task<Guid> CreateTestTemplateAsync()
     {
-        var code = $"TPL_{Guid.NewGuid():N}";
         var command = new
         {
-            Code = code,
+            Code = $"TPL_{Guid.NewGuid():N}",
             Name = $"Template {Guid.NewGuid():N}",
             Subject = "Test Subject",
             Body = "Test Body"
         };
 
         var response = await Client.PostAsJsonAsync(TemplatesUrl, command);
-        response.EnsureSuccessStatusCode();
-        return code;
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
+        var body = await response.Content.ReadFromJsonAsync<ApiResponse<NotificationTemplateDto>>();
+        body!.Success.Should().BeTrue();
+        body.Data.Should().NotBeNull();
+        return body.Data!.Id;
     }
 
     private sealed class ApiResponse

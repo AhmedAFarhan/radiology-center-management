@@ -32,15 +32,18 @@ public sealed class BackendStatusService
 
         try
         {
-            if (System.Diagnostics.Debugger.IsAttached)
-            {
-                IsReady = true;
-            }
-            else
-            {
-                await (LocalhostService.Instance?.StartAsync() ?? Task.CompletedTask);
-                IsReady = LocalhostService.Instance?.IsReady ?? true;
-            }
+            await (LocalhostService.Instance?.StartAsync() ?? Task.CompletedTask);
+            IsReady = LocalhostService.Instance?.IsReady ?? true;
+
+            //if (System.Diagnostics.Debugger.IsAttached)
+            //{
+            //    IsReady = true;
+            //}
+            //else
+            //{
+            //    await (LocalhostService.Instance?.StartAsync() ?? Task.CompletedTask);
+            //    IsReady = LocalhostService.Instance?.IsReady ?? true;
+            //}
         }
         catch (Exception ex)
         {

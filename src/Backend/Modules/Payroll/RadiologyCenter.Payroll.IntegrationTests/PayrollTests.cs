@@ -701,12 +701,13 @@ public class PayrollTests : TestBase
             HireDate = DateTime.UtcNow.Date.AddDays(-5)
         };
         var response = await Client.PostAsJsonAsync(StaffBaseUrl, command);
-        response.EnsureSuccessStatusCode();
-        var allResponse = await Client.PostAsJsonAsync($"{StaffBaseUrl}/all",
-            new { Pagination = new { PageNumber = 1, PageSize = 1 }, SearchTerm = command.FullName });
-        allResponse.EnsureSuccessStatusCode();
-        var allBody = await allResponse.Content.ReadFromJsonAsync<ApiResponse<PagedResultDto<StaffDto>>>();
-        return allBody!.Data!.Items.First().Id;
+        if (response.StatusCode != HttpStatusCode.OK)
+        {
+            var body = await response.Content.ReadAsStringAsync();
+            throw new InvalidOperationException($"Expected OK but got {response.StatusCode}: {body}");
+        }
+        var responseBody = await response.Content.ReadFromJsonAsync<ApiResponse<StaffDto>>();
+        return responseBody!.Data!.Id;
     }
 
     private async Task<Guid> CreateTestReferralDoctorAsync()
@@ -717,19 +718,21 @@ public class PayrollTests : TestBase
             Phone = $"010{Random.Shared.Next(10000000, 99999999)}"
         };
         var response = await Client.PostAsJsonAsync(ReferralDoctorsBaseUrl, command);
-        response.EnsureSuccessStatusCode();
-        var allResponse = await Client.PostAsJsonAsync($"{ReferralDoctorsBaseUrl}/all",
-            new { Pagination = new { PageNumber = 1, PageSize = 1 }, SearchTerm = command.FullName });
-        allResponse.EnsureSuccessStatusCode();
-        var allBody = await allResponse.Content.ReadFromJsonAsync<ApiResponse<PagedResultDto<ReferralDoctorDto>>>();
-        return allBody!.Data!.Items.First().Id;
+        if (response.StatusCode != HttpStatusCode.OK)
+        {
+            var body = await response.Content.ReadAsStringAsync();
+            throw new InvalidOperationException($"Expected OK but got {response.StatusCode}: {body}");
+        }
+        var responseBody = await response.Content.ReadFromJsonAsync<ApiResponse<ReferralDoctorDto>>();
+        return responseBody!.Data!.Id;
     }
 
     private async Task<Guid> CreateTestExaminationTypeAsync()
     {
+        var name = $"TestExType_{Guid.NewGuid():N}";
         var command = new
         {
-            Name = $"TestExType_{Guid.NewGuid():N}",
+            Name = name,
             Modality = "XRay",
             BodyPart = "Chest",
             StandardDurationMinutes = 15,
@@ -737,11 +740,19 @@ public class PayrollTests : TestBase
             RequiresPreparation = false,
             RequiresConsent = false
         };
-        var response = await Client.PostAsJsonAsync(ExaminationTypesBaseUrl, command);
-        response.EnsureSuccessStatusCode();
+        var createResponse = await Client.PostAsJsonAsync(ExaminationTypesBaseUrl, command);
+        if (createResponse.StatusCode != HttpStatusCode.OK)
+        {
+            var body = await createResponse.Content.ReadAsStringAsync();
+            throw new InvalidOperationException($"Expected OK but got {createResponse.StatusCode}: {body}");
+        }
         var allResponse = await Client.PostAsJsonAsync($"{ExaminationTypesBaseUrl}/all",
-            new { Pagination = new { PageNumber = 1, PageSize = 1 } });
-        allResponse.EnsureSuccessStatusCode();
+            new { Pagination = new { PageNumber = 1, PageSize = 1 }, SearchTerm = name });
+        if (allResponse.StatusCode != HttpStatusCode.OK)
+        {
+            var body = await allResponse.Content.ReadAsStringAsync();
+            throw new InvalidOperationException($"Expected OK but got {allResponse.StatusCode}: {body}");
+        }
         var allBody = await allResponse.Content.ReadFromJsonAsync<ApiResponse<PagedResultDto<ExaminationTypeDto>>>();
         return allBody!.Data!.Items.First().Id;
     }
@@ -755,12 +766,13 @@ public class PayrollTests : TestBase
             Notes = "Test pay run"
         };
         var response = await Client.PostAsJsonAsync(PayRunsBaseUrl, command);
-        response.EnsureSuccessStatusCode();
-        var allResponse = await Client.PostAsJsonAsync($"{PayRunsBaseUrl}/all",
-            new { Pagination = new { PageNumber = 1, PageSize = 1 } });
-        allResponse.EnsureSuccessStatusCode();
-        var allBody = await allResponse.Content.ReadFromJsonAsync<ApiResponse<PagedResultDto<PayRunDto>>>();
-        return allBody!.Data!.Items.First().Id;
+        if (response.StatusCode != HttpStatusCode.OK)
+        {
+            var body = await response.Content.ReadAsStringAsync();
+            throw new InvalidOperationException($"Expected OK but got {response.StatusCode}: {body}");
+        }
+        var responseBody = await response.Content.ReadFromJsonAsync<ApiResponse<PayRunDto>>();
+        return responseBody!.Data!.Id;
     }
 
     private async Task<Guid> CreateTestSalaryAsync()
@@ -774,12 +786,13 @@ public class PayrollTests : TestBase
             EffectiveDate = DateTime.UtcNow.Date.AddDays(-10)
         };
         var response = await Client.PostAsJsonAsync(SalariesBaseUrl, command);
-        response.EnsureSuccessStatusCode();
-        var allResponse = await Client.PostAsJsonAsync($"{SalariesBaseUrl}/all",
-            new { Pagination = new { PageNumber = 1, PageSize = 1 } });
-        allResponse.EnsureSuccessStatusCode();
-        var allBody = await allResponse.Content.ReadFromJsonAsync<ApiResponse<PagedResultDto<SalaryDto>>>();
-        return allBody!.Data!.Items.First().Id;
+        if (response.StatusCode != HttpStatusCode.OK)
+        {
+            var body = await response.Content.ReadAsStringAsync();
+            throw new InvalidOperationException($"Expected OK but got {response.StatusCode}: {body}");
+        }
+        var responseBody = await response.Content.ReadFromJsonAsync<ApiResponse<SalaryDto>>();
+        return responseBody!.Data!.Id;
     }
 
     private async Task<Guid> CreateTestSalaryComponentAsync()
@@ -794,12 +807,13 @@ public class PayrollTests : TestBase
             IsPerWorkDay = false
         };
         var response = await Client.PostAsJsonAsync(SalaryComponentsBaseUrl, command);
-        response.EnsureSuccessStatusCode();
-        var allResponse = await Client.PostAsJsonAsync($"{SalaryComponentsBaseUrl}/all",
-            new { Pagination = new { PageNumber = 1, PageSize = 1 } });
-        allResponse.EnsureSuccessStatusCode();
-        var allBody = await allResponse.Content.ReadFromJsonAsync<ApiResponse<PagedResultDto<SalaryComponentDto>>>();
-        return allBody!.Data!.Items.First().Id;
+        if (response.StatusCode != HttpStatusCode.OK)
+        {
+            var body = await response.Content.ReadAsStringAsync();
+            throw new InvalidOperationException($"Expected OK but got {response.StatusCode}: {body}");
+        }
+        var responseBody = await response.Content.ReadFromJsonAsync<ApiResponse<SalaryComponentDto>>();
+        return responseBody!.Data!.Id;
     }
 
     private async Task<Guid> CreateTestExaminationFeeAsync()
@@ -813,12 +827,13 @@ public class PayrollTests : TestBase
             IsPercentage = false
         };
         var response = await Client.PostAsJsonAsync(ExaminationFeesBaseUrl, command);
-        response.EnsureSuccessStatusCode();
-        var allResponse = await Client.PostAsJsonAsync($"{ExaminationFeesBaseUrl}/all",
-            new { Pagination = new { PageNumber = 1, PageSize = 1 } });
-        allResponse.EnsureSuccessStatusCode();
-        var allBody = await allResponse.Content.ReadFromJsonAsync<ApiResponse<PagedResultDto<ExaminationFeeDto>>>();
-        return allBody!.Data!.Items.First().Id;
+        if (response.StatusCode != HttpStatusCode.OK)
+        {
+            var body = await response.Content.ReadAsStringAsync();
+            throw new InvalidOperationException($"Expected OK but got {response.StatusCode}: {body}");
+        }
+        var responseBody = await response.Content.ReadFromJsonAsync<ApiResponse<ExaminationFeeDto>>();
+        return responseBody!.Data!.Id;
     }
 
     private async Task<Guid> CreateTestReferralFeeAsync()
@@ -833,12 +848,13 @@ public class PayrollTests : TestBase
             IsPercentage = false
         };
         var response = await Client.PostAsJsonAsync(ReferralFeesBaseUrl, command);
-        response.EnsureSuccessStatusCode();
-        var allResponse = await Client.PostAsJsonAsync($"{ReferralFeesBaseUrl}/all",
-            new { Pagination = new { PageNumber = 1, PageSize = 1 } });
-        allResponse.EnsureSuccessStatusCode();
-        var allBody = await allResponse.Content.ReadFromJsonAsync<ApiResponse<PagedResultDto<ReferralFeeDto>>>();
-        return allBody!.Data!.Items.First().Id;
+        if (response.StatusCode != HttpStatusCode.OK)
+        {
+            var body = await response.Content.ReadAsStringAsync();
+            throw new InvalidOperationException($"Expected OK but got {response.StatusCode}: {body}");
+        }
+        var responseBody = await response.Content.ReadFromJsonAsync<ApiResponse<ReferralFeeDto>>();
+        return responseBody!.Data!.Id;
     }
 
     private async Task<Guid> CreateTestAllowanceAsync()
@@ -854,12 +870,13 @@ public class PayrollTests : TestBase
             IsPerWorkDay = false
         };
         var response = await Client.PostAsJsonAsync(AllowancesBaseUrl, command);
-        response.EnsureSuccessStatusCode();
-        var allResponse = await Client.PostAsJsonAsync($"{AllowancesBaseUrl}/all",
-            new { Pagination = new { PageNumber = 1, PageSize = 1 } });
-        allResponse.EnsureSuccessStatusCode();
-        var allBody = await allResponse.Content.ReadFromJsonAsync<ApiResponse<PagedResultDto<AllowanceAssignmentDto>>>();
-        return allBody!.Data!.Items.First().Id;
+        if (response.StatusCode != HttpStatusCode.OK)
+        {
+            var body = await response.Content.ReadAsStringAsync();
+            throw new InvalidOperationException($"Expected OK but got {response.StatusCode}: {body}");
+        }
+        var responseBody = await response.Content.ReadFromJsonAsync<ApiResponse<AllowanceAssignmentDto>>();
+        return responseBody!.Data!.Id;
     }
 
     #endregion

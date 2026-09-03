@@ -603,24 +603,20 @@ public class InventoryTests : TestBase
     {
         var itemName = name ?? $"Test Item {Guid.NewGuid():N}";
         var command = new { Name = itemName, Category = "MedicalSupply", Unit = "Piece" };
-        await Client.PostAsJsonAsync(ItemsUrl, command);
-        var allResponse = await Client.PostAsJsonAsync($"{ItemsUrl}/all",
-            new { Pagination = new { PageNumber = 1, PageSize = 1 }, SearchTerm = itemName });
-        allResponse.EnsureSuccessStatusCode();
-        var allBody = await allResponse.Content.ReadFromJsonAsync<ApiResponse<PagedResultDto<ItemDto>>>();
-        return allBody!.Data!.Items.First().Id;
+        var createResponse = await Client.PostAsJsonAsync(ItemsUrl, command);
+        createResponse.StatusCode.Should().Be(HttpStatusCode.OK);
+        var createBody = await createResponse.Content.ReadFromJsonAsync<ApiResponse<ItemDto>>();
+        return createBody!.Data!.Id;
     }
 
     private async Task<Guid> CreateTestSupplierAsync(string? phone = null)
     {
         var supplierPhone = phone ?? $"010{Random.Shared.Next(10000000, 99999999)}";
         var command = new { Name = $"Supplier {Guid.NewGuid():N}", Phone = supplierPhone };
-        await Client.PostAsJsonAsync(SuppliersUrl, command);
-        var allResponse = await Client.PostAsJsonAsync($"{SuppliersUrl}/all",
-            new { Pagination = new { PageNumber = 1, PageSize = 1 }, SearchTerm = command.Name });
-        allResponse.EnsureSuccessStatusCode();
-        var allBody = await allResponse.Content.ReadFromJsonAsync<ApiResponse<PagedResultDto<SupplierDto>>>();
-        return allBody!.Data!.Items.First().Id;
+        var createResponse = await Client.PostAsJsonAsync(SuppliersUrl, command);
+        createResponse.StatusCode.Should().Be(HttpStatusCode.OK);
+        var createBody = await createResponse.Content.ReadFromJsonAsync<ApiResponse<SupplierDto>>();
+        return createBody!.Data!.Id;
     }
 
     private async Task<Guid> CreateTestPurchaseOrderAsync(Guid? itemId = null, Guid? supplierId = null)
@@ -636,7 +632,7 @@ public class InventoryTests : TestBase
             }
         };
         var response = await Client.PostAsJsonAsync(PurchaseOrdersUrl, command);
-        response.EnsureSuccessStatusCode();
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
         var body = await response.Content.ReadFromJsonAsync<ApiResponse<PurchaseOrderDto>>();
         return body!.Data!.Id;
     }
@@ -654,7 +650,7 @@ public class InventoryTests : TestBase
             }
         };
         var receiveResponse = await Client.PostAsJsonAsync($"{PurchaseOrdersUrl}/{poId}/receive", receiveCommand);
-        receiveResponse.EnsureSuccessStatusCode();
+        receiveResponse.StatusCode.Should().Be(HttpStatusCode.OK);
     }
 
     #endregion

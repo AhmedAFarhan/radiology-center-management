@@ -9,6 +9,9 @@ public class ReportsTests : TestBase
 {
     private const string ReportsUrl = "api/reports";
     private const string TemplatesUrl = "api/reports/templates";
+    private const string PatientsUrl = "api/patients";
+    private const string ExaminationsUrl = "api/examinations";
+    private const string ExaminationTypesUrl = "api/examination-types";
 
     public ReportsTests(CustomWebApplicationFactory factory) : base(factory) { }
 
@@ -762,7 +765,7 @@ public class ReportsTests : TestBase
             RadiologistId = Guid.NewGuid()
         };
         var response = await Client.PostAsJsonAsync(ReportsUrl, command);
-        response.EnsureSuccessStatusCode();
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
         var body = await response.Content.ReadFromJsonAsync<ApiResponse<ReportDto>>();
         return body!.Data!.Id;
     }
@@ -777,7 +780,7 @@ public class ReportsTests : TestBase
             Position = 0
         };
         var response = await Client.PostAsJsonAsync($"{ReportsUrl}/{reportId}/findings", command);
-        response.EnsureSuccessStatusCode();
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
         var body = await response.Content.ReadFromJsonAsync<ApiResponse<ReportFindingDto>>();
         return body!.Data!.Id;
     }
@@ -792,7 +795,7 @@ public class ReportsTests : TestBase
             Description = "Test template"
         };
         var response = await Client.PostAsJsonAsync(TemplatesUrl, command);
-        response.EnsureSuccessStatusCode();
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
         var body = await response.Content.ReadFromJsonAsync<ApiResponse<ReportTemplateDto>>();
         return body!.Data!.Id;
     }
@@ -800,7 +803,7 @@ public class ReportsTests : TestBase
     private async Task DeactivateTestTemplateAsync(Guid templateId)
     {
         var response = await Client.PostAsJsonAsync($"{TemplatesUrl}/{templateId}/deactivate", new { });
-        response.EnsureSuccessStatusCode();
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
     }
 
     private async Task<Guid> CreateTestPatientAsync()
@@ -809,11 +812,11 @@ public class ReportsTests : TestBase
         {
             FullName = "Ahmed Mohamed Ali",
             Gender = "Male",
-            PhoneNumber = "01012345678",
+            PhoneNumber = $"010{Random.Shared.Next(10000000, 99999999)}",
             DateOfBirth = new DateTime(1990, 5, 15)
         };
-        var response = await Client.PostAsJsonAsync("api/patients", command);
-        response.EnsureSuccessStatusCode();
+        var response = await Client.PostAsJsonAsync(PatientsUrl, command);
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
         var body = await response.Content.ReadFromJsonAsync<ApiResponse<PatientDto>>();
         return body!.Data!.Id;
     }
@@ -832,15 +835,15 @@ public class ReportsTests : TestBase
             IsDiscountPercentage = false,
             Paid = 0m
         };
-        var response = await Client.PostAsJsonAsync("api/examinations", command);
-        response.EnsureSuccessStatusCode();
+        var response = await Client.PostAsJsonAsync(ExaminationsUrl, command);
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
         var body = await response.Content.ReadFromJsonAsync<ApiResponse<ExaminationDto>>();
         return body!.Data!.Id;
     }
 
     private async Task<Guid> GetOrCreateExaminationTypeAsync()
     {
-        var response = await Client.PostAsJsonAsync("api/examination-types/all", new { PageNumber = 1, PageSize = 1 });
+        var response = await Client.PostAsJsonAsync($"{ExaminationTypesUrl}/all", new { PageNumber = 1, PageSize = 1 });
         if (response.IsSuccessStatusCode)
         {
             var body = await response.Content.ReadFromJsonAsync<ApiResponse<PagedResultDto<ExaminationTypeListItemDto>>>();
@@ -860,13 +863,10 @@ public class ReportsTests : TestBase
             RequiresConsent = false,
             RequiresContrast = false
         };
-        var createResponse = await Client.PostAsJsonAsync("api/examination-types", createTypeCommand);
-        createResponse.EnsureSuccessStatusCode();
-
-        var allResponse = await Client.PostAsJsonAsync("api/examination-types/all", new { PageNumber = 1, PageSize = 1 });
-        allResponse.EnsureSuccessStatusCode();
-        var allBody = await allResponse.Content.ReadFromJsonAsync<ApiResponse<PagedResultDto<ExaminationTypeListItemDto>>>();
-        return allBody!.Data!.Items.First().Id;
+        var createResponse = await Client.PostAsJsonAsync(ExaminationTypesUrl, createTypeCommand);
+        createResponse.StatusCode.Should().Be(HttpStatusCode.OK);
+        var createBody = await createResponse.Content.ReadFromJsonAsync<ApiResponse<ExaminationTypeListItemDto>>();
+        return createBody!.Data!.Id;
     }
 
     // ── DTOs ──────────────────────────────────────────────────────────────

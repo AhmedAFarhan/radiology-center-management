@@ -1,6 +1,7 @@
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Json;
+using System.Text.Json;
 using AwesomeAssertions;
 using RadiologyCenter.IntegrationTests.Shared;
 
@@ -8,7 +9,7 @@ namespace Tests;
 
 public class ExaminationTypesTests : TestBase
 {
-    private const string BaseUrl = "api/catalog/examination-types";
+    private const string ExaminationTypesUrl = "api/catalog/examination-types";
 
     public ExaminationTypesTests(CustomWebApplicationFactory factory) : base(factory) { }
 
@@ -26,7 +27,7 @@ public class ExaminationTypesTests : TestBase
             RequiresConsent = false
         };
 
-        var response = await Client.PostAsJsonAsync(BaseUrl, command);
+        var response = await Client.PostAsJsonAsync(ExaminationTypesUrl, command);
         response.StatusCode.Should().Be(HttpStatusCode.OK);
         var body = await response.Content.ReadFromJsonAsync<ApiResponse>();
         body!.Success.Should().BeTrue();
@@ -42,7 +43,7 @@ public class ExaminationTypesTests : TestBase
             BodyPart = "Chest"
         };
 
-        var response = await Client.PostAsJsonAsync(BaseUrl, command);
+        var response = await Client.PostAsJsonAsync(ExaminationTypesUrl, command);
         response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
     }
 
@@ -56,7 +57,7 @@ public class ExaminationTypesTests : TestBase
             BodyPart = "Head"
         };
 
-        var response = await Client.PostAsJsonAsync(BaseUrl, command);
+        var response = await Client.PostAsJsonAsync(ExaminationTypesUrl, command);
         response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
     }
 
@@ -70,7 +71,7 @@ public class ExaminationTypesTests : TestBase
             BodyPart = ""
         };
 
-        var response = await Client.PostAsJsonAsync(BaseUrl, command);
+        var response = await Client.PostAsJsonAsync(ExaminationTypesUrl, command);
         response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
     }
 
@@ -84,7 +85,7 @@ public class ExaminationTypesTests : TestBase
             BodyPart = "Chest"
         };
 
-        var response = await Client.PostAsJsonAsync(BaseUrl, command);
+        var response = await Client.PostAsJsonAsync(ExaminationTypesUrl, command);
         response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
     }
 
@@ -99,7 +100,7 @@ public class ExaminationTypesTests : TestBase
             Price = -100m
         };
 
-        var response = await Client.PostAsJsonAsync(BaseUrl, command);
+        var response = await Client.PostAsJsonAsync(ExaminationTypesUrl, command);
         response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
     }
 
@@ -114,7 +115,7 @@ public class ExaminationTypesTests : TestBase
             StandardDurationMinutes = -5
         };
 
-        var response = await Client.PostAsJsonAsync(BaseUrl, command);
+        var response = await Client.PostAsJsonAsync(ExaminationTypesUrl, command);
         response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
     }
 
@@ -122,7 +123,7 @@ public class ExaminationTypesTests : TestBase
     public async Task GetById_Existing_ReturnsOk()
     {
         var id = await CreateTestExaminationTypeAsync();
-        var response = await Client.GetAsync($"{BaseUrl}/{id}");
+        var response = await Client.GetAsync($"{ExaminationTypesUrl}/{id}");
         response.StatusCode.Should().Be(HttpStatusCode.OK);
         var body = await response.Content.ReadFromJsonAsync<ApiResponse<ExaminationTypeDto>>();
         body!.Success.Should().BeTrue();
@@ -133,7 +134,7 @@ public class ExaminationTypesTests : TestBase
     public async Task GetById_Nonexistent_ReturnsNotFound()
     {
         var fakeId = Guid.NewGuid();
-        var response = await Client.GetAsync($"{BaseUrl}/{fakeId}");
+        var response = await Client.GetAsync($"{ExaminationTypesUrl}/{fakeId}");
         response.StatusCode.Should().Be(HttpStatusCode.NotFound);
     }
 
@@ -141,7 +142,7 @@ public class ExaminationTypesTests : TestBase
     public async Task GetAllPaged_ReturnsOk()
     {
         var request = new { Pagination = new { PageNumber = 1, PageSize = 10 } };
-        var response = await Client.PostAsJsonAsync($"{BaseUrl}/all", request);
+        var response = await Client.PostAsJsonAsync($"{ExaminationTypesUrl}/all", request);
         response.StatusCode.Should().Be(HttpStatusCode.OK);
         var body = await response.Content.ReadFromJsonAsync<ApiResponse<PagedResultDto<ExaminationTypeDto>>>();
         body!.Success.Should().BeTrue();
@@ -164,7 +165,7 @@ public class ExaminationTypesTests : TestBase
             RequiresConsent = false
         };
 
-        var response = await Client.PutAsJsonAsync($"{BaseUrl}/{id}", command);
+        var response = await Client.PutAsJsonAsync($"{ExaminationTypesUrl}/{id}", command);
         response.StatusCode.Should().Be(HttpStatusCode.OK);
     }
 
@@ -180,7 +181,7 @@ public class ExaminationTypesTests : TestBase
             BodyPart = "Head"
         };
 
-        var response = await Client.PutAsJsonAsync($"{BaseUrl}/{fakeId}", command);
+        var response = await Client.PutAsJsonAsync($"{ExaminationTypesUrl}/{fakeId}", command);
         response.StatusCode.Should().Be(HttpStatusCode.NotFound);
     }
 
@@ -200,7 +201,7 @@ public class ExaminationTypesTests : TestBase
             BodyPart = "Abdomen"
         };
 
-        var response = await Client.PutAsJsonAsync($"{BaseUrl}/{id2}", command);
+        var response = await Client.PutAsJsonAsync($"{ExaminationTypesUrl}/{id2}", command);
         response.StatusCode.Should().Be(HttpStatusCode.Conflict);
     }
 
@@ -208,7 +209,7 @@ public class ExaminationTypesTests : TestBase
     public async Task Activate_ReturnsOk()
     {
         var id = await CreateTestExaminationTypeAsync();
-        var response = await Client.PostAsJsonAsync($"{BaseUrl}/{id}/activate", new { });
+        var response = await Client.PostAsJsonAsync($"{ExaminationTypesUrl}/{id}/activate", new { });
         response.StatusCode.Should().Be(HttpStatusCode.OK);
     }
 
@@ -216,7 +217,7 @@ public class ExaminationTypesTests : TestBase
     public async Task Deactivate_ReturnsOk()
     {
         var id = await CreateTestExaminationTypeAsync();
-        var response = await Client.PostAsJsonAsync($"{BaseUrl}/{id}/deactivate", new { });
+        var response = await Client.PostAsJsonAsync($"{ExaminationTypesUrl}/{id}/deactivate", new { });
         response.StatusCode.Should().Be(HttpStatusCode.OK);
     }
 
@@ -224,7 +225,7 @@ public class ExaminationTypesTests : TestBase
     public async Task Delete_ReturnsOk()
     {
         var id = await CreateTestExaminationTypeAsync();
-        var response = await Client.DeleteAsync($"{BaseUrl}/{id}");
+        var response = await Client.DeleteAsync($"{ExaminationTypesUrl}/{id}");
         response.StatusCode.Should().Be(HttpStatusCode.OK);
     }
 
@@ -232,7 +233,7 @@ public class ExaminationTypesTests : TestBase
     public async Task Delete_Nonexistent_ReturnsNotFound()
     {
         var fakeId = Guid.NewGuid();
-        var response = await Client.DeleteAsync($"{BaseUrl}/{fakeId}");
+        var response = await Client.DeleteAsync($"{ExaminationTypesUrl}/{fakeId}");
         response.StatusCode.Should().Be(HttpStatusCode.NotFound);
     }
 
@@ -242,7 +243,7 @@ public class ExaminationTypesTests : TestBase
         var name = $"VerifyData_{Guid.NewGuid():N}";
         var id = await CreateTestExaminationTypeAsync(name, "MRI", "Spine");
 
-        var response = await Client.GetAsync($"{BaseUrl}/{id}");
+        var response = await Client.GetAsync($"{ExaminationTypesUrl}/{id}");
         response.StatusCode.Should().Be(HttpStatusCode.OK);
         var body = await response.Content.ReadFromJsonAsync<ApiResponse<ExaminationTypeDto>>();
         body!.Success.Should().BeTrue();
@@ -267,9 +268,9 @@ public class ExaminationTypesTests : TestBase
             Modality = "XRay",
             BodyPart = "Chest"
         };
-        await Client.PutAsJsonAsync($"{BaseUrl}/{id}", updateCommand);
+        await Client.PutAsJsonAsync($"{ExaminationTypesUrl}/{id}", updateCommand);
 
-        var getResponse = await Client.GetAsync($"{BaseUrl}/{id}");
+        var getResponse = await Client.GetAsync($"{ExaminationTypesUrl}/{id}");
         getResponse.StatusCode.Should().Be(HttpStatusCode.OK);
         var body = await getResponse.Content.ReadFromJsonAsync<ApiResponse<ExaminationTypeDto>>();
         body!.Data!.Name.Should().Be(newName);
@@ -296,7 +297,7 @@ public class ExaminationTypesTests : TestBase
             Price = 300m
         };
 
-        var response = await Client.PostAsJsonAsync(BaseUrl, command);
+        var response = await Client.PostAsJsonAsync(ExaminationTypesUrl, command);
         response.StatusCode.Should().Be(HttpStatusCode.OK);
         var body = await response.Content.ReadFromJsonAsync<ApiResponse>();
         body!.Success.Should().BeTrue();
@@ -309,7 +310,7 @@ public class ExaminationTypesTests : TestBase
         {
             Pagination = new { PageNumber = 1, PageSize = 10 }
         };
-        var response = await Client.PostAsJsonAsync($"{BaseUrl}/export", request);
+        var response = await Client.PostAsJsonAsync($"{ExaminationTypesUrl}/export", request);
         response.StatusCode.Should().Be(HttpStatusCode.OK);
         response.Content.Headers.ContentType.Should().NotBeNull();
     }
@@ -317,7 +318,7 @@ public class ExaminationTypesTests : TestBase
     [Fact]
     public async Task GetImportTemplate_ReturnsOk()
     {
-        var response = await Client.GetAsync($"{BaseUrl}/import-template");
+        var response = await Client.GetAsync($"{ExaminationTypesUrl}/import-template");
         response.StatusCode.Should().Be(HttpStatusCode.OK);
         response.Content.Headers.ContentType.Should().NotBeNull();
     }
@@ -331,7 +332,7 @@ public class ExaminationTypesTests : TestBase
         fileContentObj.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
         content.Add(fileContentObj, "File", "examination-types.xlsx");
 
-        var response = await Client.PostAsync($"{BaseUrl}/import", content);
+        var response = await Client.PostAsync($"{ExaminationTypesUrl}/import", content);
         response.StatusCode.Should().Be(HttpStatusCode.OK);
     }
 
@@ -351,14 +352,16 @@ public class ExaminationTypesTests : TestBase
             RequiresConsent = false
         };
 
-        var response = await Client.PostAsJsonAsync(BaseUrl, command);
-        response.EnsureSuccessStatusCode();
+        var response = await Client.PostAsJsonAsync(ExaminationTypesUrl, command);
+        if (response.StatusCode != HttpStatusCode.OK)
+        {
+            var body = await response.Content.ReadAsStringAsync();
+            throw new InvalidOperationException($"Expected OK but got {response.StatusCode}: {body}");
+        }
 
-        var allResponse = await Client.PostAsJsonAsync($"{BaseUrl}/all",
-            new { Pagination = new { PageNumber = 1, PageSize = 1 } });
-        allResponse.EnsureSuccessStatusCode();
-        var allBody = await allResponse.Content.ReadFromJsonAsync<ApiResponse<PagedResultDto<ExaminationTypeDto>>>();
-        return allBody!.Data!.Items.First().Id;
+        var createBody = await response.Content.ReadFromJsonAsync<ApiResponse>();
+        var id = ((JsonElement)createBody!.Data!).GetProperty("Id").GetGuid();
+        return id;
     }
 
     private sealed class ApiResponse
