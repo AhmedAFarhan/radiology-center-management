@@ -4,6 +4,7 @@
     <Project Path="Backend/BuildingBlocks/RadiologyCenter.BuildingBlocks.Application/RadiologyCenter.BuildingBlocks.Application.csproj" />
     <Project Path="Backend/BuildingBlocks/RadiologyCenter.BuildingBlocks.Domain/RadiologyCenter.BuildingBlocks.Domain.csproj" />
     <Project Path="Backend/BuildingBlocks/RadiologyCenter.BuildingBlocks.Infrastructure/RadiologyCenter.BuildingBlocks.Infrastructure.csproj" />
+    <Project Path="Backend/BuildingBlocks/RadiologyCenter.IntegrationTests.Shared/RadiologyCenter.IntegrationTests.Shared.csproj" />
   </Folder>
   <Folder Name="/Backend/Localhost/">
     <Project Path="Backend/Localhost/RadiologyCenter.Localhost/RadiologyCenter.Localhost.csproj" />
@@ -13,70 +14,67 @@
     <Project Path="Backend/Modules/Identity/RadiologyCenter.Identity.Application/RadiologyCenter.Identity.Application.csproj" />
     <Project Path="Backend/Modules/Identity/RadiologyCenter.Identity.Domain/RadiologyCenter.Identity.Domain.csproj" />
     <Project Path="Backend/Modules/Identity/RadiologyCenter.Identity.Infrastructure/RadiologyCenter.Identity.Infrastructure.csproj" />
+    <Project Path="Backend/Modules/Identity/RadiologyCenter.Identity.IntegrationTests/RadiologyCenter.Identity.IntegrationTests.csproj" />
   </Folder>
   <Folder Name="/Backend/Modules/Inventory/">
     <Project Path="Backend/Modules/Inventory/RadiologyCenter.Inventory.Domain/RadiologyCenter.Inventory.Domain.csproj" />
     <Project Path="Backend/Modules/Inventory/RadiologyCenter.Inventory.Application/RadiologyCenter.Inventory.Application.csproj" />
     <Project Path="Backend/Modules/Inventory/RadiologyCenter.Inventory.Infrastructure/RadiologyCenter.Inventory.Infrastructure.csproj" />
+    <Project Path="Backend/Modules/Inventory/RadiologyCenter.Inventory.IntegrationTests/RadiologyCenter.Inventory.IntegrationTests.csproj" />
   </Folder>
   <Folder Name="/Backend/Modules/Patients/">
     <Project Path="Backend/Modules/Patients/RadiologyCenter.Patients.Application/RadiologyCenter.Patients.Application.csproj" />
     <Project Path="Backend/Modules/Patients/RadiologyCenter.Patients.Domain/RadiologyCenter.Patients.Domain.csproj" />
     <Project Path="Backend/Modules/Patients/RadiologyCenter.Patients.Infrastructure/RadiologyCenter.Patients.Infrastructure.csproj" />
+    <Project Path="Backend/Modules/Patients/RadiologyCenter.Patients.IntegrationTests/RadiologyCenter.Patients.IntegrationTests.csproj" />
   </Folder>
   <Folder Name="/Backend/Modules/Catalog/">
     <Project Path="Backend/Modules/Catalog/RadiologyCenter.Catalog.Domain/RadiologyCenter.Catalog.Domain.csproj" />
     <Project Path="Backend/Modules/Catalog/RadiologyCenter.Catalog.Application/RadiologyCenter.Catalog.Application.csproj" />
     <Project Path="Backend/Modules/Catalog/RadiologyCenter.Catalog.Infrastructure/RadiologyCenter.Catalog.Infrastructure.csproj" />
+    <Project Path="Backend/Modules/Catalog/RadiologyCenter.Catalog.IntegrationTests/RadiologyCenter.Catalog.IntegrationTests.csproj" />
   </Folder>
   <Folder Name="/Backend/Modules/Examinations/">
     <Project Path="Backend/Modules/Examinations/RadiologyCenter.Examinations.Domain/RadiologyCenter.Examinations.Domain.csproj" />
     <Project Path="Backend/Modules/Examinations/RadiologyCenter.Examinations.Application/RadiologyCenter.Examinations.Application.csproj" />
     <Project Path="Backend/Modules/Examinations/RadiologyCenter.Examinations.Infrastructure/RadiologyCenter.Examinations.Infrastructure.csproj" />
+    <Project Path="Backend/Modules/Examinations/RadiologyCenter.Examinations.IntegrationTests/RadiologyCenter.Examinations.IntegrationTests.csproj" />
   </Folder>
   <Folder Name="/Backend/Modules/ResourceManagement/">
     <Project Path="Backend/Modules/ResourceManagement/RadiologyCenter.ResourceManagement.Domain/RadiologyCenter.ResourceManagement.Domain.csproj" />
     <Project Path="Backend/Modules/ResourceManagement/RadiologyCenter.ResourceManagement.Application/RadiologyCenter.ResourceManagement.Application.csproj" />
     <Project Path="Backend/Modules/ResourceManagement/RadiologyCenter.ResourceManagement.Infrastructure/RadiologyCenter.ResourceManagement.Infrastructure.csproj" />
+    <Project Path="Backend/Modules/ResourceManagement/RadiologyCenter.ResourceManagement.IntegrationTests/RadiologyCenter.ResourceManagement.IntegrationTests.csproj" />
   </Folder>
   <Folder Name="/Backend/Modules/Payroll/">
     <Project Path="Backend/Modules/Payroll/RadiologyCenter.Payroll.Domain/RadiologyCenter.Payroll.Domain.csproj" />
     <Project Path="Backend/Modules/Payroll/RadiologyCenter.Payroll.Application/RadiologyCenter.Payroll.Application.csproj" />
     <Project Path="Backend/Modules/Payroll/RadiologyCenter.Payroll.Infrastructure/RadiologyCenter.Payroll.Infrastructure.csproj" />
+    <Project Path="Backend/Modules/Payroll/RadiologyCenter.Payroll.IntegrationTests/RadiologyCenter.Payroll.IntegrationTests.csproj" />
   </Folder>
   <Folder Name="/Backend/Modules/Reports/">
     <Project Path="Backend/Modules/Reports/RadiologyCenter.Reports.Domain/RadiologyCenter.Reports.Domain.csproj" />
     <Project Path="Backend/Modules/Reports/RadiologyCenter.Reports.Application/RadiologyCenter.Reports.Application.csproj" />
     <Project Path="Backend/Modules/Reports/RadiologyCenter.Reports.Infrastructure/RadiologyCenter.Reports.Infrastructure.csproj" />
+    <Project Path="Backend/Modules/Reports/RadiologyCenter.Reports.IntegrationTests/RadiologyCenter.Reports.IntegrationTests.csproj" />
   </Folder>
   <Folder Name="/Backend/Modules/Insurance/">
     <Project Path="Backend/Modules/Insurance/RadiologyCenter.Insurance.Domain/RadiologyCenter.Insurance.Domain.csproj" />
     <Project Path="Backend/Modules/Insurance/RadiologyCenter.Insurance.Application/RadiologyCenter.Insurance.Application.csproj" />
     <Project Path="Backend/Modules/Insurance/RadiologyCenter.Insurance.Infrastructure/RadiologyCenter.Insurance.Infrastructure.csproj" />
+    <Project Path="Backend/Modules/Insurance/RadiologyCenter.Insurance.IntegrationTests/RadiologyCenter.Insurance.IntegrationTests.csproj" />
   </Folder>
   <Folder Name="/Backend/Modules/Cash/">
     <Project Path="Backend/Modules/Cash/RadiologyCenter.Cash.Domain/RadiologyCenter.Cash.Domain.csproj" />
     <Project Path="Backend/Modules/Cash/RadiologyCenter.Cash.Application/RadiologyCenter.Cash.Application.csproj" />
     <Project Path="Backend/Modules/Cash/RadiologyCenter.Cash.Infrastructure/RadiologyCenter.Cash.Infrastructure.csproj" />
+    <Project Path="Backend/Modules/Cash/RadiologyCenter.Cash.IntegrationTests/RadiologyCenter.Cash.IntegrationTests.csproj" />
   </Folder>
   <Folder Name="/Backend/Modules/Notification/">
     <Project Path="Backend/Modules/Notification/RadiologyCenter.Notification.Domain/RadiologyCenter.Notification.Domain.csproj" />
     <Project Path="Backend/Modules/Notification/RadiologyCenter.Notification.Application/RadiologyCenter.Notification.Application.csproj" />
     <Project Path="Backend/Modules/Notification/RadiologyCenter.Notification.Infrastructure/RadiologyCenter.Notification.Infrastructure.csproj" />
-  </Folder>
-  <Folder Name="/Backend/Tests/">
-    <Project Path="Backend/Tests/RadiologyCenter.IntegrationTests.Shared/RadiologyCenter.IntegrationTests.Shared.csproj" />
-    <Project Path="Backend/Tests/RadiologyCenter.Identity.Tests/RadiologyCenter.Identity.Tests.csproj" />
-    <Project Path="Backend/Tests/RadiologyCenter.Patients.Tests/RadiologyCenter.Patients.Tests.csproj" />
-    <Project Path="Backend/Tests/RadiologyCenter.Catalog.Tests/RadiologyCenter.Catalog.Tests.csproj" />
-    <Project Path="Backend/Tests/RadiologyCenter.Examinations.Tests/RadiologyCenter.Examinations.Tests.csproj" />
-    <Project Path="Backend/Tests/RadiologyCenter.ResourceManagement.Tests/RadiologyCenter.ResourceManagement.Tests.csproj" />
-    <Project Path="Backend/Tests/RadiologyCenter.Payroll.Tests/RadiologyCenter.Payroll.Tests.csproj" />
-    <Project Path="Backend/Tests/RadiologyCenter.Reports.Tests/RadiologyCenter.Reports.Tests.csproj" />
-    <Project Path="Backend/Tests/RadiologyCenter.Insurance.Tests/RadiologyCenter.Insurance.Tests.csproj" />
-    <Project Path="Backend/Tests/RadiologyCenter.Cash.Tests/RadiologyCenter.Cash.Tests.csproj" />
-    <Project Path="Backend/Tests/RadiologyCenter.Inventory.Tests/RadiologyCenter.Inventory.Tests.csproj" />
-    <Project Path="Backend/Tests/RadiologyCenter.Notification.Tests/RadiologyCenter.Notification.Tests.csproj" />
+    <Project Path="Backend/Modules/Notification/RadiologyCenter.Notification.IntegrationTests/RadiologyCenter.Notification.IntegrationTests.csproj" />
   </Folder>
   <Folder Name="/Desktop/">
     <Project Path="Desktop/RadiologyCenter.Desktop/RadiologyCenter.Desktop.csproj" />
