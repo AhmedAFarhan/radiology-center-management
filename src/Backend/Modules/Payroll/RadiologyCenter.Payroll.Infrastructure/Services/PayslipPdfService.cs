@@ -1,17 +1,19 @@
 using QuestPDF.Fluent;
 using QuestPDF.Helpers;
 using QuestPDF.Infrastructure;
+using RadiologyCenter.BuildingBlocks.Application.Common;
 using RadiologyCenter.BuildingBlocks.Domain.Specifications;
 using RadiologyCenter.Payroll.Application.Abstractions;
 using RadiologyCenter.Payroll.Application.DTOs;
 using RadiologyCenter.Payroll.Domain.Entities;
+using RadiologyCenter.Payroll.Domain.Enumerations;
 using RadiologyCenter.ResourceManagement.Application.Abstractions;
+using RadiologyCenter.ResourceManagement.Domain.Enumerations;
 
 namespace RadiologyCenter.Payroll.Infrastructure.Services;
 
 public class PayslipPdfService : IPayslipPdfService
 {
-    private const string PrimaryColor = "#4C58E0";
     private readonly IPayRunRepository _payRunRepository;
     private readonly IStaffRepository _staffRepository;
     private readonly IExamFeeIncomeResolver _examFeeIncomeResolver;
@@ -47,7 +49,7 @@ public class PayslipPdfService : IPayslipPdfService
             StaffSpecialization = staff.Specialization,
             StaffPhoneNumber = staff.PhoneNumber,
             StaffHireDate = staff.HireDate,
-            SalaryCalculationRule = staff.SalaryCalculationRule?.Name ?? "FixedPlusFees",
+            SalaryCalculationRule = staff.SalaryCalculationRule?.Name ?? ResourceManagement.Domain.Enumerations.SalaryCalculationRule.FixedPlusFees.Name,
             RunFrom = payRun.RunFrom,
             RunTo = payRun.RunTo,
             PayRunStatus = payRun.Status.Name,
@@ -99,8 +101,8 @@ public class PayslipPdfService : IPayslipPdfService
 
             row.RelativeItem(3).Column(col =>
             {
-                col.Item().Text("RADIOLOGY CENTER").FontSize(18).Bold().FontColor(PrimaryColor);
-                col.Item().Text("PAYSLIP").FontSize(14).Bold().FontColor(Colors.Grey.Darken1);
+                col.Item().Text(BrandConstants.CompanyName).FontSize(18).Bold().FontColor(BrandConstants.PrimaryColor);
+                col.Item().Text(PdfLabels.Payslip).FontSize(14).Bold().FontColor(Colors.Grey.Darken1);
                 col.Item().PaddingTop(5).Text($"Period: {dto.RunFrom:MMM dd, yyyy} - {dto.RunTo:MMM dd, yyyy}").FontSize(9).FontColor(Colors.Grey.Medium);
             });
 
@@ -115,7 +117,7 @@ public class PayslipPdfService : IPayslipPdfService
     private static byte[] GetLogoBytes()
     {
         var assembly = typeof(PayslipPdfService).Assembly;
-        using var stream = assembly.GetManifestResourceStream("RadiologyCenter.Payroll.Infrastructure.Resources.logo.png");
+        using var stream = assembly.GetManifestResourceStream(BrandConstants.LogoResourceName);
         if (stream is null)
             return [];
 
@@ -130,8 +132,8 @@ public class PayslipPdfService : IPayslipPdfService
         {
             col.Item().Background(Colors.Grey.Lighten5).Padding(10).Row(row =>
             {
-                row.RelativeItem(2).Column(c => c.Item().Text("Employee Information").FontSize(11).Bold().FontColor(PrimaryColor));
-                row.RelativeItem(1).Column(c => c.Item().Text("Pay Period").FontSize(11).Bold().FontColor(PrimaryColor));
+                row.RelativeItem(2).Column(c => c.Item().Text(PdfLabels.EmployeeInformation).FontSize(11).Bold().FontColor(BrandConstants.PrimaryColor));
+                row.RelativeItem(1).Column(c => c.Item().Text(PdfLabels.PayPeriod).FontSize(11).Bold().FontColor(BrandConstants.PrimaryColor));
             });
 
             col.Item().PaddingVertical(5).LineHorizontal(1).LineColor(Colors.Grey.Lighten1);
@@ -166,13 +168,13 @@ public class PayslipPdfService : IPayslipPdfService
             {
                 col.Item().PaddingTop(20).Padding(10).Column(c =>
                 {
-                    c.Item().Text("Additional Information").FontSize(10).Bold().FontColor(Colors.Grey.Darken1);
+                    c.Item().Text(PdfLabels.AdditionalInformation).FontSize(10).Bold().FontColor(Colors.Grey.Darken1);
                     if (!string.IsNullOrWhiteSpace(dto.StaffDepartment))
-                        c.Item().PaddingTop(3).Text($"Department: {dto.StaffDepartment}").FontSize(9);
+                        c.Item().PaddingTop(3).Text($"{PdfLabels.Department} {dto.StaffDepartment}").FontSize(9);
                     if (!string.IsNullOrWhiteSpace(dto.StaffSpecialization))
-                        c.Item().Text($"Specialization: {dto.StaffSpecialization}").FontSize(9);
+                        c.Item().Text($"{PdfLabels.Specialization} {dto.StaffSpecialization}").FontSize(9);
                     if (!string.IsNullOrWhiteSpace(dto.SalaryCalculationRule))
-                        c.Item().Text($"Salary Rule: {dto.SalaryCalculationRule}").FontSize(9);
+                        c.Item().Text($"{PdfLabels.SalaryRule} {dto.SalaryCalculationRule}").FontSize(9);
                 });
             }
         });
@@ -182,7 +184,7 @@ public class PayslipPdfService : IPayslipPdfService
     {
         container.Padding(10).Column(col =>
         {
-            col.Item().Text("EARNINGS").FontSize(11).Bold().FontColor(Colors.Green.Darken1);
+            col.Item().Text(PdfLabels.Earnings).FontSize(11).Bold().FontColor(Colors.Green.Darken1);
             col.Item().PaddingTop(5).Table(table =>
             {
                 table.ColumnsDefinition(columns =>
@@ -192,10 +194,10 @@ public class PayslipPdfService : IPayslipPdfService
                 });
                 table.Header(h =>
                 {
-                    h.Cell().Text("Description").FontSize(8).Bold().FontColor(Colors.Grey.Darken1);
-                    h.Cell().AlignRight().Text("Amount").FontSize(8).Bold().FontColor(Colors.Grey.Darken1);
+                    h.Cell().Text(PdfLabels.Description).FontSize(8).Bold().FontColor(Colors.Grey.Darken1);
+                    h.Cell().AlignRight().Text(PdfLabels.Amount).FontSize(8).Bold().FontColor(Colors.Grey.Darken1);
                 });
-                table.Cell().Text("Base Salary").FontSize(9);
+                table.Cell().Text(PdfLabels.BaseSalary).FontSize(9);
                 table.Cell().AlignRight().Text(dto.GrossSalary.ToString("N2")).FontSize(9);
                 foreach (var c in dto.Components.Where(c => !c.IsDeduction && c.Name != "Examination Fees"))
                 {
@@ -209,7 +211,7 @@ public class PayslipPdfService : IPayslipPdfService
                 }
                 table.Cell().PaddingTop(3).LineHorizontal(0.5f).LineColor(Colors.Grey.Lighten1);
                 table.Cell().PaddingTop(3).LineHorizontal(0.5f).LineColor(Colors.Grey.Lighten1);
-                table.Cell().Text("Total Earnings").FontSize(9).Bold();
+                table.Cell().Text(PdfLabels.TotalEarnings).FontSize(9).Bold();
                 table.Cell().AlignRight().Text(dto.TotalEarnings.ToString("N2")).FontSize(9).Bold().FontColor(Colors.Green.Darken1);
             });
         });
@@ -217,9 +219,9 @@ public class PayslipPdfService : IPayslipPdfService
 
     private static void BuildExamFeeBreakdown(IContainer container, PayslipPdfDto dto)
     {
-        container.Padding(10).BorderLeft(2).BorderColor(PrimaryColor).Column(col =>
+        container.Padding(10).BorderLeft(2).BorderColor(BrandConstants.PrimaryColor).Column(col =>
         {
-            col.Item().Text("EXAMINATION FEE BREAKDOWN").FontSize(10).Bold().FontColor(PrimaryColor);
+            col.Item().Text(PdfLabels.ExaminationFeeBreakdown).FontSize(10).Bold().FontColor(BrandConstants.PrimaryColor);
             col.Item().PaddingTop(5).Table(table =>
             {
                 table.ColumnsDefinition(columns =>
@@ -231,10 +233,10 @@ public class PayslipPdfService : IPayslipPdfService
                 });
                 table.Header(h =>
                 {
-                    h.Cell().Text("Exam Type").FontSize(8).Bold().FontColor(Colors.Grey.Darken1);
-                    h.Cell().AlignRight().Text("Count").FontSize(8).Bold().FontColor(Colors.Grey.Darken1);
-                    h.Cell().AlignRight().Text("Rate").FontSize(8).Bold().FontColor(Colors.Grey.Darken1);
-                    h.Cell().AlignRight().Text("Total").FontSize(8).Bold().FontColor(Colors.Grey.Darken1);
+                    h.Cell().Text(PdfLabels.ExamType).FontSize(8).Bold().FontColor(Colors.Grey.Darken1);
+                    h.Cell().AlignRight().Text(PdfLabels.Count).FontSize(8).Bold().FontColor(Colors.Grey.Darken1);
+                    h.Cell().AlignRight().Text(PdfLabels.Rate).FontSize(8).Bold().FontColor(Colors.Grey.Darken1);
+                    h.Cell().AlignRight().Text(PdfLabels.Total).FontSize(8).Bold().FontColor(Colors.Grey.Darken1);
                 });
                 foreach (var item in dto.ExaminationFeeBreakdown)
                 {
@@ -247,10 +249,10 @@ public class PayslipPdfService : IPayslipPdfService
                 table.Cell().PaddingTop(3).LineHorizontal(0.5f).LineColor(Colors.Grey.Lighten1);
                 table.Cell().PaddingTop(3).LineHorizontal(0.5f).LineColor(Colors.Grey.Lighten1);
                 table.Cell().PaddingTop(3).LineHorizontal(0.5f).LineColor(Colors.Grey.Lighten1);
-                table.Cell().Text("Total Exam Fees").FontSize(9).Bold();
+                table.Cell().Text(PdfLabels.TotalExamFees).FontSize(9).Bold();
                 table.Cell().AlignRight().Text(dto.ExaminationFeeBreakdown.Sum(i => i.Count).ToString()).FontSize(9).Bold();
                 table.Cell().AlignRight();
-                table.Cell().AlignRight().Text(dto.ExaminationFeeTotal.ToString("N2")).FontSize(9).Bold().FontColor(PrimaryColor);
+                table.Cell().AlignRight().Text(dto.ExaminationFeeTotal.ToString("N2")).FontSize(9).Bold().FontColor(BrandConstants.PrimaryColor);
             });
         });
     }
@@ -259,7 +261,7 @@ public class PayslipPdfService : IPayslipPdfService
     {
         container.Padding(10).Column(col =>
         {
-            col.Item().Text("DEDUCTIONS").FontSize(11).Bold().FontColor(Colors.Red.Darken1);
+            col.Item().Text(PdfLabels.Deductions).FontSize(11).Bold().FontColor(Colors.Red.Darken1);
             col.Item().PaddingTop(5).Table(table =>
             {
                 table.ColumnsDefinition(columns =>
@@ -269,8 +271,8 @@ public class PayslipPdfService : IPayslipPdfService
                 });
                 table.Header(h =>
                 {
-                    h.Cell().Text("Description").FontSize(8).Bold().FontColor(Colors.Grey.Darken1);
-                    h.Cell().AlignRight().Text("Amount").FontSize(8).Bold().FontColor(Colors.Grey.Darken1);
+                    h.Cell().Text(PdfLabels.Description).FontSize(8).Bold().FontColor(Colors.Grey.Darken1);
+                    h.Cell().AlignRight().Text(PdfLabels.Amount).FontSize(8).Bold().FontColor(Colors.Grey.Darken1);
                 });
                 if (dto.UnpaidLeaveDays > 0)
                 {
@@ -284,7 +286,7 @@ public class PayslipPdfService : IPayslipPdfService
                 }
                 table.Cell().PaddingTop(3).LineHorizontal(0.5f).LineColor(Colors.Grey.Lighten1);
                 table.Cell().PaddingTop(3).LineHorizontal(0.5f).LineColor(Colors.Grey.Lighten1);
-                table.Cell().Text("Total Deductions").FontSize(9).Bold();
+                table.Cell().Text(PdfLabels.TotalDeductions).FontSize(9).Bold();
                 table.Cell().AlignRight().Text(dto.TotalDeductions.ToString("N2")).FontSize(9).Bold().FontColor(Colors.Red.Darken1);
             });
         });
@@ -294,8 +296,8 @@ public class PayslipPdfService : IPayslipPdfService
     {
         container.Background(Colors.Grey.Lighten5).Padding(15).Row(row =>
         {
-            row.RelativeItem(2).Column(c => c.Item().Text("NET SALARY").FontSize(14).Bold().FontColor(PrimaryColor));
-            row.RelativeItem(1).Column(c => c.Item().AlignRight().Text(dto.NetSalary.ToString("N2")).FontSize(16).Bold().FontColor(PrimaryColor));
+            row.RelativeItem(2).Column(c => c.Item().Text(PdfLabels.NetSalary).FontSize(14).Bold().FontColor(BrandConstants.PrimaryColor));
+            row.RelativeItem(1).Column(c => c.Item().AlignRight().Text(dto.NetSalary.ToString("N2")).FontSize(16).Bold().FontColor(BrandConstants.PrimaryColor));
         });
     }
 
@@ -303,19 +305,17 @@ public class PayslipPdfService : IPayslipPdfService
     {
         container.AlignCenter().Text(text =>
         {
-            text.Span("Generated on ").FontSize(8).FontColor(Colors.Grey.Medium);
+            text.Span(PdfLabels.GeneratedOn).FontSize(8).FontColor(Colors.Grey.Medium);
             text.Span(DateTime.Now.ToString("MMM dd, yyyy HH:mm")).FontSize(8).FontColor(Colors.Grey.Medium);
-            text.Span(" | This is a system-generated document.").FontSize(8).FontColor(Colors.Grey.Medium);
+            text.Span($" | {PdfLabels.SystemGeneratedDocument}").FontSize(8).FontColor(Colors.Grey.Medium);
         });
     }
 
-    private static string GetStatusColor(string status) => status switch
-    {
-        "Draft" => Colors.Grey.Medium,
-        "Computed" => PrimaryColor,
-        "Approved" => Colors.Green.Medium,
-        "Paid" => Colors.Green.Darken2,
-        "Rejected" => Colors.Red.Medium,
-        _ => Colors.Grey.Medium
-    };
+    private static string GetStatusColor(string status) =>
+        status == PayRunStatus.Draft.Name ? Colors.Grey.Medium :
+        status == PayRunStatus.Computed.Name ? BrandConstants.PrimaryColor :
+        status == PayRunStatus.Approved.Name ? Colors.Green.Medium :
+        status == PayRunStatus.Paid.Name ? Colors.Green.Darken2 :
+        status == PayRunStatus.Rejected.Name ? Colors.Red.Medium :
+        Colors.Grey.Medium;
 }

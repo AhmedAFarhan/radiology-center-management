@@ -100,7 +100,7 @@ public class ApiError
 
     public static ApiError FromException(Exception ex, string? code = null, string? message = null) => new()
     {
-        Code = code ?? "Error",
+        Code = code ?? ApiErrorCodes.Error,
         Message = message ?? ex.Message,
     };
 }

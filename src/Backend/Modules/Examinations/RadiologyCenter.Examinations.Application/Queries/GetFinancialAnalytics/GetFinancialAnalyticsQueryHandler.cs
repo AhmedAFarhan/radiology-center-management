@@ -1,4 +1,5 @@
 using RadiologyCenter.BuildingBlocks.Application.Abstractions;
+using RadiologyCenter.BuildingBlocks.Application.Common;
 using RadiologyCenter.Examinations.Application.Abstractions;
 using RadiologyCenter.Examinations.Application.DTOs;
 using RadiologyCenter.Examinations.Domain.Common;
@@ -40,7 +41,7 @@ public static class GetFinancialAnalyticsQueryHandler
             .ToList();
 
         var byModality = projections
-            .GroupBy(p => typeLookup.TryGetValue(p.ExaminationTypeId, out var t) ? t.Modality : "Unknown")
+            .GroupBy(p => typeLookup.TryGetValue(p.ExaminationTypeId, out var t) ? t.Modality : BrandConstants.UnknownModality)
             .OrderByDescending(g => g.Sum(p => p.Paid))
             .Select(g => new RevenueByModalityDto(g.Key, g.Sum(p => p.Paid), g.Count()))
             .ToList();

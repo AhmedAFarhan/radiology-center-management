@@ -37,6 +37,7 @@ public class AppDbContextFactory : IDesignTimeDbContextFactory<AppDbContext>
             basePath = Path.GetDirectoryName(basePath);
         }
 
-        return "Server=.;Database=RadiologyCenter;Trusted_Connection=True;TrustServerCertificate=True;";
+        throw new InvalidOperationException(
+                "Connection string 'DefaultConnection' not found. Ensure appsettings.json exists in the project root or set the environment variable.");
     }
 }

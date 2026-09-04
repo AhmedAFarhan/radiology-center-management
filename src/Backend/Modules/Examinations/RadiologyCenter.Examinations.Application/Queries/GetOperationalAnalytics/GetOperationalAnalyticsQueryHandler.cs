@@ -1,5 +1,7 @@
+using RadiologyCenter.BuildingBlocks.Application.Common;
 using RadiologyCenter.Examinations.Application.Abstractions;
 using RadiologyCenter.Examinations.Application.DTOs;
+using RadiologyCenter.Examinations.Domain.Enumerations;
 
 namespace RadiologyCenter.Examinations.Application.Queries.GetOperationalAnalytics;
 
@@ -18,13 +20,13 @@ public static class GetOperationalAnalyticsQueryHandler
         var typeLookup = types.ToDictionary(t => t.Id, t => t.Modality);
 
         var total = projections.Count;
-        var completed = projections.Count(p => p.Status.Name == "Completed");
-        var cancelled = projections.Count(p => p.Status.Name == "Cancelled");
+        var completed = projections.Count(p => p.Status.Name == ExaminationStatus.Completed.Name);
+        var cancelled = projections.Count(p => p.Status.Name == ExaminationStatus.Cancelled.Name);
 
         var terminal = completed + cancelled;
         var completionRate = terminal == 0 ? 0m : Math.Round((decimal)completed / terminal, 4);
 
-        var completedExams = projections.Where(p => p.Status.Name == "Completed").ToList();
+        var completedExams = projections.Where(p => p.Status.Name == ExaminationStatus.Completed.Name).ToList();
         var durations = completedExams
             .Where(p => p.StartedAt is not null && p.CompletedAt is not null)
             .Select(p => (p.CompletedAt!.Value - p.StartedAt!.Value).TotalMinutes)
@@ -49,16 +51,16 @@ public static class GetOperationalAnalyticsQueryHandler
             .Select(g => new MonthlyVolumeDto(
                 g.Key,
                 g.Count(),
-                g.Count(p => p.Status.Name == "Completed")))
+                g.Count(p => p.Status.Name == ExaminationStatus.Completed.Name)))
             .ToList();
 
         var byModality = projections
-            .GroupBy(p => typeLookup.TryGetValue(p.ExaminationTypeId, out var modality) ? modality : "Unknown")
+            .GroupBy(p => typeLookup.TryGetValue(p.ExaminationTypeId, out var modality) ? modality : BrandConstants.UnknownModality)
             .OrderByDescending(g => g.Count())
             .Select(g => new ModalityVolumeDto(
                 g.Key,
                 g.Count(),
-                g.Count(p => p.Status.Name == "Completed")))
+                g.Count(p => p.Status.Name == ExaminationStatus.Completed.Name)))
             .ToList();
 
         var byPriority = projections

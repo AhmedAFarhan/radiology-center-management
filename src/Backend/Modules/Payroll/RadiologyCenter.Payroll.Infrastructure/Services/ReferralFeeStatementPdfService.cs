@@ -1,14 +1,15 @@
 using QuestPDF.Fluent;
 using QuestPDF.Helpers;
 using QuestPDF.Infrastructure;
+using RadiologyCenter.BuildingBlocks.Application.Common;
 using RadiologyCenter.Payroll.Application.Abstractions;
+using RadiologyCenter.Payroll.Domain.Enumerations;
 using RadiologyCenter.ResourceManagement.Application.Abstractions;
 
 namespace RadiologyCenter.Payroll.Infrastructure.Services;
 
 public class ReferralFeeStatementPdfService : IReferralFeeStatementPdfService
 {
-    private const string PrimaryColor = "#4C58E0";
     private readonly IPayRunRepository _payRunRepository;
     private readonly IReferralDoctorRepository _referralDoctorRepository;
     private readonly IReferralFeeStatementResolver _resolver;
@@ -83,8 +84,8 @@ public class ReferralFeeStatementPdfService : IReferralFeeStatementPdfService
 
             row.RelativeItem(3).Column(col =>
             {
-                col.Item().Text("RADIOLOGY CENTER").FontSize(18).Bold().FontColor(PrimaryColor);
-                col.Item().Text("REFERRAL FEE STATEMENT").FontSize(14).Bold().FontColor(Colors.Grey.Darken1);
+                col.Item().Text(BrandConstants.CompanyName).FontSize(18).Bold().FontColor(BrandConstants.PrimaryColor);
+                col.Item().Text(PdfLabels.ReferralFeeStatement).FontSize(14).Bold().FontColor(Colors.Grey.Darken1);
                 col.Item().PaddingTop(5).Text($"Period: {payRun.RunFrom:MMM dd, yyyy} - {payRun.RunTo:MMM dd, yyyy}").FontSize(9).FontColor(Colors.Grey.Medium);
             });
 
@@ -99,7 +100,7 @@ public class ReferralFeeStatementPdfService : IReferralFeeStatementPdfService
     private static byte[] GetLogoBytes()
     {
         var assembly = typeof(ReferralFeeStatementPdfService).Assembly;
-        using var stream = assembly.GetManifestResourceStream("RadiologyCenter.Payroll.Infrastructure.Resources.logo.png");
+        using var stream = assembly.GetManifestResourceStream(BrandConstants.LogoResourceName);
         if (stream is null)
             return [];
 
@@ -122,8 +123,8 @@ public class ReferralFeeStatementPdfService : IReferralFeeStatementPdfService
         {
             col.Item().Background(Colors.Grey.Lighten5).Padding(10).Row(row =>
             {
-                row.RelativeItem(2).Column(c => c.Item().Text("Referral Doctor Information").FontSize(11).Bold().FontColor(PrimaryColor));
-                row.RelativeItem(1).Column(c => c.Item().Text("Statement Period").FontSize(11).Bold().FontColor(PrimaryColor));
+                row.RelativeItem(2).Column(c => c.Item().Text(PdfLabels.ReferralDoctorInformation).FontSize(11).Bold().FontColor(BrandConstants.PrimaryColor));
+                row.RelativeItem(1).Column(c => c.Item().Text(PdfLabels.StatementPeriod).FontSize(11).Bold().FontColor(BrandConstants.PrimaryColor));
             });
 
             col.Item().PaddingVertical(5).LineHorizontal(1).LineColor(Colors.Grey.Lighten1);
@@ -152,7 +153,7 @@ public class ReferralFeeStatementPdfService : IReferralFeeStatementPdfService
             {
                 col.Item().Padding(10).Column(c =>
                 {
-                    c.Item().Text("EXAMINATION FEE BREAKDOWN").FontSize(11).Bold().FontColor(Colors.Grey.Darken1);
+                    c.Item().Text(PdfLabels.ExaminationFeeBreakdown).FontSize(11).Bold().FontColor(Colors.Grey.Darken1);
                     c.Item().PaddingTop(5).Table(table =>
                     {
                         table.ColumnsDefinition(columns =>
@@ -163,8 +164,8 @@ public class ReferralFeeStatementPdfService : IReferralFeeStatementPdfService
                         });
                         table.Header(h =>
                         {
-                            h.Cell().Text("Exam Type").FontSize(8).Bold().FontColor(Colors.Grey.Darken1);
-                            h.Cell().AlignRight().Text("Count").FontSize(8).Bold().FontColor(Colors.Grey.Darken1);
+                            h.Cell().Text(PdfLabels.ExamType).FontSize(8).Bold().FontColor(Colors.Grey.Darken1);
+                            h.Cell().AlignRight().Text(PdfLabels.Count).FontSize(8).Bold().FontColor(Colors.Grey.Darken1);
                             h.Cell().AlignRight().Text("Total Fee").FontSize(8).Bold().FontColor(Colors.Grey.Darken1);
                         });
                         foreach (var item in breakdown.Items)
@@ -176,17 +177,17 @@ public class ReferralFeeStatementPdfService : IReferralFeeStatementPdfService
                         table.Cell().PaddingTop(3).LineHorizontal(0.5f).LineColor(Colors.Grey.Lighten1);
                         table.Cell().PaddingTop(3).LineHorizontal(0.5f).LineColor(Colors.Grey.Lighten1);
                         table.Cell().PaddingTop(3).LineHorizontal(0.5f).LineColor(Colors.Grey.Lighten1);
-                        table.Cell().Text("Total").FontSize(9).Bold();
+                        table.Cell().Text(PdfLabels.Total).FontSize(9).Bold();
                         table.Cell().AlignRight().Text(breakdown.ExamCount.ToString()).FontSize(9).Bold();
-                        table.Cell().AlignRight().Text(breakdown.TotalFee.ToString("N2")).FontSize(9).Bold().FontColor(PrimaryColor);
+                        table.Cell().AlignRight().Text(breakdown.TotalFee.ToString("N2")).FontSize(9).Bold().FontColor(BrandConstants.PrimaryColor);
                     });
                 });
             }
 
             col.Item().PaddingTop(10).Background(Colors.Grey.Lighten5).Padding(15).Row(row =>
             {
-                row.RelativeItem(2).Column(c => c.Item().Text("TOTAL REFERRAL FEES").FontSize(14).Bold().FontColor(PrimaryColor));
-                row.RelativeItem(1).Column(c => c.Item().AlignRight().Text(statement.TotalFee.ToString("N2")).FontSize(16).Bold().FontColor(PrimaryColor));
+                row.RelativeItem(2).Column(c => c.Item().Text("TOTAL REFERRAL FEES").FontSize(14).Bold().FontColor(BrandConstants.PrimaryColor));
+                row.RelativeItem(1).Column(c => c.Item().AlignRight().Text(statement.TotalFee.ToString("N2")).FontSize(16).Bold().FontColor(BrandConstants.PrimaryColor));
             });
         });
     }
@@ -195,19 +196,17 @@ public class ReferralFeeStatementPdfService : IReferralFeeStatementPdfService
     {
         container.AlignCenter().Text(text =>
         {
-            text.Span("Generated on ").FontSize(8).FontColor(Colors.Grey.Medium);
+            text.Span(PdfLabels.GeneratedOn).FontSize(8).FontColor(Colors.Grey.Medium);
             text.Span(DateTime.Now.ToString("MMM dd, yyyy HH:mm")).FontSize(8).FontColor(Colors.Grey.Medium);
-            text.Span(" | This is a system-generated document.").FontSize(8).FontColor(Colors.Grey.Medium);
+            text.Span($" | {PdfLabels.SystemGeneratedDocument}").FontSize(8).FontColor(Colors.Grey.Medium);
         });
     }
 
-    private static string GetStatusColor(string status) => status switch
-    {
-        "Draft" => Colors.Grey.Medium,
-        "Computed" => PrimaryColor,
-        "Approved" => Colors.Green.Medium,
-        "Paid" => Colors.Green.Darken2,
-        "Rejected" => Colors.Red.Medium,
-        _ => Colors.Grey.Medium
-    };
+    private static string GetStatusColor(string status) =>
+        status == PayRunStatus.Draft.Name ? Colors.Grey.Medium :
+        status == PayRunStatus.Computed.Name ? BrandConstants.PrimaryColor :
+        status == PayRunStatus.Approved.Name ? Colors.Green.Medium :
+        status == PayRunStatus.Paid.Name ? Colors.Green.Darken2 :
+        status == PayRunStatus.Rejected.Name ? Colors.Red.Medium :
+        Colors.Grey.Medium;
 }

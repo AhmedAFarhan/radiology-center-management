@@ -1,357 +1,307 @@
-# Plan: Remove ExaminationHistory — Use Snapshot Fields on Examination
+# Plan: Backend Hardcoded Values & Plain Text Cleanup
 
-## Goal
-Remove `ExaminationHistory` / `ExaminationHistoryItem` tables. Store frozen snapshot values on `Examination` and `ExaminationItem`. Analytics queries read from `Examination` (where `Status == Completed`).
+## ✅ ALL PHASES COMPLETE
+
+### Phase 1: Security-Critical — DONE
+- Seed credentials → `appsettings.json` `Seed:Admin:*` section
+- JWT secret → placeholder `<JWT_SECRET_KEY>`
+- Connection string fallback → throws `InvalidOperationException`
+- CORS → reads from `Cors:AllowedOrigins` config
+
+### Phase 2: Centralize — DONE
+- `TimezoneConstants` created (DefaultTimezone, WindowsTimezone)
+- `CurrentUserService`, `UserTimezoneConverter`, `ClinicClock` updated
+- `BrandConstants` created (CompanyName, PrimaryColor, LogoResourceName, UnknownModality)
+
+### Phase 3: Type Safety — DONE
+- Status strings → `ExaminationStatus.Completed.Name`, `PayRunStatus.X.Name`, `ClaimStatus.X.Name`
+- `"Unknown"` → `BrandConstants.UnknownModality` (6 files)
+- `"FixedPlusFees"` → `SalaryCalculationRule.FixedPlusFees.Name`
+
+### Phase 4: Constants — DONE
+- `ApiErrorCodes` constants class created
+- `ExceptionMiddleware`, `ApiResponse` updated
+- `Error.cs` left as string literals (Domain can't reference Application)
+
+### Phase 5: PDF/Excel — DONE
+- `PdfLabels` constants class created (20+ labels)
+- `ExcelTheme` constants class created (3 colors)
+- 3 PDF services + ExcelService updated
+
+### Phase 6: Timezone Strategy — DONE (done previously)
+### Phase 7: Domain Event Dispatch — DONE (done previously)
+### Phase 8: UnitOfWork Fix — DONE (done previously)
+### Phase 9: Reporting Tier 1 — DONE (done previously)
 
 ---
 
-## Snapshot Fields
+## Priority 1: Security-Critical (4 files)
 
-### On `Examination` (add 5)
+### 1.1 Hardcoded Seed Credentials
+**File:** `Identity.Infrastructure/Persistence/Seed/IdentityDbSeeder.cs`
+- `AdminUserName = "admin123"` → Move to `appsettings.json` under `Seed:Admin:Username`
+- `AdminPassword = "admin123"` → Move to `appsettings.json` under `Seed:Admin:Password`
+- `AdminRoleName = "Administrator"` → Keep as constant (intentional)
+- `"admin@radiologycenter.local"`, `"01000000000"` → Move to config
 
-| Field | Type | Set when | Source |
-|---|---|---|---|
-| `TypePrice` | `decimal` | Book time | `ExaminationType.Price` |
-| `TypeStandardDurationMinutes` | `int` | Book time | `ExaminationType.StandardDurationMinutes` |
-| `RadiologistFee` | `decimal?` | Complete time | `IExaminationFeeResolver` |
-| `TechnicianFee` | `decimal?` | Complete time | `IExaminationFeeResolver` |
-| `ReferralFee` | `decimal?` | Complete time | `IExaminationFeeResolver` |
+### 1.2 JWT Secret in appsettings.json
+**File:** `Localhost/appsettings.json` line 18
+- `"SecretKey": "a3f8c9e1b2d4f6a7c8e9f0a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0"`
+- **Action:** Replace with environment variable placeholder `"<JWT_SECRET_KEY>"` and add comment. Use `IConfiguration` or User Secrets for actual value.
 
-### On `ExaminationItem` (add 1)
+### 1.3 Hardcoded Connection String Fallback
+**File:** `BuildingBlocks.Infrastructure/Persistence/AppDbContextFactory.cs` line 40
+- `"Server=.;Database=RadiologyCenter;Trusted_Connection=True;TrustServerCertificate=True;"`
+- **Action:** Throw `InvalidOperationException` with clear message instead of fallback
 
-| Field | Type | Set when | Source |
-|---|---|---|---|
-| `UnitCost` | `decimal` | Book time | `IItemSnapshotResolver` (weighted avg from StockMovement) |
+### 1.4 CORS Policy
+**File:** `Localhost/Program.cs` lines 60-69
+- `.AllowAnyHeader()`, `.AllowAnyMethod()`, `.SetIsOriginAllowed(_ => true)`
+- **Action:** Read allowed origins from config, restrict in production
 
 ---
 
-## Implementation Steps
-
-### Step 1: Domain — Examination.cs
-
-**File:** `src/Backend/Modules/Examinations/RadiologyCenter.Examinations.Domain/Entities/Examination.cs`
-
-Add 5 properties after line 38 (before `RowVersion`):
-```csharp
-public decimal TypePrice { get; private set; }
-public int TypeStandardDurationMinutes { get; private set; }
-public decimal? RadiologistFee { get; private set; }
-public decimal? TechnicianFee { get; private set; }
-public decimal? ReferralFee { get; private set; }
-```
-
-Update `Create()` signature (line 50) — add params `decimal typePrice, int typeStandardDurationMinutes`:
-```csharp
-public static Examination Create(
-    Guid patientId,
-    Guid examinationTypeId,
-    Guid? radiologistId,
-    Guid? technicianId,
-    string clinicalIndication,
-    ExaminationPriority priority,
-    decimal price,
-    decimal typePrice,
-    int typeStandardDurationMinutes,
-    Guid? referralDoctorId = null,
-    decimal discount = 0,
-    bool isDiscountPercentage = false,
-    decimal paid = 0,
-    string? notes = null,
-    Guid? equipmentId = null)
-```
-
-Set in initializer block (after line 92):
-```csharp
-TypePrice = typePrice,
-TypeStandardDurationMinutes = typeStandardDurationMinutes,
-```
-
-Add method after `SetBilling` (after line 267):
-```csharp
-public void SetCompletionFees(decimal? radiologistFee, decimal? technicianFee, decimal? referralFee)
-{
-    RadiologistFee = radiologistFee;
-    TechnicianFee = technicianFee;
-    ReferralFee = referralFee;
-}
-```
-
-### Step 2: Domain — ExaminationItem.cs
-
-**File:** `src/Backend/Modules/Examinations/RadiologyCenter.Examinations.Domain/Entities/ExaminationItem.cs`
-
-Add property after line 13:
-```csharp
-public decimal UnitCost { get; private set; }
-```
-
-Update `Create()` — add param `decimal unitCost = 0` and set it:
-```csharp
-public static ExaminationItem Create(
-    Guid examinationId,
-    Guid itemId,
-    int quantity,
-    bool isContrast = false,
-    bool isRequired = false,
-    string? notes = null,
-    decimal unitCost = 0)
-{
-    ...
-    return new ExaminationItem
-    {
-        ...
-        UnitCost = unitCost,
-    };
-}
-```
-
-### Step 3: Domain — Delete history entities
-
-- DELETE `src/Backend/Modules/Examinations/RadiologyCenter.Examinations.Domain/Entities/ExaminationHistory.cs`
-- DELETE `src/Backend/Modules/Examinations/RadiologyCenter.Examinations.Domain/Entities/ExaminationHistoryItem.cs`
-- DELETE `src/Backend/Modules/Examinations/RadiologyCenter.Examinations.Domain/ValueObjects/ItemSnapshot.cs`
-
-### Step 4: Application — ExaminationCompletedEventHandler.cs
-
-**File:** `src/Backend/Modules/Examinations/RadiologyCenter.Examinations.Application/Events/ExaminationCompletedEventHandler.cs`
-
-Rewrite to:
-- Remove: `IExaminationTypeDirectory`, `IItemSnapshotResolver`, `IExaminationHistoryRepository`
-- Keep: `IExaminationRepository`, `IExaminationFeeResolver`, `IExaminationsUnitOfWork`
-- Body: load examination → resolve fees → call `examination.SetCompletionFees(...)` → save
-
-```csharp
-public static async Task HandleAsync(
-    ExaminationCompletedEvent e,
-    IExaminationRepository examinationRepository,
-    IExaminationFeeResolver examinationFeeResolver,
-    IExaminationsUnitOfWork unitOfWork,
-    CancellationToken ct)
-{
-    var examination = await examinationRepository.GetWithItemsAsync(e.ExaminationId, ct);
-    if (examination is null)
-        return;
+## Priority 2: Timezone Centralization (8 files)
+
+All instances of `"Africa/Cairo"` → single config value `DefaultTimeZone` in `appsettings.json`
+
+| File | Line | Current |
+|---|---|---|
+| `Identity.Domain/Entities/User.cs` | 38, 41 | Default param `"Africa/Cairo"` |
+| `BuildingBlocks.Infrastructure/Services/CurrentUserService.cs` | 22 | Fallback `"Africa/Cairo"` |
+| `BuildingBlocks.Infrastructure/Services/UserTimezoneConverter.cs` | 13, 48 | Fallback `"Africa/Cairo"` |
+| `Examinations.Application/Scheduling/ClinicClock.cs` | 20, 23 | `"Africa/Cairo"`, `"Egypt Standard Time"` |
+| `Identity.Infrastructure/Persistence/Configurations/UserConfiguration.cs` | 15 | `.HasDefaultValue("Africa/Cairo")` |
+
+**Action:**
+1. Add `"DefaultTimeZone": "Africa/Cairo"` to `appsettings.json`
+2. Create `TimezoneConstants` static class in BuildingBlocks
+3. Read from `IConfiguration` at runtime, use constant only for EF default value
+4. Domain entity default stays as fallback (can't inject DI into domain)
+
+---
+
+## Priority 3: Status String Comparisons → Enumeration Objects (9 findings)
+
+### 3.1 ClaimStatus Strings
+**File:** `Examinations.Application/Queries/ExportAnalytics/GetInsuranceAnalyticsQueryHandler.cs` lines 22-26
+- `"Draft"`, `"Submitted"`, `"Approved"`, `"Rejected"`, `"Paid"`
+- **Action:** Use `ClaimStatus.Draft.Name`, `ClaimStatus.Submitted.Name`, etc.
+
+### 3.2 ExaminationStatus Strings
+**File:** `Examinations.Application/Queries/GetOperationalAnalytics/GetOperationalAnalyticsQueryHandler.cs` lines 21-22, 27, 52, 61
+- `"Completed"`, `"Cancelled"`
+- **Action:** Use `ExaminationStatus.Completed.Name`, `ExaminationStatus.Cancelled.Name`
+
+### 3.3 PayRunStatus Strings (2 files)
+**Files:**
+- `Payroll.Infrastructure/Services/PayslipPdfService.cs` lines 314-318
+- `Payroll.Infrastructure/Services/ReferralFeeStatementPdfService.cs` lines 206-210
+- `"Draft"`, `"Computed"`, `"Approved"`, `"Paid"`, `"Rejected"`
+- **Action:** Use `PayRunStatus.Draft.Name` etc. Extract shared method for color mapping.
+
+### 3.4 ClaimStatus in InsuranceAnalyticsDataSource
+**File:** `Localhost/Extensions/InsuranceAnalyticsDataSource.cs` line 113
+- `"Approved"`, `"Paid"`
+- **Action:** Use `ClaimStatus.Approved.Name`, `ClaimStatus.Paid.Name`
+
+### 3.5 "FixedPlusFees" Defaults
+**Files:**
+- `Payroll.Infrastructure/Services/PayslipPdfService.cs` line 50
+- `Payroll.Application/DTOs/PayslipPdfDto.cs` line 11
+- `ResourceManagement.Application/DTOs/StaffDto.cs` line 19
+- **Action:** Use `SalaryCalculationRule.FixedPlusFees.Name`
+
+### 3.6 "Unknown" Fallback (6 files)
+All use `"Unknown"` as modality fallback:
+- `Examinations.Infrastructure/Adapters/PayrollFeeIncomeResolver.cs`
+- `Examinations.Application/Queries/GetOperationalAnalytics/GetOperationalAnalyticsQueryHandler.cs`
+- `Examinations.Application/Queries/GetFinancialAnalytics/GetFinancialAnalyticsQueryHandler.cs`
+- `Examinations.Application/Queries/GetStaffMachineAnalytics/GetStaffMachineAnalyticsQueryHandler.cs`
+- `Examinations.Application/Queries/GetExaminationsForCalendar/GetExaminationsForCalendarQueryHandler.cs`
+- `Localhost/Extensions/ReferralFeeStatementResolver.cs`
+- **Action:** Create `const string UnknownModality = "Unknown"` in a shared constants class
+
+---
+
+## Priority 4: Magic Numbers → Named Constants (8 findings)
+
+### 4.1 JWT Expiration Defaults
+**File:** `Identity.Infrastructure/Settings/JwtOptions.cs` lines 8-9
+- `15` (minutes), `7` (days)
+- **Action:** Already configurable via appsettings. Remove `= 15` / `= 7` defaults, require config.
+
+### 4.2 Lockout Defaults
+**File:** `Identity.Application/Settings/LockoutOptions.cs` lines 5-6
+- `5` (attempts), `5` (minutes)
+- **Action:** Same — remove defaults, require config.
+
+### 4.3 Password Policy
+**File:** `BuildingBlocks.Application/Validation/PasswordPolicyRule.cs` lines 7-8
+- `MinLength = 8`, `MaxLength = 100`
+- **Action:** Make configurable via `IOptions<PasswordPolicy>` or keep as `const` with documentation.
+
+### 4.4 Pagination Defaults
+**File:** `BuildingBlocks.Domain/Pagination/PaginationParams.cs` lines 5, 7-8
+- `MaxPageSize = 100`, `_pageNumber = 1`, `_pageSize = 10`
+- **Action:** Keep as `const` (these are reasonable defaults, not business config).
+
+### 4.5 Aging Bucket Days
+**File:** `Examinations.Application/Queries/GetFinancialAnalytics/GetFinancialAnalyticsQueryHandler.cs` lines 10-12
+- `30`, `60`, `90`
+- **Action:** Create `AgingBucketConfig` record, inject via DI or keep as `const` with doc comment.
+
+### 4.6 Clinic Work Hours
+**File:** `Examinations.Application/Queries/GetAvailableSlots/GetAvailableSlotsQueryHandler.cs` lines 8-9
+- `DayStart = new TimeOnly(8, 0)`, `DayEnd = new TimeOnly(17, 0)`
+- **Action:** Make configurable per clinic/equipment or keep as `const` with doc comment.
+
+### 4.7 Global Search Scoring
+**File:** `Localhost/Services/GlobalSearch/GlobalSearchService.cs` lines 28-31, 401-408
+- `DefaultLimit = 5`, `MaxLimit = 10`, scoring weights `40`, `30`, `20`, `10`
+- **Action:** Keep as `const` in the service (internal implementation detail).
+
+### 4.8 Report Finding Max Length
+**Files:** 3 files with `5000`
+- **Action:** Keep as `const` (already consistent).
 
-    var fees = await examinationFeeResolver.ResolveAsync(
-        examination.ExaminationTypeId,
-        examination.TypePrice,
-        examination.RadiologistId!.Value,
-        examination.TechnicianId!.Value,
-        examination.ReferralDoctorId,
-        ct);
+---
 
-    examination.SetCompletionFees(fees?.RadiologistFee, fees?.TechnicianFee, fees?.ReferralFee);
-    await unitOfWork.SaveChangesAsync(ct);
-}
-```
+## Priority 5: Hardcoded PDF/Brand Strings (3 files, ~30 strings)
 
-### Step 5: Application — Delete history abstractions
+### 5.1 Company Name
+**Files:**
+- `Payroll.Infrastructure/Services/PayslipPdfService.cs` line 102
+- `Payroll.Infrastructure/Services/ReferralFeeStatementPdfService.cs` line 86
+- `Examinations.Infrastructure/Services/AnalyticsPdfService.cs` line 515
+- `"RADIOLOGY CENTER"`
+- **Action:** Add `"CompanyName": "RADIOLOGY CENTER"` to `appsettings.json`, inject via `IConfiguration`
 
-- DELETE `src/Backend/Modules/Examinations/RadiologyCenter.Examinations.Application/Abstractions/IExaminationHistoryRepository.cs`
-- Keep `IItemSnapshotResolver` — still needed for book-time item cost resolution
+### 5.2 PDF Labels
+All English labels in PDFs: `"PAYSLIP"`, `"EARNINGS"`, `"DEDUCTIONS"`, etc.
+- **Action:** Create `PdfLabels` static class with all labels as constants, or use localization. Since PDFs are QuestPDF (code-based), constants are simplest.
 
-### Step 6: Application — GetMonthlyProfitQueryHandler.cs
+### 5.3 Primary Color
+**Files:** 3 PDF services with `"#4C58E0"`
+- **Action:** Add `"PrimaryColor": "#4C58E0"` to config, or create `BrandColors` constants class.
 
-**File:** `src/Backend/Modules/Examinations/RadiologyCenter.Examinations.Application/Queries/GetMonthlyProfit/GetMonthlyProfitQueryHandler.cs`
+### 5.4 Logo Resource Path
+**Files:** 2 PDF services with `"RadiologyCenter.Payroll.Infrastructure.Resources.logo.png"`
+- **Action:** Create `const string LogoResourceName` in a shared location.
 
-Replace parameter `IExaminationHistoryRepository historyRepository` with `IExaminationRepository examinationRepository`.
+---
 
-Add `GetCompletedByRangeAsync` to `IExaminationRepository` and implement in `ExaminationRepository`.
+## Priority 6: Error/Status Code Strings (4 findings)
 
-Rewrite handler:
-```csharp
-public static async Task<Result<ProfitAnalyticsDto>> HandleAsync(
-    GetMonthlyProfitQuery query,
-    IExaminationRepository examinationRepository,
-    IProfitSourceResolver profitSourceResolver,
-    ITimezoneConverter timezone,
-    CancellationToken ct)
-{
-    var today = timezone.GetLocalDate(DateTime.UtcNow);
-    var fromDate = query.From?.Date ?? today.AddMonths(-1).AddDays(1).ToDateTime(TimeOnly.MinValue);
-    var toDate = query.To?.Date.AddDays(1) ?? today.AddDays(1).ToDateTime(TimeOnly.MinValue);
-
-    var fromUtc = timezone.ToUtc(fromDate);
-    var toUtc = timezone.ToUtc(toDate);
-    var examinations = await examinationRepository.GetCompletedByRangeAsync(fromUtc, toUtc, ct);
-
-    var collected = examinations.Sum(e => e.Paid);
-    var billed = examinations.Sum(Billable);
-    var discounts = examinations.Sum(e => e.Price - Billable(e));
-    var staffCaseFees = examinations.Sum(e => (e.RadiologistFee ?? 0m) + (e.TechnicianFee ?? 0m));
-    var referralFees = examinations.Sum(e => e.ReferralFee ?? 0m);
-
-    // ... rest same, but Billable takes Examination instead of ExaminationHistory
-}
-
-private static decimal Billable(Examination e) =>
-    ExaminationPricing.BillableAmount(e.Price, e.Discount, e.IsDiscountPercentage);
-```
+### 6.1 ExceptionMiddleware Error Codes
+**File:** `Localhost/Middleware/ExceptionMiddleware.cs` lines 31, 41, 54, 61, 68, 82
+- `"NotFound"`, `"Validation"`, `"Conflict"`, `"InternalError"`, `"DomainError"`
+- **Action:** Create `ApiErrorCodes` static class in BuildingBlocks
 
-### Step 7: Application — GetStaffMachineAnalyticsQueryHandler.cs
-
-**File:** `src/Backend/Modules/Examinations/RadiologyCenter.Examinations.Application/Queries/GetStaffMachineAnalytics/GetStaffMachineAnalyticsQueryHandler.cs`
-
-Replace `IExaminationHistoryRepository` with `IExaminationRepository`.
-
-Query completed examinations in date range. For TypeName/TypeModality — use `IExaminationTypeDirectory` to build a lookup from `ExaminationTypeId`.
-
-The grouping logic reads fees from examination properties directly.
-
-### Step 8: Application — ExportStaffReportQueryHandler.cs
-
-**File:** `src/Backend/Modules/Examinations/RadiologyCenter.Examinations.Application/Queries/ExportAnalytics/ExportStaffReportQueryHandler.cs`
-
-Update signature: replace `IExaminationHistoryRepository` with `IExaminationRepository`. Pass to `GetStaffMachineAnalyticsQueryHandler.HandleAsync`.
-
-### Step 9: Application — ExportProfitReportQueryHandler.cs
-
-**File:** `src/Backend/Modules/Examinations/RadiologyCenter.Examinations.Application/Queries/ExportAnalytics/ExportProfitReportQueryHandler.cs`
-
-Update signature: replace `IExaminationHistoryRepository` with `IExaminationRepository`. Pass to `GetMonthlyProfitQueryHandler.HandleAsync`.
-
-### Step 10: Application — BookExaminationCommandHandler.cs
-
-**File:** `src/Backend/Modules/Examinations/RadiologyCenter.Examinations.Application/Commands/BookExamination/BookExaminationCommandHandler.cs`
-
-Already loads `examinationType` with `Price` and `StandardDurationMinutes`. Pass them to `Examination.Create()`:
-```csharp
-var examination = Examination.Create(
-    command.PatientId,
-    examinationType.Id,
-    command.RadiologistId,
-    command.TechnicianId,
-    ...,
-    priority,
-    examinationType.Price,
-    examinationType.Price,          // typePrice
-    examinationType.StandardDurationMinutes,  // typeStandardDurationMinutes
-    ...);
-```
-
-For item costs: inject `IItemSnapshotResolver` and resolve costs after seeding items:
-```csharp
-foreach (var seeded in ExaminationItemSeeding.Build(examinationType))
-    examination.AddItem(seeded.ItemId, seeded.Quantity, seeded.IsContrast, seeded.IsRequired);
-```
-
-After adding items, resolve costs and set `UnitCost` on each item. Need to load items after `AddItem` returns them, or resolve costs inline.
-
-Actually, `AddItem` returns the `ExaminationItem`. So:
-```csharp
-var itemCosts = await itemSnapshotResolver.ResolveAsync(
-    ExaminationItemSeeding.Build(examinationType).Select(i => i.ItemId), ct);
-
-foreach (var seeded in ExaminationItemSeeding.Build(examinationType))
-{
-    var item = examination.AddItem(seeded.ItemId, seeded.Quantity, seeded.IsContrast, seeded.IsRequired);
-    if (itemCosts.TryGetValue(seeded.ItemId, out var snapshot))
-        item.UnitCost = snapshot.UnitCost;  // Need setter or method
-}
-```
-
-Problem: `ExaminationItem.UnitCost` has `private set`. Need to either:
-- Make it settable via a method on `ExaminationItem`
-- Or set it in `Create()` by passing `unitCost`
-
-Best: pass `unitCost` to `AddItem` → `ExaminationItem.Create()`:
-```csharp
-public ExaminationItem AddItem(
-    Guid itemId, int quantity, bool isContrast, bool isRequired, string? notes, decimal unitCost = 0)
-{
-    ...
-    var item = ExaminationItem.Create(Id, itemId, quantity, isContrast, isRequired, notes, unitCost);
-    ...
-}
-```
-
-Then in the handler:
-```csharp
-var itemCosts = await itemSnapshotResolver.ResolveAsync(
-    ExaminationItemSeeding.Build(examinationType).Select(i => i.ItemId), ct);
-
-foreach (var seeded in ExaminationItemSeeding.Build(examinationType))
-{
-    var unitCost = itemCosts.TryGetValue(seeded.ItemId, out var s) ? s.UnitCost : 0m;
-    examination.AddItem(seeded.ItemId, seeded.Quantity, seeded.IsContrast, seeded.IsRequired, unitCost: unitCost);
-}
-```
-
-### Step 11: Infrastructure — ExaminationHistoryRepository.cs
-
-DELETE `src/Backend/Modules/Examinations/RadiologyCenter.Examinations.Infrastructure/Repositories/ExaminationHistoryRepository.cs`
-
-### Step 12: Infrastructure — ExaminationsInfrastructureRegistration.cs
-
-**File:** `src/Backend/Modules/Examinations/RadiologyCenter.Examinations.Infrastructure/ExaminationsInfrastructureRegistration.cs`
-
-Remove line 24: `services.AddScoped<IExaminationHistoryRepository, ExaminationHistoryRepository>();`
-
-### Step 13: Infrastructure — ExaminationsDbContext.cs
-
-**File:** `src/Backend/Modules/Examinations/RadiologyCenter.Examinations.Infrastructure/Persistence/ExaminationsDbContext.cs`
-
-Remove lines 11-12:
-```csharp
-public DbSet<ExaminationHistory> ExaminationHistories => Set<ExaminationHistory>();
-public DbSet<ExaminationHistoryItem> ExaminationHistoryItems => Set<ExaminationHistoryItem>();
-```
-
-### Step 14: Infrastructure — EF Configurations
-
-DELETE:
-- `src/Backend/Modules/Examinations/RadiologyCenter.Examinations.Infrastructure/Persistence/Configurations/ExaminationHistoryConfiguration.cs`
-- `src/Backend/Modules/Examinations/RadiologyCenter.Examinations.Infrastructure/Persistence/Configurations/ExaminationHistoryItemConfiguration.cs`
-
-Update `ExaminationItemConfiguration.cs` — add `UnitCost` precision if not already there.
-
-### Step 15: Infrastructure — ExaminationRepository.cs
-
-**File:** `src/Backend/Modules/Examinations/RadiologyCenter.Examinations.Infrastructure/Repositories/ExaminationRepository.cs`
-
-Add `GetCompletedByRangeAsync`:
-```csharp
-public async Task<IReadOnlyList<Examination>> GetCompletedByRangeAsync(
-    DateTime? from, DateTime? to, CancellationToken ct = default)
-{
-    var query = DbSet.Where(e => e.Status == ExaminationStatus.Completed);
-    if (from is not null)
-        query = query.Where(e => e.CompletedAt >= from);
-    if (to is not null)
-        query = query.Where(e => e.CompletedAt <= to);
-    return await query.ToListAsync(ct);
-}
-```
-
-### Step 16: Localhost — ReferralFeeStatementResolver.cs
-
-**File:** `src/Backend/Localhost/RadiologyCenter.Localhost/Extensions/ReferralFeeStatementResolver.cs`
-
-Replace `IExaminationHistoryRepository` with `IExaminationRepository` + `IExaminationTypeDirectory`.
-
-Query completed examinations with `ReferralDoctorId != null && ReferralFee > 0` in date range.
-
-For TypeName — resolve via `IExaminationTypeDirectory.GetWithItemsByIdsAsync`.
-
-### Step 17: Localhost — PayrollFeeIncomeResolver.cs
-
-**File:** `src/Backend/Modules/Examinations/RadiologyCenter.Examinations.Infrastructure/Adapters/PayrollFeeIncomeResolver.cs`
-
-Replace `IExaminationHistoryRepository` with `IExaminationRepository` + `IExaminationTypeDirectory`.
-
-Query completed examinations where `RadiologistId == staffId || TechnicianId == staffId` in date range.
-
-For TypeName — resolve via `IExaminationTypeDirectory`.
-
-### Step 18: Migration
-
-Generate migration to:
-- Add columns to `Examinations.Examinations`: `TypePrice decimal(18,2) NOT NULL DEFAULT 0`, `TypeStandardDurationMinutes int NOT NULL DEFAULT 0`, `RadiologistFee decimal(18,2) NULL`, `TechnicianFee decimal(18,2) NULL`, `ReferralFee decimal(18,2) NULL`
-- Add column to `Examinations.ExaminationItems`: `UnitCost decimal(18,2) NOT NULL DEFAULT 0`
-- Drop tables: `Examinations.ExaminationHistoryItems`, `Examinations.ExaminationHistories`
-
-### Step 19: Build & Verify
-
-1. `dotnet build src/RadiologyCenter.slnx` — fix compilation errors
-2. `dotnet ef migrations add RemoveExaminationHistory ...` — generate migration
-3. Verify integration tests pass
+### 6.2 ApiResponse Default Error
+**File:** `BuildingBlocks.Application/Common/ApiResponse.cs` line 103
+- `"Error"`
+- **Action:** Use `ApiErrorCodes.Error` constant
+
+### 6.3 Error.Factory Strings
+**File:** `BuildingBlocks.Domain/Results/Error.cs` lines 28, 40
+- `"Conflict"`, `"Failure"`
+- **Action:** Use `ApiErrorCodes` constants
+
+---
+
+## Priority 7: Plain Text Validation Messages (8 files, ~20 messages)
+
+### 7.1 BuildingBlocks Validation
+- `PasswordPolicyRule.cs` line 25 — English password message
+- `EgyptianPhoneNumberRule.cs` line 33 — English phone message
+- **Action:** These already have error codes. The English text is a fallback. Acceptable as-is since the frontend handles localization.
+
+### 7.2 Domain Validation Messages
+- `Patient.cs` lines 149-164 — 5 messages
+- `Payslip.cs` lines 36-38, 65 — 4 messages
+- **Action:** These are `DomainException` messages. They have error codes. The English text is fallback. Acceptable.
+
+### 7.3 Application Error Messages
+- `LoginCommandHandler.cs` lines 23, 26, 37
+- `SendNotificationCommandHandler.cs` lines 20, 32, 61, 67
+- `PayslipPdfService.cs` lines 32, 35, 38
+- `ReferralFeeStatementPdfService.cs` lines 32, 35, 38
+- **Action:** These have error codes. The English text is fallback. Acceptable.
+
+**Note:** Per the user's directive, error messages must never contain raw IDs/GUIDs. These messages use entity names, not IDs. ✓
+
+---
+
+## Priority 8: File/Resource Paths (5 findings)
+
+### 8.1 Embedded Resource Paths
+- `PayslipPdfService.cs` line 118 — `"RadiologyCenter.Payroll.Infrastructure.Resources.logo.png"`
+- `ReferralFeeStatementPdfService.cs` line 102 — same
+- **Action:** Create `const string LogoResourceName` in Payroll BuildingBlocks
+
+### 8.2 Insurance Storage Path
+- `InsuranceInfrastructureRegistration.cs` line 17 — `"App_Data/Insurance"`
+- **Action:** Already configurable via `appsettings.json`. Fallback is acceptable.
+
+### 8.3 Localization Resources Path
+- `JsonTranslator.cs` lines 110-111 — `"Resources"`
+- `Program.cs` line 187 — `"Resources"`
+- **Action:** Create `const string LocalizationResourcesDir` in BuildingBlocks
+
+### 8.4 Document Storage Directories
+- `UploadPreAuthorizationDocumentCommandHandler.cs` line 24 — `"preauthorizations"`
+- `UploadPolicyDocumentCommandHandler.cs` line 24 — `"policies"`
+- **Action:** These are subdirectory names under the configurable root. Acceptable as constants.
+
+---
+
+## Priority 9: Excel Styling Colors (1 file)
+
+**File:** `BuildingBlocks.Infrastructure/Excel/ExcelService.cs` lines 30, 84, 95, 106
+- `"#F3F4F6"`, `"#9CA3AF"`, `"#3B82F6"`
+- **Action:** Create `ExcelTheme` static class with named constants.
+
+---
+
+## Implementation Order
+
+1. **Phase 1 (Security):** Seed credentials → config, JWT secret → env var, connection string fallback → throw, CORS → config
+2. **Phase 2 (Centralize):** Timezone → single config point, Company name/color → config
+3. **Phase 3 (Type Safety):** Status strings → enum references, "FixedPlusFees" → enum, "Unknown" → constant
+4. **Phase 4 (Constants):** Magic numbers → named constants, error codes → shared class
+5. **Phase 5 (PDF):** Labels → constants class, logo path → constant, colors → constants
+
+---
+
+## Files to Create
+
+| File | Purpose |
+|---|---|
+| `BuildingBlocks.Application/Common/ApiErrorCodes.cs` | API error code constants |
+| `BuildingBlocks.Application/Common/BrandConstants.cs` | Company name, primary color, logo path |
+| `BuildingBlocks.Application/Common/UnknownConstants.cs` | `"Unknown"` fallback constant |
+| `BuildingBlocks.Application/Settings/PasswordPolicyOptions.cs` | Configurable password policy |
+| `BuildingBlocks.Infrastructure/Excel/ExcelTheme.cs` | Excel styling color constants |
+
+## Files to Modify
+
+| File | Change |
+|---|---|
+| `Localhost/appsettings.json` | Add `DefaultTimeZone`, `CompanyName`, `PrimaryColor`, `Seed:Admin:*`, remove JWT secret default |
+| `Localhost/Program.cs` | Read CORS origins from config |
+| `Identity.Infrastructure/Seed/IdentityDbSeeder.cs` | Read credentials from config |
+| `Identity.Infrastructure/Settings/JwtOptions.cs` | Remove defaults |
+| `Identity.Application/Settings/LockoutOptions.cs` | Remove defaults |
+| `BuildingBlocks.Infrastructure/Persistence/AppDbContextFactory.cs` | Throw instead of fallback |
+| `BuildingBlocks.Infrastructure/Services/CurrentUserService.cs` | Read from config |
+| `BuildingBlocks.Infrastructure/Services/UserTimezoneConverter.cs` | Read from config |
+| `Examinations.Application/Scheduling/ClinicClock.cs` | Read from config |
+| 6 analytics handlers | Replace string comparisons with enum references |
+| 3 PDF services | Use shared constants |
+| 2 PDF services | Use shared logo path constant |
+| `Localhost/Middleware/ExceptionMiddleware.cs` | Use `ApiErrorCodes` |
+| `BuildingBlocks.Application/Common/ApiResponse.cs` | Use `ApiErrorCodes` |
+| `BuildingBlocks.Domain/Results/Error.cs` | Use `ApiErrorCodes` |
+| `Localhost/Extensions/InsuranceAnalyticsDataSource.cs` | Use enum references |
+| 3 DTO files | Use `SalaryCalculationRule.FixedPlusFees.Name` |

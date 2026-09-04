@@ -1,5 +1,6 @@
 using System.Text;
 using ClosedXML.Excel;
+using RadiologyCenter.BuildingBlocks.Application.Common;
 using RadiologyCenter.BuildingBlocks.Application.Excel;
 using RadiologyCenter.BuildingBlocks.Application.Localization;
 
@@ -27,7 +28,7 @@ public sealed class ExcelService : IExcelService
             var cell = sheet.Cell(1, c + 1);
             cell.Value = Translator.LocalizeCode(column.HeaderCode, column.HeaderFallback);
             cell.Style.Font.Bold = true;
-            cell.Style.Fill.BackgroundColor = XLColor.FromHtml("#F3F4F6");
+            cell.Style.Fill.BackgroundColor = XLColor.FromHtml(ExcelTheme.HeaderBackground);
             sheet.Column(c + 1).Width = column.Width;
         }
 
@@ -81,7 +82,7 @@ public sealed class ExcelService : IExcelService
             var cell = sheet.Cell(1, c + 1);
             cell.Value = Translator.LocalizeCode(columns[c].HeaderCode, columns[c].HeaderFallback);
             cell.Style.Font.Bold = true;
-            cell.Style.Fill.BackgroundColor = XLColor.FromHtml("#F3F4F6");
+            cell.Style.Fill.BackgroundColor = XLColor.FromHtml(ExcelTheme.HeaderBackground);
             sheet.Column(c + 1).Width = 24;
         }
 
@@ -92,7 +93,7 @@ public sealed class ExcelService : IExcelService
 
             var note = sheet.Range(2, 1, 2, Math.Max(columns.Count, 1));
             note.Style.Font.Italic = true;
-            note.Style.Font.FontColor = XLColor.FromHtml("#9CA3AF");
+            note.Style.Font.FontColor = XLColor.FromHtml(ExcelTheme.NoteTextColor);
         }
 
         if (referenceSheets is not null)
@@ -103,7 +104,7 @@ public sealed class ExcelService : IExcelService
                 for (var i = 0; i < values.Count; i++)
                     refSheet.Cell(i + 1, 1).Value = values[i];
                 refSheet.Columns().AdjustToContents();
-                refSheet.SetTabColor(XLColor.FromHtml("#3B82F6"));
+                refSheet.SetTabColor(XLColor.FromHtml(ExcelTheme.ReferenceTabColor));
             }
 
             foreach (var (name, values) in referenceSheets)

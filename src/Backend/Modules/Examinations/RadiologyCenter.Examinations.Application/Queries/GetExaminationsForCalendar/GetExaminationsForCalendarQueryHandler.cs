@@ -1,3 +1,4 @@
+using RadiologyCenter.BuildingBlocks.Application.Common;
 using RadiologyCenter.Examinations.Application.Abstractions;
 using RadiologyCenter.Examinations.Application.DTOs;
 using RadiologyCenter.Examinations.Domain.Enumerations;
@@ -54,7 +55,7 @@ public static class GetExaminationsForCalendarQueryHandler
                 e.RadiologistId,
                 null,
                 patient?.FullName ?? "Unknown Patient",
-                typeInfo?.Name ?? "Unknown",
+                typeInfo?.Name ?? BrandConstants.UnknownModality,
                 typeInfo?.Modality ?? "",
                 e.ScheduledAt ?? DateTime.MinValue,
                 e.ScheduledEnd,

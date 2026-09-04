@@ -1,3 +1,4 @@
+using RadiologyCenter.BuildingBlocks.Application.Common;
 using RadiologyCenter.Examinations.Application.Abstractions;
 using RadiologyCenter.Payroll.Application.Abstractions;
 
@@ -54,7 +55,7 @@ public class PayrollFeeIncomeResolver : IExamFeeIncomeResolver
 
             total += fee;
 
-            var key = typeLookup.TryGetValue(row.ExaminationTypeId, out var name) ? name : "Unknown";
+            var key = typeLookup.TryGetValue(row.ExaminationTypeId, out var name) ? name : BrandConstants.UnknownModality;
             if (grouped.TryGetValue(key, out var existing))
             {
                 grouped[key] = (existing.Count + 1, existing.Rate, existing.Total + fee);

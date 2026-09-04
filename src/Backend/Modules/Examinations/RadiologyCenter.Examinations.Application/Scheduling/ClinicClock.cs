@@ -1,3 +1,5 @@
+using RadiologyCenter.BuildingBlocks.Application.Common;
+
 namespace RadiologyCenter.Examinations.Application.Scheduling;
 
 /// <summary>
@@ -17,10 +19,10 @@ public static class ClinicClock
 
     private static TimeZoneInfo ResolveZone()
     {
-        try { return TimeZoneInfo.FindSystemTimeZoneById("Africa/Cairo"); }
+        try { return TimeZoneInfo.FindSystemTimeZoneById(TimezoneConstants.DefaultTimezone); }
         catch (TimeZoneNotFoundException)
         {
-            try { return TimeZoneInfo.FindSystemTimeZoneById("Egypt Standard Time"); }
+            try { return TimeZoneInfo.FindSystemTimeZoneById(TimezoneConstants.WindowsTimezone); }
             catch (Exception ex) when (ex is TimeZoneNotFoundException or InvalidTimeZoneException)
             {
                 return TimeZoneInfo.Utc;

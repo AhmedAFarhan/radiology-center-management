@@ -28,7 +28,7 @@ public class ExceptionMiddleware
             _logger.LogWarning(ex, "Resource not found");
             var message = Translator.LocalizeCode(ex.Code, ex.Message);
             await WriteResponse(context, HttpStatusCode.NotFound,
-                ApiResponse.Fail(message, ApiError.FromException(ex, "NotFound", message)));
+                ApiResponse.Fail(message, ApiError.FromException(ex, ApiErrorCodes.NotFound, message)));
         }
         catch (ValidationException ex)
         {
@@ -38,7 +38,7 @@ public class ExceptionMiddleware
                 kvp => kvp.Key,
                 kvp => (object)kvp.Value.ToArray());
             await WriteResponse(context, HttpStatusCode.BadRequest,
-                ApiResponse.Fail(message, new ApiError { Code = "Validation", Message = message, Details = details }));
+                ApiResponse.Fail(message, new ApiError { Code = ApiErrorCodes.Validation, Message = message, Details = details }));
         }
         catch (FluentValidation.ValidationException ex)
         {
@@ -51,35 +51,35 @@ public class ExceptionMiddleware
             });
             var message = Translator.LocalizeCode(MessageCodes.Shared.ValidationFailed, ex.Message);
             await WriteResponse(context, HttpStatusCode.BadRequest,
-                ApiResponse.Fail(message, new ApiError { Code = "Validation", Message = message, Details = details }));
+                ApiResponse.Fail(message, new ApiError { Code = ApiErrorCodes.Validation, Message = message, Details = details }));
         }
         catch (BusinessRuleViolationException ex)
         {
             _logger.LogWarning(ex, "Business rule violated");
             var message = Translator.LocalizeCode(ex.Code, ex.Message);
             await WriteResponse(context, HttpStatusCode.Conflict,
-                ApiResponse.Fail(message, ApiError.FromException(ex, ex.Code ?? "Conflict", message)));
+                ApiResponse.Fail(message, ApiError.FromException(ex, ex.Code ?? ApiErrorCodes.Conflict, message)));
         }
         catch (ConcurrencyException ex)
         {
             _logger.LogWarning(ex, "Concurrency conflict");
             var message = Translator.LocalizeCode(ex.Code, ex.Message);
             await WriteResponse(context, HttpStatusCode.Conflict,
-                ApiResponse.Fail(message, ApiError.FromException(ex, "Conflict", message)));
+                ApiResponse.Fail(message, ApiError.FromException(ex, ApiErrorCodes.Conflict, message)));
         }
         catch (DomainException ex)
         {
             _logger.LogWarning(ex, "Domain exception");
             var message = Translator.LocalizeCode(ex.Code, ex.Message);
             await WriteResponse(context, HttpStatusCode.BadRequest,
-                ApiResponse.Fail(message, ApiError.FromException(ex, ex.Code ?? "DomainError", message)));
+                ApiResponse.Fail(message, ApiError.FromException(ex, ex.Code ?? ApiErrorCodes.DomainError, message)));
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Unhandled exception");
             var message = Translator.LocalizeCode(MessageCodes.Shared.UnexpectedError);
             await WriteResponse(context, HttpStatusCode.InternalServerError,
-                ApiResponse.Fail(message, new ApiError { Code = "InternalError", Message = message }));
+                ApiResponse.Fail(message, new ApiError { Code = ApiErrorCodes.InternalError, Message = message }));
         }
     }
 

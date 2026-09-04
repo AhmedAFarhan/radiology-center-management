@@ -1,4 +1,5 @@
 using RadiologyCenter.BuildingBlocks.Application.Abstractions;
+using RadiologyCenter.BuildingBlocks.Application.Common;
 
 namespace RadiologyCenter.BuildingBlocks.Infrastructure.Services;
 
@@ -10,7 +11,7 @@ public class UserTimezoneConverter : ITimezoneConverter
     public UserTimezoneConverter(ICurrentUser currentUser)
     {
         _currentUser = currentUser;
-        _timeZone = ResolveTimeZone(currentUser.TimeZoneId ?? "Africa/Cairo");
+        _timeZone = ResolveTimeZone(currentUser.TimeZoneId ?? TimezoneConstants.DefaultTimezone);
     }
 
     public string TimeZoneId => _timeZone.Id;
@@ -45,7 +46,7 @@ public class UserTimezoneConverter : ITimezoneConverter
         }
         catch (TimeZoneNotFoundException)
         {
-            return TimeZoneInfo.FindSystemTimeZoneById("Africa/Cairo");
+            return TimeZoneInfo.FindSystemTimeZoneById(TimezoneConstants.DefaultTimezone);
         }
         catch (InvalidTimeZoneException)
         {

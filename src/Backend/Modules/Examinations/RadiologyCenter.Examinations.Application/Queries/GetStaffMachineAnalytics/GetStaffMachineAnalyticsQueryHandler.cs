@@ -1,3 +1,4 @@
+using RadiologyCenter.BuildingBlocks.Application.Common;
 using RadiologyCenter.Examinations.Application.Abstractions;
 using RadiologyCenter.Examinations.Application.DTOs;
 using RadiologyCenter.Examinations.Domain.Entities;
@@ -59,7 +60,7 @@ public static class GetStaffMachineAnalyticsQueryHandler
             .ToList();
 
         var modalityUtilization = examinations
-            .GroupBy(e => typeLookup.TryGetValue(e.ExaminationTypeId, out var t) ? t.Modality : "Unknown")
+            .GroupBy(e => typeLookup.TryGetValue(e.ExaminationTypeId, out var t) ? t.Modality : BrandConstants.UnknownModality)
             .Select(g => new ModalityUtilizationDto(
                 g.Key,
                 g.Count(),

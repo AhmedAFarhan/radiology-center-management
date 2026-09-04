@@ -1,3 +1,4 @@
+using RadiologyCenter.BuildingBlocks.Application.Common;
 using RadiologyCenter.Examinations.Application.Abstractions;
 using RadiologyCenter.Payroll.Application.Abstractions;
 
@@ -72,7 +73,7 @@ public class ReferralFeeStatementResolver : IReferralFeeStatementResolver
         IReadOnlyDictionary<Guid, string> typeLookup)
     {
         var items = exams
-            .GroupBy(e => typeLookup.TryGetValue(e.ExaminationTypeId, out var name) ? name : "Unknown")
+            .GroupBy(e => typeLookup.TryGetValue(e.ExaminationTypeId, out var name) ? name : BrandConstants.UnknownModality)
             .Select(g => new ReferralFeeExamBreakdownItem(
                 g.Key,
                 g.Count(),

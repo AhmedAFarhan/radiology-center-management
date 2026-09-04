@@ -1,6 +1,7 @@
 using QuestPDF.Fluent;
 using QuestPDF.Helpers;
 using QuestPDF.Infrastructure;
+using RadiologyCenter.BuildingBlocks.Application.Common;
 using RadiologyCenter.Examinations.Application.DTOs;
 using RadiologyCenter.Examinations.Application.Reports;
 
@@ -8,8 +9,6 @@ namespace RadiologyCenter.Examinations.Infrastructure.Services;
 
 public sealed class AnalyticsPdfService : IAnalyticsPdfService
 {
-    private const string PrimaryColor = "#4C58E0";
-
     ReportContentDto IAnalyticsPdfService.BuildFinancialPdf(FinancialAnalyticsDto data, DateTime from, DateTime to)
         => BuildFinancialPdf(data, from, to);
 
@@ -49,7 +48,7 @@ public sealed class AnalyticsPdfService : IAnalyticsPdfService
                         col.Item().Text($"Outstanding Receivables: {data.Receivables:N2}").FontSize(10);
                         col.Item().Text($"Average Per Exam: {data.AvgPerExam:N2}").FontSize(10);
 
-                        col.Item().PaddingTop(15).Text("Revenue by Month").FontSize(11).Bold().FontColor(PrimaryColor);
+                        col.Item().PaddingTop(15).Text("Revenue by Month").FontSize(11).Bold().FontColor(BrandConstants.PrimaryColor);
                         col.Item().PaddingTop(5).Table(table =>
                         {
                             table.ColumnsDefinition(columns =>
@@ -72,7 +71,7 @@ public sealed class AnalyticsPdfService : IAnalyticsPdfService
                             }
                         });
 
-                        col.Item().PaddingTop(15).Text("Revenue by Modality").FontSize(11).Bold().FontColor(PrimaryColor);
+                        col.Item().PaddingTop(15).Text("Revenue by Modality").FontSize(11).Bold().FontColor(BrandConstants.PrimaryColor);
                         col.Item().PaddingTop(5).Table(table =>
                         {
                             table.ColumnsDefinition(columns =>
@@ -95,7 +94,7 @@ public sealed class AnalyticsPdfService : IAnalyticsPdfService
                             }
                         });
 
-                        col.Item().PaddingTop(15).Text("Receivable Aging").FontSize(11).Bold().FontColor(PrimaryColor);
+                        col.Item().PaddingTop(15).Text("Receivable Aging").FontSize(11).Bold().FontColor(BrandConstants.PrimaryColor);
                         col.Item().PaddingTop(5).Table(table =>
                         {
                             table.ColumnsDefinition(columns =>
@@ -146,7 +145,7 @@ public sealed class AnalyticsPdfService : IAnalyticsPdfService
                         col.Item().Text($"Avg Duration: {data.AvgDurationMinutes:F0} minutes").FontSize(10);
                         col.Item().Text($"Avg Time to Start: {data.AvgTimeToStartMinutes:F0} minutes").FontSize(10);
 
-                        col.Item().PaddingTop(15).Text("Volume by Month").FontSize(11).Bold().FontColor(PrimaryColor);
+                        col.Item().PaddingTop(15).Text("Volume by Month").FontSize(11).Bold().FontColor(BrandConstants.PrimaryColor);
                         col.Item().PaddingTop(5).Table(table =>
                         {
                             table.ColumnsDefinition(columns =>
@@ -190,7 +189,7 @@ public sealed class AnalyticsPdfService : IAnalyticsPdfService
                 {
                     c.PaddingTop(10).Column(col =>
                     {
-                        col.Item().Text("Radiologists").FontSize(11).Bold().FontColor(PrimaryColor);
+                        col.Item().Text("Radiologists").FontSize(11).Bold().FontColor(BrandConstants.PrimaryColor);
                         col.Item().PaddingTop(5).Table(table =>
                         {
                             table.ColumnsDefinition(columns =>
@@ -213,7 +212,7 @@ public sealed class AnalyticsPdfService : IAnalyticsPdfService
                             }
                         });
 
-                        col.Item().PaddingTop(15).Text("Technicians").FontSize(11).Bold().FontColor(PrimaryColor);
+                        col.Item().PaddingTop(15).Text("Technicians").FontSize(11).Bold().FontColor(BrandConstants.PrimaryColor);
                         col.Item().PaddingTop(5).Table(table =>
                         {
                             table.ColumnsDefinition(columns =>
@@ -236,7 +235,7 @@ public sealed class AnalyticsPdfService : IAnalyticsPdfService
                             }
                         });
 
-                        col.Item().PaddingTop(15).Text("Referral Doctors").FontSize(11).Bold().FontColor(PrimaryColor);
+                        col.Item().PaddingTop(15).Text("Referral Doctors").FontSize(11).Bold().FontColor(BrandConstants.PrimaryColor);
                         col.Item().PaddingTop(5).Table(table =>
                         {
                             table.ColumnsDefinition(columns =>
@@ -330,8 +329,8 @@ public sealed class AnalyticsPdfService : IAnalyticsPdfService
 
                         col.Item().PaddingTop(15).Background(Colors.Grey.Lighten5).Padding(15).Row(row =>
                         {
-                            row.RelativeItem(2).Column(c => c.Item().Text("NET PROFIT").FontSize(14).Bold().FontColor(PrimaryColor));
-                            row.RelativeItem(1).Column(c => c.Item().AlignRight().Text(data.NetProfit.ToString("N2")).FontSize(16).Bold().FontColor(PrimaryColor));
+                            row.RelativeItem(2).Column(c => c.Item().Text("NET PROFIT").FontSize(14).Bold().FontColor(BrandConstants.PrimaryColor));
+                            row.RelativeItem(1).Column(c => c.Item().AlignRight().Text(data.NetProfit.ToString("N2")).FontSize(16).Bold().FontColor(BrandConstants.PrimaryColor));
                         });
 
                         col.Item().PaddingTop(5).AlignCenter().Text($"Margin: {data.NetMargin:P1}").FontSize(10).FontColor(Colors.Grey.Darken1);
@@ -425,7 +424,7 @@ public sealed class AnalyticsPdfService : IAnalyticsPdfService
                         col.Item().Text($"Total Sessions: {data.TotalSessions}").FontSize(10);
                         col.Item().Text($"Avg Session Balance: {data.AvgSessionBalance:N2}").FontSize(10);
 
-                        col.Item().PaddingTop(15).Text("Monthly Breakdown").FontSize(11).Bold().FontColor(PrimaryColor);
+                        col.Item().PaddingTop(15).Text("Monthly Breakdown").FontSize(11).Bold().FontColor(BrandConstants.PrimaryColor);
                         col.Item().PaddingTop(5).Table(table =>
                         {
                             table.ColumnsDefinition(columns =>
@@ -451,7 +450,7 @@ public sealed class AnalyticsPdfService : IAnalyticsPdfService
                             }
                         });
 
-                        col.Item().PaddingTop(15).Text("By Entry Reason").FontSize(11).Bold().FontColor(PrimaryColor);
+                        col.Item().PaddingTop(15).Text("By Entry Reason").FontSize(11).Bold().FontColor(BrandConstants.PrimaryColor);
                         col.Item().PaddingTop(5).Table(table =>
                         {
                             table.ColumnsDefinition(columns =>
@@ -512,7 +511,7 @@ public sealed class AnalyticsPdfService : IAnalyticsPdfService
 
             row.RelativeItem(3).Column(col =>
             {
-                col.Item().Text("RADIOLOGY CENTER").FontSize(18).Bold().FontColor(PrimaryColor);
+                col.Item().Text(BrandConstants.CompanyName).FontSize(18).Bold().FontColor(BrandConstants.PrimaryColor);
                 col.Item().Text(title.ToUpperInvariant()).FontSize(14).Bold().FontColor(Colors.Grey.Darken1);
                 col.Item().PaddingTop(5).Text($"Period: {from:MMM dd, yyyy} - {to:MMM dd, yyyy}").FontSize(9).FontColor(Colors.Grey.Medium);
             });
@@ -523,9 +522,9 @@ public sealed class AnalyticsPdfService : IAnalyticsPdfService
     {
         container.AlignCenter().Text(text =>
         {
-            text.Span("Generated on ").FontSize(8).FontColor(Colors.Grey.Medium);
+            text.Span(PdfLabels.GeneratedOn).FontSize(8).FontColor(Colors.Grey.Medium);
             text.Span(DateTime.Now.ToString("MMM dd, yyyy HH:mm")).FontSize(8).FontColor(Colors.Grey.Medium);
-            text.Span(" | This is a system-generated document.").FontSize(8).FontColor(Colors.Grey.Medium);
+            text.Span($" | {PdfLabels.SystemGeneratedDocument}").FontSize(8).FontColor(Colors.Grey.Medium);
         });
     }
 }

@@ -1,6 +1,7 @@
 using RadiologyCenter.Examinations.Application.DTOs;
 using RadiologyCenter.Examinations.Application.Queries.ExportAnalytics;
 using RadiologyCenter.Insurance.Application.Abstractions;
+using RadiologyCenter.Insurance.Domain.Enumerations;
 
 namespace RadiologyCenter.Localhost.Extensions;
 
@@ -110,7 +111,7 @@ public sealed class InsuranceAnalyticsDataSource : IInsuranceAnalyticsDataSource
     public async Task<decimal> GetOutstandingAmountAsync(DateTime from, DateTime to, CancellationToken ct = default)
     {
         var claims = await _claimRepository.GetByDateRangeAsync(from, to, ct);
-        var activeClaims = claims.Where(c => c.Status.Name == "Approved" || c.Status.Name == "Paid").ToList();
+        var activeClaims = claims.Where(c => c.Status.Name == ClaimStatus.Approved.Name || c.Status.Name == ClaimStatus.Paid.Name).ToList();
 
         var claimIds = activeClaims.Select(c => c.Id).ToList();
         var settlements = await _settlementRepository.GetByClaimIdsAsync(claimIds, ct);

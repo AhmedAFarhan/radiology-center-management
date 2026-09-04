@@ -1,6 +1,7 @@
 using System.Security.Claims;
 using Microsoft.AspNetCore.Http;
 using RadiologyCenter.BuildingBlocks.Application.Abstractions;
+using RadiologyCenter.BuildingBlocks.Application.Common;
 
 namespace RadiologyCenter.BuildingBlocks.Infrastructure.Services;
 
@@ -19,7 +20,7 @@ public class CurrentUserService : ICurrentUser
         _httpContextAccessor.HttpContext?.User.Identity?.Name;
 
     public string? TimeZoneId =>
-        _httpContextAccessor.HttpContext?.User.FindFirst("timezone")?.Value ?? "Africa/Cairo";
+        _httpContextAccessor.HttpContext?.User.FindFirst("timezone")?.Value ?? TimezoneConstants.DefaultTimezone;
 
     public bool IsAuthenticated =>
         _httpContextAccessor.HttpContext?.User.Identity?.IsAuthenticated ?? false;

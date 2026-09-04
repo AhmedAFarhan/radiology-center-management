@@ -61,10 +61,13 @@ builder.Services.AddCors(options =>
 {
     options.AddDefaultPolicy(policy =>
     {
+        var allowedOrigins = builder.Configuration.GetSection("Cors:AllowedOrigins").Get<string[]>() ?? [];
         policy.AllowAnyHeader()
               .AllowAnyMethod()
               .AllowCredentials()
-              .SetIsOriginAllowed(_ => true);
+              .SetIsOriginAllowed(origin =>
+                  allowedOrigins.Length == 0 ||
+                  allowedOrigins.Contains(origin, StringComparer.OrdinalIgnoreCase));
     });
 });
 builder.Services.AddSingleton<ITranslator, JsonTranslator>();
@@ -181,9 +184,14 @@ using (var scope = app.Services.CreateScope())
     }
 
     var identityDb = scope.ServiceProvider.GetRequiredService<IdentityDbContext>();
+    var seedConfig = app.Configuration.GetSection("Seed:Admin");
     await IdentityDbSeeder.SeedAsync(
         identityDb,
         scope.ServiceProvider.GetRequiredService<IPasswordHasher<User>>(),
+        seedConfig["Username"] ?? "admin123",
+        seedConfig["Password"] ?? "admin123",
+        seedConfig["Email"] ?? "admin@radiologycenter.local",
+        seedConfig["Phone"] ?? "01000000000",
         Path.Combine(app.Environment.ContentRootPath, "Resources"));
 }
 
