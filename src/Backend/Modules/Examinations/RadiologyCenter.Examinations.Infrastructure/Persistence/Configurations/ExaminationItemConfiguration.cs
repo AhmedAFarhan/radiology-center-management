@@ -20,6 +20,7 @@ public class ExaminationItemConfiguration : IEntityTypeConfiguration<Examination
         builder.Property(i => i.IsContrast).IsRequired();
         builder.Property(i => i.IsRequired).IsRequired();
         builder.Property(i => i.Notes).HasMaxLength(500);
+        builder.Property(i => i.UnitCost).HasPrecision(18, 2).IsRequired();
 
         builder.HasIndex(i => i.ExaminationId);
         builder.HasIndex(i => i.ItemId);

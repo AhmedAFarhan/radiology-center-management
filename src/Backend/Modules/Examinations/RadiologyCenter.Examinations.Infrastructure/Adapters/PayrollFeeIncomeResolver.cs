@@ -1,16 +1,20 @@
-using RadiologyCenter.BuildingBlocks.Domain.Specifications;
 using RadiologyCenter.Examinations.Application.Abstractions;
-using RadiologyCenter.Examinations.Domain.Entities;
 using RadiologyCenter.Payroll.Application.Abstractions;
 
 namespace RadiologyCenter.Examinations.Infrastructure.Adapters;
 
 public class PayrollFeeIncomeResolver : IExamFeeIncomeResolver
 {
-    private readonly IExaminationHistoryRepository _examinationHistoryRepository;
+    private readonly IExaminationRepository _examinationRepository;
+    private readonly RadiologyCenter.Examinations.Application.Abstractions.IExaminationTypeDirectory _examinationTypeDirectory;
 
-    public PayrollFeeIncomeResolver(IExaminationHistoryRepository examinationHistoryRepository)
-        => _examinationHistoryRepository = examinationHistoryRepository;
+    public PayrollFeeIncomeResolver(
+        IExaminationRepository examinationRepository,
+        RadiologyCenter.Examinations.Application.Abstractions.IExaminationTypeDirectory examinationTypeDirectory)
+    {
+        _examinationRepository = examinationRepository;
+        _examinationTypeDirectory = examinationTypeDirectory;
+    }
 
     public async Task<decimal> GetFeeIncomeAsync(Guid staffId, DateTime from, DateTime to, CancellationToken ct = default)
     {
@@ -20,16 +24,24 @@ public class PayrollFeeIncomeResolver : IExamFeeIncomeResolver
 
     public async Task<ExamFeeBreakdown> GetFeeIncomeBreakdownAsync(Guid staffId, DateTime from, DateTime to, CancellationToken ct = default)
     {
-        var spec = new DynamicSpecification<ExaminationHistory>(h => h.CompletedAt != null);
-        spec.AddCriteria(h => h.CompletedAt!.Value >= from && h.CompletedAt!.Value <= to);
-        spec.AddCriteria(h => h.RadiologistId == staffId || h.TechnicianId == staffId);
+        var examinations = await _examinationRepository.GetCompletedByRangeAsync(from, to, ct);
 
-        var rows = await _examinationHistoryRepository.FindAsync(spec, ct);
+        var filtered = examinations
+            .Where(e => (e.RadiologistId == staffId || e.TechnicianId == staffId)
+                     && e.CompletedAt != null)
+            .ToList();
+
+        if (filtered.Count == 0)
+            return new ExamFeeBreakdown(0, []);
+
+        var typeIds = filtered.Select(e => e.ExaminationTypeId).Distinct().ToList();
+        var types = await _examinationTypeDirectory.GetWithItemsByIdsAsync(typeIds, ct);
+        var typeLookup = types.ToDictionary(t => t.Id, t => t.Name);
 
         decimal total = 0;
         var grouped = new Dictionary<string, (int Count, decimal Rate, decimal Total)>();
 
-        foreach (var row in rows)
+        foreach (var row in filtered)
         {
             decimal fee = 0;
             if (row.RadiologistId == staffId)
@@ -42,7 +54,7 @@ public class PayrollFeeIncomeResolver : IExamFeeIncomeResolver
 
             total += fee;
 
-            var key = row.TypeName;
+            var key = typeLookup.TryGetValue(row.ExaminationTypeId, out var name) ? name : "Unknown";
             if (grouped.TryGetValue(key, out var existing))
             {
                 grouped[key] = (existing.Count + 1, existing.Rate, existing.Total + fee);

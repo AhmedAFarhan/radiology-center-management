@@ -119,4 +119,18 @@ public class ExaminationRepository : BaseRepository<Examination, Guid>, IExamina
                 && (!excludeId.HasValue || e.Id != excludeId.Value))
             .ToListAsync(ct);
     }
+
+    public async Task<IReadOnlyList<Examination>> GetCompletedByRangeAsync(
+        DateTime? from, DateTime? to, CancellationToken ct = default)
+    {
+        var query = DbSet.Where(e => e.Status == ExaminationStatus.Completed);
+
+        if (from is not null)
+            query = query.Where(e => e.CompletedAt >= from);
+
+        if (to is not null)
+            query = query.Where(e => e.CompletedAt <= to);
+
+        return await query.ToListAsync(ct);
+    }
 }

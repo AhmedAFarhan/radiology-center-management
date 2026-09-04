@@ -1,7 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using RadiologyCenter.BuildingBlocks.Domain.Specifications;
 using RadiologyCenter.Examinations.Application.Abstractions;
-using RadiologyCenter.Examinations.Domain.ValueObjects;
 using RadiologyCenter.Inventory.Application.Abstractions;
 using RadiologyCenter.Inventory.Domain.Entities;
 using RadiologyCenter.Inventory.Domain.Enumerations;
@@ -20,22 +19,15 @@ public sealed class ItemSnapshotResolver : IItemSnapshotResolver
         _inventory = inventory;
     }
 
-    public async Task<IReadOnlyDictionary<Guid, ItemSnapshot>> ResolveAsync(IEnumerable<Guid> itemIds, CancellationToken ct)
+    public async Task<IReadOnlyDictionary<Guid, decimal>> ResolveAsync(IEnumerable<Guid> itemIds, CancellationToken ct)
     {
         var ids = itemIds.Distinct().ToList();
         if (ids.Count == 0)
-            return new Dictionary<Guid, ItemSnapshot>();
+            return new Dictionary<Guid, decimal>();
 
         var costs = await ComputeWeightedAverageCostsAsync(ids, ct);
 
-        var spec = new DynamicSpecification<Item>();
-        spec.AddCriteria(i => ids.Contains(i.Id));
-        var items = await _itemRepository.FindIncludingDeletedAsync(spec, ct);
-
-        return items.ToDictionary(
-            i => i.Id,
-            i => new ItemSnapshot(i.Id, i.Name, i.Category.Value,
-                costs.TryGetValue(i.Id, out var cost) ? Math.Round(cost, 2) : 0m));
+        return costs;
     }
 
     private async Task<IReadOnlyDictionary<Guid, decimal>> ComputeWeightedAverageCostsAsync(IReadOnlyList<Guid> itemIds, CancellationToken ct)
@@ -55,6 +47,6 @@ public sealed class ItemSnapshotResolver : IItemSnapshotResolver
 
         return aggregates
             .Where(a => a.Quantity > 0)
-            .ToDictionary(a => a.ItemId, a => a.Value / a.Quantity);
+            .ToDictionary(a => a.ItemId, a => Math.Round(a.Value / a.Quantity, 2));
     }
 }

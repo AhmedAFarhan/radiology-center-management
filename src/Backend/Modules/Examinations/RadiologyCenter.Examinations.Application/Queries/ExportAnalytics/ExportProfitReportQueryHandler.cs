@@ -9,7 +9,7 @@ public static class ExportProfitReportQueryHandler
 {
     public static async Task<Result<ReportContentDto>> HandleAsync(
         ExportProfitReportQuery query,
-        IExaminationHistoryRepository historyRepository,
+        IExaminationRepository examinationRepository,
         IProfitSourceResolver profitSourceResolver,
         ITimezoneConverter timezone,
         IAnalyticsReportService reportService,
@@ -18,7 +18,7 @@ public static class ExportProfitReportQueryHandler
     {
         var profitResult = await GetMonthlyProfitQueryHandler.HandleAsync(
             new GetMonthlyProfitQuery(query.From, query.To),
-            historyRepository, profitSourceResolver, timezone, ct);
+            examinationRepository, profitSourceResolver, timezone, ct);
         if (profitResult.IsFailure)
             return Result.Failure<ReportContentDto>(profitResult.Error);
 

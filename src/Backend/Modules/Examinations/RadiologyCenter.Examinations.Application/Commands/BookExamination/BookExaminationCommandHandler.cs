@@ -15,6 +15,7 @@ public static class BookExaminationCommandHandler
         BookExaminationCommand command,
         IExaminationTypeDirectory examinationTypeDirectory,
         IExaminationRepository examinationRepository,
+        IItemSnapshotResolver itemSnapshotResolver,
         IExaminationsUnitOfWork unitOfWork,
         ITimezoneConverter timezone,
         CancellationToken ct)
@@ -57,12 +58,21 @@ public static class BookExaminationCommandHandler
             string.IsNullOrWhiteSpace(command.ClinicalIndication) ? "Scheduled from calendar" : command.ClinicalIndication,
             priority,
             examinationType.Price,
+            examinationType.Price,
+            examinationType.StandardDurationMinutes,
             command.ReferralDoctorId,
             notes: command.Notes,
             equipmentId: command.EquipmentId);
 
-        foreach (var seeded in ExaminationItemSeeding.Build(examinationType))
-            examination.AddItem(seeded.ItemId, seeded.Quantity, seeded.IsContrast, seeded.IsRequired);
+        var seededItems = ExaminationItemSeeding.Build(examinationType);
+        var itemIds = seededItems.Select(i => i.ItemId).ToList();
+        var itemCosts = await itemSnapshotResolver.ResolveAsync(itemIds, ct);
+
+        foreach (var seeded in seededItems)
+        {
+            var unitCost = itemCosts.TryGetValue(seeded.ItemId, out var cost) ? cost : 0m;
+            examination.AddItem(seeded.ItemId, seeded.Quantity, seeded.IsContrast, seeded.IsRequired, unitCost: unitCost);
+        }
 
         examination.Schedule(command.ScheduledAt, examinationType.StandardDurationMinutes);
 

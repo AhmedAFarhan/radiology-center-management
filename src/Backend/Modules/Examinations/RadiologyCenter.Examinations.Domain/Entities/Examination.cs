@@ -33,6 +33,11 @@ public sealed class Examination : SoftDeletableAggregateRoot<Guid>
     public bool IsDiscountPercentage { get; private set; }
     public decimal Paid { get; private set; }
     public decimal Remaining { get; private set; }
+    public decimal TypePrice { get; private set; }
+    public int TypeStandardDurationMinutes { get; private set; }
+    public decimal? RadiologistFee { get; private set; }
+    public decimal? TechnicianFee { get; private set; }
+    public decimal? ReferralFee { get; private set; }
     public string? StudyInstanceUID { get; private set; }
     public string? AccessionNumber { get; private set; }
     public DateTime? ImagesReceivedAt { get; private set; }
@@ -55,6 +60,8 @@ public sealed class Examination : SoftDeletableAggregateRoot<Guid>
         string clinicalIndication,
         ExaminationPriority priority,
         decimal price,
+        decimal typePrice,
+        int typeStandardDurationMinutes,
         Guid? referralDoctorId = null,
         decimal discount = 0,
         bool isDiscountPercentage = false,
@@ -85,6 +92,8 @@ public sealed class Examination : SoftDeletableAggregateRoot<Guid>
             Priority = priority,
             Status = ExaminationStatus.Requested,
             Price = price,
+            TypePrice = typePrice,
+            TypeStandardDurationMinutes = typeStandardDurationMinutes,
             Discount = discount,
             IsDiscountPercentage = isDiscountPercentage,
             Paid = paid,
@@ -102,12 +111,13 @@ public sealed class Examination : SoftDeletableAggregateRoot<Guid>
         int quantity,
         bool isContrast = false,
         bool isRequired = false,
-        string? notes = null)
+        string? notes = null,
+        decimal unitCost = 0)
     {
         EnsureNotTerminal();
         Guard.Against(_items.Any(i => i.ItemId == itemId), isDuplicate => isDuplicate, DomainErrors.DuplicateItem, "This item is already on this examination.");
 
-        var item = ExaminationItem.Create(Id, itemId, quantity, isContrast, isRequired, notes);
+        var item = ExaminationItem.Create(Id, itemId, quantity, isContrast, isRequired, notes, unitCost);
         _items.Add(item);
         return item;
     }
@@ -264,6 +274,13 @@ public sealed class Examination : SoftDeletableAggregateRoot<Guid>
         if (paid.HasValue)
             Paid = paid.Value;
         RecalculateRemaining();
+    }
+
+    public void SetCompletionFees(decimal? radiologistFee, decimal? technicianFee, decimal? referralFee)
+    {
+        RadiologistFee = radiologistFee;
+        TechnicianFee = technicianFee;
+        ReferralFee = referralFee;
     }
 
     public void RecordPayment(decimal amount)

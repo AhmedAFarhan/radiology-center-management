@@ -9,7 +9,8 @@ public static class ExportStaffReportQueryHandler
 {
     public static async Task<Result<ReportContentDto>> HandleAsync(
         ExportStaffReportQuery query,
-        IExaminationHistoryRepository historyRepository,
+        IExaminationRepository examinationRepository,
+        IExaminationTypeDirectory examinationTypeDirectory,
         IAncillaryDirectory ancillaryDirectory,
         ITimezoneConverter timezone,
         IAnalyticsReportService reportService,
@@ -18,7 +19,7 @@ public static class ExportStaffReportQueryHandler
     {
         var staffResult = await GetStaffMachineAnalyticsQueryHandler.HandleAsync(
             new GetStaffMachineAnalyticsQuery(query.From, query.To),
-            historyRepository, ancillaryDirectory, ct);
+            examinationRepository, examinationTypeDirectory, ancillaryDirectory, ct);
         if (staffResult.IsFailure)
             return Result.Failure<ReportContentDto>(staffResult.Error);
 

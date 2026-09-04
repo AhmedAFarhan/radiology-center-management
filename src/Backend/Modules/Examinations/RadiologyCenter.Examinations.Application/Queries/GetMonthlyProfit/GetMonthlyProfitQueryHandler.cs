@@ -2,6 +2,7 @@ using RadiologyCenter.BuildingBlocks.Application.Abstractions;
 using RadiologyCenter.Examinations.Application.Abstractions;
 using RadiologyCenter.Examinations.Application.DTOs;
 using RadiologyCenter.Examinations.Domain.Common;
+using RadiologyCenter.Examinations.Domain.Entities;
 
 namespace RadiologyCenter.Examinations.Application.Queries.GetMonthlyProfit;
 
@@ -9,7 +10,7 @@ public static class GetMonthlyProfitQueryHandler
 {
     public static async Task<Result<ProfitAnalyticsDto>> HandleAsync(
         GetMonthlyProfitQuery query,
-        IExaminationHistoryRepository historyRepository,
+        IExaminationRepository examinationRepository,
         IProfitSourceResolver profitSourceResolver,
         ITimezoneConverter timezone,
         CancellationToken ct)
@@ -20,13 +21,13 @@ public static class GetMonthlyProfitQueryHandler
 
         var fromUtc = timezone.ToUtc(fromDate);
         var toUtc = timezone.ToUtc(toDate);
-        var histories = await historyRepository.GetByCompletedRangeAsync(fromUtc, toUtc, ct);
+        var examinations = await examinationRepository.GetCompletedByRangeAsync(fromUtc, toUtc, ct);
 
-        var collected = histories.Sum(h => h.Paid);
-        var billed = histories.Sum(Billable);
-        var discounts = histories.Sum(h => h.Price - Billable(h));
-        var staffCaseFees = histories.Sum(h => (h.RadiologistFee ?? 0m) + (h.TechnicianFee ?? 0m));
-        var referralFees = histories.Sum(h => h.ReferralFee ?? 0m);
+        var collected = examinations.Sum(e => e.Paid);
+        var billed = examinations.Sum(Billable);
+        var discounts = examinations.Sum(e => e.Price - Billable(e));
+        var staffCaseFees = examinations.Sum(e => (e.RadiologistFee ?? 0m) + (e.TechnicianFee ?? 0m));
+        var referralFees = examinations.Sum(e => e.ReferralFee ?? 0m);
 
         var laborCost = await profitSourceResolver.GetLaborCostForAsync(fromUtc, toUtc, ct);
         var (materialCost, materialTracked) = await profitSourceResolver.GetMaterialCostForAsync(fromUtc, toUtc, ct);
@@ -52,6 +53,6 @@ public static class GetMonthlyProfitQueryHandler
             netMargin));
     }
 
-    private static decimal Billable(Domain.Entities.ExaminationHistory h) =>
-        ExaminationPricing.BillableAmount(h.Price, h.Discount, h.IsDiscountPercentage);
+    private static decimal Billable(Examination e) =>
+        ExaminationPricing.BillableAmount(e.Price, e.Discount, e.IsDiscountPercentage);
 }

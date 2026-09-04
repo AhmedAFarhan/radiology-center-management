@@ -21,7 +21,6 @@ public static class ExaminationsInfrastructureRegistration
                    .AddInterceptors(sp.GetRequiredService<DomainEventDispatchInterceptor>()));
 
         services.AddScoped<IExaminationRepository, ExaminationRepository>();
-        services.AddScoped<IExaminationHistoryRepository, ExaminationHistoryRepository>();
         services.AddScoped<IExaminationTypeItemRepository, ExaminationTypeItemRepository>();
         services.AddScoped<IExaminationsUnitOfWork, ExaminationsUnitOfWork>();
         services.AddScoped<RadiologyCenter.Payroll.Application.Abstractions.IExamFeeIncomeResolver, PayrollFeeIncomeResolver>();

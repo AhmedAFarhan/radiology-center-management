@@ -13,4 +13,5 @@ public interface IExaminationRepository : IBaseRepository<Examination, Guid>
     Task<IReadOnlyList<ExamFinancialProjection>> GetFinancialProjectionAsync(DateTime? from, DateTime? to, CancellationToken ct = default);
     Task<IReadOnlyList<OperationalExamProjection>> GetOperationalProjectionAsync(DateTime? from, DateTime? to, CancellationToken ct = default);
     Task<IReadOnlyList<Examination>> GetScheduledInRangeAsync(DateTime start, DateTime end, Guid? excludeId = null, CancellationToken ct = default);
+    Task<IReadOnlyList<Examination>> GetCompletedByRangeAsync(DateTime? from, DateTime? to, CancellationToken ct = default);
 }

@@ -1,5 +1,6 @@
 using RadiologyCenter.Examinations.Application.Abstractions;
 using RadiologyCenter.Examinations.Application.DTOs;
+using RadiologyCenter.Examinations.Domain.Entities;
 
 namespace RadiologyCenter.Examinations.Application.Queries.GetStaffMachineAnalytics;
 
@@ -7,19 +8,26 @@ public static class GetStaffMachineAnalyticsQueryHandler
 {
     public static async Task<Result<StaffMachineAnalyticsDto>> HandleAsync(
         GetStaffMachineAnalyticsQuery query,
-        IExaminationHistoryRepository historyRepository,
+        IExaminationRepository examinationRepository,
+        IExaminationTypeDirectory examinationTypeDirectory,
         IAncillaryDirectory ancillaryDirectory,
         CancellationToken ct)
     {
-        var histories = await historyRepository.GetByCompletedRangeAsync(query.From, query.To, ct);
+        var examinations = await examinationRepository.GetCompletedByRangeAsync(query.From, query.To, ct);
 
-        var staffIds = histories
-            .SelectMany(h => new[] { h.RadiologistId, h.TechnicianId })
+        var typeIds = examinations.Select(e => e.ExaminationTypeId).Distinct().ToList();
+        var types = await examinationTypeDirectory.GetWithItemsByIdsAsync(typeIds, ct);
+        var typeLookup = types.ToDictionary(t => t.Id, t => (Name: t.Name, Modality: t.Modality));
+
+        var staffIds = examinations
+            .SelectMany(e => new[] { e.RadiologistId, e.TechnicianId })
+            .Where(id => id.HasValue)
+            .Select(id => id!.Value)
             .Distinct()
             .ToList();
-        var referralIds = histories
-            .Where(h => h.ReferralDoctorId is not null)
-            .Select(h => h.ReferralDoctorId!.Value)
+        var referralIds = examinations
+            .Where(e => e.ReferralDoctorId is not null)
+            .Select(e => e.ReferralDoctorId!.Value)
             .Distinct()
             .ToList();
 
@@ -28,30 +36,30 @@ public static class GetStaffMachineAnalyticsQueryHandler
         var machines = await ancillaryDirectory.GetActiveMachineCountByModalityAsync(ct);
 
         var radiologists = BuildStaffPerformance(
-            histories,
-            h => h.RadiologistId,
-            h => h.RadiologistFee,
+            examinations,
+            e => e.RadiologistId!.Value,
+            e => e.RadiologistFee,
             staffNames);
 
         var technicians = BuildStaffPerformance(
-            histories,
-            h => h.TechnicianId,
-            h => h.TechnicianFee,
+            examinations,
+            e => e.TechnicianId!.Value,
+            e => e.TechnicianFee,
             staffNames);
 
-        var referralDoctors = histories
-            .Where(h => h.ReferralDoctorId is not null)
-            .GroupBy(h => h.ReferralDoctorId!.Value)
+        var referralDoctors = examinations
+            .Where(e => e.ReferralDoctorId is not null)
+            .GroupBy(e => e.ReferralDoctorId!.Value)
             .Select(g => new ReferralDoctorPerformanceDto(
                 g.Key,
                 referralNames.TryGetValue(g.Key, out var name) ? name : string.Empty,
                 g.Count(),
-                g.Sum(h => h.ReferralFee ?? 0m)))
+                g.Sum(e => e.ReferralFee ?? 0m)))
             .OrderByDescending(d => d.ReferredExams)
             .ToList();
 
-        var modalityUtilization = histories
-            .GroupBy(h => h.TypeModality.Name)
+        var modalityUtilization = examinations
+            .GroupBy(e => typeLookup.TryGetValue(e.ExaminationTypeId, out var t) ? t.Modality : "Unknown")
             .Select(g => new ModalityUtilizationDto(
                 g.Key,
                 g.Count(),
@@ -70,11 +78,11 @@ public static class GetStaffMachineAnalyticsQueryHandler
     }
 
     private static IReadOnlyList<StaffPerformanceDto> BuildStaffPerformance(
-        IReadOnlyList<Domain.Entities.ExaminationHistory> histories,
-        Func<Domain.Entities.ExaminationHistory, Guid> selector,
-        Func<Domain.Entities.ExaminationHistory, decimal?> feeSelector,
+        IReadOnlyList<Examination> examinations,
+        Func<Examination, Guid> selector,
+        Func<Examination, decimal?> feeSelector,
         IReadOnlyDictionary<Guid, string> names) =>
-        histories
+        examinations
             .GroupBy(selector)
             .Select(g => new StaffPerformanceDto(
                 g.Key,

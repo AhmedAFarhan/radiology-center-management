@@ -5,22 +5,38 @@ namespace RadiologyCenter.Localhost.Extensions;
 
 public class ReferralFeeStatementResolver : IReferralFeeStatementResolver
 {
-    private readonly IExaminationHistoryRepository _examinationHistoryRepository;
+    private readonly IExaminationRepository _examinationRepository;
+    private readonly RadiologyCenter.Examinations.Application.Abstractions.IExaminationTypeDirectory _examinationTypeDirectory;
 
-    public ReferralFeeStatementResolver(IExaminationHistoryRepository examinationHistoryRepository)
-        => _examinationHistoryRepository = examinationHistoryRepository;
+    public ReferralFeeStatementResolver(
+        IExaminationRepository examinationRepository,
+        RadiologyCenter.Examinations.Application.Abstractions.IExaminationTypeDirectory examinationTypeDirectory)
+    {
+        _examinationRepository = examinationRepository;
+        _examinationTypeDirectory = examinationTypeDirectory;
+    }
 
     public async Task<IReadOnlyList<ReferralFeeExamBreakdown>> GetReferralFeeBreakdownsAsync(
         DateTime from,
         DateTime to,
         CancellationToken ct = default)
     {
-        var completedExams = await _examinationHistoryRepository.GetByCompletedRangeAsync(from, to, ct);
+        var completedExams = await _examinationRepository.GetCompletedByRangeAsync(from, to, ct);
 
-        return completedExams
-            .Where(h => h.ReferralDoctorId.HasValue && h.ReferralFee.HasValue && h.ReferralFee.Value > 0)
-            .GroupBy(h => h.ReferralDoctorId!.Value)
-            .Select(g => BuildBreakdown(g.Key, g.ToList()))
+        var filtered = completedExams
+            .Where(e => e.ReferralDoctorId.HasValue && e.ReferralFee.HasValue && e.ReferralFee.Value > 0)
+            .ToList();
+
+        if (filtered.Count == 0)
+            return [];
+
+        var typeIds = filtered.Select(e => e.ExaminationTypeId).Distinct().ToList();
+        var types = await _examinationTypeDirectory.GetWithItemsByIdsAsync(typeIds, ct);
+        var typeLookup = types.ToDictionary(t => t.Id, t => t.Name);
+
+        return filtered
+            .GroupBy(e => e.ReferralDoctorId!.Value)
+            .Select(g => BuildBreakdown(g.Key, g.ToList(), typeLookup))
             .Where(b => b.TotalFee > 0)
             .OrderByDescending(b => b.TotalFee)
             .ToList();
@@ -32,28 +48,35 @@ public class ReferralFeeStatementResolver : IReferralFeeStatementResolver
         DateTime to,
         CancellationToken ct = default)
     {
-        var completedExams = await _examinationHistoryRepository.GetByCompletedRangeAsync(from, to, ct);
+        var completedExams = await _examinationRepository.GetCompletedByRangeAsync(from, to, ct);
 
         var filtered = completedExams
-            .Where(h => h.ReferralDoctorId == referralDoctorId
-                     && h.ReferralFee.HasValue
-                     && h.ReferralFee.Value > 0)
+            .Where(e => e.ReferralDoctorId == referralDoctorId
+                     && e.ReferralFee.HasValue
+                     && e.ReferralFee.Value > 0)
             .ToList();
 
         if (filtered.Count == 0)
             return null;
 
-        return BuildBreakdown(referralDoctorId, filtered);
+        var typeIds = filtered.Select(e => e.ExaminationTypeId).Distinct().ToList();
+        var types = await _examinationTypeDirectory.GetWithItemsByIdsAsync(typeIds, ct);
+        var typeLookup = types.ToDictionary(t => t.Id, t => t.Name);
+
+        return BuildBreakdown(referralDoctorId, filtered, typeLookup);
     }
 
-    private static ReferralFeeExamBreakdown BuildBreakdown(Guid referralDoctorId, List<Examinations.Domain.Entities.ExaminationHistory> exams)
+    private static ReferralFeeExamBreakdown BuildBreakdown(
+        Guid referralDoctorId,
+        List<Examinations.Domain.Entities.Examination> exams,
+        IReadOnlyDictionary<Guid, string> typeLookup)
     {
         var items = exams
-            .GroupBy(h => h.TypeName)
+            .GroupBy(e => typeLookup.TryGetValue(e.ExaminationTypeId, out var name) ? name : "Unknown")
             .Select(g => new ReferralFeeExamBreakdownItem(
                 g.Key,
                 g.Count(),
-                Math.Round(g.Sum(h => h.ReferralFee!.Value), 2, MidpointRounding.AwayFromZero)))
+                Math.Round(g.Sum(e => e.ReferralFee!.Value), 2, MidpointRounding.AwayFromZero)))
             .OrderByDescending(i => i.TotalFee)
             .ToList();
 

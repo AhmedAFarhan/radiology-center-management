@@ -41,6 +41,11 @@ public class ExaminationConfiguration : IEntityTypeConfiguration<Examination>
         builder.Property(e => e.IsDiscountPercentage).IsRequired();
         builder.Property(e => e.Paid).HasPrecision(18, 2).IsRequired();
         builder.Property(e => e.Remaining).HasPrecision(18, 2).IsRequired();
+        builder.Property(e => e.TypePrice).HasPrecision(18, 2).IsRequired();
+        builder.Property(e => e.TypeStandardDurationMinutes).IsRequired();
+        builder.Property(e => e.RadiologistFee).HasPrecision(18, 2);
+        builder.Property(e => e.TechnicianFee).HasPrecision(18, 2);
+        builder.Property(e => e.ReferralFee).HasPrecision(18, 2);
 
         builder.Property(e => e.RowVersion).IsRowVersion();
 
