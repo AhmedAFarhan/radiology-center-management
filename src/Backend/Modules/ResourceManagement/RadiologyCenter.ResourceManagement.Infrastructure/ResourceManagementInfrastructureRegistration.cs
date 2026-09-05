@@ -17,7 +17,8 @@ public static class ResourceManagementInfrastructureRegistration
         services.AddDbContext<ResourceManagementDbContext>((sp, options) =>
             options.UseSqlServer(connectionString)
                    .AddInterceptors(sp.GetRequiredService<AuditSoftDeleteInterceptor>())
-                   .AddInterceptors(sp.GetRequiredService<DomainEventDispatchInterceptor>()));
+                   .AddInterceptors(sp.GetRequiredService<DomainEventDispatchInterceptor>())
+                   .AddInterceptors(sp.GetRequiredService<OutboxFlushInterceptor>()));
 
         services.AddScoped<IStaffRepository, StaffRepository>();
         services.AddScoped<IEquipmentRepository, EquipmentRepository>();

@@ -17,7 +17,8 @@ public static class CashInfrastructureRegistration
         services.AddDbContext<CashDbContext>((sp, options) =>
             options.UseSqlServer(connectionString)
                    .AddInterceptors(sp.GetRequiredService<AuditSoftDeleteInterceptor>())
-                   .AddInterceptors(sp.GetRequiredService<DomainEventDispatchInterceptor>()));
+                   .AddInterceptors(sp.GetRequiredService<DomainEventDispatchInterceptor>())
+                   .AddInterceptors(sp.GetRequiredService<OutboxFlushInterceptor>()));
 
         services.AddScoped<ICashSessionRepository, CashSessionRepository>();
         services.AddScoped<ICashEntryRepository, CashEntryRepository>();

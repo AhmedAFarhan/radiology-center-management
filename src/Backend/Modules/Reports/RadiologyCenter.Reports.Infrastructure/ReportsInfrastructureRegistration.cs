@@ -17,7 +17,8 @@ public static class ReportsInfrastructureRegistration
         services.AddDbContext<ReportsDbContext>((sp, options) =>
             options.UseSqlServer(connectionString)
                    .AddInterceptors(sp.GetRequiredService<AuditSoftDeleteInterceptor>())
-                   .AddInterceptors(sp.GetRequiredService<DomainEventDispatchInterceptor>()));
+                   .AddInterceptors(sp.GetRequiredService<DomainEventDispatchInterceptor>())
+                   .AddInterceptors(sp.GetRequiredService<OutboxFlushInterceptor>()));
 
         services.AddScoped<IReportRepository, ReportRepository>();
         services.AddScoped<IReportTemplateRepository, ReportTemplateRepository>();

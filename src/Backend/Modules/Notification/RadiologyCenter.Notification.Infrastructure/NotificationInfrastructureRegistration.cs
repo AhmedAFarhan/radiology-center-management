@@ -18,7 +18,8 @@ public static class NotificationInfrastructureRegistration
         services.AddDbContext<NotificationDbContext>((sp, options) =>
             options.UseSqlServer(connectionString)
                    .AddInterceptors(sp.GetRequiredService<AuditSoftDeleteInterceptor>())
-                   .AddInterceptors(sp.GetRequiredService<DomainEventDispatchInterceptor>()));
+                   .AddInterceptors(sp.GetRequiredService<DomainEventDispatchInterceptor>())
+                   .AddInterceptors(sp.GetRequiredService<OutboxFlushInterceptor>()));
 
         services.AddScoped<INotificationTemplateRepository, NotificationTemplateRepository>();
         services.AddScoped<INotificationMessageRepository, NotificationMessageRepository>();

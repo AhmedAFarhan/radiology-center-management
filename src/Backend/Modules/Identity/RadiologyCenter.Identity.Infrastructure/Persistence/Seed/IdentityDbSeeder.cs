@@ -9,14 +9,14 @@ namespace RadiologyCenter.Identity.Infrastructure.Persistence.Seed;
 public static class IdentityDbSeeder
 {
     public const string AdminRoleName = "Administrator";
+    public const string AdminUserName = "admin123";
+    public const string AdminPassword = "admin123";
+    public const string AdminEmail = "admin@radiologycenter.local";
+    public const string AdminPhone = "01000000000";
 
     public static async Task SeedAsync(
         IdentityDbContext context,
         IPasswordHasher<User> passwordHasher,
-        string adminUserName,
-        string adminPassword,
-        string adminEmail,
-        string adminPhone,
         string? resourcesPath = null,
         CancellationToken ct = default)
     {
@@ -40,12 +40,12 @@ public static class IdentityDbSeeder
 
         var adminUser = await context.Users
             .Include(u => u.AssignedRoles)
-            .FirstOrDefaultAsync(u => u.UserName == adminUserName, ct);
+            .FirstOrDefaultAsync(u => u.UserName == AdminUserName, ct);
 
         if (adminUser is null)
         {
-            adminUser = User.Create(adminUserName, adminEmail, "Admin", "System", adminPhone);
-            adminUser.SetPasswordHash(passwordHasher.HashPassword(adminUser, adminPassword));
+            adminUser = User.Create(AdminUserName, AdminEmail, "Admin", "System", AdminPhone);
+            adminUser.SetPasswordHash(passwordHasher.HashPassword(adminUser, AdminPassword));
             adminUser.ConfirmEmail();
             adminUser.AssignRole(adminRole);
             context.Users.Add(adminUser);

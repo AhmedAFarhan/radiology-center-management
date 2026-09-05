@@ -19,7 +19,8 @@ public static class InsuranceInfrastructureRegistration
         services.AddDbContext<InsuranceDbContext>((sp, options) =>
             options.UseSqlServer(connectionString)
                    .AddInterceptors(sp.GetRequiredService<AuditSoftDeleteInterceptor>())
-                   .AddInterceptors(sp.GetRequiredService<DomainEventDispatchInterceptor>()));
+                   .AddInterceptors(sp.GetRequiredService<DomainEventDispatchInterceptor>())
+                   .AddInterceptors(sp.GetRequiredService<OutboxFlushInterceptor>()));
 
         services.Configure<DocumentStorageOptions>(o => o.RootPath = storageRoot);
 

@@ -1,51 +1,43 @@
-using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 using RadiologyCenter.BuildingBlocks.Application;
+using RadiologyCenter.BuildingBlocks.Application.Localization;
 using RadiologyCenter.BuildingBlocks.Infrastructure;
 using RadiologyCenter.BuildingBlocks.Infrastructure.Messaging;
-using RadiologyCenter.BuildingBlocks.Infrastructure.Persistence;
-using RadiologyCenter.Identity.Application;
-using RadiologyCenter.Identity.Domain.Entities;
-using RadiologyCenter.Identity.Infrastructure;
-using RadiologyCenter.Identity.Infrastructure.Persistence;
-using RadiologyCenter.Identity.Infrastructure.Persistence.Seed;
-using RadiologyCenter.Examinations.Application.Abstractions;
-using RadiologyCenter.Localhost.Extensions;
-using RadiologyCenter.Localhost.Filters;
-using RadiologyCenter.Localhost.Middleware;
+using RadiologyCenter.Cash.Application;
+using RadiologyCenter.Cash.Application.Abstractions;
+using RadiologyCenter.Cash.Infrastructure;
 using RadiologyCenter.Catalog.Application;
 using RadiologyCenter.Catalog.Infrastructure;
-using RadiologyCenter.Catalog.Infrastructure.Persistence;
-using RadiologyCenter.Patients.Application;
-using RadiologyCenter.Patients.Infrastructure;
-using RadiologyCenter.Patients.Infrastructure.Persistence;
-using RadiologyCenter.Inventory.Application;
-using RadiologyCenter.Inventory.Infrastructure;
-using RadiologyCenter.Inventory.Infrastructure.Persistence;
 using RadiologyCenter.Examinations.Application;
+using RadiologyCenter.Examinations.Application.Abstractions;
+using RadiologyCenter.Examinations.Application.Queries.ExportAnalytics;
+using RadiologyCenter.Examinations.Application.Reports;
 using RadiologyCenter.Examinations.Infrastructure;
-using RadiologyCenter.Examinations.Infrastructure.Persistence;
-using RadiologyCenter.ResourceManagement.Application;
-using RadiologyCenter.ResourceManagement.Infrastructure;
-using RadiologyCenter.ResourceManagement.Infrastructure.Persistence;
-using RadiologyCenter.Payroll.Application;
-using RadiologyCenter.Payroll.Infrastructure;
-using RadiologyCenter.Payroll.Infrastructure.Persistence;
-using RadiologyCenter.Reports.Application;
-using RadiologyCenter.Reports.Infrastructure;
-using RadiologyCenter.Reports.Infrastructure.Persistence;
+using RadiologyCenter.Examinations.Infrastructure.Services;
+using RadiologyCenter.Identity.Application;
+using RadiologyCenter.Identity.Infrastructure;
 using RadiologyCenter.Insurance.Application;
+using RadiologyCenter.Insurance.Application.Abstractions;
 using RadiologyCenter.Insurance.Infrastructure;
-using RadiologyCenter.Insurance.Infrastructure.Persistence;
-using RadiologyCenter.Cash.Application;
-using RadiologyCenter.Cash.Infrastructure;
-using RadiologyCenter.Cash.Infrastructure.Persistence;
+using RadiologyCenter.Localhost.Extensions;
+using RadiologyCenter.Localhost.Filters;
+using RadiologyCenter.Localhost.Localization;
+using RadiologyCenter.Localhost.Middleware;
 using RadiologyCenter.Notification.Application;
 using RadiologyCenter.Notification.Infrastructure;
-using RadiologyCenter.Notification.Infrastructure.Persistence;
-using RadiologyCenter.Localhost.Localization;
-using RadiologyCenter.BuildingBlocks.Application.Localization;
+using RadiologyCenter.Patients.Application;
+using RadiologyCenter.Patients.Infrastructure;
+using RadiologyCenter.Payroll.Application;
+using RadiologyCenter.Payroll.Application.Abstractions;
+using RadiologyCenter.Payroll.Application.Services;
+using RadiologyCenter.Payroll.Infrastructure;
+using RadiologyCenter.Reports.Application;
+using RadiologyCenter.Reports.Application.Abstractions;
+using RadiologyCenter.Reports.Infrastructure;
+using RadiologyCenter.ResourceManagement.Application;
+using RadiologyCenter.ResourceManagement.Infrastructure;
+using RadiologyCenter.Inventory.Application;
+using RadiologyCenter.Inventory.Infrastructure;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -70,6 +62,7 @@ builder.Services.AddCors(options =>
                   allowedOrigins.Contains(origin, StringComparer.OrdinalIgnoreCase));
     });
 });
+
 builder.Services.AddSingleton<ITranslator, JsonTranslator>();
 builder.Services.Configure<RequestLocalizationOptions>(options =>
 {
@@ -111,7 +104,7 @@ builder.Services.AddSwaggerGen(options =>
     });
 });
 
-builder.Host.ConfigureWolverine(builder.Configuration.GetConnectionString("DefaultConnection"));
+builder.Host.ConfigureWolverine(builder.Configuration.GetConnectionString("DefaultConnection")!);
 
 builder.Services.AddApplication();
 builder.Services.AddInfrastructure(builder.Configuration);
@@ -139,61 +132,26 @@ builder.Services.AddNotificationApplication();
 builder.Services.AddNotificationInfrastructure(builder.Configuration);
 builder.Services.AddScoped<IItemSnapshotResolver, ItemSnapshotResolver>();
 builder.Services.AddScoped<IExaminationFeeResolver, ExaminationFeeResolver>();
-builder.Services.AddScoped<RadiologyCenter.Payroll.Application.Abstractions.IReferralFeeStatementResolver, ReferralFeeStatementResolver>();
-builder.Services.AddScoped<RadiologyCenter.Payroll.Application.Abstractions.IReferralFeeStatementCalculator, RadiologyCenter.Payroll.Application.Services.ReferralFeeStatementCalculator>();
-builder.Services.AddScoped<RadiologyCenter.Examinations.Application.Abstractions.IAncillaryDirectory, AncillaryDirectory>();
+builder.Services.AddScoped<IReferralFeeStatementResolver, ReferralFeeStatementResolver>();
+builder.Services.AddScoped<IReferralFeeStatementCalculator, ReferralFeeStatementCalculator>();
+builder.Services.AddScoped<IAncillaryDirectory, AncillaryDirectory>();
 builder.Services.AddScoped<RadiologyCenter.Examinations.Application.Abstractions.IExaminationTypeDirectory, ExaminationTypeInfoDirectory>();
-builder.Services.AddScoped<RadiologyCenter.Examinations.Application.Abstractions.IProfitSourceResolver, ProfitSourceResolver>();
-builder.Services.AddScoped<RadiologyCenter.Reports.Application.Abstractions.IReportDirectory, ReportDirectory>();
-builder.Services.AddScoped<RadiologyCenter.Insurance.Application.Abstractions.IInsuranceDirectory, InsuranceDirectory>();
-builder.Services.AddScoped<RadiologyCenter.Cash.Application.Abstractions.ICashDirectory, CashDirectory>();
+builder.Services.AddScoped<IProfitSourceResolver, ProfitSourceResolver>();
+builder.Services.AddScoped<IReportDirectory, ReportDirectory>();
+builder.Services.AddScoped<IInsuranceDirectory, InsuranceDirectory>();
+builder.Services.AddScoped<ICashDirectory, CashDirectory>();
 builder.Services.AddScoped<IPaymentCashEntryRecorder, PaymentCashEntryRecorder>();
-builder.Services.AddScoped<RadiologyCenter.Examinations.Application.Reports.IAnalyticsReportService, RadiologyCenter.Examinations.Application.Reports.AnalyticsReportService>();
-builder.Services.AddScoped<RadiologyCenter.Examinations.Application.Reports.IAnalyticsPdfService, RadiologyCenter.Examinations.Infrastructure.Services.AnalyticsPdfService>();
-builder.Services.AddScoped<RadiologyCenter.Examinations.Application.Queries.ExportAnalytics.IInsuranceAnalyticsDataSource, InsuranceAnalyticsDataSource>();
-builder.Services.AddScoped<RadiologyCenter.Examinations.Application.Queries.ExportAnalytics.ICashFlowDataSource, CashFlowDataSource>();
+builder.Services.AddScoped<IAnalyticsReportService, AnalyticsReportService>();
+builder.Services.AddScoped<IAnalyticsPdfService, AnalyticsPdfService>();
+builder.Services.AddScoped<IInsuranceAnalyticsDataSource, InsuranceAnalyticsDataSource>();
+builder.Services.AddScoped<ICashFlowDataSource, CashFlowDataSource>();
 builder.Services.AddSingleton<RadiologyCenter.Localhost.Services.GlobalSearch.GlobalSearchService>();
 
 var app = builder.Build();
 
-RadiologyCenter.BuildingBlocks.Application.Localization.Translator.Current =
-    app.Services.GetRequiredService<RadiologyCenter.BuildingBlocks.Application.Localization.ITranslator>();
+Translator.Current = app.Services.GetRequiredService<ITranslator>();
 
-using (var scope = app.Services.CreateScope())
-{
-    var dbContextTypes = new[]
-    {
-        typeof(AppDbContext),
-        typeof(IdentityDbContext),
-        typeof(PatientsDbContext),
-        typeof(InventoryDbContext),
-        typeof(CatalogDbContext),
-        typeof(ExaminationsDbContext),
-        typeof(ResourceManagementDbContext),
-        typeof(PayrollDbContext),
-        typeof(ReportsDbContext),
-        typeof(InsuranceDbContext),
-        typeof(CashDbContext),
-        typeof(NotificationDbContext)
-    };
-
-    foreach (var dbContextType in dbContextTypes)
-    {
-        var dbContext = (DbContext)scope.ServiceProvider.GetRequiredService(dbContextType);
-        dbContext.Database.Migrate();
-    }
-
-    var identityDb = scope.ServiceProvider.GetRequiredService<IdentityDbContext>();
-    var seedConfig = app.Configuration.GetSection("Seed:Admin");
-    await IdentityDbSeeder.SeedAsync(
-        identityDb,
-        scope.ServiceProvider.GetRequiredService<IPasswordHasher<User>>(),
-        seedConfig["Username"] ?? "admin123",
-        seedConfig["Password"] ?? "admin123",
-        seedConfig["Email"] ?? "admin@radiologycenter.local",
-        seedConfig["Phone"] ?? "01000000000",
-        Path.Combine(app.Environment.ContentRootPath, "Resources"));
-}
+await app.Services.MigrateAndSeedAsync(Path.Combine(app.Environment.ContentRootPath, "Resources"));
 
 app.UseRequestLocalization();
 

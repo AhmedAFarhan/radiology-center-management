@@ -18,7 +18,8 @@ public static class CatalogInfrastructureRegistration
         services.AddDbContext<CatalogDbContext>((sp, options) =>
             options.UseSqlServer(connectionString)
                    .AddInterceptors(sp.GetRequiredService<AuditSoftDeleteInterceptor>())
-                   .AddInterceptors(sp.GetRequiredService<DomainEventDispatchInterceptor>()));
+                   .AddInterceptors(sp.GetRequiredService<DomainEventDispatchInterceptor>())
+                   .AddInterceptors(sp.GetRequiredService<OutboxFlushInterceptor>()));
 
         services.AddScoped<IExaminationTypeRepository, ExaminationTypeRepository>();
         services.AddScoped<ICatalogUnitOfWork, CatalogUnitOfWork>();

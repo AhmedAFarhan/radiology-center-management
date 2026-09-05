@@ -17,7 +17,8 @@ public static class InventoryInfrastructureRegistration
         services.AddDbContext<InventoryDbContext>((sp, options) =>
             options.UseSqlServer(connectionString)
                    .AddInterceptors(sp.GetRequiredService<AuditSoftDeleteInterceptor>())
-                   .AddInterceptors(sp.GetRequiredService<DomainEventDispatchInterceptor>()));
+                   .AddInterceptors(sp.GetRequiredService<DomainEventDispatchInterceptor>())
+                   .AddInterceptors(sp.GetRequiredService<OutboxFlushInterceptor>()));
 
         services.AddScoped<IItemRepository, ItemRepository>();
         services.AddScoped<ISupplierRepository, SupplierRepository>();

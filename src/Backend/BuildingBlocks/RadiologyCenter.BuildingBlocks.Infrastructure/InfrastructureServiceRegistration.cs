@@ -22,6 +22,7 @@ public static class InfrastructureServiceRegistration
         services.AddHttpContextAccessor();
         services.AddScoped<AuditSoftDeleteInterceptor>();
         services.AddScoped<DomainEventDispatchInterceptor>();
+        services.AddScoped<OutboxFlushInterceptor>();
         services.AddScoped(sp =>
         {
             var options = new DbContextOptionsBuilder<AppDbContext>()
@@ -30,6 +31,7 @@ public static class InfrastructureServiceRegistration
                     b => b.MigrationsAssembly(typeof(AppDbContext).Assembly.GetName().Name))
                 .AddInterceptors(sp.GetRequiredService<AuditSoftDeleteInterceptor>())
                 .AddInterceptors(sp.GetRequiredService<DomainEventDispatchInterceptor>())
+                .AddInterceptors(sp.GetRequiredService<OutboxFlushInterceptor>())
                 .Options;
 
             return new AppDbContext(options);

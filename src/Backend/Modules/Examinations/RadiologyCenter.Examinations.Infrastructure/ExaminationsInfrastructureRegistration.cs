@@ -18,7 +18,8 @@ public static class ExaminationsInfrastructureRegistration
         services.AddDbContext<ExaminationsDbContext>((sp, options) =>
             options.UseSqlServer(connectionString)
                    .AddInterceptors(sp.GetRequiredService<AuditSoftDeleteInterceptor>())
-                   .AddInterceptors(sp.GetRequiredService<DomainEventDispatchInterceptor>()));
+                   .AddInterceptors(sp.GetRequiredService<DomainEventDispatchInterceptor>())
+                   .AddInterceptors(sp.GetRequiredService<OutboxFlushInterceptor>()));
 
         services.AddScoped<IExaminationRepository, ExaminationRepository>();
         services.AddScoped<IExaminationTypeItemRepository, ExaminationTypeItemRepository>();

@@ -24,10 +24,6 @@ public class UnitOfWork<TContext> : IUnitOfWork, IUnitOfWork<TContext>
         try
         {
             var result = await _context.SaveChangesAsync(ct);
-
-            if (_context.Database.CurrentTransaction is null)
-                await _eventDispatcher.FlushAsync(ct);
-
             return result;
         }
         catch (DbUpdateConcurrencyException ex)
@@ -42,7 +38,7 @@ public class UnitOfWork<TContext> : IUnitOfWork, IUnitOfWork<TContext>
     public async Task<IUnitOfWorkTransaction> BeginTransactionAsync(CancellationToken ct = default)
     {
         var transaction = await _context.Database.BeginTransactionAsync(ct);
-        return new DbUnitOfWorkTransaction(transaction, this, _eventDispatcher);
+        return new DbUnitOfWorkTransaction(transaction, _eventDispatcher);
     }
 
 }
@@ -50,16 +46,13 @@ public class UnitOfWork<TContext> : IUnitOfWork, IUnitOfWork<TContext>
 internal sealed class DbUnitOfWorkTransaction : IUnitOfWorkTransaction
 {
     private readonly IDbContextTransaction _transaction;
-    private readonly IUnitOfWork _unitOfWork;
     private readonly IDomainEventDispatcher _eventDispatcher;
 
     public DbUnitOfWorkTransaction(
         IDbContextTransaction transaction,
-        IUnitOfWork unitOfWork,
         IDomainEventDispatcher eventDispatcher)
     {
         _transaction = transaction;
-        _unitOfWork = unitOfWork;
         _eventDispatcher = eventDispatcher;
     }
 
@@ -69,7 +62,6 @@ internal sealed class DbUnitOfWorkTransaction : IUnitOfWorkTransaction
     {
         try
         {
-            await _unitOfWork.SaveChangesAsync(ct);
             await _transaction.CommitAsync(ct);
             await _eventDispatcher.FlushAsync(ct);
         }
