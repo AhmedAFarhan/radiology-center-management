@@ -28,13 +28,16 @@ public sealed class LocalhostService : LocalProcessServiceBase
     protected override Process CreateProcess()
     {
         var (exePath, workDir, isDevelopment) = ResolveLocalhostPaths();
+        var parentPid = Environment.ProcessId;
 
         return new Process
         {
             StartInfo = new ProcessStartInfo
             {
                 FileName = isDevelopment ? "dotnet" : exePath,
-                Arguments = isDevelopment ? $"\"{exePath}\" --urls http://localhost:{Port}" : $"--urls http://localhost:{Port}",
+                Arguments = isDevelopment
+                    ? $"\"{exePath}\" --urls http://localhost:{Port} --parent-pid {parentPid}"
+                    : $"--urls http://localhost:{Port} --parent-pid {parentPid}",
                 WorkingDirectory = workDir,
                 UseShellExecute = false,
                 CreateNoWindow = true,

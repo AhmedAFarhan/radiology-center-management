@@ -42,7 +42,7 @@ public class PayRunsController : ControllerBase
     [HttpPost("all")]
     public async Task<IActionResult> GetAllAsync([FromBody] QueryRequest request, CancellationToken ct)
     {
-        var result = await _bus.InvokeAsync<Result<PagedResult<PayRunDto>>>(new GetPayRunsQuery(request), ct);
+        var result = await _bus.InvokeAsync<Result<PagedResult<PayRunListItemDto>>>(new GetPayRunsQuery(request), ct);
         return result.ToActionResult();
     }
 

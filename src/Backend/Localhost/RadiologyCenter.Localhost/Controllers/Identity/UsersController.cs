@@ -42,7 +42,7 @@ public class UsersController : ControllerBase
     [HttpPost("all")]
     public async Task<IActionResult> GetAllAsync([FromBody] QueryRequest request, CancellationToken ct)
     {
-        var result = await _bus.InvokeAsync<Result<PagedResult<UserDto>>>(new GetUsersQuery(request), ct);
+        var result = await _bus.InvokeAsync<Result<PagedResult<UserListItemDto>>>(new GetUsersQuery(request), ct);
         return result.ToActionResult();
     }
 

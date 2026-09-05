@@ -23,6 +23,7 @@ using RadiologyCenter.Localhost.Extensions;
 using RadiologyCenter.Localhost.Filters;
 using RadiologyCenter.Localhost.Localization;
 using RadiologyCenter.Localhost.Middleware;
+using RadiologyCenter.Localhost.Services;
 using RadiologyCenter.Notification.Application;
 using RadiologyCenter.Notification.Infrastructure;
 using RadiologyCenter.Patients.Application;
@@ -40,6 +41,13 @@ using RadiologyCenter.Inventory.Application;
 using RadiologyCenter.Inventory.Infrastructure;
 
 var builder = WebApplication.CreateBuilder(args);
+
+// Parse --parent-pid so ParentProcessWatcher can shut down when Desktop exits
+var parentPidIdx = Array.FindIndex(args, a => a == "--parent-pid");
+if (parentPidIdx >= 0 && parentPidIdx + 1 < args.Length && int.TryParse(args[parentPidIdx + 1], out var pid))
+    builder.Configuration["ParentPid"] = pid.ToString();
+
+builder.Services.AddHostedService<ParentProcessWatcher>();
 
 builder.Services.AddControllers(options =>
 {
