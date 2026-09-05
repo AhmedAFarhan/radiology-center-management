@@ -21,14 +21,8 @@ public class DomainEventDispatcher : IDomainEventDispatcher
         var events = aggregate.DomainEvents.ToArray();
         aggregate.ClearDomainEvents();
 
-        foreach (var domainEvent in events)
-        {
-            await _outbox.PublishAsync(domainEvent);
-        }
+        foreach (var domainEvent in events) await _outbox.PublishAsync(domainEvent);
     }
 
-    public async Task FlushAsync(CancellationToken ct = default)
-    {
-        await _outbox.FlushOutgoingMessagesAsync();
-    }
+    public async Task FlushAsync(CancellationToken ct = default) => await _outbox.FlushOutgoingMessagesAsync();
 }

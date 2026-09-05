@@ -11,34 +11,28 @@ public class UnitOfWork<TContext> : IUnitOfWork, IUnitOfWork<TContext>
     where TContext : AppDbContext
 {
     private readonly TContext _context;
-    private readonly IDomainEventDispatcher _eventDispatcher;
 
-    public UnitOfWork(TContext context, IDomainEventDispatcher eventDispatcher)
+    public UnitOfWork(TContext context)
     {
         _context = context;
-        _eventDispatcher = eventDispatcher;
     }
 
     public async Task<int> SaveChangesAsync(CancellationToken ct = default)
     {
         try
         {
-            var result = await _context.SaveChangesAsync(ct);
-            return result;
+            return await _context.SaveChangesAsync(ct);
         }
         catch (DbUpdateConcurrencyException ex)
         {
-            throw new ConcurrencyException(
-                MessageCodes.Shared.ConcurrencyConflict,
-                "The record was modified by another user. Please refresh and try again.",
-                ex);
+            throw new ConcurrencyException(MessageCodes.Shared.ConcurrencyConflict, "The record was modified by another user. Please refresh and try again.", ex);
         }
     }
 
     public async Task<IUnitOfWorkTransaction> BeginTransactionAsync(CancellationToken ct = default)
     {
         var transaction = await _context.Database.BeginTransactionAsync(ct);
-        return new DbUnitOfWorkTransaction(transaction, _eventDispatcher);
+        return new DbUnitOfWorkTransaction(transaction);
     }
 
 }
@@ -46,14 +40,11 @@ public class UnitOfWork<TContext> : IUnitOfWork, IUnitOfWork<TContext>
 internal sealed class DbUnitOfWorkTransaction : IUnitOfWorkTransaction
 {
     private readonly IDbContextTransaction _transaction;
-    private readonly IDomainEventDispatcher _eventDispatcher;
 
     public DbUnitOfWorkTransaction(
-        IDbContextTransaction transaction,
-        IDomainEventDispatcher eventDispatcher)
+        IDbContextTransaction transaction)
     {
         _transaction = transaction;
-        _eventDispatcher = eventDispatcher;
     }
 
     public DbTransaction? DbTransaction => _transaction.GetDbTransaction();
@@ -63,7 +54,6 @@ internal sealed class DbUnitOfWorkTransaction : IUnitOfWorkTransaction
         try
         {
             await _transaction.CommitAsync(ct);
-            await _eventDispatcher.FlushAsync(ct);
         }
         catch
         {

@@ -18,7 +18,7 @@ public static class CashInfrastructureRegistration
             options.UseSqlServer(connectionString)
                    .AddInterceptors(sp.GetRequiredService<AuditSoftDeleteInterceptor>())
                    .AddInterceptors(sp.GetRequiredService<DomainEventDispatchInterceptor>())
-                   .AddInterceptors(sp.GetRequiredService<OutboxFlushInterceptor>()));
+);
 
         services.AddScoped<ICashSessionRepository, CashSessionRepository>();
         services.AddScoped<ICashEntryRepository, CashEntryRepository>();

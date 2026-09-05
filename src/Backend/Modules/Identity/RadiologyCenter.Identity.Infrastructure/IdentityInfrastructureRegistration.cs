@@ -31,7 +31,7 @@ public static class IdentityInfrastructureRegistration
             options.UseSqlServer(connectionString)
                    .AddInterceptors(sp.GetRequiredService<AuditSoftDeleteInterceptor>())
                    .AddInterceptors(sp.GetRequiredService<DomainEventDispatchInterceptor>())
-                   .AddInterceptors(sp.GetRequiredService<OutboxFlushInterceptor>()));
+);
 
         services.AddScoped<IIdentityUnitOfWork, IdentityUnitOfWork>();
 

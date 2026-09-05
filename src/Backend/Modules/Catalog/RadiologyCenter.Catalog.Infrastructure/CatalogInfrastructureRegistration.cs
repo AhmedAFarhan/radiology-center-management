@@ -19,7 +19,7 @@ public static class CatalogInfrastructureRegistration
             options.UseSqlServer(connectionString)
                    .AddInterceptors(sp.GetRequiredService<AuditSoftDeleteInterceptor>())
                    .AddInterceptors(sp.GetRequiredService<DomainEventDispatchInterceptor>())
-                   .AddInterceptors(sp.GetRequiredService<OutboxFlushInterceptor>()));
+);
 
         services.AddScoped<IExaminationTypeRepository, ExaminationTypeRepository>();
         services.AddScoped<ICatalogUnitOfWork, CatalogUnitOfWork>();

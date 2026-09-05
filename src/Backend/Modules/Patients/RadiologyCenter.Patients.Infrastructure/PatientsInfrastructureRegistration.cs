@@ -18,7 +18,7 @@ public static class PatientsInfrastructureRegistration
             options.UseSqlServer(connectionString)
                    .AddInterceptors(sp.GetRequiredService<AuditSoftDeleteInterceptor>())
                    .AddInterceptors(sp.GetRequiredService<DomainEventDispatchInterceptor>())
-                   .AddInterceptors(sp.GetRequiredService<OutboxFlushInterceptor>()));
+);
 
         services.AddScoped<IPatientRepository, PatientRepository>();
         services.AddScoped<IPatientsUnitOfWork, PatientsUnitOfWork>();

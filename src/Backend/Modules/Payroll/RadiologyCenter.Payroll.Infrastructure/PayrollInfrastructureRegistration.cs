@@ -20,7 +20,7 @@ public static class PayrollInfrastructureRegistration
             options.UseSqlServer(connectionString)
                    .AddInterceptors(sp.GetRequiredService<AuditSoftDeleteInterceptor>())
                    .AddInterceptors(sp.GetRequiredService<DomainEventDispatchInterceptor>())
-                   .AddInterceptors(sp.GetRequiredService<OutboxFlushInterceptor>()));
+);
 
         services.AddScoped<ISalaryComponentRepository, SalaryComponentRepository>();
         services.AddScoped<ISalaryRepository, SalaryRepository>();
