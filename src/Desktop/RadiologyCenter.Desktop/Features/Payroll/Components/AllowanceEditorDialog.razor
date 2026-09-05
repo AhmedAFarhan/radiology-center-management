@@ -7,7 +7,7 @@
 <MudDialog>
     <DialogContent>
         <DialogHeader Icon="@Icons.Material.Filled.AttachMoney" Title="@(Allowance is null ? T.Allowance.NewAllowance : T.FormatValue(T.Allowance.EditTitle, Allowance.Name))" />
-        <EditForm EditContext="_editContext">
+        <EditForm EditContext="_editContext" OnValidSubmit="SubmitAsync">
             <LocalizedDataAnnotationsValidator />
             <MudGrid Spacing="2">
                 @if (IsEdit)
@@ -105,6 +105,7 @@
                     <MudSwitch T="bool" @bind-Value="_model.IsPerWorkDay" Color="Color.Primary">@T.AllowanceDialog.PaidPerWorkDay</MudSwitch>
                 </MudItem>
             </MudGrid>
+            <button type="submit" style="display:none"></button>
         </EditForm>
     </DialogContent>
     <DialogActions>

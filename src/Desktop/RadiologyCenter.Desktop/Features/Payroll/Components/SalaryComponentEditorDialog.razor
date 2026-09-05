@@ -6,7 +6,7 @@
 <MudDialog>
     <DialogContent>
         <DialogHeader Icon="@Icons.Material.Filled.Category" Title="@(Component is null ? T.SalaryComponent.NewSalaryComponent : T.FormatValue(T.SalaryComponent.EditTitle, Component.Name))" />
-        <EditForm EditContext="_editContext">
+        <EditForm EditContext="_editContext" OnValidSubmit="SubmitAsync">
             <LocalizedDataAnnotationsValidator />
             <MudGrid Spacing="2">
                 <MudItem xs="12" sm="7">
@@ -57,6 +57,7 @@
                     <MudSwitch T="bool" @bind-Value="_model.IsPerWorkDay" Color="Color.Primary">@T.SalaryComponent.PaidPerWorkDay</MudSwitch>
                 </MudItem>
             </MudGrid>
+            <button type="submit" style="display:none"></button>
         </EditForm>
     </DialogContent>
     <DialogActions>

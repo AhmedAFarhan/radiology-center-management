@@ -6,7 +6,7 @@
 <MudDialog>
     <DialogContent>
         <DialogHeader Icon="@Icons.Material.Filled.MedicalServices" Title="@(Fee is null ? T.ExamFee.NewExaminationFee : T.ExamFee.EditExaminationFee)" />
-        <EditForm EditContext="_editContext">
+        <EditForm EditContext="_editContext" OnValidSubmit="SubmitAsync">
             <LocalizedDataAnnotationsValidator />
             <MudGrid Spacing="2">
                 @if (IsEdit)
@@ -68,6 +68,7 @@
                     <MudSwitch T="bool" @bind-Value="_model.IsPercentage" Color="Color.Primary">@T.ExamFee.AmountIsPercentage</MudSwitch>
                 </MudItem>
             </MudGrid>
+            <button type="submit" style="display:none"></button>
         </EditForm>
     </DialogContent>
     <DialogActions>

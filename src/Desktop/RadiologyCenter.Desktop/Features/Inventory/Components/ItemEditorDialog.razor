@@ -5,7 +5,7 @@
 <MudDialog>
     <DialogContent>
         <DialogHeader Icon="@Icons.Material.Filled.Inventory2" Title="@(Item is null ? T.ItemDialog.NewItem : T.ItemDialog.EditItem)" />
-        <EditForm EditContext="_editContext">
+        <EditForm EditContext="_editContext" OnValidSubmit="SubmitAsync">
             <LocalizedDataAnnotationsValidator />
             <MudGrid Spacing="2">
                 <MudItem xs="12" sm="8">
@@ -91,6 +91,7 @@
                                   Immediate="true" />
                 </MudItem>
             </MudGrid>
+            <button type="submit" style="display:none"></button>
         </EditForm>
     </DialogContent>
     <DialogActions>

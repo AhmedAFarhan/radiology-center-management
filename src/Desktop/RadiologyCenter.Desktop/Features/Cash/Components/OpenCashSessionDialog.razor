@@ -4,7 +4,7 @@
 <MudDialog>
     <DialogContent>
         <DialogHeader Icon="@Icons.Material.Filled.AccountBalanceWallet" Title="@T.OpenCash.Title" />
-        <EditForm EditContext="_editContext">
+        <EditForm EditContext="_editContext" OnValidSubmit="SubmitAsync">
             <LocalizedDataAnnotationsValidator />
             <MudGrid Spacing="2">
                 <MudItem xs="12">
@@ -25,6 +25,7 @@
                                   For="@(() => _model.Notes)" />
                 </MudItem>
             </MudGrid>
+            <button type="submit" style="display:none"></button>
         </EditForm>
     </DialogContent>
     <DialogActions>

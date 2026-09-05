@@ -5,7 +5,7 @@
 <MudDialog>
     <DialogContent>
         <DialogHeader Icon="@Icons.Material.Filled.Biotech" Title="@(Equipment is null ? T.Equipment.NewEquipment : T.FormatValue(T.Equipment.Edit, Equipment.Name))" />
-        <EditForm EditContext="_editContext">
+        <EditForm EditContext="_editContext" OnValidSubmit="SubmitAsync">
             <LocalizedDataAnnotationsValidator />
             <MudGrid Spacing="2">
                 <MudItem xs="12">
@@ -44,6 +44,7 @@
                                    Class="w-100" />
                 </MudItem>
             </MudGrid>
+            <button type="submit" style="display:none"></button>
         </EditForm>
     </DialogContent>
     <DialogActions>

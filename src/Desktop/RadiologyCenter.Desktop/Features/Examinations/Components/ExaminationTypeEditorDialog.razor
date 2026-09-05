@@ -6,7 +6,7 @@
 <MudDialog>
     <DialogContent>
         <DialogHeader Icon="@Icons.Material.Filled.MedicalServices" Title="@(Type is null ? T.ExamDialog.NewTitle : T.ExamDialog.EditTitle)" />
-        <EditForm EditContext="_editContext">
+        <EditForm EditContext="_editContext" OnValidSubmit="SubmitAsync">
             <LocalizedDataAnnotationsValidator />
             <MudGrid Spacing="2">
                 <MudItem xs="12">
@@ -110,6 +110,7 @@
             {
                 <MudText Typo="Typo.body2" Class="text-secondary">@T.ExamDialog.NoItems</MudText>
             }
+            <button type="submit" style="display:none"></button>
         </EditForm>
     </DialogContent>
     <DialogActions>

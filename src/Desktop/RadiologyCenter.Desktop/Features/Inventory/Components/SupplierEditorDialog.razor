@@ -4,7 +4,7 @@
 <MudDialog>
     <DialogContent>
         <DialogHeader Icon="@Icons.Material.Filled.LocalShipping" Title="@(Supplier is null ? T.SupplierDialog.NewSupplier : T.SupplierDialog.EditSupplier)" />
-        <EditForm EditContext="_editContext">
+        <EditForm EditContext="_editContext" OnValidSubmit="SubmitAsync">
             <LocalizedDataAnnotationsValidator />
             <MudGrid Spacing="2">
                 <MudItem xs="12" sm="8">
@@ -64,6 +64,7 @@
                                   For="@(() => _model.PaymentTerms)" />
                 </MudItem>
             </MudGrid>
+            <button type="submit" style="display:none"></button>
         </EditForm>
     </DialogContent>
     <DialogActions>

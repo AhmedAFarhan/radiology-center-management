@@ -4,7 +4,7 @@
 <MudDialog>
     <DialogContent>
         <DialogHeader Icon="@Icons.Material.Filled.ReceiptLong" Title="@T.PoDialog.NewPurchaseOrder" />
-        <EditForm EditContext="_editContext">
+        <EditForm EditContext="_editContext" OnValidSubmit="SubmitAsync">
             <LocalizedDataAnnotationsValidator />
             <MudGrid Spacing="2">
                 <MudItem xs="12" sm="8">
@@ -87,6 +87,7 @@
                           Margin="Margin.Dense"
                           Lines="3"
                           Immediate="true" />
+            <button type="submit" style="display:none"></button>
         </EditForm>
     </DialogContent>
     <DialogActions>

@@ -4,7 +4,7 @@
 <MudDialog>
     <DialogContent>
         <DialogHeader Icon="@Icons.Material.Filled.Security" Title="@(Role is null ? T.RoleDialog.NewRole : T.RoleDialog.EditTitle)" />
-        <EditForm EditContext="_editContext">
+        <EditForm EditContext="_editContext" OnValidSubmit="SubmitAsync">
             <LocalizedDataAnnotationsValidator />
             <MudTextField @bind-Value="_model.Name"
                           Label="@T.RoleDialog.RoleName"
@@ -20,6 +20,7 @@
                           Lines="3"
                           Immediate="true"
                           For="@(() => _model.Description)" />
+            <button type="submit" style="display:none"></button>
         </EditForm>
     </DialogContent>
     <DialogActions>
