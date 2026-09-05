@@ -38,7 +38,7 @@ public sealed class Role : IdentityRole<Guid>, IAggregateRoot
             CreatedAt = DateTime.UtcNow
         };
 
-        // role.RaiseDomainEvent(new RoleCreatedEvent(role.Id, name));
+        role.RaiseDomainEvent(new RoleCreatedEvent(role.Id, name));
         return role;
     }
 
@@ -56,7 +56,7 @@ public sealed class Role : IdentityRole<Guid>, IAggregateRoot
         if (_permissions.Any(p => p.Id == permission.Id)) return;
 
         _permissions.Add(permission);
-        // RaiseDomainEvent(new RolePermissionsUpdatedEvent(Id, _permissions.Select(p => p.Code).ToList()));
+        RaiseDomainEvent(new RolePermissionsUpdatedEvent(Id, _permissions.Select(p => p.Code).ToList()));
     }
 
     public void RemovePermission(Permission permission)

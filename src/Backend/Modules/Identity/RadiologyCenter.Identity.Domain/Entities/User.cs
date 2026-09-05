@@ -65,7 +65,7 @@ public sealed class User : IdentityUser<Guid>, IAggregateRoot
             CreatedAt = DateTime.UtcNow
         };
 
-        // user.RaiseDomainEvent(new UserRegisteredEvent(user.Id, userName, email));
+        user.RaiseDomainEvent(new UserRegisteredEvent(user.Id, userName, email));
         return user;
     }
 
@@ -107,7 +107,7 @@ public sealed class User : IdentityUser<Guid>, IAggregateRoot
         if (_assignedRoles.Any(r => r.Id == role.Id)) return;
 
         _assignedRoles.Add(role);
-        // RaiseDomainEvent(new UserRolesUpdatedEvent(Id, _assignedRoles.Select(r => r.Id).ToList()));
+        RaiseDomainEvent(new UserRolesUpdatedEvent(Id, _assignedRoles.Select(r => r.Id).ToList()));
     }
 
     public void RemoveRole(Role role)

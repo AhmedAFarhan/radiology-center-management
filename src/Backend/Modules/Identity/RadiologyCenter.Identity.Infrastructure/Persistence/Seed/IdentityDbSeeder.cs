@@ -36,6 +36,7 @@ public static class IdentityDbSeeder
         if (context.Entry(adminRole).State == EntityState.Detached)
             context.Roles.Add(adminRole);
 
+        adminRole.ClearDomainEvents();
         await context.SaveChangesAsync(ct);
 
         var adminUser = await context.Users
@@ -55,6 +56,7 @@ public static class IdentityDbSeeder
             adminUser.AssignRole(adminRole);
         }
 
+        adminUser.ClearDomainEvents();
         await context.SaveChangesAsync(ct);
     }
 

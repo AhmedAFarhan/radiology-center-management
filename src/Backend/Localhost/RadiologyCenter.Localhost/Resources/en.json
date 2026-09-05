@@ -722,7 +722,7 @@
     "Identity.RoleNotFound": "Role not found.",
     "Identity.PermissionNotFound": "Permission not found.",
     "Identity.CurrentPasswordIncorrect": "Current password is incorrect.",
-    "Identity.InvalidCredentials": "Invalid credentials.",
+    "Identity.InvalidCredentials": "Invalid username or password.",
     "Identity.AccountLockedOut": "Account is locked out.",
     "Identity.RefreshTokenExpired": "Refresh token has expired.",
     "Identity.InvalidRefreshToken": "Invalid refresh token.",

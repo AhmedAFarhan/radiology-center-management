@@ -724,7 +724,7 @@
     "Identity.RoleNotFound": "لم يتم العثور على الدور.",
     "Identity.PermissionNotFound": "لم يتم العثور على الصلاحية.",
     "Identity.CurrentPasswordIncorrect": "كلمة المرور الحالية غير صحيحة.",
-    "Identity.InvalidCredentials": "بيانات اعتماد غير صالحة.",
+    "Identity.InvalidCredentials": "اسم المستخدم أو كلمة المرور غير صحيحة.",
     "Identity.AccountLockedOut": "الحساب مقفل.",
     "Identity.RefreshTokenExpired": "رمز التحديث منتهي الصلاحية.",
     "Identity.InvalidRefreshToken": "رمز تحديث غير صالح.",
