@@ -2,6 +2,7 @@
 @attribute [Authorize]
 @inherits ListPageBase<ItemDto>
 @inject InventoryService InventoryService
+@inject EnumOptionsService EnumOptionsService
 
 <PageHeader Icon="@Icons.Material.Filled.Inventory2" Title="@T.Inventory.Title"
             Subtitle="@T.Inventory.Subtitle"
@@ -9,15 +10,33 @@
             SearchValue="@SearchQuery"
             SearchPlaceholder="@T.Inventory.SearchPlaceholder"
             OnRefresh="ReloadAsync"
-            OnExport="ExportItemsToExcelAsync">
-    <AuthorizeView Policy="@InventoryPermissions.ItemsCreate">
-        <Authorized Context="auth">
-            <MudTooltip Placement="Placement.Bottom" Text="@T.Common.ImportFromExcel">
-                <MudIconButton Icon="@Icons.Material.Filled.Download" Color="Color.Default" aria-label="@T.Common.ImportFromExcel" OnClick="OpenItemsImportDialogAsync" />
-            </MudTooltip>
-            <MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Add" OnClick="OpenCreateDialogAsync">@T.Inventory.AddItem</MudButton>
-        </Authorized>
-    </AuthorizeView>
+            OnExport="ExportItemsToExcelAsync"
+            OnImport="OpenItemsImportDialogAsync">
+    <ChildContent>
+        <MudSelect T="string" Value="_category" ValueChanged="OnCategoryChangedAsync" Label="@T.Inventory.Category"
+                   Variant="Variant.Outlined" Margin="Margin.Dense" Dense="true" Style="width:150px;">
+            <MudSelectItem Value="@(string.Empty)">@T.Common.All</MudSelectItem>
+            @foreach (var cat in _categoryOptions)
+            {
+                <MudSelectItem Value="@cat.Key">@cat.Value</MudSelectItem>
+            }
+        </MudSelect>
+        <MudSelect T="string" Value="_unit" ValueChanged="OnUnitChangedAsync" Label="@T.Inventory.Unit"
+                   Variant="Variant.Outlined" Margin="Margin.Dense" Dense="true" Style="width:150px;">
+            <MudSelectItem Value="@(string.Empty)">@T.Common.All</MudSelectItem>
+            @foreach (var u in _unitOptions)
+            {
+                <MudSelectItem Value="@u.Key">@u.Value</MudSelectItem>
+            }
+        </MudSelect>
+    </ChildContent>
+    <ActionContent>
+        <AuthorizeView Policy="@InventoryPermissions.ItemsCreate">
+            <Authorized Context="auth">
+                <MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Add" OnClick="OpenCreateDialogAsync">@T.Inventory.AddItem</MudButton>
+            </Authorized>
+        </AuthorizeView>
+    </ActionContent>
 </PageHeader>
 
 <MudTable Breakpoint="Breakpoint.Sm" T="ItemDto" @ref="Table" ServerData="LoadServerData" Dense="true" Hover="true" Striped="true" Elevation="1" RowsPerPage="10" FixedHeader="true" Class="table-scroll">

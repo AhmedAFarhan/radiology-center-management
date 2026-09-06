@@ -19,9 +19,28 @@ namespace RadiologyCenter.Desktop.Features.Inventory.Pages;
 
 public partial class Inventory : ListPageBase<ItemDto>
 {
+    private string _category = string.Empty;
+    private string _unit = string.Empty;
+    private IReadOnlyList<EnumOptionDto> _categoryOptions = Array.Empty<EnumOptionDto>();
+    private IReadOnlyList<EnumOptionDto> _unitOptions = Array.Empty<EnumOptionDto>();
+
     protected override string BaseRoute => "/inventory/items";
 
     protected override string UnreachableMessage => T.Inventory.Unreachable;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+
+        try
+        {
+            _categoryOptions = await EnumOptionsService.GetOptionsAsync("ItemCategory");
+            _unitOptions = await EnumOptionsService.GetOptionsAsync("UnitType");
+        }
+        catch
+        {
+        }
+    }
 
     protected override async Task<PagedResult<ItemDto>> LoadPageAsync(
         string? search,
@@ -30,7 +49,23 @@ public partial class Inventory : ListPageBase<ItemDto>
         int page,
         int pageSize,
         CancellationToken ct)
-        => await InventoryService.GetItemsPagedAsync(search, sortBy, sortDescending, page, pageSize, ct);
+        => await InventoryService.GetItemsPagedAsync(
+            search, sortBy, sortDescending, page, pageSize,
+            string.IsNullOrWhiteSpace(_category) ? null : _category,
+            string.IsNullOrWhiteSpace(_unit) ? null : _unit,
+            ct);
+
+    private async Task OnCategoryChangedAsync(string value)
+    {
+        _category = value;
+        await ReloadAsync();
+    }
+
+    private async Task OnUnitChangedAsync(string value)
+    {
+        _unit = value;
+        await ReloadAsync();
+    }
 
     protected override async Task OpenByDeepLinkAsync(string id)
     {
