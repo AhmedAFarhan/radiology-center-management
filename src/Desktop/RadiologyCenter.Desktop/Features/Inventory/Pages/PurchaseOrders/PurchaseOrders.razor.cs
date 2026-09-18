@@ -28,7 +28,7 @@ public partial class PurchaseOrders : ListPageBase<PurchaseOrderDto>
         int page,
         int pageSize,
         CancellationToken ct)
-        => await InventoryService.GetPurchaseOrdersPagedAsync(search, sortBy, sortDescending, page, pageSize, ct);
+        => await InventoryService.GetPurchaseOrdersPagedAsync(search, sortBy, sortDescending, page, pageSize, status: null, ct);
 
     private async Task OpenCreateDialogAsync()
     {

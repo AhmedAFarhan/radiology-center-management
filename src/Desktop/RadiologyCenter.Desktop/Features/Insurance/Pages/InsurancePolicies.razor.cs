@@ -17,7 +17,7 @@ public partial class InsurancePolicies : ListPageBase<InsurancePolicyListItemDto
         int page,
         int pageSize,
         CancellationToken ct)
-        => await InsuranceService.GetPoliciesPagedAsync(search, sortBy, sortDescending, page, pageSize, ct);
+        => await InsuranceService.GetPoliciesPagedAsync(search, sortBy, sortDescending, page, pageSize, status: null, ct);
 
     protected override async Task OpenByDeepLinkAsync(string id)
     {

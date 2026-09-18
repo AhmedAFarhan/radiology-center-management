@@ -34,7 +34,7 @@ public partial class ReferralFees : ListPageBase<ReferralFeeDto>
     {
         var feesTask = PayrollService.GetReferralFeesPagedAsync(search, sortBy, sortDescending, page, pageSize, ct);
         var doctorsTask = ResourceService.GetReferralDoctorsPagedAsync(null, null, false, 1, 100, ct);
-        var typesTask = ExaminationService.GetTypesPagedAsync(null, null, false, 1, 100, ct);
+        var typesTask = ExaminationService.GetTypesPagedAsync(null, null, false, 1, 100, modality: null, isActive: null, ct);
 
         await Task.WhenAll(feesTask, doctorsTask, typesTask);
 

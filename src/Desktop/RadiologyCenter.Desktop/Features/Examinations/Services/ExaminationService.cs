@@ -15,8 +15,27 @@ public sealed class ExaminationService : CrudServiceBase
         bool sortDescending,
         int pageNumber,
         int pageSize,
+        string? modality = null,
+        bool? isActive = null,
         CancellationToken ct = default)
-        => FetchPageAsync<ExaminationTypeDto>(TypesRes, searchTerm, sortBy, sortDescending, pageNumber, pageSize, ct);
+    {
+        var filters = new List<object>();
+        if (!string.IsNullOrWhiteSpace(modality))
+            filters.Add(new { field = "Modality", @operator = "Equals", value = modality });
+        if (isActive.HasValue)
+            filters.Add(new { field = "IsActive", @operator = "Equals", value = isActive.Value });
+
+        var body = new
+        {
+            pagination = new { pageNumber, pageSize },
+            sortBy,
+            sortDescending,
+            searchTerm,
+            filters = filters.Count > 0 ? filters : null
+        };
+
+        return Api.PostAsync<PagedResult<ExaminationTypeDto>>($"{TypesRes}/all", body, ct);
+    }
 
     public Task<ExaminationTypeDto> GetTypeByIdAsync(string id, CancellationToken ct = default)
         => FetchByIdAsync<ExaminationTypeDto>(TypesRes, id, ct);
@@ -58,8 +77,27 @@ public sealed class ExaminationService : CrudServiceBase
         bool sortDescending,
         int pageNumber,
         int pageSize,
+        string? priority = null,
+        string? status = null,
         CancellationToken ct = default)
-        => FetchPageAsync<ExaminationListItemDto>(Res, searchTerm, sortBy, sortDescending, pageNumber, pageSize, ct);
+    {
+        var filters = new List<object>();
+        if (!string.IsNullOrWhiteSpace(priority))
+            filters.Add(new { field = "Priority", @operator = "Equals", value = priority });
+        if (!string.IsNullOrWhiteSpace(status))
+            filters.Add(new { field = "Status", @operator = "Equals", value = status });
+
+        var body = new
+        {
+            pagination = new { pageNumber, pageSize },
+            sortBy,
+            sortDescending,
+            searchTerm,
+            filters = filters.Count > 0 ? filters : null
+        };
+
+        return Api.PostAsync<PagedResult<ExaminationListItemDto>>($"{Res}/all", body, ct);
+    }
 
     public Task<ExaminationDto> GetByIdAsync(string id, CancellationToken ct = default)
         => FetchByIdAsync<ExaminationDto>(Res, id, ct);

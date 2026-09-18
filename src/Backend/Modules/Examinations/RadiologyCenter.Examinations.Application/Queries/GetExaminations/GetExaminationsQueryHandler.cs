@@ -13,7 +13,7 @@ public static class GetExaminationsQueryHandler
         IExaminationTypeDirectory examinationTypeDirectory,
         CancellationToken ct)
     {
-        var paged = await examinationRepository.GetPagedWithItemsAsync(query.Request, ct);
+        var paged = await examinationRepository.GetPagedAsync(query.Request, ct);
 
         var typeIds = paged.Items.Select(e => e.ExaminationTypeId).Distinct().ToList();
         var types = await examinationTypeDirectory.GetWithItemsByIdsAsync(typeIds, ct);

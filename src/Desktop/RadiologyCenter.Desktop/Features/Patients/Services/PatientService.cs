@@ -14,8 +14,27 @@ public sealed class PatientService : CrudServiceBase
         bool sortDescending,
         int pageNumber,
         int pageSize,
+        string? gender = null,
+        bool? isActive = null,
         CancellationToken ct = default)
-        => FetchPageAsync<PatientDto>(Res, searchTerm, sortBy, sortDescending, pageNumber, pageSize, ct);
+    {
+        var filters = new List<object>();
+        if (!string.IsNullOrWhiteSpace(gender))
+            filters.Add(new { field = "Gender", @operator = "Equals", value = gender });
+        if (isActive.HasValue)
+            filters.Add(new { field = "IsActive", @operator = "Equals", value = isActive.Value });
+
+        var body = new
+        {
+            pagination = new { pageNumber, pageSize },
+            sortBy,
+            sortDescending,
+            searchTerm,
+            filters = filters.Count > 0 ? filters : null
+        };
+
+        return Api.PostAsync<PagedResult<PatientDto>>($"{Res}/all", body, ct);
+    }
 
     public Task<PatientDto> GetByIdAsync(string id, CancellationToken ct = default)
         => FetchByIdAsync<PatientDto>(Res, id, ct);

@@ -21,7 +21,7 @@ public partial class Patients : ListPageBase<PatientDto>
         int page,
         int pageSize,
         CancellationToken ct)
-        => await PatientService.GetPagedAsync(search, sortBy, sortDescending, page, pageSize, ct);
+        => await PatientService.GetPagedAsync(search, sortBy, sortDescending, page, pageSize, gender: null, isActive: null, ct);
 
     protected override async Task OpenByDeepLinkAsync(string id)
     {

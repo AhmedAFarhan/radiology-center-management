@@ -30,7 +30,7 @@ public partial class Examinations : ListPageBase<ExaminationTypeDto>
         int page,
         int pageSize,
         CancellationToken ct)
-        => await ExaminationService.GetTypesPagedAsync(search, sortBy, sortDescending, page, pageSize, ct);
+        => await ExaminationService.GetTypesPagedAsync(search, sortBy, sortDescending, page, pageSize, modality: null, isActive: null, ct);
 
     protected override async Task OpenByDeepLinkAsync(string id)
     {

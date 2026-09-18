@@ -76,7 +76,7 @@ public partial class VisitEditorDialog : ComponentBase, IDisposable
             return Array.Empty<PatientDto>();
 
         var page = await SafeExecute.RunAsync(
-            () => PatientService.GetPagedAsync(value, "LastName", false, 1, 20, ct),
+            () => PatientService.GetPagedAsync(value, "LastName", false, 1, 20, gender: null, isActive: null, ct),
             Snackbar,
             () => T.VisitDialog.SearchPatientsError);
         return page?.Items ?? Array.Empty<PatientDto>();
@@ -88,7 +88,7 @@ public partial class VisitEditorDialog : ComponentBase, IDisposable
             return Array.Empty<ExaminationTypeDto>();
 
         var page = await SafeExecute.RunAsync(
-            () => ExaminationService.GetTypesPagedAsync(value, "Name", false, 1, 20, ct),
+            () => ExaminationService.GetTypesPagedAsync(value, "Name", false, 1, 20, modality: null, isActive: null, ct),
             Snackbar,
             () => T.VisitDialog.SearchTypesError);
         return page?.Items ?? Array.Empty<ExaminationTypeDto>();

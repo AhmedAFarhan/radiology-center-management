@@ -20,8 +20,24 @@ public sealed class PayrollService : CrudServiceBase
         bool sortDescending,
         int pageNumber,
         int pageSize,
+        string? status = null,
         CancellationToken ct = default)
-        => FetchPageAsync<PayRunListItemDto>(PayRunsRes, searchTerm, sortBy, sortDescending, pageNumber, pageSize, ct);
+    {
+        var filters = new List<object>();
+        if (!string.IsNullOrWhiteSpace(status))
+            filters.Add(new { field = "Status", @operator = "Equals", value = status });
+
+        var body = new
+        {
+            pagination = new { pageNumber, pageSize },
+            sortBy,
+            sortDescending,
+            searchTerm,
+            filters = filters.Count > 0 ? filters : null
+        };
+
+        return Api.PostAsync<PagedResult<PayRunListItemDto>>($"{PayRunsRes}/all", body, ct);
+    }
 
     public Task<PayRunDto> GetPayRunByIdAsync(string id, CancellationToken ct = default)
         => FetchByIdAsync<PayRunDto>(PayRunsRes, id, ct);
@@ -66,8 +82,27 @@ public sealed class PayrollService : CrudServiceBase
         bool sortDescending,
         int pageNumber,
         int pageSize,
+        string? kind = null,
+        string? frequency = null,
         CancellationToken ct = default)
-        => FetchPageAsync<SalaryComponentDto>(SalaryComponentsRes, searchTerm, sortBy, sortDescending, pageNumber, pageSize, ct);
+    {
+        var filters = new List<object>();
+        if (!string.IsNullOrWhiteSpace(kind))
+            filters.Add(new { field = "Kind", @operator = "Equals", value = kind });
+        if (!string.IsNullOrWhiteSpace(frequency))
+            filters.Add(new { field = "Frequency", @operator = "Equals", value = frequency });
+
+        var body = new
+        {
+            pagination = new { pageNumber, pageSize },
+            sortBy,
+            sortDescending,
+            searchTerm,
+            filters = filters.Count > 0 ? filters : null
+        };
+
+        return Api.PostAsync<PagedResult<SalaryComponentDto>>($"{SalaryComponentsRes}/all", body, ct);
+    }
 
     public Task<SalaryComponentDto> GetSalaryComponentByIdAsync(string id, CancellationToken ct = default)
         => FetchByIdAsync<SalaryComponentDto>(SalaryComponentsRes, id, ct);

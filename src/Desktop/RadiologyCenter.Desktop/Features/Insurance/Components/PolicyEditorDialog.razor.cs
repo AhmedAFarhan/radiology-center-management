@@ -28,7 +28,7 @@ public partial class PolicyEditorDialog : EditorDialogBase
             return Array.Empty<PatientDto>();
 
         var page = await SafeExecute.RunAsync(
-            () => PatientService.GetPagedAsync(value, "LastName", false, 1, 20, ct),
+            () => PatientService.GetPagedAsync(value, "LastName", false, 1, 20, gender: null, isActive: null, ct),
             Snackbar,
             () => T.PolicyDialog.UnableSearchPatients);
         return page?.Items ?? Array.Empty<PatientDto>();

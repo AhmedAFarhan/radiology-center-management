@@ -28,7 +28,7 @@ public partial class Equipment : ListPageBase<EquipmentDto>
         int page,
         int pageSize,
         CancellationToken ct)
-        => await ResourceService.GetEquipmentPagedAsync(search, sortBy, sortDescending, page, pageSize, ct);
+        => await ResourceService.GetEquipmentPagedAsync(search, sortBy, sortDescending, page, pageSize, status: null, ct);
 
     private async Task OpenCreateDialogAsync()
     {

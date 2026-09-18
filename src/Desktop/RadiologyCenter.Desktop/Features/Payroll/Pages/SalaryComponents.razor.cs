@@ -28,7 +28,7 @@ public partial class SalaryComponents : ListPageBase<SalaryComponentDto>
         int page,
         int pageSize,
         CancellationToken ct)
-        => await PayrollService.GetSalaryComponentsPagedAsync(search, sortBy, sortDescending, page, pageSize, ct);
+        => await PayrollService.GetSalaryComponentsPagedAsync(search, sortBy, sortDescending, page, pageSize, kind: null, frequency: null, ct);
 
     private async Task OpenCreateDialogAsync()
     {

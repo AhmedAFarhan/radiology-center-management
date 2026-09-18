@@ -39,9 +39,9 @@ public class PatientsController : ControllerBase
 
     [HasPermission(PatientsReadCode)]
     [HttpPost("all")]
-    public async Task<IActionResult> GetAllAsync([FromBody] QueryRequest request, CancellationToken ct, [FromQuery] bool? isActive = null)
+    public async Task<IActionResult> GetAllAsync([FromBody] QueryRequest request, CancellationToken ct)
     {
-        var result = await _bus.InvokeAsync<Result<PagedResult<PatientDto>>>(new GetPatientsQuery(request, isActive), ct);
+        var result = await _bus.InvokeAsync<Result<PagedResult<PatientDto>>>(new GetPatientsQuery(request), ct);
         return result.ToActionResult();
     }
 

@@ -39,7 +39,7 @@ public partial class ExaminationFeeEditorDialog : EditorDialogBase
 
         try
         {
-            var page = await ExaminationService.GetTypesPagedAsync(value, "Name", false, 1, 20, ct);
+            var page = await ExaminationService.GetTypesPagedAsync(value, "Name", false, 1, 20, modality: null, isActive: null, ct);
             return page.Items;
         }
         catch (Exception)

@@ -15,7 +15,7 @@ public partial class PreAuthorizations : ListPageBase<PreAuthorizationListItemDt
         int page,
         int pageSize,
         CancellationToken ct)
-        => await InsuranceService.GetPreAuthorizationsPagedAsync(search, sortBy, sortDescending, page, pageSize, ct);
+        => await InsuranceService.GetPreAuthorizationsPagedAsync(search, sortBy, sortDescending, page, pageSize, status: null, ct);
 
     private async Task OpenCreateDialogAsync()
     {

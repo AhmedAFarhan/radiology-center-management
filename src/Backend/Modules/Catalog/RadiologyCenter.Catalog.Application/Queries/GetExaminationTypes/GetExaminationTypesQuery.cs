@@ -2,4 +2,4 @@
 
 namespace RadiologyCenter.Catalog.Application.Queries.GetExaminationTypes;
 
-public record GetExaminationTypesQuery(QueryRequest Request, bool? IsActive = null) : IQuery;
+public record GetExaminationTypesQuery(QueryRequest Request) : IQuery;

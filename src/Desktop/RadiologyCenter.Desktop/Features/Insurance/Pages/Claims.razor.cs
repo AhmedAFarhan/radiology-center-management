@@ -15,7 +15,7 @@ public partial class Claims : ListPageBase<ClaimListItemDto>
         int page,
         int pageSize,
         CancellationToken ct)
-        => await InsuranceService.GetClaimsPagedAsync(search, sortBy, sortDescending, page, pageSize, ct);
+        => await InsuranceService.GetClaimsPagedAsync(search, sortBy, sortDescending, page, pageSize, status: null, ct);
 
     private async Task OpenCreateDialogAsync()
     {

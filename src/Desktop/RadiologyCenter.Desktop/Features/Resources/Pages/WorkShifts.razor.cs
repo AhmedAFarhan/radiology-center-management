@@ -34,7 +34,7 @@ public partial class WorkShifts : ListPageBase<WorkShiftDto>
     {
         var shiftsTask = ResourceService.GetWorkShiftsPagedAsync(search, sortBy, sortDescending, page, pageSize, ct);
         var staffTask = ResourceService.GetStaffsPagedAsync(null, null, false, 1, 100, ct);
-        var equipmentTask = ResourceService.GetEquipmentPagedAsync(null, null, false, 1, 100, ct);
+        var equipmentTask = ResourceService.GetEquipmentPagedAsync(null, null, false, 1, 100, status: null, ct);
 
         await Task.WhenAll(shiftsTask, staffTask, equipmentTask);
 

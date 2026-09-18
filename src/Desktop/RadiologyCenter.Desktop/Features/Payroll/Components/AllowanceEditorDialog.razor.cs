@@ -58,7 +58,7 @@ public partial class AllowanceEditorDialog : EditorDialogBase
 
         try
         {
-            var page = await PayrollService.GetSalaryComponentsPagedAsync(value, "Name", false, 1, 20, ct);
+            var page = await PayrollService.GetSalaryComponentsPagedAsync(value, "Name", false, 1, 20, kind: null, frequency: null, ct);
             return page.Items;
         }
         catch (Exception)

@@ -32,7 +32,7 @@ public partial class ExaminationFees : ListPageBase<ExaminationFeeDto>
         CancellationToken ct)
     {
         var feesTask = PayrollService.GetExaminationFeesPagedAsync(search, sortBy, sortDescending, page, pageSize, ct);
-        var typesTask = ExaminationService.GetTypesPagedAsync(null, null, false, 1, 100, ct);
+        var typesTask = ExaminationService.GetTypesPagedAsync(null, null, false, 1, 100, modality: null, isActive: null, ct);
 
         await Task.WhenAll(feesTask, typesTask);
 

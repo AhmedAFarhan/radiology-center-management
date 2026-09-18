@@ -25,7 +25,7 @@ public partial class PreAuthDialog : EditorDialogBase
             return Array.Empty<PatientDto>();
 
         var page = await SafeExecute.RunAsync(
-            () => PatientService.GetPagedAsync(value, "LastName", false, 1, 20, ct),
+            () => PatientService.GetPagedAsync(value, "LastName", false, 1, 20, gender: null, isActive: null, ct),
             Snackbar,
             () => T.PreAuthDialog.UnableSearchPatients);
         return page?.Items ?? Array.Empty<PatientDto>();
@@ -59,7 +59,7 @@ public partial class PreAuthDialog : EditorDialogBase
         }
 
         var page = await SafeExecute.RunAsync(
-            () => ExaminationService.GetPagedAsync(value, "ScheduledAt", false, 1, 50, ct),
+            () => ExaminationService.GetPagedAsync(value, "ScheduledAt", false, 1, 50, priority: null, status: null, ct),
             Snackbar,
             () => T.PreAuthDialog.UnableSearchExaminations);
         return page?.Items.Where(e => e.PatientId == _selectedPatient.Id) ?? Array.Empty<ExaminationListItemDto>();

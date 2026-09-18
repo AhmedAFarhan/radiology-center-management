@@ -38,6 +38,7 @@ public partial class PayRuns : ComponentBase, IDisposable
                 state.SortDirection == SortDirection.Descending,
                 state.Page + 1,
                 state.PageSize,
+                status: null,
                 ct);
 
             _stats = new PayRunStats

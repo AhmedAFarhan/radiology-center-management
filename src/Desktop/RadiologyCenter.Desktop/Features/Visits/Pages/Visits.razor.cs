@@ -42,7 +42,7 @@ public partial class Visits : ListPageBase<ExaminationListItemDto>
         int pageSize,
         CancellationToken ct)
     {
-        var result = await ExaminationService.GetPagedAsync(search, sortBy, sortDescending, page, pageSize, ct);
+        var result = await ExaminationService.GetPagedAsync(search, sortBy, sortDescending, page, pageSize, priority: null, status: null, ct);
         await PrimeInsuranceCacheAsync(result.Items.Select(i => i.PatientId).Distinct().ToList());
         return result;
     }

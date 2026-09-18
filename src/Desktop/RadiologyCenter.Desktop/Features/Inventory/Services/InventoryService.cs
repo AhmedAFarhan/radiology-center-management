@@ -121,8 +121,24 @@ public sealed class InventoryService : CrudServiceBase
         bool sortDescending,
         int pageNumber,
         int pageSize,
+        string? status = null,
         CancellationToken ct = default)
-        => FetchPageAsync<PurchaseOrderDto>(PurchaseOrdersRes, searchTerm, sortBy, sortDescending, pageNumber, pageSize, ct);
+    {
+        var filters = new List<object>();
+        if (!string.IsNullOrWhiteSpace(status))
+            filters.Add(new { field = "Status", @operator = "Equals", value = status });
+
+        var body = new
+        {
+            pagination = new { pageNumber, pageSize },
+            sortBy,
+            sortDescending,
+            searchTerm,
+            filters = filters.Count > 0 ? filters : null
+        };
+
+        return Api.PostAsync<PagedResult<PurchaseOrderDto>>($"{PurchaseOrdersRes}/all", body, ct);
+    }
 
     public Task<PurchaseOrderDto> GetPurchaseOrderByIdAsync(string id, CancellationToken ct = default)
         => FetchByIdAsync<PurchaseOrderDto>(PurchaseOrdersRes, id, ct);

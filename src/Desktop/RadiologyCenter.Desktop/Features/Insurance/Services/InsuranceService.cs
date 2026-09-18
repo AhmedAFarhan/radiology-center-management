@@ -32,8 +32,24 @@ public sealed class InsuranceService : CrudServiceBase
         bool sortDescending,
         int pageNumber,
         int pageSize,
+        string? status = null,
         CancellationToken ct = default)
-        => FetchPageAsync<InsurancePolicyListItemDto>(PoliciesRes, searchTerm, sortBy, sortDescending, pageNumber, pageSize, ct);
+    {
+        var filters = new List<object>();
+        if (!string.IsNullOrWhiteSpace(status))
+            filters.Add(new { field = "Status", @operator = "Equals", value = status });
+
+        var body = new
+        {
+            pagination = new { pageNumber, pageSize },
+            sortBy,
+            sortDescending,
+            searchTerm,
+            filters = filters.Count > 0 ? filters : null
+        };
+
+        return Api.PostAsync<PagedResult<InsurancePolicyListItemDto>>($"{PoliciesRes}/all", body, ct);
+    }
 
     public Task<InsurancePolicyDto> GetPolicyByIdAsync(string id, CancellationToken ct = default)
         => FetchByIdAsync<InsurancePolicyDto>(PoliciesRes, id, ct);
@@ -81,8 +97,24 @@ public sealed class InsuranceService : CrudServiceBase
         bool sortDescending,
         int pageNumber,
         int pageSize,
+        string? status = null,
         CancellationToken ct = default)
-        => FetchPageAsync<PreAuthorizationListItemDto>(PreAuthsRes, searchTerm, sortBy, sortDescending, pageNumber, pageSize, ct);
+    {
+        var filters = new List<object>();
+        if (!string.IsNullOrWhiteSpace(status))
+            filters.Add(new { field = "Status", @operator = "Equals", value = status });
+
+        var body = new
+        {
+            pagination = new { pageNumber, pageSize },
+            sortBy,
+            sortDescending,
+            searchTerm,
+            filters = filters.Count > 0 ? filters : null
+        };
+
+        return Api.PostAsync<PagedResult<PreAuthorizationListItemDto>>($"{PreAuthsRes}/all", body, ct);
+    }
 
     public Task<PreAuthorizationDto> GetPreAuthorizationByExaminationAsync(string examinationId, CancellationToken ct = default)
         => Api.GetAsync<PreAuthorizationDto>($"{PreAuthsRes}/by-examination/{examinationId}", ct);
@@ -124,8 +156,24 @@ public sealed class InsuranceService : CrudServiceBase
         bool sortDescending,
         int pageNumber,
         int pageSize,
+        string? status = null,
         CancellationToken ct = default)
-        => FetchPageAsync<ClaimListItemDto>(ClaimsRes, searchTerm, sortBy, sortDescending, pageNumber, pageSize, ct);
+    {
+        var filters = new List<object>();
+        if (!string.IsNullOrWhiteSpace(status))
+            filters.Add(new { field = "Status", @operator = "Equals", value = status });
+
+        var body = new
+        {
+            pagination = new { pageNumber, pageSize },
+            sortBy,
+            sortDescending,
+            searchTerm,
+            filters = filters.Count > 0 ? filters : null
+        };
+
+        return Api.PostAsync<PagedResult<ClaimListItemDto>>($"{ClaimsRes}/all", body, ct);
+    }
 
     public Task<ClaimDto> GetClaimByIdAsync(string id, CancellationToken ct = default)
         => FetchByIdAsync<ClaimDto>(ClaimsRes, id, ct);

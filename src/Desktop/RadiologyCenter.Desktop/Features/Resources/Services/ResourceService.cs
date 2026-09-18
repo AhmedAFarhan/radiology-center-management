@@ -20,8 +20,24 @@ public sealed class ResourceService : CrudServiceBase
         bool sortDescending,
         int pageNumber,
         int pageSize,
+        string? status = null,
         CancellationToken ct = default)
-        => FetchPageAsync<EquipmentDto>(EquipmentRes, searchTerm, sortBy, sortDescending, pageNumber, pageSize, ct);
+    {
+        var filters = new List<object>();
+        if (!string.IsNullOrWhiteSpace(status))
+            filters.Add(new { field = "Status", @operator = "Equals", value = status });
+
+        var body = new
+        {
+            pagination = new { pageNumber, pageSize },
+            sortBy,
+            sortDescending,
+            searchTerm,
+            filters = filters.Count > 0 ? filters : null
+        };
+
+        return Api.PostAsync<PagedResult<EquipmentDto>>($"{EquipmentRes}/all", body, ct);
+    }
 
     public Task<EquipmentDto> GetEquipmentByIdAsync(string id, CancellationToken ct = default)
         => FetchByIdAsync<EquipmentDto>(EquipmentRes, id, ct);

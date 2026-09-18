@@ -47,7 +47,7 @@ public partial class WorkShiftEditorDialog : EditorDialogBase
             return Array.Empty<EquipmentDto>();
 
         var page = await SafeExecute.RunAsync(
-            () => ResourceService.GetEquipmentPagedAsync(value, "Name", false, 1, 20, ct),
+            () => ResourceService.GetEquipmentPagedAsync(value, "Name", false, 1, 20, status: null, ct),
             Snackbar,
             () => T.WorkShiftDialog.SearchEquipmentError);
         return page?.Items ?? Array.Empty<EquipmentDto>();
