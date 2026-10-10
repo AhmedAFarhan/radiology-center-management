@@ -1,4 +1,5 @@
 using RadiologyCenter.BuildingBlocks.Application.Abstractions;
+using RadiologyCenter.BuildingBlocks.Application.Abstractions.Services;
 using RadiologyCenter.Examinations.Application.Abstractions;
 using RadiologyCenter.Examinations.Application.Commands.CreateExamination;
 using RadiologyCenter.Examinations.Application.DTOs;
@@ -17,36 +18,15 @@ public static class BookExaminationCommandHandler
         IExaminationRepository examinationRepository,
         IItemSnapshotResolver itemSnapshotResolver,
         IExaminationsUnitOfWork unitOfWork,
-        ITimezoneConverter timezone,
+        ExaminationScheduler scheduler,
+        INumberSequenceGenerator sequence,
         CancellationToken ct)
     {
         var examinationType = await examinationTypeDirectory.GetWithItemsAsync(command.ExaminationTypeId, ct);
         if (examinationType is null)
             return Result.Failure<ExaminationDto>(Error.NotFound(ErrorCodes.ExaminationTypeNotFound, "ExaminationType", command.ExaminationTypeId));
 
-        var localNow = timezone.ToLocal(DateTime.UtcNow);
-        if (command.ScheduledAt < localNow.AddMinutes(-1))
-            return Result.Failure<ExaminationDto>(Error.Conflict(ErrorCodes.ScheduledTimePast, "Scheduled time cannot be in the past."));
-
-        var scheduledEnd = examinationType.StandardDurationMinutes > 0
-            ? command.ScheduledAt.AddMinutes(examinationType.StandardDurationMinutes)
-            : command.ScheduledAt.AddMinutes(30);
-
-        if (command.EquipmentId.HasValue)
-        {
-            var (isConflict, resource) = await ExaminationOverlapChecker.FindConflictAsync(
-                examinationRepository, command.EquipmentId, command.RadiologistId,
-                command.ScheduledAt, scheduledEnd, excludeExaminationId: null, ct);
-
-            if (isConflict)
-            {
-                var code = resource == "equipment" ? ErrorCodes.EquipmentOverlap : ErrorCodes.RadiologistOverlap;
-                var message = resource == "equipment"
-                    ? "This equipment is already booked for the selected time slot."
-                    : "This radiologist is already booked for the selected time slot.";
-                return Result.Failure<ExaminationDto>(Error.Conflict(code, message));
-            }
-        }
+        await using var transaction = await unitOfWork.BeginTransactionAsync(ct);
 
         var priority = ExaminationPriority.FromName<ExaminationPriority>(command.Priority);
 
@@ -74,10 +54,13 @@ public static class BookExaminationCommandHandler
             examination.AddItem(seeded.ItemId, seeded.Quantity, seeded.IsContrast, seeded.IsRequired, unitCost: unitCost);
         }
 
-        examination.Schedule(command.ScheduledAt, examinationType.StandardDurationMinutes);
+        var scheduled = await scheduler.ScheduleAsync(examination, examinationType, command.ScheduledAt, transaction, ct);
+        if (scheduled.IsFailure) return Result.Failure<ExaminationDto>(scheduled.Error!);
 
+        examination.AssignAccession(await sequence.GenerateNextAsync("ExaminationAccession", "EX", 8, transaction.DbTransaction, ct));
         await examinationRepository.AddAsync(examination, ct);
         await unitOfWork.SaveChangesAsync(ct);
+        await transaction.CommitAsync(ct);
 
         return Result.Success(examination.ToDto(examinationType.Name));
     }

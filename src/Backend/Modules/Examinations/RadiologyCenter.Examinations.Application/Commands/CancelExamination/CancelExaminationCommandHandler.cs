@@ -35,6 +35,7 @@ public static class CancelExaminationCommandHandler
 
         examination.Cancel(command.Reason);
 
+        await unitOfWork.SaveChangesAsync(ct);
         await transaction.CommitAsync(ct);
 
         return Result.Success();

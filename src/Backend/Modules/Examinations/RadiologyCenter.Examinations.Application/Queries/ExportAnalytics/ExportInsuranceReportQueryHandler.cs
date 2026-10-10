@@ -18,7 +18,7 @@ public static class ExportInsuranceReportQueryHandler
             new GetInsuranceAnalyticsQuery(query.From, query.To),
             dataSource, timezone, ct);
         if (insuranceResult.IsFailure)
-            return Result.Failure<ReportContentDto>(insuranceResult.Error);
+            return Result.Failure<ReportContentDto>(insuranceResult.Error!);
 
         var today = timezone.GetLocalDate(DateTime.UtcNow);
         var from = query.From ?? today.AddMonths(-1).AddDays(1).ToDateTime(TimeOnly.MinValue);

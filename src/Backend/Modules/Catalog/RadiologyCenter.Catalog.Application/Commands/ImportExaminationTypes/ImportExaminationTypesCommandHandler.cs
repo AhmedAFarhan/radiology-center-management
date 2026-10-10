@@ -1,3 +1,4 @@
+using RadiologyCenter.BuildingBlocks.Domain.Specifications;
 using RadiologyCenter.BuildingBlocks.Application.Abstractions.Services;
 using FluentValidation;
 using RadiologyCenter.BuildingBlocks.Application.Common;
@@ -25,6 +26,7 @@ public static class ImportExaminationTypesCommandHandler
         IExaminationTypeRepository examinationTypeRepository,
         INumberSequenceGenerator numberSequenceGenerator,
         ICatalogUnitOfWork unitOfWork,
+        ITransactionLock transactionLock,
         IExcelService excelService,
         CancellationToken ct)
     {
@@ -45,6 +47,8 @@ public static class ImportExaminationTypesCommandHandler
         if (!string.IsNullOrWhiteSpace(parsed.TemplateVersion) && parsed.TemplateVersion != ExcelImportLimits.TemplateVersion)
             return Result.Failure<ExcelImportResult>(Error.Validation("Excel.WrongVersion", Translate("Excel.WrongVersion")));
 
+        await using var transaction = await unitOfWork.BeginTransactionAsync(ct);
+        await transactionLock.AcquireAsync(transaction, ["catalog:examination-types"], ct);
         var existingNames = (await examinationTypeRepository.GetAllAsync(ct))
             .Select(t => Normalize(t.Name))
             .ToHashSet();
@@ -107,7 +111,6 @@ public static class ImportExaminationTypesCommandHandler
 
         if (pending.Count > 0)
         {
-            await using var transaction = await unitOfWork.BeginTransactionAsync(ct);
             foreach (var candidate in pending)
             {
                 var code = await numberSequenceGenerator.GenerateNextAsync(
@@ -130,6 +133,7 @@ public static class ImportExaminationTypesCommandHandler
                     ct);
             }
 
+            await unitOfWork.SaveChangesAsync(ct);
             await transaction.CommitAsync(ct);
         }
 

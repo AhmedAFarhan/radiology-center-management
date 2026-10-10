@@ -21,14 +21,27 @@ public static class UploadPolicyDocumentCommandHandler
         if (type is null)
             return Result.Failure<PolicyDocumentDto>(Error.Validation(ErrorCodes.InvalidDocumentType, $"'{command.Type}' is not a valid document type."));
 
+        await using var transaction = await unitOfWork.BeginTransactionAsync(ct);
         var relativeDirectory = Path.Combine("policies", command.PolicyId.ToString());
         var storedPath = await storage.SaveAsync(relativeDirectory, command.FileName, command.Content, ct);
 
+        PolicyDocumentDto result;
+        try
+        {
         var document = policy.AddDocument(type, command.FileName, command.ContentType, storedPath, command.SizeInBytes);
 
         policyRepository.Update(policy);
         await unitOfWork.SaveChangesAsync(ct);
-
-        return Result.Success(document.ToDto());
+        result = document.ToDto();
+        }
+        catch
+        {
+            await transaction.RollbackAsync(CancellationToken.None);
+            storage.Delete(storedPath);
+            throw;
+        }
+        // Keep the file if commit fails: a network failure may leave commit outcome unknown.
+        await transaction.CommitAsync(ct);
+        return Result.Success(result);
     }
 }

@@ -1,3 +1,4 @@
+using RadiologyCenter.BuildingBlocks.Application.Abstractions;
 using RadiologyCenter.BuildingBlocks.Infrastructure.Persistence;
 using RadiologyCenter.Insurance.Application.Abstractions;
 
@@ -5,8 +6,8 @@ namespace RadiologyCenter.Insurance.Infrastructure.Persistence;
 
 public class InsuranceUnitOfWork : UnitOfWork<InsuranceDbContext>, IInsuranceUnitOfWork
 {
-    public InsuranceUnitOfWork(InsuranceDbContext context)
-        : base(context)
+    public InsuranceUnitOfWork(InsuranceDbContext context, IDomainEventDispatcher events)
+        : base(context, events)
     {
     }
 }

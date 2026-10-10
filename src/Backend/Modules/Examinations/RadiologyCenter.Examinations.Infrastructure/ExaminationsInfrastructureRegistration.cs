@@ -13,10 +13,9 @@ public static class ExaminationsInfrastructureRegistration
 {
     public static IServiceCollection AddExaminationsInfrastructure(this IServiceCollection services, IConfiguration configuration)
     {
-        var connectionString = configuration.GetConnectionString("DefaultConnection");
 
         services.AddDbContext<ExaminationsDbContext>((sp, options) =>
-            options.UseSqlServer(connectionString)
+            options.UseSqlServer(sp.GetRequiredService<IConfiguration>().GetConnectionString("DefaultConnection"))
                    .AddInterceptors(sp.GetRequiredService<AuditSoftDeleteInterceptor>())
                    .AddInterceptors(sp.GetRequiredService<DomainEventDispatchInterceptor>())
 );

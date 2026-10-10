@@ -17,15 +17,23 @@ public sealed class InsuranceDocumentStorage : IInsuranceDocumentStorage
 
     public async Task<string> SaveAsync(string relativeDirectory, string fileName, Stream content, CancellationToken ct = default)
     {
-        var directory = Path.Combine(_rootPath, relativeDirectory);
+        var directory = GetFullPath(relativeDirectory);
         Directory.CreateDirectory(directory);
 
         var storedName = $"{Guid.NewGuid():N}-{SanitizeFileName(fileName)}";
         var storedPath = Path.Combine(relativeDirectory, storedName);
-        var fullPath = Path.Combine(_rootPath, storedPath);
+        var fullPath = GetFullPath(storedPath);
 
-        await using var file = new FileStream(fullPath, FileMode.CreateNew, FileAccess.Write, FileShare.None, 81920, true);
-        await content.CopyToAsync(file, ct);
+        try
+        {
+            await using var file = new FileStream(fullPath, FileMode.CreateNew, FileAccess.Write, FileShare.None, 81920, true);
+            await content.CopyToAsync(file, ct);
+        }
+        catch
+        {
+            File.Delete(fullPath);
+            throw;
+        }
 
         return storedPath;
     }
@@ -48,7 +56,7 @@ public sealed class InsuranceDocumentStorage : IInsuranceDocumentStorage
     private string GetFullPath(string storedPath)
     {
         var fullPath = Path.GetFullPath(Path.Combine(_rootPath, storedPath));
-        if (!fullPath.StartsWith(_rootPath, StringComparison.OrdinalIgnoreCase))
+        if (!fullPath.StartsWith(Path.TrimEndingDirectorySeparator(_rootPath) + Path.DirectorySeparatorChar, StringComparison.OrdinalIgnoreCase))
             throw new InvalidOperationException("Stored path escapes the storage root.");
         return fullPath;
     }

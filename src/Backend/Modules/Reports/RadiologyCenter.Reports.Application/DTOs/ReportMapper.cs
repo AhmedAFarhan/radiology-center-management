@@ -17,7 +17,7 @@ internal static class ReportMapper
             report.CurrentVersionNumber,
             report.FinalizedAt,
             report.CancelReason,
-            report.CurrentVersion!.Adapt<ReportVersionDto>());
+            report.CurrentVersion!.Adapt<ReportVersionDto>(), Revision: report.Revision);
 
     public static ReportListItemDto ToListItemDto(this RadiologyReport report) =>
         new(

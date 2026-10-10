@@ -1,0 +1,32 @@
+<Project Sdk="Microsoft.NET.Sdk">
+<PropertyGroup><TargetFramework>net10.0</TargetFramework><Nullable>enable</Nullable><ImplicitUsings>enable</ImplicitUsings></PropertyGroup>
+<ItemGroup><FrameworkReference Include="Microsoft.AspNetCore.App"/><PackageReference Include="WolverineFx.RuntimeCompilation" Version="6.24.0"/></ItemGroup>
+<ItemGroup><EmbeddedResource Include="Security/DesktopSecurity.sql" /></ItemGroup>
+<ItemGroup>
+<ProjectReference Include="..\..\Backend\BuildingBlocks\RadiologyCenter.BuildingBlocks.Application\RadiologyCenter.BuildingBlocks.Application.csproj"/>
+<ProjectReference Include="..\..\Backend\BuildingBlocks\RadiologyCenter.BuildingBlocks.Infrastructure\RadiologyCenter.BuildingBlocks.Infrastructure.csproj"/>
+<ProjectReference Include="..\..\Backend\Modules\Identity\RadiologyCenter.Identity.Application\RadiologyCenter.Identity.Application.csproj"/>
+<ProjectReference Include="..\..\Backend\Modules\Identity\RadiologyCenter.Identity.Infrastructure\RadiologyCenter.Identity.Infrastructure.csproj"/>
+<ProjectReference Include="..\..\Backend\Modules\Patients\RadiologyCenter.Patients.Application\RadiologyCenter.Patients.Application.csproj"/>
+<ProjectReference Include="..\..\Backend\Modules\Patients\RadiologyCenter.Patients.Infrastructure\RadiologyCenter.Patients.Infrastructure.csproj"/>
+<ProjectReference Include="..\..\Backend\Modules\Inventory\RadiologyCenter.Inventory.Application\RadiologyCenter.Inventory.Application.csproj"/>
+<ProjectReference Include="..\..\Backend\Modules\Inventory\RadiologyCenter.Inventory.Infrastructure\RadiologyCenter.Inventory.Infrastructure.csproj"/>
+<ProjectReference Include="..\..\Backend\Modules\Examinations\RadiologyCenter.Examinations.Application\RadiologyCenter.Examinations.Application.csproj"/>
+<ProjectReference Include="..\..\Backend\Modules\Examinations\RadiologyCenter.Examinations.Infrastructure\RadiologyCenter.Examinations.Infrastructure.csproj"/>
+<ProjectReference Include="..\..\Backend\Modules\Catalog\RadiologyCenter.Catalog.Application\RadiologyCenter.Catalog.Application.csproj"/>
+<ProjectReference Include="..\..\Backend\Modules\Catalog\RadiologyCenter.Catalog.Infrastructure\RadiologyCenter.Catalog.Infrastructure.csproj"/>
+<ProjectReference Include="..\..\Backend\Modules\ResourceManagement\RadiologyCenter.ResourceManagement.Application\RadiologyCenter.ResourceManagement.Application.csproj"/>
+<ProjectReference Include="..\..\Backend\Modules\ResourceManagement\RadiologyCenter.ResourceManagement.Infrastructure\RadiologyCenter.ResourceManagement.Infrastructure.csproj"/>
+<ProjectReference Include="..\..\Backend\Modules\Payroll\RadiologyCenter.Payroll.Application\RadiologyCenter.Payroll.Application.csproj"/>
+<ProjectReference Include="..\..\Backend\Modules\Payroll\RadiologyCenter.Payroll.Infrastructure\RadiologyCenter.Payroll.Infrastructure.csproj"/>
+<ProjectReference Include="..\..\Backend\Modules\Reports\RadiologyCenter.Reports.Application\RadiologyCenter.Reports.Application.csproj"/>
+<ProjectReference Include="..\..\Backend\Modules\Reports\RadiologyCenter.Reports.Infrastructure\RadiologyCenter.Reports.Infrastructure.csproj"/>
+<ProjectReference Include="..\..\Backend\Modules\Insurance\RadiologyCenter.Insurance.Application\RadiologyCenter.Insurance.Application.csproj"/>
+<ProjectReference Include="..\..\Backend\Modules\Insurance\RadiologyCenter.Insurance.Infrastructure\RadiologyCenter.Insurance.Infrastructure.csproj"/>
+<ProjectReference Include="..\..\Backend\Modules\Cash\RadiologyCenter.Cash.Application\RadiologyCenter.Cash.Application.csproj"/>
+<ProjectReference Include="..\..\Backend\Modules\Cash\RadiologyCenter.Cash.Infrastructure\RadiologyCenter.Cash.Infrastructure.csproj"/>
+<ProjectReference Include="..\..\Backend\Modules\Notification\RadiologyCenter.Notification.Application\RadiologyCenter.Notification.Application.csproj"/>
+<ProjectReference Include="..\..\Backend\Modules\Notification\RadiologyCenter.Notification.Infrastructure\RadiologyCenter.Notification.Infrastructure.csproj"/>
+</ItemGroup>
+<ItemGroup><Content Include="Resources/**/*.json" CopyToOutputDirectory="PreserveNewest" /></ItemGroup>
+</Project>

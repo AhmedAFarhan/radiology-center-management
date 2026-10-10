@@ -1,18 +1,21 @@
-﻿namespace RadiologyCenter.Desktop;
+namespace RadiologyCenter.Desktop;
 
 using RadiologyCenter.Desktop.Services;
 using WindowsColor = Windows.UI.Color;
+using Microsoft.Extensions.DependencyInjection;
 
 public partial class App : Application
 {
-    private readonly LocalhostService _localhost;
     private readonly PacsService _pacs;
 
-    public App()
+    private readonly IServiceProvider _services;
+
+    public App(IServiceProvider services)
     {
         InitializeComponent();
-        _localhost = new LocalhostService();
-        _pacs = new PacsService();
+        services.GetRequiredService<TokenStorage>().Clear();
+        _services = services;
+        _pacs = new PacsService(services.GetRequiredService<IHttpClientFactory>(), services.GetRequiredService<IServiceScopeFactory>());
     }
 
     protected override Window CreateWindow(IActivationState? activationState)
@@ -60,25 +63,12 @@ public partial class App : Application
             },
         };
         CenterWindowOnLaunch(window);
-        _ = StartPacsInBackgroundAsync();
         window.Destroying += (_, _) =>
         {
-            _localhost.Stop();
-            _pacs.Stop();
+            _ = _services.GetRequiredService<BusinessRuntimeService>().DisposeAsync();
+            _pacs.Dispose();
         };
         return window;
-    }
-
-    private async Task StartPacsInBackgroundAsync()
-    {
-        try
-        {
-            await _pacs.StartAsync();
-        }
-        catch (Exception ex)
-        {
-            System.Diagnostics.Debug.WriteLine($"PACS start failed: {ex.Message}");
-        }
     }
 
     private void CenterWindowOnLaunch(Window window)

@@ -8,4 +8,7 @@ public record UpsertReportSectionCommand(
     string Title,
     string Body,
     int Position = 0,
-    bool IsLocked = false) : ICommand;
+    bool IsLocked = false) : ICommand
+{
+    public int? ExpectedRevision { get; init; }
+}

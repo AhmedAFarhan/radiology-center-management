@@ -77,7 +77,7 @@ public partial class SalaryEditorDialog : EditorDialogBase
 
     private async Task SubmitAsync()
     {
-        if (!_editContext.Validate())
+        if (!_editContext.Validate() || _model.EffectiveDate is not DateTime effectiveDate)
             return;
 
         if (!IsEdit && _selectedStaff is null)
@@ -91,7 +91,7 @@ public partial class SalaryEditorDialog : EditorDialogBase
             StaffId = IsEdit ? _staffId : _selectedStaff!.Id,
             BaseSalary = _model.BaseSalary,
             SalaryType = _model.SalaryType,
-            EffectiveDate = _model.EffectiveDate.Value.Date,
+            EffectiveDate = effectiveDate.Date,
         };
 
         if (await TrySaveAsync(

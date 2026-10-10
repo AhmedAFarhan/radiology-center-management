@@ -55,6 +55,7 @@ public sealed class AppAuthenticationStateProvider : AuthenticationStateProvider
         var identityClaims = new List<Claim>
         {
             new(ClaimTypes.Name, tokens.Username),
+            new(ClaimTypes.NameIdentifier, claims.Get("sub") ?? string.Empty),
             new(ClaimTypes.Email, claims.Get("email") ?? string.Empty),
             new(ClaimTypes.GivenName, claims.Get("firstName") ?? string.Empty),
             new(ClaimTypes.Surname, claims.Get("lastName") ?? string.Empty),

@@ -5,4 +5,7 @@ public record AddReportFindingCommand(
     string Region,
     string Description,
     string Severity,
-    int Position = 0) : ICommand;
+    int Position = 0) : ICommand
+{
+    public int? ExpectedRevision { get; init; }
+}

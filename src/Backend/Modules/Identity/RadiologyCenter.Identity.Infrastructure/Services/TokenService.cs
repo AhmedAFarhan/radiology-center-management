@@ -42,10 +42,10 @@ public class TokenService : ITokenService
             new("timezone", user.TimeZoneId),
         };
 
-        foreach (var role in user.AssignedRoles)
+        foreach (var role in user.AssignedRoles.Where(r => r.IsActive))
             claims.Add(new("role", role.Name!));
 
-        if (user.AssignedRoles.Any(r => r.IsSystem))
+        if (user.AssignedRoles.Any(r => r.IsActive && r.IsSystem && r.Name == "Administrator"))
         {
             claims.Add(new("isAdmin", "true"));
             foreach (var permission in Permissions.All)

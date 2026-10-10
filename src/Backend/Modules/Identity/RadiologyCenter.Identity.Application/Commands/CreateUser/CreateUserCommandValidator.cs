@@ -8,7 +8,8 @@ public class CreateUserCommandValidator : AbstractValidator<CreateUserCommand>
 {
     public CreateUserCommandValidator()
     {
-        RuleFor(x => x.UserName).NotEmpty().WithErrorCode(ErrorCodes.UserNameRequired).MaximumLength(100).WithErrorCode(ErrorCodes.UserNameTooLong);
+        RuleFor(x => x.UserName).NotEmpty().WithErrorCode(ErrorCodes.UserNameRequired).MaximumLength(80).WithErrorCode(ErrorCodes.UserNameTooLong)
+            .Matches("^[A-Za-z0-9_.-]+$").WithMessage("Use letters, numbers, dots, underscores or hyphens in the clinic username.");
         RuleFor(x => x.Email).NotEmpty().WithErrorCode(ErrorCodes.EmailRequired).EmailAddress().WithErrorCode(ErrorCodes.EmailInvalid).MaximumLength(200).WithErrorCode(ErrorCodes.EmailTooLong);
         RuleFor(x => x.FirstName).NotEmpty().WithErrorCode(ErrorCodes.FirstNameRequired).MaximumLength(100).WithErrorCode(ErrorCodes.FirstNameTooLong);
         RuleFor(x => x.LastName).NotEmpty().WithErrorCode(ErrorCodes.LastNameRequired).MaximumLength(100).WithErrorCode(ErrorCodes.LastNameTooLong);

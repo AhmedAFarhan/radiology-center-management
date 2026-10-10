@@ -49,27 +49,13 @@ public sealed class PacsSyncService
             return null;
         }
 
-        candidates = candidates.Where(s => !string.IsNullOrWhiteSpace(s.StudyInstanceUid)).ToList();
-
-        if (candidates.Count == 0)
-        {
-            // Fall back to all studies matched by AccessionNumber or patient name.
-            try
-            {
-                var all = await pacs.GetStudiesAsync(ct);
-                candidates = all
-                    .Where(s => !string.IsNullOrWhiteSpace(s.StudyInstanceUid))
-                    .Where(s => AccessionsMatch(s.AccessionNumber, accessionNumber)
-                                || NamesMatch(s.PatientName, patientName))
-                    .ToList();
-            }
-            catch
-            {
-                return null;
-            }
-        }
-
-        var best = SelectBestStudy(candidates, accessionNumber);
+        // Patient and accession identifiers must both match exactly.
+        if (string.IsNullOrWhiteSpace(patientCode) || string.IsNullOrWhiteSpace(accessionNumber))
+            return null;
+        var matching = candidates.Where(s => !string.IsNullOrWhiteSpace(s.StudyInstanceUid)
+            && string.Equals(s.PatientId.Trim(), patientCode.Trim(), StringComparison.OrdinalIgnoreCase)
+            && AccessionsMatch(s.AccessionNumber, accessionNumber)).ToList();
+        var best = matching.Count == 1 ? matching[0] : null;
         if (best is null)
             return null;
 
@@ -87,39 +73,9 @@ public sealed class PacsSyncService
         return best.StudyInstanceUid;
     }
 
-    private static PacsService.PacsStudy? SelectBestStudy(
-        IReadOnlyList<PacsService.PacsStudy> candidates,
-        string? accessionNumber)
-    {
-        var byAccession = candidates.FirstOrDefault(s =>
-            AccessionsMatch(s.AccessionNumber, accessionNumber));
-        if (byAccession is not null)
-            return byAccession;
-
-        return candidates
-            .OrderByDescending(s => ParseDate(s.StudyDate))
-            .ThenByDescending(s => s.StudyDate)
-            .FirstOrDefault();
-    }
-
-    private static DateTime? ParseDate(string? value)
-        => DateTime.TryParseExact(
-            value, "yyyyMMdd", CultureInfo.InvariantCulture, DateTimeStyles.None, out var date)
-            ? date
-            : null;
-
     private static bool AccessionsMatch(string? a, string? b)
         => !string.IsNullOrWhiteSpace(a)
            && !string.IsNullOrWhiteSpace(b)
            && a.Trim().Equals(b.Trim(), StringComparison.OrdinalIgnoreCase);
 
-    private static bool NamesMatch(string? a, string? b)
-    {
-        if (string.IsNullOrWhiteSpace(a) || string.IsNullOrWhiteSpace(b))
-            return false;
-        var normalizedA = new string(a.Where(char.IsLetterOrDigit).ToArray());
-        var normalizedB = new string(b.Where(char.IsLetterOrDigit).ToArray());
-        return !string.IsNullOrWhiteSpace(normalizedA)
-               && normalizedA.Equals(normalizedB, StringComparison.OrdinalIgnoreCase);
-    }
 }

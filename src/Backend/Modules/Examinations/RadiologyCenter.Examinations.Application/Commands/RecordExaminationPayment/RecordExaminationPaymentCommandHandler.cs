@@ -39,6 +39,7 @@ public static class RecordExaminationPaymentCommandHandler
         if (cashResult.IsFailure)
             return cashResult;
 
+        await unitOfWork.SaveChangesAsync(ct);
         await transaction.CommitAsync(ct);
 
         return Result.Success();

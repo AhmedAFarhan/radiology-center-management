@@ -13,16 +13,22 @@ public static class InsuranceInfrastructureRegistration
 {
     public static IServiceCollection AddInsuranceInfrastructure(this IServiceCollection services, IConfiguration configuration)
     {
-        var connectionString = configuration.GetConnectionString("DefaultConnection");
-        var storageRoot = configuration.GetSection("Insurance:Storage")["RootPath"] ?? "App_Data/Insurance";
 
         services.AddDbContext<InsuranceDbContext>((sp, options) =>
-            options.UseSqlServer(connectionString)
+            options.UseSqlServer(sp.GetRequiredService<IConfiguration>().GetConnectionString("DefaultConnection"))
                    .AddInterceptors(sp.GetRequiredService<AuditSoftDeleteInterceptor>())
                    .AddInterceptors(sp.GetRequiredService<DomainEventDispatchInterceptor>())
 );
 
-        services.Configure<DocumentStorageOptions>(o => o.RootPath = storageRoot);
+        services.AddOptions<DocumentStorageOptions>().Configure<IConfiguration>((o, config) =>
+        {
+            var configured = config["Insurance:Storage:RootPath"];
+            o.RootPath = string.IsNullOrWhiteSpace(configured)
+                ? Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData), "EGcare", "insurance")
+                : configured;
+            if (!Path.IsPathFullyQualified(o.RootPath))
+                throw new InvalidOperationException("Insurance storage must use an absolute data directory.");
+        });
 
         services.AddScoped<IInsuranceCompanyRepository, InsuranceCompanyRepository>();
         services.AddScoped<IInsurancePolicyRepository, InsurancePolicyRepository>();

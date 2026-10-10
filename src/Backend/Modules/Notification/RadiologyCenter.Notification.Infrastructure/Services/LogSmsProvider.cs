@@ -15,7 +15,7 @@ public class LogSmsProvider : ISmsProvider
 
     public Task<Result> SendAsync(string phoneNumber, string message, CancellationToken ct = default)
     {
-        _logger.LogInformation("[SMS] to {PhoneNumber}: {Message}", phoneNumber, message);
-        return Task.FromResult(Result.Success());
+        _logger.LogWarning("SMS delivery is unavailable: no delivery provider is installed.");
+        return Task.FromResult(Result.Failure(Error.Conflict("Notification.ProviderNotConfigured", "SMS delivery is not configured for this clinic. The message was not delivered.")));
     }
 }

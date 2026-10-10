@@ -35,19 +35,21 @@ public static class SearchExpressionBuilder
         if (targetFields.Length is 0)
             return null;
 
-        var term = searchTerm.Trim();
         var param = Expression.Parameter(typeof(T), "e");
         Expression? combined = null;
-
-        foreach (var field in targetFields)
+        // A name may span FirstName, MiddleName and LastName columns. Match
+        // every word across the searchable fields, rather than one whole phrase.
+        foreach (var term in searchTerm.Split((char[]?)null, StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries))
         {
-            var property = typeof(T).GetProperty(field, BindingFlags.IgnoreCase | BindingFlags.Public | BindingFlags.Instance);
-            if (property is null)
-                continue;
-
-            Expression? condition = BuildCondition(param, property, term);
-            if (condition is not null)
-                combined = combined is null ? condition : Expression.OrElse(combined, condition);
+            Expression? word = null;
+            foreach (var field in targetFields)
+            {
+                var property = typeof(T).GetProperty(field, BindingFlags.IgnoreCase | BindingFlags.Public | BindingFlags.Instance);
+                if (property is null) continue;
+                var condition = BuildCondition(param, property, term);
+                if (condition is not null) word = word is null ? condition : Expression.OrElse(word, condition);
+            }
+            if (word is not null) combined = combined is null ? word : Expression.AndAlso(combined, word);
         }
 
         return combined is null ? null : Expression.Lambda<Func<T, bool>>(combined, param);

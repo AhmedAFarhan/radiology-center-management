@@ -141,6 +141,7 @@ public class PayrollTests : TestBase
     public async Task ApprovePayRun_ReturnsOk()
     {
         var payRunId = await CreateTestPayRunAsync();
+        (await Client.PostAsJsonAsync($"{PayRunsBaseUrl}/{payRunId}/compute", new { })).EnsureSuccessStatusCode();
         var response = await Client.PostAsJsonAsync($"{PayRunsBaseUrl}/{payRunId}/approve", new { });
         response.StatusCode.Should().Be(HttpStatusCode.OK);
     }
@@ -149,6 +150,7 @@ public class PayrollTests : TestBase
     public async Task RejectPayRun_ReturnsOk()
     {
         var payRunId = await CreateTestPayRunAsync();
+        (await Client.PostAsJsonAsync($"{PayRunsBaseUrl}/{payRunId}/compute", new { })).EnsureSuccessStatusCode();
         var response = await Client.PostAsJsonAsync($"{PayRunsBaseUrl}/{payRunId}/reject", new { });
         response.StatusCode.Should().Be(HttpStatusCode.OK);
     }
@@ -157,6 +159,8 @@ public class PayrollTests : TestBase
     public async Task RestartPayRun_ReturnsOk()
     {
         var payRunId = await CreateTestPayRunAsync();
+        (await Client.PostAsJsonAsync($"{PayRunsBaseUrl}/{payRunId}/compute", new { })).EnsureSuccessStatusCode();
+        (await Client.PostAsJsonAsync($"{PayRunsBaseUrl}/{payRunId}/reject", new { })).EnsureSuccessStatusCode();
         var response = await Client.PostAsJsonAsync($"{PayRunsBaseUrl}/{payRunId}/restart", new { });
         response.StatusCode.Should().Be(HttpStatusCode.OK);
     }
@@ -165,6 +169,8 @@ public class PayrollTests : TestBase
     public async Task PayPayRun_ReturnsOk()
     {
         var payRunId = await CreateTestPayRunAsync();
+        (await Client.PostAsJsonAsync($"{PayRunsBaseUrl}/{payRunId}/compute", new { })).EnsureSuccessStatusCode();
+        (await Client.PostAsJsonAsync($"{PayRunsBaseUrl}/{payRunId}/approve", new { })).EnsureSuccessStatusCode();
         var response = await Client.PostAsJsonAsync($"{PayRunsBaseUrl}/{payRunId}/pay", new { });
         response.StatusCode.Should().Be(HttpStatusCode.OK);
     }
@@ -757,12 +763,15 @@ public class PayrollTests : TestBase
         return allBody!.Data!.Items.First().Id;
     }
 
+    private static int _payRunSequence;
+
     private async Task<Guid> CreateTestPayRunAsync()
     {
+        var period = new DateTime(2100, 1, 1).AddMonths(Interlocked.Increment(ref _payRunSequence));
         var command = new
         {
-            RunFrom = DateTime.UtcNow.Date.AddDays(-30),
-            RunTo = DateTime.UtcNow.Date,
+            RunFrom = period,
+            RunTo = period.AddMonths(1).AddDays(-1),
             Notes = "Test pay run"
         };
         var response = await Client.PostAsJsonAsync(PayRunsBaseUrl, command);

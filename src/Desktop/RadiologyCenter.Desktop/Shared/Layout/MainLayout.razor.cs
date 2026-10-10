@@ -25,6 +25,8 @@ public partial class MainLayout : LayoutComponentBase, IDisposable
     private Task<AuthenticationState>? AuthStateTask { get; set; }
 
 private bool _shouldRender = true;
+    private async Task OpenClinicUpdates() => await DialogService.ShowAsync<RadiologyCenter.Desktop.Shared.Components.ClinicUpdateDialog>("EGcare", new DialogOptions { MaxWidth = MaxWidth.Small, FullWidth = true, BackdropClick = false, CloseOnEscapeKey = false });
+    private async Task OpenPacsAccount()=>await DialogService.ShowAsync<RadiologyCenter.Desktop.Shared.Components.PacsAccountDialog>("EGcare",new DialogOptions { MaxWidth=MaxWidth.Small,FullWidth=true });
 private bool _drawerOpen = true;
     private bool _loggingOut;
     private string _userName = string.Empty;
@@ -167,7 +169,7 @@ private async Task RefreshUserAsync(Task<AuthenticationState> task)
         var state = await task;
         var user = state.User;
         _userName = user.Identity?.Name ?? string.Empty;
-        _displayName = user.Claims.FirstOrDefault(c => c.Type == ClaimTypes.GivenName)?.Value;
+        _displayName = user.Claims.FirstOrDefault(c => c.Type == ClaimTypes.GivenName)?.Value ?? string.Empty;
         if (string.IsNullOrWhiteSpace(_displayName))
             _displayName = _userName;
 

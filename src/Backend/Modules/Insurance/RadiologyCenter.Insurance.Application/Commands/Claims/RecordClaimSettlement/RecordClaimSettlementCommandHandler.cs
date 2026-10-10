@@ -29,6 +29,7 @@ public static class RecordClaimSettlementCommandHandler
         claim.RecordSettlement(method, command.Amount, command.Reference);
 
         claimRepository.Update(claim);
+        await unitOfWork.SaveChangesAsync(ct);
         await transaction.CommitAsync(ct);
 
         return Result.Success(claim.ToDto());

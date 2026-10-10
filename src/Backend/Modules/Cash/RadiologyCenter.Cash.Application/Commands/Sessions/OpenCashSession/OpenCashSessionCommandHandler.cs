@@ -13,10 +13,14 @@ public static class OpenCashSessionCommandHandler
         ICurrentUser currentUser,
         ICashSessionRepository sessionRepository,
         ICashUnitOfWork unitOfWork,
+        ITransactionLock transactionLock,
         CancellationToken ct)
     {
         if (!Guid.TryParse(currentUser.Id, out var userId))
             return Result.Failure<CashSessionDto>(Error.Unauthorized());
+
+        await using var transaction = await unitOfWork.BeginTransactionAsync(ct);
+        await transactionLock.AcquireAsync(transaction, new[] { "cash:ledger" }, ct);
 
         if (await sessionRepository.GetOpenSessionByUserAsync(userId, ct) is not null)
             return Result.Failure<CashSessionDto>(Error.Conflict(ErrorCodes.SessionAlreadyOpen, "A cash session is already open for this user."));
@@ -30,6 +34,7 @@ public static class OpenCashSessionCommandHandler
 
         await sessionRepository.AddAsync(session, ct);
         await unitOfWork.SaveChangesAsync(ct);
+        await transaction.CommitAsync(ct);
 
         return Result.Success(new CashSessionDto(
             session.Id,

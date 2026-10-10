@@ -17,7 +17,7 @@ public static class ExportCashFlowReportQueryHandler
             new GetCashFlowReportQuery(query.From, query.To),
             dataSource, timezone, ct);
         if (cashFlowResult.IsFailure)
-            return Result.Failure<ReportContentDto>(cashFlowResult.Error);
+            return Result.Failure<ReportContentDto>(cashFlowResult.Error!);
 
         var today = timezone.GetLocalDate(DateTime.UtcNow);
         var from = query.From ?? today.AddMonths(-1).AddDays(1).ToDateTime(TimeOnly.MinValue);

@@ -1,0 +1,116 @@
+@using RadiologyCenter.Clinic
+@using Microsoft.Extensions.Configuration
+@using Microsoft.Data.SqlClient
+@inject BusinessRuntimeService Business
+@inject BackendStatusService Backend
+@inject AppLocalizer T
+@inject AppAuthenticationStateProvider Authentication
+
+<div style="max-width:680px;width:100%;margin:auto;padding:24px;">
+    <MudText Typo="Typo.h5">@L("Connect EGcare to your clinic", "توصيل EGcare بالعيادة")</MudText>
+    <MudText Typo="Typo.body2" Class="mb-4">@L("Every computer uses the same database on the admin PC.", "تستخدم كل الأجهزة قاعدة البيانات نفسها على جهاز المسؤول.")</MudText>
+    <div class="d-flex gap-2 mb-4">
+        <MudButton Variant="Variant.Outlined" OnClick="() => _admin = false" Disabled="_busy">@L("Connect to clinic", "الاتصال بالعيادة")</MudButton>
+        <MudButton Variant="Variant.Outlined" OnClick="() => _admin = true" Disabled="_busy">@L("Admin PC setup / upgrade", "إعداد / تحديث جهاز المسؤول")</MudButton>
+    </div>
+    @if (!_admin)
+    {
+        <MudButton StartIcon="@Icons.Material.Filled.FolderOpen" OnClick="ImportAsync" Disabled="_busy">@L("Import clinic connection file", "استيراد ملف اتصال العيادة")</MudButton>
+    }
+    <MudTextField @bind-Value="_server" Label="@L("Admin PC SQL Server name or IP", "اسم أو عنوان خادم SQL على جهاز المسؤول")" Disabled="_busy" Variant="Variant.Outlined" Class="my-2" />
+    <MudTextField @bind-Value="_database" Label="@L("Clinic database", "قاعدة بيانات العيادة")" Disabled="_busy" Variant="Variant.Outlined" Class="my-2" />
+    <MudTextField @bind-Value="_pacs" Label="@L("Image server HTTPS address (optional)", "عنوان HTTPS لخادم الصور (اختياري)")" Disabled="_busy" Variant="Variant.Outlined" Class="my-2" />
+    <MudTextField @bind-Value="_updates" Label="@L("Clinic update folder (optional)", "مجلد تحديثات العيادة (اختياري)")" Disabled="_busy" Variant="Variant.Outlined" Class="my-2" />
+    @if (_admin)
+    {
+        <MudAlert Severity="Severity.Info" Class="my-3">@L("Run this on the admin PC with a Windows account allowed to administer SQL Server. Close EGcare on the other computers before upgrading.", "شغّل هذا الإجراء على جهاز المسؤول بحساب Windows لديه صلاحية إدارة SQL Server. أغلق EGcare على الأجهزة الأخرى قبل التحديث.")</MudAlert>
+        <MudCheckBox T="bool" @bind-Value="_createNew" Disabled="_busy" Label="@L("Create a new, empty clinic database", "إنشاء قاعدة بيانات عيادة جديدة وفارغة")" />
+        @if (!_createNew)
+        {
+            <MudTextField @bind-Value="_backup" Label="@L("New backup file path on the SQL Server PC", "مسار ملف نسخ احتياطي جديد على جهاز SQL Server")" Disabled="_busy" Variant="Variant.Outlined" Class="my-2" />
+            <MudTextField @bind-Value="_documents" Label="@L("Existing insurance documents folder (if used)", "مجلد مستندات التأمين الحالي (إذا استُخدم)")" Disabled="_busy" Variant="Variant.Outlined" Class="my-2" />
+        }
+        <MudTextField @bind-Value="_adminUser" Label="@L("Clinic administrator username", "اسم مستخدم مسؤول العيادة")" Disabled="_busy" Variant="Variant.Outlined" Class="my-2" />
+        <MudTextField @bind-Value="_adminPassword" InputType="InputType.Password" autocomplete="off" Label="@(_createNew ? L("New administrator password", "كلمة مرور المسؤول الجديدة") : L("Current administrator password (for first connection)", "كلمة مرور المسؤول الحالية (للاتصال الأول)"))" Disabled="_busy" Variant="Variant.Outlined" Class="my-2" />
+        <MudText Typo="Typo.caption">@L("Existing accounts are never reset or unlocked by maintenance. Backups are created and verified before existing databases are upgraded.", "لا تعيد الصيانة تعيين كلمات مرور الحسابات الحالية أو تفتحها. يتم إنشاء النسخة الاحتياطية والتحقق منها قبل تحديث قاعدة البيانات.")</MudText>
+        <MudCheckBox T="bool" @bind-Value="_acknowledged" Disabled="_busy" Label="@L("I am on the admin PC and the other workstations are closed", "أنا على جهاز المسؤول والأجهزة الأخرى مغلقة")" />
+    }
+    @if (_error is not null) { <MudAlert Severity="Severity.Error" role="alert" Class="my-3">@_error</MudAlert> }
+    @if (_message is not null) { <MudAlert Severity="Severity.Success" Class="my-3">@_message</MudAlert> }
+    <div class="d-flex gap-2 mt-4">
+        <MudButton Color="Color.Primary" Variant="Variant.Filled" OnClick="SaveAsync" Disabled="@(_busy || (_admin && !_acknowledged))">@(_busy ? L("Working…", "جارٍ التنفيذ…") : _admin ? L("Run setup / upgrade", "تنفيذ الإعداد / التحديث") : L("Use this clinic", "استخدام هذه العيادة"))</MudButton>
+        @if (!_admin && DesktopConfiguration.Profile is not null)
+        {
+            <MudButton OnClick="ExportAsync" Disabled="_busy">@L("Export connection file", "تصدير ملف الاتصال")</MudButton>
+        }
+    </div>
+</div>
+
+@code {
+    [Parameter] public EventCallback Completed { get; set; }
+    private bool _admin,_createNew,_acknowledged,_busy,_development;
+    private string _server="",_database="EGcareClinic",_pacs="",_updates="",_backup="",_documents="",_adminUser="admin",_adminPassword="";
+    private string? _error,_message;
+    private string L(string en,string ar)=>T.IsRTL?ar:en;
+    protected override void OnInitialized()
+    {
+        if(DesktopConfiguration.Profile is {} profile) Load(profile);
+        else if(DesktopConfiguration.IsDevelopment)
+        {
+            _development=_admin=true;
+            var config=new ConfigurationBuilder().AddJsonFile(Path.Combine(AppContext.BaseDirectory,"appsettings.Development.json")).Build();
+            var sql=new SqlConnectionStringBuilder(config.GetConnectionString("DefaultConnection"));
+            _server=sql.DataSource is "." or "(local)" or "localhost"?Environment.MachineName:sql.DataSource; _database=sql.InitialCatalog;
+        }
+        _backup=Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData),"EGcare","backups",_database+"-"+DateTime.UtcNow.ToString("yyyyMMdd-HHmmss")+"-"+Guid.NewGuid().ToString("N")[..8]+".bak");
+        _documents=Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData),"EGcare","insurance");
+    }
+    private void Load(ClinicConnectionProfile profile) { _server=profile.Server; _database=profile.Database; _pacs=profile.PacsUrl??""; _updates=profile.UpdatesDirectory??""; }
+    private ClinicConnectionProfile Profile()=>new() { Server=_server.Trim(),Database=_database.Trim(),PacsUrl=string.IsNullOrWhiteSpace(_pacs)?null:_pacs.Trim(),UpdatesDirectory=string.IsNullOrWhiteSpace(_updates)?null:_updates.Trim() };
+    private async Task ImportAsync()
+    {
+        try {
+            var file=await FilePicker.Default.PickAsync(new PickOptions { PickerTitle=L("Select clinic connection file", "اختر ملف اتصال العيادة") });
+            if(file is not null) Load(ClinicConnectionProfile.Read(file.FullPath));
+            _error=null;
+        } catch(Exception ex) { _error=ex.Message; }
+    }
+    private async Task ExportAsync()
+    {
+        try {
+            var path=Path.Combine(FileSystem.CacheDirectory,"EGcare-clinic.json"); Profile().Write(path);
+            await Share.Default.RequestAsync(new ShareFileRequest("EGcare clinic connection",new ShareFile(path)));
+        } catch(Exception ex) { _error=ex.Message; }
+    }
+    private async Task SaveAsync()
+    {
+        _busy=true;_error=_message=null;
+        try {
+            var profile=Profile(); profile.Validate();
+            if(_admin && !_development && DesktopConfiguration.Profile is null && string.IsNullOrWhiteSpace(_adminPassword))
+                throw new InvalidOperationException(L("Enter the clinic administrator password to establish the first connection.", "أدخل كلمة مرور مسؤول العيادة لإنشاء الاتصال الأول."));
+            await Business.DisposeRuntimeAsync();
+            await Authentication.SignOutAsync();
+            if(_admin)
+            {
+                if(!_acknowledged) return;
+                if(!string.IsNullOrWhiteSpace(_backup)) Directory.CreateDirectory(Path.GetDirectoryName(Path.GetFullPath(_backup))!);
+                var connection=profile.ConnectionString(maintenance:true);
+                if(_development)
+                {
+                    var config=new ConfigurationBuilder().AddJsonFile(Path.Combine(AppContext.BaseDirectory,"appsettings.Development.json")).Build();
+                    var sql=new SqlConnectionStringBuilder(config.GetConnectionString("DefaultConnection")) { DataSource=profile.Server,InitialCatalog=profile.Database };
+                    connection=sql.ConnectionString;
+                }
+                SqlConnection.ClearAllPools();
+                await Task.Run(()=>ClinicMaintenance.RunAsync(profile,connection,_createNew,_backup,_adminUser,_adminPassword,_documents));
+                _adminPassword="";
+                _message=L("Setup completed. Export the connection file for the other computers.", "اكتمل الإعداد. صدّر ملف الاتصال للأجهزة الأخرى.");
+            }
+            if(!_development) profile.Write(DesktopConfiguration.ProfilePath);
+            await Backend.StartAsync();
+            await Completed.InvokeAsync();
+        } catch(Exception ex) { _error=ex.Message; }
+        finally { _busy=false; }
+    }
+}

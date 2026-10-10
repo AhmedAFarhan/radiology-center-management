@@ -56,6 +56,7 @@ public sealed record ExaminationListItemDto(
     decimal Remaining,
     string? Notes,
     int ItemCount,
+    string? AccessionNumber,
     string? StudyInstanceUID);
 
 public sealed record ExaminationItemDto(

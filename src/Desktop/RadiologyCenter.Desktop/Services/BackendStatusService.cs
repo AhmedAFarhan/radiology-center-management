@@ -1,78 +1,26 @@
 namespace RadiologyCenter.Desktop.Services;
-
-public sealed class BackendStatusService
+public sealed class BackendStatusService(BusinessRuntimeService business)
 {
     public event Action? StateChanged;
-
     public bool IsReady { get; private set; }
     public bool IsFailed { get; private set; }
     public string? Error { get; private set; }
     public bool IsStarting { get; private set; }
-
-    private bool _started;
-
-    public async Task EnsureStartedAsync()
-    {
-        if (_started)
-            return;
-
-        _started = true;
-        await StartAsync();
-    }
-
+    public bool NeedsSetup => !DesktopConfiguration.IsDevelopment && !File.Exists(DesktopConfiguration.ProfilePath);
+    private readonly SemaphoreSlim _start = new(1,1);
+    public Task EnsureStartedAsync() => IsReady ? Task.CompletedTask : StartAsync();
     public async Task StartAsync()
     {
-        IsStarting = true;
-        IsReady = false;
-        IsFailed = false;
-        Error = null;
-        StateChanged?.Invoke();
-
-        await Task.Delay(TimeSpan.FromSeconds(1));
-
-        try
-        {
-            await (LocalhostService.Instance?.StartAsync() ?? Task.CompletedTask);
-            IsReady = LocalhostService.Instance?.IsReady ?? true;
-
-            //if (System.Diagnostics.Debugger.IsAttached)
-            //{
-            //    IsReady = true;
-            //}
-            //else
-            //{
-            //    await (LocalhostService.Instance?.StartAsync() ?? Task.CompletedTask);
-            //    IsReady = LocalhostService.Instance?.IsReady ?? true;
-            //}
-        }
-        catch (Exception ex)
-        {
-            IsFailed = true;
-            Error = ex.Message;
-        }
-        finally
-        {
-            IsStarting = false;
-        }
-
-        StateChanged?.Invoke();
+        await _start.WaitAsync();
+        try {
+            IsStarting=true; IsReady=false; IsFailed=false; Error=null; StateChanged?.Invoke();
+            if (NeedsSetup) return;
+            if (DesktopConfiguration.IsDevelopment) await business.EnsureDevelopmentAsync();
+            else (DesktopConfiguration.Profile ?? throw new InvalidOperationException("The clinic connection file is invalid. Open clinic setup and import or correct it.")).Validate();
+            // SQL credentials are requested by the login dialog, before opening the shared database.
+            IsReady=true;
+        } catch (Exception ex) { IsFailed=true; Error=ex.Message; }
+        finally { IsStarting=false; StateChanged?.Invoke(); _start.Release(); }
     }
-
-    public async Task RetryAsync()
-    {
-        try
-        {
-            await (LocalhostService.Instance?.RetryAsync() ?? Task.CompletedTask);
-            IsReady = LocalhostService.Instance?.IsReady ?? true;
-            IsFailed = false;
-            Error = null;
-        }
-        catch (Exception ex)
-        {
-            IsFailed = true;
-            Error = ex.Message;
-        }
-
-        StateChanged?.Invoke();
-    }
+    public Task RetryAsync() => StartAsync();
 }

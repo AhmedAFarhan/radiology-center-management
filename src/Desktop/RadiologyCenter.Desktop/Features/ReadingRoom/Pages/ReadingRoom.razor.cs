@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
 using MudBlazor;
 using RadiologyCenter.Desktop.Models;
@@ -19,26 +19,26 @@ public partial class ReadingRoom : ComponentBase, IDisposable
 [Inject] private AppLocalizer T { get; set; } = default!;
     [Inject] private IJSRuntime JS { get; set; } = default!;
     [Inject] private EnumOptionsService EnumOptionsService { get; set; } = default!;
-    [Inject] private RealTimeNotificationService RealTime { get; set; } = default!;
+    [Inject] private ApiClient Api { get; set; } = default!;
+
     private IReadOnlyList<EnumOptionDto> _severityOptions = Array.Empty<EnumOptionDto>();
 
     private readonly List<QueueExam> _queue = new();
-    private readonly Dictionary<string, PatientDto> _patientCache = new(StringComparer.OrdinalIgnoreCase);
-    private readonly Dictionary<string, string> _reportStatusByExam = new(StringComparer.OrdinalIgnoreCase);
-    private readonly Dictionary<string, string> _reportStatusKeyByExam = new(StringComparer.OrdinalIgnoreCase);
     private readonly HashSet<string> _linking = new(StringComparer.OrdinalIgnoreCase);
 
     private string? _filter;
+    private int _queuePage=1,_queueTotal,_pendingTotal,_imagedTotal;
+    private bool _includeFinalized;
     private bool _loadingQueue;
     private string? _queueError;
     private bool _loaded;
+    private readonly CancellationTokenSource _queuePolling = new();
 
     private QueueExam? _selected;
     private bool _loadingReport;
     private string? _reportError;
     private ReportDto? _report;
 
-    private int _selectedSeries = 1;
 
     private readonly List<SectionEditor> _sections = new();
     private readonly List<ReportFindingDto> _findings = new();
@@ -94,13 +94,12 @@ public partial class ReadingRoom : ComponentBase, IDisposable
 
     private QueueExam? Selected => _selected;
 
-    private static int SeriesCount => 4;
 
     private string? SelectedStudyUrl
     {
         get
         {
-            if (_selected is not { StudyInstanceUid.Length: > 0 } selected)
+            if (PacsService.Instance?.IsReady!=true || _selected is not { StudyInstanceUid.Length: > 0 } selected)
                 return null;
             var baseUrl = PacsService.Instance?.ViewerBaseUrl;
             return baseUrl is null ? null : $"{baseUrl}/viewer?StudyInstanceUIDs={Uri.EscapeDataString(selected.StudyInstanceUid)}";
@@ -121,49 +120,23 @@ public partial class ReadingRoom : ComponentBase, IDisposable
                 if (t.IsFaulted)
                     Snackbar.Add(T.ReadingRoom.Unreachable, Severity.Error);
             }, TaskContinuationOptions.OnlyOnFaulted);
-            _ = ConnectToRealTimeAsync();
+            _ = PollQueueAsync();
         }
     }
 
-    private async Task ConnectToRealTimeAsync()
+    private async Task PollQueueAsync()
     {
-        try
-        {
-            var baseUrl = Environment.GetEnvironmentVariable("API_BASE_URL") ?? "http://localhost:5000";
-            await RealTime.StartAsync($"{baseUrl}/hubs/notifications");
-            RealTime.On<ExamCheckedInNotificationDto>("exams:checkedin", dto =>
-            {
-                if (_queue.Any(q => q.Id == dto.ExaminationId))
-                    return Task.CompletedTask;
-
-                _queue.Add(new QueueExam
-                {
-                    Id = dto.ExaminationId,
-                    PatientId = dto.PatientId,
-                    PatientName = dto.PatientName,
-                    PatientCode = dto.PatientCode,
-                    ExamName = dto.ExamName,
-                    ExaminationTypeId = dto.ExaminationTypeId,
-                    StatusKey = dto.StatusKey,
-                    ScheduledAt = dto.ScheduledAt,
-                    Priority = dto.Priority,
-                    PriorityKey = dto.PriorityKey,
-                    Indication = dto.Indication ?? string.Empty,
-                    AssignedRadiologistId = dto.RadiologistId,
-                    AssignedTechnicianId = dto.TechnicianId,
-                });
-
-                _queue.Sort((a, b) =>
-                    (a.ScheduledAt ?? DateTime.MaxValue).CompareTo(b.ScheduledAt ?? DateTime.MaxValue));
-
-                StateHasChanged();
-                return Task.CompletedTask;
-            });
-        }
-        catch
-        {
-            // real-time is non-critical; worklist still works via manual refresh
-        }
+        using var timer = new PeriodicTimer(TimeSpan.FromSeconds(15));
+        try {
+            while (await timer.WaitForNextTickAsync(_queuePolling.Token))
+                await InvokeAsync(async () => { if (!_loadingQueue) { await LoadQueueAsync(); StateHasChanged(); } });
+        } catch (OperationCanceledException) when (_queuePolling.IsCancellationRequested) { }
+    }
+    private async Task ConfigureImagesAsync()
+    {
+        var dialog=await DialogService.ShowAsync<Shared.Components.PacsAccountDialog>(string.Empty);
+        await dialog.Result;
+        StateHasChanged();
     }
 
     private async Task LoadSeverityOptionsAsync()
@@ -181,6 +154,7 @@ public partial class ReadingRoom : ComponentBase, IDisposable
     public void Dispose()
     {
         _ = JS.InvokeVoidAsync("unregisterReadingRoomKeydown");
+        _queuePolling.Cancel();
         _jsRef?.Dispose();
     }
 
@@ -201,6 +175,7 @@ public partial class ReadingRoom : ComponentBase, IDisposable
 
     private sealed class QueueExam
     {
+        public QueueExam() { }
         public string Id { get; init; } = string.Empty;
         public string PatientId { get; init; } = string.Empty;
         public string PatientName { get; init; } = string.Empty;
@@ -217,9 +192,10 @@ public partial class ReadingRoom : ComponentBase, IDisposable
         public string? AssignedTechnicianId { get; set; }
         public string ReportStatus { get; set; } = "New";
         public string ReportStatusKey { get; set; } = "New";
+        public string? AccessionNumber { get; init; }
         public string? StudyInstanceUid { get; init; }
 
-        public string DateLabel => ScheduledAt?.ToString("yyyy-MM-dd") ?? string.Empty;
+        public string DateLabel => (ScheduledAt??CompletedAt) is {} date?ClinicTime.ToLocal(date).ToString("yyyy-MM-dd"):string.Empty;
     }
 
 }

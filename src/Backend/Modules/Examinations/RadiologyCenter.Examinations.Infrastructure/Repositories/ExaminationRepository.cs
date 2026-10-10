@@ -111,9 +111,8 @@ public class ExaminationRepository : BaseRepository<Examination, Guid>, IExamina
     {
         return await DbSet
             .Where(e => e.ScheduledAt != null
-                && e.ScheduledEnd != null
                 && e.ScheduledAt < end
-                && e.ScheduledEnd > start
+                && (e.ScheduledEnd ?? e.ScheduledAt.Value.AddMinutes(e.TypeStandardDurationMinutes > 0 ? e.TypeStandardDurationMinutes : 30)) > start
                 && e.Status != ExaminationStatus.Completed
                 && e.Status != ExaminationStatus.Cancelled
                 && (!excludeId.HasValue || e.Id != excludeId.Value))

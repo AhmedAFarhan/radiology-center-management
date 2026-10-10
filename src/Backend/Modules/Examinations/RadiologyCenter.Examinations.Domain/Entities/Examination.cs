@@ -100,7 +100,7 @@ public sealed class Examination : SoftDeletableAggregateRoot<Guid>
             Remaining = 0,
             Notes = notes?.Trim()
         };
-        examination.RecalculateRemaining();
+        examination.SetBilling(discount, isDiscountPercentage, paid);
 
         examination.RaiseDomainEvent(new ExaminationCreatedEvent(examination.Id, examination.ExaminationTypeId));
         return examination;
@@ -175,7 +175,7 @@ public sealed class Examination : SoftDeletableAggregateRoot<Guid>
         PatientId = patientId;
     }
 
-    public void ChangeType(Guid examinationTypeId, decimal price)
+    public void ChangeType(Guid examinationTypeId, decimal price, int durationMinutes = 30)
     {
         EnsureStatus(ExaminationStatus.Requested, ExaminationStatus.Scheduled, ExaminationStatus.CheckedIn);
         Guard.AgainstEmpty(examinationTypeId, nameof(examinationTypeId));
@@ -191,16 +191,19 @@ public sealed class Examination : SoftDeletableAggregateRoot<Guid>
         }
 
         Price = price;
+        TypePrice = price;
+        TypeStandardDurationMinutes = durationMinutes > 0 ? durationMinutes : 30;
         RecalculateRemaining();
     }
 
-        public void Schedule(DateTime scheduledAt, int durationMinutes = 0)
+        public void Schedule(DateTime scheduledAt, int durationMinutes = 30)
         {
             EnsureStatus(ExaminationStatus.Requested, ExaminationStatus.Scheduled);
             Guard.Against(scheduledAt, s => s == default, DomainErrors.ScheduledTimeDefault, "Scheduled time cannot be the default value.");
+            Guard.AgainstNegativeOrZero(durationMinutes, nameof(durationMinutes));
 
             ScheduledAt = scheduledAt;
-            ScheduledEnd = durationMinutes > 0 ? scheduledAt.AddMinutes(durationMinutes) : null;
+            ScheduledEnd = scheduledAt.AddMinutes(durationMinutes);
             Status = ExaminationStatus.Scheduled;
             RaiseDomainEvent(new ExaminationScheduledEvent(Id, scheduledAt, ScheduledEnd));
         }
@@ -251,12 +254,22 @@ public sealed class Examination : SoftDeletableAggregateRoot<Guid>
 
     public void RecordPacsImages(string? studyInstanceUID, string? accessionNumber)
     {
+        Guard.Against(accessionNumber, value => !string.IsNullOrWhiteSpace(value) && value != AccessionNumber,
+            "Examination.AccessionImmutable", "The examination accession cannot be changed while linking images.");
         if (!string.IsNullOrWhiteSpace(studyInstanceUID))
             StudyInstanceUID = studyInstanceUID.Trim();
         if (!string.IsNullOrWhiteSpace(accessionNumber))
             AccessionNumber = accessionNumber.Trim();
         if (!string.IsNullOrWhiteSpace(studyInstanceUID) || !string.IsNullOrWhiteSpace(accessionNumber))
             ImagesReceivedAt = DateTime.UtcNow;
+    }
+
+    public void AssignAccession(string accessionNumber)
+    {
+        Guard.AgainstNullOrWhiteSpace(accessionNumber, nameof(accessionNumber));
+        Guard.Against(accessionNumber, value => value.Length > 16, "Examination.AccessionTooLong", "DICOM accessions must fit in 16 characters.");
+        Guard.Against(AccessionNumber, value => !string.IsNullOrEmpty(value), "Examination.AccessionImmutable", "An accession is already assigned.");
+        AccessionNumber = accessionNumber;
     }
 
     public void SetBilling(decimal discount, bool isDiscountPercentage, decimal? paid = null)
@@ -269,6 +282,9 @@ public sealed class Examination : SoftDeletableAggregateRoot<Guid>
             Guard.Against(paid.Value, p => p < 0, DomainErrors.PaidAmountNegative, "Paid amount cannot be negative.");
         }
 
+        var billable = ExaminationPricing.BillableAmount(Price, discount, isDiscountPercentage);
+        Guard.Against(billable, total => total < 0 || total < (paid ?? Paid), DomainErrors.PaymentExceedsRemaining,
+            "The discount cannot make the bill negative or less than recorded payments. Refund first.");
         Discount = discount;
         IsDiscountPercentage = isDiscountPercentage;
         if (paid.HasValue)
@@ -303,9 +319,7 @@ public sealed class Examination : SoftDeletableAggregateRoot<Guid>
 
     private void RecalculateRemaining()
     {
-        var discountValue = ExaminationPricing.DiscountValue(Price, Discount, IsDiscountPercentage);
-        Remaining = Price - discountValue - Paid;
-        if (Remaining < 0) Remaining = 0;
+        Remaining = ExaminationPricing.BillableAmount(Price, Discount, IsDiscountPercentage) - Paid;
     }
 
     private ExaminationItem GetItem(Guid examinationItemId)

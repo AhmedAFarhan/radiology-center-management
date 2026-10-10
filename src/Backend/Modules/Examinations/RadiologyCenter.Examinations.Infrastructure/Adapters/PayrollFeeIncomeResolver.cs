@@ -25,7 +25,9 @@ public class PayrollFeeIncomeResolver : IExamFeeIncomeResolver
 
     public async Task<ExamFeeBreakdown> GetFeeIncomeBreakdownAsync(Guid staffId, DateTime from, DateTime to, CancellationToken ct = default)
     {
-        var examinations = await _examinationRepository.GetCompletedByRangeAsync(from, to, ct);
+        var start = RadiologyCenter.Examinations.Application.Scheduling.ClinicClock.UtcDayStart(from);
+        var end = RadiologyCenter.Examinations.Application.Scheduling.ClinicClock.UtcDayEndExclusive(to);
+        var examinations = await _examinationRepository.GetCompletedByRangeAsync(start, end.AddTicks(-1), ct);
 
         var filtered = examinations
             .Where(e => (e.RadiologistId == staffId || e.TechnicianId == staffId)

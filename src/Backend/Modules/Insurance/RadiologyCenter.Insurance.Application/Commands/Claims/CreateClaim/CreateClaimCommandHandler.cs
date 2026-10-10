@@ -14,6 +14,7 @@ public static class CreateClaimCommandHandler
         IClaimRepository claimRepository,
         IPreAuthorizationRepository preAuthorizationRepository,
         IInsuranceUnitOfWork unitOfWork,
+        IInsuranceDirectory directory,
         CancellationToken ct)
     {
         if (await policyRepository.GetByIdAsync(command.PolicyId, ct) is not { } policy)
@@ -22,6 +23,8 @@ public static class CreateClaimCommandHandler
             return Result.Failure<ClaimDto>(Error.Conflict(ErrorCodes.PolicyNotActive, "Policy is not active."));
         if (policy.PatientId != command.PatientId)
             return Result.Failure<ClaimDto>(Error.Conflict(ErrorCodes.PolicyPatientMismatch, "The policy does not belong to the claim's patient."));
+        if (await directory.GetExaminationPatientAsync(command.ExaminationId, ct) != command.PatientId)
+            return Result.Failure<ClaimDto>(Error.Conflict("Insurance.ExaminationPatientMismatch", "The examination must belong to the claim's patient."));
 
         if (await claimRepository.GetByExaminationIdAsync(command.ExaminationId, ct) is not null)
             return Result.Failure<ClaimDto>(Error.Conflict(ErrorCodes.ClaimAlreadyExists, "A claim already exists for this examination."));

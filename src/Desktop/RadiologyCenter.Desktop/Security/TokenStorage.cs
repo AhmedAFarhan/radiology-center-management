@@ -38,11 +38,17 @@ public sealed class TokenStorage
         if (string.IsNullOrWhiteSpace(accessToken) || string.IsNullOrWhiteSpace(refreshToken))
             return null;
 
+        if (!DateTime.TryParse(Preferences.Default.Get(ExpiresAtKey, ""), CultureInfo.InvariantCulture,
+                DateTimeStyles.RoundtripKind, out var expires)
+            || !DateTime.TryParse(Preferences.Default.Get(RefreshExpiresAtKey, ""), CultureInfo.InvariantCulture,
+                DateTimeStyles.RoundtripKind, out var refreshExpires))
+        { Clear(); return null; }
+
         return new AuthTokens(
             accessToken,
             refreshToken,
-            DateTime.Parse(Preferences.Default.Get(ExpiresAtKey, DateTime.MinValue.ToString("o")), CultureInfo.InvariantCulture),
-            DateTime.Parse(Preferences.Default.Get(RefreshExpiresAtKey, DateTime.MinValue.ToString("o")), CultureInfo.InvariantCulture),
+            expires,
+            refreshExpires,
             Preferences.Default.Get(UsernameKey, string.Empty),
             Preferences.Default.Get(MustChangePasswordKey, false));
     }

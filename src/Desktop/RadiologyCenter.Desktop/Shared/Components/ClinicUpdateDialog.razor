@@ -1,0 +1,86 @@
+@implements IDisposable
+@using Velopack
+@inject UpdateService Updates
+@inject BusinessRuntimeService Business
+@inject AppLocalizer T
+
+<MudDialog>
+    <DialogContent>
+        <MudText Typo="Typo.h6">@(T.IsRTL ? "تحديثات العيادة" : "Clinic updates")</MudText>
+        <MudText Typo="Typo.body2" Class="mb-3">@(T.IsRTL ? "تأتي التحديثات من مجلد العيادة على الشبكة المحلية." : "Updates come from the clinic folder on the local network.")</MudText>
+        @if (_error is not null)
+        {
+            <MudAlert Severity="Severity.Error">@_error</MudAlert>
+        }
+        @if (_busy)
+        {
+            <MudProgressLinear Indeterminate="@(!_downloading)" Value="_progress" Class="my-3" />
+            <MudText>@(_downloading ? $"{_progress}%" : T.Common.Loading)</MudText>
+        }
+        else if (_update is not null)
+        {
+            <MudAlert Severity="Severity.Info">@(T.IsRTL ? "الإصدار المتاح: " : "Available version: ")@_update.TargetFullRelease.Version</MudAlert>
+            <MudText Class="mt-3">@(T.IsRTL ? "احفظ عملك وأغلق أي نماذج مفتوحة قبل التثبيت. سيتم إغلاق التطبيق وإعادة تشغيله." : "Save your work and close any open forms before installing. The app will close and restart.")</MudText>
+        }
+        else if (_checked && _error is null)
+        {
+            <MudAlert Severity="Severity.Success">@(T.IsRTL ? "هذا التطبيق محدث حسب مجلد العيادة." : "This app is up to date with the clinic folder.")</MudAlert>
+        }
+    </DialogContent>
+    <DialogActions>
+        @if (_update is not null)
+        {
+            <MudButton Color="Color.Primary" Variant="Variant.Filled" Disabled="_busy" OnClick="InstallAsync">@(_downloaded ? (T.IsRTL ? "تثبيت وإعادة التشغيل" : "Install and restart") : (T.IsRTL ? "تنزيل التحديث" : "Download update"))</MudButton>
+        }
+        <MudButton OnClick="CheckAsync" Disabled="_busy">@(T.IsRTL ? "التحقق من التحديثات" : "Check for updates")</MudButton>
+        <MudButton OnClick="Close" Disabled="_busy">@T.Common.Cancel</MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    [CascadingParameter] public IMudDialogInstance MudDialog { get; set; } = default!;
+    private UpdateInfo? _update;
+    private bool _busy, _downloading, _downloaded, _checked, _disposed;
+    private int _progress;
+    private string? _error;
+
+    protected override Task OnInitializedAsync() => CheckAsync();
+
+    private async Task CheckAsync()
+    {
+        _busy = true; _error = null; _update = null; _downloaded = false;
+        try { _update = await Task.Run(() => Updates.CheckForUpdatesAsync(throwOnError: true)); _checked = true; }
+        catch (Exception ex)
+        {
+            _error = ex is InvalidOperationException ? ex.Message : (T.IsRTL ? "تعذر قراءة مجلد التحديثات. تحقق من الشبكة والصلاحيات وملفات الإصدار." : "Cannot read the update folder. Check the network, access permissions and release files.");
+        }
+        finally { _busy = false; }
+    }
+
+    private async Task InstallAsync()
+    {
+        if (_update is null) return;
+        _busy = true; _error = null;
+        try
+        {
+            if (!_downloaded)
+            {
+                _downloading = true; _progress = 0;
+                _downloaded = await Task.Run(() => Updates.DownloadUpdateAsync(_update, progress =>
+                {
+                    if (!_disposed) _ = InvokeAsync(() => { _progress = progress; StateHasChanged(); });
+                }));
+                if (!_downloaded) _error = T.IsRTL ? "تعذر تنزيل التحديث. تحقق من الشبكة والمساحة المتاحة ثم أعد المحاولة." : "The update download failed. Check the network and free disk space, then retry.";
+                return;
+            }
+            // Release the shared database maintenance lease before the installed app exits.
+            await Business.DisposeRuntimeAsync();
+            Updates.ApplyAndRestart(_update);
+        }
+        catch { _error = T.IsRTL ? "تعذر إعادة تشغيل التطبيق للتحديث. أغلق التطبيق وأعد فتحه ثم حاول مجدداً." : "Cannot restart for the update. Close and reopen the app, then retry."; }
+        finally { _busy = _downloading = false; }
+    }
+
+    private void Close() => MudDialog.Close();
+    public void Dispose() => _disposed = true;
+}

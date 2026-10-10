@@ -9,6 +9,10 @@
             @T.RoleDialog.PermissionsDescription
         </MudText>
 
+        @if (DesktopConfiguration.UseClinicServer)
+        {
+            <MudText Typo="Typo.caption" Class="mb-3">@(T.IsRTL?"تغييرات الحسابات والأدوار مقتصرة على المسؤولين.":"Account and role changes are limited to administrators.")</MudText>
+        }
         @if (_loading)
         {
             <DialogSkeleton Rows="4" />
@@ -35,7 +39,8 @@
                                         <MudSwitch T="bool"
                                                    @bind-Value="_selected[permission.Code]"
                                                    Color="Color.Primary"
-                                                   Size="Size.Small">
+                                                   Size="Size.Small"
+                                                   Disabled="@(DesktopConfiguration.UseClinicServer && !Role.IsSystem && (permission.Code.StartsWith("users.") || permission.Code.StartsWith("roles.")) && !permission.Code.EndsWith(".read"))">
                                             <MudText Typo="Typo.body2">@PermissionName(permission)</MudText>
                                         </MudSwitch>
                                     </div>

@@ -1,4 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Forms;
 using MudBlazor;
@@ -35,8 +35,6 @@ public partial class ScheduleExamDialog : ComponentBase
 
     private PatientDto? _selectedPatient;
     private ExaminationTypeDto? _selectedExamType;
-    private DateTime? _scheduledDate;
-    private TimeSpan? _scheduledTime;
     private string _priority = "Routine";
     private string? _clinicalIndication;
     private string? _notes;
@@ -46,58 +44,24 @@ public partial class ScheduleExamDialog : ComponentBase
     {
         _editContext = new EditContext(_model);
 
-        _scheduledDate = ScheduledDate ?? DateTime.Today;
-        _scheduledTime = ScheduledTime ?? TimeSpan.FromHours(9);
+        _model.ScheduledDate = ScheduledDate ?? ClinicTime.Today;
+        _model.ScheduledTime = ScheduledTime ?? TimeSpan.FromHours(9);
         _equipmentName = EquipmentName;
 
-        try
-        {
-            var patientTask = PatientService.GetPagedAsync(null, null, false, 1, 500);
-            var typeTask = ExaminationService.GetTypesPagedAsync(null, null, false, 1, 500);
-
-            await Task.WhenAll(patientTask, typeTask);
-
-            _patients = (await patientTask).Items.Where(p => p.IsActive).ToList();
-            _examTypes = (await typeTask).Items.Where(t => t.IsActive).ToList();
-
-            if (!string.IsNullOrEmpty(Modality))
-                _examTypes = _examTypes
-                    .Where(t => string.Equals(t.Modality, Modality, StringComparison.OrdinalIgnoreCase))
-                    .ToList();
-        }
-        catch
-        {
-            Snackbar.Add(T.ScheduleExam.LoadError, Severity.Warning);
-        }
-        finally
-        {
-            _loading = false;
-        }
+        _loading = false;
+        await Task.CompletedTask;
     }
 
     private async Task<IEnumerable<PatientDto>> SearchPatients(string value, CancellationToken ct)
     {
-        if (string.IsNullOrEmpty(value))
-            return _patients.Take(50);
-
-        await Task.Delay(0, ct);
-        return _patients
-            .Where(p => p.FullName.Contains(value, StringComparison.OrdinalIgnoreCase)
-                     || p.PatientCode.Contains(value, StringComparison.OrdinalIgnoreCase)
-                     || p.PhoneNumber.Contains(value))
-            .Take(50);
+        var page = await PatientService.GetPagedAsync(value, "LastName", false, 1, 50, isActive: true, ct: ct);
+        return page.Items;
     }
 
     private async Task<IEnumerable<ExaminationTypeDto>> SearchExamTypes(string value, CancellationToken ct)
     {
-        if (string.IsNullOrEmpty(value))
-            return _examTypes.Take(50);
-
-        await Task.Delay(0, ct);
-        return _examTypes
-            .Where(t => t.Name.Contains(value, StringComparison.OrdinalIgnoreCase)
-                     || t.Code.Contains(value, StringComparison.OrdinalIgnoreCase))
-            .Take(50);
+        var page = await ExaminationService.GetTypesPagedAsync(value, "Name", false, 1, 50, modality: Modality, isActive: true, ct: ct);
+        return page.Items;
     }
 
     private void OnPatientChanged(PatientDto? patient)
@@ -129,7 +93,7 @@ public partial class ScheduleExamDialog : ComponentBase
 
         await SafeExecute.RunAsync(async () =>
         {
-            var scheduledAt = _scheduledDate.Value.Date + _scheduledTime.Value;
+            var scheduledAt = DateTime.SpecifyKind(_model.ScheduledDate!.Value.Date + _model.ScheduledTime!.Value, DateTimeKind.Unspecified);
 
             var input = new BookExamInput
             {

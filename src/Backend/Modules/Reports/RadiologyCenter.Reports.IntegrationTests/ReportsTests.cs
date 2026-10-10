@@ -11,9 +11,80 @@ public class ReportsTests : TestBase
     private const string TemplatesUrl = "api/reports/templates";
     private const string PatientsUrl = "api/patients";
     private const string ExaminationsUrl = "api/examinations";
-    private const string ExaminationTypesUrl = "api/examination-types";
+    private const string ExaminationTypesUrl = "api/catalog/examination-types";
 
     public ReportsTests(CustomWebApplicationFactory factory) : base(factory) { }
+
+    [Fact]
+    public async Task UpsertSection_StaleRevision_DoesNotOverwriteSavedContent()
+    {
+        var reportId = await CreateTestReportAsync();
+        var first = await PutReportAsync($"{ReportsUrl}/{reportId}/sections", new
+        {
+            SectionType = "Findings", Title = "Findings", Body = "Saved on workstation one", ExpectedRevision = 0
+        });
+        first.EnsureSuccessStatusCode();
+        var stale = await PutReportAsync($"{ReportsUrl}/{reportId}/sections", new
+        {
+            SectionType = "Findings", Title = "Findings", Body = "Stale workstation two", ExpectedRevision = 0
+        });
+        stale.StatusCode.Should().Be(HttpStatusCode.Conflict);
+        var saved = await Client.GetFromJsonAsync<ApiResponse<ReportDto>>($"{ReportsUrl}/{reportId}");
+        saved!.Data!.CurrentVersion!.Sections!.Single(s => s.SectionTypeKey == "Findings").Body.Should().Be("Saved on workstation one");
+    }
+
+    [Fact]
+    public async Task CreateDraft_WrongPatient_ReturnsBadRequest()
+    {
+        var examinationId = await CreateTestExaminationAsync();
+        var response = await PostReportAsync(ReportsUrl, new
+        {
+            ExaminationId = examinationId, PatientId = await CreateTestPatientAsync(),
+            RadiologistId = await TestData.StaffAsync(Client, "Radiologist")
+        });
+        response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+    }
+
+    [Fact]
+    public async Task UpsertSection_MissingRevision_ReturnsBadRequest()
+    {
+        var reportId = await CreateTestReportAsync();
+        var response = await Client.PutAsJsonAsync($"{ReportsUrl}/{reportId}/sections", new
+        {
+            SectionType = "Findings", Title = "Findings", Body = "Missing concurrency version"
+        });
+        response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+    }
+
+    private async Task<int?> MutationRevisionAsync(string path)
+    {
+        if (!path.StartsWith(ReportsUrl + "/") || !Guid.TryParse(path[(ReportsUrl.Length + 1)..].Split('/')[0], out var id)) return null;
+        using var response = await Client.GetAsync($"{ReportsUrl}/{id}");
+        if (response.StatusCode == HttpStatusCode.NotFound) return 0;
+        response.EnsureSuccessStatusCode();
+        var report = await response.Content.ReadFromJsonAsync<ApiResponse<ReportDto>>();
+        return report!.Data!.Revision;
+    }
+
+    private async Task<System.Text.Json.Nodes.JsonObject> MutationBodyAsync(string path, object? body)
+    {
+        var payload = System.Text.Json.JsonSerializer.SerializeToNode(body) as System.Text.Json.Nodes.JsonObject ?? new();
+        if (!payload.Any(p => p.Key.Equals("expectedRevision", StringComparison.OrdinalIgnoreCase)) && await MutationRevisionAsync(path) is int revision)
+            payload["expectedRevision"] = revision;
+        return payload;
+    }
+
+    private async Task<HttpResponseMessage> PostReportAsync(string path, object? body)
+        => await Client.PostAsJsonAsync(path, await MutationBodyAsync(path, body));
+
+    private async Task<HttpResponseMessage> PutReportAsync(string path, object? body)
+        => await Client.PutAsJsonAsync(path, await MutationBodyAsync(path, body));
+
+    private async Task<HttpResponseMessage> DeleteReportAsync(string path)
+    {
+        if (await MutationRevisionAsync(path) is int revision) path += $"?expectedRevision={revision}";
+        return await Client.DeleteAsync(path);
+    }
 
     // ── Reports: Create Draft ──────────────────────────────────────────────
 
@@ -21,15 +92,16 @@ public class ReportsTests : TestBase
     public async Task CreateDraft_ValidData_ReturnsOk()
     {
         var examinationId = await CreateTestExaminationAsync();
-        var patientId = await CreateTestPatientAsync();
-        var radiologistId = Guid.NewGuid();
+        var exam = await Client.GetFromJsonAsync<ApiResponse<ExaminationDto>>($"{ExaminationsUrl}/{examinationId}");
+        var patientId = exam!.Data!.PatientId;
+        var radiologistId = await TestData.StaffAsync(Client, "Radiologist");
         var command = new
         {
             ExaminationId = examinationId,
             PatientId = patientId,
             RadiologistId = radiologistId
         };
-        var response = await Client.PostAsJsonAsync(ReportsUrl, command);
+        var response = await PostReportAsync(ReportsUrl, command);
         response.StatusCode.Should().Be(HttpStatusCode.OK);
         var body = await response.Content.ReadFromJsonAsync<ApiResponse<ReportDto>>();
         body!.Success.Should().BeTrue();
@@ -46,9 +118,9 @@ public class ReportsTests : TestBase
         var command = new
         {
             PatientId = patientId,
-            RadiologistId = Guid.NewGuid()
+            RadiologistId = await TestData.StaffAsync(Client, "Radiologist")
         };
-        var response = await Client.PostAsJsonAsync(ReportsUrl, command);
+        var response = await PostReportAsync(ReportsUrl, command);
         response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
     }
 
@@ -59,9 +131,9 @@ public class ReportsTests : TestBase
         var command = new
         {
             ExaminationId = examinationId,
-            RadiologistId = Guid.NewGuid()
+            RadiologistId = await TestData.StaffAsync(Client, "Radiologist")
         };
-        var response = await Client.PostAsJsonAsync(ReportsUrl, command);
+        var response = await PostReportAsync(ReportsUrl, command);
         response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
     }
 
@@ -69,13 +141,14 @@ public class ReportsTests : TestBase
     public async Task CreateDraft_MissingRadiologistId_ReturnsBadRequest()
     {
         var examinationId = await CreateTestExaminationAsync();
-        var patientId = await CreateTestPatientAsync();
+        var exam = await Client.GetFromJsonAsync<ApiResponse<ExaminationDto>>($"{ExaminationsUrl}/{examinationId}");
+        var patientId = exam!.Data!.PatientId;
         var command = new
         {
             ExaminationId = examinationId,
             PatientId = patientId
         };
-        var response = await Client.PostAsJsonAsync(ReportsUrl, command);
+        var response = await PostReportAsync(ReportsUrl, command);
         response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
     }
 
@@ -154,7 +227,7 @@ public class ReportsTests : TestBase
     {
         await CreateTestReportAsync();
         var request = new { Pagination = new { PageNumber = 1, PageSize = 10 } };
-        var response = await Client.PostAsJsonAsync($"{ReportsUrl}/all", request);
+        var response = await PostReportAsync($"{ReportsUrl}/all", request);
         response.StatusCode.Should().Be(HttpStatusCode.OK);
         var body = await response.Content.ReadFromJsonAsync<ApiResponse<PagedResultDto<ReportListItemDto>>>();
         body!.Success.Should().BeTrue();
@@ -170,13 +243,13 @@ public class ReportsTests : TestBase
         var reportId = await CreateTestReportAsync();
         var command = new
         {
-            SectionType = "ClinicalHistory",
+            SectionType = "ClinicalIndication",
             Title = "Clinical History",
             Body = "Patient presents with chest pain.",
             Position = 0,
             IsLocked = false
         };
-        var response = await Client.PutAsJsonAsync($"{ReportsUrl}/{reportId}/sections", command);
+        var response = await PutReportAsync($"{ReportsUrl}/{reportId}/sections", command);
         response.StatusCode.Should().Be(HttpStatusCode.OK);
         var body = await response.Content.ReadFromJsonAsync<ApiResponse<ReportDto>>();
         body!.Success.Should().BeTrue();
@@ -189,11 +262,11 @@ public class ReportsTests : TestBase
         var fakeId = Guid.NewGuid();
         var command = new
         {
-            SectionType = "ClinicalHistory",
+            SectionType = "ClinicalIndication",
             Title = "Clinical History",
             Body = "Test body"
         };
-        var response = await Client.PutAsJsonAsync($"{ReportsUrl}/{fakeId}/sections", command);
+        var response = await PutReportAsync($"{ReportsUrl}/{fakeId}/sections", command);
         response.StatusCode.Should().Be(HttpStatusCode.NotFound);
     }
 
@@ -206,7 +279,7 @@ public class ReportsTests : TestBase
             Title = "Clinical History",
             Body = "Test body"
         };
-        var response = await Client.PutAsJsonAsync($"{ReportsUrl}/{reportId}/sections", command);
+        var response = await PutReportAsync($"{ReportsUrl}/{reportId}/sections", command);
         response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
     }
 
@@ -223,7 +296,7 @@ public class ReportsTests : TestBase
             Severity = "Moderate",
             Position = 0
         };
-        var response = await Client.PostAsJsonAsync($"{ReportsUrl}/{reportId}/findings", command);
+        var response = await PostReportAsync($"{ReportsUrl}/{reportId}/findings", command);
         response.StatusCode.Should().Be(HttpStatusCode.OK);
         var body = await response.Content.ReadFromJsonAsync<ApiResponse<ReportFindingDto>>();
         body!.Success.Should().BeTrue();
@@ -243,7 +316,7 @@ public class ReportsTests : TestBase
             Description = "Test finding",
             Severity = "Mild"
         };
-        var response = await Client.PostAsJsonAsync($"{ReportsUrl}/{fakeId}/findings", command);
+        var response = await PostReportAsync($"{ReportsUrl}/{fakeId}/findings", command);
         response.StatusCode.Should().Be(HttpStatusCode.NotFound);
     }
 
@@ -256,7 +329,7 @@ public class ReportsTests : TestBase
             Description = "Test finding",
             Severity = "Mild"
         };
-        var response = await Client.PostAsJsonAsync($"{ReportsUrl}/{reportId}/findings", command);
+        var response = await PostReportAsync($"{ReportsUrl}/{reportId}/findings", command);
         response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
     }
 
@@ -273,7 +346,7 @@ public class ReportsTests : TestBase
             Description = "Updated finding description.",
             Severity = "Severe"
         };
-        var response = await Client.PutAsJsonAsync($"{ReportsUrl}/{reportId}/findings/{findingId}", command);
+        var response = await PutReportAsync($"{ReportsUrl}/{reportId}/findings/{findingId}", command);
         response.StatusCode.Should().Be(HttpStatusCode.OK);
     }
 
@@ -287,7 +360,7 @@ public class ReportsTests : TestBase
             Description = "Updated description",
             Severity = "Severe"
         };
-        var response = await Client.PutAsJsonAsync($"{ReportsUrl}/{reportId}/findings/{fakeFindingId}", command);
+        var response = await PutReportAsync($"{ReportsUrl}/{reportId}/findings/{fakeFindingId}", command);
         response.StatusCode.Should().Be(HttpStatusCode.NotFound);
     }
 
@@ -301,7 +374,7 @@ public class ReportsTests : TestBase
             Description = "Updated description",
             Severity = "Severe"
         };
-        var response = await Client.PutAsJsonAsync($"{ReportsUrl}/{fakeReportId}/findings/{fakeFindingId}", command);
+        var response = await PutReportAsync($"{ReportsUrl}/{fakeReportId}/findings/{fakeFindingId}", command);
         response.StatusCode.Should().Be(HttpStatusCode.NotFound);
     }
 
@@ -313,7 +386,7 @@ public class ReportsTests : TestBase
         var reportId = await CreateTestReportAsync();
         var findingId = await AddTestFindingAsync(reportId);
 
-        var response = await Client.DeleteAsync($"{ReportsUrl}/{reportId}/findings/{findingId}");
+        var response = await DeleteReportAsync($"{ReportsUrl}/{reportId}/findings/{findingId}");
         response.StatusCode.Should().Be(HttpStatusCode.OK);
     }
 
@@ -323,7 +396,7 @@ public class ReportsTests : TestBase
         var reportId = await CreateTestReportAsync();
         var fakeFindingId = Guid.NewGuid();
 
-        var response = await Client.DeleteAsync($"{ReportsUrl}/{reportId}/findings/{fakeFindingId}");
+        var response = await DeleteReportAsync($"{ReportsUrl}/{reportId}/findings/{fakeFindingId}");
         response.StatusCode.Should().Be(HttpStatusCode.NotFound);
     }
 
@@ -333,7 +406,7 @@ public class ReportsTests : TestBase
         var fakeReportId = Guid.NewGuid();
         var fakeFindingId = Guid.NewGuid();
 
-        var response = await Client.DeleteAsync($"{ReportsUrl}/{fakeReportId}/findings/{fakeFindingId}");
+        var response = await DeleteReportAsync($"{ReportsUrl}/{fakeReportId}/findings/{fakeFindingId}");
         response.StatusCode.Should().Be(HttpStatusCode.NotFound);
     }
 
@@ -346,7 +419,7 @@ public class ReportsTests : TestBase
         var templateId = await CreateTestTemplateAsync();
 
         var command = new { TemplateId = templateId };
-        var response = await Client.PostAsJsonAsync($"{ReportsUrl}/{reportId}/apply-template", command);
+        var response = await PostReportAsync($"{ReportsUrl}/{reportId}/apply-template", command);
         response.StatusCode.Should().Be(HttpStatusCode.OK);
         var body = await response.Content.ReadFromJsonAsync<ApiResponse<ReportDto>>();
         body!.Success.Should().BeTrue();
@@ -359,7 +432,7 @@ public class ReportsTests : TestBase
         var fakeId = Guid.NewGuid();
         var templateId = await CreateTestTemplateAsync();
         var command = new { TemplateId = templateId };
-        var response = await Client.PostAsJsonAsync($"{ReportsUrl}/{fakeId}/apply-template", command);
+        var response = await PostReportAsync($"{ReportsUrl}/{fakeId}/apply-template", command);
         response.StatusCode.Should().Be(HttpStatusCode.NotFound);
     }
 
@@ -369,7 +442,7 @@ public class ReportsTests : TestBase
         var reportId = await CreateTestReportAsync();
         var fakeTemplateId = Guid.NewGuid();
         var command = new { TemplateId = fakeTemplateId };
-        var response = await Client.PostAsJsonAsync($"{ReportsUrl}/{reportId}/apply-template", command);
+        var response = await PostReportAsync($"{ReportsUrl}/{reportId}/apply-template", command);
         response.StatusCode.Should().Be(HttpStatusCode.NotFound);
     }
 
@@ -379,7 +452,8 @@ public class ReportsTests : TestBase
     public async Task Finalize_DraftReport_ReturnsOk()
     {
         var reportId = await CreateTestReportAsync();
-        var response = await Client.PostAsJsonAsync($"{ReportsUrl}/{reportId}/finalize", new { });
+        await PopulateReportAsync(reportId);
+        var response = await PostReportAsync($"{ReportsUrl}/{reportId}/finalize", new { });
         response.StatusCode.Should().Be(HttpStatusCode.OK);
         var body = await response.Content.ReadFromJsonAsync<ApiResponse<ReportDto>>();
         body!.Success.Should().BeTrue();
@@ -391,7 +465,7 @@ public class ReportsTests : TestBase
     public async Task Finalize_NonexistentReport_ReturnsNotFound()
     {
         var fakeId = Guid.NewGuid();
-        var response = await Client.PostAsJsonAsync($"{ReportsUrl}/{fakeId}/finalize", new { });
+        var response = await PostReportAsync($"{ReportsUrl}/{fakeId}/finalize", new { });
         response.StatusCode.Should().Be(HttpStatusCode.NotFound);
     }
 
@@ -399,9 +473,11 @@ public class ReportsTests : TestBase
     public async Task Finalize_AlreadyFinalized_ReturnsError()
     {
         var reportId = await CreateTestReportAsync();
-        await Client.PostAsJsonAsync($"{ReportsUrl}/{reportId}/finalize", new { });
+        await PopulateReportAsync(reportId);
+        var finalized = await PostReportAsync($"{ReportsUrl}/{reportId}/finalize", new { });
+        finalized.EnsureSuccessStatusCode();
 
-        var response = await Client.PostAsJsonAsync($"{ReportsUrl}/{reportId}/finalize", new { });
+        var response = await PostReportAsync($"{ReportsUrl}/{reportId}/finalize", new { });
         response.StatusCode.Should().NotBe(HttpStatusCode.OK);
     }
 
@@ -411,10 +487,12 @@ public class ReportsTests : TestBase
     public async Task Amend_FinalizedReport_ReturnsOk()
     {
         var reportId = await CreateTestReportAsync();
-        await Client.PostAsJsonAsync($"{ReportsUrl}/{reportId}/finalize", new { });
+        await PopulateReportAsync(reportId);
+        var finalized = await PostReportAsync($"{ReportsUrl}/{reportId}/finalize", new { });
+        finalized.EnsureSuccessStatusCode();
 
         var command = new { Reason = "Correction needed for findings" };
-        var response = await Client.PostAsJsonAsync($"{ReportsUrl}/{reportId}/amend", command);
+        var response = await PostReportAsync($"{ReportsUrl}/{reportId}/amend", command);
         response.StatusCode.Should().Be(HttpStatusCode.OK);
         var body = await response.Content.ReadFromJsonAsync<ApiResponse<ReportDto>>();
         body!.Success.Should().BeTrue();
@@ -426,7 +504,7 @@ public class ReportsTests : TestBase
     {
         var fakeId = Guid.NewGuid();
         var command = new { Reason = "Missing report" };
-        var response = await Client.PostAsJsonAsync($"{ReportsUrl}/{fakeId}/amend", command);
+        var response = await PostReportAsync($"{ReportsUrl}/{fakeId}/amend", command);
         response.StatusCode.Should().Be(HttpStatusCode.NotFound);
     }
 
@@ -435,7 +513,7 @@ public class ReportsTests : TestBase
     {
         var reportId = await CreateTestReportAsync();
         var command = new { Reason = "Cannot amend draft" };
-        var response = await Client.PostAsJsonAsync($"{ReportsUrl}/{reportId}/amend", command);
+        var response = await PostReportAsync($"{ReportsUrl}/{reportId}/amend", command);
         response.StatusCode.Should().NotBe(HttpStatusCode.OK);
     }
 
@@ -446,7 +524,7 @@ public class ReportsTests : TestBase
     {
         var reportId = await CreateTestReportAsync();
         var command = new { Reason = "Patient requested cancellation" };
-        var response = await Client.PostAsJsonAsync($"{ReportsUrl}/{reportId}/cancel", command);
+        var response = await PostReportAsync($"{ReportsUrl}/{reportId}/cancel", command);
         response.StatusCode.Should().Be(HttpStatusCode.OK);
     }
 
@@ -454,7 +532,7 @@ public class ReportsTests : TestBase
     public async Task Cancel_WithoutReason_ReturnsOk()
     {
         var reportId = await CreateTestReportAsync();
-        var response = await Client.PostAsJsonAsync($"{ReportsUrl}/{reportId}/cancel", new { });
+        var response = await PostReportAsync($"{ReportsUrl}/{reportId}/cancel", new { });
         response.StatusCode.Should().Be(HttpStatusCode.OK);
     }
 
@@ -463,7 +541,7 @@ public class ReportsTests : TestBase
     {
         var fakeId = Guid.NewGuid();
         var command = new { Reason = "Missing report" };
-        var response = await Client.PostAsJsonAsync($"{ReportsUrl}/{fakeId}/cancel", command);
+        var response = await PostReportAsync($"{ReportsUrl}/{fakeId}/cancel", command);
         response.StatusCode.Should().Be(HttpStatusCode.NotFound);
     }
 
@@ -475,17 +553,17 @@ public class ReportsTests : TestBase
         var command = new
         {
             Name = $"Template_{Guid.NewGuid():N}",
-            Modality = "X-Ray",
+            Modality = "XRay",
             BodyPart = "Chest",
             Description = "Standard chest X-ray report template"
         };
-        var response = await Client.PostAsJsonAsync(TemplatesUrl, command);
+        var response = await PostReportAsync(TemplatesUrl, command);
         response.StatusCode.Should().Be(HttpStatusCode.OK);
         var body = await response.Content.ReadFromJsonAsync<ApiResponse<ReportTemplateDto>>();
         body!.Success.Should().BeTrue();
         body.Data.Should().NotBeNull();
         body.Data!.Name.Should().Be(command.Name);
-        body.Data.Modality.Should().Be("X-Ray");
+        body.Data.Modality.Should().Be("XRay");
         body.Data.IsActive.Should().BeTrue();
     }
 
@@ -500,7 +578,7 @@ public class ReportsTests : TestBase
             {
                 new
                 {
-                    SectionType = "ClinicalHistory",
+                    SectionType = "ClinicalIndication",
                     Title = "Clinical History",
                     Body = "Default clinical history text",
                     Position = 0,
@@ -516,7 +594,7 @@ public class ReportsTests : TestBase
                 }
             }
         };
-        var response = await Client.PostAsJsonAsync(TemplatesUrl, command);
+        var response = await PostReportAsync(TemplatesUrl, command);
         response.StatusCode.Should().Be(HttpStatusCode.OK);
         var body = await response.Content.ReadFromJsonAsync<ApiResponse<ReportTemplateDto>>();
         body!.Success.Should().BeTrue();
@@ -528,9 +606,9 @@ public class ReportsTests : TestBase
     {
         var command = new
         {
-            Modality = "X-Ray"
+            Modality = "XRay"
         };
-        var response = await Client.PostAsJsonAsync(TemplatesUrl, command);
+        var response = await PostReportAsync(TemplatesUrl, command);
         response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
     }
 
@@ -541,7 +619,7 @@ public class ReportsTests : TestBase
         {
             Name = $"Template_{Guid.NewGuid():N}"
         };
-        var response = await Client.PostAsJsonAsync(TemplatesUrl, command);
+        var response = await PostReportAsync(TemplatesUrl, command);
         response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
     }
 
@@ -573,7 +651,7 @@ public class ReportsTests : TestBase
     {
         await CreateTestTemplateAsync();
         var request = new { Pagination = new { PageNumber = 1, PageSize = 10 } };
-        var response = await Client.PostAsJsonAsync($"{TemplatesUrl}/all", request);
+        var response = await PostReportAsync($"{TemplatesUrl}/all", request);
         response.StatusCode.Should().Be(HttpStatusCode.OK);
         var body = await response.Content.ReadFromJsonAsync<ApiResponse<PagedResultDto<ReportTemplateDto>>>();
         body!.Success.Should().BeTrue();
@@ -594,7 +672,7 @@ public class ReportsTests : TestBase
             BodyPart = "Abdomen",
             Description = "Updated description"
         };
-        var response = await Client.PutAsJsonAsync($"{TemplatesUrl}/{templateId}", command);
+        var response = await PutReportAsync($"{TemplatesUrl}/{templateId}", command);
         response.StatusCode.Should().Be(HttpStatusCode.OK);
         var body = await response.Content.ReadFromJsonAsync<ApiResponse<ReportTemplateDto>>();
         body!.Success.Should().BeTrue();
@@ -609,9 +687,9 @@ public class ReportsTests : TestBase
         var command = new
         {
             Name = "Updated Name",
-            Modality = "X-Ray"
+            Modality = "XRay"
         };
-        var response = await Client.PutAsJsonAsync($"{TemplatesUrl}/{fakeId}", command);
+        var response = await PutReportAsync($"{TemplatesUrl}/{fakeId}", command);
         response.StatusCode.Should().Be(HttpStatusCode.NotFound);
     }
 
@@ -632,7 +710,7 @@ public class ReportsTests : TestBase
                 IsLocked = false
             }
         };
-        var response = await Client.PostAsJsonAsync($"{TemplatesUrl}/{templateId}/sections", command);
+        var response = await PostReportAsync($"{TemplatesUrl}/{templateId}/sections", command);
         response.StatusCode.Should().Be(HttpStatusCode.OK);
         var body = await response.Content.ReadFromJsonAsync<ApiResponse<ReportTemplateDto>>();
         body!.Success.Should().BeTrue();
@@ -652,7 +730,7 @@ public class ReportsTests : TestBase
                 Body = "Test"
             }
         };
-        var response = await Client.PostAsJsonAsync($"{TemplatesUrl}/{fakeId}/sections", command);
+        var response = await PostReportAsync($"{TemplatesUrl}/{fakeId}/sections", command);
         response.StatusCode.Should().Be(HttpStatusCode.NotFound);
     }
 
@@ -662,11 +740,13 @@ public class ReportsTests : TestBase
     public async Task RemoveTemplateSection_ValidSection_ReturnsOk()
     {
         var templateId = await CreateTestTemplateAsync();
+        var added = await PostReportAsync($"{TemplatesUrl}/{templateId}/sections", new { Section = new { SectionType = "Technique", Title = "Technique", Body = "Test" } });
+        added.EnsureSuccessStatusCode();
         var templateResponse = await Client.GetAsync($"{TemplatesUrl}/{templateId}");
         var templateBody = await templateResponse.Content.ReadFromJsonAsync<ApiResponse<ReportTemplateDto>>();
         var sectionId = templateBody!.Data!.Sections!.First().Id;
 
-        var response = await Client.DeleteAsync($"{TemplatesUrl}/{templateId}/sections/{sectionId}");
+        var response = await DeleteReportAsync($"{TemplatesUrl}/{templateId}/sections/{sectionId}");
         response.StatusCode.Should().Be(HttpStatusCode.OK);
         var body = await response.Content.ReadFromJsonAsync<ApiResponse<ReportTemplateDto>>();
         body!.Success.Should().BeTrue();
@@ -679,7 +759,7 @@ public class ReportsTests : TestBase
         var templateId = await CreateTestTemplateAsync();
         var fakeSectionId = Guid.NewGuid();
 
-        var response = await Client.DeleteAsync($"{TemplatesUrl}/{templateId}/sections/{fakeSectionId}");
+        var response = await DeleteReportAsync($"{TemplatesUrl}/{templateId}/sections/{fakeSectionId}");
         response.StatusCode.Should().Be(HttpStatusCode.NotFound);
     }
 
@@ -689,7 +769,7 @@ public class ReportsTests : TestBase
         var fakeTemplateId = Guid.NewGuid();
         var fakeSectionId = Guid.NewGuid();
 
-        var response = await Client.DeleteAsync($"{TemplatesUrl}/{fakeTemplateId}/sections/{fakeSectionId}");
+        var response = await DeleteReportAsync($"{TemplatesUrl}/{fakeTemplateId}/sections/{fakeSectionId}");
         response.StatusCode.Should().Be(HttpStatusCode.NotFound);
     }
 
@@ -701,7 +781,7 @@ public class ReportsTests : TestBase
         var templateId = await CreateTestTemplateAsync();
         await DeactivateTestTemplateAsync(templateId);
 
-        var response = await Client.PostAsJsonAsync($"{TemplatesUrl}/{templateId}/activate", new { });
+        var response = await PostReportAsync($"{TemplatesUrl}/{templateId}/activate", new { });
         response.StatusCode.Should().Be(HttpStatusCode.OK);
     }
 
@@ -709,7 +789,7 @@ public class ReportsTests : TestBase
     public async Task ActivateTemplate_Nonexistent_ReturnsNotFound()
     {
         var fakeId = Guid.NewGuid();
-        var response = await Client.PostAsJsonAsync($"{TemplatesUrl}/{fakeId}/activate", new { });
+        var response = await PostReportAsync($"{TemplatesUrl}/{fakeId}/activate", new { });
         response.StatusCode.Should().Be(HttpStatusCode.NotFound);
     }
 
@@ -719,7 +799,7 @@ public class ReportsTests : TestBase
     public async Task DeactivateTemplate_ReturnsOk()
     {
         var templateId = await CreateTestTemplateAsync();
-        var response = await Client.PostAsJsonAsync($"{TemplatesUrl}/{templateId}/deactivate", new { });
+        var response = await PostReportAsync($"{TemplatesUrl}/{templateId}/deactivate", new { });
         response.StatusCode.Should().Be(HttpStatusCode.OK);
     }
 
@@ -727,7 +807,7 @@ public class ReportsTests : TestBase
     public async Task DeactivateTemplate_Nonexistent_ReturnsNotFound()
     {
         var fakeId = Guid.NewGuid();
-        var response = await Client.PostAsJsonAsync($"{TemplatesUrl}/{fakeId}/deactivate", new { });
+        var response = await PostReportAsync($"{TemplatesUrl}/{fakeId}/deactivate", new { });
         response.StatusCode.Should().Be(HttpStatusCode.NotFound);
     }
 
@@ -737,7 +817,7 @@ public class ReportsTests : TestBase
     public async Task DeleteTemplate_ReturnsOk()
     {
         var templateId = await CreateTestTemplateAsync();
-        var response = await Client.DeleteAsync($"{TemplatesUrl}/{templateId}");
+        var response = await DeleteReportAsync($"{TemplatesUrl}/{templateId}");
         response.StatusCode.Should().Be(HttpStatusCode.OK);
 
         var getResponse = await Client.GetAsync($"{TemplatesUrl}/{templateId}");
@@ -748,23 +828,33 @@ public class ReportsTests : TestBase
     public async Task DeleteTemplate_Nonexistent_ReturnsNotFound()
     {
         var fakeId = Guid.NewGuid();
-        var response = await Client.DeleteAsync($"{TemplatesUrl}/{fakeId}");
+        var response = await DeleteReportAsync($"{TemplatesUrl}/{fakeId}");
         response.StatusCode.Should().Be(HttpStatusCode.NotFound);
     }
 
     // ── Helpers ───────────────────────────────────────────────────────────
 
+    private async Task PopulateReportAsync(Guid reportId)
+    {
+        foreach (var type in new[] { "Findings", "Impression" })
+        {
+            var response = await PutReportAsync($"{ReportsUrl}/{reportId}/sections", new { SectionType = type, Title = type, Body = "No abnormality detected." });
+            response.EnsureSuccessStatusCode();
+        }
+    }
+
     private async Task<Guid> CreateTestReportAsync()
     {
         var examinationId = await CreateTestExaminationAsync();
-        var patientId = await CreateTestPatientAsync();
+        var exam = await Client.GetFromJsonAsync<ApiResponse<ExaminationDto>>($"{ExaminationsUrl}/{examinationId}");
+        var patientId = exam!.Data!.PatientId;
         var command = new
         {
             ExaminationId = examinationId,
             PatientId = patientId,
-            RadiologistId = Guid.NewGuid()
+            RadiologistId = await TestData.StaffAsync(Client, "Radiologist")
         };
-        var response = await Client.PostAsJsonAsync(ReportsUrl, command);
+        var response = await PostReportAsync(ReportsUrl, command);
         response.StatusCode.Should().Be(HttpStatusCode.OK);
         var body = await response.Content.ReadFromJsonAsync<ApiResponse<ReportDto>>();
         return body!.Data!.Id;
@@ -779,7 +869,7 @@ public class ReportsTests : TestBase
             Severity = "Moderate",
             Position = 0
         };
-        var response = await Client.PostAsJsonAsync($"{ReportsUrl}/{reportId}/findings", command);
+        var response = await PostReportAsync($"{ReportsUrl}/{reportId}/findings", command);
         response.StatusCode.Should().Be(HttpStatusCode.OK);
         var body = await response.Content.ReadFromJsonAsync<ApiResponse<ReportFindingDto>>();
         return body!.Data!.Id;
@@ -790,11 +880,11 @@ public class ReportsTests : TestBase
         var command = new
         {
             Name = $"Template_{Guid.NewGuid():N}",
-            Modality = "X-Ray",
+            Modality = "XRay",
             BodyPart = "Chest",
             Description = "Test template"
         };
-        var response = await Client.PostAsJsonAsync(TemplatesUrl, command);
+        var response = await PostReportAsync(TemplatesUrl, command);
         response.StatusCode.Should().Be(HttpStatusCode.OK);
         var body = await response.Content.ReadFromJsonAsync<ApiResponse<ReportTemplateDto>>();
         return body!.Data!.Id;
@@ -802,7 +892,7 @@ public class ReportsTests : TestBase
 
     private async Task DeactivateTestTemplateAsync(Guid templateId)
     {
-        var response = await Client.PostAsJsonAsync($"{TemplatesUrl}/{templateId}/deactivate", new { });
+        var response = await PostReportAsync($"{TemplatesUrl}/{templateId}/deactivate", new { });
         response.StatusCode.Should().Be(HttpStatusCode.OK);
     }
 
@@ -815,7 +905,7 @@ public class ReportsTests : TestBase
             PhoneNumber = $"010{Random.Shared.Next(10000000, 99999999)}",
             DateOfBirth = new DateTime(1990, 5, 15)
         };
-        var response = await Client.PostAsJsonAsync(PatientsUrl, command);
+        var response = await PostReportAsync(PatientsUrl, command);
         response.StatusCode.Should().Be(HttpStatusCode.OK);
         var body = await response.Content.ReadFromJsonAsync<ApiResponse<PatientDto>>();
         return body!.Data!.Id;
@@ -831,11 +921,12 @@ public class ReportsTests : TestBase
             ExaminationTypeId = examinationTypeId,
             ClinicalIndication = "Test indication",
             Priority = "Routine",
+            Status = "CheckedIn",
             Discount = 0m,
             IsDiscountPercentage = false,
             Paid = 0m
         };
-        var response = await Client.PostAsJsonAsync(ExaminationsUrl, command);
+        var response = await PostReportAsync(ExaminationsUrl, command);
         response.StatusCode.Should().Be(HttpStatusCode.OK);
         var body = await response.Content.ReadFromJsonAsync<ApiResponse<ExaminationDto>>();
         return body!.Data!.Id;
@@ -843,7 +934,7 @@ public class ReportsTests : TestBase
 
     private async Task<Guid> GetOrCreateExaminationTypeAsync()
     {
-        var response = await Client.PostAsJsonAsync($"{ExaminationTypesUrl}/all", new { PageNumber = 1, PageSize = 1 });
+        var response = await PostReportAsync($"{ExaminationTypesUrl}/all", new { PageNumber = 1, PageSize = 1 });
         if (response.IsSuccessStatusCode)
         {
             var body = await response.Content.ReadFromJsonAsync<ApiResponse<PagedResultDto<ExaminationTypeListItemDto>>>();
@@ -855,7 +946,7 @@ public class ReportsTests : TestBase
         {
             Name = $"TestType_{Guid.NewGuid():N}",
             Code = $"TST_{Guid.NewGuid():N}",
-            Modality = "X-Ray",
+            Modality = "XRay",
             BodyPart = "Chest",
             StandardDurationMinutes = 30,
             Price = 100m,
@@ -863,7 +954,7 @@ public class ReportsTests : TestBase
             RequiresConsent = false,
             RequiresContrast = false
         };
-        var createResponse = await Client.PostAsJsonAsync(ExaminationTypesUrl, createTypeCommand);
+        var createResponse = await PostReportAsync(ExaminationTypesUrl, createTypeCommand);
         createResponse.StatusCode.Should().Be(HttpStatusCode.OK);
         var createBody = await createResponse.Content.ReadFromJsonAsync<ApiResponse<ExaminationTypeListItemDto>>();
         return createBody!.Data!.Id;
@@ -902,6 +993,7 @@ public class ReportsTests : TestBase
         public string? Status { get; set; }
         public string? StatusKey { get; set; }
         public int CurrentVersionNumber { get; set; }
+        public int Revision { get; set; }
         public DateTime? FinalizedAt { get; set; }
         public string? CancelReason { get; set; }
         public ReportVersionDto? CurrentVersion { get; set; }
@@ -940,6 +1032,7 @@ public class ReportsTests : TestBase
     {
         public Guid Id { get; set; }
         public string? SectionType { get; set; }
+        public string? SectionTypeKey { get; set; }
         public string? Title { get; set; }
         public string? Body { get; set; }
         public int Position { get; set; }
@@ -972,6 +1065,7 @@ public class ReportsTests : TestBase
     {
         public Guid Id { get; set; }
         public string? SectionType { get; set; }
+        public string? SectionTypeKey { get; set; }
         public string? Title { get; set; }
         public string? Body { get; set; }
         public int Position { get; set; }
@@ -987,6 +1081,7 @@ public class ReportsTests : TestBase
     private sealed class ExaminationDto
     {
         public Guid Id { get; set; }
+        public Guid PatientId { get; set; }
     }
 
     private sealed class ExaminationTypeListItemDto

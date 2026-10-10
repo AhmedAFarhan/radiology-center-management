@@ -6,9 +6,9 @@
 @inject IJSRuntime JS
 
 <PageHeader Icon="@Icons.Material.Filled.Security" Title="@T.InsuranceAnalytics.Title" Subtitle="@T.InsuranceAnalytics.Subtitle" OnRefresh="() => ReloadAsync()" ShowSearch="false">
-    <RightContent>
+    <ActionContent>
         <ExportButton Loading="@_exporting" OnExport="ExportAsync" />
-    </RightContent>
+    </ActionContent>
 </PageHeader>
 
 <PeriodSelector Class="mb-4" />
@@ -21,7 +21,7 @@ else if (Error)
 {
     <ErrorState Title="@T.Overview.LoadErrorTitle" Message="@T.Overview.LoadErrorMsg" Detail="@LastError" Action="ReloadAsync" RetryLabel="@T.Overview.Retry" />
 }
-else
+else if (_data is not null)
 {
     <MudGrid Spacing="3">
         <MudItem xs="12" sm="6" lg="3">

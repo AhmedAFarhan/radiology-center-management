@@ -7,6 +7,13 @@ public class AppDbContext : DbContext
 {
     public AppDbContext(DbContextOptions options) : base(options) { }
 
+    protected override void ConfigureConventions(ModelConfigurationBuilder configurationBuilder)
+    {
+        // SQL Server forbids OUTPUT without INTO on tables with triggers or security block predicates.
+        configurationBuilder.Conventions.Add(_ => new DesktopSqlOutputConvention());
+        base.ConfigureConventions(configurationBuilder);
+    }
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         if (GetType() == typeof(AppDbContext))
@@ -43,5 +50,14 @@ public class AppDbContext : DbContext
     private static void SetSoftDeleteFilter<T>(ModelBuilder modelBuilder) where T : class, ISoftDeletable
     {
         modelBuilder.Entity<T>().HasQueryFilter(e => !e.IsDeleted);
+    }
+}
+
+internal sealed class DesktopSqlOutputConvention : Microsoft.EntityFrameworkCore.Metadata.Conventions.IModelFinalizingConvention
+{
+    public void ProcessModelFinalizing(Microsoft.EntityFrameworkCore.Metadata.Builders.IConventionModelBuilder builder,
+        Microsoft.EntityFrameworkCore.Metadata.Conventions.IConventionContext<Microsoft.EntityFrameworkCore.Metadata.Builders.IConventionModelBuilder> context)
+    {
+        foreach(var entity in builder.Metadata.GetEntityTypes()) entity.UseSqlOutputClause(false);
     }
 }

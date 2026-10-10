@@ -11,6 +11,7 @@ public static class UpdateUserRolesCommandHandler
         IUserRepository userRepository,
         IRoleRepository roleRepository,
         IIdentityUnitOfWork unitOfWork,
+        ICurrentUser currentUser,
         CancellationToken ct)
     {
         var user = await userRepository.GetByIdAsync(command.UserId, ct);
@@ -22,6 +23,8 @@ public static class UpdateUserRolesCommandHandler
         if (missingRoleId != Guid.Empty)
             return Result.Failure(Error.NotFound(ErrorCodes.RoleNotFound, "Role", missingRoleId));
 
+        if (roles.Any(r => r.IsSystem) && !currentUser.IsAdministrator)
+            return Result.Failure(Error.Forbidden("Identity.RoleAssignmentForbidden", "Only an administrator can assign a system role."));
         user.UpdateRoles(roles);
         await userRepository.UpdateAsync(user, ct);
         await unitOfWork.SaveChangesAsync(ct);

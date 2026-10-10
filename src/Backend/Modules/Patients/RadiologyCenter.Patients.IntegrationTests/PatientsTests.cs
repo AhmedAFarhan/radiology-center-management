@@ -302,14 +302,28 @@ public class PatientsTests : TestBase
     [Fact]
     public async Task ImportPatients_WithValidFile_ReturnsOk()
     {
-        var fileContent = new byte[] { 0x50, 0x4B, 0x03, 0x04 };
+        var template = await Client.GetByteArrayAsync($"{BaseUrl}/import-template");
+        using var workbook = new ClosedXML.Excel.XLWorkbook(new MemoryStream(template));
+        var sheet = workbook.Worksheets.First(ws => ws.Name != "Instructions" && ws.Name != "_Meta");
+        sheet.Cell(2, 1).Value = "Imported Patient Persisted";
+        sheet.Cell(2, 2).Value = "Male";
+        sheet.Cell(2, 3).Value = "1990-01-01";
+        sheet.Cell(2, 4).Clear();
+        sheet.Cell(2, 5).Value = "01012345678";
+        using var output = new MemoryStream();
+        workbook.SaveAs(output);
+        var fileContent = output.ToArray();
         var content = new MultipartFormDataContent();
         var fileContentObj = new ByteArrayContent(fileContent);
         fileContentObj.Headers.ContentType = new("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
         content.Add(fileContentObj, "File", "patients.xlsx");
 
         var response = await Client.PostAsync($"{BaseUrl}/import", content);
-        response.StatusCode.Should().Be(HttpStatusCode.OK);
+        response.StatusCode.Should().Be(HttpStatusCode.OK, await response.Content.ReadAsStringAsync());
+        var readback = await Client.PostAsJsonAsync($"{BaseUrl}/all", new { SearchTerm = "Imported Patient Persisted" });
+        readback.EnsureSuccessStatusCode();
+        var persisted = await readback.Content.ReadAsStringAsync();
+        persisted.Should().Contain("Imported Patient Persisted");
     }
 
     [Fact]

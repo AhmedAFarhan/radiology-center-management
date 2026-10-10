@@ -11,17 +11,32 @@ public class UnitOfWork<TContext> : IUnitOfWork, IUnitOfWork<TContext>
     where TContext : AppDbContext
 {
     private readonly TContext _context;
+    private readonly IDomainEventDispatcher _events;
 
-    public UnitOfWork(TContext context)
+    public UnitOfWork(TContext context, IDomainEventDispatcher events)
     {
         _context = context;
+        _events = events;
     }
 
     public async Task<int> SaveChangesAsync(CancellationToken ct = default)
     {
         try
         {
-            return await _context.SaveChangesAsync(ct);
+            if (_context.Database.CurrentTransaction is not null)
+                return await _context.SaveChangesAsync(ct);
+
+            // Own the transaction before the domain-event interceptor enrolls the
+            // DbContext in Wolverine's outbox. Otherwise enrollment can open a
+            // transaction that nobody commits and a successful request loses data.
+            int count;
+            await using (var transaction = await _context.Database.BeginTransactionAsync(ct))
+            {
+                count = await _context.SaveChangesAsync(ct);
+                await transaction.CommitAsync(ct);
+            }
+            await _events.FlushAsync(ct);
+            return count;
         }
         catch (DbUpdateConcurrencyException ex)
         {
@@ -32,7 +47,7 @@ public class UnitOfWork<TContext> : IUnitOfWork, IUnitOfWork<TContext>
     public async Task<IUnitOfWorkTransaction> BeginTransactionAsync(CancellationToken ct = default)
     {
         var transaction = await _context.Database.BeginTransactionAsync(ct);
-        return new DbUnitOfWorkTransaction(transaction);
+        return new DbUnitOfWorkTransaction(transaction, _events);
     }
 
 }
@@ -40,11 +55,13 @@ public class UnitOfWork<TContext> : IUnitOfWork, IUnitOfWork<TContext>
 internal sealed class DbUnitOfWorkTransaction : IUnitOfWorkTransaction
 {
     private readonly IDbContextTransaction _transaction;
+    private readonly IDomainEventDispatcher _events;
 
     public DbUnitOfWorkTransaction(
-        IDbContextTransaction transaction)
+        IDbContextTransaction transaction, IDomainEventDispatcher events)
     {
         _transaction = transaction;
+        _events = events;
     }
 
     public DbTransaction? DbTransaction => _transaction.GetDbTransaction();
@@ -60,6 +77,9 @@ internal sealed class DbUnitOfWorkTransaction : IUnitOfWorkTransaction
             await RollbackAsync(ct);
             throw;
         }
+        // SQL is committed before messages become visible to local handlers.
+        // A dispatch failure must never attempt to roll back a committed transaction.
+        await _events.FlushAsync(ct);
     }
 
     public async Task RollbackAsync(CancellationToken ct = default) =>

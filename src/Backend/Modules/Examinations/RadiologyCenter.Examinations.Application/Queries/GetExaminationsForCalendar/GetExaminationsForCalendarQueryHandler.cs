@@ -14,8 +14,10 @@ public static class GetExaminationsForCalendarQueryHandler
         IPatientInfoResolver patientInfoResolver,
         CancellationToken ct)
     {
-        var startUtc = query.StartDate;
-        var endUtc = query.EndDate;
+        var startUtc = Scheduling.ClinicClock.ToUtc(query.StartDate);
+        var endUtc = Scheduling.ClinicClock.ToUtc(query.EndDate);
+        if (endUtc <= startUtc || endUtc - startUtc > TimeSpan.FromDays(31))
+            return Result.Failure<IReadOnlyList<CalendarSlotDto>>(Error.Validation("Examinations.InvalidCalendarRange", "Select a calendar range of at most 31 days."));
 
         var examinations = await examinationRepository.GetScheduledInRangeAsync(
             startUtc, endUtc, excludeId: null, ct);
@@ -37,8 +39,9 @@ public static class GetExaminationsForCalendarQueryHandler
                 .ToList();
 
         var patientIds = examinations.Select(e => e.PatientId).Distinct().ToList();
-        var patientTasks = patientIds.Select(id => patientInfoResolver.ResolveAsync(id, ct));
-        var patients = await Task.WhenAll(patientTasks);
+        var patients = new List<PatientInfo?>();
+        foreach (var id in patientIds)
+            patients.Add(await patientInfoResolver.ResolveAsync(id, ct));
         var patientDict = patients
             .Where(p => p != null)
             .ToDictionary(p => p!.Id, p => p!);
@@ -58,7 +61,7 @@ public static class GetExaminationsForCalendarQueryHandler
                 typeInfo?.Name ?? BrandConstants.UnknownModality,
                 typeInfo?.Modality ?? "",
                 e.ScheduledAt ?? DateTime.MinValue,
-                e.ScheduledEnd,
+                e.ScheduledEnd ?? e.ScheduledAt!.Value.AddMinutes(e.TypeStandardDurationMinutes > 0 ? e.TypeStandardDurationMinutes : 30),
                 e.Status.Name,
                 e.Priority.Name);
         }).ToList();

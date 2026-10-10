@@ -21,7 +21,7 @@ public static class ExportStaffReportQueryHandler
             new GetStaffMachineAnalyticsQuery(query.From, query.To),
             examinationRepository, examinationTypeDirectory, ancillaryDirectory, ct);
         if (staffResult.IsFailure)
-            return Result.Failure<ReportContentDto>(staffResult.Error);
+            return Result.Failure<ReportContentDto>(staffResult.Error!);
 
         var today = timezone.GetLocalDate(DateTime.UtcNow);
         var from = query.From ?? today.AddMonths(-1).AddDays(1).ToDateTime(TimeOnly.MinValue);

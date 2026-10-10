@@ -141,24 +141,23 @@ public partial class GlobalSearch
             }
 
             var cursor = 0;
-            var seq = 0;
-            foreach (var span in merged)
+                foreach (var span in merged)
             {
                 if (span.Start > cursor)
                 {
-                    builder.AddContent(seq++, raw.Substring(cursor, span.Start - cursor));
+                    builder.AddContent(0, raw.Substring(cursor, span.Start - cursor));
                 }
 
-                builder.OpenElement(seq++, "mark");
-                builder.AddAttribute(seq++, "class", "global-search-mark");
-                builder.AddContent(seq++, raw.Substring(span.Start, span.Length));
+                builder.OpenElement(1, "mark");
+                builder.AddAttribute(2, "class", "global-search-mark");
+                builder.AddContent(3, raw.Substring(span.Start, span.Length));
                 builder.CloseElement();
 
                 cursor = span.Start + span.Length;
             }
 
             if (cursor < raw.Length)
-                builder.AddContent(seq++, raw.Substring(cursor));
+                builder.AddContent(4, raw.Substring(cursor));
         };
     }
 }

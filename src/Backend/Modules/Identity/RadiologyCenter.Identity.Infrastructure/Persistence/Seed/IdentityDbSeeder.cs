@@ -9,15 +9,12 @@ namespace RadiologyCenter.Identity.Infrastructure.Persistence.Seed;
 public static class IdentityDbSeeder
 {
     public const string AdminRoleName = "Administrator";
-    public const string AdminUserName = "admin123";
-    public const string AdminPassword = "admin123";
-    public const string AdminEmail = "admin@radiologycenter.local";
-    public const string AdminPhone = "01000000000";
 
     public static async Task SeedAsync(
         IdentityDbContext context,
         IPasswordHasher<User> passwordHasher,
         string? resourcesPath = null,
+        AdministratorSeedOptions? options = null,
         CancellationToken ct = default)
     {
         var permissions = await SeedPermissionsAsync(context, ct);
@@ -39,25 +36,24 @@ public static class IdentityDbSeeder
         adminRole.ClearDomainEvents();
         await context.SaveChangesAsync(ct);
 
-        var adminUser = await context.Users
-            .Include(u => u.AssignedRoles)
-            .FirstOrDefaultAsync(u => u.UserName == AdminUserName, ct);
-
-        if (adminUser is null)
+        // Bootstrap only an empty identity store. Existing accounts are never
+        // recreated, reactivated, or silently granted administrator access.
+        if (!await context.Users.AnyAsync(ct))
         {
-            adminUser = User.Create(AdminUserName, AdminEmail, "Admin", "System", AdminPhone);
-            adminUser.SetPasswordHash(passwordHasher.HashPassword(adminUser, AdminPassword));
+            options ??= new AdministratorSeedOptions();
+            var password = options.AdminPassword;
+            if (password.Length < 12 || !password.Any(char.IsUpper) || !password.Any(char.IsLower)
+                || !password.Any(char.IsDigit) || !password.Any(c => !char.IsLetterOrDigit(c)))
+                throw new InvalidOperationException("Configure Seed:AdminPassword with at least 12 characters, upper and lower case, a digit and a symbol before first startup.");
+            var adminUser = User.Create(options.AdminUserName, options.AdminEmail, "Admin", "System", options.AdminPhone);
+            adminUser.SetPasswordHash(passwordHasher.HashPassword(adminUser, password));
             adminUser.ConfirmEmail();
+            adminUser.RequirePasswordChange();
             adminUser.AssignRole(adminRole);
+            adminUser.ClearDomainEvents();
             context.Users.Add(adminUser);
+            await context.SaveChangesAsync(ct);
         }
-        else if (!adminUser.HasRole(adminRole.Id))
-        {
-            adminUser.AssignRole(adminRole);
-        }
-
-        adminUser.ClearDomainEvents();
-        await context.SaveChangesAsync(ct);
     }
 
     private static async Task<IReadOnlyList<Permission>> SeedPermissionsAsync(IdentityDbContext context, CancellationToken ct)

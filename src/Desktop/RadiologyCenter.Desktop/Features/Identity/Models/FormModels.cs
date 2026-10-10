@@ -23,8 +23,8 @@ internal sealed class UserFormModel
     public string? PhoneNumber { get; set; }
 
     [Required(ErrorMessage = "validation.passwordRequired")]
-    [MinLength(8, ErrorMessage = "validation.passwordMinLength")]
-    [RegularExpression(@"^(?=.*[A-Za-z])(?=.*\d).{8,}$", ErrorMessage = "validation.passwordLettersDigits")]
+    [MinLength(12, ErrorMessage = "validation.passwordMinLength")]
+    [RegularExpression(@"^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[^A-Za-z0-9]).{12,128}$", ErrorMessage = "validation.passwordLettersDigits")]
     public string Password { get; set; } = string.Empty;
 
     public IReadOnlyCollection<string> SelectedRoleIds { get; set; } = new List<string>();

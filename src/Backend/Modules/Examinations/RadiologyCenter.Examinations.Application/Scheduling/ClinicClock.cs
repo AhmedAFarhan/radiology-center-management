@@ -13,9 +13,18 @@ public static class ClinicClock
     private static readonly TimeZoneInfo Zone = ResolveZone();
 
     public static DateTime ToUtc(DateTime egyptWallTime)
-        => TimeZoneInfo.ConvertTimeToUtc(
-            DateTime.SpecifyKind(egyptWallTime, DateTimeKind.Unspecified),
-            Zone);
+        => egyptWallTime.Kind switch
+        {
+            DateTimeKind.Utc => egyptWallTime,
+            DateTimeKind.Local => egyptWallTime.ToUniversalTime(),
+            _ => TimeZoneInfo.ConvertTimeToUtc(egyptWallTime, Zone)
+        };
+
+    public static DateTime ToLocal(DateTime utc) => TimeZoneInfo.ConvertTimeFromUtc(
+        DateTime.SpecifyKind(utc, DateTimeKind.Utc), Zone);
+
+    public static DateTime UtcDayStart(DateTime clinicDate) => ToUtc(DateTime.SpecifyKind(clinicDate.Date, DateTimeKind.Unspecified));
+    public static DateTime UtcDayEndExclusive(DateTime clinicDate) => UtcDayStart(clinicDate.Date.AddDays(1));
 
     private static TimeZoneInfo ResolveZone()
     {
@@ -25,12 +34,8 @@ public static class ClinicClock
             try { return TimeZoneInfo.FindSystemTimeZoneById(TimezoneConstants.WindowsTimezone); }
             catch (Exception ex) when (ex is TimeZoneNotFoundException or InvalidTimeZoneException)
             {
-                return TimeZoneInfo.Utc;
+                throw new InvalidOperationException("The clinic time zone is unavailable.", ex);
             }
-        }
-        catch (InvalidTimeZoneException)
-        {
-            return TimeZoneInfo.Utc;
         }
     }
 }

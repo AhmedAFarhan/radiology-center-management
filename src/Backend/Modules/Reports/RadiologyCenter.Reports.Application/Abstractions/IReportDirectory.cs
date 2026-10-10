@@ -9,6 +9,9 @@ public interface IReportDirectory
     Task<IReadOnlyDictionary<Guid, string>> ResolvePatientNamesAsync(IEnumerable<Guid> ids, CancellationToken ct = default);
     Task<IReadOnlyDictionary<Guid, string>> ResolveRadiologistNamesAsync(IEnumerable<Guid> ids, CancellationToken ct = default);
     Task<IReadOnlyDictionary<Guid, string>> ResolveExaminationTypeNamesAsync(IEnumerable<Guid> examinationIds, CancellationToken ct = default);
+    Task<ReportExaminationIdentity?> GetExaminationIdentityAsync(Guid examinationId, CancellationToken ct = default);
+    Task<bool> IsActiveRadiologistAsync(Guid radiologistId, CancellationToken ct = default);
     Task<bool> IsExaminationCompletedAsync(Guid examinationId, CancellationToken ct = default);
     Task<bool> IsExaminationInStatusAsync(Guid examinationId, CancellationToken ct = default);
 }
+public sealed record ReportExaminationIdentity(Guid PatientId, Guid? RadiologistId);

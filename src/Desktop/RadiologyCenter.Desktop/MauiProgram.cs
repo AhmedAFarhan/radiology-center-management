@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging;
 using MudBlazor;
 using MudBlazor.Services;
 using MudBlazor.Utilities;
@@ -13,9 +13,6 @@ public static class MauiProgram
 {
     public static MauiApp CreateMauiApp()
     {
-        var updateService = new UpdateService();
-        updateService.Init();
-
         var builder = MauiApp.CreateBuilder();
         builder
             .UseMauiApp<App>()
@@ -29,17 +26,15 @@ public static class MauiProgram
         builder.Services.AddAuthorizationCore();
         builder.Services.AddScoped<IAuthorizationHandler, PermissionAuthorizationHandler>();
         builder.Services.AddSingleton<IAuthorizationPolicyProvider, PermissionPolicyProvider>();
-        builder.Services.AddSingleton(updateService);
+        builder.Services.AddSingleton<UpdateService>();
         builder.Services.AddMudServices(config =>
         {
             config.SnackbarConfiguration.PositionClass = Defaults.Classes.Position.TopEnd;
         });
 
-        builder.Services.AddHttpClient(ApiClient.HttpClientName, client =>
-        {
-            client.BaseAddress = new Uri(ApiClient.BaseUrl);
-            client.Timeout = TimeSpan.FromSeconds(30);
-        });
+        builder.Services.AddHttpClient();
+        builder.Services.AddHttpClient("PacsDesktop").ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler { AllowAutoRedirect = false });
+        builder.Services.AddSingleton<BusinessRuntimeService>();
         builder.Services.AddSingleton<AppLocalizer>();
         builder.Services.AddSingleton<MudLocalizer, AppMudLocalizer>();
         builder.Services.AddSingleton<BackendStatusService>();
@@ -70,7 +65,7 @@ public static class MauiProgram
         builder.Services.AddScoped<SearchService>();
         builder.Services.AddSingleton<SearchHistoryService>();
         builder.Services.AddScoped<GlobalSearchService>();
-        builder.Services.AddSingleton<RealTimeNotificationService>();
+
 
 #if DEBUG
         builder.Services.AddBlazorWebViewDeveloperTools();

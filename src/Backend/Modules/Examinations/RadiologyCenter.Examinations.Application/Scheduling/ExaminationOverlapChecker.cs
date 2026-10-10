@@ -21,7 +21,7 @@ internal static class ExaminationOverlapChecker
         if (equipmentId.HasValue
             && existing.Any(e => e.EquipmentId == equipmentId.Value
                 && e.ScheduledAt < scheduledEnd
-                && scheduledAt < e.ScheduledEnd))
+                && scheduledAt < (e.ScheduledEnd ?? e.ScheduledAt!.Value.AddMinutes(e.TypeStandardDurationMinutes > 0 ? e.TypeStandardDurationMinutes : 30))))
         {
             return (true, "equipment");
         }
@@ -29,7 +29,7 @@ internal static class ExaminationOverlapChecker
         if (radiologistId.HasValue
             && existing.Any(e => e.RadiologistId == radiologistId.Value
                 && e.ScheduledAt < scheduledEnd
-                && scheduledAt < e.ScheduledEnd))
+                && scheduledAt < (e.ScheduledEnd ?? e.ScheduledAt!.Value.AddMinutes(e.TypeStandardDurationMinutes > 0 ? e.TypeStandardDurationMinutes : 30))))
         {
             return (true, "radiologist");
         }

@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using RadiologyCenter.BuildingBlocks.Application.Common;
 using RadiologyCenter.BuildingBlocks.Application.Services;
 using RadiologyCenter.BuildingBlocks.Domain.Pagination;
@@ -15,7 +15,7 @@ public class ExaminationTypeRepository : BaseRepository<ExaminationType, Guid>, 
 {
     public ExaminationTypeRepository(CatalogDbContext context) : base(context) { }
 
-    public async Task<PagedResult<ExaminationType>> GetPagedAsync(QueryRequest request, CancellationToken ct = default)
+    public new async Task<PagedResult<ExaminationType>> GetPagedAsync(QueryRequest request, CancellationToken ct = default)
     {
         var spec = new DynamicSpecification<ExaminationType>(FilterExpressionBuilder.Build<ExaminationType>(request.Filters));
 

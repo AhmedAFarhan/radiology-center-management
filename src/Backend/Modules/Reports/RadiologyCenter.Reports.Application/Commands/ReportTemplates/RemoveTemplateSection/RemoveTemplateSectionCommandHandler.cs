@@ -16,6 +16,8 @@ public static class RemoveTemplateSectionCommandHandler
         if (template is null)
             return Result.Failure<ReportTemplateDto>(Error.NotFound(ErrorCodes.ReportTemplateNotFound, "ReportTemplate", command.TemplateId));
 
+        if (!template.Sections.Any(s => s.Id == command.SectionId))
+            return Result.Failure<ReportTemplateDto>(Error.NotFound("Reports.TemplateSectionNotFound", "TemplateSection", command.SectionId));
         template.RemoveSection(command.SectionId);
 
         await unitOfWork.SaveChangesAsync(ct);

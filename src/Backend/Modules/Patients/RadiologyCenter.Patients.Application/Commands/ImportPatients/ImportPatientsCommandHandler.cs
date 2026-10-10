@@ -137,7 +137,8 @@ public static class ImportPatientsCommandHandler
                     ct);
             }
 
-            await transaction.CommitAsync(ct);
+            await unitOfWork.SaveChangesAsync(ct);
+        await transaction.CommitAsync(ct);
         }
 
         return Result.Success(new ExcelImportResult(parsed.Rows.Count, pending.Count, errors));

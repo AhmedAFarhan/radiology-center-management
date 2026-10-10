@@ -16,17 +16,17 @@
         <MudSelectItem Value="@("week")">@T.ExamCalendar.WeekView</MudSelectItem>
     </MudSelect>
 
-    <MudSelect T="string?" Value="@_selectedModality" ValueChanged="OnModalityChanged" Variant="Variant.Outlined" Dense="true" Placeholder="@T.ExamCalendar.ModalityFilter" Clearable="true" Class="me-2" Style="width: 150px;">
+    <MudSelect T="string" Value="@_selectedModality" ValueChanged="OnModalityChanged" Variant="Variant.Outlined" Dense="true" Placeholder="@T.ExamCalendar.ModalityFilter" Clearable="true" Class="me-2" Style="width: 150px;">
         @foreach (var m in _modalities)
         {
-            <MudSelectItem Value="@((string?)m)">@m</MudSelectItem>
+            <MudSelectItem Value="@m">@m</MudSelectItem>
         }
     </MudSelect>
 
-    <MudSelect T="string?" Value="@_selectedEquipmentId" ValueChanged="OnEquipmentChanged" Variant="Variant.Outlined" Dense="true" Placeholder="@T.ExamCalendar.EquipmentFilter" Clearable="true" Style="width: 200px;">
+    <MudSelect T="string" Value="@_selectedEquipmentId" ValueChanged="OnEquipmentChanged" Variant="Variant.Outlined" Dense="true" Placeholder="@T.ExamCalendar.EquipmentFilter" Clearable="true" Style="width: 200px;">
         @foreach (var eq in _equipments)
         {
-            <MudSelectItem Value="@((string?)eq.Id)">@eq.Name</MudSelectItem>
+            <MudSelectItem Value="@eq.Id">@eq.Name</MudSelectItem>
         }
     </MudSelect>
 </PageHeader>
@@ -91,7 +91,8 @@ else
                             @foreach (var slot in resource.Slots)
                             {
                                 var statusClass = GetSlotStatusClass(slot);
-                                <div class="cal-slot-cell @statusClass @(slot.IsAvailable ? "available" : "occupied")"
+                                <button type="button" class="cal-slot-cell @statusClass @(slot.IsAvailable ? "available" : "occupied")"
+                                     aria-label="@(slot.Exam is null ? $"{resource.Name} {slot.StartTime:HH:mm} {T.ExamCalendar.Available}" : $"{resource.Name} {slot.StartTime:HH:mm} {slot.Exam.PatientName}")"
                                      @onclick="() => OnSlotClick(slot)">
                                     @if (!slot.IsAvailable && slot.Exam is not null)
                                     {
@@ -107,7 +108,7 @@ else
                                             <MudIcon Icon="@Icons.Material.Filled.Add" Size="Size.Small" Class="cal-slot-add-icon" />
                                         </div>
                                     }
-                                </div>
+                                </button>
                             }
                         </div>
                     }
@@ -120,6 +121,19 @@ else
                 </div>
             </div>
         </MudPaper>
+
+        @if (_otherAppointments.Count > 0)
+        {
+            <MudPaper Class="pa-3 mt-3">
+                <MudText Typo="Typo.subtitle2">@(T.IsRTL ? "مواعيد خارج الشبكة أو بدون جهاز" : "Appointments outside the grid or without equipment")</MudText>
+                @foreach (var exam in _otherAppointments)
+                {
+                    <MudButton Href="@($"/visits?highlight={exam.Id}")" Variant="Variant.Text">
+                        @exam.ScheduledAt.ToString("HH:mm") · @exam.PatientName · @exam.ExaminationTypeName
+                    </MudButton>
+                }
+            </MudPaper>
+        }
 
         @* ── Legend ── *@
         <div class="cal-legend">

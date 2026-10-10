@@ -6,4 +6,6 @@ public interface ICurrentUser
     string? Name { get; }
     string? TimeZoneId { get; }
     bool IsAuthenticated { get; }
+    bool IsAdministrator { get; }
+    bool HasPermission(string permissionCode);
 }

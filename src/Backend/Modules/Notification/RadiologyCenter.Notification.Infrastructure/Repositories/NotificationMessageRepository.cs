@@ -16,7 +16,7 @@ public class NotificationMessageRepository : BaseRepository<NotificationMessage,
 {
     public NotificationMessageRepository(NotificationDbContext context) : base(context) { }
 
-    public async new Task<PagedResult<NotificationMessage>> GetPagedAsync(
+    public async Task<PagedResult<NotificationMessage>> GetPagedAsync(
         QueryRequest request,
         NotificationChannel? channel = null,
         NotificationStatus? status = null,

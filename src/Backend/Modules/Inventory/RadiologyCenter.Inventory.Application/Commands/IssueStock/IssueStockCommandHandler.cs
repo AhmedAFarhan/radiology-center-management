@@ -52,6 +52,7 @@ public static class IssueStockCommandHandler
         if (item.ReorderLevel > 0 && stockOnHand < item.ReorderLevel)
             item.ReportLowStock(stockOnHand);
 
+        await unitOfWork.SaveChangesAsync(ct);
         await transaction.CommitAsync(ct);
         return Result.Success();
     }

@@ -13,10 +13,9 @@ public static class NotificationInfrastructureRegistration
 {
     public static IServiceCollection AddNotificationInfrastructure(this IServiceCollection services, IConfiguration configuration)
     {
-        var connectionString = configuration.GetConnectionString("DefaultConnection");
 
         services.AddDbContext<NotificationDbContext>((sp, options) =>
-            options.UseSqlServer(connectionString)
+            options.UseSqlServer(sp.GetRequiredService<IConfiguration>().GetConnectionString("DefaultConnection"))
                    .AddInterceptors(sp.GetRequiredService<AuditSoftDeleteInterceptor>())
                    .AddInterceptors(sp.GetRequiredService<DomainEventDispatchInterceptor>())
 );

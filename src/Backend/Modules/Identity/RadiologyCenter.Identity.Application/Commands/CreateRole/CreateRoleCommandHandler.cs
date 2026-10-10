@@ -9,9 +9,12 @@ public static class CreateRoleCommandHandler
         CreateRoleCommand command,
         IRoleRepository roleRepository,
         IIdentityUnitOfWork unitOfWork,
+        ICurrentUser currentUser,
         CancellationToken ct)
     {
-        var role = Role.Create(command.Name, command.Description, command.IsSystem);
+        if (command.IsSystem || string.Equals(command.Name, "Administrator", StringComparison.OrdinalIgnoreCase))
+            return Result.Failure(Error.Forbidden("Identity.ReservedRole", "System roles can only be provisioned by the server."));
+        var role = Role.Create(command.Name, command.Description);
         await roleRepository.AddAsync(role, ct);
         await unitOfWork.SaveChangesAsync(ct);
         return Result.Success();

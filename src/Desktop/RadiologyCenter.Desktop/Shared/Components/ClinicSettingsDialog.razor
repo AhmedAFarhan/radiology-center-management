@@ -1,0 +1,7 @@
+<MudDialog><DialogContent><ClinicSetupPanel Completed="Close" /></DialogContent>
+<DialogActions><MudButton OnClick="Close">@T.Common.Close</MudButton></DialogActions></MudDialog>
+@inject AppLocalizer T
+@code {
+    [CascadingParameter] public IMudDialogInstance MudDialog { get; set; } = default!;
+    private void Close()=>MudDialog.Close();
+}

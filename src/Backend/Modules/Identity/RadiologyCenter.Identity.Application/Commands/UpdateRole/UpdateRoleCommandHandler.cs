@@ -16,6 +16,8 @@ public static class UpdateRoleCommandHandler
         if (role is null)
             return Result.Failure(Error.NotFound(ErrorCodes.RoleNotFound, "Role", command.RoleId));
 
+        if (role.IsSystem || string.Equals(command.Name, "Administrator", StringComparison.OrdinalIgnoreCase))
+            return Result.Failure(Error.Forbidden("Identity.ReservedRole", "System role names cannot be changed."));
         role.Update(command.Name, command.Description);
         await roleRepository.UpdateAsync(role, ct);
         await unitOfWork.SaveChangesAsync(ct);

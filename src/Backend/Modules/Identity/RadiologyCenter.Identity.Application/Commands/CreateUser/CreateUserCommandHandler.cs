@@ -13,6 +13,8 @@ public static class CreateUserCommandHandler
         IRoleRepository roleRepository,
         IIdentityUnitOfWork unitOfWork,
         IPasswordHasher<User> passwordHasher,
+        ICurrentUser currentUser,
+        IIdentityAccessProvisioner accessProvisioner,
         CancellationToken ct)
     {
         var user = User.Create(command.UserName, command.Email, command.FirstName, command.LastName, command.PhoneNumber);
@@ -24,10 +26,16 @@ public static class CreateUserCommandHandler
         if (missingRoleId != Guid.Empty)
             return Result.Failure(Error.NotFound(ErrorCodes.RoleNotFound, "Role", missingRoleId));
 
+        if (!currentUser.HasPermission(RadiologyCenter.Identity.Domain.Permissions.UsersManageRolesCode)
+            || (roles.Any(r => r.IsSystem) && !currentUser.IsAdministrator))
+            return Result.Failure(Error.Forbidden("Identity.RoleAssignmentForbidden", "You cannot assign the requested roles."));
         user.UpdateRoles(roles);
 
+        await using var transaction = await unitOfWork.BeginTransactionAsync(ct);
         await userRepository.AddAsync(user, ct);
         await unitOfWork.SaveChangesAsync(ct);
+        await accessProvisioner.ProvisionAsync(user.Id,command.Password,ct);
+        await transaction.CommitAsync(ct);
         return Result.Success();
     }
 }

@@ -16,8 +16,8 @@ internal sealed class ChangePasswordModel
     [Required(ErrorMessage = "validation.currentPasswordRequired")]
     public string CurrentPassword { get; set; } = string.Empty;
 
-    [MinLength(8, ErrorMessage = "validation.passwordMinLength")]
-    [RegularExpression(@"^(?=.*[A-Za-z])(?=.*\d).{8,}$", ErrorMessage = "validation.passwordLettersDigits")]
+    [MinLength(12, ErrorMessage = "validation.passwordMinLength")]
+    [RegularExpression(@"^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[^A-Za-z0-9]).{12,128}$", ErrorMessage = "validation.passwordLettersDigits")]
     public string NewPassword { get; set; } = string.Empty;
 
     [Compare(nameof(NewPassword), ErrorMessage = "validation.passwordMismatch")]
@@ -26,8 +26,8 @@ internal sealed class ChangePasswordModel
 
 internal sealed class ResetPasswordModel
 {
-    [MinLength(8, ErrorMessage = "validation.passwordMinLength")]
-    [RegularExpression(@"^(?=.*[A-Za-z])(?=.*\d).{8,}$", ErrorMessage = "validation.passwordLettersDigits")]
+    [MinLength(12, ErrorMessage = "validation.passwordMinLength")]
+    [RegularExpression(@"^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[^A-Za-z0-9]).{12,128}$", ErrorMessage = "validation.passwordLettersDigits")]
     public string NewPassword { get; set; } = string.Empty;
 
     [Compare(nameof(NewPassword), ErrorMessage = "validation.passwordMismatch")]

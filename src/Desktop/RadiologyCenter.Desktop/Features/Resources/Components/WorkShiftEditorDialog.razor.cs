@@ -82,7 +82,8 @@ public partial class WorkShiftEditorDialog : EditorDialogBase
 
     private async Task SubmitAsync()
     {
-        if (!_editContext.Validate())
+        if (!_editContext.Validate() || _model.Date is not DateTime date
+            || _model.StartTime is not TimeSpan startTime || _model.EndTime is not TimeSpan endTime)
             return;
 
         if (_selectedStaff is null)
@@ -101,9 +102,9 @@ public partial class WorkShiftEditorDialog : EditorDialogBase
         {
             StaffId = _selectedStaff.Id,
             EquipmentId = _selectedEquipment?.Id,
-            Date = _model.Date.Value.Date,
-            StartTime = _model.StartTime.Value,
-            EndTime = _model.EndTime.Value,
+            Date = date.Date,
+            StartTime = startTime,
+            EndTime = endTime,
             Notes = _model.Notes,
         };
 

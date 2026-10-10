@@ -15,9 +15,10 @@ public static class UpdateExaminationCommandHandler
         IExaminationTypeDirectory examinationTypeDirectory,
         IExaminationRepository examinationRepository,
         IExaminationsUnitOfWork unitOfWork,
-        ITimezoneConverter timezone,
+        ExaminationScheduler scheduler,
         CancellationToken ct)
     {
+        await using var transaction = await unitOfWork.BeginTransactionAsync(ct);
         var examination = await examinationRepository.GetWithItemsAsync(command.ExaminationId, ct);
         if (examination is null)
             return Result.Failure(Error.NotFound(ErrorCodes.ExaminationNotFound, "Examination", command.ExaminationId));
@@ -31,7 +32,7 @@ public static class UpdateExaminationCommandHandler
             if (newType is null)
                 return Result.Failure(Error.NotFound(ErrorCodes.ExaminationTypeNotFound, "ExaminationType", command.ExaminationTypeId.Value));
 
-            examination.ChangeType(newType.Id, newType.Price);
+            examination.ChangeType(newType.Id, newType.Price, newType.StandardDurationMinutes);
             foreach (var seeded in ExaminationItemSeeding.Build(newType))
                 examination.AddItem(seeded.ItemId, seeded.Quantity, seeded.IsContrast, seeded.IsRequired);
         }
@@ -47,6 +48,9 @@ public static class UpdateExaminationCommandHandler
             command.Notes,
             command.EquipmentId);
 
+        if (command.Paid.HasValue && command.Paid.Value != examination.Paid)
+            return Result.Failure(Error.Validation("Examinations.UsePaymentCommand", "Record payments or refunds through the payment workflow."));
+
         if (command.Discount.HasValue || command.IsDiscountPercentage.HasValue || command.Paid.HasValue)
         {
             examination.SetBilling(
@@ -58,100 +62,28 @@ public static class UpdateExaminationCommandHandler
         if (command.Items is not null)
             ReconcileItems(examination, command.Items);
 
-        var statusError = await ApplyStatusTransitionAsync(examination, command.Status, command.ScheduledAt, examinationRepository, timezone, ct);
-        if (statusError is not null)
-            return statusError;
-
+        var type = await examinationTypeDirectory.GetByIdAsync(examination.ExaminationTypeId, ct);
+        if (type is null) return Result.Failure(Error.NotFound(ErrorCodes.ExaminationTypeNotFound, "ExaminationType", examination.ExaminationTypeId));
+        var target = string.IsNullOrWhiteSpace(command.Status) ? examination.Status.Name : command.Status.Trim();
+        if (target == ExaminationStatus.Scheduled.Name && examination.Status != ExaminationStatus.Scheduled && examination.Status != ExaminationStatus.Requested)
+            return Result.Failure(Error.Conflict(ErrorCodes.InvalidStatusTransition, "This examination cannot be scheduled."));
+        if (target == ExaminationStatus.Scheduled.Name)
+        {
+            var scheduled = await scheduler.ScheduleAsync(examination, type, command.ScheduledAt ?? examination.ScheduledAt ?? DateTime.UtcNow, transaction, ct);
+            if (scheduled.IsFailure) return scheduled;
+        }
+        else
+        {
+            var validated = await scheduler.ValidateReservationAsync(examination, type, examination.ScheduledAt, examination.ScheduledEnd, transaction, ct);
+            if (validated.IsFailure) return validated;
+            if (target == ExaminationStatus.CheckedIn.Name && (examination.Status == ExaminationStatus.Requested || examination.Status == ExaminationStatus.Scheduled))
+                examination.CheckIn();
+            else if (target != examination.Status.Name)
+                return Result.Failure(Error.Conflict(ErrorCodes.InvalidStatusTransition, "Use the dedicated examination lifecycle action."));
+        }
         await unitOfWork.SaveChangesAsync(ct);
+        await transaction.CommitAsync(ct);
         return Result.Success();
-    }
-
-    private static async Task<Result?> ApplyStatusTransitionAsync(
-        Examination examination,
-        string? status,
-        DateTime? scheduledAt,
-        IExaminationRepository examinationRepository,
-        ITimezoneConverter timezone,
-        CancellationToken ct)
-    {
-        if (string.IsNullOrWhiteSpace(status))
-            return null;
-
-        var target = status.Trim();
-        var current = examination.Status.Name;
-        if (string.Equals(current, target, StringComparison.Ordinal))
-        {
-            if (string.Equals(target, ExaminationStatus.Scheduled.Name, StringComparison.Ordinal)
-                && scheduledAt.HasValue)
-            {
-                var localNow = timezone.ToLocal(DateTime.UtcNow);
-                if (scheduledAt.Value < localNow.AddMinutes(-1))
-                    return Result.Failure(Error.Conflict(ErrorCodes.ScheduledTimePast, "Scheduled time cannot be in the past."));
-
-                var overlapError = await CheckOverlapForScheduleAsync(examination, scheduledAt.Value, examinationRepository, ct);
-                if (overlapError is not null)
-                    return overlapError;
-
-                examination.Schedule(scheduledAt.Value);
-            }
-
-            return null;
-        }
-
-        if (string.Equals(target, ExaminationStatus.CheckedIn.Name, StringComparison.Ordinal)
-            && (current == ExaminationStatus.Requested.Name || current == ExaminationStatus.Scheduled.Name))
-        {
-            examination.CheckIn();
-            return null;
-        }
-
-        if (string.Equals(target, ExaminationStatus.Scheduled.Name, StringComparison.Ordinal)
-            && (current == ExaminationStatus.Requested.Name || current == ExaminationStatus.Scheduled.Name))
-        {
-            var scheduledLocal = scheduledAt ?? DateTime.UtcNow;
-            var localNow = timezone.ToLocal(DateTime.UtcNow);
-            if (scheduledLocal < localNow.AddMinutes(-1))
-                return Result.Failure(Error.Conflict(ErrorCodes.ScheduledTimePast, "Scheduled time cannot be in the past."));
-
-            var overlapError = await CheckOverlapForScheduleAsync(examination, scheduledLocal, examinationRepository, ct);
-            if (overlapError is not null)
-                return overlapError;
-
-            examination.Schedule(scheduledLocal);
-            return null;
-        }
-
-        return Result.Failure(Error.Conflict(
-            ErrorCodes.InvalidStatusTransition,
-            $"Cannot change examination status from '{current}' to '{target}'."));
-    }
-
-    private static async Task<Result?> CheckOverlapForScheduleAsync(
-        Examination examination,
-        DateTime scheduledAt,
-        IExaminationRepository examinationRepository,
-        CancellationToken ct)
-    {
-        var scheduledEnd = scheduledAt.AddMinutes(30);
-
-        var (isConflict, resource) = await ExaminationOverlapChecker.FindConflictAsync(
-            examinationRepository,
-            examination.EquipmentId,
-            examination.RadiologistId,
-            scheduledAt,
-            scheduledEnd,
-            excludeExaminationId: examination.Id,
-            ct);
-
-        if (isConflict)
-        {
-            var errorCode = resource == "equipment" ? ErrorCodes.EquipmentOverlap : ErrorCodes.RadiologistOverlap;
-            return Result.Failure(Error.Conflict(
-                errorCode,
-                $"The {resource} is already booked during the selected time slot."));
-        }
-
-        return null;
     }
 
     private static void ReconcileItems(

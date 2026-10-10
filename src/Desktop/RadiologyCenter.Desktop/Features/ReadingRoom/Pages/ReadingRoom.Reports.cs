@@ -12,7 +12,6 @@ public partial class ReadingRoom
     private async Task SelectExamAsync(QueueExam item)
     {
         _selected = item;
-        _selectedSeries = 1;
         _loadingReport = true;
         _reportError = null;
         _report = null;
@@ -139,8 +138,6 @@ public partial class ReadingRoom
             });
         }
 
-        _reportStatusByExam[item.Id] = "Draft";
-        _reportStatusKeyByExam[item.Id] = "Draft";
         item.ReportStatus = "Draft";
         item.ReportStatusKey = "Draft";
         return draft;
@@ -275,8 +272,6 @@ public partial class ReadingRoom
                 {
                     _selected.ReportStatus = "Finalized";
                     _selected.ReportStatusKey = "Finalized";
-                    _reportStatusByExam[_selected.Id] = "Finalized";
-                    _reportStatusKeyByExam[_selected.Id] = "Finalized";
                 }
                 Snackbar.Add(T.ReadingRoom.ReportSigned, Severity.Success);
             },

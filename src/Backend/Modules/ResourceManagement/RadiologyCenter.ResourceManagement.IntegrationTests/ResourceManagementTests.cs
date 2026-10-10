@@ -523,7 +523,7 @@ public class ResourceManagementTests : TestBase
         var command = new
         {
             StaffId = staffId,
-            LeaveType = "Personal",
+            LeaveType = "Other",
             StartDate = DateTime.UtcNow.Date.AddDays(20),
             EndDate = DateTime.UtcNow.Date.AddDays(22)
         };

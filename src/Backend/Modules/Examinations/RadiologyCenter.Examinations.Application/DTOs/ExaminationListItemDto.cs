@@ -25,4 +25,5 @@ public record ExaminationListItemDto(
     decimal Remaining,
     string? Notes,
     int ItemCount,
-    string? StudyInstanceUID);
+    string? StudyInstanceUID,
+    string? AccessionNumber);

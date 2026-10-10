@@ -1,3 +1,4 @@
+using RadiologyCenter.BuildingBlocks.Application.Abstractions;
 using RadiologyCenter.Inventory.Application.Localization;
 using RadiologyCenter.BuildingBlocks.Domain.Exceptions;
 using RadiologyCenter.Inventory.Application.Abstractions;
@@ -13,15 +14,17 @@ public static class ReceivePurchaseOrderCommandHandler
         IStockBatchRepository stockBatchRepository,
         IStockMovementRepository stockMovementRepository,
         IInventoryUnitOfWork unitOfWork,
+        ITransactionLock transactionLock,
         CancellationToken ct)
     {
+        await using var transaction = await unitOfWork.BeginTransactionAsync(ct);
+        await transactionLock.AcquireAsync(transaction, new[] { "inventory:purchaseorders" }, ct);
         var purchaseOrder = await purchaseOrderRepository.GetWithItemsAsync(command.PurchaseOrderId, ct);
         if (purchaseOrder is null)
             return Result.Failure(Error.NotFound(ErrorCodes.PurchaseOrderNotFound, "PurchaseOrder", command.PurchaseOrderId));
 
         try
         {
-            await using var transaction = await unitOfWork.BeginTransactionAsync(ct);
 
             foreach (var line in command.Lines)
             {
@@ -48,6 +51,7 @@ public static class ReceivePurchaseOrderCommandHandler
             }
 
             purchaseOrderRepository.Update(purchaseOrder);
+            await unitOfWork.SaveChangesAsync(ct);
             await transaction.CommitAsync(ct);
 
             return Result.Success();

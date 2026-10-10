@@ -1,12 +1,19 @@
 @inject BackendStatusService Backend
 @inject AppLocalizer T
+@implements IDisposable
 
+@if (Backend.NeedsSetup || _configure)
+{
+    <div style="height:100vh;overflow:auto;background:#f5f6fb;"><ClinicSetupPanel Completed="SetupCompleted" /></div>
+}
+else
+{
 <div class="boot-splash" @onclick="() => { }" @oncontextmenu="() => { }">
     <div class="boot-splash-center">
         <div class="boot-splash-logo">
             <span class="boot-splash-halo boot-splash-halo-1"></span>
             <span class="boot-splash-halo boot-splash-halo-2"></span>
-            <img src="images/healthcare_logo_v2_512.png" alt="EGcare" />
+            <img src="images/healthcare-logo-64.png" alt="EGcare" width="120" height="120" />
         </div>
 
         <div class="boot-splash-title" aria-label="EGcare">
@@ -24,11 +31,20 @@
                 <MudIcon Icon="@Icons.Material.Filled.Error" Class="mr-2" Color="Color.Error" />
                 <span>@T.BootSplash.Failed</span>
             </div>
-            <div class="boot-splash-error-detail">@Backend.Error</div>
+            <div class="boot-splash-error-detail" role="alert">@Backend.Error</div>
             <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="RetryAsync" Disabled="_retrying" StartIcon="@Icons.Material.Filled.Refresh">
                 @if (_retrying) { @T.BootSplash.Retrying } else { @T.BootSplash.TryAgain }
             </MudButton>
+            <MudButton OnClick="() => _configure = true">@(T.IsRTL?"إعداد / تحديث العيادة":"Clinic setup / upgrade")</MudButton>
+        }
+        else
+        {
+            <div class="boot-splash-hint" role="status">
+                <MudProgressCircular Indeterminate="true" Size="Size.Small" />
+                <span>@T.BootSplash.Retrying</span>
+            </div>
         }
     </div>
 </div>
+}
 

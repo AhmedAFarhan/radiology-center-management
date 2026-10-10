@@ -23,11 +23,17 @@
                           Placeholder="@T.ReadingRoom.FilterPlaceholder"
                           Variant="Variant.Outlined"
                           Margin="Margin.Dense"
-                          Immediate="true"
+                          DebounceInterval="300"
                           Adornment="Adornment.Start"
                           AdornmentIcon="@Icons.Material.Filled.Search"
                           Class="rr-search" />
         </div>
+        <div class="d-flex align-center justify-space-between pa-2">
+            <MudButton Disabled="@(_loadingQueue || _queuePage<=1)" OnClick="PreviousQueuePageAsync" aria-label="@(T.IsRTL?"الصفحة السابقة":"Previous page")">‹</MudButton>
+            <MudText Typo="Typo.caption">@_queuePage / @Math.Max(1,(_queueTotal+49)/50)</MudText>
+            <MudButton Disabled="@(_loadingQueue || _queuePage*50>=_queueTotal)" OnClick="NextQueuePageAsync" aria-label="@(T.IsRTL?"الصفحة التالية":"Next page")">›</MudButton>
+        </div>
+        <MudCheckBox T="bool" Value="_includeFinalized" ValueChanged="IncludeFinalizedChangedAsync" Label="@(T.IsRTL?"عرض التقارير النهائية":"Include finalized reports")" Disabled="_loadingQueue" />
         <div class="rr-worklist-items">
             @if (_loadingQueue)
             {
@@ -52,9 +58,8 @@
                 @foreach (var item in Queue)
                 {
                     var current = item;
-                    <button type="button" @key="item.Id"
-                            class="rr-worklist-item @(IsSelected(current) ? "selected" : string.Empty)"
-                            @onclick="() => SelectExamAsync(current)">
+                    <div @key="item.Id" class="rr-worklist-item @(IsSelected(current) ? "selected" : string.Empty)">
+                        <button type="button" class="rr-exam-selector" @onclick="() => SelectExamAsync(current)">
                         <div class="rr-item-top">
                             <span class="rr-prio @PriorityClass(current.Priority)" title="@current.Priority" aria-hidden="true"></span>
                             <span class="rr-item-name">@current.PatientName</span>
@@ -67,6 +72,9 @@
                         <div class="rr-item-meta">
                             <StatusChip Token="@current.ReportStatusKey">@current.ReportStatus</StatusChip>
                             <StatusChip Token="@current.PriorityKey">@current.Priority</StatusChip>
+                        </div>
+                        </button>
+                        <div class="rr-item-meta">
                             @if (current.StudyInstanceUid is null)
                             {
                                 @if (IsLinking(current))
@@ -87,7 +95,7 @@
                                 }
                             }
                         </div>
-                    </button>
+                    </div>
                 }
             }
         </div>
@@ -146,26 +154,18 @@
                     <MudText Typo="Typo.h6" Class="text-secondary">@Selected.PatientName</MudText>
                     <MudText Typo="Typo.body2" Class="text-secondary">@Selected.ExamName - @Selected.PatientCode</MudText>
                     <MudText Typo="Typo.body2" Class="text-secondary">@Selected.Priority @T.ReadingRoom.Priority</MudText>
-                    <MudText Typo="Typo.caption" Class="mt-2">@T.ReadingRoom.NoImagedStudiesMessage</MudText>
+                    @if(Selected.StudyInstanceUid is not null && PacsService.Instance?.IsReady!=true)
+                    {
+                        <MudText Typo="Typo.body2" Class="mt-2">@(T.IsRTL?"سجّل الدخول بحساب خادم الصور الشخصي لعرض الصور.":"Sign in with your personal image server account to view images.")</MudText>
+                        <MudButton OnClick="ConfigureImagesAsync" Color="Color.Primary">@(T.IsRTL?"حساب خادم الصور":"Image server account")</MudButton>
+                    }
+                    else
+                    {
+                        <MudText Typo="Typo.caption" Class="mt-2">@T.ReadingRoom.NoImagedStudiesMessage</MudText>
+                    }
                 </div>
             }
         </div>
-        @if (Selected is not null && SelectedStudyUrl is null)
-        {
-            <div class="rr-thumbnails">
-                <span class="rr-thumbs-label">@T.ReadingRoom.Series</span>
-                @for (var i = 1; i <= SeriesCount; i++)
-                {
-                    var index = i;
-                    <button type="button"
-                            class="rr-thumb @(index == _selectedSeries ? "selected" : string.Empty)"
-                            title="@(T.FormatValue(T.ReadingRoom.SeriesThumbTitle, index))"
-                            @onclick="() => _selectedSeries = index">
-                        <MudText Typo="Typo.caption">S@index</MudText>
-                    </button>
-                }
-            </div>
-        }
     </section>
 
     <section class="reading-room-pane rr-report">

@@ -25,6 +25,7 @@ public partial class VisitViewDialog : ComponentBase
 
     private ExaminationDto? _visit;
     private string _patientName = string.Empty;
+    private string _patientCode = string.Empty;
     private string? _radiologistName;
     private string? _technicianName;
     private string? _referralDoctorName;
@@ -54,7 +55,7 @@ public partial class VisitViewDialog : ComponentBase
             var technicianTask = ResolveStaffNameAsync(_visit.TechnicianId);
             var referralTask = ResolveStaffNameAsync(_visit.ReferralDoctorId);
 
-            await Task.WhenAll(patientTask, radiologistTask, technicianTask, referralTask);
+            await Task.WhenAll(new Task[] { patientTask, radiologistTask, technicianTask, referralTask });
 
             _patientName = await patientTask;
             _radiologistName = await radiologistTask;
@@ -80,6 +81,7 @@ public partial class VisitViewDialog : ComponentBase
         try
         {
             var patient = await PatientService.GetByIdAsync(patientId);
+            _patientCode = patient.PatientCode;
             return patient.FullName;
         }
         catch

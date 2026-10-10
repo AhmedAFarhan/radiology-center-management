@@ -64,7 +64,7 @@ public static class SendNotificationCommandHandler
 
         return sendResult.IsSuccess
             ? Result.Success()
-            : Result.Failure(Error.Failure(ErrorCodes.DeliveryFailed, sendResult.Error?.Message ?? "Notification delivery failed."));
+            : sendResult;
     }
 
     private static string ApplyPlaceholders(string text, Dictionary<string, string>? placeholders)

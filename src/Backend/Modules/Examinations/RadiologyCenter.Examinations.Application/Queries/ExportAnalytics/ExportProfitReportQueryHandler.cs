@@ -20,7 +20,7 @@ public static class ExportProfitReportQueryHandler
             new GetMonthlyProfitQuery(query.From, query.To),
             examinationRepository, profitSourceResolver, timezone, ct);
         if (profitResult.IsFailure)
-            return Result.Failure<ReportContentDto>(profitResult.Error);
+            return Result.Failure<ReportContentDto>(profitResult.Error!);
 
         var today = timezone.GetLocalDate(DateTime.UtcNow);
         var from = query.From ?? today.AddMonths(-1).AddDays(1).ToDateTime(TimeOnly.MinValue);

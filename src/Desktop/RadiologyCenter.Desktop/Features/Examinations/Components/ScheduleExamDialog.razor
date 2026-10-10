@@ -8,8 +8,9 @@
         }
         else
         {
-            <EditForm EditContext="_editContext" OnValidSubmit="SubmitAsync">
+            <EditForm id="schedule-examination-form" EditContext="_editContext" OnValidSubmit="SubmitAsync">
                 <LocalizedDataAnnotationsValidator />
+                <ValidationSummary />
                 <MudGrid Spacing="3">
                     @* ── Patient ── *@
                     <MudItem xs="12">
@@ -57,30 +58,32 @@
                                    Variant="Variant.Outlined" Dense="true">
                             <MudSelectItem Value="@("Routine")">@T.ScheduleExam.Routine</MudSelectItem>
                             <MudSelectItem Value="@("Urgent")">@T.ScheduleExam.Urgent</MudSelectItem>
-                            <MudSelectItem Value="@("Emergency")">@T.ScheduleExam.Emergency</MudSelectItem>
+                            <MudSelectItem Value="@("Stat")">@T.ScheduleExam.Emergency</MudSelectItem>
                         </MudSelect>
                     </MudItem>
 
                     @* ── Date & Time ── *@
                     <MudItem xs="12" Sm="6">
-                        <MudDatePicker @bind-Date="_scheduledDate"
+                        <MudDatePicker @bind-Date="_model.ScheduledDate"
                                        Label="@T.ScheduleExam.Date"
                                        Variant="Variant.Outlined"
-                                       Dense="true"
-                                       MinDate="DateTime.Today" />
+
+                                       MinDate="ClinicTime.Today" />
+                        <ValidationMessage For="@(() => _model.ScheduledDate)" />
                     </MudItem>
                     <MudItem xs="12" Sm="6">
-                        <MudTimePicker @bind-Time="_scheduledTime"
+                        <MudTimePicker @bind-Time="_model.ScheduledTime"
                                        Label="@T.ScheduleExam.Time"
                                        Variant="Variant.Outlined"
-                                       Dense="true" />
+                                       />
+                        <ValidationMessage For="@(() => _model.ScheduledTime)" />
                     </MudItem>
 
                     @* ── Equipment (pre-filled) ── *@
                     @if (!string.IsNullOrEmpty(_equipmentName))
                     {
                         <MudItem xs="12">
-                            <MudField Label="@T.ScheduleExam.Equipment" Variant="Variant.Outlined" Dense="true">
+                            <MudField Label="@T.ScheduleExam.Equipment" Variant="Variant.Outlined">
                                 <div class="d-flex align-center gap-2">
                                     <MudIcon Icon="@Icons.Material.Filled.ChevronRight" Size="Size.Small" Color="Color.Primary" />
                                     <MudText Typo="Typo.body2">@_equipmentName</MudText>
@@ -94,7 +97,7 @@
                         <MudTextField T="string" @bind-Value="_clinicalIndication"
                                       Label="@T.ScheduleExam.ClinicalIndication"
                                       Variant="Variant.Outlined"
-                                      Dense="true"
+
                                       Lines="2" />
                     </MudItem>
 
@@ -103,7 +106,7 @@
                         <MudTextField T="string" @bind-Value="_notes"
                                       Label="@T.ScheduleExam.Notes"
                                       Variant="Variant.Outlined"
-                                      Dense="true"
+
                                       Lines="2" />
                     </MudItem>
                 </MudGrid>
@@ -112,7 +115,7 @@
     </DialogContent>
     <DialogActions>
         <MudButton Color="Color.Default" OnClick="Cancel" Disabled="_saving">@T.Common.Cancel</MudButton>
-        <MudButton Color="Color.Primary" Variant="Variant.Filled" ButtonType="ButtonType.Submit" Disabled="_saving || _loading">
+        <MudButton Color="Color.Primary" Variant="Variant.Filled" ButtonType="ButtonType.Submit" form="schedule-examination-form" Disabled="_saving || _loading">
             @if (_saving)
             {
                 <MudProgressCircular Size="Size.Small" Indeterminate="true" Class="mx-1" />

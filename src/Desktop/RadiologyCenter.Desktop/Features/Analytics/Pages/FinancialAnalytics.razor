@@ -1,4 +1,4 @@
-﻿@page "/analytics/financial"
+@page "/analytics/financial"
 @attribute [Authorize]
 @inherits AnalyticsPageBase
 @using RadiologyCenter.Desktop.Features.Analytics.Components
@@ -7,9 +7,9 @@
 @inject AppLocalizer T
 
 <PageHeader Icon="@Icons.Material.Filled.AccountBalanceWallet" Title="@T.Financial.Title" Subtitle="@T.Financial.Subtitle" OnRefresh="() => ReloadAsync()" ShowSearch="false">
-    <RightContent>
+    <ActionContent>
         <ExportButton Loading="@_exporting" OnExport="ExportAsync" />
-    </RightContent>
+    </ActionContent>
 </PageHeader>
 
 <PeriodSelector Class="mb-4" />
@@ -22,7 +22,7 @@ else if (Error)
 {
     <ErrorState Title="@T.Financial.LoadErrorTitle" Message="@T.Financial.LoadErrorMsg" Detail="@LastError" Action="ReloadAsync" RetryLabel="@T.Financial.Retry" />
 }
-else
+else if (_data is not null && _exams is not null && _insuranceStats is not null)
 {
     <MudGrid Spacing="3">
         <MudItem xs="12" sm="6" lg="4">

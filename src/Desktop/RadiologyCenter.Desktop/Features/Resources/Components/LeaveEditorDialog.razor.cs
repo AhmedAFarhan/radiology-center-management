@@ -75,7 +75,8 @@ public partial class LeaveEditorDialog : EditorDialogBase
 
     private async Task SubmitAsync()
     {
-        if (!_editContext.Validate())
+        if (!_editContext.Validate() || _model.StartDate is not DateTime startDate
+            || _model.EndDate is not DateTime endDate)
             return;
 
         if (_selectedStaff is null)
@@ -94,8 +95,8 @@ public partial class LeaveEditorDialog : EditorDialogBase
         {
             StaffId = _selectedStaff.Id,
             LeaveType = _model.LeaveType,
-            StartDate = _model.StartDate.Value.Date,
-            EndDate = _model.EndDate.Value.Date,
+            StartDate = startDate.Date,
+            EndDate = endDate.Date,
             Reason = _model.Reason,
         };
 

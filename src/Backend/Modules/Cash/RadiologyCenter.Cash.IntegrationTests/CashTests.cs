@@ -13,6 +13,18 @@ public class CashTests : TestBase
     public CashTests(CustomWebApplicationFactory factory) : base(factory) { }
 
     [Fact]
+    public async Task OpenSession_ConcurrentRequests_OnlyOneSessionIsCreated()
+    {
+        await EnsureNoOpenSessionAsync();
+        var responses = await Task.WhenAll(Enumerable.Range(0, 2).Select(_ =>
+            Client.PostAsJsonAsync(SessionsUrl, new { OpeningFloat = 0m })));
+        responses.Count(r => r.StatusCode == HttpStatusCode.OK).Should().Be(1);
+        responses.Count(r => r.StatusCode == HttpStatusCode.Conflict).Should().Be(1);
+        var session = await responses.Single(r => r.IsSuccessStatusCode).Content.ReadFromJsonAsync<ApiResponse<CashSessionDto>>();
+        await CloseTestSessionAsync(session!.Data!.Id);
+    }
+
+    [Fact]
     public async Task OpenSession_ValidData_ReturnsOk()
     {
         var sessionId = await CreateTestSessionAsync();

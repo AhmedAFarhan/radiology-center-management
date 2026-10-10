@@ -6,8 +6,9 @@
     <Project Path="Backend/BuildingBlocks/RadiologyCenter.BuildingBlocks.Infrastructure/RadiologyCenter.BuildingBlocks.Infrastructure.csproj" />
     <Project Path="Backend/BuildingBlocks/RadiologyCenter.IntegrationTests.Shared/RadiologyCenter.IntegrationTests.Shared.csproj" />
   </Folder>
-  <Folder Name="/Backend/Localhost/">
-    <Project Path="Backend/Localhost/RadiologyCenter.Localhost/RadiologyCenter.Localhost.csproj" />
+  <Folder Name="/Clinic/">
+    <Project Path="Clinic/RadiologyCenter.Clinic/RadiologyCenter.Clinic.csproj" />
+    <Project Path="Clinic/RadiologyCenter.Clinic.IntegrationTests/RadiologyCenter.Clinic.IntegrationTests.csproj" />
   </Folder>
   <Folder Name="/Backend/Modules/" />
   <Folder Name="/Backend/Modules/Identity/">
@@ -78,5 +79,6 @@
   </Folder>
   <Folder Name="/Desktop/">
     <Project Path="Desktop/RadiologyCenter.Desktop/RadiologyCenter.Desktop.csproj" />
+    <Project Path="Desktop/RadiologyCenter.Desktop.StartupTests/RadiologyCenter.Desktop.StartupTests.csproj" />
   </Folder>
 </Solution>

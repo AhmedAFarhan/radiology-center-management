@@ -16,7 +16,7 @@ public class ExaminationsTests : TestBase
     [Fact]
     public async Task Create_ValidData_ReturnsOk()
     {
-        var patientId = Guid.NewGuid();
+        var patientId = await TestData.PatientAsync(Client);
         var examinationTypeId = await GetOrCreateExaminationTypeAsync();
         var command = new
         {
@@ -52,7 +52,7 @@ public class ExaminationsTests : TestBase
     [Fact]
     public async Task Create_MissingExaminationTypeId_ReturnsBadRequest()
     {
-        var patientId = Guid.NewGuid();
+        var patientId = await TestData.PatientAsync(Client);
         var command = new
         {
             PatientId = patientId,
@@ -66,7 +66,7 @@ public class ExaminationsTests : TestBase
     [Fact]
     public async Task Create_MissingClinicalIndication_ReturnsBadRequest()
     {
-        var patientId = Guid.NewGuid();
+        var patientId = await TestData.PatientAsync(Client);
         var examinationTypeId = await GetOrCreateExaminationTypeAsync();
         var command = new
         {
@@ -81,7 +81,7 @@ public class ExaminationsTests : TestBase
     [Fact]
     public async Task Create_MissingPriority_ReturnsBadRequest()
     {
-        var patientId = Guid.NewGuid();
+        var patientId = await TestData.PatientAsync(Client);
         var examinationTypeId = await GetOrCreateExaminationTypeAsync();
         var command = new
         {
@@ -96,7 +96,7 @@ public class ExaminationsTests : TestBase
     [Fact]
     public async Task Create_NegativeDiscount_ReturnsBadRequest()
     {
-        var patientId = Guid.NewGuid();
+        var patientId = await TestData.PatientAsync(Client);
         var examinationTypeId = await GetOrCreateExaminationTypeAsync();
         var command = new
         {
@@ -163,7 +163,7 @@ public class ExaminationsTests : TestBase
     [Fact]
     public async Task Start_ReturnsOk()
     {
-        var examId = await CreateTestExaminationAsync(status: "CheckedIn", paid: 0m);
+        var examId = await CreateTestExaminationAsync(status: "CheckedIn", paid: 100m);
         var response = await Client.PostAsync($"{ExaminationsUrl}/{examId}/start", null);
         response.StatusCode.Should().Be(HttpStatusCode.OK);
     }
@@ -171,12 +171,12 @@ public class ExaminationsTests : TestBase
     [Fact]
     public async Task Complete_ReturnsOk()
     {
-        var radiologistId = Guid.NewGuid();
-        var technicianId = Guid.NewGuid();
-        var equipmentId = Guid.NewGuid();
+        var radiologistId = await TestData.StaffAsync(Client, "Radiologist");
+        var technicianId = await TestData.StaffAsync(Client, "Technician");
+        var equipmentId = await TestData.EquipmentAsync(Client);
         var examId = await CreateTestExaminationAsync(
             status: "CheckedIn",
-            paid: 0m,
+            paid: 100m,
             radiologistId: radiologistId,
             technicianId: technicianId,
             equipmentId: equipmentId);
@@ -204,6 +204,38 @@ public class ExaminationsTests : TestBase
         var getResponse = await Client.GetAsync($"{ExaminationsUrl}/{examId}");
         var body = await getResponse.Content.ReadFromJsonAsync<ApiResponse<ExaminationDto>>();
         body!.Data!.CancellationReason.Should().Be("Patient request");
+    }
+
+    [Fact]
+    public async Task RecordPayment_ConcurrentFullPayments_CashIsRecordedOnce()
+    {
+        var id = await CreateTestExaminationAsync(paid: 0m);
+        var initial = await Client.GetFromJsonAsync<ApiResponse<ExaminationDto>>($"{ExaminationsUrl}/{id}");
+        var remaining = initial!.Data!.Remaining;
+        var responses = await Task.WhenAll(Enumerable.Range(0, 2).Select(_ =>
+            Client.PostAsJsonAsync($"{ExaminationsUrl}/{id}/payments", new { Amount = remaining })));
+        responses.Count(r => r.StatusCode == HttpStatusCode.OK).Should().Be(1);
+        responses.Count(r => r.StatusCode == HttpStatusCode.BadRequest).Should().Be(1);
+        var saved = await Client.GetFromJsonAsync<ApiResponse<ExaminationDto>>($"{ExaminationsUrl}/{id}");
+        saved!.Data!.Paid.Should().Be(remaining);
+        saved.Data.Remaining.Should().Be(0m);
+        var session = await Client.GetFromJsonAsync<System.Text.Json.JsonElement>("api/cash/sessions/my-open");
+        var sessionId = session.GetProperty("data").GetProperty("id").GetGuid();
+        var entries = await Client.GetFromJsonAsync<System.Text.Json.JsonElement>($"api/cash/sessions/{sessionId}/entries");
+        var payments = entries.GetProperty("data").EnumerateArray().Where(e => e.GetProperty("referenceId").GetString() == id.ToString()).ToList();
+        payments.Should().ContainSingle();
+        payments[0].GetProperty("amount").GetDecimal().Should().Be(remaining);
+    }
+
+    [Theory]
+    [InlineData("api/examinations/" + "00000000-0000-0000-0000-000000000001")]
+    [InlineData("api/reports/00000000-0000-0000-0000-000000000001")]
+    public async Task ClinicalEndpoints_WithoutToken_RejectAnonymousRequests(string path)
+    {
+        using var request = new HttpRequestMessage(HttpMethod.Get, path);
+        using var anonymous = Factory.CreateClient();
+        var response = await anonymous.SendAsync(request);
+        response.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
     }
 
     [Fact]
@@ -244,7 +276,7 @@ public class ExaminationsTests : TestBase
     [Fact]
     public async Task CreateThenGetById_VerifyData()
     {
-        var patientId = Guid.NewGuid();
+        var patientId = await TestData.PatientAsync(Client);
         var examinationTypeId = await GetOrCreateExaminationTypeAsync();
         var clinicalIndication = "Verification test";
         var createCommand = new
@@ -274,12 +306,12 @@ public class ExaminationsTests : TestBase
     [Fact]
     public async Task FullLifecycle_Create_CheckIn_Start_Complete()
     {
-        var radiologistId = Guid.NewGuid();
-        var technicianId = Guid.NewGuid();
-        var equipmentId = Guid.NewGuid();
+        var radiologistId = await TestData.StaffAsync(Client, "Radiologist");
+        var technicianId = await TestData.StaffAsync(Client, "Technician");
+        var equipmentId = await TestData.EquipmentAsync(Client);
 
         var examId = await CreateTestExaminationAsync(
-            paid: 0m,
+            paid: 100m,
             radiologistId: radiologistId,
             technicianId: technicianId,
             equipmentId: equipmentId);
@@ -288,7 +320,7 @@ public class ExaminationsTests : TestBase
         checkInResponse.StatusCode.Should().Be(HttpStatusCode.OK);
 
         var startResponse = await Client.PostAsync($"{ExaminationsUrl}/{examId}/start", null);
-        startResponse.StatusCode.Should().Be(HttpStatusCode.OK);
+        startResponse.StatusCode.Should().Be(HttpStatusCode.OK, await startResponse.Content.ReadAsStringAsync());
 
         var completeResponse = await Client.PostAsync($"{ExaminationsUrl}/{examId}/complete", null);
         completeResponse.StatusCode.Should().Be(HttpStatusCode.OK);
@@ -353,7 +385,7 @@ public class ExaminationsTests : TestBase
     [Fact]
     public async Task Book_ValidData_ReturnsOk()
     {
-        var patientId = Guid.NewGuid();
+        var patientId = await TestData.PatientAsync(Client);
         var examinationTypeId = await GetOrCreateExaminationTypeAsync();
         var command = new
         {
@@ -370,6 +402,44 @@ public class ExaminationsTests : TestBase
         body.Data.Should().NotBeNull();
     }
 
+    [Fact]
+    public async Task Book_ConcurrentEquipmentReservation_OnlyOneSucceeds()
+    {
+        var equipment = await TestData.EquipmentAsync(Client);
+        var type = await GetOrCreateExaminationTypeAsync();
+        var patientOne = await TestData.PatientAsync(Client);
+        var patientTwo = await TestData.PatientAsync(Client);
+        var time = DateTime.UtcNow.AddDays(3);
+        var responses = await Task.WhenAll(new[] { patientOne, patientTwo }.Select(patient =>
+            Client.PostAsJsonAsync($"{ExaminationsUrl}/book", new
+            {
+                PatientId = patient, ExaminationTypeId = type, EquipmentId = equipment,
+                ScheduledAt = time, ClinicalIndication = "Concurrent reservation", Priority = "Routine"
+            })));
+        responses.Count(r => r.StatusCode == HttpStatusCode.OK).Should().Be(1);
+        responses.Count(r => r.StatusCode == HttpStatusCode.Conflict).Should().Be(1);
+        var created = await responses.Single(r => r.IsSuccessStatusCode).Content.ReadFromJsonAsync<ApiResponse<ExaminationDto>>();
+        var persisted = await Client.GetFromJsonAsync<ApiResponse<ExaminationDto>>($"{ExaminationsUrl}/{created!.Data!.Id}");
+        persisted!.Data!.ScheduledAt.Should().BeCloseTo(time, TimeSpan.FromSeconds(1));
+        persisted.Data.AccessionNumber.Should().NotBeNullOrWhiteSpace().And.HaveLength(16);
+    }
+
+    [Fact]
+    public async Task AvailableSlots_ZeroInterval_ReturnsBadRequest()
+    {
+        var equipment = await TestData.EquipmentAsync(Client);
+        var date = DateTime.UtcNow.AddDays(1);
+        var response = await Client.GetAsync($"{ExaminationsUrl}/available-slots?date={date:O}&equipmentId={equipment}&intervalMinutes=0");
+        response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+    }
+
+    [Fact]
+    public async Task Health_AfterProvisioning_ReturnsOk()
+    {
+        var response = await Client.GetAsync("health");
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
+    }
+
     private async Task<Guid> CreateTestExaminationAsync(
         string? status = null,
         decimal? paid = null,
@@ -380,13 +450,13 @@ public class ExaminationsTests : TestBase
         var examinationTypeId = await GetOrCreateExaminationTypeAsync();
         var command = new
         {
-            PatientId = Guid.NewGuid(),
+            PatientId = await TestData.PatientAsync(Client),
             ExaminationTypeId = examinationTypeId,
             ClinicalIndication = "Test indication",
             Priority = "Routine",
             Discount = 0m,
             IsDiscountPercentage = false,
-            Paid = paid ?? 0m,
+            Paid = 0m,
             RadiologistId = radiologistId,
             TechnicianId = technicianId,
             EquipmentId = equipmentId,
@@ -395,24 +465,23 @@ public class ExaminationsTests : TestBase
         var response = await Client.PostAsJsonAsync(ExaminationsUrl, command);
         response.EnsureSuccessStatusCode();
         var body = await response.Content.ReadFromJsonAsync<ApiResponse<ExaminationDto>>();
+        if (paid is > 0)
+        {
+            var payment = await Client.PostAsJsonAsync($"{ExaminationsUrl}/{body!.Data!.Id}/payments", new { Amount = body.Data.Remaining });
+            payment.EnsureSuccessStatusCode();
+            var verification = await Client.GetFromJsonAsync<ApiResponse<ExaminationDto>>($"{ExaminationsUrl}/{body.Data.Id}");
+            verification!.Data!.Remaining.Should().Be(0, "payments must persist before the examination can start");
+        }
         return body!.Data!.Id;
     }
 
     private async Task<Guid> GetOrCreateExaminationTypeAsync()
     {
-        var response = await Client.PostAsJsonAsync($"{CatalogExaminationTypesUrl}/all", new { PageNumber = 1, PageSize = 1 });
-        if (response.IsSuccessStatusCode)
-        {
-            var body = await response.Content.ReadFromJsonAsync<ApiResponse<PagedResultDto<ExaminationTypeListItemDto>>>();
-            if (body?.Data?.Items.Count > 0)
-                return body.Data.Items.First().Id;
-        }
-
         var createTypeCommand = new
         {
             Name = $"TestType_{Guid.NewGuid():N}",
             Code = $"TST_{Guid.NewGuid():N}",
-            Modality = "X-Ray",
+            Modality = "XRay",
             BodyPart = "Chest",
             StandardDurationMinutes = 30,
             Price = 100m,
@@ -423,10 +492,8 @@ public class ExaminationsTests : TestBase
         var createResponse = await Client.PostAsJsonAsync(CatalogExaminationTypesUrl, createTypeCommand);
         createResponse.EnsureSuccessStatusCode();
 
-        var allResponse = await Client.PostAsJsonAsync($"{CatalogExaminationTypesUrl}/all", new { PageNumber = 1, PageSize = 1 });
-        allResponse.EnsureSuccessStatusCode();
-        var allBody = await allResponse.Content.ReadFromJsonAsync<ApiResponse<PagedResultDto<ExaminationTypeListItemDto>>>();
-        return allBody!.Data!.Items.First().Id;
+        var created = await createResponse.Content.ReadFromJsonAsync<ApiResponse<ExaminationTypeListItemDto>>();
+        return created!.Data!.Id;
     }
 
     private async Task<Guid> GetOrCreateItemAsync()
@@ -443,7 +510,8 @@ public class ExaminationsTests : TestBase
         {
             Name = $"TestItem_{Guid.NewGuid():N}",
             Code = $"ITM_{Guid.NewGuid():N}",
-            Unit = "unit",
+            Unit = "Piece",
+            Category = "Consumable",
             UnitPrice = 10m
         };
         var createResponse = await Client.PostAsJsonAsync(InventoryItemsUrl, createCommand);
@@ -480,6 +548,7 @@ public class ExaminationsTests : TestBase
     private sealed class ExaminationDto
     {
         public Guid Id { get; set; }
+        public string? AccessionNumber { get; set; }
         public Guid PatientId { get; set; }
         public Guid ExaminationTypeId { get; set; }
         public string? ExaminationTypeName { get; set; }
@@ -540,9 +609,9 @@ public class ExaminationsTests : TestBase
     public async Task AssignStaff_ValidData_ReturnsOk()
     {
         var examId = await CreateTestExaminationAsync();
-        var radiologistId = Guid.NewGuid();
-        var technicianId = Guid.NewGuid();
-        var equipmentId = Guid.NewGuid();
+        var radiologistId = await TestData.StaffAsync(Client, "Radiologist");
+        var technicianId = await TestData.StaffAsync(Client, "Technician");
+        var equipmentId = await TestData.EquipmentAsync(Client);
         var command = new
         {
             RadiologistId = radiologistId,
@@ -557,7 +626,7 @@ public class ExaminationsTests : TestBase
     public async Task AssignStaff_MissingRadiologistId_ReturnsBadRequest()
     {
         var examId = await CreateTestExaminationAsync();
-        var technicianId = Guid.NewGuid();
+        var technicianId = await TestData.StaffAsync(Client, "Technician");
         var command = new
         {
             TechnicianId = technicianId
@@ -567,7 +636,7 @@ public class ExaminationsTests : TestBase
     }
 
     [Fact]
-    public async Task RecordPacsImages_ValidData_ReturnsOk()
+    public async Task RecordPacsImages_WrongAccession_IsRejected()
     {
         var examId = await CreateTestExaminationAsync();
         var command = new
@@ -576,7 +645,7 @@ public class ExaminationsTests : TestBase
             AccessionNumber = $"ACC_{Guid.NewGuid():N}"
         };
         var response = await Client.PostAsJsonAsync($"{ExaminationsUrl}/{examId}/pacs-images", command);
-        response.StatusCode.Should().Be(HttpStatusCode.OK);
+        response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
     }
 
     [Fact]
@@ -622,7 +691,7 @@ public class ExaminationsTests : TestBase
     public async Task GetAvailableSlots_ReturnsOk()
     {
         var date = DateTime.UtcNow.Date.AddDays(1);
-        var equipmentId = Guid.NewGuid();
+        var equipmentId = await TestData.EquipmentAsync(Client);
         var url = $"{ExaminationsUrl}/available-slots?date={date:O}&equipmentId={equipmentId}";
         var response = await Client.GetAsync(url);
         response.StatusCode.Should().Be(HttpStatusCode.OK);

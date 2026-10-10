@@ -15,7 +15,7 @@ public class LogEmailProvider : IEmailProvider
 
     public Task<Result> SendAsync(string to, string subject, string body, CancellationToken ct = default)
     {
-        _logger.LogInformation("[EMAIL] to {To} | subject: {Subject} | body: {Body}", to, subject, body);
-        return Task.FromResult(Result.Success());
+        _logger.LogWarning("Email delivery is unavailable: no delivery provider is installed.");
+        return Task.FromResult(Result.Failure(Error.Conflict("Notification.ProviderNotConfigured", "Email delivery is not configured for this clinic. The message was not delivered.")));
     }
 }

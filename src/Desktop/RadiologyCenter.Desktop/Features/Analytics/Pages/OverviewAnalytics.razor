@@ -1,4 +1,4 @@
-﻿@page "/analytics/overview"
+@page "/analytics/overview"
 @attribute [Authorize]
 @inherits AnalyticsPageBase
 @using RadiologyCenter.Desktop.Features.Analytics.Components
@@ -7,9 +7,9 @@
 @inject AppLocalizer T
 
 <PageHeader Icon="@Icons.Material.Filled.Insights" Title="@T.Overview.Title" Subtitle="@T.Overview.Subtitle" OnRefresh="() => ReloadAsync()" ShowSearch="false">
-    <RightContent>
+    <ActionContent>
         <ExportButton Loading="@_exporting" OnExport="ExportAsync" />
-    </RightContent>
+    </ActionContent>
 </PageHeader>
 
 <PeriodSelector Class="mb-4" />
@@ -22,7 +22,7 @@ else if (Error)
 {
     <ErrorState Title="@T.Overview.LoadErrorTitle" Message="@T.Overview.LoadErrorMsg" Detail="@LastError" Action="ReloadAsync" RetryLabel="@T.Overview.Retry" />
 }
-else
+else if (_profit is not null && _financial is not null)
 {
     <div class="profit-hero mb-4">
         <div class="profit-hero-body">

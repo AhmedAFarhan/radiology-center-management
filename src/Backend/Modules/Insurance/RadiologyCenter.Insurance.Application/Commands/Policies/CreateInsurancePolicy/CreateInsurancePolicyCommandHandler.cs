@@ -11,8 +11,11 @@ public static class CreateInsurancePolicyCommandHandler
         IInsuranceCompanyRepository companyRepository,
         IInsurancePolicyRepository policyRepository,
         IInsuranceUnitOfWork unitOfWork,
+        IInsuranceDirectory directory,
         CancellationToken ct)
     {
+        if (!await directory.PatientExistsAsync(command.PatientId, ct))
+            return Result.Failure<InsurancePolicyDto>(Error.NotFound("Insurance.PatientNotFound", "Patient", command.PatientId));
         if (await companyRepository.GetByIdAsync(command.CompanyId, ct) is null)
             return Result.Failure<InsurancePolicyDto>(Error.NotFound(ErrorCodes.CompanyNotFound, "Company", command.CompanyId));
 

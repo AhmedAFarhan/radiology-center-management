@@ -53,3 +53,13 @@ LaunchApp.app
 
 ## Localhost
 appsettings.Development.json
+
+# Local audit evidence, logs, test output and machine secrets
+audit-results/
+server.json
+client.json
+orthanc.json
+*.pfx
+*.bak
+# Private Visual Studio database settings; never publish or commit these files.
+src/Desktop/RadiologyCenter.Desktop/appsettings.Development.json

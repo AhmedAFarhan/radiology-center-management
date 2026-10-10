@@ -1,4 +1,4 @@
-﻿@inherits LayoutComponentBase
+@inherits LayoutComponentBase
 @using RadiologyCenter.Desktop.Shared.Pages
 @using RadiologyCenter.Desktop.Features.Auth.Components
 @using RadiologyCenter.Desktop.Models
@@ -80,7 +80,9 @@
                         </div>
                     </div>
                     <MudDivider />
+                    <MudMenuItem Icon="@Icons.Material.Filled.Image" OnClick="OpenPacsAccount">@(T.IsRTL?"حساب خادم الصور":"Image server account")</MudMenuItem>
                     <MudMenuItem Icon="@Icons.Material.Filled.Key" OnClick="OnChangePassword">@T.Layout.ChangePassword</MudMenuItem>
+                    <MudMenuItem Icon="@Icons.Material.Filled.SystemUpdate" OnClick="OpenClinicUpdates">@(T.IsRTL ? "تحديثات العيادة" : "Clinic updates")</MudMenuItem>
                     <MudMenuItem Icon="@Icons.Material.Filled.Logout" OnClick="OnLogout">@T.Layout.SignOut</MudMenuItem>
                 </ChildContent>
             </MudMenu>

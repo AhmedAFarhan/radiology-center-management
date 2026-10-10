@@ -4,4 +4,7 @@ public record UpdateReportFindingCommand(
     Guid ReportId,
     Guid FindingId,
     string Description,
-    string Severity) : ICommand;
+    string Severity) : ICommand
+{
+    public int? ExpectedRevision { get; init; }
+}

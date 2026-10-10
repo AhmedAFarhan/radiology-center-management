@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components;
 using MudBlazor;
 using RadiologyCenter.Desktop.Models;
 using RadiologyCenter.Desktop.Services;
@@ -15,7 +15,7 @@ public partial class ExaminationCalendar : ComponentBase
     [Inject] private IDialogService DialogService { get; set; } = default!;
     [Inject] private AppLocalizer T { get; set; } = default!;
 
-    private DateTime _currentDate = DateTime.Today;
+    private DateTime _currentDate = ClinicTime.Today;
     private string _viewMode = "day";
     private string? _selectedModality;
     private string? _selectedEquipmentId;
@@ -23,6 +23,7 @@ public partial class ExaminationCalendar : ComponentBase
 
     private IReadOnlyList<EquipmentDto> _equipments = Array.Empty<EquipmentDto>();
     private List<CalendarSlotDto> _slots = new();
+    private List<CalendarSlotDto> _otherAppointments = new();
     private List<ResourceRow> _resources = new();
     private List<string> _timeHeaders = new();
     private List<DateTime> _weekDays = new();
@@ -49,12 +50,18 @@ public partial class ExaminationCalendar : ComponentBase
     {
         try
         {
-            var page = await ResourceService.GetEquipmentPagedAsync(null, null, false, 1, 200);
-            _equipments = page.Items.Where(e => e.IsActive).ToList();
+            var equipment = new List<EquipmentDto>();
+            for (var pageNumber = 1; ; pageNumber++)
+            {
+                var page = await ResourceService.GetEquipmentPagedAsync(null, "Name", false, pageNumber, 100, status: "Operational");
+                equipment.AddRange(page.Items.Where(e => e.IsActive));
+                if (pageNumber * page.PageSize >= page.TotalCount || page.Items.Count == 0) break;
+            }
+            _equipments = equipment;
         }
         catch
         {
-            // non-critical
+            Snackbar.Add(T.ExamCalendar.LoadError, Severity.Error);
         }
     }
 
@@ -68,8 +75,8 @@ public partial class ExaminationCalendar : ComponentBase
             var (start, end) = GetDayRange();
             BuildWeekDays(start);
 
-            var startUtc = start.ToUniversalTime();
-            var endUtc = end.ToUniversalTime();
+            var startUtc = ClinicTime.ToUtc(start);
+            var endUtc = ClinicTime.ToUtc(end);
 
             _slots = (await ExaminationService.GetCalendarSlotsAsync(
                 startUtc, endUtc,
@@ -77,9 +84,17 @@ public partial class ExaminationCalendar : ComponentBase
                 null,
                 _selectedModality)).ToList();
 
+            _slots = _slots.Select(slot => slot with
+            {
+                ScheduledAt = ClinicTime.ToLocal(slot.ScheduledAt),
+                ScheduledEnd = slot.ScheduledEnd.HasValue ? ClinicTime.ToLocal(slot.ScheduledEnd.Value) : null,
+            }).ToList();
             BuildTimeHeaders();
-            BuildResourceRows(start);
-            UpdateCurrentTimeIndicator(start);
+            var gridStart = start.AddHours(WorkDayStartHour);
+            BuildResourceRows(gridStart);
+            var displayed = _resources.SelectMany(r => r.Slots).Where(s => s.Exam is not null).Select(s => s.Exam!.Id).ToHashSet();
+            _otherAppointments = _slots.Where(s => !displayed.Contains(s.Id)).OrderBy(s => s.ScheduledAt).ToList();
+            UpdateCurrentTimeIndicator(gridStart);
         }
         catch (ApiException apiEx)
         {
@@ -99,7 +114,7 @@ public partial class ExaminationCalendar : ComponentBase
     private (DateTime DayStart, DateTime DayEnd) GetDayRange()
     {
         var date = _currentDate.Date;
-        return (date.AddHours(WorkDayStartHour), date.AddHours(WorkDayEndHour));
+        return (date, date.AddDays(1));
     }
 
     private void BuildWeekDays(DateTime weekStart)
@@ -107,7 +122,7 @@ public partial class ExaminationCalendar : ComponentBase
         _weekDays.Clear();
         if (_viewMode != "week") return;
 
-        var monday = weekStart.Date.AddDays(-(int)weekStart.Date.DayOfWeek + (int)DayOfWeek.Monday);
+        var monday = weekStart.Date.AddDays(-((7 + (int)weekStart.Date.DayOfWeek - (int)DayOfWeek.Monday) % 7));
         for (var i = 0; i < 7; i++)
             _weekDays.Add(monday.AddDays(i));
     }
@@ -148,7 +163,7 @@ public partial class ExaminationCalendar : ComponentBase
                 && !string.Equals(eq.Modality, _selectedModality, StringComparison.OrdinalIgnoreCase))
                 continue;
 
-            var row = new ResourceRow { Name = eq.Name, Type = eq.Modality, Slots = new List<SlotCell>() };
+            var row = new ResourceRow { Id = eq.Id, Name = eq.Name, Type = eq.Modality, Slots = new List<SlotCell>() };
 
             var current = dayStart;
             while (current < dayStart.AddHours(WorkDayEndHour - WorkDayStartHour))
@@ -160,6 +175,8 @@ public partial class ExaminationCalendar : ComponentBase
 
                 row.Slots.Add(new SlotCell
                 {
+                    EquipmentId = eq.Id,
+                    Modality = eq.Modality,
                     StartTime = current,
                     EndTime = slotEnd,
                     IsAvailable = exam is null,
@@ -176,7 +193,7 @@ public partial class ExaminationCalendar : ComponentBase
     private void UpdateCurrentTimeIndicator(DateTime dayStart)
     {
         _currentTimeLeft = null;
-        var now = DateTime.Now;
+        var now = ClinicTime.Now;
 
         if (now.Date != _currentDate.Date)
             return;
@@ -225,13 +242,13 @@ public partial class ExaminationCalendar : ComponentBase
             return;
         }
 
-        var equipmentName = _equipments.FirstOrDefault(e => e.Id == _selectedEquipmentId)?.Name;
+        var equipmentName = _equipments.FirstOrDefault(e => e.Id == slot.EquipmentId)?.Name;
 
         var parameters = new DialogParameters
         {
-            ["EquipmentId"] = _selectedEquipmentId,
+            ["EquipmentId"] = slot.EquipmentId,
             ["EquipmentName"] = equipmentName,
-            ["Modality"] = _selectedModality,
+            ["Modality"] = slot.Modality,
             ["ScheduledDate"] = slot.StartTime.Date,
             ["ScheduledTime"] = slot.StartTime.TimeOfDay,
         };
@@ -261,7 +278,7 @@ public partial class ExaminationCalendar : ComponentBase
 
     private async Task GoToToday()
     {
-        _currentDate = DateTime.Today;
+        _currentDate = ClinicTime.Today;
         await LoadDataAsync();
     }
 
@@ -285,6 +302,7 @@ public partial class ExaminationCalendar : ComponentBase
 
     private sealed class ResourceRow
     {
+        public string Id { get; init; } = string.Empty;
         public string Name { get; init; } = string.Empty;
         public string Type { get; init; } = string.Empty;
         public List<SlotCell> Slots { get; init; } = new();
@@ -292,6 +310,8 @@ public partial class ExaminationCalendar : ComponentBase
 
     private sealed class SlotCell
     {
+        public string EquipmentId { get; init; } = string.Empty;
+        public string Modality { get; init; } = string.Empty;
         public DateTime StartTime { get; init; }
         public DateTime EndTime { get; init; }
         public bool IsAvailable { get; init; }

@@ -111,7 +111,7 @@ public class InsuranceTests : TestBase
     public async Task CreatePolicy_ValidData_ReturnsOk()
     {
         var companyId = await CreateTestCompanyAsync();
-        var patientId = Guid.NewGuid();
+        var patientId = await TestData.PatientAsync(Client);
         var command = new { CompanyId = companyId, PatientId = patientId, PolicyNumber = $"POL-{Guid.NewGuid():N}", CoveragePercent = 75m, EffectiveFrom = DateTime.UtcNow, IsGovernment = false };
         var response = await Client.PostAsJsonAsync(PoliciesUrl, command);
         response.StatusCode.Should().Be(HttpStatusCode.OK);
@@ -169,7 +169,7 @@ public class InsuranceTests : TestBase
     public async Task GetPoliciesByPatient_ReturnsOk()
     {
         var companyId = await CreateTestCompanyAsync();
-        var patientId = Guid.NewGuid();
+        var patientId = await TestData.PatientAsync(Client);
         await CreateTestPolicyForPatientAsync(companyId, patientId);
         var response = await Client.GetAsync($"{PoliciesUrl}/by-patient/{patientId}");
         response.StatusCode.Should().Be(HttpStatusCode.OK);
@@ -188,7 +188,7 @@ public class InsuranceTests : TestBase
     public async Task ChangePolicyStatus_ReturnsOk()
     {
         var policyId = await CreateTestPolicyAsync();
-        var command = new { PolicyId = policyId, Action = "Activate" };
+        var command = new { PolicyId = policyId, Action = "Deactivate" };
         var response = await Client.PostAsJsonAsync($"{PoliciesUrl}/{policyId}/status", command);
         response.StatusCode.Should().Be(HttpStatusCode.OK);
     }
@@ -238,8 +238,8 @@ public class InsuranceTests : TestBase
     [Fact]
     public async Task GetClaimByExamination_ReturnsOk()
     {
-        var (_, _, examinationId, _) = await CreateClaimPrerequisitesAsync();
-        await CreateTestClaimForExaminationAsync(examinationId);
+        var (policyId, patientId, examinationId, preAuthId) = await CreateClaimPrerequisitesAsync();
+        await CreateTestClaimForExaminationAsync(examinationId, patientId, policyId, preAuthId);
         var response = await Client.GetAsync($"{ClaimsUrl}/by-examination/{examinationId}");
         response.StatusCode.Should().Be(HttpStatusCode.OK);
     }
@@ -248,7 +248,7 @@ public class InsuranceTests : TestBase
     public async Task SubmitClaim_ReturnsOk()
     {
         var claimId = await CreateTestClaimAsync();
-        var response = await Client.PostAsJsonAsync($"{ClaimsUrl}/{claimId}/submit", new { ClaimId = claimId });
+        var response = (await Client.PostAsJsonAsync($"{ClaimsUrl}/{claimId}/submit", new { ClaimId = claimId })).EnsureSuccessStatusCode();
         response.StatusCode.Should().Be(HttpStatusCode.OK);
     }
 
@@ -256,8 +256,8 @@ public class InsuranceTests : TestBase
     public async Task AdjudicateClaim_Approve_ReturnsOk()
     {
         var claimId = await CreateTestClaimAsync();
-        await Client.PostAsJsonAsync($"{ClaimsUrl}/{claimId}/submit", new { ClaimId = claimId });
-        var command = new { ClaimId = claimId, Decision = "Approve", ApprovedAmount = 400m };
+        (await Client.PostAsJsonAsync($"{ClaimsUrl}/{claimId}/submit", new { ClaimId = claimId })).EnsureSuccessStatusCode();
+        var command = new { ClaimId = claimId, Decision = "Approve", ApprovedAmount = 350m };
         var response = await Client.PostAsJsonAsync($"{ClaimsUrl}/{claimId}/adjudicate", command);
         response.StatusCode.Should().Be(HttpStatusCode.OK);
     }
@@ -266,8 +266,8 @@ public class InsuranceTests : TestBase
     public async Task AdjudicateClaim_Reject_ReturnsOk()
     {
         var claimId = await CreateTestClaimAsync();
-        await Client.PostAsJsonAsync($"{ClaimsUrl}/{claimId}/submit", new { ClaimId = claimId });
-        var command = new { ClaimId = claimId, Decision = "Reject", RejectionCode = "C01", RejectionReason = "Not covered" };
+        (await Client.PostAsJsonAsync($"{ClaimsUrl}/{claimId}/submit", new { ClaimId = claimId })).EnsureSuccessStatusCode();
+        var command = new { ClaimId = claimId, Decision = "Reject", RejectionCode = "CoverageExcluded", RejectionReason = "Not covered" };
         var response = await Client.PostAsJsonAsync($"{ClaimsUrl}/{claimId}/adjudicate", command);
         response.StatusCode.Should().Be(HttpStatusCode.OK);
     }
@@ -276,7 +276,11 @@ public class InsuranceTests : TestBase
     public async Task ResubmitClaim_ReturnsOk()
     {
         var claimId = await CreateTestClaimAsync();
-        await Client.PostAsJsonAsync($"{ClaimsUrl}/{claimId}/submit", new { ClaimId = claimId });
+        (await Client.PostAsJsonAsync($"{ClaimsUrl}/{claimId}/submit", new { ClaimId = claimId })).EnsureSuccessStatusCode();
+        (await Client.PostAsJsonAsync($"{ClaimsUrl}/{claimId}/adjudicate", new
+        {
+            Decision = "Reject", RejectionCode = "MissingInformation", RejectionReason = "Synthetic missing document"
+        })).EnsureSuccessStatusCode();
         var command = new { ClaimId = claimId };
         var response = await Client.PostAsJsonAsync($"{ClaimsUrl}/{claimId}/resubmit", command);
         response.StatusCode.Should().Be(HttpStatusCode.OK);
@@ -286,9 +290,14 @@ public class InsuranceTests : TestBase
     public async Task RecordClaimSettlement_ReturnsOk()
     {
         var claimId = await CreateTestClaimAsync();
+        (await Client.PostAsJsonAsync($"{ClaimsUrl}/{claimId}/submit", new { })).EnsureSuccessStatusCode();
+        (await Client.PostAsJsonAsync($"{ClaimsUrl}/{claimId}/adjudicate", new { Decision = "Approve", ApprovedAmount = 350m })).EnsureSuccessStatusCode();
         var command = new { ClaimId = claimId, Method = "BankTransfer", Amount = 350m };
         var response = await Client.PostAsJsonAsync($"{ClaimsUrl}/{claimId}/settlements", command);
         response.StatusCode.Should().Be(HttpStatusCode.OK);
+        var saved = await Client.GetFromJsonAsync<ApiResponse<ClaimDto>>($"{ClaimsUrl}/{claimId}");
+        saved!.Data!.Status.Should().Be("Paid");
+
     }
 
     // ── Pre-Authorizations ───────────────────────────────────────────────
@@ -297,9 +306,9 @@ public class InsuranceTests : TestBase
     public async Task CreatePreAuthorization_ValidData_ReturnsOk()
     {
         var companyId = await CreateTestCompanyAsync();
-        var patientId = Guid.NewGuid();
+        var patientId = await TestData.PatientAsync(Client);
         var policyId = await CreateTestPolicyForPatientAsync(companyId, patientId);
-        var examinationId = Guid.NewGuid();
+        var examinationId = await TestData.ExaminationAsync(Client, patientId);
         var command = new { ExaminationId = examinationId, PatientId = patientId, PolicyId = policyId, EstimatedAmount = 1000m };
         var response = await Client.PostAsJsonAsync(PreAuthUrl, command);
         response.StatusCode.Should().Be(HttpStatusCode.OK);
@@ -311,7 +320,7 @@ public class InsuranceTests : TestBase
     public async Task CreatePreAuthorization_MissingExaminationId_ReturnsBadRequest()
     {
         var companyId = await CreateTestCompanyAsync();
-        var patientId = Guid.NewGuid();
+        var patientId = await TestData.PatientAsync(Client);
         var policyId = await CreateTestPolicyForPatientAsync(companyId, patientId);
         var command = new { ExaminationId = Guid.Empty, PatientId = patientId, PolicyId = policyId, EstimatedAmount = 1000m };
         var response = await Client.PostAsJsonAsync(PreAuthUrl, command);
@@ -322,9 +331,9 @@ public class InsuranceTests : TestBase
     public async Task CreatePreAuthorization_NegativeEstimatedAmount_ReturnsBadRequest()
     {
         var companyId = await CreateTestCompanyAsync();
-        var patientId = Guid.NewGuid();
+        var patientId = await TestData.PatientAsync(Client);
         var policyId = await CreateTestPolicyForPatientAsync(companyId, patientId);
-        var examinationId = Guid.NewGuid();
+        var examinationId = await TestData.ExaminationAsync(Client, patientId);
         var command = new { ExaminationId = examinationId, PatientId = patientId, PolicyId = policyId, EstimatedAmount = -500m };
         var response = await Client.PostAsJsonAsync(PreAuthUrl, command);
         response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
@@ -373,10 +382,10 @@ public class InsuranceTests : TestBase
         var response = await Client.PostAsJsonAsync(CompaniesUrl, command);
         if (response.StatusCode != HttpStatusCode.OK)
             throw new Exception($"CreateTestCompanyAsync failed: expected OK but got {response.StatusCode}");
-        var body = await response.Content.ReadFromJsonAsync<ApiResponse<Guid>>();
-        if (body == null || !body.Success || body.Data == Guid.Empty)
+        var body = await response.Content.ReadFromJsonAsync<ApiResponse<EntityIdDto>>();
+        if (body == null || !body.Success || body.Data?.Id == Guid.Empty)
             throw new Exception($"CreateTestCompanyAsync returned unsuccessful response: {body?.Message ?? "null"}");
-        return body.Data;
+        return body.Data!.Id;
     }
 
     private async Task<Guid> CreateTestPolicyForPatientAsync(Guid companyId, Guid patientId)
@@ -385,33 +394,35 @@ public class InsuranceTests : TestBase
         var response = await Client.PostAsJsonAsync(PoliciesUrl, command);
         if (response.StatusCode != HttpStatusCode.OK)
             throw new Exception($"CreateTestPolicyForPatientAsync failed: expected OK but got {response.StatusCode}");
-        var body = await response.Content.ReadFromJsonAsync<ApiResponse<Guid>>();
-        if (body == null || !body.Success || body.Data == Guid.Empty)
+        var body = await response.Content.ReadFromJsonAsync<ApiResponse<EntityIdDto>>();
+        if (body == null || !body.Success || body.Data?.Id == Guid.Empty)
             throw new Exception($"CreateTestPolicyForPatientAsync returned unsuccessful response: {body?.Message ?? "null"}");
-        return body.Data;
+        return body.Data!.Id;
     }
 
     private async Task<Guid> CreateTestPolicyAsync()
     {
         var companyId = await CreateTestCompanyAsync();
-        var patientId = Guid.NewGuid();
+        var patientId = await TestData.PatientAsync(Client);
         return await CreateTestPolicyForPatientAsync(companyId, patientId);
     }
 
     private async Task<(Guid PolicyId, Guid PatientId, Guid ExaminationId, Guid PreAuthId)> CreateClaimPrerequisitesAsync()
     {
         var companyId = await CreateTestCompanyAsync();
-        var patientId = Guid.NewGuid();
+        var patientId = await TestData.PatientAsync(Client);
         var policyId = await CreateTestPolicyForPatientAsync(companyId, patientId);
-        var examinationId = Guid.NewGuid();
+        var examinationId = await TestData.ExaminationAsync(Client, patientId);
         var preAuthCommand = new { ExaminationId = examinationId, PatientId = patientId, PolicyId = policyId, EstimatedAmount = 1000m };
         var preAuthResponse = await Client.PostAsJsonAsync(PreAuthUrl, preAuthCommand);
         if (preAuthResponse.StatusCode != HttpStatusCode.OK)
             throw new Exception($"CreateClaimPrerequisitesAsync (pre-auth) failed: expected OK but got {preAuthResponse.StatusCode}");
-        var preAuthBody = await preAuthResponse.Content.ReadFromJsonAsync<ApiResponse<Guid>>();
-        if (preAuthBody == null || !preAuthBody.Success || preAuthBody.Data == Guid.Empty)
+        var preAuthBody = await preAuthResponse.Content.ReadFromJsonAsync<ApiResponse<EntityIdDto>>();
+        if (preAuthBody == null || !preAuthBody.Success || preAuthBody.Data?.Id == Guid.Empty)
             throw new Exception($"CreateClaimPrerequisitesAsync (pre-auth) returned unsuccessful response: {preAuthBody?.Message ?? "null"}");
-        var preAuthId = preAuthBody.Data;
+        var preAuthId = preAuthBody.Data!.Id;
+        var approved = await Client.PostAsJsonAsync($"{PreAuthUrl}/{preAuthId}/decide", new { Decision = "Approve", ApprovedAmount = 1000m });
+        approved.EnsureSuccessStatusCode();
         return (policyId, patientId, examinationId, preAuthId);
     }
 
@@ -434,26 +445,26 @@ public class InsuranceTests : TestBase
         var response = await Client.PostAsJsonAsync(ClaimsUrl, command);
         if (response.StatusCode != HttpStatusCode.OK)
             throw new Exception($"CreateTestClaimForExaminationAsync failed: expected OK but got {response.StatusCode}");
-        var body = await response.Content.ReadFromJsonAsync<ApiResponse<Guid>>();
-        if (body == null || !body.Success || body.Data == Guid.Empty)
+        var body = await response.Content.ReadFromJsonAsync<ApiResponse<EntityIdDto>>();
+        if (body == null || !body.Success || body.Data?.Id == Guid.Empty)
             throw new Exception($"CreateTestClaimForExaminationAsync returned unsuccessful response: {body?.Message ?? "null"}");
-        return body.Data;
+        return body.Data!.Id;
     }
 
     private async Task<(Guid PreAuthId, Guid ExaminationId)> CreateTestPreAuthorizationAsync()
     {
         var companyId = await CreateTestCompanyAsync();
-        var patientId = Guid.NewGuid();
+        var patientId = await TestData.PatientAsync(Client);
         var policyId = await CreateTestPolicyForPatientAsync(companyId, patientId);
-        var examinationId = Guid.NewGuid();
+        var examinationId = await TestData.ExaminationAsync(Client, patientId);
         var command = new { ExaminationId = examinationId, PatientId = patientId, PolicyId = policyId, EstimatedAmount = 1000m };
         var response = await Client.PostAsJsonAsync(PreAuthUrl, command);
         if (response.StatusCode != HttpStatusCode.OK)
             throw new Exception($"CreateTestPreAuthorizationAsync failed: expected OK but got {response.StatusCode}");
-        var body = await response.Content.ReadFromJsonAsync<ApiResponse<Guid>>();
-        if (body == null || !body.Success || body.Data == Guid.Empty)
+        var body = await response.Content.ReadFromJsonAsync<ApiResponse<EntityIdDto>>();
+        if (body == null || !body.Success || body.Data?.Id == Guid.Empty)
             throw new Exception($"CreateTestPreAuthorizationAsync returned unsuccessful response: {body?.Message ?? "null"}");
-        return (body.Data, examinationId);
+        return (body.Data!.Id, examinationId);
     }
 
     // ── DTOs ─────────────────────────────────────────────────────────────
@@ -479,6 +490,8 @@ public class InsuranceTests : TestBase
         public string? Code { get; set; }
         public string? Message { get; set; }
     }
+
+    private sealed class EntityIdDto { public Guid Id { get; set; } }
 
     private sealed class CompanyDto
     {

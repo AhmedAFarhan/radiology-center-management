@@ -7,7 +7,6 @@ using RadiologyCenter.BuildingBlocks.Application.Excel;
 using RadiologyCenter.BuildingBlocks.Infrastructure.Excel;
 using RadiologyCenter.BuildingBlocks.Infrastructure.Persistence;
 using RadiologyCenter.BuildingBlocks.Infrastructure.Persistence.Interceptors;
-using RadiologyCenter.BuildingBlocks.Infrastructure.RealTime;
 using RadiologyCenter.BuildingBlocks.Infrastructure.Repositories;
 using RadiologyCenter.BuildingBlocks.Infrastructure.Services;
 
@@ -17,7 +16,6 @@ public static class InfrastructureServiceRegistration
 {
     public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
     {
-        var connectionString = configuration.GetConnectionString("DefaultConnection");
 
         services.AddHttpContextAccessor();
         services.AddScoped<AuditSoftDeleteInterceptor>();
@@ -26,7 +24,7 @@ public static class InfrastructureServiceRegistration
         {
             var options = new DbContextOptionsBuilder<AppDbContext>()
                 .UseSqlServer(
-                    connectionString,
+                    sp.GetRequiredService<IConfiguration>().GetConnectionString("DefaultConnection"),
                     b => b.MigrationsAssembly(typeof(AppDbContext).Assembly.GetName().Name))
                 .AddInterceptors(sp.GetRequiredService<AuditSoftDeleteInterceptor>())
                 .AddInterceptors(sp.GetRequiredService<DomainEventDispatchInterceptor>())
@@ -44,11 +42,9 @@ public static class InfrastructureServiceRegistration
         services.AddScoped<ICurrentUser, CurrentUserService>();
         services.AddScoped<ITimezoneConverter, UserTimezoneConverter>();
         services.AddScoped<IDomainEventDispatcher, DomainEventDispatcher>();
+        services.AddScoped<ITransactionLock, SqlTransactionLock>();
         services.AddScoped<INumberSequenceGenerator, NumberSequenceGenerator>();
         services.AddSingleton<IExcelService, ExcelService>();
-
-        services.AddSignalR();
-        services.AddSingleton<INotificationService, NotificationService>();
 
         return services;
     }

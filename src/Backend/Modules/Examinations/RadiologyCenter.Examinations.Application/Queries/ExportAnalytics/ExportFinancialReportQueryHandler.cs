@@ -20,7 +20,7 @@ public static class ExportFinancialReportQueryHandler
             new GetFinancialAnalyticsQuery(query.From, query.To),
             examinationRepository, examinationTypeDirectory, timezone, ct);
         if (financialResult.IsFailure)
-            return Result.Failure<ReportContentDto>(financialResult.Error);
+            return Result.Failure<ReportContentDto>(financialResult.Error!);
 
         var today = timezone.GetLocalDate(DateTime.UtcNow);
         var from = query.From ?? today.AddMonths(-1).AddDays(1).ToDateTime(TimeOnly.MinValue);

@@ -15,7 +15,7 @@ public class LogPushProvider : IPushProvider
 
     public Task<Result> SendAsync(string deviceToken, string title, string body, CancellationToken ct = default)
     {
-        _logger.LogInformation("[PUSH] to {DeviceToken} | title: {Title} | body: {Body}", deviceToken, title, body);
-        return Task.FromResult(Result.Success());
+        _logger.LogWarning("Push delivery is unavailable: no delivery provider is installed.");
+        return Task.FromResult(Result.Failure(Error.Conflict("Notification.ProviderNotConfigured", "Push delivery is not configured for this clinic. The message was not delivered.")));
     }
 }

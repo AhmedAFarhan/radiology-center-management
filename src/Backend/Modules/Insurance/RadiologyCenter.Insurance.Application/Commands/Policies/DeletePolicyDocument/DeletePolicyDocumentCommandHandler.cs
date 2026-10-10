@@ -16,10 +16,9 @@ public static class DeletePolicyDocumentCommandHandler
         if (document is null || document.PolicyId != command.PolicyId)
             return Result.Failure(Error.NotFound(ErrorCodes.PolicyDocumentNotFound, "PolicyDocument", command.DocumentId));
 
-        storage.Delete(document.StoredPath);
-
         documentRepository.Remove(document);
         await unitOfWork.SaveChangesAsync(ct);
+        // Retain the file with soft-deleted metadata for the configured backup/retention policy.
 
         return Result.Success();
     }

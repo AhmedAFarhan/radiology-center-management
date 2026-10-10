@@ -41,6 +41,9 @@ public static class JwtClaimsParser
             {
                 if (prop.Value.ValueKind == JsonValueKind.String)
                     Add(values, prop.Name, prop.Value.GetString() ?? string.Empty);
+                else if (prop.Value.ValueKind == JsonValueKind.Array)
+                    foreach(var value in prop.Value.EnumerateArray())
+                        if(value.ValueKind==JsonValueKind.String) Add(values,prop.Name,value.GetString()??string.Empty);
             }
 
             return new JwtClaims(values);

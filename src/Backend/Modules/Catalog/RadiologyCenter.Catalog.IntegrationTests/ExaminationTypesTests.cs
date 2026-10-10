@@ -326,7 +326,7 @@ public class ExaminationTypesTests : TestBase
     [Fact]
     public async Task ImportExaminationTypes_WithValidFile_ReturnsOk()
     {
-        var fileContent = new byte[] { 0x50, 0x4B, 0x03, 0x04 };
+        var fileContent = await Client.GetByteArrayAsync($"{ExaminationTypesUrl}/import-template");
         var content = new MultipartFormDataContent();
         var fileContentObj = new ByteArrayContent(fileContent);
         fileContentObj.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
@@ -360,7 +360,7 @@ public class ExaminationTypesTests : TestBase
         }
 
         var createBody = await response.Content.ReadFromJsonAsync<ApiResponse>();
-        var id = ((JsonElement)createBody!.Data!).GetProperty("Id").GetGuid();
+        var id = ((JsonElement)createBody!.Data!).GetProperty("id").GetGuid();
         return id;
     }
 

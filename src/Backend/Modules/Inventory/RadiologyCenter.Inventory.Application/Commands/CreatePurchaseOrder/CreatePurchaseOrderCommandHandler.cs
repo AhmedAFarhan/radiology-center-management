@@ -41,6 +41,7 @@ public static class CreatePurchaseOrderCommandHandler
             ct);
         var supplier = await supplierRepository.GetByIdAsync(purchaseOrder.SupplierId, ct);
 
+        await unitOfWork.SaveChangesAsync(ct);
         await transaction.CommitAsync(ct);
 
         return Result.Success(PurchaseOrderMapper.Map(

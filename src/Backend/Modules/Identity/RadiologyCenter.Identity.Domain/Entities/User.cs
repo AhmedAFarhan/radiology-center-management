@@ -146,7 +146,7 @@ public sealed class User : IdentityUser<Guid>, IAggregateRoot
     }
 
     public IReadOnlyCollection<string> GetEffectivePermissions() =>
-        _assignedRoles.SelectMany(r => r.Permissions).Select(p => p.Code).Distinct().ToList();
+        _assignedRoles.Where(r => r.IsActive).SelectMany(r => r.Permissions).Select(p => p.Code).Distinct().ToList();
 
     public void Activate()
     {

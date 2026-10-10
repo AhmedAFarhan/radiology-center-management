@@ -45,6 +45,7 @@ public sealed class StockBatch : AuditableEntity<Guid>
 
     public void Issue(int quantity)
     {
+        Guard.Against(IsExpired(DateTime.UtcNow), expired => expired, DomainErrors.BatchExpiryDatePast, "Expired stock cannot be issued.");
         Guard.AgainstNegativeOrZero(quantity, nameof(quantity));
         Guard.Against(quantity, q => q > QuantityRemaining, DomainErrors.InsufficientBatchStock, $"Cannot issue {quantity} from batch '{LotNumber}'; only {QuantityRemaining} remaining.");
 

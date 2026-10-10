@@ -24,4 +24,10 @@ public class CurrentUserService : ICurrentUser
 
     public bool IsAuthenticated =>
         _httpContextAccessor.HttpContext?.User.Identity?.IsAuthenticated ?? false;
+
+    public bool IsAdministrator => IsAuthenticated &&
+        (_httpContextAccessor.HttpContext?.User.HasClaim("isAdmin", "true") ?? false);
+
+    public bool HasPermission(string permissionCode) => IsAuthenticated &&
+        (IsAdministrator || (_httpContextAccessor.HttpContext?.User.HasClaim("permission", permissionCode) ?? false));
 }

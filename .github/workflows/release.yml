@@ -5,12 +5,23 @@ on:
     tags:
       - "v*"
   workflow_dispatch:
+    inputs:
+      version:
+        description: 'Release version, e.g. 1.0.0'
+        required: true
+        type: string
 
 permissions:
   contents: write
 
 jobs:
+  verify:
+    uses: ./.github/workflows/ci.yml
+    permissions:
+      contents: read
+      actions: write
   build:
+    needs: verify
     runs-on: windows-latest
 
     steps:
@@ -22,20 +33,23 @@ jobs:
           dotnet-version: "10.0.x"
 
       - name: Install MAUI workload
-        run: dotnet workload install maui
+        run: dotnet workload install maui-windows
 
       - name: Install Velopack CLI
-        run: dotnet tool install -g vpk
+        run: dotnet tool install -g vpk --version 1.2.0
 
       - name: Get version from tag
         id: version
         shell: pwsh
+        env:
+          REQUESTED_VERSION: ${{ inputs.version || github.ref_name }}
         run: |
-          $version = "${{ github.ref_name }}" -replace '^v', ''
-          echo "VERSION=$version" >> $env:GITHUB_OUTPUT
+          $version = $env:REQUESTED_VERSION -replace '^v', ''
+          if ($version -notmatch '^\d+\.\d+\.\d+$') { throw 'Use a numeric major.minor.patch version.' }
+          "VERSION=$version" >> $env:GITHUB_OUTPUT
 
       - name: Restore dependencies
-        run: dotnet restore src\RadiologyCenter.slnx
+        run: dotnet restore src\Desktop\RadiologyCenter.Desktop\RadiologyCenter.Desktop.csproj
 
       - name: Publish Desktop app
         run: |
@@ -47,27 +61,50 @@ jobs:
             -p:AssemblyVersion=${{ steps.version.outputs.VERSION }}.0 `
             -p:FileVersion=${{ steps.version.outputs.VERSION }}.0 `
             -p:WindowsPackageType=None `
+            -p:WindowsAppSDKSelfContained=true `
+            -r win-x64 `
+            --self-contained true `
             -o publish\app
 
-      - name: Publish Localhost
+      - name: Verify single application payload
+        shell: pwsh
         run: |
-          dotnet publish src\Backend\Localhost\RadiologyCenter.Localhost\RadiologyCenter.Localhost.csproj `
-            -c Release `
-            -f net10.0 `
-            --self-contained `
-            -r win-x64 `
-            -p:AssemblyVersion=${{ steps.version.outputs.VERSION }}.0 `
-            -p:FileVersion=${{ steps.version.outputs.VERSION }}.0 `
-            -p:PublishSingleFile=true `
-            -o publish\app\localhost
+          if (Get-ChildItem publish\app -Recurse -Filter 'appsettings.Development.json') { throw 'Private development settings cannot be packaged.' }
+          if (Get-ChildItem publish\app -Recurse -Filter 'RadiologyCenter.Localhost*') { throw 'The old server must not be packaged.' }
+          if (Get-ChildItem publish\app -Recurse -Directory -Filter '*WebView2*') { throw 'Browser user data must not be packaged.' }
+          Copy-Item docs\lan-deployment.md publish\app\
 
       - name: Pack with Velopack
         shell: pwsh
+        env:
+          EGCARE_SIGN_TEMPLATE: ${{ secrets.EGCARE_SIGN_TEMPLATE }}
         run: |
-          vpk pack -u RadiologyCenter -v ${{ steps.version.outputs.VERSION }} -p publish\app --mainExe RadiologyCenter.Desktop.exe -o release
+          if ([string]::IsNullOrWhiteSpace($env:EGCARE_SIGN_TEMPLATE)) { throw 'Configure the CI signing provider and EGCARE_SIGN_TEMPLATE before publishing clinic releases. Unsigned local candidates are for staging.' }
+          vpk pack -u RadiologyCenter --packTitle EGcare -v ${{ steps.version.outputs.VERSION }} -p publish\app --mainExe RadiologyCenter.Desktop.exe --icon src\Desktop\RadiologyCenter.Desktop\Resources\taskbar.ico --signTemplate $env:EGCARE_SIGN_TEMPLATE -o release
+          if ($LASTEXITCODE -ne 0) { throw 'Velopack signing/packaging failed.' }
+          Copy-Item docs\lan-deployment.md release\
+          Copy-Item scripts\New-ClinicConfiguration.ps1 release\
+          Copy-Item scripts\OrthancReadOnly.lua release\
+
+      - name: Verify release signatures
+        shell: pwsh
+        run: |
+          if ((Get-AuthenticodeSignature release\RadiologyCenter-win-Setup.exe).Status -ne 'Valid') { throw 'The installer signature is missing or invalid.' }
+          $package = [IO.Compression.ZipFile]::OpenRead((Resolve-Path 'release\RadiologyCenter-${{ steps.version.outputs.VERSION }}-full.nupkg').Path)
+          $probe = Join-Path $env:RUNNER_TEMP ('EGcare-signature-' + [guid]::NewGuid().ToString('N') + '.exe')
+          try {
+            $entry = $package.Entries | Where-Object { $_.FullName.EndsWith('/RadiologyCenter.Desktop.exe') } | Select-Object -First 1
+            if ($null -eq $entry) { throw 'The signed application executable is missing.' }
+            [IO.Compression.ZipFileExtensions]::ExtractToFile($entry, $probe)
+            if ((Get-AuthenticodeSignature $probe).Status -ne 'Valid') { throw 'The packaged application signature is missing or invalid.' }
+          } finally {
+            $package.Dispose()
+            if (Test-Path -LiteralPath $probe) { Remove-Item -LiteralPath $probe }
+          }
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
+          tag_name: v${{ steps.version.outputs.VERSION }}
           files: release/*
           generate_release_notes: true

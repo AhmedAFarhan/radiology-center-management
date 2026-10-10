@@ -5,29 +5,44 @@ namespace RadiologyCenter.Desktop;
 
 public sealed class UpdateService
 {
-    private const string GithubRepo = "https://github.com/AhmedAFarhan/radiology-center-management";
-    private UpdateManager? _mgr;
 
-    public void Init()
+    private UpdateManager? _mgr;
+    private string? _sourceDirectory;
+
+    public static void Init()
     {
         VelopackApp.Build()
-            .SetAutoApplyOnStartup(true)
+            .SetAutoApplyOnStartup(false)
             .Run();
     }
 
     public UpdateManager GetManager()
     {
-        _mgr ??= new UpdateManager(new GithubSource(GithubRepo, null, false));
+        var directory=Services.DesktopConfiguration.Profile?.UpdatesDirectory
+            ?? throw new InvalidOperationException("No clinic update folder is configured.");
+        if (_mgr is null || !string.Equals(directory,_sourceDirectory,StringComparison.OrdinalIgnoreCase))
+        {
+            _mgr=new UpdateManager(new SimpleFileSource(new DirectoryInfo(directory)));
+            _sourceDirectory=directory;
+        }
         return _mgr;
     }
 
-    public async Task<UpdateInfo?> CheckForUpdatesAsync()
+    public async Task<UpdateInfo?> CheckForUpdatesAsync(bool throwOnError = false)
     {
         try
         {
-            return await GetManager().CheckForUpdatesAsync();
+            var directory = Services.DesktopConfiguration.Profile?.UpdatesDirectory;
+            if (string.IsNullOrWhiteSpace(directory))
+                throw new InvalidOperationException("Choose a clinic update folder in the connection settings first.");
+            var manager = GetManager();
+            if (!manager.IsInstalled)
+                throw new InvalidOperationException("Updates are available after installing EGcare with the clinic installer. Development builds cannot install updates.");
+            if (!Directory.Exists(directory))
+                throw new InvalidOperationException("The clinic update folder is unavailable. Check the local network and folder access.");
+            return await manager.CheckForUpdatesAsync();
         }
-        catch
+        catch when (!throwOnError)
         {
             return null;
         }

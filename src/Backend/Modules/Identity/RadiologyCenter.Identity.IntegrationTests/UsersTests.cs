@@ -32,10 +32,10 @@ public class UsersTests : TestBase
     }
 
     [Fact]
-    public async Task GetById_InvalidGuid_ReturnsBadRequest()
+    public async Task GetById_InvalidGuid_ReturnsNotFound()
     {
         var response = await Client.GetAsync($"{UsersUrl}/not-a-guid");
-        response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+        response.StatusCode.Should().Be(HttpStatusCode.NotFound);
     }
 
     [Fact]
@@ -69,8 +69,8 @@ public class UsersTests : TestBase
             FirstName = "Test",
             LastName = "User",
             PhoneNumber = "01012345678",
-            Password = "Test@12345",
-            RoleIds = new object[] { }
+            Password = TestCredentials.Password,
+            RoleIds = new[] { await CreateTestRoleAsync() }
         };
         var response = await Client.PostAsJsonAsync(UsersUrl, command);
         response.StatusCode.Should().Be(HttpStatusCode.OK);
@@ -79,7 +79,7 @@ public class UsersTests : TestBase
     }
 
     [Fact]
-    public async Task Create_DuplicateEmail_ReturnsConflict()
+    public async Task Create_DuplicateEmail_ReturnsBadRequest()
     {
         var email = $"dup_{Guid.NewGuid():N}@example.com";
         var command1 = new
@@ -89,8 +89,8 @@ public class UsersTests : TestBase
             FirstName = "First",
             LastName = "User",
             PhoneNumber = "01012345678",
-            Password = "Test@12345",
-            RoleIds = new object[] { }
+            Password = TestCredentials.Password,
+            RoleIds = new[] { await CreateTestRoleAsync() }
         };
         await Client.PostAsJsonAsync(UsersUrl, command1);
 
@@ -101,15 +101,15 @@ public class UsersTests : TestBase
             FirstName = "Second",
             LastName = "User",
             PhoneNumber = "01098765432",
-            Password = "Test@12345",
-            RoleIds = new object[] { }
+            Password = TestCredentials.Password,
+            RoleIds = new[] { await CreateTestRoleAsync() }
         };
         var response = await Client.PostAsJsonAsync(UsersUrl, command2);
-        response.StatusCode.Should().Be(HttpStatusCode.Conflict);
+        response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
     }
 
     [Fact]
-    public async Task Create_DuplicateUsername_ReturnsConflict()
+    public async Task Create_DuplicateUsername_ReturnsBadRequest()
     {
         var userName = $"dupuser_{Guid.NewGuid():N}";
         var command1 = new
@@ -119,8 +119,8 @@ public class UsersTests : TestBase
             FirstName = "First",
             LastName = "User",
             PhoneNumber = "01012345678",
-            Password = "Test@12345",
-            RoleIds = new object[] { }
+            Password = TestCredentials.Password,
+            RoleIds = new[] { await CreateTestRoleAsync() }
         };
         await Client.PostAsJsonAsync(UsersUrl, command1);
 
@@ -131,11 +131,11 @@ public class UsersTests : TestBase
             FirstName = "Second",
             LastName = "User",
             PhoneNumber = "01098765432",
-            Password = "Test@12345",
-            RoleIds = new object[] { }
+            Password = TestCredentials.Password,
+            RoleIds = new[] { await CreateTestRoleAsync() }
         };
         var response = await Client.PostAsJsonAsync(UsersUrl, command2);
-        response.StatusCode.Should().Be(HttpStatusCode.Conflict);
+        response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
     }
 
     [Fact]
@@ -156,8 +156,8 @@ public class UsersTests : TestBase
             FirstName = "Test",
             LastName = "User",
             PhoneNumber = "01012345678",
-            Password = "Test@12345",
-            RoleIds = new object[] { }
+            Password = TestCredentials.Password,
+            RoleIds = new[] { await CreateTestRoleAsync() }
         };
         var response = await Client.PostAsJsonAsync(UsersUrl, command);
         response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
@@ -173,8 +173,8 @@ public class UsersTests : TestBase
             FirstName = "Test",
             LastName = "User",
             PhoneNumber = "123",
-            Password = "Test@12345",
-            RoleIds = new object[] { }
+            Password = TestCredentials.Password,
+            RoleIds = new[] { await CreateTestRoleAsync() }
         };
         var response = await Client.PostAsJsonAsync(UsersUrl, command);
         response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
@@ -191,7 +191,7 @@ public class UsersTests : TestBase
             LastName = "User",
             PhoneNumber = "01012345678",
             Password = "weak",
-            RoleIds = new object[] { }
+            RoleIds = new[] { await CreateTestRoleAsync() }
         };
         var response = await Client.PostAsJsonAsync(UsersUrl, command);
         response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
@@ -307,7 +307,7 @@ public class UsersTests : TestBase
     public async Task ResetPassword_ExistingUser_ReturnsOk()
     {
         var userId = await CreateTestUserAsync();
-        var command = new { NewPassword = "Reset@12345" };
+        var command = new { NewPassword = "ResetAdmin@12345" };
         var response = await Client.PostAsJsonAsync($"{UsersUrl}/{userId}/reset-password", command);
         response.StatusCode.Should().Be(HttpStatusCode.OK);
     }
@@ -316,7 +316,7 @@ public class UsersTests : TestBase
     public async Task ResetPassword_NonexistentUser_ReturnsNotFound()
     {
         var fakeId = Guid.NewGuid();
-        var command = new { NewPassword = "Reset@12345" };
+        var command = new { NewPassword = "ResetAdmin@12345" };
         var response = await Client.PostAsJsonAsync($"{UsersUrl}/{fakeId}/reset-password", command);
         response.StatusCode.Should().Be(HttpStatusCode.NotFound);
     }
@@ -393,7 +393,7 @@ public class UsersTests : TestBase
     public async Task UpdateRoles_NonexistentUser_ReturnsNotFound()
     {
         var fakeUserId = Guid.NewGuid();
-        var command = new { RoleIds = Array.Empty<Guid>() };
+        var command = new { RoleIds = new[] { await CreateTestRoleAsync() } };
         var response = await Client.PutAsJsonAsync($"{UsersUrl}/{fakeUserId}/roles", command);
         response.StatusCode.Should().Be(HttpStatusCode.NotFound);
     }
@@ -416,8 +416,8 @@ public class UsersTests : TestBase
             FirstName = "Test",
             LastName = "User",
             PhoneNumber = "01012345678",
-            Password = "Test@12345",
-            RoleIds = new object[] { }
+            Password = TestCredentials.Password,
+            RoleIds = new[] { await CreateTestRoleAsync() }
         };
         var createResponse = await Client.PostAsJsonAsync(UsersUrl, command);
         createResponse.StatusCode.Should().Be(HttpStatusCode.OK);

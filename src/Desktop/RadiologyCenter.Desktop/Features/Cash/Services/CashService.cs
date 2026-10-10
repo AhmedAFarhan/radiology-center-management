@@ -1,4 +1,4 @@
-﻿using RadiologyCenter.Desktop.Features.Cash.Models;
+using RadiologyCenter.Desktop.Features.Cash.Models;
 
 namespace RadiologyCenter.Desktop.Features.Cash.Services;
 
@@ -13,7 +13,7 @@ public sealed class CashService : CrudServiceBase
         => Api.PostAsync<CashSessionDto>(SessionsRes, input, ct);
 
     public Task<CashSessionDto?> GetMyOpenAsync(CancellationToken ct = default)
-        => Api.GetAsync<CashSessionDto>($"{SessionsRes}/my-open", ct);
+        => Api.GetAsync<CashSessionDto?>($"{SessionsRes}/my-open", ct);
 
     public Task<CashSessionDto> GetByIdAsync(string id, CancellationToken ct = default)
         => FetchByIdAsync<CashSessionDto>(SessionsRes, id, ct);
@@ -53,7 +53,7 @@ public sealed class CashService : CrudServiceBase
         => FetchPageAsync<CashHandoverDto>(HandoversRes, searchTerm, sortBy, sortDescending, pageNumber, pageSize, ct);
 
     public Task<CashHandoverDto?> GetHandoverBySessionAsync(string sessionId, CancellationToken ct = default)
-        => Api.GetAsync<CashHandoverDto>($"{HandoversRes}/{sessionId}", ct);
+        => Api.GetAsync<CashHandoverDto?>($"{HandoversRes}/{sessionId}", ct);
 
     public Task<CashHandoverDto> ApproveHandoverAsync(string sessionId, CancellationToken ct = default)
         => Api.PostAsync<CashHandoverDto>($"{HandoversRes}/{sessionId}/approve", null, ct);

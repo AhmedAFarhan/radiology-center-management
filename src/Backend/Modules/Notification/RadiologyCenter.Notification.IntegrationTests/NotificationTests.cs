@@ -208,7 +208,7 @@ public class NotificationTests : TestBase
     // ───────────────── Messages: Send ────────────────────────────────────
 
     [Fact]
-    public async Task SendNotification_WithTemplateCode_ReturnsOk()
+    public async Task SendNotification_WithTemplateCode_UnavailableProvider_ReturnsConflict()
     {
         var templateCode = $"TPL_{Guid.NewGuid():N}";
         var createCommand = new
@@ -230,11 +230,11 @@ public class NotificationTests : TestBase
         };
 
         var response = await Client.PostAsJsonAsync($"{MessagesUrl}/send", command);
-        response.StatusCode.Should().Be(HttpStatusCode.OK);
+        response.StatusCode.Should().Be(HttpStatusCode.Conflict);
     }
 
     [Fact]
-    public async Task SendNotification_WithInlineSubjectAndBody_ReturnsOk()
+    public async Task SendNotification_WithInlineSubjectAndBody_UnavailableProvider_ReturnsConflict()
     {
         var command = new
         {
@@ -245,7 +245,7 @@ public class NotificationTests : TestBase
         };
 
         var response = await Client.PostAsJsonAsync($"{MessagesUrl}/send", command);
-        response.StatusCode.Should().Be(HttpStatusCode.OK);
+        response.StatusCode.Should().Be(HttpStatusCode.Conflict);
     }
 
     [Fact]

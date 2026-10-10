@@ -13,7 +13,8 @@ public sealed record ReportDto(
     ReportVersionDto? CurrentVersion,
     string? PatientName = null,
     string? RadiologistName = null,
-    string? ExaminationTypeName = null);
+    string? ExaminationTypeName = null,
+    int Revision = 0);
 
 public sealed record ReportListItemDto(
     string Id,
@@ -83,6 +84,7 @@ public sealed class CreateReportDraftInput
 
 public sealed class UpsertReportSectionInput
 {
+    public int? ExpectedRevision { get; set; }
     public string SectionType { get; set; } = string.Empty;
     public string Title { get; set; } = string.Empty;
     public string Body { get; set; } = string.Empty;
@@ -92,6 +94,7 @@ public sealed class UpsertReportSectionInput
 
 public sealed class AddReportFindingInput
 {
+    public int? ExpectedRevision { get; set; }
     public string Region { get; set; } = string.Empty;
     public string Description { get; set; } = string.Empty;
     public string Severity { get; set; } = string.Empty;
@@ -100,6 +103,7 @@ public sealed class AddReportFindingInput
 
 public sealed class UpdateReportFindingInput
 {
+    public int? ExpectedRevision { get; set; }
     public string Description { get; set; } = string.Empty;
     public string Severity { get; set; } = string.Empty;
 }

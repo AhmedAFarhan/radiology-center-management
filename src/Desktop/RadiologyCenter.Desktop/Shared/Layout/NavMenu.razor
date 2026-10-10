@@ -15,13 +15,12 @@
             {
                 <MudTooltip Text="@T.Nav.Visits">
                     <MudMenu Icon="@Icons.Material.Filled.EventNote" aria-label="@T.Nav.Visits"
-                             IconSize="Size.Medium"
+                             Size="Size.Medium"
                              Class="collapsed-nav-menu"
-                             AnchorOrigin="Origin.CenterRight"
-                             TransformOrigin="Origin.TopLeft"
+                             AnchorOrigin="@(T.IsRTL ? Origin.CenterLeft : Origin.CenterRight)"
+                             TransformOrigin="@(T.IsRTL ? Origin.TopRight : Origin.TopLeft)"
                              Dense="true"
-                             OffsetX="12"
-                             Direction="Direction.Left">
+                             >
                         <MudMenuItem Icon="@Icons.Material.Filled.EventNote" OnClick="@(() => Go("/visits"))">@T.Nav.Visits</MudMenuItem>
                         <MudMenuItem Icon="@Icons.Material.Filled.CalendarMonth" OnClick="@(() => Go("/examinations/calendar"))">@T.Nav.VisitsCalendar</MudMenuItem>
                     </MudMenu>
@@ -40,13 +39,12 @@
         {
             <MudTooltip Text="@T.Nav.Inventory">
                 <MudMenu Icon="@Icons.Material.Filled.Warehouse" aria-label="@T.Nav.Inventory"
-                         IconSize="Size.Medium"
+                         Size="Size.Medium"
                          Class="collapsed-nav-menu"
-                         AnchorOrigin="Origin.CenterRight"
-                         TransformOrigin="Origin.TopLeft"
+                         AnchorOrigin="@(T.IsRTL ? Origin.CenterLeft : Origin.CenterRight)"
+                         TransformOrigin="@(T.IsRTL ? Origin.TopRight : Origin.TopLeft)"
                          Dense="true"
-                         OffsetX="12"
-                         Direction="Direction.Left">
+                         >
                     @if (Can(InventoryPermissions.ItemsRead))
                     {
                         <MudMenuItem Icon="@Icons.Material.Filled.Inventory2" OnClick="@(() => Go("/inventory/items"))">@T.Nav.Inventory</MudMenuItem>
@@ -71,13 +69,12 @@
         {
             <MudTooltip Text="@T.Nav.Payroll">
                 <MudMenu Icon="@Icons.Material.Filled.Payments" aria-label="@T.Nav.Payroll"
-                         IconSize="Size.Medium"
+                         Size="Size.Medium"
                          Class="collapsed-nav-menu"
-                         AnchorOrigin="Origin.CenterRight"
-                         TransformOrigin="Origin.TopLeft"
+                         AnchorOrigin="@(T.IsRTL ? Origin.CenterLeft : Origin.CenterRight)"
+                         TransformOrigin="@(T.IsRTL ? Origin.TopRight : Origin.TopLeft)"
                          Dense="true"
-                         OffsetX="12"
-                         Direction="Direction.Left">
+                         >
                     <MudMenuItem Icon="@Icons.Material.Filled.ReceiptLong" OnClick="@(() => Go("/payroll/payruns"))">@T.Nav.PayRuns</MudMenuItem>
                     <MudMenuItem Icon="@Icons.Material.Filled.Category" OnClick="@(() => Go("/payroll/salary-components"))">@T.Nav.SalaryComponents</MudMenuItem>
                     <MudMenuItem Icon="@Icons.Material.Filled.Calculate" OnClick="@(() => Go("/payroll/salaries"))">@T.Nav.Salaries</MudMenuItem>
@@ -92,13 +89,12 @@
         {
             <MudTooltip Text="@T.Nav.Insurance">
                 <MudMenu Icon="@Icons.Material.Filled.Approval" aria-label="@T.Nav.Insurance"
-                         IconSize="Size.Medium"
+                         Size="Size.Medium"
                          Class="collapsed-nav-menu"
-                         AnchorOrigin="Origin.CenterRight"
-                         TransformOrigin="Origin.TopLeft"
+                         AnchorOrigin="@(T.IsRTL ? Origin.CenterLeft : Origin.CenterRight)"
+                         TransformOrigin="@(T.IsRTL ? Origin.TopRight : Origin.TopLeft)"
                          Dense="true"
-                         OffsetX="12"
-                         Direction="Direction.Left">
+                         >
                     @if (Can(InsurancePermissions.CompaniesRead))
                     {
                         <MudMenuItem Icon="@Icons.Material.Filled.Shield" OnClick="@(() => Go("/insurance/companies"))">@T.Nav.Companies</MudMenuItem>
@@ -123,13 +119,12 @@
         {
             <MudTooltip Text="@T.Nav.Cash">
                 <MudMenu Icon="@Icons.Material.Filled.AccountBalanceWallet" aria-label="@T.Nav.Cash"
-                         IconSize="Size.Medium"
+                         Size="Size.Medium"
                          Class="collapsed-nav-menu"
-                         AnchorOrigin="Origin.CenterRight"
-                         TransformOrigin="Origin.TopLeft"
+                         AnchorOrigin="@(T.IsRTL ? Origin.CenterLeft : Origin.CenterRight)"
+                         TransformOrigin="@(T.IsRTL ? Origin.TopRight : Origin.TopLeft)"
                          Dense="true"
-                         OffsetX="12"
-                         Direction="Direction.Left">
+                         >
                     <MudMenuItem Icon="@Icons.Material.Filled.AccountBalanceWallet" OnClick="@(() => Go("/cash/sessions"))">@T.Nav.CashSessions</MudMenuItem>
                 </MudMenu>
             </MudTooltip>
@@ -139,13 +134,12 @@
         {
             <MudTooltip Text="@T.Nav.Notifications">
                 <MudMenu Icon="@Icons.Material.Filled.Notifications" aria-label="@T.Nav.Notifications"
-                         IconSize="Size.Medium"
+                         Size="Size.Medium"
                          Class="collapsed-nav-menu"
-                         AnchorOrigin="Origin.CenterRight"
-                         TransformOrigin="Origin.TopLeft"
+                         AnchorOrigin="@(T.IsRTL ? Origin.CenterLeft : Origin.CenterRight)"
+                         TransformOrigin="@(T.IsRTL ? Origin.TopRight : Origin.TopLeft)"
                          Dense="true"
-                         OffsetX="12"
-                         Direction="Direction.Left">
+                         >
                     @if (Can(NotificationPermissions.TemplatesManage))
                     {
                         <MudMenuItem Icon="@Icons.Material.Filled.Article" OnClick="@(() => Go("/notifications/templates"))">@T.Nav.Templates</MudMenuItem>
@@ -162,13 +156,12 @@
         {
             <MudTooltip Text="@T.Nav.Resources">
                 <MudMenu Icon="@Icons.Material.Filled.PrecisionManufacturing" aria-label="@T.Nav.Resources"
-                         IconSize="Size.Medium"
+                         Size="Size.Medium"
                          Class="collapsed-nav-menu"
-                         AnchorOrigin="Origin.CenterRight"
-                         TransformOrigin="Origin.TopLeft"
+                         AnchorOrigin="@(T.IsRTL ? Origin.CenterLeft : Origin.CenterRight)"
+                         TransformOrigin="@(T.IsRTL ? Origin.TopRight : Origin.TopLeft)"
                          Dense="true"
-                         OffsetX="12"
-                         Direction="Direction.Left">
+                         >
                     @if (Can(ResourcesPermissions.EquipmentRead))
                     {
                         <MudMenuItem Icon="@Icons.Material.Filled.Biotech" OnClick="@(() => Go("/resources/equipment"))">@T.Nav.Equipment</MudMenuItem>
@@ -197,13 +190,12 @@
         {
             <MudTooltip Text="@T.Nav.Analytics">
                 <MudMenu Icon="@Icons.Material.Filled.Insights" aria-label="@T.Nav.Analytics"
-                         IconSize="Size.Medium"
+                         Size="Size.Medium"
                          Class="collapsed-nav-menu"
-                         AnchorOrigin="Origin.CenterRight"
-                         TransformOrigin="Origin.TopLeft"
+                         AnchorOrigin="@(T.IsRTL ? Origin.CenterLeft : Origin.CenterRight)"
+                         TransformOrigin="@(T.IsRTL ? Origin.TopRight : Origin.TopLeft)"
                          Dense="true"
-                         OffsetX="12"
-                         Direction="Direction.Left">
+                         >
                     <MudMenuItem Icon="@Icons.Material.Filled.Speed" OnClick="@(() => Go("/analytics/overview"))">@T.Nav.Overview</MudMenuItem>
                     <MudMenuItem Icon="@Icons.Material.Filled.AccountBalanceWallet" OnClick="@(() => Go("/analytics/financial"))">@T.Nav.Financials</MudMenuItem>
                     <MudMenuItem Icon="@Icons.Material.Filled.Construction" OnClick="@(() => Go("/analytics/operations"))">@T.Nav.Operations</MudMenuItem>
@@ -218,13 +210,12 @@
         {
             <MudTooltip Text="@T.Nav.Administration">
                 <MudMenu Icon="@Icons.Material.Filled.AdminPanelSettings" aria-label="@T.Nav.Administration"
-                         IconSize="Size.Medium"
+                         Size="Size.Medium"
                          Class="collapsed-nav-menu"
-                         AnchorOrigin="Origin.CenterRight"
-                         TransformOrigin="Origin.TopLeft"
+                         AnchorOrigin="@(T.IsRTL ? Origin.CenterLeft : Origin.CenterRight)"
+                         TransformOrigin="@(T.IsRTL ? Origin.TopRight : Origin.TopLeft)"
                          Dense="true"
-                         OffsetX="12"
-                         Direction="Direction.Left">
+                         >
                     @if (Can(UsersPermissions.Read))
                     {
                         <MudMenuItem Icon="@Icons.Material.Filled.Person" OnClick="@(() => Go("/users"))">@T.Nav.Users</MudMenuItem>

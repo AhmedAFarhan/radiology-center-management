@@ -1,4 +1,6 @@
+using RadiologyCenter.Examinations.Application.Scheduling;
 using RadiologyCenter.BuildingBlocks.Application.Abstractions;
+using RadiologyCenter.BuildingBlocks.Application.Abstractions.Services;
 using RadiologyCenter.Examinations.Application.Localization;
 using RadiologyCenter.Examinations.Application.Abstractions;
 using RadiologyCenter.Examinations.Application.DTOs;
@@ -15,19 +17,16 @@ public static class CreateExaminationCommandHandler
         IExaminationRepository examinationRepository,
         IItemSnapshotResolver itemSnapshotResolver,
         IExaminationsUnitOfWork unitOfWork,
-        ITimezoneConverter timezone,
+        ExaminationScheduler scheduler,
+        IPaymentCashEntryRecorder cashRecorder,
+        INumberSequenceGenerator sequence,
         CancellationToken ct)
     {
         var examinationType = await examinationTypeDirectory.GetWithItemsAsync(command.ExaminationTypeId, ct);
         if (examinationType is null)
             return Result.Failure<ExaminationDto>(Error.NotFound(ErrorCodes.ExaminationTypeNotFound, "ExaminationType", command.ExaminationTypeId));
 
-        if (command.ScheduledAt.HasValue)
-        {
-            var localNow = timezone.ToLocal(DateTime.UtcNow);
-            if (command.ScheduledAt.Value < localNow.AddMinutes(-1))
-                return Result.Failure<ExaminationDto>(Error.Conflict(ErrorCodes.ScheduledTimePast, "Scheduled time cannot be in the past."));
-        }
+        await using var transaction = await unitOfWork.BeginTransactionAsync(ct);
 
         var priority = ExaminationPriority.FromName<ExaminationPriority>(command.Priority);
 
@@ -44,7 +43,7 @@ public static class CreateExaminationCommandHandler
             command.ReferralDoctorId,
             command.Discount,
             command.IsDiscountPercentage,
-            command.Paid,
+            0m,
             command.Notes,
             command.EquipmentId);
 
@@ -59,15 +58,30 @@ public static class CreateExaminationCommandHandler
         }
 
         if (string.Equals(command.Status, ExaminationStatus.CheckedIn.Name, StringComparison.Ordinal))
+        {
+            var validated = await scheduler.ValidateReservationAsync(examination, examinationType, null, null, transaction, ct);
+            if (validated.IsFailure) return Result.Failure<ExaminationDto>(validated.Error!);
             examination.CheckIn();
+        }
         else
         {
-            var scheduledAt = command.ScheduledAt ?? DateTime.UtcNow;
-            examination.Schedule(scheduledAt);
+            var scheduled = await scheduler.ScheduleAsync(examination, examinationType, command.ScheduledAt ?? DateTime.UtcNow, transaction, ct);
+            if (scheduled.IsFailure) return Result.Failure<ExaminationDto>(scheduled.Error!);
         }
 
+        if (command.Paid > 0)
+        {
+            if (command.Paid > examination.Remaining)
+                return Result.Failure<ExaminationDto>(Error.Validation(ErrorCodes.PaymentExceedsRemaining, "Initial payment exceeds the remaining balance."));
+            var cash = await cashRecorder.RecordAsync(examination.Id, command.Paid, "Initial examination payment", transaction, ct);
+            if (cash.IsFailure) return Result.Failure<ExaminationDto>(cash.Error!);
+            examination.RecordPayment(command.Paid);
+        }
+
+        examination.AssignAccession(await sequence.GenerateNextAsync("ExaminationAccession", "EX", 8, transaction.DbTransaction, ct));
         await examinationRepository.AddAsync(examination, ct);
         await unitOfWork.SaveChangesAsync(ct);
+        await transaction.CommitAsync(ct);
 
         return Result.Success(examination.ToDto(examinationType.Name));
     }

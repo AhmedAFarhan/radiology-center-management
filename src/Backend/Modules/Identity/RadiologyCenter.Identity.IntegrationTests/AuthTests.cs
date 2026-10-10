@@ -14,7 +14,7 @@ public class AuthTests : TestBase
     [Fact]
     public async Task Login_WithValidCredentials_ReturnsToken()
     {
-        var command = new { UserName = "admin123", Password = "admin123" };
+        var command = new { UserName = TestCredentials.UserName, Password = TestCredentials.Password };
         var response = await Client.PostAsJsonAsync($"{AuthUrl}/login", command);
         response.StatusCode.Should().Be(HttpStatusCode.OK);
         var body = await response.Content.ReadFromJsonAsync<ApiResponse>();
@@ -25,7 +25,7 @@ public class AuthTests : TestBase
     [Fact]
     public async Task Login_WithWrongPassword_ReturnsConflict()
     {
-        var command = new { UserName = "admin123", Password = "WrongPassword1!" };
+        var command = new { UserName = TestCredentials.UserName, Password = "WrongPassword1!" };
         var response = await Client.PostAsJsonAsync($"{AuthUrl}/login", command);
         response.StatusCode.Should().Be(HttpStatusCode.Conflict);
         var body = await response.Content.ReadFromJsonAsync<ApiResponse>();
@@ -47,7 +47,7 @@ public class AuthTests : TestBase
     [Fact]
     public async Task Login_WithEmptyUserName_ReturnsBadRequest()
     {
-        var command = new { UserName = "", Password = "admin123" };
+        var command = new { UserName = "", Password = TestCredentials.Password };
         var response = await Client.PostAsJsonAsync($"{AuthUrl}/login", command);
         response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
     }
@@ -55,7 +55,7 @@ public class AuthTests : TestBase
     [Fact]
     public async Task Login_WithEmptyPassword_ReturnsBadRequest()
     {
-        var command = new { UserName = "admin123", Password = "" };
+        var command = new { UserName = TestCredentials.UserName, Password = "" };
         var response = await Client.PostAsJsonAsync($"{AuthUrl}/login", command);
         response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
     }
@@ -124,13 +124,13 @@ public class AuthTests : TestBase
     public async Task ChangePassword_WithCorrectCurrentPassword_ReturnsOk()
     {
         var loginResult = await LoginAsAdminAsync();
-        var command = new { CurrentPassword = "admin123", NewPassword = "NewAdmin@12345" };
+        var command = new { CurrentPassword = TestCredentials.Password, NewPassword = "NewAdmin@12345" };
         var response = await Client.PostAsJsonAsync($"{AuthUrl}/change-password", command);
         response.StatusCode.Should().Be(HttpStatusCode.OK);
         var body = await response.Content.ReadFromJsonAsync<ApiResponse>();
         body!.Success.Should().BeTrue();
 
-        var revertCommand = new { CurrentPassword = "NewAdmin@12345", NewPassword = "admin123" };
+        var revertCommand = new { CurrentPassword = "NewAdmin@12345", NewPassword = TestCredentials.Password };
         await Client.PostAsJsonAsync($"{AuthUrl}/change-password", revertCommand);
         await LoginAsAdminAsync();
     }
@@ -150,7 +150,7 @@ public class AuthTests : TestBase
     public async Task ChangePassword_WithSamePassword_ReturnsBadRequest()
     {
         var loginResult = await LoginAsAdminAsync();
-        var command = new { CurrentPassword = "admin123", NewPassword = "admin123" };
+        var command = new { CurrentPassword = TestCredentials.Password, NewPassword = TestCredentials.Password };
         var response = await Client.PostAsJsonAsync($"{AuthUrl}/change-password", command);
         response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
     }
@@ -159,7 +159,7 @@ public class AuthTests : TestBase
     public async Task ChangePassword_WithWeakNewPassword_ReturnsBadRequest()
     {
         var loginResult = await LoginAsAdminAsync();
-        var command = new { CurrentPassword = "admin123", NewPassword = "weak" };
+        var command = new { CurrentPassword = TestCredentials.Password, NewPassword = "weak" };
         var response = await Client.PostAsJsonAsync($"{AuthUrl}/change-password", command);
         response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
     }
@@ -168,7 +168,7 @@ public class AuthTests : TestBase
     public async Task ChangePassword_WithoutAuth_ReturnsUnauthorized()
     {
         var unauthClient = Factory.CreateClient();
-        var command = new { CurrentPassword = "admin123", NewPassword = "NewAdmin@12345" };
+        var command = new { CurrentPassword = TestCredentials.Password, NewPassword = "NewAdmin@12345" };
         var response = await unauthClient.PostAsJsonAsync($"{AuthUrl}/change-password", command);
         response.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
     }
@@ -184,14 +184,15 @@ public class AuthTests : TestBase
         var refreshResponse = await Client.PostAsJsonAsync($"{AuthUrl}/refresh", refreshCommand);
         refreshResponse.StatusCode.Should().Be(HttpStatusCode.OK);
 
-        var logoutCommand = new { RefreshToken = loginResult.RefreshToken };
+        var refreshed = await refreshResponse.Content.ReadFromJsonAsync<ApiResponse<TokenResultDto>>();
+        var logoutCommand = new { RefreshToken = refreshed!.Data!.RefreshToken };
         var logoutResponse = await Client.PostAsJsonAsync($"{AuthUrl}/logout", logoutCommand);
         logoutResponse.StatusCode.Should().Be(HttpStatusCode.OK);
     }
 
     private async Task<TokenResultDto> LoginAsAdminAsync()
     {
-        var command = new { UserName = "admin123", Password = "admin123" };
+        var command = new { UserName = TestCredentials.UserName, Password = TestCredentials.Password };
         var response = await Client.PostAsJsonAsync($"{AuthUrl}/login", command);
         response.StatusCode.Should().Be(HttpStatusCode.OK);
         var body = await response.Content.ReadFromJsonAsync<ApiResponse<TokenResultDto>>();

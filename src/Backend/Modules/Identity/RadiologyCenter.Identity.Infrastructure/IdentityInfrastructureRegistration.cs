@@ -1,11 +1,10 @@
 using System.Text;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.IdentityModel.Tokens;
+using Microsoft.Extensions.Options;
 using RadiologyCenter.BuildingBlocks.Application.Abstractions;
 using RadiologyCenter.BuildingBlocks.Infrastructure.Persistence.Interceptors;
 using RadiologyCenter.Identity.Application.Abstractions;
@@ -23,12 +22,9 @@ public static class IdentityInfrastructureRegistration
 {
     public static IServiceCollection AddIdentityInfrastructure(this IServiceCollection services, IConfiguration configuration)
     {
-        var connectionString = configuration.GetConnectionString("DefaultConnection");
-        var jwtOptions = configuration.GetSection("Jwt").Get<JwtOptions>()
-            ?? throw new InvalidOperationException("Jwt configuration section is missing.");
 
         services.AddDbContext<IdentityDbContext>((sp, options) =>
-            options.UseSqlServer(connectionString)
+            options.UseSqlServer(sp.GetRequiredService<IConfiguration>().GetConnectionString("DefaultConnection"))
                    .AddInterceptors(sp.GetRequiredService<AuditSoftDeleteInterceptor>())
                    .AddInterceptors(sp.GetRequiredService<DomainEventDispatchInterceptor>())
 );
@@ -39,37 +35,19 @@ public static class IdentityInfrastructureRegistration
         services.AddScoped<IRoleRepository, RoleRepository>();
         services.AddScoped<IPasswordHasher<User>, PasswordHasher<User>>();
 
-        services.Configure<JwtOptions>(configuration.GetSection("Jwt"));
+        services.AddOptions<JwtOptions>().Bind(configuration.GetSection("Jwt"))
+            .Validate(o => Encoding.UTF8.GetByteCount(o.SecretKey) >= 64 && !o.SecretKey.Contains("Development", StringComparison.OrdinalIgnoreCase), "Configure a private randomly generated JWT signing key of at least 64 bytes.")
+            .Validate(o => !string.IsNullOrWhiteSpace(o.Issuer) && !string.IsNullOrWhiteSpace(o.Audience), "JWT issuer and audience are required.")
+            .Validate(o => o.AccessTokenExpirationMinutes is >= 1 and <= 60 && o.RefreshTokenExpirationDays is >= 1 and <= 30, "Token lifetimes are outside the supported bounds.")
+            .ValidateOnStart();
         services.Configure<AccountLockoutOptions>(configuration.GetSection("Lockout"));
         services.AddScoped<ITokenService, TokenService>();
         services.AddScoped<IAuthorizationHandler, PermissionAuthorizationHandler>();
         services.AddSingleton<IAuthorizationPolicyProvider, PermissionPolicyProvider>();
 
-        services.AddAuthentication(options =>
-        {
-            options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-            options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-        })
-        .AddJwtBearer(options =>
-        {
-            options.TokenValidationParameters = new TokenValidationParameters
-            {
-                ValidateIssuer = true,
-                ValidateAudience = true,
-                ValidateLifetime = true,
-                ValidateIssuerSigningKey = true,
-                ValidIssuer = jwtOptions.Issuer,
-                ValidAudience = jwtOptions.Audience,
-                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtOptions.SecretKey)),
-            };
-        });
-
-        services.AddAuthorization(options =>
-        {
-            options.FallbackPolicy = new AuthorizationPolicyBuilder()
-                .RequireAuthenticatedUser()
-                .Build();
-        });
+        // The embedded dispatcher performs authentication and permission checks.
+        // Core authorization has no dependency on HTTP endpoint routing services.
+        services.AddAuthorizationCore();
 
         return services;
     }

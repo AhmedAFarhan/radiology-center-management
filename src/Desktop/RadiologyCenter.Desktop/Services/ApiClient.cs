@@ -1,252 +1,81 @@
-using System.Net;
-using System.Net.Http.Headers;
-using System.Net.Http.Json;
 using System.Text.Json;
-using System.Text.Json.Serialization;
-using MudBlazor;
+using RadiologyCenter.Clinic.Dispatching;
 using RadiologyCenter.Desktop.Models;
-
 namespace RadiologyCenter.Desktop.Services;
 
-public sealed class ApiException : Exception
+public sealed class ApiException(int statusCode, string message, ApiError? error = null) : Exception(message)
 {
-    public int StatusCode { get; }
-    public ApiError? Error { get; }
-
-    public ApiException(int statusCode, string message, ApiError? error = null)
-        : base(message)
-    {
-        StatusCode = statusCode;
-        Error = error;
-    }
+    public int StatusCode { get; } = statusCode;
+    public ApiError? Error { get; } = error;
 }
 
-public sealed class ApiClient
+// Existing feature services keep their interface while calls execute directly in this process.
+public sealed class ApiClient(BusinessRuntimeService business, TokenStorage tokens,
+    AppAuthenticationStateProvider auth, AppLocalizer localizer)
 {
-    // Development only — HTTP sends tokens/passwords in cleartext.
-    // For production, switch to HTTPS and configure via appsettings or environment variable.
-    public const string BaseUrl = "http://localhost:5224";
-    public const string HttpClientName = "Api";
-
-    private static readonly JsonSerializerOptions JsonOptions = new()
+    private static readonly SemaphoreSlim RefreshGate = new(1,1);
+    public Task<T> GetAsync<T>(string path, CancellationToken ct = default) => SendAsync<T>("GET",path,null,ct);
+    public Task<T> PostAsync<T>(string path, object? body = null, CancellationToken ct = default) => SendAsync<T>("POST",path,body,ct);
+    public Task<T> PutAsync<T>(string path, object body, CancellationToken ct = default) => SendAsync<T>("PUT",path,body,ct);
+    public Task SendAsync(string path, object? body = null, CancellationToken ct = default) => SendAsync<object>("POST",path,body,ct);
+    public Task SendDeleteAsync(string path, CancellationToken ct = default) => SendAsync<object>("DELETE",path,null,ct);
+    public async Task<byte[]> GetBytesAsync(string path, CancellationToken ct = default) => File(await DispatchAsync("GET",path,null,ct));
+    public async Task<byte[]> PostBytesAsync(string path, object? body = null, CancellationToken ct = default) => File(await DispatchAsync("POST",path,body,ct));
+    public async Task<T> PostFormAsync<T>(string path, IReadOnlyDictionary<string,string>? fields = null,
+        (string Name,string FileName,string ContentType,Stream Stream)? file = null, CancellationToken ct = default)
     {
-        PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-        DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
-    };
-
-    private readonly HttpClient _http;
-    private readonly TokenStorage _tokenStorage;
-    private readonly AppAuthenticationStateProvider _authState;
-    private readonly AppLocalizer _localizer;
-    private readonly ISnackbar _snackbar;
-    private Task<TokenResult?>? _refreshTask;
-
-    public ApiClient(IHttpClientFactory httpClientFactory, TokenStorage tokenStorage, AppAuthenticationStateProvider authState, AppLocalizer localizer, ISnackbar snackbar)
-    {
-        _tokenStorage = tokenStorage;
-        _authState = authState;
-        _localizer = localizer;
-        _snackbar = snackbar;
-        _http = httpClientFactory.CreateClient(HttpClientName);
+        await business.EnsureDevelopmentAsync(ct);
+        ClinicUpload? upload = null;
+        if (file is {} f) {
+            using var memory = new MemoryStream();
+            var buffer = new byte[81920]; int count;
+            while ((count=await f.Stream.ReadAsync(buffer,ct))>0) {
+                if (memory.Length+count>20*1024*1024) throw new ApiException(400,"Documents must be no larger than 20 MB.");
+                await memory.WriteAsync(buffer.AsMemory(0,count),ct);
+            }
+            upload = new(f.Name,f.FileName,f.ContentType,memory.ToArray());
+        }
+        return Unwrap<T>(await DispatchRequestAsync(new("POST",path,
+            Fields: fields is null ? null : new Dictionary<string,string>(fields,StringComparer.OrdinalIgnoreCase),
+            Upload:upload,AccessToken:tokens.GetTokens()?.AccessToken,Culture:localizer.CurrentCulture),ct));
     }
-
-    public Task<T> GetAsync<T>(string path, CancellationToken ct = default)
-        => SendCoreAsync<T>(() => new HttpRequestMessage(HttpMethod.Get, path), ct);
-
-    public Task<T> PostAsync<T>(string path, object? body = null, CancellationToken ct = default)
-        => SendCoreAsync<T>(() => new HttpRequestMessage(HttpMethod.Post, path) { Content = CreateJson(body) }, ct);
-
-    public Task<T> PutAsync<T>(string path, object body, CancellationToken ct = default)
-        => SendCoreAsync<T>(() => new HttpRequestMessage(HttpMethod.Put, path) { Content = CreateJson(body) }, ct);
-
-    public Task SendAsync(string path, object? body = null, CancellationToken ct = default)
-        => SendCoreAsync<object>(() => new HttpRequestMessage(HttpMethod.Post, path) { Content = CreateJson(body) }, ct);
-
-    public Task SendDeleteAsync(string path, CancellationToken ct = default)
-        => SendCoreAsync<object>(() => new HttpRequestMessage(HttpMethod.Delete, path), ct);
-
-    public Task<T> PostFormAsync<T>(
-        string path,
-        IReadOnlyDictionary<string, string>? fields = null,
-        (string Name, string FileName, string ContentType, Stream Stream)? file = null,
-        CancellationToken ct = default)
-        => SendCoreAsync<T>(() =>
+    private async Task<T> SendAsync<T>(string kind,string path,object? body,CancellationToken ct) => Unwrap<T>(await DispatchAsync(kind,path,body,ct));
+    private async Task<ClinicResult> DispatchAsync(string kind,string path,object? body,CancellationToken ct)
+    {
+        await business.EnsureDevelopmentAsync(ct);
+        var request = new ClinicRequest(kind,path,body is null ? null : JsonSerializer.Serialize(body,ClinicDispatcher.JsonOptions),
+            AccessToken:tokens.GetTokens()?.AccessToken,Culture:localizer.CurrentCulture);
+        return await DispatchRequestAsync(request,ct);
+    }
+    private async Task<ClinicResult> DispatchRequestAsync(ClinicRequest request,CancellationToken ct)
+    {
+        var result = await business.Runtime.Dispatcher.DispatchAsync(request,ct);
+        if (result.StatusCode==401 && business.IsDevelopment && tokens.GetTokens() is {} current && !request.Operation.TrimStart('/').StartsWith("api/auth/") && !request.Operation.TrimStart('/').StartsWith("auth/"))
         {
-            var content = new MultipartFormDataContent();
-            if (fields is not null)
-            {
-                foreach (var (name, value) in fields)
-                {
-                    if (!string.IsNullOrEmpty(value))
-                        content.Add(new StringContent(value!), name);
+            await RefreshGate.WaitAsync(ct);
+            try {
+                var latest=tokens.GetTokens();
+                if (latest is not null && latest.AccessToken==current.AccessToken) {
+                    var refreshed=await business.Runtime.Dispatcher.DispatchAsync(new("POST","auth/refresh",
+                        JsonSerializer.Serialize(new { token=latest.RefreshToken }),Culture:localizer.CurrentCulture),ct);
+                    if (refreshed.IsSuccess) await auth.SignInAsync(AuthTokens.From(Unwrap<TokenResult>(refreshed),latest.Username));
+                    else { await business.SignOutAsync(); await auth.SignOutAsync(); }
                 }
-            }
-
-            if (file is { } f)
-            {
-                var streamContent = new StreamContent(f.Stream);
-                streamContent.Headers.ContentType = new MediaTypeHeaderValue(f.ContentType);
-                content.Add(streamContent, "file", f.FileName);
-            }
-
-            return new HttpRequestMessage(HttpMethod.Post, path) { Content = content };
-        }, ct);
-
-    public Task<byte[]> GetBytesAsync(string path, CancellationToken ct = default)
-        => SendCoreRawAsync(() => new HttpRequestMessage(HttpMethod.Get, path), ct);
-
-    public Task<byte[]> PostBytesAsync(string path, object? body = null, CancellationToken ct = default)
-        => SendCoreRawAsync(() => new HttpRequestMessage(HttpMethod.Post, path) { Content = CreateJson(body) }, ct);
-
-    private async Task<T> SendCoreAsync<T>(Func<HttpRequestMessage> requestFactory, CancellationToken ct)
-    {
-        var response = await SendWithRefreshAsync(requestFactory, ct);
-        return await DeserializeAsync<T>(response, ct);
+                result=await business.Runtime.Dispatcher.DispatchAsync(request with { AccessToken=tokens.GetTokens()?.AccessToken },ct);
+            } finally { RefreshGate.Release(); }
+        }
+        if(result.StatusCode==401 && !business.IsDevelopment) { await business.SignOutAsync(); await auth.SignOutAsync(); }
+        return result;
     }
-
-    private async Task<byte[]> SendCoreRawAsync(Func<HttpRequestMessage> requestFactory, CancellationToken ct)
-    {
-        var response = await SendWithRefreshAsync(requestFactory, ct);
-
-        if (response.StatusCode == HttpStatusCode.Unauthorized)
-            throw new ApiException(401, _localizer.Error.SignOut);
-
-        if (!response.IsSuccessStatusCode)
-        {
-            var error = BuildError(await response.Content.ReadAsStringAsync(ct), (int)response.StatusCode);
-            throw new ApiException(error.StatusCode, error.Message, error.Error);
-        }
-
-        return await response.Content.ReadAsByteArrayAsync(ct);
+    private static byte[] File(ClinicResult result) {
+        if (result.IsSuccess && result.Value is ClinicFile file) return file.Content;
+        _=Unwrap<object>(result); throw new ApiException(500,"The operation did not return a file.");
     }
-
-    private async Task<HttpResponseMessage> SendWithRefreshAsync(Func<HttpRequestMessage> requestFactory, CancellationToken ct)
-    {
-        var request = requestFactory();
-        ApplyAuth(request, null);
-        var response = await _http.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, ct);
-
-        if (response.StatusCode != HttpStatusCode.Unauthorized)
-            return response;
-
-        var tokens = _tokenStorage.GetTokens();
-        if (tokens is null)
-            return response;
-
-        var refreshed = await GetOrStartRefreshAsync(tokens, ct);
-        if (refreshed is null)
-        {
-            await _authState.SignOutAsync();
-            _snackbar.Add(_localizer.Error.SignOut, Severity.Warning);
-            return response;
-        }
-
-        request = requestFactory();
-        ApplyAuth(request, refreshed.AccessToken);
-        return await _http.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, ct);
-    }
-
-    private void ApplyAuth(HttpRequestMessage request, string? accessToken)
-    {
-        request.Headers.AcceptLanguage.TryParseAdd(_localizer.CurrentCulture);
-        if (accessToken is not null)
-        {
-            request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
-            return;
-        }
-
-        var tokens = _tokenStorage.GetTokens();
-        if (tokens is not null)
-            request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", tokens.AccessToken);
-    }
-
-    private Task<TokenResult?> GetOrStartRefreshAsync(AuthTokens tokens, CancellationToken ct)
-    {
-        if (_refreshTask is not null)
-            return _refreshTask;
-
-        _refreshTask = RefreshCoreAsync(tokens, ct);
-        _ = _refreshTask.ContinueWith(
-            _ => _refreshTask = null,
-            CancellationToken.None,
-            TaskContinuationOptions.ExecuteSynchronously,
-            TaskScheduler.Default);
-        return _refreshTask;
-    }
-
-    private async Task<TokenResult?> RefreshCoreAsync(AuthTokens tokens, CancellationToken ct)
-    {
-        try
-        {
-            using var request = new HttpRequestMessage(HttpMethod.Post, "api/auth/refresh")
-            {
-                Content = CreateJson(new { token = tokens.RefreshToken }),
-            };
-
-            var response = await _http.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, ct);
-            if (!response.IsSuccessStatusCode)
-                return null;
-
-            var envelope = await response.Content.ReadFromJsonAsync<ApiEnvelope<TokenResult>>(JsonOptions, ct);
-            if (envelope is not { Success: true } || envelope.Data is null)
-                return null;
-
-            await _authState.SignInAsync(AuthTokens.From(envelope.Data, tokens.Username));
-
-            return envelope.Data;
-        }
-        catch
-        {
-            return null;
-        }
-    }
-
-    private static async Task<T> DeserializeAsync<T>(HttpResponseMessage response, CancellationToken ct)
-    {
-        var content = await response.Content.ReadAsStringAsync(ct);
-
-        if (!response.IsSuccessStatusCode)
-        {
-            var error = BuildError(content, (int)response.StatusCode);
-            throw new ApiException(error.StatusCode, error.Message, error.Error);
-        }
-
-        try
-        {
-            var envelope = JsonSerializer.Deserialize<ApiEnvelope<T>>(content, JsonOptions);
-            if (envelope is null || !envelope.Success)
-                throw new ApiException((int)response.StatusCode, envelope?.Error?.Message ?? envelope?.Message ?? "Request failed.", envelope?.Error);
-
-            return envelope.Data ?? default!;
-        }
-        catch (JsonException)
-        {
-            throw new ApiException((int)response.StatusCode, "Invalid response from server.");
-        }
-    }
-
-    private static HttpContent? CreateJson(object? body)
-    {
-        if (body is null)
-            return null;
-        return JsonContent.Create(body, options: JsonOptions);
-    }
-
-    private static ApiException BuildError(string content, int statusCode)
-    {
-        ApiError? error = null;
-        try
-        {
-            var envelope = JsonSerializer.Deserialize<ApiEnvelope>(content, JsonOptions);
-            error = envelope?.Error;
-            if (string.IsNullOrWhiteSpace(error?.Message))
-                error = new ApiError { Message = envelope?.Message ?? "Request failed." };
-        }
-        catch
-        {
-            // non-JSON error body
-        }
-
-        return new ApiException(statusCode, error?.Message ?? $"Request failed ({statusCode}).", error);
+    private static T Unwrap<T>(ClinicResult result) {
+        var json=JsonSerializer.Serialize(result.Value,ClinicDispatcher.JsonOptions);
+        var envelope=JsonSerializer.Deserialize<ApiEnvelope<T>>(json,ClinicDispatcher.JsonOptions);
+        if (!result.IsSuccess || envelope is not { Success:true })
+            throw new ApiException(result.StatusCode,envelope?.Error?.Message ?? envelope?.Message ?? "The operation failed.",envelope?.Error);
+        return envelope.Data ?? default!;
     }
 }

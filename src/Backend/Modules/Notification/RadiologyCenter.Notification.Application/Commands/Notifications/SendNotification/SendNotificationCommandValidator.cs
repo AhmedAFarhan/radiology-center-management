@@ -13,7 +13,7 @@ public class SendNotificationCommandValidator : AbstractValidator<SendNotificati
 
         RuleFor(x => x.TemplateCode)
             .NotEmpty().WithErrorCode(ErrorCodes.TemplateCodeRequired)
-            .When(x => string.IsNullOrWhiteSpace(x.Subject) && string.IsNullOrWhiteSpace(x.Body))
+            .When(x => string.IsNullOrWhiteSpace(x.Body))
             .WithErrorCode(ErrorCodes.TemplateCodeOrBodyRequired);
 
         RuleFor(x => x.Subject).MaximumLength(500).WithErrorCode(ErrorCodes.SubjectTooLong);

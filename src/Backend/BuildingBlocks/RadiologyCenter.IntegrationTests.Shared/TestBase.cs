@@ -1,11 +1,15 @@
 using System.Net.Http.Json;
 using System.Text.Json;
-using Microsoft.AspNetCore.Mvc.Testing;
 using Xunit;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.AspNetCore.Identity;
+using RadiologyCenter.Identity.Infrastructure.Persistence;
+using RadiologyCenter.Identity.Domain.Entities;
 
 namespace RadiologyCenter.IntegrationTests.Shared;
 
-public abstract class TestBase : IClassFixture<CustomWebApplicationFactory>
+public abstract class TestBase : IClassFixture<CustomWebApplicationFactory>, IAsyncLifetime
 {
     private static readonly JsonSerializerOptions JsonOptions = new()
     {
@@ -19,12 +23,26 @@ public abstract class TestBase : IClassFixture<CustomWebApplicationFactory>
     {
         Factory = factory;
         Client = factory.CreateClient();
-        LoginAsAdminAsync().GetAwaiter().GetResult();
     }
+
+    public async Task InitializeAsync()
+    {
+        await using var scope = Factory.Services.CreateAsyncScope();
+        var context = scope.ServiceProvider.GetRequiredService<IdentityDbContext>();
+        Factory.AssertTestDatabase(context.Database.GetConnectionString());
+        var administrator = await context.Users.SingleAsync(u => u.UserName == TestCredentials.UserName);
+        administrator.Unlock();
+        administrator.SetPasswordHash(new PasswordHasher<User>().HashPassword(administrator, TestCredentials.Password));
+        administrator.ClearDomainEvents();
+        await context.SaveChangesAsync();
+        await LoginAsAdminAsync();
+    }
+
+    public Task DisposeAsync() { Client.Dispose(); return Task.CompletedTask; }
 
     private async Task LoginAsAdminAsync()
     {
-        var loginPayload = new { UserName = "admin123", Password = "admin123" };
+        var loginPayload = new { UserName = TestCredentials.UserName, Password = TestCredentials.Password };
         var response = await Client.PostAsJsonAsync("/api/auth/login", loginPayload);
         response.EnsureSuccessStatusCode();
 

@@ -20,7 +20,7 @@ public static class ExportOperationalReportQueryHandler
             new GetOperationalAnalyticsQuery(query.From, query.To),
             examinationRepository, examinationTypeDirectory, ct);
         if (operationalResult.IsFailure)
-            return Result.Failure<ReportContentDto>(operationalResult.Error);
+            return Result.Failure<ReportContentDto>(operationalResult.Error!);
 
         var today = timezone.GetLocalDate(DateTime.UtcNow);
         var from = query.From ?? today.AddMonths(-1).AddDays(1).ToDateTime(TimeOnly.MinValue);

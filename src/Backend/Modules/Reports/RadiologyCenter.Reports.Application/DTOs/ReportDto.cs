@@ -13,4 +13,5 @@ public record ReportDto(
     ReportVersionDto CurrentVersion,
     string? PatientName = null,
     string? RadiologistName = null,
-    string? ExaminationTypeName = null);
+    string? ExaminationTypeName = null,
+    int Revision = 0);

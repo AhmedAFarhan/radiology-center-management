@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk.Razor">
+<Project Sdk="Microsoft.NET.Sdk.Razor">
 
     <PropertyGroup>
         <TargetFramework>net10.0-windows10.0.19041.0</TargetFramework>
@@ -48,10 +48,10 @@
 
     <ItemGroup>
         <!-- App Icon -->
-        <MauiIcon Include="Resources\AppIcon\appicon.svg" ForegroundFile="Resources\AppIcon\appiconfg.svg" Color="#512BD4" />
+        <MauiIcon Include="Resources\Splash\egcare.png" Color="#4C58E0" />
 
         <!-- Splash Screen -->
-        <MauiSplashScreen Include="Resources\Images\healthcare_logo_v2_512.png" Color="#4C58E0" BaseSize="128,128" />
+        <MauiSplashScreen Include="Resources\Splash\egcare.png" Color="#4C58E0" BaseSize="128,128" />
 
         <!-- Images -->
         <MauiImage Include="Resources\Images\*" />
@@ -77,15 +77,19 @@
         <PackageReference Include="Microsoft.AspNetCore.Components.WebView.Maui" Version="$(MauiVersion)" />
         <PackageReference Include="Microsoft.Extensions.Http" Version="10.0.0" />
         <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="10.0.0" />
-        <PackageReference Include="Microsoft.AspNetCore.SignalR.Client" Version="10.0.4" />
+
         <PackageReference Include="MudBlazor" Version="9.7.0" />
         <PackageReference Include="Velopack" Version="1.2.0" />
   </ItemGroup>
 
   <ItemGroup Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'">
-    <ProjectReference Include="..\..\Backend\Localhost\RadiologyCenter.Localhost\RadiologyCenter.Localhost.csproj" ReferenceOutputAssembly="false" />
+    <ProjectReference Include="..\..\Clinic\RadiologyCenter.Clinic\RadiologyCenter.Clinic.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Content Update="appsettings.Development.json" CopyToOutputDirectory="Never" CopyToPublishDirectory="Never" />
+    <Content Update="appsettings.Development.json" Condition="'$(Configuration)' == 'Debug'" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="Never" />
+  </ItemGroup>
   <ItemGroup>
     <Folder Include="Helpers\" />
     <Folder Include="Security\" />

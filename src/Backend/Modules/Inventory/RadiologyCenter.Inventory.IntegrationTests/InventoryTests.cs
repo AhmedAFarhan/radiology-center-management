@@ -1,3 +1,6 @@
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
+using RadiologyCenter.Inventory.Infrastructure.Persistence;
 using System.Net;
 using System.Net.Http.Json;
 using AwesomeAssertions;
@@ -222,6 +225,30 @@ public class InventoryTests : TestBase
         var fakeId = Guid.NewGuid();
         var response = await Client.GetAsync($"{ItemsUrl}/{fakeId}/stock");
         response.StatusCode.Should().Be(HttpStatusCode.NotFound);
+    }
+
+    [Fact]
+    public async Task IssueStock_ExpiredExistingBatch_DoesNotConsumeStock()
+    {
+        var item = await CreateTestItemAsync();
+        var supplier = await CreateTestSupplierAsync();
+        await ReceiveStockAsync(item, supplier, 20, "EXPIRING-TEST");
+        await using (var scope = Factory.Services.CreateAsyncScope())
+        {
+            var database = scope.ServiceProvider.GetRequiredService<InventoryDbContext>();
+            Factory.AssertTestDatabase(database.Database.GetConnectionString());
+            await using var transaction = await database.Database.BeginTransactionAsync();
+            var batch = await database.StockBatches.SingleAsync(b => b.ItemId == item);
+            database.Entry(batch).Property(b => b.ExpiryDate).CurrentValue = DateTime.UtcNow.Date.AddDays(-1);
+            await database.SaveChangesAsync();
+            await transaction.CommitAsync();
+        }
+        var response = await Client.PostAsJsonAsync($"{ItemsUrl}/{item}/issue", new { ItemId = item, Quantity = 5 });
+        response.StatusCode.Should().Be(HttpStatusCode.Conflict);
+        await using var verification = Factory.Services.CreateAsyncScope();
+        var context = verification.ServiceProvider.GetRequiredService<InventoryDbContext>();
+        Factory.AssertTestDatabase(context.Database.GetConnectionString());
+        (await context.StockBatches.SingleAsync(b => b.ItemId == item)).QuantityRemaining.Should().Be(20);
     }
 
     [Fact]
@@ -619,7 +646,7 @@ public class InventoryTests : TestBase
         return createBody!.Data!.Id;
     }
 
-    private async Task<Guid> CreateTestPurchaseOrderAsync(Guid? itemId = null, Guid? supplierId = null)
+    private async Task<Guid> CreateTestPurchaseOrderAsync(Guid? itemId = null, Guid? supplierId = null, int quantity = 10)
     {
         var item = itemId ?? await CreateTestItemAsync();
         var supplier = supplierId ?? await CreateTestSupplierAsync();
@@ -628,7 +655,7 @@ public class InventoryTests : TestBase
             SupplierId = supplier,
             Items = new[]
             {
-                new { ItemId = item, QuantityOrdered = 10, UnitCost = 25.50m }
+                new { ItemId = item, QuantityOrdered = quantity, UnitCost = 25.50m }
             }
         };
         var response = await Client.PostAsJsonAsync(PurchaseOrdersUrl, command);
@@ -639,7 +666,7 @@ public class InventoryTests : TestBase
 
     private async Task ReceiveStockAsync(Guid itemId, Guid supplierId, int quantity, string lotNumber)
     {
-        var poId = await CreateTestPurchaseOrderAsync(itemId, supplierId);
+        var poId = await CreateTestPurchaseOrderAsync(itemId, supplierId, quantity);
         await Client.PostAsJsonAsync($"{PurchaseOrdersUrl}/{poId}/place", new { });
         var receiveCommand = new
         {
@@ -654,6 +681,24 @@ public class InventoryTests : TestBase
     }
 
     #endregion
+
+    [Fact]
+    public async Task ReceivePurchaseOrder_ConcurrentReceipts_StockIsAddedOnce()
+    {
+        var item = await CreateTestItemAsync();
+        var supplier = await CreateTestSupplierAsync();
+        var order = await CreateTestPurchaseOrderAsync(item, supplier, 10);
+        (await Client.PostAsJsonAsync($"{PurchaseOrdersUrl}/{order}/place", new { })).EnsureSuccessStatusCode();
+        var responses = await Task.WhenAll(Enumerable.Range(0, 2).Select(_ =>
+            Client.PostAsJsonAsync($"{PurchaseOrdersUrl}/{order}/receive", new
+            {
+                PurchaseOrderId = order, Lines = new[] { new { ItemId = item, Quantity = 10, LotNumber = "CONCURRENT" } }
+            })));
+        responses.Count(r => r.StatusCode == HttpStatusCode.OK).Should().Be(1);
+        responses.Count(r => r.StatusCode == HttpStatusCode.BadRequest).Should().Be(1);
+        var stock = await Client.GetFromJsonAsync<ApiResponse<ItemStockDto>>($"{ItemsUrl}/{item}/stock");
+        stock!.Data!.StockOnHand.Should().Be(10);
+    }
 
     #region DTOs
 

@@ -20,6 +20,7 @@ public class RadiologyReportConfiguration : IEntityTypeConfiguration<RadiologyRe
         builder.Property(r => r.Status)
             .HasConversion(s => s.Value, v => ReportStatus.FromValue<ReportStatus>(v));
         builder.Property(r => r.CurrentVersionNumber).IsRequired();
+        builder.Property(r => r.Revision).IsConcurrencyToken();
         builder.Property(r => r.FinalizedAt);
         builder.Property(r => r.CancelReason).HasMaxLength(1000);
 

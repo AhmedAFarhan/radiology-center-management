@@ -46,6 +46,7 @@ public static class CreatePatientCommandHandler
             command.MedicalHistory);
 
         await patientRepository.AddAsync(patient, ct);
+        await unitOfWork.SaveChangesAsync(ct);
         await transaction.CommitAsync(ct);
 
         return Result.Success(patient.Adapt<PatientDto>());

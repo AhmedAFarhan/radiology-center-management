@@ -10,6 +10,8 @@ namespace RadiologyCenter.Insurance.Application.Abstractions;
 /// </summary>
 public interface IInsuranceDirectory
 {
+    Task<bool> PatientExistsAsync(Guid patientId, CancellationToken ct);
+    Task<Guid?> GetExaminationPatientAsync(Guid examinationId, CancellationToken ct);
     Task<IReadOnlyDictionary<Guid, string>> ResolvePatientNamesAsync(IEnumerable<Guid> ids, CancellationToken ct = default);
     Task<IReadOnlyDictionary<Guid, string>> ResolveExaminationTypeNamesAsync(IEnumerable<Guid> examinationIds, CancellationToken ct = default);
 }

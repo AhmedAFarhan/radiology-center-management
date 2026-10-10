@@ -110,7 +110,7 @@ public partial class AllowanceEditorDialog : EditorDialogBase
 
     private async Task SubmitAsync()
     {
-        if (!_editContext.Validate())
+        if (!_editContext.Validate() || _model.EffectiveDate is not DateTime effectiveDate)
             return;
 
         if (!IsEdit && _selectedStaff is null)
@@ -135,7 +135,7 @@ public partial class AllowanceEditorDialog : EditorDialogBase
             Amount = _model.Amount,
             Frequency = string.IsNullOrWhiteSpace(_model.Frequency) ? null : _model.Frequency,
             IsPerWorkDay = _model.IsPerWorkDay,
-            EffectiveDate = _model.EffectiveDate.Value.Date,
+            EffectiveDate = effectiveDate.Date,
             EndDate = _model.EndDate?.Date,
         };
 

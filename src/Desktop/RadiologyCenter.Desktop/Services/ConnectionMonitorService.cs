@@ -47,7 +47,9 @@ public sealed class ConnectionMonitorService : IDisposable
     {
         try
         {
-            return NetworkInformation.GetInternetConnectionProfile() is not null;
+            if (!DesktopConfiguration.UseClinicServer) return true;
+            return NetworkInformation.GetConnectionProfiles().Any(profile =>
+                profile.GetNetworkConnectivityLevel() != NetworkConnectivityLevel.None);
         }
         catch (Exception)
         {

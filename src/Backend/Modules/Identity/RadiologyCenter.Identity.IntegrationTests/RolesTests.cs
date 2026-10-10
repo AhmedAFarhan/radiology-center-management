@@ -31,10 +31,10 @@ public class RolesTests : TestBase
     }
 
     [Fact]
-    public async Task GetById_InvalidGuid_ReturnsBadRequest()
+    public async Task GetById_InvalidGuid_ReturnsNotFound()
     {
         var response = await Client.GetAsync($"{RolesUrl}/not-a-guid");
-        response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+        response.StatusCode.Should().Be(HttpStatusCode.NotFound);
     }
 
     [Fact]
@@ -59,12 +59,12 @@ public class RolesTests : TestBase
     }
 
     [Fact]
-    public async Task Create_DuplicateName_ReturnsConflict()
+    public async Task Create_DuplicateName_ReturnsBadRequest()
     {
         var name = $"DupRole_{Guid.NewGuid():N}";
         await Client.PostAsJsonAsync(RolesUrl, new { Name = name, Description = (string?)null });
         var response = await Client.PostAsJsonAsync(RolesUrl, new { Name = name, Description = (string?)null });
-        response.StatusCode.Should().Be(HttpStatusCode.Conflict);
+        response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
     }
 
     [Fact]
@@ -102,7 +102,7 @@ public class RolesTests : TestBase
     }
 
     [Fact]
-    public async Task Update_DuplicateName_ReturnsConflict()
+    public async Task Update_DuplicateName_ReturnsBadRequest()
     {
         var name1 = $"Role1_{Guid.NewGuid():N}";
         var name2 = $"Role2_{Guid.NewGuid():N}";
@@ -116,7 +116,7 @@ public class RolesTests : TestBase
 
         var command = new { RoleId = roleId2, Name = name1, Description = (string?)null };
         var response = await Client.PutAsJsonAsync($"{RolesUrl}/{roleId2}", command);
-        response.StatusCode.Should().Be(HttpStatusCode.Conflict);
+        response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
     }
 
     [Fact]

@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using RadiologyCenter.Examinations.Domain.Entities;
 using RadiologyCenter.Examinations.Domain.Enumerations;
 
@@ -26,16 +27,17 @@ public class ExaminationConfiguration : IEntityTypeConfiguration<Examination>
             .HasConversion(p => p.Value, v => ExaminationPriority.FromValue<ExaminationPriority>(v));
         builder.Property(e => e.Status)
             .HasConversion(s => s.Value, v => ExaminationStatus.FromValue<ExaminationStatus>(v));
-        builder.Property(e => e.ScheduledAt);
-        builder.Property(e => e.ScheduledEnd);
-        builder.Property(e => e.StartedAt);
-        builder.Property(e => e.CompletedAt);
+        var utc = new ValueConverter<DateTime, DateTime>(value => value, value => DateTime.SpecifyKind(value, DateTimeKind.Utc));
+        builder.Property(e => e.ScheduledAt).HasConversion(utc);
+        builder.Property(e => e.ScheduledEnd).HasConversion(utc);
+        builder.Property(e => e.StartedAt).HasConversion(utc);
+        builder.Property(e => e.CompletedAt).HasConversion(utc);
         builder.Property(e => e.PerformedByUserId);
         builder.Property(e => e.Notes).HasMaxLength(500);
         builder.Property(e => e.CancellationReason).HasMaxLength(500);
         builder.Property(e => e.StudyInstanceUID).HasMaxLength(64);
         builder.Property(e => e.AccessionNumber).HasMaxLength(64);
-        builder.Property(e => e.ImagesReceivedAt);
+        builder.Property(e => e.ImagesReceivedAt).HasConversion(utc);
         builder.Property(e => e.Price).HasPrecision(18, 2).IsRequired();
         builder.Property(e => e.Discount).HasPrecision(18, 2).IsRequired();
         builder.Property(e => e.IsDiscountPercentage).IsRequired();

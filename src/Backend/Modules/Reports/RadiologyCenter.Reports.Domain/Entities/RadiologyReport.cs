@@ -16,6 +16,9 @@ public sealed class RadiologyReport : AuditableAggregateRoot<Guid>
     public Guid RadiologistId { get; private set; }
     public ReportStatus Status { get; private set; }
     public int CurrentVersionNumber { get; private set; }
+    public int Revision { get; private set; }
+
+    public void MarkChanged() => Revision = checked(Revision + 1);
     public DateTime? FinalizedAt { get; private set; }
     public string? CancelReason { get; private set; }
 

@@ -15,10 +15,14 @@ public static class AddCashEntryCommandHandler
         ICashSessionRepository sessionRepository,
         ICashEntryRepository entryRepository,
         ICashUnitOfWork unitOfWork,
+        ITransactionLock transactionLock,
         CancellationToken ct)
     {
         if (!Guid.TryParse(currentUser.Id, out var userId))
             return Result.Failure<CashEntryDto>(Error.Unauthorized());
+
+        await using var transaction = await unitOfWork.BeginTransactionAsync(ct);
+        await transactionLock.AcquireAsync(transaction, new[] { "cash:ledger" }, ct);
 
         var session = await sessionRepository.GetByIdAsync(command.CashSessionId, ct);
         if (session is null)
@@ -42,6 +46,7 @@ public static class AddCashEntryCommandHandler
 
         await entryRepository.AddAsync(entry, ct);
         await unitOfWork.SaveChangesAsync(ct);
+        await transaction.CommitAsync(ct);
 
         return Result.Success(entry.ToDto());
     }

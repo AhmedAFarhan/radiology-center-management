@@ -26,7 +26,7 @@ public class CashSessionConfiguration : IEntityTypeConfiguration<CashSession>
 
         builder.Property(s => s.RowVersion).IsRowVersion();
 
-        builder.HasIndex(s => s.UserId);
+        builder.HasIndex(s => s.UserId).IsUnique().HasFilter("[Status] = 1 AND [IsDeleted] = 0");
         builder.HasIndex(s => s.Status);
     }
 }

@@ -23,10 +23,12 @@
                 <MudItem xs="12" sm="6">
                     <MudText Typo="Typo.caption" Class="text-secondary">@T.VisitDialog.Patient</MudText>
                     <MudText Typo="Typo.subtitle1">@_patientName</MudText>
+                    <MudText Typo="Typo.caption">@_patientCode</MudText>
                 </MudItem>
                 <MudItem xs="12" sm="6">
                     <MudText Typo="Typo.caption" Class="text-secondary">@T.VisitDialog.Examination</MudText>
                     <MudText Typo="Typo.subtitle1">@_visit.ExaminationTypeName</MudText>
+                    <MudText Typo="Typo.caption">@(T.IsRTL ? "رقم الفحص" : "Accession number"): @_visit.AccessionNumber</MudText>
                 </MudItem>
                 <MudItem xs="12" sm="6">
                     <MudText Typo="Typo.caption" Class="text-secondary">@T.Common.Status</MudText>
@@ -54,7 +56,7 @@
                 </MudItem>
                 <MudItem xs="12" sm="4">
                     <MudText Typo="Typo.caption" Class="text-secondary">@T.VisitDialog.Scheduled</MudText>
-                    <MudText Typo="Typo.body1">@(_visit.ScheduledAt.HasValue ? _visit.ScheduledAt.Value.ToString("g") : "-")</MudText>
+                    <MudText Typo="Typo.body1">@(_visit.ScheduledAt.HasValue ? ClinicTime.ToLocal(_visit.ScheduledAt.Value).ToString("g") : "-")</MudText>
                 </MudItem>
                 <MudItem xs="12" sm="4">
                     <MudText Typo="Typo.caption" Class="text-secondary">@T.VisitDialog.Started</MudText>

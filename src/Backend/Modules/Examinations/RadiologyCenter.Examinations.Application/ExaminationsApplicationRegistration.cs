@@ -15,6 +15,7 @@ public static class ExaminationsApplicationRegistration
         ExaminationsMappingConfig.Configure();
 
         services.AddScoped<IPatientInfoResolver, PatientInfoResolver>();
+        services.AddScoped<Scheduling.ExaminationScheduler>();
 
         return services;
     }

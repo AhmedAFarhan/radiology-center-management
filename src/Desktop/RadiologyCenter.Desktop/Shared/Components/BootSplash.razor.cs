@@ -20,6 +20,8 @@ namespace RadiologyCenter.Desktop.Shared.Components;
 public partial class BootSplash : ComponentBase
 {
 private bool _retrying;
+private bool _configure;
+    private void SetupCompleted() { _configure=false; StateHasChanged(); }
 
     protected override async Task OnInitializedAsync()
     {
@@ -33,8 +35,8 @@ private bool _retrying;
     {
         _retrying = true;
         StateHasChanged();
-        await Backend.RetryAsync();
-        _retrying = false;
+        try { await Backend.RetryAsync(); }
+        finally { _retrying = false; }
     }
 
     public void Dispose() => Backend.StateChanged -= NotifyStateChanged;

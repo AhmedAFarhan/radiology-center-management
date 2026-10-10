@@ -1,0 +1,21 @@
+@inject BusinessRuntimeService Business
+@inject AppLocalizer T
+<MudDialog><DialogContent>
+    <MudText>@(T.IsRTL?"حساب خادم الصور":"Image server account")</MudText>
+    <MudText Typo="Typo.body2">@(T.IsRTL?"استخدم حساب عرض الصور الشخصي الذي أنشأه مسؤول العيادة.":"Use your personal image-viewing account provided by the clinic administrator.")</MudText>
+    <MudTextField @bind-Value="_user" Label="@(T.IsRTL?"اسم المستخدم":"Username")" Variant="Variant.Outlined" Class="my-2" />
+    <MudTextField @bind-Value="_password" InputType="InputType.Password" Label="@(T.IsRTL?"كلمة المرور":"Password")" Variant="Variant.Outlined" Class="my-2" />
+    @if(_error is not null) { <MudAlert Severity="Severity.Error">@_error</MudAlert> }
+</DialogContent><DialogActions><MudButton OnClick="SaveAsync" Disabled="_busy" Color="Color.Primary">@T.Common.Save</MudButton><MudButton OnClick="Close" Disabled="_busy">@T.Common.Cancel</MudButton></DialogActions></MudDialog>
+@code {
+    [CascadingParameter] public IMudDialogInstance MudDialog { get; set; }=default!;
+    private string _user="",_password=""; private string? _error; private bool _busy;
+    private async Task SaveAsync()
+    {
+        _busy=true;_error=null;
+        try { await (PacsService.Instance??throw new InvalidOperationException("Image service is unavailable.")).VerifyAccountAsync(_user,_password); Business.ConfigurePacsAccount(_user,_password); _password=""; MudDialog.Close(); }
+        catch(Exception ex) { _error=ex.Message; }
+        finally { _busy=false; }
+    }
+    private void Close()=>MudDialog.Close();
+}

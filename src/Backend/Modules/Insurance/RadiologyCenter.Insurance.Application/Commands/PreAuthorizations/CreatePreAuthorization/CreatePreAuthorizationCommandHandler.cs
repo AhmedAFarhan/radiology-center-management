@@ -12,12 +12,15 @@ public static class CreatePreAuthorizationCommandHandler
         IPreAuthorizationRepository preAuthorizationRepository,
         IClaimRepository claimRepository,
         IInsuranceUnitOfWork unitOfWork,
+        IInsuranceDirectory directory,
         CancellationToken ct)
     {
         if (await policyRepository.GetByIdAsync(command.PolicyId, ct) is not { } policy)
             return Result.Failure<PreAuthorizationDto>(Error.NotFound(ErrorCodes.PolicyNotFound, "Policy", command.PolicyId));
         if (!policy.IsActive)
             return Result.Failure<PreAuthorizationDto>(Error.Conflict(ErrorCodes.PolicyNotActive, "Policy is not active."));
+        if (policy.PatientId != command.PatientId || await directory.GetExaminationPatientAsync(command.ExaminationId, ct) != command.PatientId)
+            return Result.Failure<PreAuthorizationDto>(Error.Conflict("Insurance.ExaminationPatientMismatch", "The policy and examination must belong to the same patient."));
 
         if (await preAuthorizationRepository.GetByExaminationIdAsync(command.ExaminationId, ct) is not null)
             return Result.Failure<PreAuthorizationDto>(Error.Conflict(ErrorCodes.PreAuthorizationAlreadyExists, "A pre-authorization already exists for this examination."));

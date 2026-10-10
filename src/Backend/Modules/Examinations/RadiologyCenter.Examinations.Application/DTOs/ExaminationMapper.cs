@@ -64,5 +64,6 @@ internal static class ExaminationMapper
             examination.Remaining,
             examination.Notes,
             examination.Items.Count,
-            examination.StudyInstanceUID);
+            examination.StudyInstanceUID,
+            examination.AccessionNumber);
 }
