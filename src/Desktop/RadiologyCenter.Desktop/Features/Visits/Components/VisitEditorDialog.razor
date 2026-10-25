@@ -13,7 +13,7 @@
             <LocalizedDataAnnotationsValidator />
             <MudGrid Spacing="2">
                 <MudItem xs="12" sm="6">
-                    <MudAutocomplete T="PatientDto"
+                    <MudAutocomplete Disabled="_busy" T="PatientDto"
                                      @bind-Value="_model.Patient"
                                      Label="@T.VisitDialog.PatientSearch"
                                      Variant="Variant.Outlined"
@@ -26,7 +26,7 @@
                                      Clearable="true" />
                 </MudItem>
                 <MudItem xs="12" sm="6">
-                    <MudAutocomplete T="ExaminationTypeDto"
+                    <MudAutocomplete Disabled="_busy" T="ExaminationTypeDto"
                                      @bind-Value="_model.ExaminationType"
                                      Label="@T.VisitDialog.TypeSearch"
                                      Variant="Variant.Outlined"
@@ -39,7 +39,7 @@
                                      Clearable="true" />
                 </MudItem>
                 <MudItem xs="12" sm="6">
-                    <MudSelect T="string"
+                    <MudSelect Disabled="_busy" T="string"
                                @bind-Value="_model.RadiologistId"
                                Label="@T.VisitDialog.Radiologist"
                                Variant="Variant.Outlined"
@@ -52,7 +52,7 @@
                     </MudSelect>
                 </MudItem>
                 <MudItem xs="12" sm="6">
-                    <MudSelect T="string"
+                    <MudSelect Disabled="_busy" T="string"
                                @bind-Value="_model.TechnicianId"
                                Label="@T.VisitDialog.Technician"
                                Variant="Variant.Outlined"
@@ -65,7 +65,7 @@
                     </MudSelect>
                 </MudItem>
                 <MudItem xs="12" sm="6">
-                    <MudAutocomplete T="ReferralDoctorDto"
+                    <MudAutocomplete Disabled="_busy" T="ReferralDoctorDto"
                                      @bind-Value="_selectedReferralDoctor"
                                      Label="@T.VisitDialog.ReferralDoctorId"
                                      Variant="Variant.Outlined"
@@ -77,7 +77,7 @@
                                      Clearable="true" />
                 </MudItem>
                 <MudItem xs="12" sm="6">
-                    <MudSelect T="string"
+                    <MudSelect Disabled="_busy" T="string"
                                @bind-Value="_model.Priority"
                                Label="@T.VisitDialog.Priority"
                                Variant="Variant.Outlined"
@@ -89,7 +89,7 @@
                     </MudSelect>
                 </MudItem>
                 <MudItem xs="12" sm="6">
-                    <MudSelect T="string"
+                    <MudSelect Disabled="_busy" T="string"
                                @bind-Value="_model.Status"
                                Label="@T.VisitDialog.Status"
                                Variant="Variant.Outlined"
@@ -103,7 +103,7 @@
                 @if (_model.Status == "Scheduled")
                 {
                     <MudItem xs="12" sm="6">
-                        <MudDatePicker @bind-Date="_model.ScheduledDate"
+                        <MudDatePicker Disabled="_busy" @bind-Date="_model.ScheduledDate"
                                        Label="@T.VisitDialog.ScheduledDate"
                                        Variant="Variant.Outlined"
                                        Margin="Margin.Dense"
@@ -111,7 +111,7 @@
                                        For="@(() => _model.ScheduledDate)" />
                     </MudItem>
                     <MudItem xs="12" sm="6">
-                    <MudTimePicker @bind-Time="_model.ScheduledTime"
+                    <MudTimePicker Disabled="_busy" @bind-Time="_model.ScheduledTime"
                                    Label="@T.VisitDialog.ScheduledTime"
                                    Variant="Variant.Outlined"
                                    Margin="Margin.Dense"
@@ -120,7 +120,7 @@
                     </MudItem>
                 }
                 <MudItem xs="12">
-                    <MudTextField @bind-Value="_model.ClinicalIndication"
+                    <MudTextField Disabled="_busy" @bind-Value="_model.ClinicalIndication"
                                   Label="@T.VisitDialog.ClinicalIndication"
                                   Variant="Variant.Outlined"
                                   Margin="Margin.Dense"
@@ -142,7 +142,7 @@
                                      ReadOnly="true" />
                 </MudItem>
                 <MudItem xs="12" sm="6">
-                    <MudNumericField T="decimal"
+                    <MudNumericField Disabled="_busy" T="decimal"
                                      @bind-Value="_model.Discount"
                                      Label="@T.VisitDialog.Discount"
                                      Variant="Variant.Outlined"
@@ -150,10 +150,10 @@
                                      Min="0" />
                 </MudItem>
                 <MudItem xs="12" sm="6">
-                    <MudSwitch T="bool" @bind-Value="_model.IsDiscountPercentage" Color="Color.Primary">@T.VisitDialog.DiscountIsPercentage</MudSwitch>
+                    <MudSwitch Disabled="_busy" T="bool" @bind-Value="_model.IsDiscountPercentage" Color="Color.Primary">@T.VisitDialog.DiscountIsPercentage</MudSwitch>
                 </MudItem>
                 <MudItem xs="12" sm="6">
-                    <MudNumericField T="decimal"
+                    <MudNumericField Disabled="_busy" T="decimal"
                                      @bind-Value="_model.Paid"
                                      Label="@T.VisitDialog.AmountPaid"
                                      Variant="Variant.Outlined"
@@ -161,7 +161,7 @@
                                      Min="0" />
                 </MudItem>
                 <MudItem xs="12">
-                    <MudTextField @bind-Value="_model.Notes"
+                    <MudTextField Disabled="_busy" @bind-Value="_model.Notes"
                                   Label="@T.VisitDialog.Notes"
                                   Variant="Variant.Outlined"
                                   Margin="Margin.Dense"

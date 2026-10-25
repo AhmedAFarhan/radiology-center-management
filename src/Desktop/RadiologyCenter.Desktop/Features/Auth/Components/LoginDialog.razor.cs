@@ -49,26 +49,33 @@ public partial class LoginDialog : ComponentBase
         await SafeExecute.RunAsync(async () =>
             {
                 var mustChangePassword = await AuthService.SignInAsync(_model.UserName, _model.Password);
-                if (mustChangePassword)
-                {
-                    Snackbar.Add(T.Login.MustChangePassword, Severity.Warning);
-                    MudDialog.Close(DialogResult.Ok(true));
-                    var options = new DialogOptions
-                    {
-                        CloseOnEscapeKey = false,
-                        BackdropClick = false,
-                        MaxWidth = MaxWidth.Small,
-                        FullWidth = true,
-                        NoHeader = true,
-                    };
-                    await DialogService.ShowAsync<ChangePasswordDialog>(T.ChangePassword.Title, new DialogParameters { ["Forced"] = true }, options);
-                    Navigation.NavigateTo(ReturnUrl.Consume() ?? "/dashboard");
-                    return;
-                }
-
-                Snackbar.Add(T.Login.Welcome, Severity.Success);
+                _model.Password = string.Empty;
                 MudDialog.Close(DialogResult.Ok(true));
-                Navigation.NavigateTo(ReturnUrl.Consume() ?? "/dashboard");
+                await Features.Auth.Services.SignInCompletion.CompleteAsync(
+                    mustChangePassword,
+                    async () =>
+                    {
+                        Snackbar.Add(T.Login.MustChangePassword, Severity.Warning);
+                        var options = new DialogOptions
+                        {
+                            CloseOnEscapeKey = false,
+                            BackdropClick = false,
+                            MaxWidth = MaxWidth.Small,
+                            FullWidth = true,
+                            NoHeader = true,
+                        };
+                        var dialog = await DialogService.ShowAsync<ChangePasswordDialog>(
+                            T.ChangePassword.Title, new DialogParameters { ["Forced"] = true }, options);
+                        // ShowAsync returns when displayed; Result completes after the user finishes.
+                        var result = await dialog.Result;
+                        return result is { Canceled: false, Data: true };
+                    },
+                    () => AuthService.SignOutAsync(),
+                    () =>
+                    {
+                        Snackbar.Add(T.Login.Welcome, Severity.Success);
+                        Navigation.NavigateTo(ReturnUrl.Consume() ?? "/dashboard");
+                    });
             },
             Snackbar,
             () => T.Login.Unreachable,

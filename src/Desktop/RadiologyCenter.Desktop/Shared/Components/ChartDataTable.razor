@@ -1,0 +1,15 @@
+@inject AppLocalizer T
+<details class="chart-data">
+    <summary>@(T.IsRTL ? "عرض القيم في جدول" : "View values in a table")</summary>
+    <div class="chart-data-scroll" tabindex="0" role="region" aria-label="@(T.IsRTL ? "بيانات الرسم البياني" : "Chart data")">
+        <table>
+            <caption class="sr-only">@(T.IsRTL ? "بيانات الرسم البياني" : "Chart data")</caption>
+            <thead><tr>@foreach (var header in Headers) { <th scope="col">@header</th> }</tr></thead>
+            <tbody>@foreach (var row in Rows) { <tr>@for (var i = 0; i < row.Count; i++) { @if (i == 0) { <th scope="row">@row[i]</th> } else { <td>@row[i]</td> } }</tr> }</tbody>
+        </table>
+    </div>
+</details>
+@code {
+    [Parameter] public IReadOnlyList<string> Headers { get; set; } = [];
+    [Parameter] public IEnumerable<IReadOnlyList<string>> Rows { get; set; } = [];
+}

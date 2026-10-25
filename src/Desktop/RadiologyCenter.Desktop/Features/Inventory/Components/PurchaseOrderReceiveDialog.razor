@@ -30,7 +30,7 @@
 
                 <MudGrid Spacing="2" Class="mt-1">
                     <MudItem xs="12" sm="4">
-                        <MudNumericField T="int?"
+                        <MudNumericField Disabled="_busy" T="int?"
                                          @bind-Value="line.Quantity"
                                          Label="@T.PoDialog.ReceiveQty"
                                          Variant="Variant.Outlined"
@@ -39,14 +39,14 @@
                                          Max="@remaining" />
                     </MudItem>
                     <MudItem xs="12" sm="4">
-                        <MudTextField @bind-Value="line.LotNumber"
+                        <MudTextField Disabled="_busy" @bind-Value="line.LotNumber"
                                       Label="@T.PoDialog.LotNumber"
                                       Variant="Variant.Outlined"
                                       Margin="Margin.Dense"
                                       Immediate="true" />
                     </MudItem>
                     <MudItem xs="12" sm="4">
-                        <MudDatePicker @bind-Date="line.ExpiryDate"
+                        <MudDatePicker Disabled="_busy" @bind-Date="line.ExpiryDate"
                                        Label="@T.PoDialog.ExpiryDate"
                                        Variant="Variant.Outlined"
                                        Margin="Margin.Dense"

@@ -10,7 +10,7 @@
             <LocalizedDataAnnotationsValidator />
             <MudGrid Spacing="2">
                 <MudItem xs="12">
-                    <MudTextField @bind-Value="_model.Name"
+                    <MudTextField Disabled="Busy" @bind-Value="_model.Name"
                                   Label="@T.Common.Name"
                                   Variant="Variant.Outlined"
                                   Margin="Margin.Dense"
@@ -18,7 +18,7 @@
                                   For="@(() => _model.Name)" />
                 </MudItem>
                 <MudItem xs="12" sm="6">
-                    <MudSelect T="string"
+                    <MudSelect Disabled="Busy" T="string"
                                @bind-Value="_model.Modality"
                                Label="@T.ExamDialog.Modality"
                                Variant="Variant.Outlined"
@@ -31,7 +31,7 @@
                     </MudSelect>
                 </MudItem>
                 <MudItem xs="12" sm="6">
-                    <MudTextField @bind-Value="_model.BodyPart"
+                    <MudTextField Disabled="Busy" @bind-Value="_model.BodyPart"
                                   Label="@T.ExamDialog.BodyPart"
                                   Variant="Variant.Outlined"
                                   Margin="Margin.Dense"
@@ -39,7 +39,7 @@
                                   For="@(() => _model.BodyPart)" />
                 </MudItem>
                 <MudItem xs="12" sm="6">
-                    <MudNumericField T="int"
+                    <MudNumericField Disabled="Busy" T="int"
                                      @bind-Value="_model.StandardDurationMinutes"
                                      Label="@T.ExamDialog.StandardDuration"
                                      Variant="Variant.Outlined"
@@ -48,7 +48,7 @@
                                      For="@(() => _model.StandardDurationMinutes)" />
                 </MudItem>
                 <MudItem xs="12" sm="6">
-                    <MudNumericField T="decimal"
+                    <MudNumericField Disabled="Busy" T="decimal"
                                      @bind-Value="_model.Price"
                                      Label="@T.ExamDialog.Price"
                                      Variant="Variant.Outlined"
@@ -57,10 +57,10 @@
                                      For="@(() => _model.Price)" />
                 </MudItem>
                 <MudItem xs="12" sm="6">
-                    <MudSwitch T="bool" @bind-Value="_model.RequiresPreparation" Color="Color.Info">@T.ExamDialog.RequiresPreparation</MudSwitch>
+                    <MudSwitch Disabled="Busy" T="bool" @bind-Value="_model.RequiresPreparation" Color="Color.Info">@T.ExamDialog.RequiresPreparation</MudSwitch>
                 </MudItem>
                 <MudItem xs="12" sm="6">
-                    <MudSwitch T="bool" @bind-Value="_model.RequiresConsent" Color="Color.Warning">@T.ExamDialog.RequiresConsent</MudSwitch>
+                    <MudSwitch Disabled="Busy" T="bool" @bind-Value="_model.RequiresConsent" Color="Color.Warning">@T.ExamDialog.RequiresConsent</MudSwitch>
                 </MudItem>
             </MudGrid>
 
@@ -74,7 +74,7 @@
             {
                 <MudGrid Spacing="2" Class="align-center mb-2">
                     <MudItem xs="12" sm="5">
-                        <MudSelect T="string"
+                        <MudSelect Disabled="Busy" T="string"
                                    @bind-Value="item.ItemId"
                                    Label="@T.ExamDialog.InventoryItem"
                                    Variant="Variant.Outlined"
@@ -86,7 +86,7 @@
                         </MudSelect>
                     </MudItem>
                     <MudItem xs="12" sm="2">
-                        <MudNumericField T="int"
+                        <MudNumericField Disabled="Busy" T="int"
                                          @bind-Value="item.Quantity"
                                          Label="@T.ExamDialog.Qty"
                                          Variant="Variant.Outlined"
@@ -94,8 +94,8 @@
                                          Min="1" />
                     </MudItem>
                     <MudItem xs="12" sm="4">
-                        <MudSwitch T="bool" @bind-Value="item.IsContrast" Color="Color.Secondary" Class="me-3">@T.ExamDialog.Contrast</MudSwitch>
-                        <MudSwitch T="bool" @bind-Value="item.IsRequired" Color="Color.Primary">@T.ExamDialog.Required</MudSwitch>
+                        <MudSwitch Disabled="Busy" T="bool" @bind-Value="item.IsContrast" Color="Color.Secondary" Class="me-3">@T.ExamDialog.Contrast</MudSwitch>
+                        <MudSwitch Disabled="Busy" T="bool" @bind-Value="item.IsRequired" Color="Color.Primary">@T.ExamDialog.Required</MudSwitch>
                     </MudItem>
                     <MudItem xs="12" sm="1">
                         <MudIconButton Icon="@Icons.Material.Filled.RemoveCircleOutline"

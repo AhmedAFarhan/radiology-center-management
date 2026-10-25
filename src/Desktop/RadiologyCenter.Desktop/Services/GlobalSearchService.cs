@@ -89,7 +89,8 @@ public sealed class GlobalSearchService : IDisposable
             case "ArrowDown":
                 if (ShowRecents && RecentSearches.Count > 0)
                 {
-                    SelectedIndex = 0;
+                    SelectedIndex = Math.Min(SelectedIndex + 1, RecentSearches.Count - 1);
+                    await NotifyStateChanged();
                     break;
                 }
 
@@ -98,7 +99,9 @@ public sealed class GlobalSearchService : IDisposable
                 await NotifyStateChanged();
                 break;
             case "ArrowUp":
-                if (FlatItems.Count > 0)
+                if (ShowRecents && RecentSearches.Count > 0)
+                    SelectedIndex = Math.Max(SelectedIndex - 1, 0);
+                else if (FlatItems.Count > 0)
                     SelectedIndex = Math.Max(SelectedIndex - 1, 0);
                 await NotifyStateChanged();
                 break;
@@ -106,7 +109,7 @@ public sealed class GlobalSearchService : IDisposable
                 if (SelectedIndex >= 0 && SelectedIndex < FlatItems.Count)
                     await OnActivateItem(FlatItems[SelectedIndex]);
                 else if (ShowRecents && RecentSearches.Count > 0)
-                    await OnRecentClicked(RecentSearches[0]);
+                    await OnRecentClicked(RecentSearches[Math.Clamp(SelectedIndex, 0, RecentSearches.Count - 1)]);
                 break;
             case "Escape":
                 CloseSearch();

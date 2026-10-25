@@ -30,6 +30,8 @@ private DashboardData? _data;
         await Task.WhenAll(LoadAsync(), LoadInsuranceAsync());
     }
 
+    private Task RefreshAsync() => Task.WhenAll(LoadAsync(), LoadInsuranceAsync());
+
     private async Task LoadAsync()
     {
         _loading = true;

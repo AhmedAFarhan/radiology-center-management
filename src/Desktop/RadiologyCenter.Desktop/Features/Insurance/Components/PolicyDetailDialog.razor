@@ -53,14 +53,8 @@
                 }
             }
 
-            <MudButton HtmlTag="label" for="policy-doc-input"
-                       Variant="Variant.Outlined" Color="Color.Primary"
-                       StartIcon="@Icons.Material.Filled.Upload"
-                       Disabled="_busy"
-                       Class="mt-2">
-                @(_busy ? T.PolicyDialog.Uploading : T.PolicyDialog.UploadDocument)
-            </MudButton>
-            <InputFile id="policy-doc-input" OnChange="OnFileSelectedAsync" style="display:none" />
+            <label for="policy-doc-input" class="file-input-label">@(_busy ? T.PolicyDialog.Uploading : T.PolicyDialog.UploadDocument)</label>
+            <InputFile id="policy-doc-input" OnChange="OnFileSelectedAsync" class="accessible-file-input" disabled="_busy" />
             <MudText Typo="Typo.caption" Class="text-secondary mt-1">@T.PolicyDialog.DocumentsHint</MudText>
         }
     </DialogContent>

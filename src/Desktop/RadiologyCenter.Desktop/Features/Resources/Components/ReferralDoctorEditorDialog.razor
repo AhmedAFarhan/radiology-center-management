@@ -8,7 +8,7 @@
             <LocalizedDataAnnotationsValidator />
             <MudGrid Spacing="2">
                 <MudItem xs="12">
-                    <MudTextField @bind-Value="_model.FullName"
+                    <MudTextField Disabled="Busy" @bind-Value="_model.FullName"
                                   Label="@T.ReferralDoctorDialog.FullName"
                                   Variant="Variant.Outlined"
                                   Margin="Margin.Dense"
@@ -16,7 +16,7 @@
                                   For="@(() => _model.FullName)" />
                 </MudItem>
                 <MudItem xs="12" sm="6">
-                    <MudTextField @bind-Value="_model.Phone"
+                    <MudTextField InputType="InputType.Telephone" Disabled="Busy" @bind-Value="_model.Phone"
                                   Label="@T.ReferralDoctorDialog.PhoneNumber"
                                   Variant="Variant.Outlined"
                                   Margin="Margin.Dense"
@@ -24,7 +24,7 @@
                                   For="@(() => _model.Phone)" />
                 </MudItem>
                 <MudItem xs="12" sm="6">
-                    <MudTextField @bind-Value="_model.Email"
+                    <MudTextField InputType="InputType.Email" Disabled="Busy" @bind-Value="_model.Email"
                                   Label="@T.ReferralDoctor.Email"
                                   Variant="Variant.Outlined"
                                   Margin="Margin.Dense"
@@ -32,14 +32,14 @@
                                   For="@(() => _model.Email)" />
                 </MudItem>
                 <MudItem xs="12" sm="6">
-                    <MudTextField @bind-Value="_model.Specialization"
+                    <MudTextField Disabled="Busy" @bind-Value="_model.Specialization"
                                   Label="@T.ReferralDoctor.Specialization"
                                   Variant="Variant.Outlined"
                                   Margin="Margin.Dense"
                                   Immediate="true" />
                 </MudItem>
                 <MudItem xs="12" sm="6">
-                    <MudTextField @bind-Value="_model.Hospital"
+                    <MudTextField Disabled="Busy" @bind-Value="_model.Hospital"
                                   Label="@T.ReferralDoctorDialog.HospitalClinic"
                                   Variant="Variant.Outlined"
                                   Margin="Margin.Dense"

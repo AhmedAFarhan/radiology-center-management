@@ -16,5 +16,6 @@ else
                          XValue="@(m => m.Modality)"
                          YValue="@(m => m.Collected)" />
     </ApexChart>
+    <ChartDataTable Headers="@(new[] { T.Equipment.Modality, T.Analytics.Collected })" Rows="@Items.Select(row => new[] { row.Modality, row.Collected.ToString("N2") })" />
 }
 

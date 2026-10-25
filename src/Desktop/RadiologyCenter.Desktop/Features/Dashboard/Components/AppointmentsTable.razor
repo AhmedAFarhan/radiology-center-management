@@ -8,12 +8,13 @@
         </CardHeaderContent>
     </MudCardHeader>
     <MudCardContent>
-        <MudTable T="ExaminationDto" Items="Items" Dense="true" Hover="true" Striped="true" Elevation="0">
+        <MudTable T="ExaminationListItemDto" Items="Items" Dense="true" Hover="true" Striped="true" Elevation="0">
             <HeaderContent>
                 <MudTh>@T.Dashboard.ExamType</MudTh>
                 <MudTh>@T.Dashboard.ExamStatus</MudTh>
                 <MudTh>@T.Dashboard.ExamPriority</MudTh>
-                <MudTh>@T.Dashboard.ReferringDoctor</MudTh>
+                <MudTh>@T.VisitSchedule.ScheduledDate</MudTh>
+                <MudTh>@T.Common.Actions</MudTh>
             </HeaderContent>
             <RowTemplate>
                 <MudTd DataLabel="@T.Dashboard.ExamType">@context.ExaminationTypeName</MudTd>
@@ -21,7 +22,8 @@
                     <StatusChip Token="@context.StatusKey">@context.Status</StatusChip>
                 </MudTd>
                 <MudTd DataLabel="@T.Dashboard.ExamPriority">@context.Priority</MudTd>
-                <MudTd DataLabel="@T.Dashboard.ReferringDoctor">@(string.IsNullOrWhiteSpace(context.ReferralDoctorId) ? "-" : "-")</MudTd>
+                <MudTd DataLabel="@T.VisitSchedule.ScheduledDate">@(context.ScheduledAt.HasValue ? ClinicTime.ToLocal(context.ScheduledAt.Value).ToString("dd MMM yyyy HH:mm") : T.Common.None)</MudTd>
+                <MudTd DataLabel="@T.Common.Actions"><MudButton Href="@($"/visits?highlight={context.Id}")" Size="Size.Small">@T.Visits.View</MudButton></MudTd>
             </RowTemplate>
             <NoRecordsContent>
                 <EmptyState Icon="@Icons.Material.Filled.EventNote" Title="@T.Dashboard.NoRecentExams" Message="@T.Dashboard.ExamsWillAppear" />

@@ -6,14 +6,14 @@
         <DialogHeader Icon="@Icons.Material.Filled.Security" Title="@(Role is null ? T.RoleDialog.NewRole : T.RoleDialog.EditTitle)" />
         <EditForm EditContext="_editContext" OnValidSubmit="SubmitAsync">
             <LocalizedDataAnnotationsValidator />
-            <MudTextField @bind-Value="_model.Name"
+            <MudTextField Disabled="Busy" @bind-Value="_model.Name"
                           Label="@T.RoleDialog.RoleName"
                           Variant="Variant.Outlined"
                           Margin="Margin.Dense"
                           Immediate="true"
                           Class="mb-3"
                           For="@(() => _model.Name)" />
-            <MudTextField @bind-Value="_model.Description"
+            <MudTextField Disabled="Busy" @bind-Value="_model.Description"
                           Label="@T.Roles.Description"
                           Variant="Variant.Outlined"
                           Margin="Margin.Dense"

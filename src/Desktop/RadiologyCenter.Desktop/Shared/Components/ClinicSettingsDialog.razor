@@ -1,7 +1,15 @@
-<MudDialog><DialogContent><ClinicSetupPanel Completed="Close" /></DialogContent>
-<DialogActions><MudButton OnClick="Close">@T.Common.Close</MudButton></DialogActions></MudDialog>
+<MudDialog><DialogContent><ClinicSetupPanel Completed="Close" BusyChanged="OnBusyChanged" /></DialogContent>
+<DialogActions><MudButton OnClick="Close" Disabled="_busy">@T.Common.Close</MudButton></DialogActions></MudDialog>
 @inject AppLocalizer T
 @code {
     [CascadingParameter] public IMudDialogInstance MudDialog { get; set; } = default!;
-    private void Close()=>MudDialog.Close();
+    private bool _busy;
+    private bool _closed;
+    private Task OnBusyChanged(bool busy)
+    {
+        _busy = busy;
+        if (_closed) return Task.CompletedTask;
+        return MudDialog.SetOptionsAsync(MudDialog.Options with { BackdropClick = !busy, CloseOnEscapeKey = !busy });
+    }
+    private void Close() { _closed = true; MudDialog.Close(); }
 }

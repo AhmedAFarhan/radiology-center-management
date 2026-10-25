@@ -4,8 +4,7 @@
 @inject InsuranceService InsuranceService
 @inject AppLocalizer T
 
-<h1 class="mud-typography mud-typography-h4" tabindex="-1">@T.Dashboard.Title</h1>
-<MudText Typo="Typo.body1" Class="text-secondary mb-4">@T.Dashboard.Subtitle</MudText>
+<PageHeader Icon="@Icons.Material.Filled.Dashboard" Title="@T.Dashboard.Title" Subtitle="@T.Dashboard.Subtitle" ShowSearch="false" OnRefresh="RefreshAsync" />
 
 @if (_loading)
 {
@@ -18,18 +17,30 @@ else if (_error)
 else
 {
     <MudGrid Spacing="3">
+        @if (_data!.TotalPatients.HasValue)
+        {
         <MudItem xs="12" sm="6" lg="3">
             <StatCard Label="@T.Dashboard.TotalPatients" Value="@_data!.TotalPatients.ToString()" Icon="@Icons.Material.Filled.People" Color="Color.Primary" />
         </MudItem>
+        }
+        @if (_data!.TotalExaminations.HasValue)
+        {
         <MudItem xs="12" sm="6" lg="3">
             <StatCard Label="@T.Dashboard.TotalExaminations" Value="@_data!.TotalExaminations.ToString()" Icon="@Icons.Material.Filled.MedicalServices" Color="Color.Secondary" />
         </MudItem>
+        }
+        @if (_data!.ExamsInProgress.HasValue)
+        {
         <MudItem xs="12" sm="6" lg="3">
             <StatCard Label="@T.Dashboard.ExamsInProgress" Value="@_data!.ExamsInProgress.ToString()" Icon="@Icons.Material.Filled.HourglassTop" Color="Color.Warning" />
         </MudItem>
+        }
+        @if (_data!.TotalInventoryItems.HasValue)
+        {
         <MudItem xs="12" sm="6" lg="3">
             <StatCard Label="@T.Dashboard.InventoryItems" Value="@_data!.TotalInventoryItems.ToString()" Icon="@Icons.Material.Filled.Inventory2" Color="Color.Info" />
         </MudItem>
+        }
         @if (_insuranceStats is not null)
         {
             <MudDivider Class="my-3" />
@@ -51,19 +62,18 @@ else
         }
     </MudGrid>
 
-    <MudGrid Spacing="3" Class="mt-1">
-        <MudItem xs="12" lg="8">
-            <RevenueChart Data="@DashboardSampleData.Revenue" />
-        </MudItem>
-        <MudItem xs="12" lg="4">
-            <DoctorCard Name="@DashboardSampleData.TopDoctorName" Specialty="@DashboardSampleData.TopDoctorSpecialty" Referrals="@DashboardSampleData.TopDoctorReferrals" />
-        </MudItem>
-        <MudItem xs="12" lg="8">
-            <AppointmentsTable Items="@_data!.RecentExaminations" />
-        </MudItem>
-        <MudItem xs="12" lg="4">
-            <DoctorsList Doctors="@DashboardSampleData.Doctors" />
-        </MudItem>
-    </MudGrid>
+    <MudPaper Class="pa-4 mt-4" Elevation="0">
+        <MudText Typo="Typo.h6" Class="mb-3">@(T.IsRTL ? "الوصول السريع" : "Quick access")</MudText>
+        <div class="dashboard-quick-actions">
+            <AuthorizeView Policy="@ExaminationsPermissions.Read"><MudButton Href="/examinations/calendar" Variant="Variant.Outlined" Color="Color.Primary" StartIcon="@Icons.Material.Filled.CalendarMonth">@T.ExamCalendar.Title</MudButton></AuthorizeView>
+            <AuthorizeView Policy="@PatientsPermissions.Read"><MudButton Href="/patients" Variant="Variant.Outlined" StartIcon="@Icons.Material.Filled.People">@T.Patients.Title</MudButton></AuthorizeView>
+            <AuthorizeView Policy="@ExaminationsPermissions.Read"><MudButton Href="/visits" Variant="Variant.Outlined" StartIcon="@Icons.Material.Filled.EventNote">@T.Visits.Title</MudButton></AuthorizeView>
+            <AuthorizeView Policy="@AnalyticsPermissions.Read"><MudButton Href="/analytics/financial" Variant="Variant.Outlined" StartIcon="@Icons.Material.Filled.Insights">@T.Financial.Title</MudButton></AuthorizeView>
+        </div>
+        <MudText Typo="Typo.body2" Class="mt-3 text-secondary">@(T.IsRTL ? "اختر صفحة من القائمة الجانبية للوصول إلى بقية مهامك." : "Use the sidebar to access your other tasks.")</MudText>
+    </MudPaper>
+    @if (_data!.TotalExaminations.HasValue)
+    {
+        <div class="mt-4"><AppointmentsTable Items="@_data.RecentExaminations" /></div>
+    }
 }
-

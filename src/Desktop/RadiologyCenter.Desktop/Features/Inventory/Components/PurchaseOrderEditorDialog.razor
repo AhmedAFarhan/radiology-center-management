@@ -8,7 +8,7 @@
             <LocalizedDataAnnotationsValidator />
             <MudGrid Spacing="2">
                 <MudItem xs="12" sm="8">
-                    <MudSelect T="string"
+                    <MudSelect Disabled="Busy" T="string"
                                @bind-Value="_model.SupplierId"
                                Label="@T.PoDialog.Supplier"
                                Variant="Variant.Outlined"
@@ -21,7 +21,7 @@
                     </MudSelect>
                 </MudItem>
                 <MudItem xs="12" sm="4">
-                    <MudDatePicker @bind-Date="_model.ExpectedDeliveryAt"
+                    <MudDatePicker Disabled="Busy" @bind-Date="_model.ExpectedDeliveryAt"
                                    Label="@T.PoDialog.ExpectedDeliveryLabel"
                                    Variant="Variant.Outlined"
                                    Margin="Margin.Dense"
@@ -39,7 +39,7 @@
             {
                 <MudGrid Spacing="2" Class="align-center mb-2">
                     <MudItem xs="12" sm="5">
-                        <MudSelect T="string"
+                        <MudSelect Disabled="Busy" T="string"
                                    @bind-Value="line.ItemId"
                                    Label="@T.PoDialog.Item"
                                    Variant="Variant.Outlined"
@@ -51,7 +51,7 @@
                         </MudSelect>
                     </MudItem>
                     <MudItem xs="12" sm="3">
-                        <MudNumericField T="int"
+                        <MudNumericField Disabled="Busy" T="int"
                                          @bind-Value="line.QuantityOrdered"
                                          Label="@T.PoDialog.Qty"
                                          Variant="Variant.Outlined"
@@ -59,7 +59,7 @@
                                          Min="1" />
                     </MudItem>
                     <MudItem xs="12" sm="3">
-                        <MudNumericField T="decimal"
+                        <MudNumericField Disabled="Busy" T="decimal"
                                          @bind-Value="line.UnitCost"
                                          Label="@T.PoDialog.UnitCost"
                                          Variant="Variant.Outlined"
@@ -81,7 +81,7 @@
             }
 
             <MudDivider Class="my-3" />
-            <MudTextField @bind-Value="_model.Notes"
+            <MudTextField Disabled="Busy" @bind-Value="_model.Notes"
                           Label="@T.PoDialog.Notes"
                           Variant="Variant.Outlined"
                           Margin="Margin.Dense"

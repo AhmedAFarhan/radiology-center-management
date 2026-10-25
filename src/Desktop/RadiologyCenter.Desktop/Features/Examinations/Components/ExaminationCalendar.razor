@@ -1,158 +1,128 @@
 @page "/examinations/calendar"
-@attribute [Authorize]
+@attribute [Authorize(Policy = "examinations.read")]
 
 <PageHeader Icon="@Icons.Material.Filled.CalendarMonth" Title="@T.ExamCalendar.Title"
-            Subtitle="@T.ExamCalendar.Subtitle"
-            OnRefresh="LoadDataAsync">
-
-    <MudButtonGroup Variant="Variant.Outlined" Size="Size.Small" Class="me-2">
-        <MudButton OnClick="PreviousDay" StartIcon="@Icons.Material.Filled.ChevronLeft" Size="Size.Small">@T.ExamCalendar.Prev</MudButton>
-        <MudButton OnClick="GoToToday" Size="Size.Small">@T.ExamCalendar.Today</MudButton>
-        <MudButton OnClick="NextDay" EndIcon="@Icons.Material.Filled.ChevronRight" Size="Size.Small">@T.ExamCalendar.Next</MudButton>
-    </MudButtonGroup>
-
-    <MudSelect T="string" Value="@_viewMode" ValueChanged="OnViewModeChanged" Variant="Variant.Outlined" Dense="true" Class="me-2" Style="width: 100px;">
-        <MudSelectItem Value="@("day")">@T.ExamCalendar.DayView</MudSelectItem>
-        <MudSelectItem Value="@("week")">@T.ExamCalendar.WeekView</MudSelectItem>
-    </MudSelect>
-
-    <MudSelect T="string" Value="@_selectedModality" ValueChanged="OnModalityChanged" Variant="Variant.Outlined" Dense="true" Placeholder="@T.ExamCalendar.ModalityFilter" Clearable="true" Class="me-2" Style="width: 150px;">
-        @foreach (var m in _modalities)
-        {
-            <MudSelectItem Value="@m">@m</MudSelectItem>
-        }
-    </MudSelect>
-
-    <MudSelect T="string" Value="@_selectedEquipmentId" ValueChanged="OnEquipmentChanged" Variant="Variant.Outlined" Dense="true" Placeholder="@T.ExamCalendar.EquipmentFilter" Clearable="true" Style="width: 200px;">
-        @foreach (var eq in _equipments)
-        {
-            <MudSelectItem Value="@eq.Id">@eq.Name</MudSelectItem>
-        }
-    </MudSelect>
+            Subtitle="@T.ExamCalendar.Subtitle" ShowSearch="false" OnRefresh="LoadDataAsync">
+    @if (CanBook)
+    {
+        <MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Add"
+                   Disabled="@(_loading || _currentDate.Date < ClinicTime.Today)" OnClick="@(() => BookAsync())">@T.ExamCalendar.ScheduleExam</MudButton>
+    }
 </PageHeader>
-
-@if (_loading)
-{
-    <MudProgressCircular Indeterminate="true" Class="d-flex mx-auto my-4" />
-}
-else
-{
-    <div class="cal-container">
-        @* ── Day tabs (week view) ── *@
-        @if (_viewMode == "week" && _weekDays.Any())
-        {
-            <div class="cal-day-tabs">
-                @foreach (var day in _weekDays)
-                {
-                    <button class="cal-day-tab @(day.Date == _currentDate.Date ? "active" : "")"
-                            @onclick="() => SelectDayAsync(day.Date)">
-                        <span class="cal-day-name">@day.ToString("ddd")</span>
-                        <span class="cal-day-num">@day.Day</span>
-                    </button>
-                }
-            </div>
-        }
-
-        <MudPaper Elevation="1" Class="cal-paper">
-            <div class="cal-scroll-wrapper">
-                @* ── Left: resource names (fixed) ── *@
-                <div class="cal-resource-col">
-                    <div class="cal-resource-header">
-                        <MudText Typo="Typo.caption" Class="cal-header-label">@T.ExamCalendar.Equipment</MudText>
-                    </div>
-                    @foreach (var resource in _resources)
-                    {
-                        <div class="cal-resource-row">
-                            <div class="cal-resource-indicator" style="background: @GetModalityColor(resource.Type);"></div>
-                            <div class="cal-resource-info">
-                                <MudText Typo="Typo.body2" Class="cal-resource-name">@resource.Name</MudText>
-                                <MudText Typo="Typo.caption" Class="cal-resource-type">@resource.Type</MudText>
-                            </div>
-                        </div>
-                    }
-                </div>
-
-                @* ── Right: scrollable time grid ── *@
-                <div class="cal-time-grid" @ref="_timeGridRef">
-                    @* Time headers *@
-                    <div class="cal-time-headers">
-                        @foreach (var time in _timeHeaders)
-                        {
-                            <div class="cal-time-header-cell">
-                                <MudText Typo="Typo.caption" Class="cal-time-label">@time</MudText>
-                            </div>
-                        }
-                    </div>
-
-                    @* Slot rows *@
-                    @foreach (var resource in _resources)
-                    {
-                        <div class="cal-slot-row">
-                            @foreach (var slot in resource.Slots)
-                            {
-                                var statusClass = GetSlotStatusClass(slot);
-                                <button type="button" class="cal-slot-cell @statusClass @(slot.IsAvailable ? "available" : "occupied")"
-                                     aria-label="@(slot.Exam is null ? $"{resource.Name} {slot.StartTime:HH:mm} {T.ExamCalendar.Available}" : $"{resource.Name} {slot.StartTime:HH:mm} {slot.Exam.PatientName}")"
-                                     @onclick="() => OnSlotClick(slot)">
-                                    @if (!slot.IsAvailable && slot.Exam is not null)
-                                    {
-                                        <div class="cal-slot-content">
-                                            <MudText Typo="Typo.caption" Class="cal-slot-patient">@slot.Exam.PatientName</MudText>
-                                            <MudText Typo="Typo.caption" Class="cal-slot-type">@slot.Exam.ExaminationTypeName</MudText>
-                                            <MudText Typo="Typo.caption" Class="cal-slot-time">@slot.StartTime.ToString("HH:mm") – @slot.EndTime.ToString("HH:mm")</MudText>
-                                        </div>
-                                    }
-                                    else
-                                    {
-                                        <div class="cal-slot-empty">
-                                            <MudIcon Icon="@Icons.Material.Filled.Add" Size="Size.Small" Class="cal-slot-add-icon" />
-                                        </div>
-                                    }
-                                </button>
-                            }
-                        </div>
-                    }
-
-                    @* Current time indicator *@
-                    @if (_currentTimeLeft.HasValue)
-                    {
-                        <div class="cal-now-line" style="left: @_currentTimeLeft.Value.ToString("F0")px;"></div>
-                    }
-                </div>
-            </div>
-        </MudPaper>
-
-        @if (_otherAppointments.Count > 0)
-        {
-            <MudPaper Class="pa-3 mt-3">
-                <MudText Typo="Typo.subtitle2">@(T.IsRTL ? "مواعيد خارج الشبكة أو بدون جهاز" : "Appointments outside the grid or without equipment")</MudText>
-                @foreach (var exam in _otherAppointments)
-                {
-                    <MudButton Href="@($"/visits?highlight={exam.Id}")" Variant="Variant.Text">
-                        @exam.ScheduledAt.ToString("HH:mm") · @exam.PatientName · @exam.ExaminationTypeName
-                    </MudButton>
-                }
-            </MudPaper>
-        }
-
-        @* ── Legend ── *@
-        <div class="cal-legend">
-            <div class="cal-legend-item">
-                <span class="cal-legend-dot" style="background: #E8F5E9; border: 1px solid #A5D6A7;"></span>
-                <MudText Typo="Typo.caption">@T.ExamCalendar.Available</MudText>
-            </div>
-            <div class="cal-legend-item">
-                <span class="cal-legend-dot" style="background: #BBDEFB; border-left: 3px solid #1976D2;"></span>
-                <MudText Typo="Typo.caption">@T.ExamCalendar.Scheduled</MudText>
-            </div>
-            <div class="cal-legend-item">
-                <span class="cal-legend-dot" style="background: #FFE0B2; border-left: 3px solid #F57C00;"></span>
-                <MudText Typo="Typo.caption">@T.ExamCalendar.CheckedIn</MudText>
-            </div>
-            <div class="cal-legend-item">
-                <span class="cal-legend-dot" style="background: #E1BEE7; border-left: 3px solid #7B1FA2;"></span>
-                <MudText Typo="Typo.caption">@T.ExamCalendar.InProgress</MudText>
-            </div>
+<section class="calendar-workspace" aria-busy="@_loading.ToString().ToLowerInvariant()">
+    <div class="calendar-toolbar">
+        <div class="calendar-navigation">
+            <MudIconButton Icon="@(T.IsRTL ? Icons.Material.Filled.ChevronRight : Icons.Material.Filled.ChevronLeft)" aria-label="@T.ExamCalendar.Prev" OnClick="@(() => MoveAsync(-1))" Disabled="_loading" />
+            <MudButton Variant="Variant.Outlined" OnClick="TodayAsync" Disabled="_loading">@T.ExamCalendar.Today</MudButton>
+            <MudIconButton Icon="@(T.IsRTL ? Icons.Material.Filled.ChevronLeft : Icons.Material.Filled.ChevronRight)" aria-label="@T.ExamCalendar.Next" OnClick="@(() => MoveAsync(1))" Disabled="_loading" />
+            <MudDatePicker Date="_currentDate" DateChanged="ChangeDateAsync" Label="@T.ScheduleExam.Date" Culture="Culture" DateFormat="dd MMM yyyy" Variant="Variant.Outlined" Margin="Margin.Dense" Disabled="_loading" Class="calendar-date-picker" />
+        </div>
+        <div class="calendar-view-switch" role="group" aria-label="@L("Calendar view", "طريقة عرض التقويم")">
+            @foreach (var view in new[] { "day", "week", "list" })
+            {
+                <button type="button" class="@(_viewMode == view ? "active" : null)" aria-pressed="@((_viewMode == view).ToString().ToLowerInvariant())" disabled="@_loading" @onclick="() => ChangeViewAsync(view)">@(view == "day" ? T.ExamCalendar.DayView : view == "week" ? T.ExamCalendar.WeekView : L("List", "قائمة"))</button>
+            }
         </div>
     </div>
+    <div class="calendar-filters">
+        <MudSelect T="string" Value="@_selectedModality" ValueChanged="ModalityChangedAsync" Label="@T.ExamCalendar.ModalityFilter" Variant="Variant.Outlined" Margin="Margin.Dense" Clearable="true" Disabled="_loading">
+            @foreach (var modality in _equipments.DistinctBy(ModalityKey).OrderBy(e => e.Modality)) { <MudSelectItem Value="@ModalityKey(modality)">@modality.Modality</MudSelectItem> }
+        </MudSelect>
+        <MudSelect T="string" Value="@_selectedEquipmentId" ValueChanged="EquipmentChangedAsync" Label="@T.ExamCalendar.EquipmentFilter" Variant="Variant.Outlined" Margin="Margin.Dense" Clearable="true" Disabled="_loading">
+            @foreach (var equipment in _equipments.Where(e => string.IsNullOrEmpty(_selectedModality) || ModalityKey(e) == _selectedModality)) { <MudSelectItem Value="@equipment.Id">@equipment.Name</MudSelectItem> }
+        </MudSelect>
+        @if (!string.IsNullOrEmpty(_selectedModality) || !string.IsNullOrEmpty(_selectedEquipmentId))
+        { <MudButton OnClick="ClearFiltersAsync" Disabled="_loading">@L("Clear filters", "مسح الفلاتر")</MudButton> }
+    </div>
+    <div class="calendar-heading"><h2>@DateTitle</h2><span role="status">@(_loading ? T.Common.Loading : $"{_slots.Count} {L("active appointments", "موعد نشط")}")</span></div>
+    @if (_loading)
+    {
+        <MudProgressLinear Indeterminate="true" Color="Color.Primary" />
+        <MudSkeleton Height="280px" Width="100%" />
+    }
+    else if (_error is not null)
+    {
+        <MudAlert Severity="Severity.Error">@_error <MudButton OnClick="LoadDataAsync">@T.Common.Retry</MudButton></MudAlert>
+    }
+    else if (_viewMode == "week")
+    {
+        <div class="calendar-week">
+            @foreach (var day in WeekDays)
+            {
+                var appointments = OnDay(day).ToList();
+                <section class="calendar-week-day @(day == ClinicTime.Today ? "today" : null)">
+                    <button type="button" class="calendar-week-heading" @onclick="() => OpenDayAsync(day)"><strong>@day.ToString("ddd d MMM", Culture)</strong><span>@appointments.Count</span></button>
+                    @if (appointments.Count == 0) { <p class="calendar-empty">@L("No active appointments", "لا توجد مواعيد نشطة")</p> }
+                    @foreach (var exam in appointments) { @AppointmentCard(exam) }
+                </section>
+            }
+        </div>
+    }
+    else if (_viewMode == "list") { @Agenda }
+    else
+    {
+        <p class="calendar-help">@L("Select an appointment for details or + to book. Empty time is checked against the full examination duration when booking. This view shows active appointments. Times are in Cairo time.", "اختر موعداً لعرض التفاصيل أو + للحجز. يتم التحقق من توفر الجهاز طوال مدة الفحص عند الحجز. يعرض التقويم المواعيد النشطة. الأوقات بتوقيت القاهرة.")</p>
+        <div class="calendar-small-screen">@Agenda</div>
+        @if (VisibleEquipment.Any())
+        {
+            <div class="calendar-timeline" dir="ltr" tabindex="0" role="region" aria-label="@L("Equipment schedule. Scroll to see more times and equipment.", "جدول الأجهزة. مرر لعرض المزيد من الأوقات والأجهزة.")">
+                <div style="width:@Px(180 + TrackWidth)">
+                    <div class="calendar-timeline-header">
+                        <div class="calendar-machine calendar-corner">@T.ExamCalendar.Equipment</div>
+                        <div class="calendar-hours" style="width:@Px(TrackWidth)">@foreach (var tick in Ticks) { <span>@tick.ToString("HH:mm")</span> }</div>
+                    </div>
+                    @foreach (var equipment in VisibleEquipment)
+                    {
+                        var placements = Placements(equipment.Id);
+                        var height = Math.Max(1, placements.Select(p => p.Lane + 1).DefaultIfEmpty(1).Max()) * 88;
+                        <div class="calendar-resource-row" style="height:@Px(height)">
+                            <div class="calendar-machine" dir="@(T.IsRTL ? "rtl" : "ltr")"><strong>@equipment.Name</strong><span>@equipment.Modality · @placements.Count</span></div>
+                            <div class="calendar-track" style="width:@Px(TrackWidth)">
+                                <div class="calendar-open-times">
+                                    @foreach (var tick in Ticks)
+                                    {
+                                        var occupied = DayAppointments.Any(e => e.EquipmentId == equipment.Id && e.ScheduledAt < tick.AddMinutes(30) && End(e) > tick);
+                                        <button type="button" disabled="@(occupied || tick <= _now || !CanBook)" aria-label="@($"{T.ExamCalendar.ScheduleExam}: {equipment.Name} {tick:HH:mm}")" @onclick="() => BookAsync(tick, equipment)"><span aria-hidden="true">+</span></button>
+                                    }
+                                </div>
+                                @foreach (var placement in placements)
+                                {
+                                    var exam = _slots.First(e => e.Id == placement.Id);
+                                    <button type="button" class="calendar-appointment @StatusClass(exam)" dir="@(T.IsRTL ? "rtl" : "ltr")" style="left:@Px(placement.StartMinutes * 2);width:@Px(placement.DurationMinutes * 2);top:@Px(placement.Lane * 88 + 4)" title="@Description(exam)" aria-label="@Description(exam)" @onclick="() => ShowDetails(exam)">
+                                        <strong>@exam.PatientName</strong><span>@exam.ExaminationTypeName</span><span dir="ltr">@exam.ScheduledAt.ToString("HH:mm")–@End(exam).ToString("HH:mm")</span><span>@Status(exam) @(exam.Priority is "Urgent" or "Stat" ? $"· {Priority(exam)}" : null)</span>
+                                    </button>
+                                }
+                                @if (_now >= GridStart && _now < GridEnd) { <div class="calendar-now" style="left:@Px((_now - GridStart).TotalMinutes * 2)" aria-hidden="true"></div> }
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+        }
+        else { <MudAlert Severity="Severity.Info" Class="calendar-desktop-only">@L("No operational equipment matches these filters.", "لا توجد أجهزة جاهزة للعمل تطابق هذه الفلاتر.")</MudAlert> }
+        @if (Unassigned.Any())
+        {
+            <section class="calendar-attention calendar-desktop-only"><h3>@L("Appointments without an available equipment row", "مواعيد بدون صف جهاز متاح")</h3><div class="calendar-agenda">@foreach (var exam in Unassigned) { @AppointmentCard(exam) }</div></section>
+        }
+    }
+</section>
+@if (_detailsOpen && _selectedExam is { } selected)
+{
+    <MudDrawer @bind-Open="_detailsOpen" Anchor="Anchor.End" Variant="DrawerVariant.Temporary" Width="380px" Elevation="8" Class="calendar-details" role="dialog" aria-modal="true" aria-label="@L("Appointment details", "تفاصيل الموعد")" @onkeydown="OnDetailsKeyDown">
+        <MudFocusTrap>
+            <div class="calendar-heading"><h2>@L("Appointment details", "تفاصيل الموعد")</h2><MudIconButton Icon="@Icons.Material.Filled.Close" aria-label="@T.Common.Close" OnClick="@(() => _detailsOpen = false)" /></div>
+            <h3>@selected.PatientName</h3><p>@selected.ExaminationTypeName</p>
+            <dl><dt>@T.ScheduleExam.Date</dt><dd>@selected.ScheduledAt.ToString("dddd d MMM yyyy", Culture)</dd><dt>@T.ScheduleExam.Time</dt><dd dir="ltr">@selected.ScheduledAt.ToString("HH:mm")–@End(selected).ToString("HH:mm")</dd><dt>@T.ScheduleExam.Equipment</dt><dd>@EquipmentName(selected)</dd><dt>@L("Status", "الحالة")</dt><dd>@Status(selected)</dd><dt>@T.ScheduleExam.Priority</dt><dd>@(selected.Priority is "Urgent" or "Stat" ? Priority(selected) : T.ScheduleExam.Routine)</dd></dl>
+            <MudButton FullWidth="true" Color="Color.Primary" Variant="Variant.Filled" OnClick="OpenVisit">@L("Open examination", "فتح الفحص")</MudButton>
+        </MudFocusTrap>
+    </MudDrawer>
+}
+@code {
+    private RenderFragment AppointmentCard(CalendarSlotDto exam) => @<button type="button" class="calendar-list-card @StatusClass(exam)" @onclick="() => ShowDetails(exam)">
+        <span dir="ltr">@exam.ScheduledAt.ToString("HH:mm")–@End(exam).ToString("HH:mm")</span><strong>@exam.PatientName</strong><span>@exam.ExaminationTypeName</span><span>@EquipmentName(exam)</span><span class="calendar-status">@Status(exam) @(exam.Priority is "Urgent" or "Stat" ? $"· {Priority(exam)}" : null)</span>
+    </button>;
+    private RenderFragment Agenda => @<div class="calendar-agenda">
+        @if (!DayAppointments.Any()) { <p class="calendar-empty">@L("No active appointments for this date and these filters.", "لا توجد مواعيد نشطة لهذا التاريخ وهذه الفلاتر.")</p> }
+        @foreach (var exam in DayAppointments) { @AppointmentCard(exam) }
+    </div>;
 }

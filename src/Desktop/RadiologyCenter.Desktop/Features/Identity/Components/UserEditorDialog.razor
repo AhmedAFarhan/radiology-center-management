@@ -10,7 +10,7 @@
                 @if (!IsEdit)
                 {
                     <MudItem xs="12" sm="6">
-                        <MudTextField @bind-Value="_model.UserName"
+                        <MudTextField Disabled="Busy" @bind-Value="_model.UserName"
                                       Label="@T.UserDialog.Username"
                                       Variant="Variant.Outlined"
                                       Margin="Margin.Dense"
@@ -18,7 +18,7 @@
                                       For="@(() => _model.UserName)" />
                     </MudItem>
                     <MudItem xs="12" sm="6">
-                        <MudTextField @bind-Value="_model.Email"
+                        <MudTextField InputType="InputType.Email" Disabled="Busy" @bind-Value="_model.Email"
                                       Label="@T.UserDialog.Email"
                                       Variant="Variant.Outlined"
                                       Margin="Margin.Dense"
@@ -36,7 +36,7 @@
                                       ReadOnly="true" />
                     </MudItem>
                     <MudItem xs="12" sm="6">
-                        <MudTextField Value="@_model.Email"
+                        <MudTextField InputType="InputType.Email" Value="@_model.Email"
                                       Label="@T.UserDialog.Email"
                                       Variant="Variant.Outlined"
                                       Margin="Margin.Dense"
@@ -44,7 +44,7 @@
                     </MudItem>
                 }
                 <MudItem xs="12" sm="6">
-                    <MudTextField @bind-Value="_model.FirstName"
+                    <MudTextField Disabled="Busy" @bind-Value="_model.FirstName"
                                   Label="@T.UserDialog.FirstName"
                                   Variant="Variant.Outlined"
                                   Margin="Margin.Dense"
@@ -52,7 +52,7 @@
                                   For="@(() => _model.FirstName)" />
                 </MudItem>
                 <MudItem xs="12" sm="6">
-                    <MudTextField @bind-Value="_model.LastName"
+                    <MudTextField Disabled="Busy" @bind-Value="_model.LastName"
                                   Label="@T.UserDialog.LastName"
                                   Variant="Variant.Outlined"
                                   Margin="Margin.Dense"
@@ -60,7 +60,7 @@
                                   For="@(() => _model.LastName)" />
                 </MudItem>
                 <MudItem xs="12" sm="6">
-                    <MudTextField @bind-Value="_model.PhoneNumber"
+                    <MudTextField InputType="InputType.Telephone" Disabled="Busy" @bind-Value="_model.PhoneNumber"
                                   Label="@T.UserDialog.Phone"
                                   Variant="Variant.Outlined"
                                   Margin="Margin.Dense"
@@ -69,7 +69,7 @@
                 @if (!IsEdit)
                 {
                     <MudItem xs="12" sm="6">
-                        <MudTextField @bind-Value="_model.Password"
+                        <MudTextField AdornmentAriaLabel="@(T.IsRTL ? "إظهار أو إخفاء كلمة المرور" : "Show or hide password")" Disabled="Busy" @bind-Value="_model.Password"
                                       Label="@T.UserDialog.Password"
                                       Variant="Variant.Outlined"
                                       Margin="Margin.Dense"
@@ -81,7 +81,7 @@
                                       OnAdornmentClick="@(() => _showPassword = !_showPassword)" />
                     </MudItem>
                     <MudItem xs="12">
-                        <MudSelect T="string"
+                        <MudSelect Disabled="Busy" T="string"
                                    SelectedValues="@_model.SelectedRoleIds"
                                    SelectedValuesChanged="@(vals => _model.SelectedRoleIds = vals)"
                                    Label="@T.UserDialog.Roles"

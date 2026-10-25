@@ -9,4 +9,8 @@ window.setAppLanguage = function (lang, dir) {
     if (reload) {
         reload.textContent = lang === 'ar' ? 'إعادة التحميل' : 'Reload';
     }
+    var dismiss = document.querySelector('#blazor-error-ui .dismiss');
+    if (dismiss) {
+        dismiss.setAttribute('aria-label', lang === 'ar' ? 'إغلاق رسالة الخطأ' : 'Dismiss error');
+    }
 };

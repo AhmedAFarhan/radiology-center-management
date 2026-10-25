@@ -9,7 +9,7 @@
             <LocalizedDataAnnotationsValidator />
             <MudGrid Spacing="2">
                 <MudItem xs="12" sm="6">
-                    <MudAutocomplete T="PatientDto"
+                    <MudAutocomplete Disabled="Busy" T="PatientDto"
                                      @bind-Value="_selectedPatient"
                                      Label="@T.PolicyDialog.PatientSearchLabel"
                                      Variant="Variant.Outlined"
@@ -21,7 +21,7 @@
                                      Clearable="true" />
                 </MudItem>
                 <MudItem xs="12" sm="6">
-                    <MudAutocomplete T="InsuranceCompanyDto"
+                    <MudAutocomplete Disabled="Busy" T="InsuranceCompanyDto"
                                      @bind-Value="_selectedCompany"
                                      Label="@T.PolicyDialog.CompanyLabel"
                                      Variant="Variant.Outlined"
@@ -33,7 +33,7 @@
                                      Clearable="true" />
                 </MudItem>
                 <MudItem xs="12" sm="6">
-                    <MudTextField @bind-Value="_model.PolicyNumber"
+                    <MudTextField Disabled="Busy" @bind-Value="_model.PolicyNumber"
                                   Label="@T.PolicyDialog.PolicyNumber"
                                   Variant="Variant.Outlined"
                                   Margin="Margin.Dense"
@@ -41,7 +41,7 @@
                                   For="@(() => _model.PolicyNumber)" />
                 </MudItem>
                 <MudItem xs="12" sm="6">
-                    <MudNumericField T="decimal"
+                    <MudNumericField Disabled="Busy" T="decimal"
                                      @bind-Value="_model.CoveragePercent"
                                      Label="@T.PolicyDialog.CoveragePercent"
                                      Variant="Variant.Outlined"
@@ -51,20 +51,20 @@
                                      For="@(() => _model.CoveragePercent)" />
                 </MudItem>
                 <MudItem xs="12" sm="6">
-                    <MudDatePicker @bind-Date="_model.EffectiveFrom"
+                    <MudDatePicker Disabled="Busy" @bind-Date="_model.EffectiveFrom"
                                    Label="@T.PolicyDialog.EffectiveFrom"
                                    Variant="Variant.Outlined"
                                    Margin="Margin.Dense" />
                 </MudItem>
                 <MudItem xs="12" sm="6">
-                    <MudDatePicker @bind-Date="_model.EffectiveTo"
+                    <MudDatePicker Disabled="Busy" @bind-Date="_model.EffectiveTo" MinDate="_model.EffectiveFrom"
                                    Label="@T.PolicyDialog.EffectiveTo"
                                    Variant="Variant.Outlined"
                                    Margin="Margin.Dense"
                                    Clearable="true" />
                 </MudItem>
                 <MudItem xs="12">
-                    <MudSwitch T="bool" @bind-Value="_model.IsGovernment" Color="Color.Primary">@T.PolicyDialog.GovernmentPolicy</MudSwitch>
+                    <MudSwitch Disabled="Busy" T="bool" @bind-Value="_model.IsGovernment" Color="Color.Primary">@T.PolicyDialog.GovernmentPolicy</MudSwitch>
                 </MudItem>
             </MudGrid>
             <button type="submit" style="display:none"></button>

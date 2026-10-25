@@ -16,7 +16,7 @@
                 <LocalizedDataAnnotationsValidator />
                 <MudGrid Spacing="3">
                     <MudItem xs="12">
-                        <MudSelect T="string"
+                        <MudSelect Disabled="_busy" T="string"
                                    Label="@T.AssignStaffDialog.Radiologist"
                                    @bind-Value="_radiologistId"
                                    Variant="Variant.Outlined"
@@ -28,7 +28,7 @@
                         </MudSelect>
                     </MudItem>
                     <MudItem xs="12">
-                        <MudSelect T="string"
+                        <MudSelect Disabled="_busy" T="string"
                                    Label="@T.AssignStaffDialog.Technician"
                                    @bind-Value="_technicianId"
                                    Variant="Variant.Outlined"
@@ -40,7 +40,7 @@
                         </MudSelect>
                     </MudItem>
                     <MudItem xs="12">
-                        <MudSelect T="string"
+                        <MudSelect Disabled="_busy" T="string"
                                    Label="@T.AssignStaffDialog.Equipment"
                                    @bind-Value="_equipmentId"
                                    Variant="Variant.Outlined"

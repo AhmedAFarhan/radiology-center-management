@@ -22,6 +22,7 @@ else
                          XValue="@(m => m.Month)"
                          YValue="@(m => m.Completed)" />
     </ApexChart>
+    <ChartDataTable Headers="@(new[] { T.Analytics.Period, T.Analytics.Total, T.Analytics.Completed })" Rows="@Items.Select(row => new[] { row.Month, row.Total.ToString("N0"), row.Completed.ToString("N0") })" />
 }
 
 

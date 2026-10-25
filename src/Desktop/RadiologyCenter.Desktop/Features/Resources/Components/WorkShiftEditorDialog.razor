@@ -21,7 +21,7 @@
                                      Disabled="Busy" />
                 </MudItem>
                 <MudItem xs="12" sm="6">
-                    <MudDatePicker @bind-Date="_model.Date"
+                    <MudDatePicker Disabled="Busy" @bind-Date="_model.Date"
                                    Label="@T.WorkShiftDialog.ShiftDate"
                                    Variant="Variant.Outlined"
                                    Margin="Margin.Dense"
@@ -29,7 +29,7 @@
                                    Class="w-100" />
                 </MudItem>
                 <MudItem xs="12" sm="3">
-                    <MudTimePicker @bind-Time="_model.StartTime"
+                    <MudTimePicker Disabled="Busy" @bind-Time="_model.StartTime"
                                    Label="@T.WorkShiftDialog.StartTime"
                                    Variant="Variant.Outlined"
                                    Margin="Margin.Dense"
@@ -37,7 +37,7 @@
                                    Class="w-100" />
                 </MudItem>
                 <MudItem xs="12" sm="3">
-                    <MudTimePicker @bind-Time="_model.EndTime"
+                    <MudTimePicker Disabled="Busy" @bind-Time="_model.EndTime"
                                    Label="@T.WorkShiftDialog.EndTime"
                                    Variant="Variant.Outlined"
                                    Margin="Margin.Dense"
@@ -58,7 +58,7 @@
                                      Disabled="Busy" />
                 </MudItem>
                 <MudItem xs="12">
-                    <MudTextField @bind-Value="_model.Notes"
+                    <MudTextField Disabled="Busy" @bind-Value="_model.Notes"
                                   Label="@T.WorkShift.Notes"
                                   Variant="Variant.Outlined"
                                   Margin="Margin.Dense"

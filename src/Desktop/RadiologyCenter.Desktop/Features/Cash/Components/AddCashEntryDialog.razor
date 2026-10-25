@@ -9,7 +9,7 @@
             <LocalizedDataAnnotationsValidator />
             <MudGrid Spacing="2">
                 <MudItem xs="12" sm="6">
-                    <MudSelect @bind-Value="_model.Direction"
+                    <MudSelect Disabled="Busy" @bind-Value="_model.Direction"
                                Label="@T.CashEntry.Direction"
                                Variant="Variant.Outlined"
                                Margin="Margin.Dense"
@@ -21,7 +21,7 @@
                     </MudSelect>
                 </MudItem>
                 <MudItem xs="12" sm="6">
-                    <MudSelect @bind-Value="_model.Reason"
+                    <MudSelect Disabled="Busy" @bind-Value="_model.Reason"
                                Label="@T.CashEntry.Reason"
                                Variant="Variant.Outlined"
                                Margin="Margin.Dense"
@@ -33,7 +33,7 @@
                     </MudSelect>
                 </MudItem>
                 <MudItem xs="12" sm="6">
-                    <MudNumericField @bind-Value="_model.Amount"
+                    <MudNumericField Disabled="Busy" @bind-Value="_model.Amount"
                                      Label="@T.CashEntry.Amount"
                                      Variant="Variant.Outlined"
                                      Margin="Margin.Dense"
@@ -41,7 +41,7 @@
                                      For="@(() => _model.Amount)" />
                 </MudItem>
                 <MudItem xs="12" sm="6">
-                    <MudTextField @bind-Value="_model.ReferenceId"
+                    <MudTextField Disabled="Busy" @bind-Value="_model.ReferenceId"
                                   Label="@T.CashEntry.Reference"
                                   Variant="Variant.Outlined"
                                   Margin="Margin.Dense"
@@ -49,7 +49,7 @@
                                   For="@(() => _model.ReferenceId)" />
                 </MudItem>
                 <MudItem xs="12">
-                    <MudTextField @bind-Value="_model.Description"
+                    <MudTextField Disabled="Busy" @bind-Value="_model.Description"
                                   Label="@T.CashEntry.Description"
                                   Variant="Variant.Outlined"
                                   Margin="Margin.Dense"

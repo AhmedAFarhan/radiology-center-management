@@ -62,7 +62,7 @@
         </MudTd>
     </RowTemplate>
     <NoRecordsContent>
-        <TableNoRecords LoadError="@LoadError"
+        <TableNoRecords ActionPolicy="@ResourcesPermissions.ReferralDoctorsCreate" LoadError="@LoadError"
                         Offline="@Offline"
                         ErrorTitle="@T.ReferralDoctor.LoadErrorTitle"
                         EmptyIcon="@Icons.Material.Filled.LocalHospital"

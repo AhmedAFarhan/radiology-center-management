@@ -7,13 +7,13 @@
         <DialogHeader Icon="@Icons.Material.Filled.EventNote" Title="@(T.FormatValue(T.VisitSchedule.Title, Visit.ExaminationTypeName))" />
         <EditForm EditContext="_editContext">
             <LocalizedDataAnnotationsValidator />
-            <MudDatePicker @bind-Date="_model.ScheduledDate"
+            <MudDatePicker Disabled="_busy" @bind-Date="_model.ScheduledDate"
                            For="@(() => _model.ScheduledDate)"
                            Label="@T.VisitSchedule.ScheduledDate"
                            Variant="Variant.Outlined"
                            Margin="Margin.Dense"
                            Class="w-100" />
-            <MudTimePicker @bind-Time="_model.ScheduledTime"
+            <MudTimePicker Disabled="_busy" @bind-Time="_model.ScheduledTime"
                            For="@(() => _model.ScheduledTime)"
                            Label="@T.VisitSchedule.ScheduledTime"
                            Variant="Variant.Outlined"

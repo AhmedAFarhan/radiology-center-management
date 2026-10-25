@@ -80,5 +80,6 @@
   <Folder Name="/Desktop/">
     <Project Path="Desktop/RadiologyCenter.Desktop/RadiologyCenter.Desktop.csproj" />
     <Project Path="Desktop/RadiologyCenter.Desktop.StartupTests/RadiologyCenter.Desktop.StartupTests.csproj" />
+    <Project Path="Desktop/RadiologyCenter.Desktop.ComponentTests/RadiologyCenter.Desktop.ComponentTests.csproj" />
   </Folder>
 </Solution>

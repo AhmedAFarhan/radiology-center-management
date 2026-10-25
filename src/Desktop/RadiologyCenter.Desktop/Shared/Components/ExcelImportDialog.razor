@@ -7,17 +7,11 @@
         <MudStack Row="true" Spacing="2" Wrap="Wrap.Wrap" AlignItems="AlignItems.Center" Class="mt-4">
             <MudButton Variant="Variant.Outlined"
                        StartIcon="@Icons.Material.Filled.Download"
-                       OnClick="DownloadTemplateAsync">
+                       OnClick="DownloadTemplateAsync" Disabled="_busy">
                 @T.Common.DownloadTemplate
             </MudButton>
-            <MudButton HtmlTag="label" for="excel-import-input"
-                       Variant="Variant.Outlined"
-                       Color="Color.Primary"
-                       StartIcon="@Icons.Material.Filled.UploadFile"
-                       Disabled="_busy">
-                @(_file?.Name ?? T.Common.ChooseFile)
-            </MudButton>
-            <InputFile id="excel-import-input" OnChange="OnFileSelected" accept=".xlsx" style="display:none" />
+            <label for="excel-import-input" class="file-input-label">@(_file?.Name ?? T.Common.ChooseFile)</label>
+            <InputFile id="excel-import-input" OnChange="OnFileSelected" accept=".xlsx" disabled="_busy" aria-label="@T.Common.ChooseFile" class="accessible-file-input" />
         </MudStack>
         @if (_result is not null)
         {
@@ -37,7 +31,7 @@
         }
     </DialogContent>
     <DialogActions>
-        <MudButton Color="Color.Default" OnClick="Cancel">@T.Common.Cancel</MudButton>
+        <MudButton Color="Color.Default" OnClick="Cancel" Disabled="_busy">@T.Common.Cancel</MudButton>
         <MudButton Color="Color.Primary"
                    Variant="Variant.Filled"
                    StartIcon="@Icons.Material.Filled.UploadFile"

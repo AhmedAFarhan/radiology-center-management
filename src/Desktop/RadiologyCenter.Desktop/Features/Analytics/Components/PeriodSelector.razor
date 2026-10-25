@@ -3,7 +3,7 @@
 
 <MudCard Elevation="0" Class="@($"period-bar {@Class}")">
     <MudCardContent>
-        <MudStack Row="true" Spacing="3" AlignItems="AlignItems.Center">
+        <MudStack Row="true" Spacing="3" AlignItems="AlignItems.Center" Class="period-controls">
             <MudIcon Icon="@Icons.Material.Filled.DateRange" Color="Color.Primary" />
             <MudText Typo="Typo.body2" Class="font-weight-medium me-2" Style="white-space:nowrap">@T.Analytics.Period</MudText>
             <MudSelect T="AnalyticsRangePreset"
@@ -22,7 +22,10 @@
                 <MudSelectItem T="AnalyticsRangePreset" Value="AnalyticsRangePreset.AllTime">@T.Analytics.AllTime</MudSelectItem>
             </MudSelect>
             <MudText Typo="Typo.caption" Class="text-secondary mx-2" Style="white-space:nowrap">
-                @Preset.From.ToString("dd MMM yyyy") &mdash; @DateTime.Today.ToString("dd MMM yyyy")
+                @if (Preset.Selected == AnalyticsRangePreset.AllTime)
+                { @T.Analytics.AllTime }
+                else
+                { <span dir="ltr">@Preset.From.ToString("dd MMM yyyy") – @Preset.To.AddDays(-1).ToString("dd MMM yyyy")</span> }
             </MudText>
             <MudSpacer />
             <MudChip T="string" Size="Size.Small" Color="Color.Primary" Variant="Variant.Outlined">@Preset.Label</MudChip>

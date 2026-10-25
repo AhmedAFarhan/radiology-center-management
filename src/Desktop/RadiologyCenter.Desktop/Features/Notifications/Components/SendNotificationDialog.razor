@@ -13,7 +13,7 @@
             <LocalizedDataAnnotationsValidator />
             <MudGrid Spacing="2">
                 <MudItem xs="12" sm="6">
-                    <MudTextField @bind-Value="_model.Recipient"
+                    <MudTextField Disabled="_busy" @bind-Value="_model.Recipient"
                                   Label="@T.SendDialog.RecipientLabel"
                                   Variant="Variant.Outlined"
                                   Margin="Margin.Dense"
@@ -21,7 +21,7 @@
                                   For="@(() => _model.Recipient)" />
                 </MudItem>
                 <MudItem xs="12" sm="6">
-                    <MudSelect T="string"
+                    <MudSelect Disabled="_busy" T="string"
                                Value="_model.Channel"
                                ValueChanged="OnChannelChangedAsync"
                                Label="@T.SendDialog.Channel"
@@ -35,7 +35,7 @@
                     </MudSelect>
                 </MudItem>
                 <MudItem xs="12">
-                    <MudSelect T="string"
+                    <MudSelect Disabled="_busy" T="string"
                                Value="_model.TemplateCode"
                                ValueChanged="OnTemplateCodeChangedAsync"
                                Label="@T.SendDialog.Template"
@@ -50,14 +50,14 @@
                     </MudSelect>
                 </MudItem>
                 <MudItem xs="12">
-                    <MudTextField @bind-Value="_model.Subject"
+                    <MudTextField Disabled="_busy" @bind-Value="_model.Subject"
                                   Label="@T.SendDialog.Subject"
                                   Variant="Variant.Outlined"
                                   Margin="Margin.Dense"
                                   Immediate="true" />
                 </MudItem>
                 <MudItem xs="12">
-                    <MudTextField @bind-Value="_model.Body"
+                    <MudTextField Disabled="_busy" @bind-Value="_model.Body"
                                   Label="@T.SendDialog.Body"
                                   Variant="Variant.Outlined"
                                   Margin="Margin.Dense"
@@ -66,14 +66,14 @@
                                   />
                 </MudItem>
                 <MudItem xs="12">
-                    <MudTextField @bind-Value="_model.ReferenceId"
+                    <MudTextField Disabled="_busy" @bind-Value="_model.ReferenceId"
                                   Label="@T.SendDialog.ReferenceOptional"
                                   Variant="Variant.Outlined"
                                   Margin="Margin.Dense"
                                   Immediate="true" />
                 </MudItem>
                 <MudItem xs="12">
-                    <MudTextField @bind-Value="_model.Placeholders"
+                    <MudTextField Disabled="_busy" @bind-Value="_model.Placeholders"
                                   Label="@T.SendDialog.PlaceholdersLabel"
                                   Variant="Variant.Outlined"
                                   Margin="Margin.Dense"

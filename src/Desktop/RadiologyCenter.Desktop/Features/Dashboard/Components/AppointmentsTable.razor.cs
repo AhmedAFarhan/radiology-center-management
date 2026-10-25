@@ -19,5 +19,5 @@ namespace RadiologyCenter.Desktop.Features.Dashboard.Components;
 
 public partial class AppointmentsTable : ComponentBase
 {
-[Parameter] public IReadOnlyList<ExaminationDto> Items { get; set; } = Array.Empty<ExaminationDto>();
+[Parameter] public IReadOnlyList<ExaminationListItemDto> Items { get; set; } = Array.Empty<ExaminationListItemDto>();
 }

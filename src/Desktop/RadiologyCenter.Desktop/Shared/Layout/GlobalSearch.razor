@@ -1,10 +1,14 @@
 @using Microsoft.AspNetCore.Components.Web
 @inject AppLocalizer T
+@inject IJSRuntime JS
 
-<div class="global-search" @onclick="HandleSearchBoxClick" role="search" aria-label="@T.Layout.SearchPlaceholder">
+<div @ref="_searchRoot" @onfocusout="HandleFocusOutAsync" @onfocusin="HandleSearchBoxClick" class="global-search" @onclick="HandleSearchBoxClick" role="search" aria-label="@T.Layout.SearchPlaceholder">
     <MudTextField T="string"
                   @ref="_searchField"
                   Placeholder="@T.Layout.SearchPlaceholder"
+                  aria-label="@T.Layout.SearchPlaceholder"
+                  role="combobox" aria-autocomplete="list" aria-expanded="@ResultsOpen.ToString().ToLowerInvariant()"
+                  aria-controls="global-search-results" aria-activedescendant="@ActiveOptionId"
                   Variant="Variant.Outlined"
                   Margin="Margin.Dense"
                   Immediate="true"
@@ -13,13 +17,12 @@
                   Value="@SearchText"
                   ValueChanged="@(v => SearchTextChanged.InvokeAsync(v))"
                   OnKeyDown="HandleSearchKeyDown"
-                  OnBlur="HandleSearchBlur"
                   Class="header-search app-bar-search global-search-input" />
 
     @if (ResultsOpen)
     {
         <div class="global-search-overlay" @onmousedown="HandleCloseSearch"></div>
-        <div class="global-search-results" role="listbox">
+        <div id="global-search-results" class="global-search-results" role="listbox" aria-label="@T.Layout.SearchPlaceholder" @onclick:stopPropagation="true">
             @if (Searching && FlatItems.Count > 0)
             {
                 <div class="global-search-loading">
@@ -39,7 +42,9 @@
                                     class="global-search-item"
                                     role="option"
                                     @onmousedown:preventDefault="true"
-                                    @onmousedown="() => OnRecentClicked(term)">
+                                    @onclick="() => OnRecentClicked(term)"
+                                    id="@($"global-search-recent-{RecentSearches.ToList().IndexOf(term)}")"
+                                    aria-selected="@((SelectedIndex == RecentSearches.ToList().IndexOf(term)).ToString().ToLowerInvariant())">
                                 <span class="global-search-item-title">
                                     <MudIcon Icon="@Icons.Material.Filled.History" Size="Size.Small" Class="me-1 global-search-recent-icon" />
                                     @term
@@ -50,30 +55,30 @@
                 }
                 else
                 {
-                    <div class="global-search-status">@T.Search.TypeHint</div>
+                    <div class="global-search-status" role="status">@T.Search.TypeHint</div>
                 }
             }
             else if (Searching && FlatItems.Count == 0)
             {
-                <div class="global-search-status">@T.Common.Loading</div>
+                <div class="global-search-status" role="status">@T.Common.Loading</div>
             }
             else if (SearchError)
             {
-                <div class="global-search-status">
+                <div class="global-search-status" role="status">
                     @T.Search.Error
                     <button type="button"
                             class="global-search-retry"
                             @onmousedown:preventDefault="true"
-                            @onmousedown="HandleRetrySearch">@T.Search.Retry</button>
+                            @onclick="HandleRetrySearch">@T.Search.Retry</button>
                 </div>
             }
             else if (SearchText.Trim().Length < 2)
             {
-                <div class="global-search-status">@T.Search.TypeHint</div>
+                <div class="global-search-status" role="status">@T.Search.TypeHint</div>
             }
             else if (FlatItems.Count == 0)
             {
-                <div class="global-search-status">@T.Search.NoResults</div>
+                <div class="global-search-status" role="status">@T.Search.NoResults</div>
             }
             else
             {
@@ -86,7 +91,7 @@
                             <button type="button"
                                     class="global-search-viewall"
                                     @onmousedown:preventDefault="true"
-                                    @onmousedown="() => OnViewAll(group.EntityType)">@T.Search.ViewAll</button>
+                                    @onclick="() => OnViewAll(group.EntityType)">@T.Search.ViewAll</button>
                         </div>
                         @foreach (var item in group.Items)
                         {
@@ -95,7 +100,8 @@
                                     role="option"
                                     aria-selected="@(IsSelected(item) ? "true" : "false")"
                                     @onmousedown:preventDefault="true"
-                                    @onmousedown="() => OnActivateItem(new SearchFlatItem(group.EntityType, item))"
+                                    @onclick="() => OnActivateItem(new SearchFlatItem(group.EntityType, item))"
+                                    id="@($"global-search-option-{FlatItems.FindIndex(f => ReferenceEquals(f.Item, item))}")"
                                     @onmouseenter="() => SelectItem(item)">
                                 <span class="global-search-item-title">@Highlighted(item.Title)</span>
                                 @if (!string.IsNullOrWhiteSpace(item.Subtitle))

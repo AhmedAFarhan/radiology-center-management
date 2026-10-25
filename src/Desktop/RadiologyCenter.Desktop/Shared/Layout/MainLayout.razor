@@ -65,11 +65,11 @@
                      Class="profile-menu"
                      ListClass="profile-menu-list">
                 <ActivatorContent>
-                    <div class="d-flex align-center profile-trigger" @onclick="context.ToggleAsync">
+                    <button type="button" class="d-flex align-center profile-trigger" @onclick="context.ToggleAsync" aria-haspopup="menu" aria-label="@(T.IsRTL ? "قائمة الحساب" : "Account menu")">
                         <MudAvatar Size="Size.Small" Color="Color.Primary" Class="mx-2 app-bar-avatar">@GetInitial()</MudAvatar>
                         <MudText Typo="Typo.body2" Class="me-2 app-bar-user">@_displayName</MudText>
                         <MudIcon Icon="@Icons.Material.Filled.ArrowDropDown" Size="Size.Small" Class="app-bar-chevron" />
-                    </div>
+                    </button>
                 </ActivatorContent>
                 <ChildContent>
                     <div class="profile-menu-header">

@@ -10,7 +10,7 @@
             <LocalizedDataAnnotationsValidator />
             <MudGrid Spacing="2">
                 <MudItem xs="12" sm="7">
-                    <MudTextField @bind-Value="_model.Name"
+                    <MudTextField Disabled="Busy" @bind-Value="_model.Name"
                                   Label="@T.Common.Name"
                                   Variant="Variant.Outlined"
                                   Margin="Margin.Dense"
@@ -18,7 +18,7 @@
                                   For="@(() => _model.Name)" />
                 </MudItem>
                 <MudItem xs="12" sm="5">
-                    <MudSelect T="string"
+                    <MudSelect Disabled="Busy" T="string"
                                @bind-Value="_model.Kind"
                                Label="@T.SalaryComponent.Kind"
                                Variant="Variant.Outlined"
@@ -31,7 +31,7 @@
                     </MudSelect>
                 </MudItem>
                 <MudItem xs="12" sm="4">
-                    <MudSelect T="string"
+                    <MudSelect Disabled="Busy" T="string"
                                @bind-Value="_model.Frequency"
                                Label="@T.SalaryComponent.FrequencyOptional"
                                Variant="Variant.Outlined"
@@ -44,7 +44,7 @@
                     </MudSelect>
                 </MudItem>
                 <MudItem xs="12" sm="4">
-                    <MudNumericField T="decimal"
+                    <MudNumericField Disabled="Busy" T="decimal"
                                      @bind-Value="_model.DefaultValue"
                                      Label="@(_model.IsPercentage ? T.SalaryComponent.DefaultPercent : T.SalaryComponent.DefaultValue)"
                                      Variant="Variant.Outlined"
@@ -53,8 +53,8 @@
                                      For="@(() => _model.DefaultValue)" />
                 </MudItem>
                 <MudItem xs="12" sm="4" Class="d-flex flex-column justify-center">
-                    <MudSwitch T="bool" @bind-Value="_model.IsPercentage" Color="Color.Primary">@T.SalaryComponent.ValueIsPercentage</MudSwitch>
-                    <MudSwitch T="bool" @bind-Value="_model.IsPerWorkDay" Color="Color.Primary">@T.SalaryComponent.PaidPerWorkDay</MudSwitch>
+                    <MudSwitch Disabled="Busy" T="bool" @bind-Value="_model.IsPercentage" Color="Color.Primary">@T.SalaryComponent.ValueIsPercentage</MudSwitch>
+                    <MudSwitch Disabled="Busy" T="bool" @bind-Value="_model.IsPerWorkDay" Color="Color.Primary">@T.SalaryComponent.PaidPerWorkDay</MudSwitch>
                 </MudItem>
             </MudGrid>
             <button type="submit" style="display:none"></button>

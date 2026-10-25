@@ -17,7 +17,7 @@ using RadiologyCenter.Desktop.Services;
 
 namespace RadiologyCenter.Desktop.Features.Analytics.Components;
 
-public partial class PeriodSelector : ComponentBase
+public partial class PeriodSelector : ComponentBase, IDisposable
 {
 [Parameter] public string? Class { get; set; }
 

@@ -8,7 +8,7 @@
             <LocalizedDataAnnotationsValidator />
             <MudGrid Spacing="2">
                 <MudItem xs="12" sm="8">
-                    <MudTextField @bind-Value="_model.Name"
+                    <MudTextField Disabled="Busy" @bind-Value="_model.Name"
                                   Label="@T.Common.Name"
                                   Variant="Variant.Outlined"
                                   Margin="Margin.Dense"
@@ -16,7 +16,7 @@
                                   For="@(() => _model.Name)" />
                 </MudItem>
                 <MudItem xs="12" sm="4">
-                    <MudTextField @bind-Value="_model.Phone"
+                    <MudTextField InputType="InputType.Telephone" Disabled="Busy" @bind-Value="_model.Phone"
                                   Label="@T.SupplierDialog.Phone"
                                   Variant="Variant.Outlined"
                                   Margin="Margin.Dense"
@@ -24,7 +24,7 @@
                                   For="@(() => _model.Phone)" />
                 </MudItem>
                 <MudItem xs="12" sm="6">
-                    <MudTextField @bind-Value="_model.ContactPerson"
+                    <MudTextField Disabled="Busy" @bind-Value="_model.ContactPerson"
                                   Label="@T.SupplierDialog.ContactPerson"
                                   Variant="Variant.Outlined"
                                   Margin="Margin.Dense"
@@ -32,7 +32,7 @@
                                   For="@(() => _model.ContactPerson)" />
                 </MudItem>
                 <MudItem xs="12" sm="6">
-                    <MudTextField @bind-Value="_model.Email"
+                    <MudTextField InputType="InputType.Email" Disabled="Busy" @bind-Value="_model.Email"
                                   Label="@T.SupplierDialog.Email"
                                   Variant="Variant.Outlined"
                                   Margin="Margin.Dense"
@@ -40,7 +40,7 @@
                                   For="@(() => _model.Email)" />
                 </MudItem>
                 <MudItem xs="12">
-                    <MudTextField @bind-Value="_model.Address"
+                    <MudTextField Disabled="Busy" @bind-Value="_model.Address"
                                   Label="@T.SupplierDialog.Address"
                                   Variant="Variant.Outlined"
                                   Margin="Margin.Dense"
@@ -48,7 +48,7 @@
                                   For="@(() => _model.Address)" />
                 </MudItem>
                 <MudItem xs="12" sm="6">
-                    <MudTextField @bind-Value="_model.TaxNumber"
+                    <MudTextField Disabled="Busy" @bind-Value="_model.TaxNumber"
                                   Label="@T.SupplierDialog.TaxNumber"
                                   Variant="Variant.Outlined"
                                   Margin="Margin.Dense"
@@ -56,7 +56,7 @@
                                   For="@(() => _model.TaxNumber)" />
                 </MudItem>
                 <MudItem xs="12" sm="6">
-                    <MudTextField @bind-Value="_model.PaymentTerms"
+                    <MudTextField Disabled="Busy" @bind-Value="_model.PaymentTerms"
                                   Label="@T.SupplierDialog.PaymentTerms"
                                   Variant="Variant.Outlined"
                                   Margin="Margin.Dense"

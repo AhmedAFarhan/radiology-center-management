@@ -8,21 +8,21 @@
             <LocalizedDataAnnotationsValidator />
             <MudGrid Spacing="2">
                 <MudItem xs="12" sm="6">
-                    <MudDatePicker @bind-Date="_model.RunFrom"
+                    <MudDatePicker Disabled="Busy" @bind-Date="_model.RunFrom"
                                    Label="@T.PayRunDialog.PeriodFrom"
                                    Variant="Variant.Outlined"
                                    Margin="Margin.Dense"
                                    Class="w-100" />
                 </MudItem>
                 <MudItem xs="12" sm="6">
-                    <MudDatePicker @bind-Date="_model.RunTo"
+                    <MudDatePicker Disabled="Busy" @bind-Date="_model.RunTo" MinDate="_model.RunFrom"
                                    Label="@T.PayRunDialog.PeriodTo"
                                    Variant="Variant.Outlined"
                                    Margin="Margin.Dense"
                                    Class="w-100" />
                 </MudItem>
                 <MudItem xs="12">
-                    <MudTextField @bind-Value="_model.Notes"
+                    <MudTextField Disabled="Busy" @bind-Value="_model.Notes"
                                   Label="@T.PayRunDialog.Notes"
                                   Variant="Variant.Outlined"
                                   Margin="Margin.Dense"

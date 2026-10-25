@@ -30,7 +30,7 @@ public partial class ReadingRoomReportEditor : ComponentBase
     [Parameter] public EventCallback OnAmend { get; set; }
     [Parameter] public EventCallback<(ReportFindingDto Finding, string Severity)> OnSeverityChanged { get; set; }
     [Parameter] public EventCallback<ReportFindingDto> OnRemoveFinding { get; set; }
-    [Parameter] public EventCallback<(string Region, string Description, string Severity)> OnAddFinding { get; set; }
+    [Parameter] public Func<(string Region, string Description, string Severity), Task<bool>> OnAddFinding { get; set; } = _ => Task.FromResult(false);
 
     [Inject] private IDialogService DialogService { get; set; } = default!;
     [Inject] private ISnackbar Snackbar { get; set; } = default!;

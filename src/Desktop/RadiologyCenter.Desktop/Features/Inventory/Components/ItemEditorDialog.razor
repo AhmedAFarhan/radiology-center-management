@@ -9,7 +9,7 @@
             <LocalizedDataAnnotationsValidator />
             <MudGrid Spacing="2">
                 <MudItem xs="12" sm="8">
-                    <MudTextField @bind-Value="_model.Name"
+                    <MudTextField Disabled="Busy" @bind-Value="_model.Name"
                                   Label="@T.Common.Name"
                                   Variant="Variant.Outlined"
                                   Margin="Margin.Dense"
@@ -17,14 +17,14 @@
                                   For="@(() => _model.Name)" />
                 </MudItem>
                 <MudItem xs="12" sm="4">
-                    <MudTextField @bind-Value="_model.Brand"
+                    <MudTextField Disabled="Busy" @bind-Value="_model.Brand"
                                   Label="@T.ItemDialog.Brand"
                                   Variant="Variant.Outlined"
                                   Margin="Margin.Dense"
                                   Immediate="true" />
                 </MudItem>
                 <MudItem xs="12" sm="6">
-                    <MudSelect T="string"
+                    <MudSelect Disabled="Busy" T="string"
                                @bind-Value="_model.Category"
                                Label="@T.ItemDialog.Category"
                                Variant="Variant.Outlined"
@@ -37,7 +37,7 @@
                     </MudSelect>
                 </MudItem>
                 <MudItem xs="12" sm="6">
-                    <MudSelect T="string"
+                    <MudSelect Disabled="Busy" T="string"
                                @bind-Value="_model.Unit"
                                Label="@T.ItemDialog.Unit"
                                Variant="Variant.Outlined"
@@ -50,7 +50,7 @@
                     </MudSelect>
                 </MudItem>
                 <MudItem xs="6">
-                    <MudNumericField T="int"
+                    <MudNumericField Disabled="Busy" T="int"
                                      @bind-Value="_model.ReorderLevel"
                                      Label="@T.ItemDialog.ReorderLevel"
                                      Variant="Variant.Outlined"
@@ -59,7 +59,7 @@
                                      For="@(() => _model.ReorderLevel)" />
                 </MudItem>
                 <MudItem xs="6">
-                    <MudNumericField T="int"
+                    <MudNumericField Disabled="Busy" T="int"
                                      @bind-Value="_model.ReorderQuantity"
                                      Label="@T.ItemDialog.ReorderQuantity"
                                      Variant="Variant.Outlined"
@@ -68,7 +68,7 @@
                                      For="@(() => _model.ReorderQuantity)" />
                 </MudItem>
                 <MudItem xs="12" sm="6">
-                    <MudSelect T="string"
+                    <MudSelect Disabled="Busy" T="string"
                                @bind-Value="_model.LotTracked"
                                Label="@T.ItemDialog.LotTracking"
                                Variant="Variant.Outlined"
@@ -83,7 +83,7 @@
                     </MudText>
                 </MudItem>
                 <MudItem xs="12">
-                    <MudTextField @bind-Value="_model.StorageInstructions"
+                    <MudTextField Disabled="Busy" @bind-Value="_model.StorageInstructions"
                                   Label="@T.ItemDialog.StorageInstructions"
                                   Variant="Variant.Outlined"
                                   Margin="Margin.Dense"

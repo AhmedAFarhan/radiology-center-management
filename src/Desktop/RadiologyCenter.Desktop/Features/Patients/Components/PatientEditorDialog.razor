@@ -10,7 +10,7 @@
             <LocalizedDataAnnotationsValidator />
             <MudGrid Spacing="2">
                 <MudItem xs="12">
-                    <MudTextField @bind-Value="_model.FullName"
+                    <MudTextField Disabled="_busy" @bind-Value="_model.FullName"
                                   Label="@T.PatientDialog.FullName"
                                   Variant="Variant.Outlined"
                                   Margin="Margin.Dense"
@@ -18,7 +18,7 @@
                                   For="@(() => _model.FullName)" />
                 </MudItem>
                 <MudItem xs="12" sm="6">
-                    <MudSelect T="string"
+                    <MudSelect Disabled="_busy" T="string"
                                @bind-Value="_model.Gender"
                                Label="@T.PatientDialog.Gender"
                                Variant="Variant.Outlined"
@@ -31,7 +31,7 @@
                     </MudSelect>
                 </MudItem>
                 <MudItem xs="12" sm="6">
-                    <MudNumericField T="int?"
+                    <MudNumericField Disabled="_busy" T="int?"
                                      @bind-Value="_model.Age"
                                      Label="@T.PatientDialog.Age"
                                      Variant="Variant.Outlined"
@@ -41,7 +41,7 @@
                                      For="@(() => _model.Age)" />
                 </MudItem>
                 <MudItem xs="12" sm="6">
-                    <MudDatePicker @bind-Date="_model.DateOfBirth"
+                    <MudDatePicker Disabled="_busy" @bind-Date="_model.DateOfBirth" MaxDate="ClinicTime.Today"
                                    Label="@T.PatientDialog.DateOfBirth"
                                    Variant="Variant.Outlined"
                                    Margin="Margin.Dense"
@@ -49,7 +49,7 @@
                                    For="@(() => _model.DateOfBirth)" />
                 </MudItem>
                 <MudItem xs="12" sm="6">
-                    <MudTextField @bind-Value="_model.PhoneNumber"
+                    <MudTextField InputType="InputType.Telephone" Disabled="_busy" @bind-Value="_model.PhoneNumber"
                                   Label="@T.PatientDialog.PhoneNumber"
                                   Variant="Variant.Outlined"
                                   Margin="Margin.Dense"
@@ -57,7 +57,7 @@
                                   For="@(() => _model.PhoneNumber)" />
                 </MudItem>
                 <MudItem xs="12" sm="6">
-                    <MudTextField @bind-Value="_model.Email"
+                    <MudTextField InputType="InputType.Email" Disabled="_busy" @bind-Value="_model.Email"
                                   Label="@T.PatientDialog.Email"
                                   Variant="Variant.Outlined"
                                   Margin="Margin.Dense"
@@ -65,14 +65,14 @@
                                   For="@(() => _model.Email)" />
                 </MudItem>
                 <MudItem xs="12" sm="6">
-                    <MudTextField @bind-Value="_model.NationalId"
+                    <MudTextField Disabled="_busy" @bind-Value="_model.NationalId"
                                   Label="@T.PatientDialog.NationalId"
                                   Variant="Variant.Outlined"
                                   Margin="Margin.Dense"
                                   Immediate="true" />
                 </MudItem>
                 <MudItem xs="12" sm="6">
-                    <MudSelect T="string"
+                    <MudSelect Disabled="_busy" T="string"
                                @bind-Value="_model.BloodType"
                                Label="@T.PatientDialog.BloodType"
                                Variant="Variant.Outlined"
@@ -85,21 +85,21 @@
                     </MudSelect>
                 </MudItem>
                 <MudItem xs="12">
-                    <MudTextField @bind-Value="_model.Address"
+                    <MudTextField Disabled="_busy" @bind-Value="_model.Address"
                                   Label="@T.PatientDialog.Address"
                                   Variant="Variant.Outlined"
                                   Margin="Margin.Dense"
                                   Immediate="true" />
                 </MudItem>
                 <MudItem xs="12" sm="6">
-                    <MudTextField @bind-Value="_model.Allergies"
+                    <MudTextField Disabled="_busy" @bind-Value="_model.Allergies"
                                   Label="@T.PatientDialog.Allergies"
                                   Variant="Variant.Outlined"
                                   Margin="Margin.Dense"
                                   Immediate="true" />
                 </MudItem>
                 <MudItem xs="12">
-                    <MudTextField @bind-Value="_model.MedicalHistory"
+                    <MudTextField Disabled="_busy" @bind-Value="_model.MedicalHistory"
                                   Label="@T.PatientDialog.MedicalHistory"
                                   Variant="Variant.Outlined"
                                   Margin="Margin.Dense"

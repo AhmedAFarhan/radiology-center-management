@@ -1,48 +1,36 @@
-﻿using RadiologyCenter.Desktop.Models;
+using Microsoft.AspNetCore.Components.Authorization;
+using RadiologyCenter.Desktop.Models;
+using RadiologyCenter.Desktop.Security;
+using RadiologyCenter.Desktop.Security.Permissions;
 
 namespace RadiologyCenter.Desktop.Features.Dashboard.Services;
 
 public sealed record DashboardData(
-    int TotalPatients,
-    int TotalExaminations,
-    int ExamsInProgress,
-    int TotalInventoryItems,
-    IReadOnlyList<ExaminationDto> RecentExaminations,
-    IReadOnlyList<PatientDto> RecentPatients);
+    int? TotalPatients,
+    int? TotalExaminations,
+    int? ExamsInProgress,
+    int? TotalInventoryItems,
+    IReadOnlyList<ExaminationListItemDto> RecentExaminations);
 
-public sealed class DashboardService
+public sealed class DashboardService(ApiClient api, AuthenticationStateProvider authentication)
 {
-    private readonly ApiClient _api;
-
-    public DashboardService(ApiClient api) => _api = api;
-
     public async Task<DashboardData> LoadAsync(CancellationToken ct = default)
     {
-        var query = new { pagination = new { pageNumber = 1, pageSize = 100 } };
+        var user = (await authentication.GetAuthenticationStateAsync()).User;
+        bool Allowed(string permission) => user.HasClaim(AppClaimTypes.IsAdmin, "true") || user.HasClaim(AppClaimTypes.Permission, permission);
+        var countQuery = new { pagination = new { pageNumber = 1, pageSize = 1 } };
+        var recentQuery = new { pagination = new { pageNumber = 1, pageSize = 6 }, sortBy = "CreatedAt", sortDescending = true };
+        var progressQuery = new { pagination = new { pageNumber = 1, pageSize = 1 }, filters = new[] { new { field = "Status", @operator = "Equals", value = "InProgress" } } };
 
-        var patientsTask = _api.PostAsync<PagedResult<PatientDto>>("api/patients/all", query, ct);
-        var examinationsTask = _api.PostAsync<PagedResult<ExaminationDto>>("api/examinations/all", query, ct);
-        var itemsTask = _api.PostAsync<PagedResult<ItemDto>>("api/inventory/items/all", query, ct);
+        async Task<PagedResult<T>?> FetchAsync<T>(bool allowed, string path, object query) =>
+            allowed ? await api.PostAsync<PagedResult<T>>(path, query, ct) : null;
 
-        await Task.WhenAll(patientsTask, examinationsTask, itemsTask);
-
-        var patients = await patientsTask;
-        var examinations = await examinationsTask;
-        var items = await itemsTask;
-
-        return new DashboardData(
-            patients.TotalCount,
-            examinations.TotalCount,
-            examinations.Items.Count(e => string.Equals(e.StatusKey, "InProgress", StringComparison.OrdinalIgnoreCase)),
-            items.TotalCount,
-            examinations.Items
-                .OrderByDescending(e => e.CompletedAt ?? e.ScheduledAt ?? e.StartedAt)
-                .Take(6)
-                .ToList(),
-            patients.Items
-                .OrderByDescending(p => p.CreatedAt)
-                .Take(6)
-                .ToList());
+        var patientsTask = FetchAsync<PatientDto>(Allowed(PatientsPermissions.Read), "api/patients/all", countQuery);
+        var examinationsTask = FetchAsync<ExaminationListItemDto>(Allowed(ExaminationsPermissions.Read), "api/examinations/all", recentQuery);
+        var progressTask = FetchAsync<ExaminationListItemDto>(Allowed(ExaminationsPermissions.Read), "api/examinations/all", progressQuery);
+        var itemsTask = FetchAsync<ItemDto>(Allowed(InventoryPermissions.ItemsRead), "api/inventory/items/all", countQuery);
+        await Task.WhenAll(patientsTask, examinationsTask, progressTask, itemsTask);
+        return new DashboardData((await patientsTask)?.TotalCount, (await examinationsTask)?.TotalCount,
+            (await progressTask)?.TotalCount, (await itemsTask)?.TotalCount, (await examinationsTask)?.Items ?? []);
     }
 }
-

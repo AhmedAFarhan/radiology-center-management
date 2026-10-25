@@ -42,7 +42,7 @@
                                          Disabled="Busy" />
                     </MudItem>
                     <MudItem xs="12" sm="4">
-                        <MudSelect T="string"
+                        <MudSelect Disabled="Busy" T="string"
                                    @bind-Value="_model.Role"
                                    Label="@T.ExamFee.Role"
                                    Variant="Variant.Outlined"
@@ -56,7 +56,7 @@
                     </MudItem>
                 }
                 <MudItem xs="12" sm="6">
-                    <MudNumericField T="decimal"
+                    <MudNumericField Disabled="Busy" T="decimal"
                                      @bind-Value="_model.Amount"
                                      Label="@(_model.IsPercentage ? T.ExamFee.PercentagePercent : T.ExamFee.FlatAmount)"
                                      Variant="Variant.Outlined"
@@ -65,7 +65,7 @@
                                      For="@(() => _model.Amount)" />
                 </MudItem>
                 <MudItem xs="12" sm="6" Class="d-flex align-items-center">
-                    <MudSwitch T="bool" @bind-Value="_model.IsPercentage" Color="Color.Primary">@T.ExamFee.AmountIsPercentage</MudSwitch>
+                    <MudSwitch Disabled="Busy" T="bool" @bind-Value="_model.IsPercentage" Color="Color.Primary">@T.ExamFee.AmountIsPercentage</MudSwitch>
                 </MudItem>
             </MudGrid>
             <button type="submit" style="display:none"></button>

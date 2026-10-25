@@ -53,7 +53,7 @@
         </MudTd>
     </RowTemplate>
     <NoRecordsContent>
-        <TableNoRecords LoadError="@LoadError"
+        <TableNoRecords ActionPolicy="@ResourcesPermissions.ShiftsCreate" LoadError="@LoadError"
                         Offline="@Offline"
                         ErrorTitle="@T.WorkShift.LoadErrorTitle"
                         EmptyIcon="@Icons.Material.Filled.CalendarMonth"

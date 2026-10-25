@@ -5,6 +5,113 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
     <title>Radiology Center</title>
     <base href="/" />
+    <!-- Shared splash animations load before Blazor, which replaces the initial markup. -->
+    <style>
+        html { background: #4C58E0; }
+        body { background: #F4F7FC; margin: 0; }
+        /* Boot splash */
+        .boot-splash {
+          position: fixed;
+          inset: 0;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          background: #4C58E0;
+          z-index: 3000;
+          cursor: default;
+          user-select: none;
+        }
+        .boot-splash-center {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          text-align: center;
+          padding: 24px;
+          max-width: 380px;
+        }
+        .boot-splash-logo {
+          position: relative;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          margin-bottom: 30px;
+          animation: boot-logo-in 0.9s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+        }
+        .boot-splash-logo img {
+          width: 120px;
+          height: 120px;
+          object-fit: contain;
+          border-radius: 50%;
+          background: transparent;
+          position: relative;
+          z-index: 1;
+          animation: boot-logo-float 3.2s ease-in-out infinite;
+        }
+        @keyframes boot-logo-in {
+          from { transform: scale(0.7) translateY(18px); opacity: 0; }
+          to   { transform: scale(1) translateY(0); opacity: 1; }
+        }
+        @keyframes boot-logo-float {
+          0%, 100% { transform: translateY(0); }
+          50%      { transform: translateY(-7px); }
+        }
+        .boot-splash-halo {
+          position: absolute;
+          top: 50%;
+          left: 50%;
+          border-radius: 50%;
+          transform: translate(-50%, -50%);
+          background: rgba(255,255,255,0.16);
+          z-index: 0;
+          animation: boot-halo-pulse 2.4s ease-out infinite;
+        }
+        .boot-splash-halo-1 { width: 150px; height: 150px; }
+        .boot-splash-halo-2 { width: 150px; height: 150px; animation-delay: 1.2s; }
+        @keyframes boot-halo-pulse {
+          0%   { transform: translate(-50%, -50%) scale(0.55); opacity: 0.85; }
+          70%  { transform: translate(-50%, -50%) scale(1.35); opacity: 0; }
+          100% { transform: translate(-50%, -50%) scale(1.35); opacity: 0; }
+        }
+        .boot-splash-title {
+          position: relative;
+          display: inline-flex;
+          font-family: 'Roboto Slab', 'Montserrat', 'Cairo', sans-serif;
+          font-size: 40px;
+          font-weight: 800;
+          letter-spacing: 6px;
+          direction: ltr;
+          unicode-bidi: isolate;
+        }
+        .boot-splash-letter {
+          display: inline-block;
+          color: #ffffff;
+          background: linear-gradient(110deg, #ffffff 30%, #c7d3ff 45%, #ffffff 60%);
+          background-size: 220% auto;
+          -webkit-background-clip: text;
+          background-clip: text;
+          -webkit-text-fill-color: transparent;
+          animation:
+            boot-letter-in 0.7s cubic-bezier(0.22, 1, 0.36, 1) forwards,
+            boot-letter-shimmer 2.6s linear infinite;
+          animation-delay: calc(var(--i) * 0.09s), calc(0.6s + var(--i) * 0.09s);
+          opacity: 0;
+        }
+        @keyframes boot-letter-in {
+          from { transform: translateY(26px) rotateX(60deg); opacity: 0; }
+          to   { transform: translateY(0) rotateX(0); opacity: 1; }
+        }
+        @keyframes boot-letter-shimmer {
+          0%   { background-position: 160% center; }
+          100% { background-position: -60% center; }
+        }
+        @media (prefers-reduced-motion: reduce) {
+          .boot-splash-logo, .boot-splash-logo img, .boot-splash-halo, .boot-splash-letter {
+            animation: none;
+          }
+          .boot-splash-logo, .boot-splash-letter { opacity: 1; transform: none; }
+          .boot-splash-halo { opacity: 0; }
+        }
+    </style>
     <link href="_content/MudBlazor/MudBlazor.min.css" rel="stylesheet" />
     <link href="app.css?v=20260821" rel="stylesheet" />
     <link rel="icon" href="data:,">
@@ -14,15 +121,34 @@
 
     <div class="status-bar-safe-area"></div>
 
-    <div id="app"></div>
+    <div id="app">
+        <div class="boot-splash" role="status" aria-label="EGcare loading">
+            <div class="boot-splash-center">
+                <div class="boot-splash-logo">
+                    <span class="boot-splash-halo boot-splash-halo-1" aria-hidden="true"></span>
+                    <span class="boot-splash-halo boot-splash-halo-2" aria-hidden="true"></span>
+                    <img src="images/healthcare_logo_v2_512.png" alt="" width="120" height="120" />
+                </div>
+                <div class="boot-splash-title" aria-hidden="true">
+                    <span class="boot-splash-letter" style="--i:0">E</span>
+                    <span class="boot-splash-letter" style="--i:1">G</span>
+                    <span class="boot-splash-letter" style="--i:2">c</span>
+                    <span class="boot-splash-letter" style="--i:3">a</span>
+                    <span class="boot-splash-letter" style="--i:4">r</span>
+                    <span class="boot-splash-letter" style="--i:5">e</span>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <div id="blazor-error-ui" data-nosnippet>
         <span id="blazor-error-message">An unhandled error has occurred.</span>
         <a href="." class="reload">Reload</a>
-        <span class="dismiss">🗙</span>
+        <button type="button" class="dismiss" aria-label="Dismiss error">×</button>
     </div>
 
     <script src="js/app-language.js"></script>
+    <script src="js/ui-accessibility.js"></script>
     <script src="js/sidebar-resize.js"></script>
     <script src="js/responsive-cards.js"></script>
     <script src="js/reading-room.js"></script>

@@ -25,4 +25,7 @@
             </MudTooltip>
         </MudTd>
     </RowTemplate>
+    <NoRecordsContent>
+        <EmptyState Title="@(T.IsRTL ? "لا توجد مستحقات إحالة في هذه الدورة" : "No referral fees in this pay run")" />
+    </NoRecordsContent>
 </MudTable>

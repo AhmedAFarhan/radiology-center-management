@@ -17,6 +17,8 @@ public partial class App : MauiWinUIApplication
 	public App()
 	{
 		UpdateService.Init();
+		// Set before WebView2 creation: setting its property later can still flash white.
+		Environment.SetEnvironmentVariable("WEBVIEW2_DEFAULT_BACKGROUND_COLOR", "FF4C58E0", EnvironmentVariableTarget.Process);
 		this.InitializeComponent();
 	}
 

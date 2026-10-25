@@ -57,7 +57,7 @@
                     </MudItem>
                 }
                 <MudItem xs="12" sm="6">
-                    <MudTextField @bind-Value="_model.Name"
+                    <MudTextField Disabled="Busy" @bind-Value="_model.Name"
                                   Label="@T.AllowanceDialog.AllowanceName"
                                   Variant="Variant.Outlined"
                                   Margin="Margin.Dense"
@@ -65,7 +65,7 @@
                                   For="@(() => _model.Name)" />
                 </MudItem>
                 <MudItem xs="12" sm="6">
-                    <MudNumericField T="decimal"
+                    <MudNumericField Disabled="Busy" T="decimal"
                                      @bind-Value="_model.Amount"
                                      Label="@T.AllowanceDialog.Amount"
                                      Variant="Variant.Outlined"
@@ -74,7 +74,7 @@
                                      For="@(() => _model.Amount)" />
                 </MudItem>
                 <MudItem xs="12" sm="4">
-                    <MudSelect T="string"
+                    <MudSelect Disabled="Busy" T="string"
                                @bind-Value="_model.Frequency"
                                Label="@T.AllowanceDialog.FrequencyOptional"
                                Variant="Variant.Outlined"
@@ -87,7 +87,7 @@
                     </MudSelect>
                 </MudItem>
                 <MudItem xs="12" sm="4">
-                    <MudDatePicker @bind-Date="_model.EffectiveDate"
+                    <MudDatePicker Disabled="Busy" @bind-Date="_model.EffectiveDate"
                                    Label="@T.AllowanceDialog.EffectiveDate"
                                    Variant="Variant.Outlined"
                                    Margin="Margin.Dense"
@@ -95,14 +95,14 @@
                                    Class="w-100" />
                 </MudItem>
                 <MudItem xs="12" sm="4">
-                    <MudDatePicker @bind-Date="_model.EndDate"
+                    <MudDatePicker Disabled="Busy" @bind-Date="_model.EndDate" MinDate="_model.EffectiveDate"
                                    Label="@T.AllowanceDialog.EndDateOptional"
                                    Variant="Variant.Outlined"
                                    Margin="Margin.Dense"
                                    Class="w-100" />
                 </MudItem>
                 <MudItem xs="12">
-                    <MudSwitch T="bool" @bind-Value="_model.IsPerWorkDay" Color="Color.Primary">@T.AllowanceDialog.PaidPerWorkDay</MudSwitch>
+                    <MudSwitch Disabled="Busy" T="bool" @bind-Value="_model.IsPerWorkDay" Color="Color.Primary">@T.AllowanceDialog.PaidPerWorkDay</MudSwitch>
                 </MudItem>
             </MudGrid>
             <button type="submit" style="display:none"></button>

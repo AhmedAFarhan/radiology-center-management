@@ -45,7 +45,7 @@
         </MudTd>
     </RowTemplate>
     <NoRecordsContent>
-        <TableNoRecords LoadError="@LoadError"
+        <TableNoRecords ActionPolicy="@InsurancePermissions.PreAuthorizationsCreate" LoadError="@LoadError"
                         Offline="@Offline"
                         ErrorTitle="@T.PreAuth.LoadErrorTitle"
                         EmptyIcon="@Icons.Material.Filled.Approval"

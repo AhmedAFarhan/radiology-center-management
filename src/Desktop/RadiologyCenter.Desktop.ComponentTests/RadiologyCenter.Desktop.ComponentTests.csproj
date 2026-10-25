@@ -1,0 +1,28 @@
+<Project Sdk="Microsoft.NET.Sdk.Razor">
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <RootNamespace>RadiologyCenter.Desktop</RootNamespace>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <IsPackable>false</IsPackable>
+    <IsTestProject>true</IsTestProject>
+  </PropertyGroup>
+  <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+    <PackageReference Include="bunit" Version="2.11.3" />
+    <PackageReference Include="MudBlazor" Version="9.7.0" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.14.0" />
+    <PackageReference Include="xunit" Version="2.9.3" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="3.0.2" PrivateAssets="all" />
+  </ItemGroup>
+  <ItemGroup>
+    <RazorComponent Include="../RadiologyCenter.Desktop/Features/ReadingRoom/Components/ReadingRoomFindingsList.razor" Link="Features/ReadingRoom/Components/ReadingRoomFindingsList.razor" />
+    <Compile Include="../RadiologyCenter.Desktop/Features/ReadingRoom/Components/ReadingRoomFindingsList.razor.cs" Link="Features/ReadingRoom/Components/ReadingRoomFindingsList.razor.cs" />
+    <Compile Include="../RadiologyCenter.Desktop/Features/Reports/Models/ReportModels.cs" Link="Models/ReportModels.cs" />
+    <Compile Include="../RadiologyCenter.Desktop/Models/SharedModels.cs" Link="Models/SharedModels.cs" />
+    <Compile Include="../RadiologyCenter.Desktop/Localization/AppLocalizer.cs" Link="Localization/AppLocalizer.cs" />
+    <Compile Include="../RadiologyCenter.Desktop/Localization/AppLocalizer.Keys.g.cs" Link="Localization/AppLocalizer.Keys.g.cs" />
+    <Content Include="../RadiologyCenter.Desktop/Localization/en.json" Link="Localization/en.json" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="../RadiologyCenter.Desktop/Localization/ar.json" Link="Localization/ar.json" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+</Project>

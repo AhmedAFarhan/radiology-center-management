@@ -3,7 +3,8 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:local="clr-namespace:RadiologyCenter.Desktop"
              xmlns:components="clr-namespace:RadiologyCenter.Desktop.Shared"
-             x:Class="RadiologyCenter.Desktop.MainPage">
+             x:Class="RadiologyCenter.Desktop.MainPage"
+             BackgroundColor="#4C58E0">
 
     <BlazorWebView x:Name="blazorWebView" HostPage="wwwroot/index.html">
         <BlazorWebView.RootComponents>

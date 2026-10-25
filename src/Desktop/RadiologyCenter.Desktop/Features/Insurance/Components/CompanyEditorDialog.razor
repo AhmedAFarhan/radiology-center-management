@@ -9,7 +9,7 @@
             <LocalizedDataAnnotationsValidator />
             <MudGrid Spacing="2">
                 <MudItem xs="12" sm="8">
-                    <MudTextField @bind-Value="_model.Name"
+                    <MudTextField Disabled="_busy" @bind-Value="_model.Name"
                                   Label="@T.Common.Name"
                                   Variant="Variant.Outlined"
                                   Margin="Margin.Dense"
@@ -17,7 +17,7 @@
                                   For="@(() => _model.Name)" />
                 </MudItem>
                 <MudItem xs="12" sm="4">
-                    <MudTextField @bind-Value="_model.TaxId"
+                    <MudTextField Disabled="_busy" @bind-Value="_model.TaxId"
                                   Label="@T.CompanyDialog.TaxNumber"
                                   Variant="Variant.Outlined"
                                   Margin="Margin.Dense"
@@ -25,7 +25,7 @@
                                   For="@(() => _model.TaxId)" />
                 </MudItem>
                 <MudItem xs="12" sm="6">
-                    <MudTextField @bind-Value="_model.Phone"
+                    <MudTextField InputType="InputType.Telephone" Disabled="_busy" @bind-Value="_model.Phone"
                                   Label="@T.CompanyDialog.Phone"
                                   Variant="Variant.Outlined"
                                   Margin="Margin.Dense"
@@ -33,7 +33,7 @@
                                   For="@(() => _model.Phone)" />
                 </MudItem>
                 <MudItem xs="12" sm="6">
-                    <MudTextField @bind-Value="_model.Email"
+                    <MudTextField InputType="InputType.Email" Disabled="_busy" @bind-Value="_model.Email"
                                   Label="@T.CompanyDialog.Email"
                                   Variant="Variant.Outlined"
                                   Margin="Margin.Dense"
@@ -41,7 +41,7 @@
                                   For="@(() => _model.Email)" />
                 </MudItem>
                 <MudItem xs="12">
-                    <MudTextField @bind-Value="_model.Address"
+                    <MudTextField Disabled="_busy" @bind-Value="_model.Address"
                                   Label="@T.CompanyDialog.Address"
                                   Variant="Variant.Outlined"
                                   Margin="Margin.Dense"

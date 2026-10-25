@@ -6,21 +6,32 @@
 @inject AppLocalizer T
 @inject AppAuthenticationStateProvider Authentication
 
-<div style="max-width:680px;width:100%;margin:auto;padding:24px;">
+<div class="clinic-setup" aria-busy="@_busy.ToString().ToLowerInvariant()">
     <MudText Typo="Typo.h5">@L("Connect EGcare to your clinic", "توصيل EGcare بالعيادة")</MudText>
     <MudText Typo="Typo.body2" Class="mb-4">@L("Every computer uses the same database on the admin PC.", "تستخدم كل الأجهزة قاعدة البيانات نفسها على جهاز المسؤول.")</MudText>
-    <div class="d-flex gap-2 mb-4">
-        <MudButton Variant="Variant.Outlined" OnClick="() => _admin = false" Disabled="_busy">@L("Connect to clinic", "الاتصال بالعيادة")</MudButton>
-        <MudButton Variant="Variant.Outlined" OnClick="() => _admin = true" Disabled="_busy">@L("Admin PC setup / upgrade", "إعداد / تحديث جهاز المسؤول")</MudButton>
+    <div class="clinic-setup-modes" role="group" aria-label="@L("Choose this computer's role", "اختر دور هذا الجهاز")">
+        <button type="button" class="@(!_admin ? "selected" : null)" aria-pressed="@(!_admin ? "true" : "false")" disabled="@_busy" @onclick="() => SelectMode(false)">
+            <strong>@L("Connect this computer", "توصيل هذا الجهاز")</strong>
+            <span>@L("The clinic database is already set up. Use this on every workstation.", "قاعدة بيانات العيادة جاهزة بالفعل. استخدم هذا الخيار على أجهزة الموظفين.")</span>
+        </button>
+        <button type="button" class="@(_admin ? "selected" : null)" aria-pressed="@(_admin ? "true" : "false")" disabled="@_busy" @onclick="() => SelectMode(true)">
+            <strong>@L("Set up the admin computer", "إعداد جهاز المسؤول")</strong>
+            <span>@L("Create the shared database or upgrade an existing clinic.", "إنشاء قاعدة البيانات المشتركة أو تحديث عيادة موجودة.")</span>
+        </button>
     </div>
+    <MudAlert Severity="Severity.Info" Dense="true" Class="mb-3">@(_admin
+        ? L("1. Choose the SQL Server and database → 2. Create or upgrade → 3. Connect the other computers.", "١. اختر خادم SQL وقاعدة البيانات ← ٢. أنشئ أو حدّث ← ٣. وصّل الأجهزة الأخرى.")
+        : L("1. Import the clinic file or enter the server details → 2. Connect → 3. Sign in with your own clinic account.", "١. استورد ملف العيادة أو أدخل بيانات الخادم ← ٢. اتصل ← ٣. سجّل الدخول بحسابك في العيادة."))</MudAlert>
     @if (!_admin)
     {
         <MudButton StartIcon="@Icons.Material.Filled.FolderOpen" OnClick="ImportAsync" Disabled="_busy">@L("Import clinic connection file", "استيراد ملف اتصال العيادة")</MudButton>
     }
-    <MudTextField @bind-Value="_server" Label="@L("Admin PC SQL Server name or IP", "اسم أو عنوان خادم SQL على جهاز المسؤول")" Disabled="_busy" Variant="Variant.Outlined" Class="my-2" />
-    <MudTextField @bind-Value="_database" Label="@L("Clinic database", "قاعدة بيانات العيادة")" Disabled="_busy" Variant="Variant.Outlined" Class="my-2" />
+    <MudTextField @bind-Value="_server" Label="@L("Admin PC SQL Server name or IP", "اسم أو عنوان خادم SQL على جهاز المسؤول")" HelperText="@L("Use the same server name on every computer, for example CLINIC-SERVER. Ask the clinic administrator for this value.", "استخدم اسم الخادم نفسه على كل الأجهزة، مثل CLINIC-SERVER. اطلب هذه البيانات من مسؤول العيادة.")" Disabled="_busy" Variant="Variant.Outlined" Class="my-2" />
+    <MudTextField @bind-Value="_database" Label="@L("Clinic database", "قاعدة بيانات العيادة")" HelperText="@L("The shared database name, not a file path.", "اسم قاعدة البيانات المشتركة، وليس مسار ملف.")" Disabled="_busy" Variant="Variant.Outlined" Class="my-2" />
+    <MudExpansionPanels Elevation="0" Class="my-3"><MudExpansionPanel Text="@L("Optional: images and app updates", "اختياري: الصور وتحديثات التطبيق")">
     <MudTextField @bind-Value="_pacs" Label="@L("Image server HTTPS address (optional)", "عنوان HTTPS لخادم الصور (اختياري)")" Disabled="_busy" Variant="Variant.Outlined" Class="my-2" />
     <MudTextField @bind-Value="_updates" Label="@L("Clinic update folder (optional)", "مجلد تحديثات العيادة (اختياري)")" Disabled="_busy" Variant="Variant.Outlined" Class="my-2" />
+    </MudExpansionPanel></MudExpansionPanels>
     @if (_admin)
     {
         <MudAlert Severity="Severity.Info" Class="my-3">@L("Run this on the admin PC with a Windows account allowed to administer SQL Server. Close EGcare on the other computers before upgrading.", "شغّل هذا الإجراء على جهاز المسؤول بحساب Windows لديه صلاحية إدارة SQL Server. أغلق EGcare على الأجهزة الأخرى قبل التحديث.")</MudAlert>
@@ -36,8 +47,8 @@
         <MudCheckBox T="bool" @bind-Value="_acknowledged" Disabled="_busy" Label="@L("I am on the admin PC and the other workstations are closed", "أنا على جهاز المسؤول والأجهزة الأخرى مغلقة")" />
     }
     @if (_error is not null) { <MudAlert Severity="Severity.Error" role="alert" Class="my-3">@_error</MudAlert> }
-    @if (_message is not null) { <MudAlert Severity="Severity.Success" Class="my-3">@_message</MudAlert> }
-    <div class="d-flex gap-2 mt-4">
+    @if (_message is not null) { <MudAlert Severity="Severity.Success" role="status" Class="my-3">@_message</MudAlert> }
+    <div class="d-flex flex-wrap gap-2 mt-4">
         <MudButton Color="Color.Primary" Variant="Variant.Filled" OnClick="SaveAsync" Disabled="@(_busy || (_admin && !_acknowledged))">@(_busy ? L("Working…", "جارٍ التنفيذ…") : _admin ? L("Run setup / upgrade", "تنفيذ الإعداد / التحديث") : L("Use this clinic", "استخدام هذه العيادة"))</MudButton>
         @if (!_admin && DesktopConfiguration.Profile is not null)
         {
@@ -48,6 +59,8 @@
 
 @code {
     [Parameter] public EventCallback Completed { get; set; }
+    [Parameter] public EventCallback<bool> BusyChanged { get; set; }
+    private void SelectMode(bool admin) { _admin = admin; _error = _message = null; _acknowledged = false; }
     private bool _admin,_createNew,_acknowledged,_busy,_development;
     private string _server="",_database="EGcareClinic",_pacs="",_updates="",_backup="",_documents="",_adminUser="admin",_adminPassword="";
     private string? _error,_message;
@@ -84,7 +97,9 @@
     }
     private async Task SaveAsync()
     {
+        if (_busy) return;
         _busy=true;_error=_message=null;
+        await BusyChanged.InvokeAsync(true);
         try {
             var profile=Profile(); profile.Validate();
             if(_admin && !_development && DesktopConfiguration.Profile is null && string.IsNullOrWhiteSpace(_adminPassword))
@@ -111,6 +126,6 @@
             await Backend.StartAsync();
             await Completed.InvokeAsync();
         } catch(Exception ex) { _error=ex.Message; }
-        finally { _busy=false; }
+        finally { _busy=false; await BusyChanged.InvokeAsync(false); }
     }
 }

@@ -11,10 +11,11 @@
             <EditForm id="schedule-examination-form" EditContext="_editContext" OnValidSubmit="SubmitAsync">
                 <LocalizedDataAnnotationsValidator />
                 <ValidationSummary />
+                @if (_formError is not null) { <MudAlert Severity="Severity.Error" Class="mb-3" role="alert">@_formError</MudAlert> }
                 <MudGrid Spacing="3">
                     @* ── Patient ── *@
                     <MudItem xs="12">
-                        <MudAutocomplete T="PatientDto"
+                        <MudAutocomplete T="PatientDto" Disabled="_saving" ToStringFunc="@(patient => patient?.FullName ?? string.Empty)" Required="true" RequiredError="@T.ScheduleExam.PatientRequired"
                                          Label="@T.ScheduleExam.Patient"
                                          SearchFunc="SearchPatients"
                                          Value="_selectedPatient"
@@ -32,9 +33,16 @@
                         </MudAutocomplete>
                     </MudItem>
 
+                    <MudItem xs="12">
+                        <MudSelect T="string" Value="@_equipmentId" ValueChanged="OnEquipmentChanged" Label="@T.ScheduleExam.Equipment" Variant="Variant.Outlined" Disabled="_saving" Required="true">
+                            @foreach (var equipment in _equipment)
+                            { <MudSelectItem Value="@equipment.Id">@equipment.Name · @equipment.Modality</MudSelectItem> }
+                        </MudSelect>
+                    </MudItem>
+
                     @* ── Examination Type ── *@
                     <MudItem xs="12" Sm="6">
-                        <MudAutocomplete T="ExaminationTypeDto"
+                        <MudAutocomplete T="ExaminationTypeDto" Disabled="_saving" ToStringFunc="@(type => type?.Name ?? string.Empty)" Required="true" RequiredError="@T.ScheduleExam.ExamTypeRequired"
                                          Label="@T.ScheduleExam.ExaminationType"
                                          SearchFunc="SearchExamTypes"
                                          Value="_selectedExamType"
@@ -54,7 +62,7 @@
 
                     @* ── Priority ── *@
                     <MudItem xs="12" Sm="6">
-                        <MudSelect T="string" @bind-Value="_priority" Label="@T.ScheduleExam.Priority"
+                        <MudSelect T="string" Disabled="_saving" @bind-Value="_priority" Label="@T.ScheduleExam.Priority"
                                    Variant="Variant.Outlined" Dense="true">
                             <MudSelectItem Value="@("Routine")">@T.ScheduleExam.Routine</MudSelectItem>
                             <MudSelectItem Value="@("Urgent")">@T.ScheduleExam.Urgent</MudSelectItem>
@@ -64,7 +72,7 @@
 
                     @* ── Date & Time ── *@
                     <MudItem xs="12" Sm="6">
-                        <MudDatePicker @bind-Date="_model.ScheduledDate"
+                        <MudDatePicker Disabled="_saving" @bind-Date="_model.ScheduledDate"
                                        Label="@T.ScheduleExam.Date"
                                        Variant="Variant.Outlined"
 
@@ -72,29 +80,24 @@
                         <ValidationMessage For="@(() => _model.ScheduledDate)" />
                     </MudItem>
                     <MudItem xs="12" Sm="6">
-                        <MudTimePicker @bind-Time="_model.ScheduledTime"
+                        <MudTimePicker Disabled="_saving" @bind-Time="_model.ScheduledTime"
                                        Label="@T.ScheduleExam.Time"
                                        Variant="Variant.Outlined"
                                        />
                         <ValidationMessage For="@(() => _model.ScheduledTime)" />
                     </MudItem>
 
-                    @* ── Equipment (pre-filled) ── *@
-                    @if (!string.IsNullOrEmpty(_equipmentName))
+                    @if (_selectedExamType is not null && StartTime is { } start)
                     {
-                        <MudItem xs="12">
-                            <MudField Label="@T.ScheduleExam.Equipment" Variant="Variant.Outlined">
-                                <div class="d-flex align-center gap-2">
-                                    <MudIcon Icon="@Icons.Material.Filled.ChevronRight" Size="Size.Small" Color="Color.Primary" />
-                                    <MudText Typo="Typo.body2">@_equipmentName</MudText>
-                                </div>
-                            </MudField>
-                        </MudItem>
+                        <MudItem xs="12"><MudAlert Severity="Severity.Info" Dense="true">
+                            @L("Duration", "المدة"): @DurationMinutes @L("minutes", "دقيقة") · <span dir="ltr">@start.ToString("HH:mm")–@start.AddMinutes(DurationMinutes).ToString("HH:mm")</span>
+                            <div>@L("Availability is checked for the full duration when you schedule. Times are in Cairo time.", "يتم التحقق من توفر الجهاز طوال مدة الفحص عند الحجز. الأوقات بتوقيت القاهرة.")</div>
+                        </MudAlert></MudItem>
                     }
 
                     @* ── Clinical Indication ── *@
                     <MudItem xs="12">
-                        <MudTextField T="string" @bind-Value="_clinicalIndication"
+                        <MudTextField T="string" Disabled="_saving" @bind-Value="_clinicalIndication"
                                       Label="@T.ScheduleExam.ClinicalIndication"
                                       Variant="Variant.Outlined"
 
@@ -103,7 +106,7 @@
 
                     @* ── Notes ── *@
                     <MudItem xs="12">
-                        <MudTextField T="string" @bind-Value="_notes"
+                        <MudTextField T="string" Disabled="_saving" @bind-Value="_notes"
                                       Label="@T.ScheduleExam.Notes"
                                       Variant="Variant.Outlined"
 

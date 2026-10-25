@@ -1,18 +1,16 @@
 @using MudBlazor
+@inject AppLocalizer T
 
-<MudTooltip Text="@Tooltip">
+<MudTooltip Text="@(Tooltip ?? (T.IsRTL ? "تنزيل التقرير" : "Download report"))">
     <MudButtonGroup Variant="Variant.Outlined" Size="Size.Small">
         <MudButton StartIcon="@Icons.Material.Filled.FileDownload" OnClick="DownloadAsync" Disabled="Loading">
             @if (Loading)
             {
                 <MudProgressCircular Size="Size.Small" Indeterminate="true" />
             }
-            else
-            {
-                @Label
-            }
+            @(Label ?? (T.IsRTL ? "تصدير" : "Export"))
         </MudButton>
-        <MudMenu Icon="@Icons.Material.Filled.ArrowDropDown" Dense="true">
+        <MudMenu Icon="@Icons.Material.Filled.ArrowDropDown" Dense="true" Disabled="Loading" aria-label="@(T.IsRTL ? "صيغة التقرير" : "Report format")">
             <MudMenuItem Icon="@Icons.Material.Filled.TableChart" OnClick="DownloadExcel">Excel</MudMenuItem>
             <MudMenuItem Icon="@Icons.Material.Filled.PictureAsPdf" OnClick="DownloadPdf">PDF</MudMenuItem>
         </MudMenu>
@@ -20,8 +18,8 @@
 </MudTooltip>
 
 @code {
-    [Parameter] public string Label { get; set; } = "Export";
-    [Parameter] public string Tooltip { get; set; } = "Download report";
+    [Parameter] public string? Label { get; set; }
+    [Parameter] public string? Tooltip { get; set; }
     [Parameter] public bool Loading { get; set; }
     [Parameter] public EventCallback<string> OnExport { get; set; }
 

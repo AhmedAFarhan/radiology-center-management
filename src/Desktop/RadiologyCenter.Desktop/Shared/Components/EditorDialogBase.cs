@@ -37,5 +37,8 @@ public abstract class EditorDialogBase : ComponentBase
     /// whether the operation succeeded.
     /// </summary>
     protected async Task<bool> TrySaveAsync(Func<Task> save, Func<string> unreachable)
-        => await SafeExecute.RunAsync(save, Snackbar, unreachable, SetBusy);
+    {
+        if (Busy) return false;
+        return await SafeExecute.RunAsync(save, Snackbar, unreachable, SetBusy);
+    }
 }

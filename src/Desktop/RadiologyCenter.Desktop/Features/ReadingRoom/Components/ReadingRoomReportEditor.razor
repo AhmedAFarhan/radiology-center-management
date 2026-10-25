@@ -1,10 +1,6 @@
-@if (Report is null)
+@if (Loading)
 {
-    <div class="rr-report-empty">
-        <EmptyState Icon="@Icons.Material.Filled.Assignment"
-                    Title="@T.ReadingRoom.NoReport"
-                    Message="@(Loading ? T.Common.Loading : T.ReadingRoom.SelectStudyToRead)" />
-    </div>
+    <div class="rr-report-empty" role="status"><MudProgressCircular Indeterminate="true" Color="Color.Primary" /><MudText>@T.Common.Loading</MudText></div>
 }
 else if (Error is not null)
 {
@@ -16,6 +12,15 @@ else if (Error is not null)
                     Action="OnRetry" />
     </div>
 }
+else if (Report is null)
+{
+    <div class="rr-report-empty">
+        <EmptyState Icon="@Icons.Material.Filled.Assignment"
+                    Title="@T.ReadingRoom.NoReport"
+                    Message="@(Loading ? T.Common.Loading : T.ReadingRoom.SelectStudyToRead)" />
+    </div>
+}
+
 else
 {
     <div class="rr-pane-header">
@@ -59,7 +64,7 @@ else
                     <MudIconButton Icon="@Icons.Material.Filled.Newspaper"
                                    Size="Size.Small"
                                    aria-label="@T.ReportTemplate.Title"
-                                   OnClick="OpenTemplatePicker" />
+                                   OnClick="OpenTemplatePicker" Disabled="Busy" />
                 </MudTooltip>
             }
             <MudTooltip Placement="Placement.Bottom" Text="@T.ReportVersions.Title">
@@ -79,7 +84,7 @@ else
                           Variant="Variant.Outlined"
                           Margin="Margin.Dense"
                           Lines="@(currentSection.Position == 3 ? 5 : 3)"
-                          Disabled="@(!CanEdit || currentSection.Locked)"
+                          Disabled="@(Busy || !CanEdit || currentSection.Locked)"
                           Immediate="true"
                           Class="mb-3" />
         }
@@ -89,6 +94,7 @@ else
         <ReadingRoomFindingsList Findings="Findings"
                                   SeverityOptions="SeverityOptions"
                                   CanEdit="CanEdit"
+                                  Busy="Busy"
                                   OnSeverityChanged="OnSeverityChanged"
                                   OnRemoveFinding="OnRemoveFinding"
                                   OnAddFinding="OnAddFinding" />
@@ -100,7 +106,7 @@ else
             <MudStack Row="true" Spacing="2">
                 <MudButton Variant="Variant.Outlined" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Save" OnClick="OnSave" Disabled="Busy">@T.ReadingRoom.SaveDraft</MudButton>
                 <MudTooltip Text="@T.Common.Cancel">
-                    <MudButton Variant="Variant.Text" Color="Color.Default" StartIcon="@Icons.Material.Filled.CancelPresentation" OnClick="OnCancel" Disabled="Busy" Size="Size.Small" />
+                    <MudButton Variant="Variant.Text" Color="Color.Default" StartIcon="@Icons.Material.Filled.CancelPresentation" OnClick="OnCancel" Disabled="Busy" Size="Size.Small">@T.Common.Cancel</MudButton>
                 </MudTooltip>
             </MudStack>
             <MudButton Variant="Variant.Filled" Color="Color.Success" StartIcon="@Icons.Material.Filled.CheckCircle" OnClick="OnFinalize" Disabled="Busy">@T.ReadingRoom.SignReport</MudButton>

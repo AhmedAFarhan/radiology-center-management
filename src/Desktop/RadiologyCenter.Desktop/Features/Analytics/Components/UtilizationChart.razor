@@ -22,6 +22,7 @@ else
                          XValue="@(m => m.Modality)"
                          YValue="@(m => m.ActiveMachines)" />
     </ApexChart>
+    <ChartDataTable Headers="@(new[] { T.Equipment.Modality, T.Analytics.ExamsPerMachine, T.Analytics.ActiveMachines })" Rows="@Items.Select(row => new[] { row.Modality, row.ExamsPerMachine.ToString("N2"), row.ActiveMachines.ToString("N0") })" />
 }
 
 

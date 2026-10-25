@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Forms;
 using MudBlazor;
 using RadiologyCenter.Desktop.Models;
@@ -41,7 +41,7 @@ public partial class ExcelImportDialog : ComponentBase
 
     private async Task ImportAsync()
     {
-        if (_file is null)
+        if (_busy || _file is null)
             return;
 
         await SafeExecute.RunAsync(async () =>

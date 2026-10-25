@@ -10,7 +10,7 @@
             <LocalizedDataAnnotationsValidator />
             <MudGrid Spacing="2">
                 <MudItem xs="12" sm="6">
-                    <MudAutocomplete T="PatientDto"
+                    <MudAutocomplete Disabled="Busy" T="PatientDto"
                                      @bind-Value="_selectedPatient"
                                      Label="@T.PreAuthDialog.PatientSearchLabel"
                                      Variant="Variant.Outlined"
@@ -22,7 +22,7 @@
                                      Clearable="true" />
                 </MudItem>
                 <MudItem xs="12" sm="6">
-                    <MudAutocomplete T="InsurancePolicyDto"
+                    <MudAutocomplete Disabled="Busy" T="InsurancePolicyDto"
                                      @bind-Value="_selectedPolicy"
                                      Label="@T.PreAuthDialog.PolicySearchLabel"
                                      Variant="Variant.Outlined"
@@ -34,7 +34,7 @@
                                      Clearable="true" />
                 </MudItem>
                 <MudItem xs="12" sm="6">
-                    <MudAutocomplete T="ExaminationListItemDto"
+                    <MudAutocomplete Disabled="Busy" T="ExaminationListItemDto"
                                      @bind-Value="_selectedExamination"
                                      Label="@T.PreAuthDialog.ExaminationSearchLabel"
                                      Variant="Variant.Outlined"
@@ -46,7 +46,7 @@
                                      Clearable="true" />
                 </MudItem>
                 <MudItem xs="12" sm="6">
-                    <MudNumericField T="decimal"
+                    <MudNumericField Disabled="Busy" T="decimal"
                                      @bind-Value="_model.EstimatedAmount"
                                      Label="@T.PreAuthDialog.EstimatedAmount"
                                      Variant="Variant.Outlined"

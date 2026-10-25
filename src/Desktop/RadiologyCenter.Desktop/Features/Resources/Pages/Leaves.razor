@@ -54,7 +54,7 @@
         </MudTd>
     </RowTemplate>
     <NoRecordsContent>
-        <TableNoRecords LoadError="@LoadError"
+        <TableNoRecords ActionPolicy="@ResourcesPermissions.LeaveCreate" LoadError="@LoadError"
                         Offline="@Offline"
                         ErrorTitle="@T.Leave.LoadErrorTitle"
                         EmptyIcon="@Icons.Material.Filled.BeachAccess"

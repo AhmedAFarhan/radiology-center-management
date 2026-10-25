@@ -9,7 +9,9 @@
             SearchValueChanged="OnSearchChanged"
             SearchPlaceholder="@T.Notifications.SearchPlaceholder"
             OnRefresh="ReloadAsync">
-    <MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Add" OnClick="OpenCreateDialogAsync">@T.Notifications.NewTemplate</MudButton>
+    <AuthorizeView Policy="@NotificationPermissions.TemplatesManage">
+        <MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Add" OnClick="OpenCreateDialogAsync">@T.Notifications.NewTemplate</MudButton>
+    </AuthorizeView>
 </PageHeader>
 
 <MudTable T="NotificationTemplateDto" @ref="Table" ServerData="LoadServerData" Dense="true" Hover="true" Striped="true" Elevation="1" RowsPerPage="10" FixedHeader="true" Class="table-scroll">
@@ -54,6 +56,7 @@
                         EmptyTitle="@T.Notifications.EmptyTitle"
                         EmptyMessage="@T.Notifications.EmptyMessage"
                         EmptyActionLabel="@T.Notifications.EmptyActionLabel"
+                        ActionPolicy="@NotificationPermissions.TemplatesManage"
                         OnReload="ReloadAsync"
                         OnEmptyAction="OpenCreateDialogAsync" />
     </NoRecordsContent>

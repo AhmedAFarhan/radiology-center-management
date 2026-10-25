@@ -5,7 +5,7 @@
 <MudDialog>
     <DialogContent>
         <DialogHeader Icon="@Icons.Material.Filled.Cancel" Title="@(T.FormatValue(T.Visits.CancelVisitTitle, Visit.ExaminationTypeName))" />
-        <MudTextField @bind-Value="_reason"
+        <MudTextField Disabled="_busy" @bind-Value="_reason"
                       Label="@T.Visits.CancellationReasonOptional"
                       Variant="Variant.Outlined"
                       Margin="Margin.Dense"

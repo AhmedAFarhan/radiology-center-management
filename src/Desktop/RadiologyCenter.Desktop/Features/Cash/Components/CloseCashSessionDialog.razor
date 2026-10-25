@@ -11,7 +11,7 @@
                     <MudText Typo="Typo.body2" Class="text-secondary mb-1">
                         @(T.FormatValue(T.CloseCash.ExpectedTotalHint, _expectedTotal.ToString("C")))
                     </MudText>
-                    <MudNumericField @bind-Value="_model.CountedTotal"
+                    <MudNumericField Disabled="Busy" @bind-Value="_model.CountedTotal"
                                      Label="@T.CloseCash.CountedTotal"
                                      Variant="Variant.Outlined"
                                      Margin="Margin.Dense"
@@ -25,7 +25,7 @@
                     </MudText>
                 </MudItem>
                 <MudItem xs="12" sm="6">
-                    <MudTextField @bind-Value="_model.ReceivingUserId"
+                    <MudTextField Disabled="Busy" @bind-Value="_model.ReceivingUserId"
                                   Label="@T.CloseCash.ReceivingUserId"
                                   Variant="Variant.Outlined"
                                   Margin="Margin.Dense"
@@ -33,7 +33,7 @@
                                   For="@(() => _model.ReceivingUserId)" />
                 </MudItem>
                 <MudItem xs="12" sm="6">
-                    <MudNumericField @bind-Value="_model.ReceivingOpeningFloat"
+                    <MudNumericField Disabled="Busy" @bind-Value="_model.ReceivingOpeningFloat"
                                      Label="@T.CloseCash.ReceivingOpeningFloat"
                                      Variant="Variant.Outlined"
                                      Margin="Margin.Dense"
@@ -41,7 +41,7 @@
                                      For="@(() => _model.ReceivingOpeningFloat)" />
                 </MudItem>
                 <MudItem xs="12">
-                    <MudTextField @bind-Value="_model.Notes"
+                    <MudTextField Disabled="Busy" @bind-Value="_model.Notes"
                                   Label="@T.CloseCash.Notes"
                                   Variant="Variant.Outlined"
                                   Margin="Margin.Dense"

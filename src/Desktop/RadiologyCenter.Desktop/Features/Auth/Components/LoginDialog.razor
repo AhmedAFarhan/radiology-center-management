@@ -23,7 +23,7 @@
             <LocalizedDataAnnotationsValidator />
             <MudGrid Spacing="2">
                 <MudItem xs="12">
-                    <MudTextField @bind-Value="_model.UserName"
+                    <MudTextField Disabled="_busy" @bind-Value="_model.UserName"
                                   Label="@T.Login.Username"
                                   Variant="Variant.Outlined"
                                   Margin="Margin.Dense"
@@ -31,7 +31,7 @@
                                   autocomplete="username" />
                 </MudItem>
                 <MudItem xs="12">
-                    <MudTextField @bind-Value="_model.Password"
+                    <MudTextField AdornmentAriaLabel="@(T.IsRTL ? "إظهار أو إخفاء كلمة المرور" : "Show or hide password")" Disabled="_busy" @bind-Value="_model.Password"
                                   Label="@T.Login.Password"
                                   Variant="Variant.Outlined"
                                   Margin="Margin.Dense"

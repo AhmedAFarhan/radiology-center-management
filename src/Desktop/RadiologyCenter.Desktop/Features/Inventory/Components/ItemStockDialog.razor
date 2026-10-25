@@ -59,7 +59,7 @@
                 <LocalizedDataAnnotationsValidator />
                 <MudGrid Spacing="2">
                     <MudItem xs="12" sm="4">
-                        <MudNumericField T="int?" @bind-Value="_model.Quantity"
+                        <MudNumericField Disabled="_busy" T="int?" @bind-Value="_model.Quantity"
                                          For="@(() => _model.Quantity)"
                                          Label="@T.ItemDialog.Quantity"
                                          Variant="Variant.Outlined"
@@ -67,14 +67,14 @@
                                          Min="1" />
                     </MudItem>
                     <MudItem xs="12" sm="8">
-                        <MudTextField @bind-Value="_model.Reference"
+                        <MudTextField Disabled="_busy" @bind-Value="_model.Reference"
                                       Label="@T.ItemDialog.Reference"
                                       Variant="Variant.Outlined"
                                       Margin="Margin.Dense"
                                       Immediate="true" />
                     </MudItem>
                     <MudItem xs="12">
-                        <MudTextField @bind-Value="_model.Notes"
+                        <MudTextField Disabled="_busy" @bind-Value="_model.Notes"
                                       Label="@T.ItemDialog.Notes"
                                       Variant="Variant.Outlined"
                                       Margin="Margin.Dense"

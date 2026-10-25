@@ -21,6 +21,7 @@
                           Value="@_filter"
                           ValueChanged="OnFilterChanged"
                           Placeholder="@T.ReadingRoom.FilterPlaceholder"
+                          aria-label="@T.ReadingRoom.FilterPlaceholder"
                           Variant="Variant.Outlined"
                           Margin="Margin.Dense"
                           DebounceInterval="300"
@@ -171,7 +172,7 @@
     <section class="reading-room-pane rr-report">
         <ReadingRoomReportEditor Report="_report"
                                   Loading="_loadingReport"
-                                  Error="_reportError"
+                                  Error="@_reportError"
                                   CanEdit="CanEdit"
                                   Busy="_busy"
                                   PatientName="@(Selected?.PatientName ?? string.Empty)"

@@ -9,9 +9,10 @@
             @T.ReportTemplate.Description
         </MudText>
 
-        <MudTextField T="string"
+        <MudTextField Disabled="_busy" T="string"
                       @bind-Value="_search"
                       Placeholder="@T.ReportTemplate.SearchPlaceholder"
+                      aria-label="@T.ReportTemplate.SearchPlaceholder"
                       Variant="Variant.Outlined"
                       Margin="Margin.Dense"
                       Immediate="true"

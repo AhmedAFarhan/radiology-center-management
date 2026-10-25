@@ -66,7 +66,7 @@
         </MudTd>
     </RowTemplate>
     <NoRecordsContent>
-        <TableNoRecords LoadError="@LoadError"
+        <TableNoRecords ActionPolicy="@ResourcesPermissions.EquipmentCreate" LoadError="@LoadError"
                         Offline="@Offline"
                         ErrorTitle="@T.Equipment.LoadErrorTitle"
                         EmptyIcon="@Icons.Material.Filled.Biotech"

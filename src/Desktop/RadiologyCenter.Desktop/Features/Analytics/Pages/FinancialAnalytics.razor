@@ -83,7 +83,7 @@ else if (_data is not null && _exams is not null && _insuranceStats is not null)
         </MudItem>
         <MudItem xs="12" lg="7">
             <ChartCard Title="@T.Financial.ExamRevenueDetail" Subtitle="@T.Financial.BillingPerCompletedExam">
-                <MudTable Items="_exams!.Where(e => e.Billed > 0).OrderByDescending(e => e.CompletedAt).Take(12)" Dense="true" Hover="true" FixedHeader="true" Height="360" Elevation="0" Bordered="false">
+                <MudTable Items="_exams!.Where(e => e.Billed > 0).OrderByDescending(e => e.CompletedAt).Take(12)" Dense="true" Hover="true" FixedHeader="true" Height="360px" Elevation="0" Bordered="false">
                     <HeaderContent>
                         <MudTh>@T.Financial.Exam</MudTh>
                         <MudTh>@T.Financial.Completed</MudTh>
@@ -100,6 +100,7 @@ else if (_data is not null && _exams is not null && _insuranceStats is not null)
                         <MudTd DataLabel="@T.Financial.Paid" Class="text-right">@context.Paid.ToString("C")</MudTd>
                         <MudTd DataLabel="@T.Financial.Remaining" Class="text-right">@context.Remaining.ToString("C")</MudTd>
                     </RowTemplate>
+                    <NoRecordsContent><EmptyState Title="@(T.IsRTL ? "لا توجد فحوصات مفوترة في هذه الفترة" : "No billed examinations in this period")" /></NoRecordsContent>
                 </MudTable>
             </ChartCard>
         </MudItem>

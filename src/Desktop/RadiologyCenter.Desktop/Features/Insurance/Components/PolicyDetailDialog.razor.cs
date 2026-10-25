@@ -125,7 +125,7 @@ public partial class PolicyDetailDialog : ComponentBase
     private static string FormatDocumentMeta(PolicyDocumentDto document)
     {
         var kb = document.SizeInBytes / 1024m;
-        return $"{document.Type} Â· {kb:0.#} KB Â· {document.UploadedAt:yyyy-MM-dd}";
+        return $"{document.Type} · {kb:0.#} KB · {document.UploadedAt:yyyy-MM-dd}";
     }
 
     private void CancelAsync()

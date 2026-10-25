@@ -22,7 +22,7 @@
                 @foreach (var role in _roles)
                 {
                     <MudListItem T="RoleDto" Value="@role">
-                        <MudSwitch T="bool"
+                        <MudSwitch Disabled="_busy" T="bool"
                                    @bind-Value="_selected[role.Id]"
                                    Color="Color.Primary">
                             <MudText>@role.Name</MudText>

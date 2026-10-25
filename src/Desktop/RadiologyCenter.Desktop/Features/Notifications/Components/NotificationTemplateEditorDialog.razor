@@ -13,12 +13,12 @@
                                   Variant="Variant.Outlined"
                                   Margin="Margin.Dense"
                                   Immediate="true"
-                                  Disabled="_isEdit"
+                                  Disabled="@(Busy || _isEdit)"
                                   HelperText="@T.TemplateDialog.CodeHelper"
                                   For="@(() => _model.Code)" />
                 </MudItem>
                 <MudItem xs="12" sm="7">
-                    <MudTextField @bind-Value="_model.Name"
+                    <MudTextField Disabled="Busy" @bind-Value="_model.Name"
                                   Label="@T.Common.Name"
                                   Variant="Variant.Outlined"
                                   Margin="Margin.Dense"
@@ -26,7 +26,7 @@
                                   For="@(() => _model.Name)" />
                 </MudItem>
                 <MudItem xs="12">
-                    <MudTextField @bind-Value="_model.Subject"
+                    <MudTextField Disabled="Busy" @bind-Value="_model.Subject"
                                   Label="@T.TemplateDialog.Subject"
                                   Variant="Variant.Outlined"
                                   Margin="Margin.Dense"
@@ -35,7 +35,7 @@
                                   For="@(() => _model.Subject)" />
                 </MudItem>
                 <MudItem xs="12">
-                    <MudTextField @bind-Value="_model.Body"
+                    <MudTextField Disabled="Busy" @bind-Value="_model.Body"
                                   Label="@T.TemplateDialog.Body"
                                   Variant="Variant.Outlined"
                                   Margin="Margin.Dense"

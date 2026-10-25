@@ -14,6 +14,8 @@
     <Compile Include="../RadiologyCenter.Desktop/Security/JwtClaimsParser.cs" Link="JwtClaimsParser.cs" />
     <Compile Include="../RadiologyCenter.Desktop/Services/DesktopConfiguration.cs" Link="DesktopConfiguration.cs" />
     <Compile Include="../RadiologyCenter.Desktop/Services/SimpleFileLoggerProvider.cs" Link="SimpleFileLoggerProvider.cs" />
+    <Compile Include="../RadiologyCenter.Desktop/Features/Auth/Services/SignInCompletion.cs" Link="SignInCompletion.cs" />
+    <Compile Include="../RadiologyCenter.Desktop/Features/Examinations/Models/CalendarTimeline.cs" Link="CalendarTimeline.cs" />
     <ProjectReference Include="../../Clinic/RadiologyCenter.Clinic/RadiologyCenter.Clinic.csproj" />
   </ItemGroup>
 </Project>

@@ -15,6 +15,7 @@ else
                          XValue="@(s => s.Label)"
                          YValue="@(s => s.Value)" />
     </ApexChart>
+    <ChartDataTable Headers="@(new[] { T.Common.Name, T.Analytics.Value })" Rows="@Items.Select(row => new[] { row.Label, row.Value.ToString("N2") })" />
 }
 
 

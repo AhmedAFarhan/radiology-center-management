@@ -9,7 +9,7 @@
             <MudGrid Spacing="2">
                 <MudItem xs="12">
                     <MudText Typo="Typo.body2" Class="text-secondary mb-1">@T.OpenCash.OpeningFloatHint</MudText>
-                    <MudNumericField @bind-Value="_model.OpeningFloat"
+                    <MudNumericField Disabled="Busy" @bind-Value="_model.OpeningFloat"
                                      Label="@T.OpenCash.OpeningFloat"
                                      Variant="Variant.Outlined"
                                      Margin="Margin.Dense"
@@ -17,7 +17,7 @@
                                      For="@(() => _model.OpeningFloat)" />
                 </MudItem>
                 <MudItem xs="12">
-                    <MudTextField @bind-Value="_model.Notes"
+                    <MudTextField Disabled="Busy" @bind-Value="_model.Notes"
                                   Label="@T.OpenCash.Notes"
                                   Variant="Variant.Outlined"
                                   Margin="Margin.Dense"

@@ -9,7 +9,7 @@
             <LocalizedDataAnnotationsValidator />
             <MudGrid Spacing="2">
                 <MudItem xs="12">
-                    <MudTextField @bind-Value="_model.Name"
+                    <MudTextField Disabled="Busy" @bind-Value="_model.Name"
                                   Label="@T.Common.Name"
                                   Variant="Variant.Outlined"
                                   Margin="Margin.Dense"
@@ -17,7 +17,7 @@
                                   For="@(() => _model.Name)" />
                 </MudItem>
                 <MudItem xs="12" sm="6">
-                    <MudSelect T="string"
+                    <MudSelect Disabled="Busy" T="string"
                                @bind-Value="_model.Modality"
                                Label="@T.Equipment.Modality"
                                Variant="Variant.Outlined"
@@ -30,14 +30,14 @@
                     </MudSelect>
                 </MudItem>
                 <MudItem xs="12" sm="6">
-                    <MudTextField @bind-Value="_model.SerialNumber"
+                    <MudTextField Disabled="Busy" @bind-Value="_model.SerialNumber"
                                   Label="@T.Equipment.SerialNumber"
                                   Variant="Variant.Outlined"
                                   Margin="Margin.Dense"
                                   Immediate="true" />
                 </MudItem>
                 <MudItem xs="12" sm="6">
-                    <MudDatePicker @bind-Date="_model.PurchaseDate"
+                    <MudDatePicker Disabled="Busy" @bind-Date="_model.PurchaseDate"
                                    Label="@T.Equipment.PurchaseDate"
                                    Variant="Variant.Outlined"
                                    Margin="Margin.Dense"

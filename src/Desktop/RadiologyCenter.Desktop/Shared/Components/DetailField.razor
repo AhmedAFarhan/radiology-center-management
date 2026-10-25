@@ -1,12 +1,12 @@
 <MudItem Xs="Xs" Sm="Sm" Md="Md" Class="@Class">
-    <MudText Typo="Typo.caption" Color="Color.Secondary">@Label</MudText>
+    <MudText Typo="Typo.caption" Class="text-secondary">@Label</MudText>
     @if (ChildContent is not null)
     {
         @ChildContent
     }
     else
     {
-        <MudText>@(Value ?? "-")</MudText>
+        <MudText Class="detail-field-value">@(Value ?? "-")</MudText>
     }
 </MudItem>
 

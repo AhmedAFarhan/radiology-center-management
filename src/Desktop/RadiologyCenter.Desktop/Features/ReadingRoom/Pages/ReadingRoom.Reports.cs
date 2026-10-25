@@ -306,12 +306,12 @@ public partial class ReadingRoom
             busy => _busy = busy);
     }
 
-    private async Task AddFindingFromListAsync((string Region, string Description, string Severity) args)
+    private async Task<bool> AddFindingFromListAsync((string Region, string Description, string Severity) args)
     {
-        if (!CanEdit || _report is null)
-            return;
+        if (_busy || !CanEdit || _report is null)
+            return false;
 
-        await SafeExecute.RunAsync(
+        return await SafeExecute.RunAsync(
             async () =>
             {
                 await ReportService.AddFindingAsync(_report.Id, new AddReportFindingInput
@@ -326,7 +326,7 @@ public partial class ReadingRoom
             },
             Snackbar,
             () => T.ReadingRoom.Unreachable,
-            busy => _busy = busy);
+            busy => { _busy = busy; StateHasChanged(); });
     }
 
     private async Task OnSeverityChangedAsync(ReportFindingDto finding, string severity)

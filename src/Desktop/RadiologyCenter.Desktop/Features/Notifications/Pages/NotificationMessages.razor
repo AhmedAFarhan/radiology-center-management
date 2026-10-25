@@ -67,7 +67,7 @@
         </MudTd>
     </RowTemplate>
     <NoRecordsContent>
-        <TableNoRecords LoadError="@LoadError"
+        <TableNoRecords ActionPolicy="@NotificationPermissions.MessagesSend" LoadError="@LoadError"
                         Offline="@Offline"
                         ErrorTitle="@T.Notifications.LoadErrorTitle"
                         EmptyIcon="@Icons.Material.Filled.Notifications"

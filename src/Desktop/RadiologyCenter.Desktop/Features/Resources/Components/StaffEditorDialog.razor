@@ -23,7 +23,7 @@
                                      Disabled="Busy" />
                 </MudItem>
                 <MudItem xs="12">
-                    <MudTextField @bind-Value="_model.FullName"
+                    <MudTextField Disabled="Busy" @bind-Value="_model.FullName"
                                   Label="@T.StaffDialog.FullName"
                                   Variant="Variant.Outlined"
                                   Margin="Margin.Dense"
@@ -31,7 +31,7 @@
                                   For="@(() => _model.FullName)" />
                 </MudItem>
                 <MudItem xs="12" sm="6">
-                    <MudSelect T="string"
+                    <MudSelect Disabled="Busy" T="string"
                                @bind-Value="_model.Position"
                                Label="@T.Staff.Position"
                                Variant="Variant.Outlined"
@@ -44,14 +44,14 @@
                     </MudSelect>
                 </MudItem>
                 <MudItem xs="12" sm="6">
-                    <MudDatePicker @bind-Date="_model.HireDate"
+                    <MudDatePicker Disabled="Busy" @bind-Date="_model.HireDate"
                                    Label="@T.Staff.HireDate"
                                    Variant="Variant.Outlined"
                                    Margin="Margin.Dense"
                                    Class="w-100" />
                 </MudItem>
                 <MudItem xs="12" sm="6">
-                    <MudTextField @bind-Value="_model.PhoneNumber"
+                    <MudTextField InputType="InputType.Telephone" Disabled="Busy" @bind-Value="_model.PhoneNumber"
                                   Label="@T.StaffDialog.PhoneNumber"
                                   Variant="Variant.Outlined"
                                   Margin="Margin.Dense"
@@ -59,28 +59,28 @@
                                   For="@(() => _model.PhoneNumber)" />
                 </MudItem>
                 <MudItem xs="12" sm="6">
-                    <MudTextField @bind-Value="_model.Department"
+                    <MudTextField Disabled="Busy" @bind-Value="_model.Department"
                                   Label="@T.Staff.Department"
                                   Variant="Variant.Outlined"
                                   Margin="Margin.Dense"
                                   Immediate="true" />
                 </MudItem>
                 <MudItem xs="12" sm="6">
-                    <MudTextField @bind-Value="_model.Specialization"
+                    <MudTextField Disabled="Busy" @bind-Value="_model.Specialization"
                                   Label="@T.Staff.Specialization"
                                   Variant="Variant.Outlined"
                                   Margin="Margin.Dense"
                                   Immediate="true" />
                 </MudItem>
                 <MudItem xs="12" sm="6">
-                    <MudTextField @bind-Value="_model.LicenseNumber"
+                    <MudTextField Disabled="Busy" @bind-Value="_model.LicenseNumber"
                                   Label="@T.StaffDialog.LicenseNumber"
                                   Variant="Variant.Outlined"
                                   Margin="Margin.Dense"
                                   Immediate="true" />
                 </MudItem>
                 <MudItem xs="12" sm="6">
-                    <MudSelect T="string"
+                    <MudSelect Disabled="Busy" T="string"
                                @bind-Value="_model.SalaryCalculationRule"
                                Label="@T.StaffDialog.SalaryCalculationRule"
                                Variant="Variant.Outlined"

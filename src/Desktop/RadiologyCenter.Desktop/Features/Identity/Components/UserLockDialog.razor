@@ -10,13 +10,13 @@
         </MudText>
         <EditForm EditContext="_editContext">
             <LocalizedDataAnnotationsValidator />
-            <MudDatePicker @bind-Date="_model.LockUntilDate"
+            <MudDatePicker Disabled="_busy" @bind-Date="_model.LockUntilDate"
                            For="@(() => _model.LockUntilDate)"
                            Label="@T.UserDialog.LockUntil"
                            Variant="Variant.Outlined"
                            Margin="Margin.Dense"
                            Class="w-100" />
-            <MudTimePicker @bind-Time="_model.LockUntilTime"
+            <MudTimePicker Disabled="_busy" @bind-Time="_model.LockUntilTime"
                            For="@(() => _model.LockUntilTime)"
                            Label="@T.UserDialog.LockUntilTime"
                            Variant="Variant.Outlined"

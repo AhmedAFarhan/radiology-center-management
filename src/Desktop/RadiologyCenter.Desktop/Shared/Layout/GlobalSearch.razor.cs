@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
 using MudBlazor;
+using Microsoft.JSInterop;
 using RadiologyCenter.Desktop.Models;
 using RadiologyCenter.Desktop.Services;
 
@@ -31,6 +32,17 @@ public partial class GlobalSearch
     [Parameter] public EventCallback CloseSearch { get; set; }
 
     private MudTextField<string>? _searchField;
+    private ElementReference _searchRoot;
+    private string? ActiveOptionId => !ResultsOpen || SelectedIndex < 0 ? null
+        : ShowRecents && SelectedIndex < RecentSearches.Count ? $"global-search-recent-{SelectedIndex}"
+        : SelectedIndex < FlatItems.Count ? $"global-search-option-{SelectedIndex}" : null;
+
+    private async Task HandleFocusOutAsync(Microsoft.AspNetCore.Components.Web.FocusEventArgs args)
+    {
+        if (ResultsOpen && !await JS.InvokeAsync<bool>("egcareUi.focusWithin", _searchRoot))
+            await SearchBlur.InvokeAsync(args);
+    }
+
 
     public async Task FocusAsync()
     {
@@ -38,28 +50,28 @@ public partial class GlobalSearch
             await _searchField.FocusAsync();
     }
 
-    private void HandleSearchBoxClick()
+    private Task HandleSearchBoxClick()
         => SearchBoxClick.InvokeAsync();
 
-    private void HandleSearchKeyDown(KeyboardEventArgs e)
+    private Task HandleSearchKeyDown(KeyboardEventArgs e)
         => SearchKeyDown.InvokeAsync(e);
 
-    private void HandleSearchBlur(Microsoft.AspNetCore.Components.Web.FocusEventArgs e)
+    private Task HandleSearchBlur(Microsoft.AspNetCore.Components.Web.FocusEventArgs e)
         => SearchBlur.InvokeAsync(e);
 
-    private void HandleCloseSearch()
+    private Task HandleCloseSearch()
         => CloseSearch.InvokeAsync();
 
-    private void HandleRetrySearch()
+    private Task HandleRetrySearch()
         => RetrySearch.InvokeAsync();
 
-    private void OnRecentClicked(string term)
+    private Task OnRecentClicked(string term)
         => RecentClicked.InvokeAsync(term);
 
-    private void OnViewAll(string entityType)
+    private Task OnViewAll(string entityType)
         => ViewAll.InvokeAsync(entityType);
 
-    private void OnActivateItem(SearchFlatItem item)
+    private Task OnActivateItem(SearchFlatItem item)
         => ActivateItem.InvokeAsync(item);
 
     private void SelectItem(GlobalSearchItemDto item)

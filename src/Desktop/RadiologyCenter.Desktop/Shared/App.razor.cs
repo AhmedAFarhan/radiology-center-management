@@ -18,7 +18,7 @@ using RadiologyCenter.Desktop.Services;
 
 namespace RadiologyCenter.Desktop.Shared;
 
-public partial class App : ComponentBase
+public partial class App : ComponentBase, IDisposable
 {
 private Action? _onBackendChanged;
     private Action? _onLanguageChanged;

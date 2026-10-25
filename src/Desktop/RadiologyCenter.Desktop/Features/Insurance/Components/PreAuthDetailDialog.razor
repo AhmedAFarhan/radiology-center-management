@@ -42,7 +42,7 @@
                 <MudText Typo="Typo.subtitle2" Class="mb-1">@T.PreAuthDialog.Decision</MudText>
                 <MudGrid Spacing="2">
                     <MudItem xs="12" sm="6">
-                        <MudNumericField T="decimal?"
+                        <MudNumericField Disabled="_busy" T="decimal?"
                                          @bind-Value="_approvedAmount"
                                          Label="@T.PreAuthDialog.ApprovedAmount"
                                          Variant="Variant.Outlined"
@@ -50,7 +50,7 @@
                                          Min="0" />
                     </MudItem>
                     <MudItem xs="12">
-                        <MudTextField @bind-Value="_rejectionReason"
+                        <MudTextField Disabled="_busy" @bind-Value="_rejectionReason"
                                       Label="@T.PreAuthDialog.RejectionReasonForDeny"
                                       Variant="Variant.Outlined"
                                       Margin="Margin.Dense"
@@ -93,14 +93,8 @@
                 }
             }
 
-            <MudButton HtmlTag="label" for="preauth-doc-input"
-                       Variant="Variant.Outlined" Color="Color.Primary"
-                       StartIcon="@Icons.Material.Filled.Upload"
-                       Disabled="_busy"
-                       Class="mt-2">
-                @(_busy ? T.PreAuthDialog.Uploading : T.PreAuthDialog.UploadDocument)
-            </MudButton>
-            <InputFile id="preauth-doc-input" OnChange="OnFileSelectedAsync" style="display:none" />
+            <label for="preauth-doc-input" class="file-input-label">@(_busy ? T.PreAuthDialog.Uploading : T.PreAuthDialog.UploadDocument)</label>
+            <InputFile id="preauth-doc-input" OnChange="OnFileSelectedAsync" class="accessible-file-input" disabled="_busy" />
             <MudText Typo="Typo.caption" Class="text-secondary mt-1">@T.PreAuthDialog.UploadHint</MudText>
         }
     </DialogContent>

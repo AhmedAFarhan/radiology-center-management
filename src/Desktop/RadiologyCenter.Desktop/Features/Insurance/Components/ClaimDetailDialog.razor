@@ -44,7 +44,7 @@
                 <MudText Typo="Typo.subtitle2" Class="mb-1">@T.ClaimDialog.Adjudication</MudText>
                 <MudGrid Spacing="2">
                     <MudItem xs="12" sm="6">
-                        <MudNumericField T="decimal?"
+                        <MudNumericField Disabled="_busy" T="decimal?"
                                          @bind-Value="_approvedAmount"
                                          Label="@T.ClaimDialog.ApprovedAmount"
                                          Variant="Variant.Outlined"
@@ -52,14 +52,14 @@
                                          Min="0" />
                     </MudItem>
                     <MudItem xs="12" sm="6">
-                        <MudTextField @bind-Value="_rejectionCode"
+                        <MudTextField Disabled="_busy" @bind-Value="_rejectionCode"
                                       Label="@T.ClaimDialog.RejectionCodeForReject"
                                       Variant="Variant.Outlined"
                                       Margin="Margin.Dense"
                                       Immediate="true" />
                     </MudItem>
                     <MudItem xs="12">
-                        <MudTextField @bind-Value="_rejectionReason"
+                        <MudTextField Disabled="_busy" @bind-Value="_rejectionReason"
                                       Label="@T.ClaimDialog.RejectionReasonForReject"
                                       Variant="Variant.Outlined"
                                       Margin="Margin.Dense"
@@ -85,7 +85,7 @@
                 <MudText Typo="Typo.subtitle2" Class="mb-1">@T.ClaimDialog.RecordSettlement</MudText>
                 <MudGrid Spacing="2">
                     <MudItem xs="12" sm="4">
-                        <MudNumericField T="decimal"
+                        <MudNumericField Disabled="_busy" T="decimal"
                                          @bind-Value="_settlementAmount"
                                          Label="@T.ClaimDialog.Amount"
                                          Variant="Variant.Outlined"
@@ -93,7 +93,7 @@
                                          Min="0" />
                     </MudItem>
                     <MudItem xs="12" sm="4">
-                        <MudSelect T="string"
+                        <MudSelect Disabled="_busy" T="string"
                                    @bind-Value="_settlementMethod"
                                    Label="@T.ClaimDialog.Method"
                                    Variant="Variant.Outlined"
@@ -105,7 +105,7 @@
                         </MudSelect>
                     </MudItem>
                     <MudItem xs="12" sm="4">
-                        <MudTextField @bind-Value="_settlementReference"
+                        <MudTextField Disabled="_busy" @bind-Value="_settlementReference"
                                       Label="@T.ClaimDialog.ReferenceOptional"
                                       Variant="Variant.Outlined"
                                       Margin="Margin.Dense"

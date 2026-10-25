@@ -15,8 +15,19 @@
                 <Router AppAssembly="typeof(MauiProgram).Assembly" NotFoundPage="typeof(Pages.NotFound)" @key="_languageKey">
                     <Found Context="routeData">
                         <AuthorizeRouteView RouteData="routeData" DefaultLayout="typeof(MainLayout)">
-                            <NotAuthorized>
-                                <RedirectToLogin />
+                            <NotAuthorized Context="authenticationState">
+                                @if (authenticationState.User.Identity?.IsAuthenticated == true)
+                                {
+                                    <div class="pa-6">
+                                        <h1 class="mud-typography mud-typography-h5" tabindex="-1">@(T.IsRTL ? "لا تملك صلاحية فتح هذه الصفحة" : "You do not have access to this page")</h1>
+                                        <MudText Class="my-3">@(T.IsRTL ? "اطلب من مسؤول العيادة مراجعة صلاحيات حسابك." : "Ask the clinic administrator to review your account permissions.")</MudText>
+                                        <MudButton Href="/dashboard" Variant="Variant.Filled" Color="Color.Primary">@T.Dashboard.Title</MudButton>
+                                    </div>
+                                }
+                                else
+                                {
+                                    <RedirectToLogin />
+                                }
                             </NotAuthorized>
                             <Authorizing>
                                 <div class="d-flex align-items-center justify-content-center" style="height: 100vh;">

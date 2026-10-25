@@ -10,7 +10,7 @@
             <LocalizedDataAnnotationsValidator />
             <MudGrid Spacing="2">
                 <MudItem xs="12" sm="6">
-                    <MudAutocomplete T="PatientDto"
+                    <MudAutocomplete Disabled="Busy" T="PatientDto"
                                      @bind-Value="_selectedPatient"
                                      Label="@T.ClaimDialog.PatientSearchLabel"
                                      Variant="Variant.Outlined"
@@ -22,7 +22,7 @@
                                      Clearable="true" />
                 </MudItem>
                 <MudItem xs="12" sm="6">
-                    <MudAutocomplete T="InsurancePolicyDto"
+                    <MudAutocomplete Disabled="Busy" T="InsurancePolicyDto"
                                      @bind-Value="_selectedPolicy"
                                      Label="@T.ClaimDialog.PolicySearchLabel"
                                      Variant="Variant.Outlined"
@@ -34,7 +34,7 @@
                                      Clearable="true" />
                 </MudItem>
                 <MudItem xs="12" sm="6">
-                    <MudAutocomplete T="ExaminationListItemDto"
+                    <MudAutocomplete Disabled="Busy" T="ExaminationListItemDto"
                                      @bind-Value="_selectedExamination"
                                      Label="@T.ClaimDialog.ExaminationSearchLabel"
                                      Variant="Variant.Outlined"
@@ -46,7 +46,7 @@
                                      Clearable="true" />
                 </MudItem>
                 <MudItem xs="12" sm="6">
-                    <MudAutocomplete T="PreAuthorizationDto"
+                    <MudAutocomplete Disabled="Busy" T="PreAuthorizationDto"
                                      @bind-Value="_selectedPreAuthorization"
                                      Label="@T.ClaimDialog.PreAuthorizationLabel"
                                      Variant="Variant.Outlined"
@@ -58,7 +58,7 @@
                                      Clearable="true" />
                 </MudItem>
                 <MudItem xs="12" sm="6">
-                    <MudNumericField T="decimal"
+                    <MudNumericField Disabled="Busy" T="decimal"
                                      @bind-Value="_model.BilledAmount"
                                      Label="@T.ClaimDialog.BilledAmount"
                                      Variant="Variant.Outlined"

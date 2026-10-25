@@ -1,321 +1,151 @@
+using System.Globalization;
 using Microsoft.AspNetCore.Components;
 using MudBlazor;
+using RadiologyCenter.Desktop.Features.Examinations.Models;
 using RadiologyCenter.Desktop.Models;
+using RadiologyCenter.Desktop.Security;
 using RadiologyCenter.Desktop.Services;
-using static RadiologyCenter.Desktop.Services.ApiClient;
 
 namespace RadiologyCenter.Desktop.Features.Examinations.Components;
 
-public partial class ExaminationCalendar : ComponentBase
+public partial class ExaminationCalendar : ComponentBase, IDisposable
 {
     [Inject] private ExaminationService ExaminationService { get; set; } = default!;
     [Inject] private ResourceService ResourceService { get; set; } = default!;
     [Inject] private NavigationManager NavigationManager { get; set; } = default!;
-    [Inject] private ISnackbar Snackbar { get; set; } = default!;
     [Inject] private IDialogService DialogService { get; set; } = default!;
     [Inject] private AppLocalizer T { get; set; } = default!;
+    [Inject] private PermissionService Permissions { get; set; } = default!;
 
+    private readonly CancellationTokenSource _lifetime = new();
     private DateTime _currentDate = ClinicTime.Today;
+    private DateTime _now = ClinicTime.Now;
     private string _viewMode = "day";
-    private string? _selectedModality;
-    private string? _selectedEquipmentId;
-    private bool _loading = true;
+    private string? _selectedModality, _selectedEquipmentId, _error;
+    private bool _loading = true, _disposed, _detailsOpen;
+    private int _loadVersion;
+    private CalendarSlotDto? _selectedExam;
+    private IReadOnlyList<EquipmentDto> _equipments = [];
+    private List<CalendarSlotDto> _slots = [];
 
-    private IReadOnlyList<EquipmentDto> _equipments = Array.Empty<EquipmentDto>();
-    private List<CalendarSlotDto> _slots = new();
-    private List<CalendarSlotDto> _otherAppointments = new();
-    private List<ResourceRow> _resources = new();
-    private List<string> _timeHeaders = new();
-    private List<DateTime> _weekDays = new();
-    private double? _currentTimeLeft;
-
-    private ElementReference _timeGridRef;
-
-    private static readonly string[] Modalities = ["CT", "MRI", "XRay", "Ultrasound", "Mammography", "Fluoroscopy", "DEXA"];
-    private IReadOnlyList<string> _modalities = Modalities;
-
-    private const int SlotIntervalMinutes = 30;
-    private const int WorkDayStartHour = 8;
-    private const int WorkDayEndHour = 17;
-    private const int SlotWidthPx = 100;
-    private const int ResourceColWidthPx = 180;
+    private string L(string en, string ar) => T.IsRTL ? ar : en;
+    private CultureInfo Culture => CultureInfo.GetCultureInfo(T.IsRTL ? "ar-EG" : "en-GB");
+    private bool CanBook => Permissions.HasPermission("examinations.create");
+    private DateTime WeekStart => _currentDate.Date.AddDays(-(((int)_currentDate.DayOfWeek + 6) % 7));
+    private IEnumerable<DateTime> WeekDays => Enumerable.Range(0, 7).Select(i => WeekStart.AddDays(i));
+    private IEnumerable<EquipmentDto> VisibleEquipment => _equipments.Where(e =>
+        (string.IsNullOrEmpty(_selectedEquipmentId) || e.Id == _selectedEquipmentId) &&
+        (string.IsNullOrEmpty(_selectedModality) || ModalityKey(e) == _selectedModality));
+    private IEnumerable<CalendarSlotDto> OnDay(DateTime day) => _slots.Where(e => e.ScheduledAt < day.Date.AddDays(1) && End(e) > day.Date);
+    private IEnumerable<CalendarSlotDto> DayAppointments => OnDay(_currentDate);
+    private IEnumerable<CalendarSlotDto> Unassigned => DayAppointments.Where(e => !VisibleEquipment.Any(eq => eq.Id == e.EquipmentId));
+    private int StartHour => Math.Min(8, DayAppointments.Select(e => e.ScheduledAt.Date < _currentDate.Date ? 0 : e.ScheduledAt.Hour).DefaultIfEmpty(8).Min());
+    private int EndHour => Math.Max(17, DayAppointments.Select(e => End(e).Date > _currentDate.Date ? 24 : (int)Math.Ceiling(End(e).TimeOfDay.TotalHours)).DefaultIfEmpty(17).Max());
+    private DateTime GridStart => _currentDate.Date.AddHours(StartHour);
+    private DateTime GridEnd => _currentDate.Date.AddHours(EndHour);
+    private int TrackWidth => (EndHour - StartHour) * 120;
+    private IEnumerable<DateTime> Ticks => Enumerable.Range(0, (EndHour - StartHour) * 2).Select(i => GridStart.AddMinutes(i * 30));
+    private string DateTitle => _viewMode == "week"
+        ? $"{WeekStart.ToString("d MMM", Culture)} – {WeekStart.AddDays(6).ToString("d MMM yyyy", Culture)}"
+        : _currentDate.ToString("dddd، d MMMM yyyy", Culture);
+    private static DateTime End(CalendarSlotDto exam) => exam.ScheduledEnd ?? exam.ScheduledAt.AddMinutes(30);
+    private static string Px(double value) => value.ToString("0.##", CultureInfo.InvariantCulture) + "px";
+    private IReadOnlyList<TimelinePlacement> Placements(string equipmentId) => CalendarTimeline.Arrange(
+        DayAppointments.Where(e => e.EquipmentId == equipmentId).Select(e => new TimelineAppointment(e.Id, e.ScheduledAt, End(e))), GridStart, GridEnd);
+    private string Status(CalendarSlotDto e) => e.Status switch
+    {
+        "Scheduled" => T.ExamCalendar.Scheduled, "CheckedIn" => T.ExamCalendar.CheckedIn,
+        "InProgress" => T.ExamCalendar.InProgress, "Completed" => L("Completed", "مكتمل"),
+        "Cancelled" => L("Cancelled", "ملغي"), _ => e.Status
+    };
+    private static string StatusClass(CalendarSlotDto e) => e.Status switch
+    {
+        "CheckedIn" => "checked-in", "InProgress" => "in-progress", "Completed" => "completed", _ => "scheduled"
+    };
+    private string Priority(CalendarSlotDto e) => e.Priority == "Stat" ? T.ScheduleExam.Emergency : T.ScheduleExam.Urgent;
+    private static string ModalityKey(EquipmentDto equipment) => string.IsNullOrEmpty(equipment.ModalityKey) ? equipment.Modality : equipment.ModalityKey;
+    private string EquipmentName(CalendarSlotDto e) => e.EquipmentName ?? _equipments.FirstOrDefault(eq => eq.Id == e.EquipmentId)?.Name
+        ?? (string.IsNullOrEmpty(e.EquipmentId) ? L("No equipment assigned", "لم يتم تحديد جهاز") : L("Assigned equipment is not operational", "الجهاز المحدد غير متاح للعمل"));
+    private string Description(CalendarSlotDto e) => $"{e.PatientName} · {e.ExaminationTypeName} · {e.ScheduledAt:HH:mm}–{End(e):HH:mm} · {Status(e)}";
 
     protected override async Task OnInitializedAsync()
     {
-        await LoadEquipmentsAsync();
         await LoadDataAsync();
+        if (!_disposed) _ = UpdateClockAsync(_lifetime.Token);
     }
 
-    private async Task LoadEquipmentsAsync()
+    private async Task LoadDataAsync()
     {
+        var version = ++_loadVersion;
+        var start = _viewMode == "week" ? WeekStart : _currentDate.Date;
+        var end = start.AddDays(_viewMode == "week" ? 7 : 1);
+        var equipmentId = Guid.TryParse(_selectedEquipmentId, out var id) ? id : (Guid?)null;
+        var modality = _selectedModality;
+        _loading = true;
+        _error = null;
+        _detailsOpen = false;
         try
         {
             var equipment = new List<EquipmentDto>();
             for (var pageNumber = 1; ; pageNumber++)
             {
-                var page = await ResourceService.GetEquipmentPagedAsync(null, "Name", false, pageNumber, 100, status: "Operational");
+                var page = await ResourceService.GetEquipmentPagedAsync(null, "Name", false, pageNumber, 100, status: "Operational", ct: _lifetime.Token);
                 equipment.AddRange(page.Items.Where(e => e.IsActive));
                 if (pageNumber * page.PageSize >= page.TotalCount || page.Items.Count == 0) break;
             }
+            var slots = await ExaminationService.GetCalendarSlotsAsync(ClinicTime.ToUtc(start), ClinicTime.ToUtc(end), equipmentId, null, modality, _lifetime.Token);
+            if (_disposed || version != _loadVersion) return;
             _equipments = equipment;
+            _slots = slots.Select(e => e with { ScheduledAt = ClinicTime.ToLocal(e.ScheduledAt), ScheduledEnd = e.ScheduledEnd.HasValue ? ClinicTime.ToLocal(e.ScheduledEnd.Value) : null })
+                .OrderBy(e => e.ScheduledAt).ToList();
+            _now = ClinicTime.Now;
         }
-        catch
-        {
-            Snackbar.Add(T.ExamCalendar.LoadError, Severity.Error);
-        }
+        catch (OperationCanceledException) when (_lifetime.IsCancellationRequested) { }
+        catch { if (!_disposed && version == _loadVersion) _error = T.ExamCalendar.LoadError; }
+        finally { if (!_disposed && version == _loadVersion) _loading = false; }
     }
 
-    private async Task LoadDataAsync()
+    private async Task UpdateClockAsync(CancellationToken token)
     {
-        _loading = true;
-        StateHasChanged();
-
+        using var timer = new PeriodicTimer(TimeSpan.FromSeconds(30));
         try
         {
-            var (start, end) = GetDayRange();
-            BuildWeekDays(start);
-
-            var startUtc = ClinicTime.ToUtc(start);
-            var endUtc = ClinicTime.ToUtc(end);
-
-            _slots = (await ExaminationService.GetCalendarSlotsAsync(
-                startUtc, endUtc,
-                string.IsNullOrEmpty(_selectedEquipmentId) ? null : Guid.Parse(_selectedEquipmentId),
-                null,
-                _selectedModality)).ToList();
-
-            _slots = _slots.Select(slot => slot with
-            {
-                ScheduledAt = ClinicTime.ToLocal(slot.ScheduledAt),
-                ScheduledEnd = slot.ScheduledEnd.HasValue ? ClinicTime.ToLocal(slot.ScheduledEnd.Value) : null,
-            }).ToList();
-            BuildTimeHeaders();
-            var gridStart = start.AddHours(WorkDayStartHour);
-            BuildResourceRows(gridStart);
-            var displayed = _resources.SelectMany(r => r.Slots).Where(s => s.Exam is not null).Select(s => s.Exam!.Id).ToHashSet();
-            _otherAppointments = _slots.Where(s => !displayed.Contains(s.Id)).OrderBy(s => s.ScheduledAt).ToList();
-            UpdateCurrentTimeIndicator(gridStart);
+            while (await timer.WaitForNextTickAsync(token))
+                await InvokeAsync(() => { _now = ClinicTime.Now; StateHasChanged(); });
         }
-        catch (ApiException apiEx)
-        {
-            var detail = apiEx.StatusCode > 0 ? $" (HTTP {apiEx.StatusCode})" : "";
-            Snackbar.Add($"{T.ExamCalendar.LoadError}{detail}: {apiEx.Message}", Severity.Error);
-        }
-        catch (Exception ex)
-        {
-            Snackbar.Add($"{T.ExamCalendar.LoadError}: {ex.Message}", Severity.Error);
-        }
-        finally
-        {
-            _loading = false;
-        }
+        catch (OperationCanceledException) when (token.IsCancellationRequested) { }
     }
 
-    private (DateTime DayStart, DateTime DayEnd) GetDayRange()
+    private Task MoveAsync(int direction) { _currentDate = _currentDate.AddDays(direction * (_viewMode == "week" ? 7 : 1)); return LoadDataAsync(); }
+    private Task TodayAsync() { _currentDate = ClinicTime.Today; return LoadDataAsync(); }
+    private Task ChangeDateAsync(DateTime? date) { if (!date.HasValue) return Task.CompletedTask; _currentDate = date.Value.Date; return LoadDataAsync(); }
+    private Task ChangeViewAsync(string view) { _viewMode = view; return LoadDataAsync(); }
+    private Task OpenDayAsync(DateTime day) { _currentDate = day; _viewMode = "day"; return LoadDataAsync(); }
+    private Task ModalityChangedAsync(string? value) { _selectedModality = value; _selectedEquipmentId = null; return LoadDataAsync(); }
+    private Task EquipmentChangedAsync(string? value) { _selectedEquipmentId = value; return LoadDataAsync(); }
+    private Task ClearFiltersAsync() { _selectedModality = null; _selectedEquipmentId = null; return LoadDataAsync(); }
+    private void OnDetailsKeyDown(KeyboardEventArgs args) { if (args.Key == "Escape") _detailsOpen = false; }
+    private void ShowDetails(CalendarSlotDto exam) { _selectedExam = exam; _detailsOpen = true; }
+    private void OpenVisit() { if (_selectedExam is not null) NavigationManager.NavigateTo($"/visits?highlight={_selectedExam.Id}"); }
+
+    private async Task BookAsync(DateTime? start = null, EquipmentDto? equipment = null)
     {
-        var date = _currentDate.Date;
-        return (date, date.AddDays(1));
-    }
-
-    private void BuildWeekDays(DateTime weekStart)
-    {
-        _weekDays.Clear();
-        if (_viewMode != "week") return;
-
-        var monday = weekStart.Date.AddDays(-((7 + (int)weekStart.Date.DayOfWeek - (int)DayOfWeek.Monday) % 7));
-        for (var i = 0; i < 7; i++)
-            _weekDays.Add(monday.AddDays(i));
-    }
-
-    private void BuildTimeHeaders()
-    {
-        _timeHeaders.Clear();
-        var date = _currentDate.Date;
-        var current = date.AddHours(WorkDayStartHour);
-        var end = date.AddHours(WorkDayEndHour);
-
-        while (current < end)
-        {
-            _timeHeaders.Add(current.ToString("HH:mm"));
-            current = current.AddMinutes(SlotIntervalMinutes);
-        }
-    }
-
-    private void BuildResourceRows(DateTime dayStart)
-    {
-        _resources.Clear();
-
-        var resourceSlots = _selectedEquipmentId is not null
-            ? _slots.Where(s => s.EquipmentId == _selectedEquipmentId).ToList()
-            : _slots;
-
-        var groupedByEquipment = resourceSlots
-            .Where(s => s.EquipmentId is not null)
-            .GroupBy(s => s.EquipmentId!)
-            .ToDictionary(g => g.Key, g => g.ToList());
-
-        foreach (var eq in _equipments)
-        {
-            if (_selectedEquipmentId is not null && eq.Id != _selectedEquipmentId)
-                continue;
-
-            if (!string.IsNullOrEmpty(_selectedModality)
-                && !string.Equals(eq.Modality, _selectedModality, StringComparison.OrdinalIgnoreCase))
-                continue;
-
-            var row = new ResourceRow { Id = eq.Id, Name = eq.Name, Type = eq.Modality, Slots = new List<SlotCell>() };
-
-            var current = dayStart;
-            while (current < dayStart.AddHours(WorkDayEndHour - WorkDayStartHour))
-            {
-                var slotEnd = current.AddMinutes(SlotIntervalMinutes);
-                var exam = groupedByEquipment.TryGetValue(eq.Id, out var exams)
-                    ? exams.FirstOrDefault(e => e.ScheduledAt < slotEnd && current < (e.ScheduledEnd ?? e.ScheduledAt.AddMinutes(30)))
-                    : null;
-
-                row.Slots.Add(new SlotCell
-                {
-                    EquipmentId = eq.Id,
-                    Modality = eq.Modality,
-                    StartTime = current,
-                    EndTime = slotEnd,
-                    IsAvailable = exam is null,
-                    Exam = exam
-                });
-
-                current = slotEnd;
-            }
-
-            _resources.Add(row);
-        }
-    }
-
-    private void UpdateCurrentTimeIndicator(DateTime dayStart)
-    {
-        _currentTimeLeft = null;
-        var now = ClinicTime.Now;
-
-        if (now.Date != _currentDate.Date)
-            return;
-
-        var workStart = dayStart;
-        var workEnd = dayStart.AddHours(WorkDayEndHour - WorkDayStartHour);
-
-        if (now < workStart || now > workEnd)
-            return;
-
-        var minutesSinceStart = (now - workStart).TotalMinutes;
-        var slotIndex = minutesSinceStart / SlotIntervalMinutes;
-        _currentTimeLeft = slotIndex * SlotWidthPx;
-    }
-
-    private string GetSlotStatusClass(SlotCell slot)
-    {
-        if (slot.IsAvailable) return string.Empty;
-
-        return slot.Exam?.Status switch
-        {
-            "Scheduled" => "status-scheduled",
-            "CheckedIn" => "status-checked-in",
-            "InProgress" => "status-in-progress",
-            _ => string.Empty
-        };
-    }
-
-    private string GetModalityColor(string modality) => modality?.ToUpperInvariant() switch
-    {
-        "CT" => "#1976D2",
-        "MRI" => "#7B1FA2",
-        "XRAY" => "#388E3C",
-        "ULTRASOUND" => "#F57C00",
-        "MAMMOGRAPHY" => "#C2185B",
-        "FLUOROSCOPY" => "#00796B",
-        "DEXA" => "#5D4037",
-        _ => "#757575"
-    };
-
-    private async Task OnSlotClick(SlotCell slot)
-    {
-        if (!slot.IsAvailable && slot.Exam is not null)
-        {
-            NavigationManager.NavigateTo($"/visits?highlight={slot.Exam.Id}");
-            return;
-        }
-
-        var equipmentName = _equipments.FirstOrDefault(e => e.Id == slot.EquipmentId)?.Name;
-
+        if (!CanBook || _loading) return;
+        var date = start ?? (_currentDate.Date == ClinicTime.Today ? ClinicTime.Now.AddMinutes(30) : _currentDate.Date.AddHours(9));
+        if (date <= ClinicTime.Now) return;
+        var selectedId = equipment?.Id ?? _selectedEquipmentId;
         var parameters = new DialogParameters
         {
-            ["EquipmentId"] = slot.EquipmentId,
-            ["EquipmentName"] = equipmentName,
-            ["Modality"] = slot.Modality,
-            ["ScheduledDate"] = slot.StartTime.Date,
-            ["ScheduledTime"] = slot.StartTime.TimeOfDay,
+            [nameof(ScheduleExamDialog.EquipmentId)] = selectedId,
+            [nameof(ScheduleExamDialog.EquipmentName)] = equipment?.Name ?? _equipments.FirstOrDefault(e => e.Id == selectedId)?.Name,
+            [nameof(ScheduleExamDialog.Modality)] = equipment is not null ? ModalityKey(equipment) : _selectedModality,
+            [nameof(ScheduleExamDialog.ScheduledDate)] = date.Date,
+            [nameof(ScheduleExamDialog.ScheduledTime)] = new TimeSpan(date.Hour, date.Minute, 0)
         };
-        var dialog = await DialogService.ShowAsync<ScheduleExamDialog>(T.ExamCalendar.ScheduleExam, parameters);
-        var result = await dialog.Result;
-        if (result is { Data: true })
-            await LoadDataAsync();
+        var dialog = await DialogService.ShowAsync<ScheduleExamDialog>(T.ExamCalendar.ScheduleExam, parameters,
+            new DialogOptions { MaxWidth = MaxWidth.Medium, FullWidth = true, BackdropClick = false });
+        if (await dialog.Result is { Canceled: false, Data: true } && !_disposed) await LoadDataAsync();
     }
 
-    private async Task SelectDayAsync(DateTime date)
-    {
-        _currentDate = date;
-        await LoadDataAsync();
-    }
-
-    private async Task PreviousDay()
-    {
-        _currentDate = _viewMode == "week" ? _currentDate.AddDays(-7) : _currentDate.AddDays(-1);
-        await LoadDataAsync();
-    }
-
-    private async Task NextDay()
-    {
-        _currentDate = _viewMode == "week" ? _currentDate.AddDays(7) : _currentDate.AddDays(1);
-        await LoadDataAsync();
-    }
-
-    private async Task GoToToday()
-    {
-        _currentDate = ClinicTime.Today;
-        await LoadDataAsync();
-    }
-
-    private async Task OnViewModeChanged(string value)
-    {
-        _viewMode = value;
-        await LoadDataAsync();
-    }
-
-    private async Task OnModalityChanged(string? value)
-    {
-        _selectedModality = value;
-        await LoadDataAsync();
-    }
-
-    private async Task OnEquipmentChanged(string? value)
-    {
-        _selectedEquipmentId = value;
-        await LoadDataAsync();
-    }
-
-    private sealed class ResourceRow
-    {
-        public string Id { get; init; } = string.Empty;
-        public string Name { get; init; } = string.Empty;
-        public string Type { get; init; } = string.Empty;
-        public List<SlotCell> Slots { get; init; } = new();
-    }
-
-    private sealed class SlotCell
-    {
-        public string EquipmentId { get; init; } = string.Empty;
-        public string Modality { get; init; } = string.Empty;
-        public DateTime StartTime { get; init; }
-        public DateTime EndTime { get; init; }
-        public bool IsAvailable { get; init; }
-        public CalendarSlotDto? Exam { get; init; }
-    }
+    public void Dispose() { _disposed = true; ++_loadVersion; _lifetime.Cancel(); _lifetime.Dispose(); }
 }
-
