@@ -7,8 +7,13 @@
 @inject AppAuthenticationStateProvider Authentication
 
 <div class="clinic-setup" aria-busy="@_busy.ToString().ToLowerInvariant()">
-    <MudText Typo="Typo.h5">@L("Connect EGcare to your clinic", "توصيل EGcare بالعيادة")</MudText>
-    <MudText Typo="Typo.body2" Class="mb-4">@L("Every computer uses the same database on the admin PC.", "تستخدم كل الأجهزة قاعدة البيانات نفسها على جهاز المسؤول.")</MudText>
+    @if (ShowHeading)
+    {
+        <div class="app-form-heading mb-4">
+            <span class="app-form-emblem" aria-hidden="true"><MudIcon Icon="@Icons.Material.Outlined.Settings" /></span>
+            <div><h2>@T["forms.setupTitle"]</h2><p>@T["forms.setupSubtitle"]</p></div>
+        </div>
+    }
     <div class="clinic-setup-modes" role="group" aria-label="@L("Choose this computer's role", "اختر دور هذا الجهاز")">
         <button type="button" class="@(!_admin ? "selected" : null)" aria-pressed="@(!_admin ? "true" : "false")" disabled="@_busy" @onclick="() => SelectMode(false)">
             <strong>@L("Connect this computer", "توصيل هذا الجهاز")</strong>
@@ -26,25 +31,44 @@
     {
         <MudButton StartIcon="@Icons.Material.Filled.FolderOpen" OnClick="ImportAsync" Disabled="_busy">@L("Import clinic connection file", "استيراد ملف اتصال العيادة")</MudButton>
     }
-    <MudTextField @bind-Value="_server" Label="@L("Admin PC SQL Server name or IP", "اسم أو عنوان خادم SQL على جهاز المسؤول")" HelperText="@L("Use the same server name on every computer, for example CLINIC-SERVER. Ask the clinic administrator for this value.", "استخدم اسم الخادم نفسه على كل الأجهزة، مثل CLINIC-SERVER. اطلب هذه البيانات من مسؤول العيادة.")" Disabled="_busy" Variant="Variant.Outlined" Class="my-2" />
-    <MudTextField @bind-Value="_database" Label="@L("Clinic database", "قاعدة بيانات العيادة")" HelperText="@L("The shared database name, not a file path.", "اسم قاعدة البيانات المشتركة، وليس مسار ملف.")" Disabled="_busy" Variant="Variant.Outlined" Class="my-2" />
+    <FormSectionHeading Title="@T["forms.connection"]" Icon="@Icons.Material.Outlined.Storage" First="true" />
+    <FormField Label="@L("Admin PC SQL Server name or IP", "اسم أو عنوان خادم SQL على جهاز المسؤول")" Context="fieldId">
+        <MudTextField @bind-Value="_server" InputId="@fieldId" aria-label="@L("Admin PC SQL Server name or IP", "اسم أو عنوان خادم SQL على جهاز المسؤول")" HelperText="@L("Use the same server name on every computer, for example CLINIC-SERVER. Ask the clinic administrator for this value.", "استخدم اسم الخادم نفسه على كل الأجهزة، مثل CLINIC-SERVER. اطلب هذه البيانات من مسؤول العيادة.")" Disabled="_busy" Variant="Variant.Outlined" Class="app-form-ltr" />
+    </FormField>
+    <FormField Label="@L("Clinic database", "قاعدة بيانات العيادة")" Context="fieldId">
+        <MudTextField @bind-Value="_database" InputId="@fieldId" aria-label="@L("Clinic database", "قاعدة بيانات العيادة")" HelperText="@L("The shared database name, not a file path.", "اسم قاعدة البيانات المشتركة، وليس مسار ملف.")" Disabled="_busy" Variant="Variant.Outlined" Class="app-form-ltr" />
+    </FormField>
     <MudExpansionPanels Elevation="0" Class="my-3"><MudExpansionPanel Text="@L("Optional: images and app updates", "اختياري: الصور وتحديثات التطبيق")">
-    <MudTextField @bind-Value="_pacs" Label="@L("Image server HTTPS address (optional)", "عنوان HTTPS لخادم الصور (اختياري)")" Disabled="_busy" Variant="Variant.Outlined" Class="my-2" />
-    <MudTextField @bind-Value="_updates" Label="@L("Clinic update folder (optional)", "مجلد تحديثات العيادة (اختياري)")" Disabled="_busy" Variant="Variant.Outlined" Class="my-2" />
+    <FormField Label="@L("Image server HTTPS address (optional)", "عنوان HTTPS لخادم الصور (اختياري)")" Context="fieldId">
+        <MudTextField @bind-Value="_pacs" InputId="@fieldId" aria-label="@L("Image server HTTPS address (optional)", "عنوان HTTPS لخادم الصور (اختياري)")" Disabled="_busy" Variant="Variant.Outlined" Class="app-form-ltr" />
+    </FormField>
+    <FormField Label="@L("Clinic update folder (optional)", "مجلد تحديثات العيادة (اختياري)")" Context="fieldId">
+        <MudTextField @bind-Value="_updates" InputId="@fieldId" aria-label="@L("Clinic update folder (optional)", "مجلد تحديثات العيادة (اختياري)")" Disabled="_busy" Variant="Variant.Outlined" Class="app-form-ltr" />
+    </FormField>
     </MudExpansionPanel></MudExpansionPanels>
     @if (_admin)
     {
-        <MudAlert Severity="Severity.Info" Class="my-3">@L("Run this on the admin PC with a Windows account allowed to administer SQL Server. Close EGcare on the other computers before upgrading.", "شغّل هذا الإجراء على جهاز المسؤول بحساب Windows لديه صلاحية إدارة SQL Server. أغلق EGcare على الأجهزة الأخرى قبل التحديث.")</MudAlert>
+        <FormSectionHeading Title="@T["forms.maintenance"]" Icon="@Icons.Material.Outlined.Storage" />
+        <MudAlert Severity="Severity.Info" Class="my-3">@L("Run this on the admin PC with a Windows account allowed to administer SQL Server. Choose Exit from the EGcare tray icon on the other computers before upgrading.", "شغّل هذا الإجراء على جهاز المسؤول بحساب Windows لديه صلاحية إدارة SQL Server. اختر خروج من أيقونة EGcare بجوار الساعة على الأجهزة الأخرى قبل التحديث.")</MudAlert>
         <MudCheckBox T="bool" @bind-Value="_createNew" Disabled="_busy" Label="@L("Create a new, empty clinic database", "إنشاء قاعدة بيانات عيادة جديدة وفارغة")" />
         @if (!_createNew)
         {
-            <MudTextField @bind-Value="_backup" Label="@L("New backup file path on the SQL Server PC", "مسار ملف نسخ احتياطي جديد على جهاز SQL Server")" Disabled="_busy" Variant="Variant.Outlined" Class="my-2" />
-            <MudTextField @bind-Value="_documents" Label="@L("Existing insurance documents folder (if used)", "مجلد مستندات التأمين الحالي (إذا استُخدم)")" Disabled="_busy" Variant="Variant.Outlined" Class="my-2" />
+            <FormField Label="@L("New backup file path on the SQL Server PC", "مسار ملف نسخ احتياطي جديد على جهاز SQL Server")" Context="fieldId">
+                <MudTextField @bind-Value="_backup" InputId="@fieldId" aria-label="@L("New backup file path on the SQL Server PC", "مسار ملف نسخ احتياطي جديد على جهاز SQL Server")" Disabled="_busy" Variant="Variant.Outlined" Class="app-form-ltr" />
+            </FormField>
+            <FormField Label="@L("Existing insurance documents folder (if used)", "مجلد مستندات التأمين الحالي (إذا استُخدم)")" Context="fieldId">
+                <MudTextField @bind-Value="_documents" InputId="@fieldId" aria-label="@L("Existing insurance documents folder (if used)", "مجلد مستندات التأمين الحالي (إذا استُخدم)")" Disabled="_busy" Variant="Variant.Outlined" Class="app-form-ltr" />
+            </FormField>
         }
-        <MudTextField @bind-Value="_adminUser" Label="@L("Clinic administrator username", "اسم مستخدم مسؤول العيادة")" Disabled="_busy" Variant="Variant.Outlined" Class="my-2" />
-        <MudTextField @bind-Value="_adminPassword" InputType="InputType.Password" autocomplete="off" Label="@(_createNew ? L("New administrator password", "كلمة مرور المسؤول الجديدة") : L("Current administrator password (for first connection)", "كلمة مرور المسؤول الحالية (للاتصال الأول)"))" Disabled="_busy" Variant="Variant.Outlined" Class="my-2" />
+        <FormSectionHeading Title="@T["forms.administrator"]" Icon="@Icons.Material.Outlined.AdminPanelSettings" />
+        <FormField Label="@L("Clinic administrator username", "اسم مستخدم مسؤول العيادة")" Context="fieldId">
+            <MudTextField @bind-Value="_adminUser" InputId="@fieldId" aria-label="@L("Clinic administrator username", "اسم مستخدم مسؤول العيادة")" Disabled="_busy" Variant="Variant.Outlined" />
+        </FormField>
+        <FormField Label="@(_createNew ? L("New administrator password", "كلمة مرور المسؤول الجديدة") : L("Current administrator password (for first connection)", "كلمة مرور المسؤول الحالية (للاتصال الأول)"))" Context="fieldId">
+            <MudTextField @bind-Value="_adminPassword" InputType="InputType.Password" autocomplete="off" InputId="@fieldId" aria-label="@(_createNew ? L("New administrator password", "كلمة مرور المسؤول الجديدة") : L("Current administrator password (for first connection)", "كلمة مرور المسؤول الحالية (للاتصال الأول)"))" Disabled="_busy" Variant="Variant.Outlined" />
+        </FormField>
         <MudText Typo="Typo.caption">@L("Existing accounts are never reset or unlocked by maintenance. Backups are created and verified before existing databases are upgraded.", "لا تعيد الصيانة تعيين كلمات مرور الحسابات الحالية أو تفتحها. يتم إنشاء النسخة الاحتياطية والتحقق منها قبل تحديث قاعدة البيانات.")</MudText>
-        <MudCheckBox T="bool" @bind-Value="_acknowledged" Disabled="_busy" Label="@L("I am on the admin PC and the other workstations are closed", "أنا على جهاز المسؤول والأجهزة الأخرى مغلقة")" />
+        <MudCheckBox T="bool" @bind-Value="_acknowledged" Disabled="_busy" Label="@L("I am on the admin PC and EGcare has been exited from the tray on the other computers", "أنا على جهاز المسؤول وتم اختيار خروج من EGcare بجوار الساعة على الأجهزة الأخرى")" />
     }
     @if (_error is not null) { <MudAlert Severity="Severity.Error" role="alert" Class="my-3">@_error</MudAlert> }
     @if (_message is not null) { <MudAlert Severity="Severity.Success" role="status" Class="my-3">@_message</MudAlert> }
@@ -58,6 +82,7 @@
 </div>
 
 @code {
+    [Parameter] public bool ShowHeading { get; set; } = true;
     [Parameter] public EventCallback Completed { get; set; }
     [Parameter] public EventCallback<bool> BusyChanged { get; set; }
     private void SelectMode(bool admin) { _admin = admin; _error = _message = null; _acknowledged = false; }

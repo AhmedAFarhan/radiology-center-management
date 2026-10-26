@@ -3,66 +3,82 @@
 @inject ExaminationService ExaminationService
 @inject EnumOptionsService EnumOptionsService
 
-<MudDialog>
+<FormDialog Title="@(Fee is null ? T.ExamFee.NewExaminationFee : T.ExamFee.EditExaminationFee)" Icon="@Icons.Material.Filled.MedicalServices" Subtitle="@T["forms.payrollSubtitle"]">
     <DialogContent>
-        <DialogHeader Icon="@Icons.Material.Filled.MedicalServices" Title="@(Fee is null ? T.ExamFee.NewExaminationFee : T.ExamFee.EditExaminationFee)" />
         <EditForm EditContext="_editContext" OnValidSubmit="SubmitAsync">
             <LocalizedDataAnnotationsValidator />
-            <MudGrid Spacing="2">
+            <div role="alert"><ValidationSummary /></div>
+            <MudGrid Spacing="3">
+                <MudItem xs="12" Class="app-form-section-item">
+                    <FormSectionHeading Title="@T["forms.examinationType"]" Icon="@Icons.Material.Outlined.MedicalServices" First="true" />
+                </MudItem>
                 @if (IsEdit)
                 {
                     <MudItem xs="12" sm="8">
-                        <MudTextField @bind-Value="_examTypeName"
-                                      Label="@T.ExamFee.ExaminationType"
-                                      Variant="Variant.Outlined"
-                                      Margin="Margin.Dense"
-                                      ReadOnly="true" />
+                        <FormField Label="@T.ExamFee.ExaminationType" Context="fieldId">
+                            <MudTextField @bind-Value="_examTypeName"
+                                          InputId="@fieldId" aria-label="@T.ExamFee.ExaminationType"
+                                          Variant="Variant.Outlined"
+                                          Margin="Margin.Dense"
+                                          ReadOnly="true" />
+                        </FormField>
                     </MudItem>
                     <MudItem xs="12" sm="4">
-                        <MudTextField @bind-Value="_model.Role"
-                                      Label="@T.ExamFee.Role"
-                                      Variant="Variant.Outlined"
-                                      Margin="Margin.Dense"
-                                      ReadOnly="true" />
+                        <FormField Label="@T.ExamFee.Role" Context="fieldId">
+                            <MudTextField @bind-Value="_model.Role"
+                                          InputId="@fieldId" aria-label="@T.ExamFee.Role"
+                                          Variant="Variant.Outlined"
+                                          Margin="Margin.Dense"
+                                          ReadOnly="true" />
+                        </FormField>
                     </MudItem>
                 }
                 else
                 {
                     <MudItem xs="12" sm="8">
-                        <MudAutocomplete T="ExaminationTypeDto"
-                                         @bind-Value="_selectedType"
-                                         Label="@T.ExamFee.ExamTypeSearch"
-                                         Variant="Variant.Outlined"
-                                         Margin="Margin.Dense"
-                                         MinCharacters="1"
-                                         DebounceInterval="300"
-                                         SearchFunc="SearchTypesAsync"
-                                         ToStringFunc="@(t => t is null ? string.Empty : $"{t.Code} - {t.Name}")"
-                                         Clearable="true"
-                                         Disabled="Busy" />
+                        <FormField Label="@T.ExamFee.ExamTypeSearch" Context="fieldId" Required="true">
+                            <MudAutocomplete T="ExaminationTypeDto"
+                                             @bind-Value="_selectedType"
+                                             InputId="@fieldId" aria-required="true" aria-label="@T.ExamFee.ExamTypeSearch"
+                                             Variant="Variant.Outlined"
+                                             Margin="Margin.Dense"
+                                             MinCharacters="1"
+                                             DebounceInterval="300"
+                                             SearchFunc="SearchTypesAsync"
+                                             ToStringFunc="@(t => t is null ? string.Empty : $"{t.Code} - {t.Name}")"
+                                             Clearable="true"
+                                             Disabled="Busy" />
+                        </FormField>
                     </MudItem>
                     <MudItem xs="12" sm="4">
-                        <MudSelect Disabled="Busy" T="string"
-                                   @bind-Value="_model.Role"
-                                   Label="@T.ExamFee.Role"
-                                   Variant="Variant.Outlined"
-                                   Margin="Margin.Dense"
-                                   For="@(() => _model.Role)">
-                            @foreach (var role in _roleOptions)
-                            {
-                                <MudSelectItem T="string" Value="@role.Key">@role.Value</MudSelectItem>
-                            }
-                        </MudSelect>
+                        <FormField Label="@T.ExamFee.Role" Context="fieldId" Required="true">
+                            <LocalizedSelect Disabled="Busy" T="string"
+                                       @bind-Value="_model.Role"
+                                       InputId="@fieldId" aria-required="true" aria-label="@T.ExamFee.Role"
+                                       Variant="Variant.Outlined"
+                                       Margin="Margin.Dense"
+                                       For="@(() => _model.Role)">
+                                @foreach (var role in _roleOptions)
+                                {
+                                    <MudSelectItem T="string" Value="@role.Key">@role.Value</MudSelectItem>
+                                }
+                            </LocalizedSelect>
+                        </FormField>
                     </MudItem>
                 }
+                <MudItem xs="12" Class="app-form-section-item">
+                    <FormSectionHeading Title="@T["forms.calculation"]" Icon="@Icons.Material.Outlined.Calculate" />
+                </MudItem>
                 <MudItem xs="12" sm="6">
-                    <MudNumericField Disabled="Busy" T="decimal"
-                                     @bind-Value="_model.Amount"
-                                     Label="@(_model.IsPercentage ? T.ExamFee.PercentagePercent : T.ExamFee.FlatAmount)"
-                                     Variant="Variant.Outlined"
-                                     Margin="Margin.Dense"
-                                     Min="0"
-                                     For="@(() => _model.Amount)" />
+                    <FormField Label="@(_model.IsPercentage ? T.ExamFee.PercentagePercent : T.ExamFee.FlatAmount)" Context="fieldId">
+                        <LocalizedNumericField Disabled="Busy" T="decimal"
+                                         @bind-Value="_model.Amount"
+                                         InputId="@fieldId" aria-label="@(_model.IsPercentage ? T.ExamFee.PercentagePercent : T.ExamFee.FlatAmount)"
+                                         Variant="Variant.Outlined"
+                                         Margin="Margin.Dense"
+                                         Min="0"
+                                         For="@(() => _model.Amount)" />
+                    </FormField>
                 </MudItem>
                 <MudItem xs="12" sm="6" Class="d-flex align-items-center">
                     <MudSwitch Disabled="Busy" T="bool" @bind-Value="_model.IsPercentage" Color="Color.Primary">@T.ExamFee.AmountIsPercentage</MudSwitch>
@@ -78,4 +94,4 @@
                        OnCancel="CancelAsync"
                        OnSave="SubmitAsync" />
     </DialogActions>
-</MudDialog>
+</FormDialog>

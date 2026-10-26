@@ -2,21 +2,22 @@
 @inject ISnackbar Snackbar
 @inject AppLocalizer T
 
-<MudDialog>
+<FormDialog Title="@T.AmendReport.Title" Icon="@Icons.Material.Filled.EditNote" Subtitle="@T["forms.reportSubtitle"]">
     <DialogContent>
-        <DialogHeader Icon="@Icons.Material.Filled.EditNote" Title="@T.AmendReport.Title" />
         <MudText Typo="Typo.body2" Class="text-secondary mb-2">
             @(T.FormatValue(T.AmendReport.Description, CurrentVersion + 1))
         </MudText>
-        <MudTextField @bind-Value="_reason"
-                      Label="@T.AmendReport.Reason"
-                      Variant="Variant.Outlined"
-                      Margin="Margin.Dense"
-                      Immediate="true"
-                      FullWidth="true"
-                      Required="true"
-                      MaxLength="500"
-                      Disabled="_busy" />
+        <FormField Label="@T.AmendReport.Reason" Context="fieldId" Required="true">
+            <MudTextField @bind-Value="_reason"
+                          InputId="@fieldId" aria-required="true" aria-label="@T.AmendReport.Reason"
+                          Variant="Variant.Outlined"
+                          Margin="Margin.Dense"
+                          Immediate="true"
+                          FullWidth="true"
+                          Required="true"
+                          MaxLength="500"
+                          Disabled="_busy" />
+        </FormField>
     </DialogContent>
     <DialogActions>
         <MudButton Color="Color.Default" OnClick="CancelAsync" Disabled="_busy">@T.Common.Cancel</MudButton>
@@ -25,11 +26,8 @@
             {
                 <MudProgressCircular Size="Size.Small" Indeterminate="true" Class="mx-1" />
             }
-            else
-            {
-                <text>@T.AmendReport.Title</text>
-            }
+            <text>@T.AmendReport.Title</text>
         </MudButton>
     </DialogActions>
-</MudDialog>
+</FormDialog>
 

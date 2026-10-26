@@ -1,49 +1,65 @@
 @inherits EditorDialogBase
 @inject ResourceService ResourceService
 
-<MudDialog>
+<FormDialog Title="@(Doctor is null ? T.ReferralDoctor.NewReferralDoctor : T.FormatValue(T.ReferralDoctor.Edit, Doctor.FullName))" Icon="@Icons.Material.Filled.LocalHospital" Subtitle="@T["forms.resourceSubtitle"]">
     <DialogContent>
-        <DialogHeader Icon="@Icons.Material.Filled.LocalHospital" Title="@(Doctor is null ? T.ReferralDoctor.NewReferralDoctor : T.FormatValue(T.ReferralDoctor.Edit, Doctor.FullName))" />
         <EditForm EditContext="_editContext" OnValidSubmit="SubmitAsync">
             <LocalizedDataAnnotationsValidator />
-            <MudGrid Spacing="2">
+            <div role="alert"><ValidationSummary /></div>
+            <MudGrid Spacing="3">
+                <MudItem xs="12" Class="app-form-section-item">
+                    <FormSectionHeading Title="@T["forms.contact"]" Icon="@Icons.Material.Outlined.ContactPhone" First="true" />
+                </MudItem>
                 <MudItem xs="12">
-                    <MudTextField Disabled="Busy" @bind-Value="_model.FullName"
-                                  Label="@T.ReferralDoctorDialog.FullName"
-                                  Variant="Variant.Outlined"
-                                  Margin="Margin.Dense"
-                                  Immediate="true"
-                                  For="@(() => _model.FullName)" />
+                    <FormField Label="@T.ReferralDoctorDialog.FullName" Context="fieldId" Required="true">
+                        <LocalizedTextField Disabled="Busy" @bind-Value="_model.FullName"
+                                      InputId="@fieldId" aria-required="true" aria-label="@T.ReferralDoctorDialog.FullName"
+                                      Variant="Variant.Outlined"
+                                      Margin="Margin.Dense"
+                                      Immediate="true"
+                                      For="@(() => _model.FullName)" />
+                    </FormField>
                 </MudItem>
                 <MudItem xs="12" sm="6">
-                    <MudTextField InputType="InputType.Telephone" Disabled="Busy" @bind-Value="_model.Phone"
-                                  Label="@T.ReferralDoctorDialog.PhoneNumber"
-                                  Variant="Variant.Outlined"
-                                  Margin="Margin.Dense"
-                                  Immediate="true"
-                                  For="@(() => _model.Phone)" />
+                    <FormField Label="@T.ReferralDoctorDialog.PhoneNumber" Context="fieldId" Required="true">
+                        <LocalizedTextField InputType="InputType.Telephone" Disabled="Busy" @bind-Value="_model.Phone"
+                                      InputId="@fieldId" aria-required="true" aria-label="@T.ReferralDoctorDialog.PhoneNumber"
+                                      Variant="Variant.Outlined"
+                                      Margin="Margin.Dense"
+                                      Immediate="true"
+                                      For="@(() => _model.Phone)" />
+                    </FormField>
                 </MudItem>
                 <MudItem xs="12" sm="6">
-                    <MudTextField InputType="InputType.Email" Disabled="Busy" @bind-Value="_model.Email"
-                                  Label="@T.ReferralDoctor.Email"
-                                  Variant="Variant.Outlined"
-                                  Margin="Margin.Dense"
-                                  Immediate="true"
-                                  For="@(() => _model.Email)" />
+                    <FormField Label="@T.ReferralDoctor.Email" Context="fieldId">
+                        <LocalizedTextField InputType="InputType.Email" Disabled="Busy" @bind-Value="_model.Email"
+                                      InputId="@fieldId" aria-label="@T.ReferralDoctor.Email"
+                                      Variant="Variant.Outlined"
+                                      Margin="Margin.Dense"
+                                      Immediate="true"
+                                      For="@(() => _model.Email)" />
+                    </FormField>
+                </MudItem>
+                <MudItem xs="12" Class="app-form-section-item">
+                    <FormSectionHeading Title="@T["forms.professional"]" Icon="@Icons.Material.Outlined.Badge" />
                 </MudItem>
                 <MudItem xs="12" sm="6">
-                    <MudTextField Disabled="Busy" @bind-Value="_model.Specialization"
-                                  Label="@T.ReferralDoctor.Specialization"
-                                  Variant="Variant.Outlined"
-                                  Margin="Margin.Dense"
-                                  Immediate="true" />
+                    <FormField Label="@T.ReferralDoctor.Specialization" Context="fieldId">
+                        <MudTextField Disabled="Busy" @bind-Value="_model.Specialization"
+                                      InputId="@fieldId" aria-label="@T.ReferralDoctor.Specialization"
+                                      Variant="Variant.Outlined"
+                                      Margin="Margin.Dense"
+                                      Immediate="true" />
+                    </FormField>
                 </MudItem>
                 <MudItem xs="12" sm="6">
-                    <MudTextField Disabled="Busy" @bind-Value="_model.Hospital"
-                                  Label="@T.ReferralDoctorDialog.HospitalClinic"
-                                  Variant="Variant.Outlined"
-                                  Margin="Margin.Dense"
-                                  Immediate="true" />
+                    <FormField Label="@T.ReferralDoctorDialog.HospitalClinic" Context="fieldId">
+                        <MudTextField Disabled="Busy" @bind-Value="_model.Hospital"
+                                      InputId="@fieldId" aria-label="@T.ReferralDoctorDialog.HospitalClinic"
+                                      Variant="Variant.Outlined"
+                                      Margin="Margin.Dense"
+                                      Immediate="true" />
+                    </FormField>
                 </MudItem>
             </MudGrid>
             <button type="submit" style="display:none"></button>
@@ -56,4 +72,4 @@
                        OnCancel="CancelAsync"
                        OnSave="SubmitAsync" />
     </DialogActions>
-</MudDialog>
+</FormDialog>

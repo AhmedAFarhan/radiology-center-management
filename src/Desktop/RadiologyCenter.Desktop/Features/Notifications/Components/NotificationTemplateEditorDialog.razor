@@ -1,49 +1,63 @@
 @inherits EditorDialogBase
 @inject NotificationService NotificationService
 
-<MudDialog>
+<FormDialog Title="@(Template is null ? T.TemplateDialog.NewTitle : T.FormatValue(T.TemplateDialog.EditTitle, Template.Name))" Icon="@Icons.Material.Filled.Article" Subtitle="@T["forms.notificationSubtitle"]">
     <DialogContent>
-        <DialogHeader Icon="@Icons.Material.Filled.Article" Title="@(Template is null ? T.TemplateDialog.NewTitle : T.FormatValue(T.TemplateDialog.EditTitle, Template.Name))" />
         <EditForm EditContext="_editContext" OnValidSubmit="SubmitAsync">
             <LocalizedDataAnnotationsValidator />
-            <MudGrid Spacing="2">
+            <div role="alert"><ValidationSummary /></div>
+            <MudGrid Spacing="3">
+                <MudItem xs="12" Class="app-form-section-item">
+                    <FormSectionHeading Title="@T["forms.template"]" Icon="@Icons.Material.Outlined.Description" First="true" />
+                </MudItem>
                 <MudItem xs="12" sm="5">
-                    <MudTextField @bind-Value="_model.Code"
-                                  Label="@T.TemplateDialog.Code"
-                                  Variant="Variant.Outlined"
-                                  Margin="Margin.Dense"
-                                  Immediate="true"
-                                  Disabled="@(Busy || _isEdit)"
-                                  HelperText="@T.TemplateDialog.CodeHelper"
-                                  For="@(() => _model.Code)" />
+                    <FormField Label="@T.TemplateDialog.Code" Context="fieldId" Required="true">
+                        <LocalizedTextField @bind-Value="_model.Code"
+                                      InputId="@fieldId" aria-required="true" aria-label="@T.TemplateDialog.Code"
+                                      Variant="Variant.Outlined"
+                                      Margin="Margin.Dense"
+                                      Immediate="true"
+                                      Disabled="@(Busy || _isEdit)"
+                                      HelperText="@T.TemplateDialog.CodeHelper"
+                                      For="@(() => _model.Code)" />
+                    </FormField>
                 </MudItem>
                 <MudItem xs="12" sm="7">
-                    <MudTextField Disabled="Busy" @bind-Value="_model.Name"
-                                  Label="@T.Common.Name"
-                                  Variant="Variant.Outlined"
-                                  Margin="Margin.Dense"
-                                  Immediate="true"
-                                  For="@(() => _model.Name)" />
+                    <FormField Label="@T.Common.Name" Context="fieldId" Required="true">
+                        <LocalizedTextField Disabled="Busy" @bind-Value="_model.Name"
+                                      InputId="@fieldId" aria-required="true" aria-label="@T.Common.Name"
+                                      Variant="Variant.Outlined"
+                                      Margin="Margin.Dense"
+                                      Immediate="true"
+                                      For="@(() => _model.Name)" />
+                    </FormField>
+                </MudItem>
+                <MudItem xs="12" Class="app-form-section-item">
+                    <FormSectionHeading Title="@T["forms.message"]" Icon="@Icons.Material.Outlined.MailOutline" />
                 </MudItem>
                 <MudItem xs="12">
-                    <MudTextField Disabled="Busy" @bind-Value="_model.Subject"
-                                  Label="@T.TemplateDialog.Subject"
-                                  Variant="Variant.Outlined"
-                                  Margin="Margin.Dense"
-                                  Immediate="true"
-                                  HelperText="@T.TemplateDialog.SubjectHelper"
-                                  For="@(() => _model.Subject)" />
+                    <FormField Label="@T.TemplateDialog.Subject" Context="fieldId">
+                        <LocalizedTextField Disabled="Busy" @bind-Value="_model.Subject"
+                                      InputId="@fieldId" aria-label="@T.TemplateDialog.Subject"
+                                      Variant="Variant.Outlined"
+                                      Margin="Margin.Dense"
+                                      Immediate="true"
+                                      HelperText="@T.TemplateDialog.SubjectHelper"
+                                      For="@(() => _model.Subject)" />
+                    </FormField>
                 </MudItem>
                 <MudItem xs="12">
-                    <MudTextField Disabled="Busy" @bind-Value="_model.Body"
-                                  Label="@T.TemplateDialog.Body"
-                                  Variant="Variant.Outlined"
-                                  Margin="Margin.Dense"
-                                  Immediate="true"
-                                  Lines="5"
+                    <FormField Label="@T.TemplateDialog.Body" Context="fieldId" Required="true">
+                        <LocalizedTextField Disabled="Busy" @bind-Value="_model.Body"
+                                      InputId="@fieldId" aria-required="true" aria-label="@T.TemplateDialog.Body"
+                                      Variant="Variant.Outlined"
+                                      Margin="Margin.Dense"
+                                      Immediate="true"
+                                      Lines="5"
 
-                                  HelperText="@T.TemplateDialog.BodyHelper"
-                                  For="@(() => _model.Body)" />
+                                      HelperText="@T.TemplateDialog.BodyHelper"
+                                      For="@(() => _model.Body)" />
+                    </FormField>
                 </MudItem>
             </MudGrid>
             <button type="submit" style="display:none"></button>
@@ -56,4 +70,4 @@
                        OnCancel="CancelAsync"
                        OnSave="SubmitAsync" />
     </DialogActions>
-</MudDialog>
+</FormDialog>

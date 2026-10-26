@@ -1,26 +1,28 @@
 @inject ISnackbar Snackbar
 @inject AppLocalizer T
 
-<MudDialog>
+<FormDialog Title="@T.Payslip.AddTitle" Icon="@Icons.Material.Filled.ReceiptLong" Subtitle="@T["forms.payrollSubtitle"]">
     <DialogContent>
-        <DialogHeader Icon="@Icons.Material.Filled.ReceiptLong" Title="@T.Payslip.AddTitle" />
         <EditForm EditContext="_editContext">
             <LocalizedDataAnnotationsValidator />
-            <MudAutocomplete T="StaffDto"
-                             @bind-Value="_selectedStaff"
-                             Label="@T.Payslip.EmployeeSearch"
-                             Variant="Variant.Outlined"
-                             Margin="Margin.Dense"
-                             MinCharacters="1"
-                             DebounceInterval="300"
-                             SearchFunc="StaffSearchFunc"
-                             ToStringFunc="@(s => s is null ? string.Empty : s.FullName)"
-                             Clearable="true" />
+            <div role="alert"><ValidationSummary /></div>
+            <FormField Label="@T.Payslip.EmployeeSearch" Context="fieldId" Required="true">
+                <MudAutocomplete T="StaffDto"
+                                 @bind-Value="_selectedStaff"
+                                 InputId="@fieldId" aria-required="true" aria-label="@T.Payslip.EmployeeSearch"
+                                 Variant="Variant.Outlined"
+                                 Margin="Margin.Dense"
+                                 MinCharacters="1"
+                                 DebounceInterval="300"
+                                 SearchFunc="StaffSearchFunc"
+                                 ToStringFunc="@(s => s is null ? string.Empty : s.FullName)"
+                                 Clearable="true" />
+            </FormField>
         </EditForm>
     </DialogContent>
     <DialogActions>
         <MudButton Color="Color.Default" OnClick="CancelAsync">@T.Common.Cancel</MudButton>
         <MudButton Color="Color.Primary" Variant="Variant.Filled" OnClick="SubmitAsync" Disabled="_selectedStaff is null">@T.Common.Add</MudButton>
     </DialogActions>
-</MudDialog>
+</FormDialog>
 

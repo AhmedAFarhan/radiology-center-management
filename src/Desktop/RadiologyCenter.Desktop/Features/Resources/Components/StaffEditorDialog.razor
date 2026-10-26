@@ -3,91 +3,122 @@
 @inject IdentityService IdentityService
 @inject EnumOptionsService EnumOptionsService
 
-<MudDialog>
+<FormDialog Title="@(Staff is null ? T.Staff.NewStaff : T.FormatValue(T.Staff.Edit, Staff.FullName))" Icon="@Icons.Material.Filled.Badge" Subtitle="@T["forms.resourceSubtitle"]">
     <DialogContent>
-        <DialogHeader Icon="@Icons.Material.Filled.Badge" Title="@(Staff is null ? T.Staff.NewStaff : T.FormatValue(T.Staff.Edit, Staff.FullName))" />
         <EditForm EditContext="_editContext" OnValidSubmit="SubmitAsync">
             <LocalizedDataAnnotationsValidator />
-            <MudGrid Spacing="2">
-                <MudItem xs="12">
-                    <MudAutocomplete T="UserListItemDto"
-                                     @bind-Value="_selectedUser"
-                                     Label="@T.StaffDialog.UserSearch"
-                                     Variant="Variant.Outlined"
-                                     Margin="Margin.Dense"
-                                     MinCharacters="1"
-                                     DebounceInterval="300"
-                                     SearchFunc="SearchUsersAsync"
-                                     ToStringFunc="@(u => u is null ? string.Empty : $"{u.FullName} ({u.UserName})")"
-                                     Clearable="true"
-                                     Disabled="Busy" />
+            <div role="alert"><ValidationSummary /></div>
+            <MudGrid Spacing="3">
+                <MudItem xs="12" Class="app-form-section-item">
+                    <FormSectionHeading Title="@T["forms.personal"]" Icon="@Icons.Material.Outlined.Person" First="true" />
                 </MudItem>
                 <MudItem xs="12">
-                    <MudTextField Disabled="Busy" @bind-Value="_model.FullName"
-                                  Label="@T.StaffDialog.FullName"
-                                  Variant="Variant.Outlined"
-                                  Margin="Margin.Dense"
-                                  Immediate="true"
-                                  For="@(() => _model.FullName)" />
+                    <FormField Label="@T.StaffDialog.UserSearch" Context="fieldId" Required="true">
+                        <MudAutocomplete T="UserListItemDto"
+                                         @bind-Value="_selectedUser"
+                                         InputId="@fieldId" aria-required="true" aria-label="@T.StaffDialog.UserSearch"
+                                         Variant="Variant.Outlined"
+                                         Margin="Margin.Dense"
+                                         MinCharacters="1"
+                                         DebounceInterval="300"
+                                         SearchFunc="SearchUsersAsync"
+                                         ToStringFunc="@(u => u is null ? string.Empty : $"{u.FullName} ({u.UserName})")"
+                                         Clearable="true"
+                                         Disabled="Busy" />
+                    </FormField>
+                </MudItem>
+                <MudItem xs="12">
+                    <FormField Label="@T.StaffDialog.FullName" Context="fieldId" Required="true">
+                        <LocalizedTextField Disabled="Busy" @bind-Value="_model.FullName"
+                                      InputId="@fieldId" aria-required="true" aria-label="@T.StaffDialog.FullName"
+                                      Variant="Variant.Outlined"
+                                      Margin="Margin.Dense"
+                                      Immediate="true"
+                                      For="@(() => _model.FullName)" />
+                    </FormField>
                 </MudItem>
                 <MudItem xs="12" sm="6">
-                    <MudSelect Disabled="Busy" T="string"
-                               @bind-Value="_model.Position"
-                               Label="@T.Staff.Position"
-                               Variant="Variant.Outlined"
-                               Margin="Margin.Dense"
-                               For="@(() => _model.Position)">
-                        @foreach (var position in _positionOptions)
-                        {
-                            <MudSelectItem T="string" Value="@position.Key">@position.Value</MudSelectItem>
-                        }
-                    </MudSelect>
+                    <FormField Label="@T.StaffDialog.PhoneNumber" Context="fieldId" Required="true">
+                        <LocalizedTextField InputType="InputType.Telephone" Disabled="Busy" @bind-Value="_model.PhoneNumber"
+                                      InputId="@fieldId" aria-required="true" aria-label="@T.StaffDialog.PhoneNumber"
+                                      Variant="Variant.Outlined"
+                                      Margin="Margin.Dense"
+                                      Immediate="true"
+                                      For="@(() => _model.PhoneNumber)" />
+                    </FormField>
+                </MudItem>
+                <MudItem xs="12" Class="app-form-section-item">
+                    <FormSectionHeading Title="@T["forms.employment"]" Icon="@Icons.Material.Outlined.WorkOutline" />
                 </MudItem>
                 <MudItem xs="12" sm="6">
-                    <MudDatePicker Disabled="Busy" @bind-Date="_model.HireDate"
-                                   Label="@T.Staff.HireDate"
+                    <FormField Label="@T.Staff.Position" Context="fieldId" Required="true">
+                        <LocalizedSelect Disabled="Busy" T="string"
+                                   @bind-Value="_model.Position"
+                                   InputId="@fieldId" aria-required="true" aria-label="@T.Staff.Position"
                                    Variant="Variant.Outlined"
                                    Margin="Margin.Dense"
-                                   Class="w-100" />
+                                   For="@(() => _model.Position)">
+                            @foreach (var position in _positionOptions)
+                            {
+                                <MudSelectItem T="string" Value="@position.Key">@position.Value</MudSelectItem>
+                            }
+                        </LocalizedSelect>
+                    </FormField>
                 </MudItem>
                 <MudItem xs="12" sm="6">
-                    <MudTextField InputType="InputType.Telephone" Disabled="Busy" @bind-Value="_model.PhoneNumber"
-                                  Label="@T.StaffDialog.PhoneNumber"
-                                  Variant="Variant.Outlined"
-                                  Margin="Margin.Dense"
-                                  Immediate="true"
-                                  For="@(() => _model.PhoneNumber)" />
+                    <FormField Label="@T.Staff.HireDate" Context="fieldId" Required="true">
+                        <MudDatePicker Disabled="Busy" @bind-Date="_model.HireDate"
+                                       InputId="@fieldId" aria-required="true" aria-label="@T.Staff.HireDate"
+                                       Variant="Variant.Outlined"
+                                       Margin="Margin.Dense"
+                                       Class="w-100" />
+                    </FormField>
+                </MudItem>
+
+                <MudItem xs="12" sm="6">
+                    <FormField Label="@T.Staff.Department" Context="fieldId">
+                        <MudTextField Disabled="Busy" @bind-Value="_model.Department"
+                                      InputId="@fieldId" aria-label="@T.Staff.Department"
+                                      Variant="Variant.Outlined"
+                                      Margin="Margin.Dense"
+                                      Immediate="true" />
+                    </FormField>
+                </MudItem>
+                <MudItem xs="12" Class="app-form-section-item">
+                    <FormSectionHeading Title="@T["forms.professional"]" Icon="@Icons.Material.Outlined.Badge" />
                 </MudItem>
                 <MudItem xs="12" sm="6">
-                    <MudTextField Disabled="Busy" @bind-Value="_model.Department"
-                                  Label="@T.Staff.Department"
-                                  Variant="Variant.Outlined"
-                                  Margin="Margin.Dense"
-                                  Immediate="true" />
+                    <FormField Label="@T.Staff.Specialization" Context="fieldId">
+                        <MudTextField Disabled="Busy" @bind-Value="_model.Specialization"
+                                      InputId="@fieldId" aria-label="@T.Staff.Specialization"
+                                      Variant="Variant.Outlined"
+                                      Margin="Margin.Dense"
+                                      Immediate="true" />
+                    </FormField>
                 </MudItem>
                 <MudItem xs="12" sm="6">
-                    <MudTextField Disabled="Busy" @bind-Value="_model.Specialization"
-                                  Label="@T.Staff.Specialization"
-                                  Variant="Variant.Outlined"
-                                  Margin="Margin.Dense"
-                                  Immediate="true" />
+                    <FormField Label="@T.StaffDialog.LicenseNumber" Context="fieldId">
+                        <MudTextField Disabled="Busy" @bind-Value="_model.LicenseNumber"
+                                      InputId="@fieldId" aria-label="@T.StaffDialog.LicenseNumber"
+                                      Variant="Variant.Outlined"
+                                      Margin="Margin.Dense"
+                                      Immediate="true" />
+                    </FormField>
+                </MudItem>
+                <MudItem xs="12" Class="app-form-section-item">
+                    <FormSectionHeading Title="@T["forms.salary"]" Icon="@Icons.Material.Outlined.Payments" />
                 </MudItem>
                 <MudItem xs="12" sm="6">
-                    <MudTextField Disabled="Busy" @bind-Value="_model.LicenseNumber"
-                                  Label="@T.StaffDialog.LicenseNumber"
-                                  Variant="Variant.Outlined"
-                                  Margin="Margin.Dense"
-                                  Immediate="true" />
-                </MudItem>
-                <MudItem xs="12" sm="6">
-                    <MudSelect Disabled="Busy" T="string"
-                               @bind-Value="_model.SalaryCalculationRule"
-                               Label="@T.StaffDialog.SalaryCalculationRule"
-                               Variant="Variant.Outlined"
-                               Margin="Margin.Dense">
-                        <MudSelectItem T="string" Value="@("FixedPlusFees")">@T.StaffDialog.FixedPlusFees</MudSelectItem>
-                        <MudSelectItem T="string" Value="@("HigherOfFixedOrFees")">@T.StaffDialog.HigherOfFixedOrFees</MudSelectItem>
-                    </MudSelect>
+                    <FormField Label="@T.StaffDialog.SalaryCalculationRule" Context="fieldId">
+                        <MudSelect Disabled="Busy" T="string"
+                                   @bind-Value="_model.SalaryCalculationRule"
+                                   InputId="@fieldId" aria-label="@T.StaffDialog.SalaryCalculationRule"
+                                   Variant="Variant.Outlined"
+                                   Margin="Margin.Dense">
+                            <MudSelectItem T="string" Value="@("FixedPlusFees")">@T.StaffDialog.FixedPlusFees</MudSelectItem>
+                            <MudSelectItem T="string" Value="@("HigherOfFixedOrFees")">@T.StaffDialog.HigherOfFixedOrFees</MudSelectItem>
+                        </MudSelect>
+                    </FormField>
                 </MudItem>
             </MudGrid>
             <button type="submit" style="display:none"></button>
@@ -100,4 +131,4 @@
                        OnCancel="CancelAsync"
                        OnSave="SubmitAsync" />
     </DialogActions>
-</MudDialog>
+</FormDialog>

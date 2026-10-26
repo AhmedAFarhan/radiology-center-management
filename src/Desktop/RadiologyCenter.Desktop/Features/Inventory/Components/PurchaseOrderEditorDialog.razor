@@ -1,79 +1,94 @@
 @inherits EditorDialogBase
 @inject InventoryService InventoryService
 
-<MudDialog>
+<FormDialog Title="@T.PoDialog.NewPurchaseOrder" Icon="@Icons.Material.Filled.ReceiptLong" Subtitle="@T["forms.inventorySubtitle"]">
     <DialogContent>
-        <DialogHeader Icon="@Icons.Material.Filled.ReceiptLong" Title="@T.PoDialog.NewPurchaseOrder" />
         <EditForm EditContext="_editContext" OnValidSubmit="SubmitAsync">
             <LocalizedDataAnnotationsValidator />
-            <MudGrid Spacing="2">
-                <MudItem xs="12" sm="8">
-                    <MudSelect Disabled="Busy" T="string"
-                               @bind-Value="_model.SupplierId"
-                               Label="@T.PoDialog.Supplier"
-                               Variant="Variant.Outlined"
-                               Margin="Margin.Dense"
-                               For="@(() => _model.SupplierId)">
-                        @foreach (var supplier in _suppliers)
-                        {
-                            <MudSelectItem T="string" Value="@supplier.Id">@supplier.Name</MudSelectItem>
-                        }
-                    </MudSelect>
+            <div role="alert"><ValidationSummary /></div>
+            <MudGrid Spacing="3">
+                <MudItem xs="12" Class="app-form-section-item">
+                    <FormSectionHeading Title="@T["forms.supplierDelivery"]" Icon="@Icons.Material.Outlined.LocalShipping" First="true" />
                 </MudItem>
-                <MudItem xs="12" sm="4">
-                    <MudDatePicker Disabled="Busy" @bind-Date="_model.ExpectedDeliveryAt"
-                                   Label="@T.PoDialog.ExpectedDeliveryLabel"
+                <MudItem xs="12" sm="8">
+                    <FormField Label="@T.PoDialog.Supplier" Context="fieldId" Required="true">
+                        <LocalizedSelect Disabled="Busy" T="string"
+                                   @bind-Value="_model.SupplierId"
+                                   InputId="@fieldId" aria-required="true" aria-label="@T.PoDialog.Supplier"
                                    Variant="Variant.Outlined"
                                    Margin="Margin.Dense"
-                                   Clearable="true" />
+                                   For="@(() => _model.SupplierId)">
+                            @foreach (var supplier in _suppliers)
+                            {
+                                <MudSelectItem T="string" Value="@supplier.Id">@supplier.Name</MudSelectItem>
+                            }
+                        </LocalizedSelect>
+                    </FormField>
+                </MudItem>
+                <MudItem xs="12" sm="4">
+                    <FormField Label="@T.PoDialog.ExpectedDeliveryLabel" Context="fieldId">
+                        <MudDatePicker Disabled="Busy" @bind-Date="_model.ExpectedDeliveryAt"
+                                       InputId="@fieldId" aria-label="@T.PoDialog.ExpectedDeliveryLabel"
+                                       Variant="Variant.Outlined"
+                                       Margin="Margin.Dense"
+                                       Clearable="true" />
+                    </FormField>
                 </MudItem>
             </MudGrid>
 
             <MudDivider Class="my-3" />
             <div class="d-flex align-center justify-space-between mb-2">
-                <MudText Typo="Typo.subtitle2">@T.PoDialog.Items</MudText>
+                <FormSectionHeading Title="@T.PoDialog.Items" First="true" />
                 <MudButton Variant="Variant.Text" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Add" OnClick="AddLine" Size="Size.Small">@T.PoDialog.AddItem</MudButton>
             </div>
 
             @foreach (var line in _model.Items)
             {
-                <MudGrid Spacing="2" Class="align-center mb-2">
-                    <MudItem xs="12" sm="5">
-                        <MudSelect Disabled="Busy" T="string"
-                                   @bind-Value="line.ItemId"
-                                   Label="@T.PoDialog.Item"
-                                   Variant="Variant.Outlined"
-                                   Margin="Margin.Dense">
-                            @foreach (var item in _items)
-                            {
-                                <MudSelectItem T="string" Value="@item.Id">@item.Name</MudSelectItem>
-                            }
-                        </MudSelect>
-                    </MudItem>
-                    <MudItem xs="12" sm="3">
-                        <MudNumericField Disabled="Busy" T="int"
-                                         @bind-Value="line.QuantityOrdered"
-                                         Label="@T.PoDialog.Qty"
-                                         Variant="Variant.Outlined"
-                                         Margin="Margin.Dense"
-                                         Min="1" />
-                    </MudItem>
-                    <MudItem xs="12" sm="3">
-                        <MudNumericField Disabled="Busy" T="decimal"
-                                         @bind-Value="line.UnitCost"
-                                         Label="@T.PoDialog.UnitCost"
-                                         Variant="Variant.Outlined"
-                                         Margin="Margin.Dense"
-                                         Min="0" />
-                    </MudItem>
-                    <MudItem xs="12" sm="1">
-                        <MudIconButton Icon="@Icons.Material.Filled.RemoveCircleOutline"
-                                       Size="Size.Small"
-                                       Color="Color.Error"
-                                       aria-label="@T.PoDialog.RemoveItem"
-                                       OnClick="@(() => RemoveLine(line))" />
-                    </MudItem>
-                </MudGrid>
+                <div class="app-form-line">
+                    <MudGrid Spacing="3" Class="align-center mb-2">
+                        <MudItem xs="12">
+                            <FormField Label="@T.PoDialog.Item" Context="fieldId">
+                                <MudSelect Disabled="Busy" T="string"
+                                           @bind-Value="line.ItemId"
+                                           InputId="@fieldId" aria-label="@T.PoDialog.Item"
+                                           Variant="Variant.Outlined"
+                                           Margin="Margin.Dense">
+                                    @foreach (var item in _items)
+                                    {
+                                        <MudSelectItem T="string" Value="@item.Id">@item.Name</MudSelectItem>
+                                    }
+                                </MudSelect>
+                            </FormField>
+                        </MudItem>
+                        <MudItem xs="12" sm="5">
+                            <FormField Label="@T.PoDialog.Qty" Context="fieldId">
+                                <MudNumericField Disabled="Busy" T="int"
+                                                 @bind-Value="line.QuantityOrdered"
+                                                 InputId="@fieldId" aria-label="@T.PoDialog.Qty"
+                                                 Variant="Variant.Outlined"
+                                                 Margin="Margin.Dense"
+                                                 Min="1" />
+                            </FormField>
+                        </MudItem>
+                        <MudItem xs="12" sm="5">
+                            <FormField Label="@T.PoDialog.UnitCost" Context="fieldId">
+                                <MudNumericField Disabled="Busy" T="decimal"
+                                                 @bind-Value="line.UnitCost"
+                                                 InputId="@fieldId" aria-label="@T.PoDialog.UnitCost"
+                                                 Variant="Variant.Outlined"
+                                                 Margin="Margin.Dense"
+                                                 Min="0" />
+                            </FormField>
+                        </MudItem>
+                        <MudItem xs="12" sm="2" Class="d-flex justify-end">
+                            <MudIconButton Icon="@Icons.Material.Filled.RemoveCircleOutline"
+                                           Size="Size.Small"
+                                           Color="Color.Error"
+                                           aria-label="@T.PoDialog.RemoveItem"
+                                           OnClick="@(() => RemoveLine(line))" />
+                        </MudItem>
+                    </MudGrid>
+                </div>
             }
             @if (_model.Items.Count == 0)
             {
@@ -81,12 +96,14 @@
             }
 
             <MudDivider Class="my-3" />
-            <MudTextField Disabled="Busy" @bind-Value="_model.Notes"
-                          Label="@T.PoDialog.Notes"
-                          Variant="Variant.Outlined"
-                          Margin="Margin.Dense"
-                          Lines="3"
-                          Immediate="true" />
+            <FormField Label="@T.PoDialog.Notes" Context="fieldId">
+                <MudTextField Disabled="Busy" @bind-Value="_model.Notes"
+                              InputId="@fieldId" aria-label="@T.PoDialog.Notes"
+                              Variant="Variant.Outlined"
+                              Margin="Margin.Dense"
+                              Lines="3"
+                              Immediate="true" />
+            </FormField>
             <button type="submit" style="display:none"></button>
         </EditForm>
     </DialogContent>
@@ -98,6 +115,6 @@
                        OnCancel="CancelAsync"
                        OnSave="SubmitAsync" />
     </DialogActions>
-</MudDialog>
+</FormDialog>
 
 

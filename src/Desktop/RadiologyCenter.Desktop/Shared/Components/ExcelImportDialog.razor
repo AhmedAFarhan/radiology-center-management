@@ -1,8 +1,7 @@
 @using Microsoft.AspNetCore.Components.Forms
 
-<MudDialog>
+<FormDialog Title="@T.Common.ImportFromExcel" Icon="@Icons.Material.Filled.UploadFile" Subtitle="@T["forms.importSubtitle"]">
     <DialogContent>
-        <DialogHeader Icon="@Icons.Material.Filled.UploadFile" Title="@T.Common.ImportFromExcel" />
         <MudText Typo="Typo.body2" Class="text-secondary">@T.Common.ImportExcelHint</MudText>
         <MudStack Row="true" Spacing="2" Wrap="Wrap.Wrap" AlignItems="AlignItems.Center" Class="mt-4">
             <MudButton Variant="Variant.Outlined"
@@ -41,10 +40,7 @@
             {
                 <MudProgressCircular Size="Size.Small" Indeterminate="true" Class="mx-1" />
             }
-            else
-            {
-                <text>@T.Common.Import</text>
-            }
+            <text>@T.Common.Import</text>
         </MudButton>
     </DialogActions>
-</MudDialog>
+</FormDialog>

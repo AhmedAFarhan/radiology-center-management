@@ -1,0 +1,37 @@
+@using System.ComponentModel.DataAnnotations
+
+<EditForm EditContext="Context">
+    <LocalizedDataAnnotationsValidator />
+    <ValidationSummary />
+    <LocalizedAutocomplete T="string" @bind-Value="Model.Examination" For="@(() => Model.Examination)" />
+    <LocalizedTextField T="string" InputId="indication" @bind-Value="Model.Indication" For="@(() => Model.Indication)" Immediate="true" />
+    <LocalizedSelect T="string" @bind-Value="Model.Gender" For="@(() => Model.Gender)">
+        <MudSelectItem T="string" Value="@("Male")">Male</MudSelectItem>
+    </LocalizedSelect>
+    <LocalizedNumericField T="decimal" @bind-Value="Model.Amount" For="@(() => Model.Amount)" />
+    <LocalizedDatePicker @bind-Date="Model.Date" For="@(() => Model.Date)" />
+    <LocalizedTimePicker @bind-Time="Model.Time" For="@(() => Model.Time)" />
+</EditForm>
+
+@code {
+    public ValidationProbe Model { get; } = new();
+    public EditContext Context { get; private set; } = default!;
+    protected override void OnInitialized() => Context = new EditContext(Model);
+
+    public sealed class ValidationProbe
+    {
+        [Required(ErrorMessage = "validation.examinationTypeRequired")]
+        public string? Examination { get; set; }
+        [Required(ErrorMessage = "validation.clinicalIndicationRequired")]
+        [MaxLength(1000, ErrorMessage = "validation.clinicalIndicationMaxLength")]
+        public string Indication { get; set; } = string.Empty;
+        [Required(ErrorMessage = "validation.genderRequired")]
+        public string? Gender { get; set; }
+        [Range(1, 10000, ErrorMessage = "validation.amountGreaterThanZero")]
+        public decimal Amount { get; set; }
+        [Required(ErrorMessage = "validation.scheduledDateRequired")]
+        public DateTime? Date { get; set; }
+        [Required(ErrorMessage = "validation.scheduledTimeRequired")]
+        public TimeSpan? Time { get; set; }
+    }
+}

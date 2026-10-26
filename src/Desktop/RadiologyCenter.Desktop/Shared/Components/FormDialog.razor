@@ -1,0 +1,43 @@
+<MudDialog Class="@($"app-form-dialog {Class}")"
+           TitleClass="app-form-dialog-title"
+           ContentClass="app-form-dialog-content"
+           ActionsClass="app-form-dialog-actions">
+    <TitleContent>
+        <div class="app-form-heading">
+            <span class="app-form-emblem" aria-hidden="true"><MudIcon Icon="@Icon" /></span>
+            <div>
+                <h2>@Title</h2>
+                @if (!string.IsNullOrWhiteSpace(Subtitle))
+                {
+                    <p>@Subtitle</p>
+                }
+            </div>
+        </div>
+    </TitleContent>
+    <DialogContent>@DialogContent</DialogContent>
+    <DialogActions>
+        @if (DialogActions is not null)
+        {
+            <div class="app-form-dialog-buttons">@DialogActions</div>
+        }
+    </DialogActions>
+</MudDialog>
+
+@code {
+    [CascadingParameter] public IMudDialogInstance Dialog { get; set; } = default!;
+    [Parameter] public string Title { get; set; } = string.Empty;
+    [Parameter] public string? Subtitle { get; set; }
+    [Parameter] public string Icon { get; set; } = Icons.Material.Outlined.EditNote;
+    [Parameter] public string? Class { get; set; }
+    [Parameter] public RenderFragment? DialogContent { get; set; }
+    [Parameter] public RenderFragment? DialogActions { get; set; }
+
+    protected override Task OnInitializedAsync()
+    {
+        // Older callers hid the built-in title and put it in the scrolling body.
+        // Keep their sizing and dismissal rules while giving forms a fixed header.
+        return Dialog.Options.NoHeader == true
+            ? Dialog.SetOptionsAsync(Dialog.Options with { NoHeader = false })
+            : Task.CompletedTask;
+    }
+}

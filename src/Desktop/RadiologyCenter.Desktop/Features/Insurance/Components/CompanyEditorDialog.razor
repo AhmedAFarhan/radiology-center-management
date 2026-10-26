@@ -2,51 +2,67 @@
 @inject ISnackbar Snackbar
 @inject AppLocalizer T
 
-<MudDialog>
+<FormDialog Title="@(Company is null ? T.CompanyDialog.Title : T.CompanyDialog.EditTitle)" Icon="@Icons.Material.Filled.Shield" Subtitle="@T["forms.insuranceSubtitle"]">
     <DialogContent>
-        <DialogHeader Icon="@Icons.Material.Filled.Shield" Title="@(Company is null ? T.CompanyDialog.Title : T.CompanyDialog.EditTitle)" />
         <EditForm EditContext="_editContext">
             <LocalizedDataAnnotationsValidator />
-            <MudGrid Spacing="2">
+            <div role="alert"><ValidationSummary /></div>
+            <MudGrid Spacing="3">
+                <MudItem xs="12" Class="app-form-section-item">
+                    <FormSectionHeading Title="@T["forms.company"]" Icon="@Icons.Material.Outlined.Business" First="true" />
+                </MudItem>
                 <MudItem xs="12" sm="8">
-                    <MudTextField Disabled="_busy" @bind-Value="_model.Name"
-                                  Label="@T.Common.Name"
-                                  Variant="Variant.Outlined"
-                                  Margin="Margin.Dense"
-                                  Immediate="true"
-                                  For="@(() => _model.Name)" />
+                    <FormField Label="@T.Common.Name" Context="fieldId" Required="true">
+                        <LocalizedTextField Disabled="_busy" @bind-Value="_model.Name"
+                                      InputId="@fieldId" aria-required="true" aria-label="@T.Common.Name"
+                                      Variant="Variant.Outlined"
+                                      Margin="Margin.Dense"
+                                      Immediate="true"
+                                      For="@(() => _model.Name)" />
+                    </FormField>
                 </MudItem>
                 <MudItem xs="12" sm="4">
-                    <MudTextField Disabled="_busy" @bind-Value="_model.TaxId"
-                                  Label="@T.CompanyDialog.TaxNumber"
-                                  Variant="Variant.Outlined"
-                                  Margin="Margin.Dense"
-                                  Immediate="true"
-                                  For="@(() => _model.TaxId)" />
+                    <FormField Label="@T.CompanyDialog.TaxNumber" Context="fieldId">
+                        <LocalizedTextField Disabled="_busy" @bind-Value="_model.TaxId"
+                                      InputId="@fieldId" aria-label="@T.CompanyDialog.TaxNumber"
+                                      Variant="Variant.Outlined"
+                                      Margin="Margin.Dense"
+                                      Immediate="true"
+                                      For="@(() => _model.TaxId)" />
+                    </FormField>
+                </MudItem>
+                <MudItem xs="12" Class="app-form-section-item">
+                    <FormSectionHeading Title="@T["forms.contact"]" Icon="@Icons.Material.Outlined.ContactPhone" />
                 </MudItem>
                 <MudItem xs="12" sm="6">
-                    <MudTextField InputType="InputType.Telephone" Disabled="_busy" @bind-Value="_model.Phone"
-                                  Label="@T.CompanyDialog.Phone"
-                                  Variant="Variant.Outlined"
-                                  Margin="Margin.Dense"
-                                  Immediate="true"
-                                  For="@(() => _model.Phone)" />
+                    <FormField Label="@T.CompanyDialog.Phone" Context="fieldId">
+                        <LocalizedTextField InputType="InputType.Telephone" Disabled="_busy" @bind-Value="_model.Phone"
+                                      InputId="@fieldId" aria-label="@T.CompanyDialog.Phone"
+                                      Variant="Variant.Outlined"
+                                      Margin="Margin.Dense"
+                                      Immediate="true"
+                                      For="@(() => _model.Phone)" />
+                    </FormField>
                 </MudItem>
                 <MudItem xs="12" sm="6">
-                    <MudTextField InputType="InputType.Email" Disabled="_busy" @bind-Value="_model.Email"
-                                  Label="@T.CompanyDialog.Email"
-                                  Variant="Variant.Outlined"
-                                  Margin="Margin.Dense"
-                                  Immediate="true"
-                                  For="@(() => _model.Email)" />
+                    <FormField Label="@T.CompanyDialog.Email" Context="fieldId">
+                        <LocalizedTextField InputType="InputType.Email" Disabled="_busy" @bind-Value="_model.Email"
+                                      InputId="@fieldId" aria-label="@T.CompanyDialog.Email"
+                                      Variant="Variant.Outlined"
+                                      Margin="Margin.Dense"
+                                      Immediate="true"
+                                      For="@(() => _model.Email)" />
+                    </FormField>
                 </MudItem>
                 <MudItem xs="12">
-                    <MudTextField Disabled="_busy" @bind-Value="_model.Address"
-                                  Label="@T.CompanyDialog.Address"
-                                  Variant="Variant.Outlined"
-                                  Margin="Margin.Dense"
-                                  Immediate="true"
-                                  For="@(() => _model.Address)" />
+                    <FormField Label="@T.CompanyDialog.Address" Context="fieldId">
+                        <LocalizedTextField Disabled="_busy" @bind-Value="_model.Address"
+                                      InputId="@fieldId" aria-label="@T.CompanyDialog.Address"
+                                      Variant="Variant.Outlined"
+                                      Margin="Margin.Dense"
+                                      Immediate="true"
+                                      For="@(() => _model.Address)" />
+                    </FormField>
                 </MudItem>
             </MudGrid>
         </EditForm>
@@ -58,11 +74,8 @@
             {
                 <MudProgressCircular Size="Size.Small" Indeterminate="true" Class="mx-1" />
             }
-            else
-            {
-                <text>@(IsEdit ? T.CompanyDialog.SaveChanges : T.CompanyDialog.Create)</text>
-            }
+            <text>@(IsEdit ? T.CompanyDialog.SaveChanges : T.CompanyDialog.Create)</text>
         </MudButton>
     </DialogActions>
-</MudDialog>
+</FormDialog>
 

@@ -1,129 +1,216 @@
-<MudDialog>
-    <DialogContent>
-        <DialogHeader Icon="@Icons.Material.Filled.EventNote" Title="@T.ExamCalendar.ScheduleExam" />
+@using RadiologyCenter.Desktop.Features.Patients.Components
 
+<FormDialog Title="@(_quickRegistrationOpen ? T["visitDialog.newPatient"] : T.ExamCalendar.ScheduleExam)"
+            Icon="@(_quickRegistrationOpen ? Icons.Material.Outlined.PersonAdd : Icons.Material.Filled.EventNote)"
+            Subtitle="@T[_quickRegistrationOpen ? "visitDialog.quickRegisterHint" : "forms.examinationSubtitle"]">
+    <DialogContent>
         @if (_loading)
         {
             <MudProgressCircular Indeterminate="true" Class="d-flex mx-auto my-4" />
         }
+        else if (_quickRegistrationOpen && CanRegisterPatient)
+        {
+            <QuickPatientRegistration @ref="_registrationForm" SearchText="@_registrationSeed" Draft="_patientDraft"
+                                      GenderOptions="_genderOptions" CreatePatient="CreateQuickPatientAsync"
+                                      Registered="UseRegisteredPatientAsync" SavingChanged="PatientSavingChangedAsync" Disabled="_saving" />
+        }
         else
         {
-            <EditForm id="schedule-examination-form" EditContext="_editContext" OnValidSubmit="SubmitAsync">
+            <EditForm id="schedule-examination-form" EditContext="_editContext" OnSubmit="SubmitAsync">
                 <LocalizedDataAnnotationsValidator />
-                <ValidationSummary />
-                @if (_formError is not null) { <MudAlert Severity="Severity.Error" Class="mb-3" role="alert">@_formError</MudAlert> }
-                <MudGrid Spacing="3">
-                    @* ── Patient ── *@
-                    <MudItem xs="12">
-                        <MudAutocomplete T="PatientDto" Disabled="_saving" ToStringFunc="@(patient => patient?.FullName ?? string.Empty)" Required="true" RequiredError="@T.ScheduleExam.PatientRequired"
-                                         Label="@T.ScheduleExam.Patient"
-                                         SearchFunc="SearchPatients"
-                                         Value="_selectedPatient"
-                                         ValueChanged="OnPatientChanged"
-                                         Variant="Variant.Outlined"
-                                         Dense="true"
-                                         ResetValueOnEmptyText="true"
-                                         CoerceText="true"
-                                         ShowProgressIndicator="true"
-                                         MaxItems="50">
-                        <ItemTemplate Context="patient">
-                            <MudText Typo="Typo.body2">@patient.FullName</MudText>
-                            <MudText Typo="Typo.caption" Class="mud-text-secondary">@patient.PatientCode</MudText>
-                        </ItemTemplate>
-                        </MudAutocomplete>
-                    </MudItem>
-
-                    <MudItem xs="12">
-                        <MudSelect T="string" Value="@_equipmentId" ValueChanged="OnEquipmentChanged" Label="@T.ScheduleExam.Equipment" Variant="Variant.Outlined" Disabled="_saving" Required="true">
-                            @foreach (var equipment in _equipment)
-                            { <MudSelectItem Value="@equipment.Id">@equipment.Name · @equipment.Modality</MudSelectItem> }
-                        </MudSelect>
-                    </MudItem>
-
-                    @* ── Examination Type ── *@
-                    <MudItem xs="12" Sm="6">
-                        <MudAutocomplete T="ExaminationTypeDto" Disabled="_saving" ToStringFunc="@(type => type?.Name ?? string.Empty)" Required="true" RequiredError="@T.ScheduleExam.ExamTypeRequired"
-                                         Label="@T.ScheduleExam.ExaminationType"
-                                         SearchFunc="SearchExamTypes"
-                                         Value="_selectedExamType"
-                                         ValueChanged="OnExamTypeChanged"
-                                         Variant="Variant.Outlined"
-                                         Dense="true"
-                                         ResetValueOnEmptyText="true"
-                                         CoerceText="true"
-                                         ShowProgressIndicator="true"
-                                         MaxItems="50">
-                        <ItemTemplate Context="examType">
-                            <MudText Typo="Typo.body2">@examType.Name</MudText>
-                            <MudText Typo="Typo.caption" Class="mud-text-secondary">@examType.Modality · @examType.Code</MudText>
-                        </ItemTemplate>
-                        </MudAutocomplete>
-                    </MudItem>
-
-                    @* ── Priority ── *@
-                    <MudItem xs="12" Sm="6">
-                        <MudSelect T="string" Disabled="_saving" @bind-Value="_priority" Label="@T.ScheduleExam.Priority"
-                                   Variant="Variant.Outlined" Dense="true">
-                            <MudSelectItem Value="@("Routine")">@T.ScheduleExam.Routine</MudSelectItem>
-                            <MudSelectItem Value="@("Urgent")">@T.ScheduleExam.Urgent</MudSelectItem>
-                            <MudSelectItem Value="@("Stat")">@T.ScheduleExam.Emergency</MudSelectItem>
-                        </MudSelect>
-                    </MudItem>
-
-                    @* ── Date & Time ── *@
-                    <MudItem xs="12" Sm="6">
-                        <MudDatePicker Disabled="_saving" @bind-Date="_model.ScheduledDate"
-                                       Label="@T.ScheduleExam.Date"
-                                       Variant="Variant.Outlined"
-
-                                       MinDate="ClinicTime.Today" />
-                        <ValidationMessage For="@(() => _model.ScheduledDate)" />
-                    </MudItem>
-                    <MudItem xs="12" Sm="6">
-                        <MudTimePicker Disabled="_saving" @bind-Time="_model.ScheduledTime"
-                                       Label="@T.ScheduleExam.Time"
-                                       Variant="Variant.Outlined"
-                                       />
-                        <ValidationMessage For="@(() => _model.ScheduledTime)" />
-                    </MudItem>
-
-                    @if (_selectedExamType is not null && StartTime is { } start)
-                    {
-                        <MudItem xs="12"><MudAlert Severity="Severity.Info" Dense="true">
-                            @L("Duration", "المدة"): @DurationMinutes @L("minutes", "دقيقة") · <span dir="ltr">@start.ToString("HH:mm")–@start.AddMinutes(DurationMinutes).ToString("HH:mm")</span>
-                            <div>@L("Availability is checked for the full duration when you schedule. Times are in Cairo time.", "يتم التحقق من توفر الجهاز طوال مدة الفحص عند الحجز. الأوقات بتوقيت القاهرة.")</div>
-                        </MudAlert></MudItem>
-                    }
-
-                    @* ── Clinical Indication ── *@
-                    <MudItem xs="12">
-                        <MudTextField T="string" Disabled="_saving" @bind-Value="_clinicalIndication"
-                                      Label="@T.ScheduleExam.ClinicalIndication"
-                                      Variant="Variant.Outlined"
-
-                                      Lines="2" />
-                    </MudItem>
-
-                    @* ── Notes ── *@
-                    <MudItem xs="12">
-                        <MudTextField T="string" Disabled="_saving" @bind-Value="_notes"
-                                      Label="@T.ScheduleExam.Notes"
-                                      Variant="Variant.Outlined"
-
-                                      Lines="2" />
-                    </MudItem>
-                </MudGrid>
+                @if ((_submitAttempted && _editContext.GetValidationMessages().Any()) || _formError is not null)
+                {
+                    <div class="schedule-validation-summary" role="alert" tabindex="-1" @ref="_validationSummary">
+                        <strong><MudIcon Icon="@Icons.Material.Outlined.ErrorOutline" Size="Size.Small" aria-hidden="true" />@T["visitDialog.reviewFields"]</strong>
+                        @if (_formError is not null) { <p>@_formError</p> }
+                        <ValidationSummary />
+                    </div>
+                }
+                <div class="schedule-form-layout">
+                    <section class="schedule-form-section" aria-label="@T.VisitDialog.Patient">
+                        <MudGrid Spacing="3">
+                            <MudItem xs="12">
+                                <div class="schedule-patient-heading">
+                                    <h3><MudIcon Icon="@Icons.Material.Outlined.Person" Size="Size.Small" aria-hidden="true" />@T.VisitDialog.Patient</h3>
+                                </div>
+                                @if (_model.Patient is { } selectedPatient && !_changingPatient)
+                                {
+                                    <div class="schedule-selected-patient" role="status">
+                                        <span class="schedule-patient-avatar" aria-hidden="true"><MudIcon Icon="@Icons.Material.Outlined.Person" /></span>
+                                        <div class="schedule-patient-identity">
+                                            <strong>@selectedPatient.FullName</strong>
+                                            <span class="schedule-patient-meta"><bdi>@selectedPatient.PatientCode</bdi><span aria-hidden="true">·</span><bdi dir="ltr">@selectedPatient.PhoneNumber</bdi></span>
+                                            @if (_registeredPatientId == selectedPatient.Id)
+                                            {
+                                                <span class="schedule-patient-confirmed"><MudIcon Icon="@Icons.Material.Outlined.CheckCircle" Size="Size.Small" aria-hidden="true" />@T["visitDialog.patientRegistered"]</span>
+                                            }
+                                        </div>
+                                        <MudButton ButtonType="ButtonType.Button" Disabled="IsBusy" OnClick="ChangePatient" Color="Color.Primary">@T["visitDialog.changePatient"]</MudButton>
+                                    </div>
+                                }
+                                else
+                                {
+                                <FormField Label="@T.VisitDialog.PatientSearch" Context="fieldId" Required="true">
+                                    <LocalizedAutocomplete @ref="_patientLookup" Disabled="IsBusy" T="PatientDto"
+                                                     Value="_model.Patient" ValueChanged="PatientSelected"
+                                                     Text="@_patientSearchText" TextChanged="PatientSearchTextChanged"
+                                                     OnClearButtonClick="ClearPatientSearch"
+                                                     InputId="@fieldId" aria-required="true" aria-label="@T.VisitDialog.PatientSearch"
+                                                     Variant="Variant.Outlined"
+                                                     Margin="Margin.Dense"
+                                                     MinCharacters="1"
+                                                     DebounceInterval="300"
+                                                     SearchFunc="SearchPatientsAsync"
+                                                     ShowProgressIndicator="true"
+                                                     ToStringFunc="@(p => p is null ? string.Empty : p.FullName)"
+                                                     For="@(() => _model.Patient)"
+                                                     Clearable="true">
+                                        <ItemTemplate Context="patient">
+                                            <div class="schedule-patient-option">
+                                                <strong>@patient.FullName</strong>
+                                                <span><bdi>@patient.PatientCode</bdi> <span aria-hidden="true">·</span> <bdi dir="ltr">@patient.PhoneNumber</bdi></span>
+                                            </div>
+                                        </ItemTemplate>
+                                        <NoItemsTemplate>
+                                            @if (_patientSearchFailed)
+                                            {
+                                                <div class="schedule-patient-empty" role="status">@T.VisitDialog.SearchPatientsError</div>
+                                            }
+                                            else if (_patientNotFound)
+                                            {
+                                                <div class="schedule-patient-empty" role="status">
+                                                    <MudStack Row="false" AlignItems="AlignItems.Center" Spacing="3">
+                                                    <strong>@T["visitDialog.patientNotFound"]</strong>
+                                                    @if (CanRegisterPatient)
+                                                    {
+                                                        <MudButton ButtonType="ButtonType.Button" Variant="Variant.Outlined" Color="Color.Primary"
+                                                                   StartIcon="@Icons.Material.Outlined.PersonAdd" Disabled="IsBusy"
+                                                                   OnClick="OpenQuickRegistrationAsync">@T["visitDialog.addPatient"]</MudButton>
+                                                    }
+                                                    </MudStack>
+                                                </div>
+                                            }
+                                        </NoItemsTemplate>
+                                    </LocalizedAutocomplete>
+                                </FormField>
+                                }
+                            </MudItem>
+                        </MudGrid>
+                    </section>
+                    <section class="schedule-form-section" aria-label="@T["forms.examination"]">
+                        <MudGrid Spacing="3">
+                            <MudItem xs="12" Class="app-form-section-item">
+                                <FormSectionHeading Title="@T["forms.examination"]" Icon="@Icons.Material.Outlined.MedicalServices" First="true" />
+                            </MudItem>
+                            <MudItem xs="12">
+                                <FormField Label="@T.ScheduleExam.Equipment" Context="fieldId" Required="true">
+                                    <LocalizedSelect T="string" Value="@_model.EquipmentId" ValueChanged="OnEquipmentChanged"
+                                                     For="@(() => _model.EquipmentId)" Disabled="IsBusy"
+                                                     InputId="@fieldId" aria-required="true" aria-label="@T.ScheduleExam.Equipment"
+                                                     Variant="Variant.Outlined" Margin="Margin.Dense">
+                                        @foreach (var equipment in _equipment)
+                                        {
+                                            <MudSelectItem Value="@equipment.Id">@equipment.Name · @equipment.Modality</MudSelectItem>
+                                        }
+                                    </LocalizedSelect>
+                                </FormField>
+                            </MudItem>
+                            <MudItem xs="12">
+                                <FormField Label="@T.ScheduleExam.ExaminationType" Context="fieldId" Required="true">
+                                    <LocalizedAutocomplete @key="_model.EquipmentId" @ref="_examinationLookup" T="ExaminationTypeDto"
+                                                           Value="_model.ExaminationType" ValueChanged="OnExamTypeChanged"
+                                                           For="@(() => _model.ExaminationType)" Disabled="IsBusy"
+                                                           InputId="@fieldId" aria-required="true" aria-label="@T.ScheduleExam.ExaminationType"
+                                                           SearchFunc="SearchExamTypes" ToStringFunc="@(type => type?.Name ?? string.Empty)"
+                                                           Variant="Variant.Outlined" Margin="Margin.Dense" DebounceInterval="300"
+                                                           Clearable="true" ResetValueOnEmptyText="true" ShowProgressIndicator="true" MaxItems="50">
+                                        <ItemTemplate Context="examType">
+                                            <div class="schedule-patient-option">
+                                                <strong>@examType.Name</strong>
+                                                <span>@examType.Modality · <bdi>@examType.Code</bdi></span>
+                                            </div>
+                                        </ItemTemplate>
+                                    </LocalizedAutocomplete>
+                                </FormField>
+                            </MudItem>
+                            <MudItem xs="12">
+                                <FormField Label="@T.ScheduleExam.ClinicalIndication" Context="fieldId">
+                                    <LocalizedTextField T="string" @bind-Value="_model.ClinicalIndication" For="@(() => _model.ClinicalIndication)"
+                                                        Disabled="IsBusy" InputId="@fieldId" aria-label="@T.ScheduleExam.ClinicalIndication"
+                                                        Variant="Variant.Outlined" Margin="Margin.Dense" Lines="2" Immediate="true" />
+                                </FormField>
+                            </MudItem>
+                        </MudGrid>
+                    </section>
+                    <section class="schedule-form-section" aria-label="@T["forms.appointment"]">
+                        <MudGrid Spacing="3">
+                            <MudItem xs="12" Class="app-form-section-item">
+                                <FormSectionHeading Title="@T["forms.appointment"]" Icon="@Icons.Material.Outlined.EventNote" First="true" />
+                            </MudItem>
+                            <MudItem xs="12">
+                                <FormField Label="@T.ScheduleExam.Priority" Context="fieldId">
+                                    <MudSelect T="string" @bind-Value="_model.Priority" Disabled="IsBusy"
+                                               InputId="@fieldId" aria-label="@T.ScheduleExam.Priority"
+                                               Variant="Variant.Outlined" Margin="Margin.Dense">
+                                        <MudSelectItem Value="@("Routine")">@T.ScheduleExam.Routine</MudSelectItem>
+                                        <MudSelectItem Value="@("Urgent")">@T.ScheduleExam.Urgent</MudSelectItem>
+                                        <MudSelectItem Value="@("Stat")">@T.ScheduleExam.Emergency</MudSelectItem>
+                                    </MudSelect>
+                                </FormField>
+                            </MudItem>
+                            <MudItem xs="12" sm="6">
+                                <FormField Label="@T.ScheduleExam.Date" Context="fieldId" Required="true">
+                                    <LocalizedDatePicker @bind-Date="_model.ScheduledDate" For="@(() => _model.ScheduledDate)" Disabled="IsBusy"
+                                                         InputId="@fieldId" aria-required="true" aria-label="@T.ScheduleExam.Date"
+                                                         Variant="Variant.Outlined" Margin="Margin.Dense" Class="w-100" MinDate="ClinicTime.Today" />
+                                </FormField>
+                            </MudItem>
+                            <MudItem xs="12" sm="6">
+                                <FormField Label="@T.ScheduleExam.Time" Context="fieldId" Required="true">
+                                    <LocalizedTimePicker @bind-Time="_model.ScheduledTime" For="@(() => _model.ScheduledTime)" Disabled="IsBusy"
+                                                         InputId="@fieldId" aria-required="true" aria-label="@T.ScheduleExam.Time"
+                                                         Variant="Variant.Outlined" Margin="Margin.Dense" Class="w-100" />
+                                </FormField>
+                            </MudItem>
+                            @if (_model.ExaminationType is not null && StartTime is { } start)
+                            {
+                                <MudItem xs="12">
+                                    <div class="schedule-duration" role="status">
+                                        <strong><MudIcon Icon="@Icons.Material.Outlined.Schedule" Size="Size.Small" aria-hidden="true" />
+                                            @L("Duration", "المدة"): @DurationMinutes @L("minutes", "دقيقة") · <bdi dir="ltr">@start.ToString("HH:mm")–@start.AddMinutes(DurationMinutes).ToString("HH:mm")</bdi></strong>
+                                        <p>@L("Availability is checked for the full duration when you schedule. Times are in Cairo time.", "يتم التحقق من توفر الجهاز طوال مدة الفحص عند الحجز. الأوقات بتوقيت القاهرة.")</p>
+                                    </div>
+                                </MudItem>
+                            }
+                            <MudItem xs="12">
+                                <FormField Label="@T.ScheduleExam.Notes" Context="fieldId">
+                                    <LocalizedTextField T="string" @bind-Value="_model.Notes" For="@(() => _model.Notes)" Disabled="IsBusy"
+                                                        InputId="@fieldId" aria-label="@T.ScheduleExam.Notes"
+                                                        Variant="Variant.Outlined" Margin="Margin.Dense" Lines="2" Immediate="true" />
+                                </FormField>
+                            </MudItem>
+                        </MudGrid>
+                    </section>
+                </div>
             </EditForm>
         }
     </DialogContent>
     <DialogActions>
-        <MudButton Color="Color.Default" OnClick="Cancel" Disabled="_saving">@T.Common.Cancel</MudButton>
-        <MudButton Color="Color.Primary" Variant="Variant.Filled" ButtonType="ButtonType.Submit" form="schedule-examination-form" Disabled="_saving || _loading">
-            @if (_saving)
-            {
-                <MudProgressCircular Size="Size.Small" Indeterminate="true" Class="mx-1" />
-            }
-            <MudText>@T.ScheduleExam.Schedule</MudText>
-        </MudButton>
+        @if (_quickRegistrationOpen && CanRegisterPatient)
+        {
+            <MudButton ButtonType="ButtonType.Button" Disabled="IsBusy" OnClick="CloseQuickRegistration">@T["visitDialog.backToVisit"]</MudButton>
+            <MudButton ButtonType="ButtonType.Button" Color="Color.Primary" Variant="Variant.Filled" Disabled="IsBusy" OnClick="RegisterPatientAsync">
+                @if (_patientSaving) { <MudProgressCircular Size="Size.Small" Indeterminate="true" Class="mx-1" /> }
+                @T["visitDialog.registerAndUse"]
+            </MudButton>
+        }
+        else
+        {
+            <MudButton ButtonType="ButtonType.Button" OnClick="Cancel" Disabled="IsBusy">@T.Common.Cancel</MudButton>
+            <MudButton Color="Color.Primary" Variant="Variant.Filled" ButtonType="ButtonType.Submit" form="schedule-examination-form" Disabled="IsBusy || _loading || _equipment.Count == 0">
+                @if (_saving) { <MudProgressCircular Size="Size.Small" Indeterminate="true" Class="mx-1" /> }
+                @T.ScheduleExam.Schedule
+            </MudButton>
+        }
     </DialogActions>
-</MudDialog>
+</FormDialog>

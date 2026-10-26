@@ -3,54 +3,68 @@
 @inject PayrollService PayrollService
 @inject EnumOptionsService EnumOptionsService
 
-<MudDialog>
+<FormDialog Title="@(Component is null ? T.SalaryComponent.NewSalaryComponent : T.FormatValue(T.SalaryComponent.EditTitle, Component.Name))" Icon="@Icons.Material.Filled.Category" Subtitle="@T["forms.payrollSubtitle"]">
     <DialogContent>
-        <DialogHeader Icon="@Icons.Material.Filled.Category" Title="@(Component is null ? T.SalaryComponent.NewSalaryComponent : T.FormatValue(T.SalaryComponent.EditTitle, Component.Name))" />
         <EditForm EditContext="_editContext" OnValidSubmit="SubmitAsync">
             <LocalizedDataAnnotationsValidator />
-            <MudGrid Spacing="2">
+            <div role="alert"><ValidationSummary /></div>
+            <MudGrid Spacing="3">
+                <MudItem xs="12" Class="app-form-section-item">
+                    <FormSectionHeading Title="@T["forms.component"]" Icon="@Icons.Material.Outlined.Calculate" First="true" />
+                </MudItem>
                 <MudItem xs="12" sm="7">
-                    <MudTextField Disabled="Busy" @bind-Value="_model.Name"
-                                  Label="@T.Common.Name"
-                                  Variant="Variant.Outlined"
-                                  Margin="Margin.Dense"
-                                  Immediate="true"
-                                  For="@(() => _model.Name)" />
+                    <FormField Label="@T.Common.Name" Context="fieldId" Required="true">
+                        <LocalizedTextField Disabled="Busy" @bind-Value="_model.Name"
+                                      InputId="@fieldId" aria-required="true" aria-label="@T.Common.Name"
+                                      Variant="Variant.Outlined"
+                                      Margin="Margin.Dense"
+                                      Immediate="true"
+                                      For="@(() => _model.Name)" />
+                    </FormField>
                 </MudItem>
                 <MudItem xs="12" sm="5">
-                    <MudSelect Disabled="Busy" T="string"
-                               @bind-Value="_model.Kind"
-                               Label="@T.SalaryComponent.Kind"
-                               Variant="Variant.Outlined"
-                               Margin="Margin.Dense"
-                               For="@(() => _model.Kind)">
-                        @foreach (var kind in _kindOptions)
-                        {
-                            <MudSelectItem T="string" Value="@kind.Key">@kind.Value</MudSelectItem>
-                        }
-                    </MudSelect>
+                    <FormField Label="@T.SalaryComponent.Kind" Context="fieldId" Required="true">
+                        <LocalizedSelect Disabled="Busy" T="string"
+                                   @bind-Value="_model.Kind"
+                                   InputId="@fieldId" aria-required="true" aria-label="@T.SalaryComponent.Kind"
+                                   Variant="Variant.Outlined"
+                                   Margin="Margin.Dense"
+                                   For="@(() => _model.Kind)">
+                            @foreach (var kind in _kindOptions)
+                            {
+                                <MudSelectItem T="string" Value="@kind.Key">@kind.Value</MudSelectItem>
+                            }
+                        </LocalizedSelect>
+                    </FormField>
+                </MudItem>
+                <MudItem xs="12" Class="app-form-section-item">
+                    <FormSectionHeading Title="@T["forms.calculation"]" Icon="@Icons.Material.Outlined.Calculate" />
                 </MudItem>
                 <MudItem xs="12" sm="4">
-                    <MudSelect Disabled="Busy" T="string"
-                               @bind-Value="_model.Frequency"
-                               Label="@T.SalaryComponent.FrequencyOptional"
-                               Variant="Variant.Outlined"
-                               Margin="Margin.Dense">
-                        <MudSelectItem T="string" Value="@((string?)null)">@T.SalaryComponent.NotSet</MudSelectItem>
-                        @foreach (var frequency in _frequencyOptions)
-                        {
-                            <MudSelectItem T="string" Value="@frequency.Key">@frequency.Value</MudSelectItem>
-                        }
-                    </MudSelect>
+                    <FormField Label="@T.SalaryComponent.FrequencyOptional" Context="fieldId">
+                        <MudSelect Disabled="Busy" T="string"
+                                   @bind-Value="_model.Frequency"
+                                   InputId="@fieldId" aria-label="@T.SalaryComponent.FrequencyOptional"
+                                   Variant="Variant.Outlined"
+                                   Margin="Margin.Dense">
+                            <MudSelectItem T="string" Value="@((string?)null)">@T.SalaryComponent.NotSet</MudSelectItem>
+                            @foreach (var frequency in _frequencyOptions)
+                            {
+                                <MudSelectItem T="string" Value="@frequency.Key">@frequency.Value</MudSelectItem>
+                            }
+                        </MudSelect>
+                    </FormField>
                 </MudItem>
                 <MudItem xs="12" sm="4">
-                    <MudNumericField Disabled="Busy" T="decimal"
-                                     @bind-Value="_model.DefaultValue"
-                                     Label="@(_model.IsPercentage ? T.SalaryComponent.DefaultPercent : T.SalaryComponent.DefaultValue)"
-                                     Variant="Variant.Outlined"
-                                     Margin="Margin.Dense"
-                                     Min="0"
-                                     For="@(() => _model.DefaultValue)" />
+                    <FormField Label="@(_model.IsPercentage ? T.SalaryComponent.DefaultPercent : T.SalaryComponent.DefaultValue)" Context="fieldId">
+                        <LocalizedNumericField Disabled="Busy" T="decimal"
+                                         @bind-Value="_model.DefaultValue"
+                                         InputId="@fieldId" aria-label="@(_model.IsPercentage ? T.SalaryComponent.DefaultPercent : T.SalaryComponent.DefaultValue)"
+                                         Variant="Variant.Outlined"
+                                         Margin="Margin.Dense"
+                                         Min="0"
+                                         For="@(() => _model.DefaultValue)" />
+                    </FormField>
                 </MudItem>
                 <MudItem xs="12" sm="4" Class="d-flex flex-column justify-center">
                     <MudSwitch Disabled="Busy" T="bool" @bind-Value="_model.IsPercentage" Color="Color.Primary">@T.SalaryComponent.ValueIsPercentage</MudSwitch>
@@ -67,4 +81,4 @@
                        OnCancel="CancelAsync"
                        OnSave="SubmitAsync" />
     </DialogActions>
-</MudDialog>
+</FormDialog>

@@ -1,1 +1,35 @@
-﻿
+.schedule-form-layout { display: grid; gap: 28px; }
+.schedule-form-section { min-width: 0; padding: 20px; border: 1px solid var(--mud-palette-lines-default); border-radius: 12px; background: var(--mud-palette-surface); }
+.schedule-form-section ::deep .app-form-section-heading { margin-block: 0; padding-block: 0; border: 0; }
+.schedule-form-section ::deep .app-form-section-heading p { max-width: 56ch; line-height: 1.7; }
+.schedule-form-section ::deep .app-form-field + .app-form-field { margin-block-start: 0; }
+.schedule-validation-summary { margin-block-end: 20px; padding: 16px; border: 1px solid var(--mud-palette-error); border-radius: 10px; background: var(--mud-palette-error-hover); color: var(--mud-palette-error); font-size: .875rem; }
+.schedule-validation-summary > strong { display: flex; align-items: center; gap: 8px; line-height: 1.6; }
+.schedule-validation-summary ::deep .validation-errors { margin: 10px 0 0; padding-block: 0; padding-inline: 28px 0; border: 0; background: transparent; }
+.schedule-validation-summary ::deep .validation-errors li + li { margin-block-start: 4px; }
+.schedule-validation-summary:focus { outline: 2px solid var(--mud-palette-error); outline-offset: 3px; }
+.schedule-patient-heading { display: flex; align-items: center; gap: 12px; margin-block-end: 16px; }
+.schedule-patient-heading h3 { display: flex; align-items: center; gap: 8px; margin: 0; color: var(--mud-palette-text-primary); font-size: .95rem; font-weight: 700; }
+.schedule-patient-heading h3 ::deep .mud-icon-root { color: var(--mud-palette-primary); }
+.schedule-patient-option { display: flex; flex-direction: column; gap: 4px; padding-block: 4px; }
+.schedule-patient-option strong { font-size: .9375rem; font-weight: 600; }
+.schedule-patient-option > span { font-size: .8125rem; color: var(--mud-palette-text-secondary); }
+.schedule-patient-empty { display: flex; flex-direction: column; align-items: center; gap: 12px; padding: 20px; text-align: center; color: var(--mud-palette-text-secondary); }
+.schedule-patient-empty strong { font-size: .875rem; font-weight: 600; }
+.schedule-patient-empty ::deep .mud-button-root { min-height: 44px; text-transform: none; }
+.schedule-selected-patient { display: flex; align-items: center; gap: 14px; padding: 18px; border: 1px solid var(--mud-palette-lines-default); border-inline-start: 3px solid var(--mud-palette-primary); border-radius: 12px; background: var(--mud-palette-background); }
+.schedule-patient-avatar { display: grid; place-items: center; flex-shrink: 0; width: 44px; height: 44px; background: var(--mud-palette-primary-hover); color: var(--mud-palette-primary); border-radius: 50%; }
+.schedule-patient-identity { display: flex; flex-direction: column; flex: 1; gap: 5px; min-width: 0; }
+.schedule-patient-identity > strong { font-size: 1rem; font-weight: 700; overflow-wrap: anywhere; }
+.schedule-patient-meta { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; color: var(--mud-palette-text-secondary); font-size: .8125rem; }
+.schedule-patient-confirmed { display: flex; align-items: center; gap: 5px; color: var(--mud-palette-success); font-size: .8125rem; }
+@media (max-width: 600px) {
+    .schedule-form-layout { gap: 24px; }
+    .schedule-form-section { padding: 16px; }
+    .schedule-selected-patient { flex-wrap: wrap; padding: 14px; }
+    .schedule-selected-patient > ::deep .mud-button-root { margin-inline-start: auto; }
+}
+.schedule-validation-summary > p { margin-block: 10px 0; line-height: 1.7; }
+.schedule-duration { padding: 14px 16px; border-radius: 10px; background: var(--mud-palette-primary-hover); }
+.schedule-duration > strong { display: flex; align-items: center; flex-wrap: wrap; gap: 6px; color: var(--mud-palette-primary); font-size: .875rem; }
+.schedule-duration > p { margin: 8px 0 0; color: var(--mud-palette-text-secondary); line-height: 1.7; font-size: .8125rem; }

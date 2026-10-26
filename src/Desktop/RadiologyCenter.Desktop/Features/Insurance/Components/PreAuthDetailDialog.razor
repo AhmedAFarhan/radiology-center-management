@@ -3,10 +3,8 @@
 @inject ISnackbar Snackbar
 @inject AppLocalizer T
 
-<MudDialog>
+<FormDialog Title="@T.PreAuthDialog.DetailsTitle" Icon="@Icons.Material.Filled.Approval" Subtitle="@T["forms.insuranceSubtitle"]">
     <DialogContent>
-        <DialogHeader Icon="@Icons.Material.Filled.Approval" Title="@T.PreAuthDialog.DetailsTitle" />
-
         @if (_loadError is not null)
         {
             <ErrorState Title="@T.PreAuthDialog.LoadErrorTitle" Message="@_loadError" Action="LoadAsync" />
@@ -17,7 +15,7 @@
         }
         else
         {
-            <MudGrid Spacing="2">
+            <MudGrid Spacing="3">
                 <DetailField Label="@T.PreAuthDialog.Patient" Value="@_patientName" />
                 <DetailField Label="@T.PreAuthDialog.Examination" Value="@_examinationName" />
                 <DetailField Label="@T.PreAuthDialog.Policy" Value="@_policyNumber" />
@@ -39,23 +37,27 @@
             @if (_preAuth.StatusKey == "Requested")
             {
                 <MudDivider Class="my-2" />
-                <MudText Typo="Typo.subtitle2" Class="mb-1">@T.PreAuthDialog.Decision</MudText>
-                <MudGrid Spacing="2">
+                <FormSectionHeading Title="@T.PreAuthDialog.Decision" First="true" />
+                <MudGrid Spacing="3">
                     <MudItem xs="12" sm="6">
-                        <MudNumericField Disabled="_busy" T="decimal?"
-                                         @bind-Value="_approvedAmount"
-                                         Label="@T.PreAuthDialog.ApprovedAmount"
-                                         Variant="Variant.Outlined"
-                                         Margin="Margin.Dense"
-                                         Min="0" />
+                        <FormField Label="@T.PreAuthDialog.ApprovedAmount" Context="fieldId">
+                            <MudNumericField Disabled="_busy" T="decimal?"
+                                             @bind-Value="_approvedAmount"
+                                             InputId="@fieldId" aria-label="@T.PreAuthDialog.ApprovedAmount"
+                                             Variant="Variant.Outlined"
+                                             Margin="Margin.Dense"
+                                             Min="0" />
+                        </FormField>
                     </MudItem>
                     <MudItem xs="12">
-                        <MudTextField Disabled="_busy" @bind-Value="_rejectionReason"
-                                      Label="@T.PreAuthDialog.RejectionReasonForDeny"
-                                      Variant="Variant.Outlined"
-                                      Margin="Margin.Dense"
-                                      Lines="2"
-                                      Immediate="true" />
+                        <FormField Label="@T.PreAuthDialog.RejectionReasonForDeny" Context="fieldId">
+                            <MudTextField Disabled="_busy" @bind-Value="_rejectionReason"
+                                          InputId="@fieldId" aria-label="@T.PreAuthDialog.RejectionReasonForDeny"
+                                          Variant="Variant.Outlined"
+                                          Margin="Margin.Dense"
+                                          Lines="2"
+                                          Immediate="true" />
+                        </FormField>
                     </MudItem>
                     <MudItem xs="12" sm="6">
                         <MudButton FullWidth="true" Color="Color.Success" Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Check" OnClick="ApproveAsync" Disabled="_busy">@T.PreAuthDialog.Approve</MudButton>
@@ -67,7 +69,7 @@
             }
 
             <MudDivider Class="my-2" />
-            <MudText Typo="Typo.subtitle2" Class="mb-1">@T.PreAuthDialog.Documents</MudText>
+            <FormSectionHeading Title="@T.PreAuthDialog.Documents" First="true" />
 
             @if (_documents is null)
             {
@@ -101,5 +103,5 @@
     <DialogActions>
         <MudButton Color="Color.Default" OnClick="CancelAsync">@T.Common.Close</MudButton>
     </DialogActions>
-</MudDialog>
+</FormDialog>
 

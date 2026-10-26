@@ -19,9 +19,9 @@ public sealed class AppAuthenticationStateProvider : AuthenticationStateProvider
         return _cachedState;
     }
 
-    public Task SignInAsync(AuthTokens tokens)
+    public Task SignInAsync(AuthTokens tokens, string? databasePassword = null)
     {
-        _tokenStorage.Save(tokens);
+        _tokenStorage.Save(tokens, databasePassword);
         _cachedState = null;
         NotifyAuthenticationStateChanged(GetAuthenticationStateAsync());
         return Task.CompletedTask;

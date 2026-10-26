@@ -1,12 +1,23 @@
 @inject BusinessRuntimeService Business
 @inject AppLocalizer T
-<MudDialog><DialogContent>
-    <MudText>@(T.IsRTL?"حساب خادم الصور":"Image server account")</MudText>
-    <MudText Typo="Typo.body2">@(T.IsRTL?"استخدم حساب عرض الصور الشخصي الذي أنشأه مسؤول العيادة.":"Use your personal image-viewing account provided by the clinic administrator.")</MudText>
-    <MudTextField Disabled="_busy" @bind-Value="_user" Label="@(T.IsRTL?"اسم المستخدم":"Username")" Variant="Variant.Outlined" Class="my-2" />
-    <MudTextField Disabled="_busy" @bind-Value="_password" InputType="InputType.Password" Label="@(T.IsRTL?"كلمة المرور":"Password")" Variant="Variant.Outlined" Class="my-2" />
-    @if(_error is not null) { <MudAlert Severity="Severity.Error">@_error</MudAlert> }
-</DialogContent><DialogActions><MudButton OnClick="SaveAsync" Disabled="_busy" Color="Color.Primary">@T.Common.Save</MudButton><MudButton OnClick="Close" Disabled="_busy">@T.Common.Cancel</MudButton></DialogActions></MudDialog>
+<FormDialog Title="@T["forms.imageAccount"]" Subtitle="@T["forms.imageAccountSubtitle"]" Icon="@Icons.Material.Outlined.Image">
+    <DialogContent>
+        <FormField Label="@(T.IsRTL?"اسم المستخدم":"Username")" Context="fieldId">
+            <MudTextField Disabled="_busy" @bind-Value="_user" InputId="@fieldId" aria-label="@(T.IsRTL?"اسم المستخدم":"Username")" Variant="Variant.Outlined" autocomplete="username" />
+        </FormField>
+        <FormField Label="@(T.IsRTL?"كلمة المرور":"Password")" Context="fieldId">
+            <MudTextField Disabled="_busy" @bind-Value="_password" InputType="InputType.Password" InputId="@fieldId" aria-label="@(T.IsRTL?"كلمة المرور":"Password")" Variant="Variant.Outlined" autocomplete="current-password" />
+        </FormField>
+        @if(_error is not null) { <MudAlert Severity="Severity.Error" Class="mt-3" role="alert">@_error</MudAlert> }
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="Close" Disabled="_busy">@T.Common.Cancel</MudButton>
+        <MudButton OnClick="SaveAsync" Disabled="_busy" Color="Color.Primary" Variant="Variant.Filled">
+            @if (_busy) { <MudProgressCircular Size="Size.Small" Indeterminate="true" Class="mx-1" /> }
+            @T.Common.Save
+        </MudButton>
+    </DialogActions>
+</FormDialog>
 @code {
     [CascadingParameter] public IMudDialogInstance MudDialog { get; set; }=default!;
     private string _user="",_password=""; private string? _error; private bool _busy;

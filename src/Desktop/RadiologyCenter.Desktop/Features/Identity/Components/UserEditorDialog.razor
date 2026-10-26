@@ -1,98 +1,125 @@
 @inherits EditorDialogBase
 @inject IdentityService IdentityService
 
-<MudDialog>
+<FormDialog Title="@(User is null ? T.UserDialog.NewTitle : T.FormatValue(T.UserDialog.EditTitle, User.UserName))" Icon="@Icons.Material.Filled.Person" Subtitle="@T["forms.identitySubtitle"]">
     <DialogContent>
-        <DialogHeader Icon="@Icons.Material.Filled.Person" Title="@(User is null ? T.UserDialog.NewTitle : T.FormatValue(T.UserDialog.EditTitle, User.UserName))" />
         <EditForm EditContext="_editContext" OnValidSubmit="SubmitAsync">
             <LocalizedDataAnnotationsValidator />
-            <MudGrid Spacing="2">
+            <div role="alert"><ValidationSummary /></div>
+            <MudGrid Spacing="3">
+                <MudItem xs="12" Class="app-form-section-item">
+                    <FormSectionHeading Title="@T["forms.account"]" Icon="@Icons.Material.Outlined.Person" First="true" />
+                </MudItem>
                 @if (!IsEdit)
                 {
                     <MudItem xs="12" sm="6">
-                        <MudTextField Disabled="Busy" @bind-Value="_model.UserName"
-                                      Label="@T.UserDialog.Username"
-                                      Variant="Variant.Outlined"
-                                      Margin="Margin.Dense"
-                                      Immediate="true"
-                                      For="@(() => _model.UserName)" />
+                        <FormField Label="@T.UserDialog.Username" Context="fieldId" Required="true">
+                            <LocalizedTextField Disabled="Busy" @bind-Value="_model.UserName"
+                                          InputId="@fieldId" aria-required="true" aria-label="@T.UserDialog.Username"
+                                          Variant="Variant.Outlined"
+                                          Margin="Margin.Dense"
+                                          Immediate="true"
+                                          For="@(() => _model.UserName)" />
+                        </FormField>
                     </MudItem>
                     <MudItem xs="12" sm="6">
-                        <MudTextField InputType="InputType.Email" Disabled="Busy" @bind-Value="_model.Email"
-                                      Label="@T.UserDialog.Email"
-                                      Variant="Variant.Outlined"
-                                      Margin="Margin.Dense"
-                                      Immediate="true"
-                                      For="@(() => _model.Email)" />
+                        <FormField Label="@T.UserDialog.Email" Context="fieldId" Required="true">
+                            <LocalizedTextField InputType="InputType.Email" Disabled="Busy" @bind-Value="_model.Email"
+                                          InputId="@fieldId" aria-required="true" aria-label="@T.UserDialog.Email"
+                                          Variant="Variant.Outlined"
+                                          Margin="Margin.Dense"
+                                          Immediate="true"
+                                          For="@(() => _model.Email)" />
+                        </FormField>
                     </MudItem>
                 }
                 else
                 {
                     <MudItem xs="12" sm="6">
-                        <MudTextField Value="@_model.UserName"
-                                      Label="@T.UserDialog.Username"
-                                      Variant="Variant.Outlined"
-                                      Margin="Margin.Dense"
-                                      ReadOnly="true" />
+                        <FormField Label="@T.UserDialog.Username" Context="fieldId">
+                            <MudTextField Value="@_model.UserName"
+                                          InputId="@fieldId" aria-label="@T.UserDialog.Username"
+                                          Variant="Variant.Outlined"
+                                          Margin="Margin.Dense"
+                                          ReadOnly="true" />
+                        </FormField>
                     </MudItem>
                     <MudItem xs="12" sm="6">
-                        <MudTextField InputType="InputType.Email" Value="@_model.Email"
-                                      Label="@T.UserDialog.Email"
-                                      Variant="Variant.Outlined"
-                                      Margin="Margin.Dense"
-                                      ReadOnly="true" />
+                        <FormField Label="@T.UserDialog.Email" Context="fieldId">
+                            <MudTextField InputType="InputType.Email" Value="@_model.Email"
+                                          InputId="@fieldId" aria-label="@T.UserDialog.Email"
+                                          Variant="Variant.Outlined"
+                                          Margin="Margin.Dense"
+                                          ReadOnly="true" />
+                        </FormField>
                     </MudItem>
                 }
-                <MudItem xs="12" sm="6">
-                    <MudTextField Disabled="Busy" @bind-Value="_model.FirstName"
-                                  Label="@T.UserDialog.FirstName"
-                                  Variant="Variant.Outlined"
-                                  Margin="Margin.Dense"
-                                  Immediate="true"
-                                  For="@(() => _model.FirstName)" />
+                <MudItem xs="12" Class="app-form-section-item">
+                    <FormSectionHeading Title="@T["forms.personal"]" Icon="@Icons.Material.Outlined.Person" />
                 </MudItem>
                 <MudItem xs="12" sm="6">
-                    <MudTextField Disabled="Busy" @bind-Value="_model.LastName"
-                                  Label="@T.UserDialog.LastName"
-                                  Variant="Variant.Outlined"
-                                  Margin="Margin.Dense"
-                                  Immediate="true"
-                                  For="@(() => _model.LastName)" />
+                    <FormField Label="@T.UserDialog.FirstName" Context="fieldId" Required="true">
+                        <LocalizedTextField Disabled="Busy" @bind-Value="_model.FirstName"
+                                      InputId="@fieldId" aria-required="true" aria-label="@T.UserDialog.FirstName"
+                                      Variant="Variant.Outlined"
+                                      Margin="Margin.Dense"
+                                      Immediate="true"
+                                      For="@(() => _model.FirstName)" />
+                    </FormField>
                 </MudItem>
                 <MudItem xs="12" sm="6">
-                    <MudTextField InputType="InputType.Telephone" Disabled="Busy" @bind-Value="_model.PhoneNumber"
-                                  Label="@T.UserDialog.Phone"
-                                  Variant="Variant.Outlined"
-                                  Margin="Margin.Dense"
-                                  Immediate="true" />
+                    <FormField Label="@T.UserDialog.LastName" Context="fieldId" Required="true">
+                        <LocalizedTextField Disabled="Busy" @bind-Value="_model.LastName"
+                                      InputId="@fieldId" aria-required="true" aria-label="@T.UserDialog.LastName"
+                                      Variant="Variant.Outlined"
+                                      Margin="Margin.Dense"
+                                      Immediate="true"
+                                      For="@(() => _model.LastName)" />
+                    </FormField>
+                </MudItem>
+                <MudItem xs="12" sm="6">
+                    <FormField Label="@T.UserDialog.Phone" Context="fieldId">
+                        <MudTextField InputType="InputType.Telephone" Disabled="Busy" @bind-Value="_model.PhoneNumber"
+                                      InputId="@fieldId" aria-label="@T.UserDialog.Phone"
+                                      Variant="Variant.Outlined"
+                                      Margin="Margin.Dense"
+                                      Immediate="true" />
+                    </FormField>
                 </MudItem>
                 @if (!IsEdit)
                 {
+                    <MudItem xs="12" Class="app-form-section-item">
+                        <FormSectionHeading Title="@T["forms.security"]" Icon="@Icons.Material.Outlined.Security" />
+                    </MudItem>
                     <MudItem xs="12" sm="6">
-                        <MudTextField AdornmentAriaLabel="@(T.IsRTL ? "إظهار أو إخفاء كلمة المرور" : "Show or hide password")" Disabled="Busy" @bind-Value="_model.Password"
-                                      Label="@T.UserDialog.Password"
-                                      Variant="Variant.Outlined"
-                                      Margin="Margin.Dense"
-                                      InputType="@(_showPassword ? InputType.Text : InputType.Password)"
-                                      For="@(() => _model.Password)"
-                                      Adornment="Adornment.End"
-                                      AdornmentIcon="@(_showPassword ? Icons.Material.Filled.VisibilityOff : Icons.Material.Filled.Visibility)"
-                                      AdornmentColor="Color.Default"
-                                      OnAdornmentClick="@(() => _showPassword = !_showPassword)" />
+                        <FormField Label="@T.UserDialog.Password" Context="fieldId" Required="true">
+                            <LocalizedTextField AdornmentAriaLabel="@(T.IsRTL ? "إظهار أو إخفاء كلمة المرور" : "Show or hide password")" Disabled="Busy" @bind-Value="_model.Password"
+                                          InputId="@fieldId" aria-required="true" aria-label="@T.UserDialog.Password"
+                                          Variant="Variant.Outlined"
+                                          Margin="Margin.Dense"
+                                          InputType="@(_showPassword ? InputType.Text : InputType.Password)"
+                                          For="@(() => _model.Password)"
+                                          Adornment="Adornment.End"
+                                          AdornmentIcon="@(_showPassword ? Icons.Material.Filled.VisibilityOff : Icons.Material.Filled.Visibility)"
+                                          AdornmentColor="Color.Default"
+                                          OnAdornmentClick="@(() => _showPassword = !_showPassword)" />
+                        </FormField>
                     </MudItem>
                     <MudItem xs="12">
-                        <MudSelect Disabled="Busy" T="string"
-                                   SelectedValues="@_model.SelectedRoleIds"
-                                   SelectedValuesChanged="@(vals => _model.SelectedRoleIds = vals)"
-                                   Label="@T.UserDialog.Roles"
-                                   Variant="Variant.Outlined"
-                                   Margin="Margin.Dense"
-                                   MultiSelection="true">
-                            @foreach (var role in _roles)
-                            {
-                                <MudSelectItem T="string" Value="@role.Id">@role.Name</MudSelectItem>
-                            }
-                        </MudSelect>
+                        <FormField Label="@T.UserDialog.Roles" Context="fieldId">
+                            <MudSelect Disabled="Busy" T="string"
+                                       SelectedValues="@_model.SelectedRoleIds"
+                                       SelectedValuesChanged="@(vals => _model.SelectedRoleIds = vals)"
+                                       InputId="@fieldId" aria-label="@T.UserDialog.Roles"
+                                       Variant="Variant.Outlined"
+                                       Margin="Margin.Dense"
+                                       MultiSelection="true">
+                                @foreach (var role in _roles)
+                                {
+                                    <MudSelectItem T="string" Value="@role.Id">@role.Name</MudSelectItem>
+                                }
+                            </MudSelect>
+                        </FormField>
                     </MudItem>
                 }
             </MudGrid>
@@ -107,6 +134,6 @@
                        OnCancel="CancelAsync"
                        OnSave="SubmitAsync" />
     </DialogActions>
-</MudDialog>
+</FormDialog>
 
 

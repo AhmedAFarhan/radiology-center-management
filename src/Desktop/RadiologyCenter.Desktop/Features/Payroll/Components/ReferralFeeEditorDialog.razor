@@ -3,66 +3,82 @@
 @inject ResourceService ResourceService
 @inject ExaminationService ExaminationService
 
-<MudDialog>
+<FormDialog Title="@(Fee is null ? T.ReferralFee.NewReferralFee : T.ReferralFee.EditReferralFee)" Icon="@Icons.Material.Filled.LocalHospital" Subtitle="@T["forms.payrollSubtitle"]">
     <DialogContent>
-        <DialogHeader Icon="@Icons.Material.Filled.LocalHospital" Title="@(Fee is null ? T.ReferralFee.NewReferralFee : T.ReferralFee.EditReferralFee)" />
         <EditForm EditContext="_editContext" OnValidSubmit="SubmitAsync">
             <LocalizedDataAnnotationsValidator />
-            <MudGrid Spacing="2">
+            <div role="alert"><ValidationSummary /></div>
+            <MudGrid Spacing="3">
+                <MudItem xs="12" Class="app-form-section-item">
+                    <FormSectionHeading Title="@T["forms.referral"]" Icon="@Icons.Material.Outlined.Person" First="true" />
+                </MudItem>
                 @if (IsEdit)
                 {
                     <MudItem xs="12" sm="6">
-                        <MudTextField @bind-Value="_doctorName"
-                                      Label="@T.ReferralFee.ReferralDoctor"
-                                      Variant="Variant.Outlined"
-                                      Margin="Margin.Dense"
-                                      ReadOnly="true" />
+                        <FormField Label="@T.ReferralFee.ReferralDoctor" Context="fieldId">
+                            <MudTextField @bind-Value="_doctorName"
+                                          InputId="@fieldId" aria-label="@T.ReferralFee.ReferralDoctor"
+                                          Variant="Variant.Outlined"
+                                          Margin="Margin.Dense"
+                                          ReadOnly="true" />
+                        </FormField>
                     </MudItem>
                     <MudItem xs="12" sm="6">
-                        <MudTextField @bind-Value="_examTypeName"
-                                      Label="@T.ReferralFee.ExaminationType"
-                                      Variant="Variant.Outlined"
-                                      Margin="Margin.Dense"
-                                      ReadOnly="true" />
+                        <FormField Label="@T.ReferralFee.ExaminationType" Context="fieldId">
+                            <MudTextField @bind-Value="_examTypeName"
+                                          InputId="@fieldId" aria-label="@T.ReferralFee.ExaminationType"
+                                          Variant="Variant.Outlined"
+                                          Margin="Margin.Dense"
+                                          ReadOnly="true" />
+                        </FormField>
                     </MudItem>
                 }
                 else
                 {
                     <MudItem xs="12" sm="6">
-                        <MudAutocomplete T="ReferralDoctorDto"
-                                         @bind-Value="_selectedDoctor"
-                                         Label="@T.ReferralFee.DoctorSearch"
-                                         Variant="Variant.Outlined"
-                                         Margin="Margin.Dense"
-                                         MinCharacters="1"
-                                         DebounceInterval="300"
-                                         SearchFunc="SearchDoctorsAsync"
-                                         ToStringFunc="@(d => d is null ? string.Empty : d.FullName)"
-                                         Clearable="true"
-                                         Disabled="Busy" />
+                        <FormField Label="@T.ReferralFee.DoctorSearch" Context="fieldId" Required="true">
+                            <MudAutocomplete T="ReferralDoctorDto"
+                                             @bind-Value="_selectedDoctor"
+                                             InputId="@fieldId" aria-required="true" aria-label="@T.ReferralFee.DoctorSearch"
+                                             Variant="Variant.Outlined"
+                                             Margin="Margin.Dense"
+                                             MinCharacters="1"
+                                             DebounceInterval="300"
+                                             SearchFunc="SearchDoctorsAsync"
+                                             ToStringFunc="@(d => d is null ? string.Empty : d.FullName)"
+                                             Clearable="true"
+                                             Disabled="Busy" />
+                        </FormField>
                     </MudItem>
                     <MudItem xs="12" sm="6">
-                        <MudAutocomplete T="ExaminationTypeDto"
-                                         @bind-Value="_selectedType"
-                                         Label="@T.ReferralFee.ExamTypeSearch"
-                                         Variant="Variant.Outlined"
-                                         Margin="Margin.Dense"
-                                         MinCharacters="1"
-                                         DebounceInterval="300"
-                                         SearchFunc="SearchTypesAsync"
-                                         ToStringFunc="@(t => t is null ? string.Empty : $"{t.Code} - {t.Name}")"
-                                         Clearable="true"
-                                         Disabled="Busy" />
+                        <FormField Label="@T.ReferralFee.ExamTypeSearch" Context="fieldId" Required="true">
+                            <MudAutocomplete T="ExaminationTypeDto"
+                                             @bind-Value="_selectedType"
+                                             InputId="@fieldId" aria-required="true" aria-label="@T.ReferralFee.ExamTypeSearch"
+                                             Variant="Variant.Outlined"
+                                             Margin="Margin.Dense"
+                                             MinCharacters="1"
+                                             DebounceInterval="300"
+                                             SearchFunc="SearchTypesAsync"
+                                             ToStringFunc="@(t => t is null ? string.Empty : $"{t.Code} - {t.Name}")"
+                                             Clearable="true"
+                                             Disabled="Busy" />
+                        </FormField>
                     </MudItem>
                 }
+                <MudItem xs="12" Class="app-form-section-item">
+                    <FormSectionHeading Title="@T["forms.calculation"]" Icon="@Icons.Material.Outlined.Calculate" />
+                </MudItem>
                 <MudItem xs="12" sm="6">
-                    <MudNumericField Disabled="Busy" T="decimal"
-                                     @bind-Value="_model.Amount"
-                                     Label="@(_model.IsPercentage ? T.ReferralFee.PercentagePercent : T.ReferralFee.FlatAmount)"
-                                     Variant="Variant.Outlined"
-                                     Margin="Margin.Dense"
-                                     Min="0"
-                                     For="@(() => _model.Amount)" />
+                    <FormField Label="@(_model.IsPercentage ? T.ReferralFee.PercentagePercent : T.ReferralFee.FlatAmount)" Context="fieldId">
+                        <LocalizedNumericField Disabled="Busy" T="decimal"
+                                         @bind-Value="_model.Amount"
+                                         InputId="@fieldId" aria-label="@(_model.IsPercentage ? T.ReferralFee.PercentagePercent : T.ReferralFee.FlatAmount)"
+                                         Variant="Variant.Outlined"
+                                         Margin="Margin.Dense"
+                                         Min="0"
+                                         For="@(() => _model.Amount)" />
+                    </FormField>
                 </MudItem>
                 <MudItem xs="12" sm="6" Class="d-flex align-items-center">
                     <MudSwitch Disabled="Busy" T="bool" @bind-Value="_model.IsPercentage" Color="Color.Primary">@T.ReferralFee.AmountIsPercentage</MudSwitch>
@@ -78,4 +94,4 @@
                        OnCancel="CancelAsync"
                        OnSave="SubmitAsync" />
     </DialogActions>
-</MudDialog>
+</FormDialog>

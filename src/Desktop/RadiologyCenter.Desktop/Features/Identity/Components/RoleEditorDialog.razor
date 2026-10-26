@@ -1,25 +1,29 @@
 @inherits EditorDialogBase
 @inject IdentityService IdentityService
 
-<MudDialog>
+<FormDialog Title="@(Role is null ? T.RoleDialog.NewRole : T.RoleDialog.EditTitle)" Icon="@Icons.Material.Filled.Security" Subtitle="@T["forms.identitySubtitle"]">
     <DialogContent>
-        <DialogHeader Icon="@Icons.Material.Filled.Security" Title="@(Role is null ? T.RoleDialog.NewRole : T.RoleDialog.EditTitle)" />
         <EditForm EditContext="_editContext" OnValidSubmit="SubmitAsync">
             <LocalizedDataAnnotationsValidator />
-            <MudTextField Disabled="Busy" @bind-Value="_model.Name"
-                          Label="@T.RoleDialog.RoleName"
-                          Variant="Variant.Outlined"
-                          Margin="Margin.Dense"
-                          Immediate="true"
-                          Class="mb-3"
-                          For="@(() => _model.Name)" />
-            <MudTextField Disabled="Busy" @bind-Value="_model.Description"
-                          Label="@T.Roles.Description"
-                          Variant="Variant.Outlined"
-                          Margin="Margin.Dense"
-                          Lines="3"
-                          Immediate="true"
-                          For="@(() => _model.Description)" />
+            <div role="alert"><ValidationSummary /></div>
+            <FormField Label="@T.RoleDialog.RoleName" Context="fieldId" Required="true">
+                <LocalizedTextField Disabled="Busy" @bind-Value="_model.Name"
+                              InputId="@fieldId" aria-required="true" aria-label="@T.RoleDialog.RoleName"
+                              Variant="Variant.Outlined"
+                              Margin="Margin.Dense"
+                              Immediate="true"
+                              Class="mb-3"
+                              For="@(() => _model.Name)" />
+            </FormField>
+            <FormField Label="@T.Roles.Description" Context="fieldId">
+                <LocalizedTextField Disabled="Busy" @bind-Value="_model.Description"
+                              InputId="@fieldId" aria-label="@T.Roles.Description"
+                              Variant="Variant.Outlined"
+                              Margin="Margin.Dense"
+                              Lines="3"
+                              Immediate="true"
+                              For="@(() => _model.Description)" />
+            </FormField>
             <button type="submit" style="display:none"></button>
         </EditForm>
     </DialogContent>
@@ -30,6 +34,6 @@
                        OnCancel="CancelAsync"
                        OnSave="SubmitAsync" />
     </DialogActions>
-</MudDialog>
+</FormDialog>
 
 

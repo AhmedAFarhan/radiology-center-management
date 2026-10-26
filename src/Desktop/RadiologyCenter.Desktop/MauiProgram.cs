@@ -27,6 +27,9 @@ public static class MauiProgram
         builder.Services.AddScoped<IAuthorizationHandler, PermissionAuthorizationHandler>();
         builder.Services.AddSingleton<IAuthorizationPolicyProvider, PermissionPolicyProvider>();
         builder.Services.AddSingleton<UpdateService>();
+#if WINDOWS
+        builder.Services.AddSingleton<WinUI.WindowsTrayService>();
+#endif
         builder.Services.AddMudServices(config =>
         {
             config.SnackbarConfiguration.PositionClass = Defaults.Classes.Position.TopEnd;

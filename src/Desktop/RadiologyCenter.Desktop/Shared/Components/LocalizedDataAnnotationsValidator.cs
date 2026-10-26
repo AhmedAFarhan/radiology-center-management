@@ -91,6 +91,10 @@ public sealed class LocalizedDataAnnotationsValidator : ComponentBase, IDisposab
         {
             CurrentEditContext.OnValidationRequested -= ValidateModel;
             CurrentEditContext.OnFieldChanged -= ValidateField;
+            // A dialog can keep its EditContext while temporarily showing quick registration.
+            // Remove this validator's messages so they do not outlive the form that owns them.
+            _messages?.Clear();
+            CurrentEditContext.NotifyValidationStateChanged();
         }
     }
 }

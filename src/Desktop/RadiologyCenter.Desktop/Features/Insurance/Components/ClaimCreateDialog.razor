@@ -3,68 +3,84 @@
 @inject ExaminationService ExaminationService
 @inject PatientService PatientService
 
-<MudDialog>
+<FormDialog Title="@T.ClaimDialog.Title" Icon="@Icons.Material.Filled.RequestQuote" Subtitle="@T["forms.insuranceSubtitle"]">
     <DialogContent>
-        <DialogHeader Icon="@Icons.Material.Filled.RequestQuote" Title="@T.ClaimDialog.Title" />
         <EditForm EditContext="_editContext" OnValidSubmit="SubmitAsync">
             <LocalizedDataAnnotationsValidator />
-            <MudGrid Spacing="2">
-                <MudItem xs="12" sm="6">
-                    <MudAutocomplete Disabled="Busy" T="PatientDto"
-                                     @bind-Value="_selectedPatient"
-                                     Label="@T.ClaimDialog.PatientSearchLabel"
-                                     Variant="Variant.Outlined"
-                                     Margin="Margin.Dense"
-                                     MinCharacters="1"
-                                     DebounceInterval="300"
-                                     SearchFunc="SearchPatientsAsync"
-                                     ToStringFunc="@(p => p is null ? string.Empty : p.FullName)"
-                                     Clearable="true" />
+            <div role="alert"><ValidationSummary /></div>
+            <MudGrid Spacing="3">
+                <MudItem xs="12" Class="app-form-section-item">
+                    <FormSectionHeading Title="@T["forms.insuranceReferences"]" Icon="@Icons.Material.Outlined.Description" First="true" />
                 </MudItem>
                 <MudItem xs="12" sm="6">
-                    <MudAutocomplete Disabled="Busy" T="InsurancePolicyDto"
-                                     @bind-Value="_selectedPolicy"
-                                     Label="@T.ClaimDialog.PolicySearchLabel"
-                                     Variant="Variant.Outlined"
-                                     Margin="Margin.Dense"
-                                     MinCharacters="1"
-                                     DebounceInterval="300"
-                                     SearchFunc="SearchPoliciesAsync"
-                                     ToStringFunc="@(p => p is null ? string.Empty : p.PolicyNumber)"
-                                     Clearable="true" />
+                    <FormField Label="@T.ClaimDialog.PatientSearchLabel" Context="fieldId">
+                        <MudAutocomplete Disabled="Busy" T="PatientDto"
+                                         @bind-Value="_selectedPatient"
+                                         InputId="@fieldId" aria-label="@T.ClaimDialog.PatientSearchLabel"
+                                         Variant="Variant.Outlined"
+                                         Margin="Margin.Dense"
+                                         MinCharacters="1"
+                                         DebounceInterval="300"
+                                         SearchFunc="SearchPatientsAsync"
+                                         ToStringFunc="@(p => p is null ? string.Empty : p.FullName)"
+                                         Clearable="true" />
+                    </FormField>
                 </MudItem>
                 <MudItem xs="12" sm="6">
-                    <MudAutocomplete Disabled="Busy" T="ExaminationListItemDto"
-                                     @bind-Value="_selectedExamination"
-                                     Label="@T.ClaimDialog.ExaminationSearchLabel"
-                                     Variant="Variant.Outlined"
-                                     Margin="Margin.Dense"
-                                     MinCharacters="1"
-                                     DebounceInterval="300"
-                                     SearchFunc="SearchExaminationsAsync"
-                                     ToStringFunc="@(e => e is null ? string.Empty : e.ExaminationTypeName)"
-                                     Clearable="true" />
+                    <FormField Label="@T.ClaimDialog.PolicySearchLabel" Context="fieldId">
+                        <MudAutocomplete Disabled="Busy" T="InsurancePolicyDto"
+                                         @bind-Value="_selectedPolicy"
+                                         InputId="@fieldId" aria-label="@T.ClaimDialog.PolicySearchLabel"
+                                         Variant="Variant.Outlined"
+                                         Margin="Margin.Dense"
+                                         MinCharacters="1"
+                                         DebounceInterval="300"
+                                         SearchFunc="SearchPoliciesAsync"
+                                         ToStringFunc="@(p => p is null ? string.Empty : p.PolicyNumber)"
+                                         Clearable="true" />
+                    </FormField>
                 </MudItem>
                 <MudItem xs="12" sm="6">
-                    <MudAutocomplete Disabled="Busy" T="PreAuthorizationDto"
-                                     @bind-Value="_selectedPreAuthorization"
-                                     Label="@T.ClaimDialog.PreAuthorizationLabel"
-                                     Variant="Variant.Outlined"
-                                     Margin="Margin.Dense"
-                                     MinCharacters="1"
-                                     DebounceInterval="300"
-                                     SearchFunc="SearchPreAuthorizationsAsync"
-                                     ToStringFunc="@(p => p is null ? string.Empty : $"{p.Status} · {p.EstimatedAmount:C}")"
-                                     Clearable="true" />
+                    <FormField Label="@T.ClaimDialog.ExaminationSearchLabel" Context="fieldId">
+                        <MudAutocomplete Disabled="Busy" T="ExaminationListItemDto"
+                                         @bind-Value="_selectedExamination"
+                                         InputId="@fieldId" aria-label="@T.ClaimDialog.ExaminationSearchLabel"
+                                         Variant="Variant.Outlined"
+                                         Margin="Margin.Dense"
+                                         MinCharacters="1"
+                                         DebounceInterval="300"
+                                         SearchFunc="SearchExaminationsAsync"
+                                         ToStringFunc="@(e => e is null ? string.Empty : e.ExaminationTypeName)"
+                                         Clearable="true" />
+                    </FormField>
                 </MudItem>
                 <MudItem xs="12" sm="6">
-                    <MudNumericField Disabled="Busy" T="decimal"
-                                     @bind-Value="_model.BilledAmount"
-                                     Label="@T.ClaimDialog.BilledAmount"
-                                     Variant="Variant.Outlined"
-                                     Margin="Margin.Dense"
-                                     Min="0"
-                                     For="@(() => _model.BilledAmount)" />
+                    <FormField Label="@T.ClaimDialog.PreAuthorizationLabel" Context="fieldId">
+                        <MudAutocomplete Disabled="Busy" T="PreAuthorizationDto"
+                                         @bind-Value="_selectedPreAuthorization"
+                                         InputId="@fieldId" aria-label="@T.ClaimDialog.PreAuthorizationLabel"
+                                         Variant="Variant.Outlined"
+                                         Margin="Margin.Dense"
+                                         MinCharacters="1"
+                                         DebounceInterval="300"
+                                         SearchFunc="SearchPreAuthorizationsAsync"
+                                         ToStringFunc="@(p => p is null ? string.Empty : $"{p.Status} · {p.EstimatedAmount:C}")"
+                                         Clearable="true" />
+                    </FormField>
+                </MudItem>
+                <MudItem xs="12" Class="app-form-section-item">
+                    <FormSectionHeading Title="@T["forms.billing"]" Icon="@Icons.Material.Outlined.ReceiptLong" />
+                </MudItem>
+                <MudItem xs="12" sm="6">
+                    <FormField Label="@T.ClaimDialog.BilledAmount" Context="fieldId">
+                        <LocalizedNumericField Disabled="Busy" T="decimal"
+                                         @bind-Value="_model.BilledAmount"
+                                         InputId="@fieldId" aria-label="@T.ClaimDialog.BilledAmount"
+                                         Variant="Variant.Outlined"
+                                         Margin="Margin.Dense"
+                                         Min="0"
+                                         For="@(() => _model.BilledAmount)" />
+                    </FormField>
                 </MudItem>
             </MudGrid>
             <button type="submit" style="display:none"></button>
@@ -77,5 +93,5 @@
                        OnCancel="CancelAsync"
                        OnSave="SubmitAsync" />
     </DialogActions>
-</MudDialog>
+</FormDialog>
 

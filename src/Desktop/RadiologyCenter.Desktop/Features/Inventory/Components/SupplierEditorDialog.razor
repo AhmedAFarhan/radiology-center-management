@@ -1,67 +1,87 @@
 @inherits EditorDialogBase
 @inject InventoryService InventoryService
 
-<MudDialog>
+<FormDialog Title="@(Supplier is null ? T.SupplierDialog.NewSupplier : T.SupplierDialog.EditSupplier)" Icon="@Icons.Material.Filled.LocalShipping" Subtitle="@T["forms.inventorySubtitle"]">
     <DialogContent>
-        <DialogHeader Icon="@Icons.Material.Filled.LocalShipping" Title="@(Supplier is null ? T.SupplierDialog.NewSupplier : T.SupplierDialog.EditSupplier)" />
         <EditForm EditContext="_editContext" OnValidSubmit="SubmitAsync">
             <LocalizedDataAnnotationsValidator />
-            <MudGrid Spacing="2">
+            <div role="alert"><ValidationSummary /></div>
+            <MudGrid Spacing="3">
+                <MudItem xs="12" Class="app-form-section-item">
+                    <FormSectionHeading Title="@T["forms.contact"]" Icon="@Icons.Material.Outlined.ContactPhone" First="true" />
+                </MudItem>
                 <MudItem xs="12" sm="8">
-                    <MudTextField Disabled="Busy" @bind-Value="_model.Name"
-                                  Label="@T.Common.Name"
-                                  Variant="Variant.Outlined"
-                                  Margin="Margin.Dense"
-                                  Immediate="true"
-                                  For="@(() => _model.Name)" />
+                    <FormField Label="@T.Common.Name" Context="fieldId" Required="true">
+                        <LocalizedTextField Disabled="Busy" @bind-Value="_model.Name"
+                                      InputId="@fieldId" aria-required="true" aria-label="@T.Common.Name"
+                                      Variant="Variant.Outlined"
+                                      Margin="Margin.Dense"
+                                      Immediate="true"
+                                      For="@(() => _model.Name)" />
+                    </FormField>
                 </MudItem>
                 <MudItem xs="12" sm="4">
-                    <MudTextField InputType="InputType.Telephone" Disabled="Busy" @bind-Value="_model.Phone"
-                                  Label="@T.SupplierDialog.Phone"
-                                  Variant="Variant.Outlined"
-                                  Margin="Margin.Dense"
-                                  Immediate="true"
-                                  For="@(() => _model.Phone)" />
+                    <FormField Label="@T.SupplierDialog.Phone" Context="fieldId" Required="true">
+                        <LocalizedTextField InputType="InputType.Telephone" Disabled="Busy" @bind-Value="_model.Phone"
+                                      InputId="@fieldId" aria-required="true" aria-label="@T.SupplierDialog.Phone"
+                                      Variant="Variant.Outlined"
+                                      Margin="Margin.Dense"
+                                      Immediate="true"
+                                      For="@(() => _model.Phone)" />
+                    </FormField>
                 </MudItem>
                 <MudItem xs="12" sm="6">
-                    <MudTextField Disabled="Busy" @bind-Value="_model.ContactPerson"
-                                  Label="@T.SupplierDialog.ContactPerson"
-                                  Variant="Variant.Outlined"
-                                  Margin="Margin.Dense"
-                                  Immediate="true"
-                                  For="@(() => _model.ContactPerson)" />
+                    <FormField Label="@T.SupplierDialog.ContactPerson" Context="fieldId">
+                        <LocalizedTextField Disabled="Busy" @bind-Value="_model.ContactPerson"
+                                      InputId="@fieldId" aria-label="@T.SupplierDialog.ContactPerson"
+                                      Variant="Variant.Outlined"
+                                      Margin="Margin.Dense"
+                                      Immediate="true"
+                                      For="@(() => _model.ContactPerson)" />
+                    </FormField>
                 </MudItem>
                 <MudItem xs="12" sm="6">
-                    <MudTextField InputType="InputType.Email" Disabled="Busy" @bind-Value="_model.Email"
-                                  Label="@T.SupplierDialog.Email"
-                                  Variant="Variant.Outlined"
-                                  Margin="Margin.Dense"
-                                  Immediate="true"
-                                  For="@(() => _model.Email)" />
+                    <FormField Label="@T.SupplierDialog.Email" Context="fieldId">
+                        <LocalizedTextField InputType="InputType.Email" Disabled="Busy" @bind-Value="_model.Email"
+                                      InputId="@fieldId" aria-label="@T.SupplierDialog.Email"
+                                      Variant="Variant.Outlined"
+                                      Margin="Margin.Dense"
+                                      Immediate="true"
+                                      For="@(() => _model.Email)" />
+                    </FormField>
                 </MudItem>
                 <MudItem xs="12">
-                    <MudTextField Disabled="Busy" @bind-Value="_model.Address"
-                                  Label="@T.SupplierDialog.Address"
-                                  Variant="Variant.Outlined"
-                                  Margin="Margin.Dense"
-                                  Immediate="true"
-                                  For="@(() => _model.Address)" />
+                    <FormField Label="@T.SupplierDialog.Address" Context="fieldId">
+                        <LocalizedTextField Disabled="Busy" @bind-Value="_model.Address"
+                                      InputId="@fieldId" aria-label="@T.SupplierDialog.Address"
+                                      Variant="Variant.Outlined"
+                                      Margin="Margin.Dense"
+                                      Immediate="true"
+                                      For="@(() => _model.Address)" />
+                    </FormField>
+                </MudItem>
+                <MudItem xs="12" Class="app-form-section-item">
+                    <FormSectionHeading Title="@T["forms.billing"]" Icon="@Icons.Material.Outlined.ReceiptLong" />
                 </MudItem>
                 <MudItem xs="12" sm="6">
-                    <MudTextField Disabled="Busy" @bind-Value="_model.TaxNumber"
-                                  Label="@T.SupplierDialog.TaxNumber"
-                                  Variant="Variant.Outlined"
-                                  Margin="Margin.Dense"
-                                  Immediate="true"
-                                  For="@(() => _model.TaxNumber)" />
+                    <FormField Label="@T.SupplierDialog.TaxNumber" Context="fieldId">
+                        <LocalizedTextField Disabled="Busy" @bind-Value="_model.TaxNumber"
+                                      InputId="@fieldId" aria-label="@T.SupplierDialog.TaxNumber"
+                                      Variant="Variant.Outlined"
+                                      Margin="Margin.Dense"
+                                      Immediate="true"
+                                      For="@(() => _model.TaxNumber)" />
+                    </FormField>
                 </MudItem>
                 <MudItem xs="12" sm="6">
-                    <MudTextField Disabled="Busy" @bind-Value="_model.PaymentTerms"
-                                  Label="@T.SupplierDialog.PaymentTerms"
-                                  Variant="Variant.Outlined"
-                                  Margin="Margin.Dense"
-                                  Immediate="true"
-                                  For="@(() => _model.PaymentTerms)" />
+                    <FormField Label="@T.SupplierDialog.PaymentTerms" Context="fieldId">
+                        <LocalizedTextField Disabled="Busy" @bind-Value="_model.PaymentTerms"
+                                      InputId="@fieldId" aria-label="@T.SupplierDialog.PaymentTerms"
+                                      Variant="Variant.Outlined"
+                                      Margin="Margin.Dense"
+                                      Immediate="true"
+                                      For="@(() => _model.PaymentTerms)" />
+                    </FormField>
                 </MudItem>
             </MudGrid>
             <button type="submit" style="display:none"></button>
@@ -74,6 +94,6 @@
                        OnCancel="CancelAsync"
                        OnSave="SubmitAsync" />
     </DialogActions>
-</MudDialog>
+</FormDialog>
 
 

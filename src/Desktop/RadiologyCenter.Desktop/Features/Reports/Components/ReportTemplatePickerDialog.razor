@@ -2,9 +2,8 @@
 @inject ISnackbar Snackbar
 @inject AppLocalizer T
 
-<MudDialog>
+<FormDialog Title="@T.ReportTemplate.ApplyTitle" Icon="@Icons.Material.Filled.Newspaper" Subtitle="@T["forms.reportSubtitle"]">
     <DialogContent>
-        <DialogHeader Icon="@Icons.Material.Filled.Newspaper" Title="@T.ReportTemplate.ApplyTitle" />
         <MudText Typo="Typo.body2" Class="text-secondary mb-2">
             @T.ReportTemplate.Description
         </MudText>
@@ -68,5 +67,5 @@
     <DialogActions>
         <MudButton Color="Color.Default" OnClick="CancelAsync" Disabled="_busy">@T.Common.Close</MudButton>
     </DialogActions>
-</MudDialog>
+</FormDialog>
 

@@ -1,5 +1,7 @@
-<MudDialog><DialogContent><ClinicSetupPanel Completed="Close" BusyChanged="OnBusyChanged" /></DialogContent>
-<DialogActions><MudButton OnClick="Close" Disabled="_busy">@T.Common.Close</MudButton></DialogActions></MudDialog>
+<FormDialog Title="@T["forms.setupTitle"]" Subtitle="@T["forms.setupSubtitle"]" Icon="@Icons.Material.Outlined.Settings">
+    <DialogContent><ClinicSetupPanel ShowHeading="false" Completed="Close" BusyChanged="OnBusyChanged" /></DialogContent>
+    <DialogActions><MudButton OnClick="Close" Disabled="_busy">@T.Common.Close</MudButton></DialogActions>
+</FormDialog>
 @inject AppLocalizer T
 @code {
     [CascadingParameter] public IMudDialogInstance MudDialog { get; set; } = default!;

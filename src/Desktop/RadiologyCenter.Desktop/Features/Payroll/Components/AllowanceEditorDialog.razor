@@ -4,102 +4,129 @@
 @inject ResourceService ResourceService
 @inject EnumOptionsService EnumOptionsService
 
-<MudDialog>
+<FormDialog Title="@(Allowance is null ? T.Allowance.NewAllowance : T.FormatValue(T.Allowance.EditTitle, Allowance.Name))" Icon="@Icons.Material.Filled.AttachMoney" Subtitle="@T["forms.payrollSubtitle"]">
     <DialogContent>
-        <DialogHeader Icon="@Icons.Material.Filled.AttachMoney" Title="@(Allowance is null ? T.Allowance.NewAllowance : T.FormatValue(T.Allowance.EditTitle, Allowance.Name))" />
         <EditForm EditContext="_editContext" OnValidSubmit="SubmitAsync">
             <LocalizedDataAnnotationsValidator />
-            <MudGrid Spacing="2">
+            <div role="alert"><ValidationSummary /></div>
+            <MudGrid Spacing="3">
+                <MudItem xs="12" Class="app-form-section-item">
+                    <FormSectionHeading Title="@T["forms.employee"]" Icon="@Icons.Material.Outlined.Badge" First="true" />
+                </MudItem>
                 @if (IsEdit)
                 {
                     <MudItem xs="12" sm="6">
-                        <MudTextField @bind-Value="_employeeName"
-                                      Label="@T.Allowance.Employee"
-                                      Variant="Variant.Outlined"
-                                      Margin="Margin.Dense"
-                                      ReadOnly="true" />
+                        <FormField Label="@T.Allowance.Employee" Context="fieldId">
+                            <MudTextField @bind-Value="_employeeName"
+                                          InputId="@fieldId" aria-label="@T.Allowance.Employee"
+                                          Variant="Variant.Outlined"
+                                          Margin="Margin.Dense"
+                                          ReadOnly="true" />
+                        </FormField>
                     </MudItem>
                     <MudItem xs="12" sm="6">
-                        <MudTextField @bind-Value="_componentName"
-                                      Label="@T.AllowanceDialog.SalaryComponent"
-                                      Variant="Variant.Outlined"
-                                      Margin="Margin.Dense"
-                                      ReadOnly="true" />
+                        <FormField Label="@T.AllowanceDialog.SalaryComponent" Context="fieldId">
+                            <MudTextField @bind-Value="_componentName"
+                                          InputId="@fieldId" aria-label="@T.AllowanceDialog.SalaryComponent"
+                                          Variant="Variant.Outlined"
+                                          Margin="Margin.Dense"
+                                          ReadOnly="true" />
+                        </FormField>
                     </MudItem>
                 }
                 else
                 {
                     <MudItem xs="12" sm="6">
-                        <MudAutocomplete T="StaffDto"
-                                         @bind-Value="_selectedStaff"
-                                         Label="@T.AllowanceDialog.EmployeeSearch"
-                                         Variant="Variant.Outlined"
-                                         Margin="Margin.Dense"
-                                         MinCharacters="1"
-                                         DebounceInterval="300"
-                                         SearchFunc="SearchStaffAsync"
-                                         ToStringFunc="@(s => s is null ? string.Empty : s.FullName)"
-                                         Clearable="true"
-                                         Disabled="Busy" />
+                        <FormField Label="@T.AllowanceDialog.EmployeeSearch" Context="fieldId" Required="true">
+                            <MudAutocomplete T="StaffDto"
+                                             @bind-Value="_selectedStaff"
+                                             InputId="@fieldId" aria-required="true" aria-label="@T.AllowanceDialog.EmployeeSearch"
+                                             Variant="Variant.Outlined"
+                                             Margin="Margin.Dense"
+                                             MinCharacters="1"
+                                             DebounceInterval="300"
+                                             SearchFunc="SearchStaffAsync"
+                                             ToStringFunc="@(s => s is null ? string.Empty : s.FullName)"
+                                             Clearable="true"
+                                             Disabled="Busy" />
+                        </FormField>
                     </MudItem>
                     <MudItem xs="12" sm="6">
-                        <MudAutocomplete T="SalaryComponentDto"
-                                         @bind-Value="_selectedComponent"
-                                         Label="@T.AllowanceDialog.SalaryComponentOptional"
-                                         Variant="Variant.Outlined"
-                                         Margin="Margin.Dense"
-                                         MinCharacters="1"
-                                         DebounceInterval="300"
-                                         SearchFunc="SearchComponentsAsync"
-                                         ToStringFunc="@(c => c is null ? string.Empty : c.Name)"
-                                         Clearable="true"
-                                         Disabled="Busy" />
+                        <FormField Label="@T.AllowanceDialog.SalaryComponentOptional" Context="fieldId">
+                            <MudAutocomplete T="SalaryComponentDto"
+                                             @bind-Value="_selectedComponent"
+                                             InputId="@fieldId" aria-label="@T.AllowanceDialog.SalaryComponentOptional"
+                                             Variant="Variant.Outlined"
+                                             Margin="Margin.Dense"
+                                             MinCharacters="1"
+                                             DebounceInterval="300"
+                                             SearchFunc="SearchComponentsAsync"
+                                             ToStringFunc="@(c => c is null ? string.Empty : c.Name)"
+                                             Clearable="true"
+                                             Disabled="Busy" />
+                        </FormField>
                     </MudItem>
                 }
-                <MudItem xs="12" sm="6">
-                    <MudTextField Disabled="Busy" @bind-Value="_model.Name"
-                                  Label="@T.AllowanceDialog.AllowanceName"
-                                  Variant="Variant.Outlined"
-                                  Margin="Margin.Dense"
-                                  Immediate="true"
-                                  For="@(() => _model.Name)" />
+                <MudItem xs="12" Class="app-form-section-item">
+                    <FormSectionHeading Title="@T["forms.allowance"]" Icon="@Icons.Material.Outlined.Payments" />
                 </MudItem>
                 <MudItem xs="12" sm="6">
-                    <MudNumericField Disabled="Busy" T="decimal"
-                                     @bind-Value="_model.Amount"
-                                     Label="@T.AllowanceDialog.Amount"
-                                     Variant="Variant.Outlined"
-                                     Margin="Margin.Dense"
-                                     Min="0"
-                                     For="@(() => _model.Amount)" />
+                    <FormField Label="@T.AllowanceDialog.AllowanceName" Context="fieldId" Required="true">
+                        <LocalizedTextField Disabled="Busy" @bind-Value="_model.Name"
+                                      InputId="@fieldId" aria-required="true" aria-label="@T.AllowanceDialog.AllowanceName"
+                                      Variant="Variant.Outlined"
+                                      Margin="Margin.Dense"
+                                      Immediate="true"
+                                      For="@(() => _model.Name)" />
+                    </FormField>
+                </MudItem>
+                <MudItem xs="12" sm="6">
+                    <FormField Label="@T.AllowanceDialog.Amount" Context="fieldId">
+                        <LocalizedNumericField Disabled="Busy" T="decimal"
+                                         @bind-Value="_model.Amount"
+                                         InputId="@fieldId" aria-label="@T.AllowanceDialog.Amount"
+                                         Variant="Variant.Outlined"
+                                         Margin="Margin.Dense"
+                                         Min="0"
+                                         For="@(() => _model.Amount)" />
+                    </FormField>
                 </MudItem>
                 <MudItem xs="12" sm="4">
-                    <MudSelect Disabled="Busy" T="string"
-                               @bind-Value="_model.Frequency"
-                               Label="@T.AllowanceDialog.FrequencyOptional"
-                               Variant="Variant.Outlined"
-                               Margin="Margin.Dense">
-                        <MudSelectItem T="string" Value="@((string?)null)">@T.AllowanceDialog.NotSet</MudSelectItem>
-                        @foreach (var frequency in _frequencyOptions)
-                        {
-                            <MudSelectItem T="string" Value="@frequency.Key">@frequency.Value</MudSelectItem>
-                        }
-                    </MudSelect>
-                </MudItem>
-                <MudItem xs="12" sm="4">
-                    <MudDatePicker Disabled="Busy" @bind-Date="_model.EffectiveDate"
-                                   Label="@T.AllowanceDialog.EffectiveDate"
+                    <FormField Label="@T.AllowanceDialog.FrequencyOptional" Context="fieldId">
+                        <MudSelect Disabled="Busy" T="string"
+                                   @bind-Value="_model.Frequency"
+                                   InputId="@fieldId" aria-label="@T.AllowanceDialog.FrequencyOptional"
                                    Variant="Variant.Outlined"
-                                   Margin="Margin.Dense"
-                                   For="@(() => _model.EffectiveDate)"
-                                   Class="w-100" />
+                                   Margin="Margin.Dense">
+                            <MudSelectItem T="string" Value="@((string?)null)">@T.AllowanceDialog.NotSet</MudSelectItem>
+                            @foreach (var frequency in _frequencyOptions)
+                            {
+                                <MudSelectItem T="string" Value="@frequency.Key">@frequency.Value</MudSelectItem>
+                            }
+                        </MudSelect>
+                    </FormField>
+                </MudItem>
+                <MudItem xs="12" Class="app-form-section-item">
+                    <FormSectionHeading Title="@T["forms.period"]" Icon="@Icons.Material.Outlined.DateRange" />
                 </MudItem>
                 <MudItem xs="12" sm="4">
-                    <MudDatePicker Disabled="Busy" @bind-Date="_model.EndDate" MinDate="_model.EffectiveDate"
-                                   Label="@T.AllowanceDialog.EndDateOptional"
-                                   Variant="Variant.Outlined"
-                                   Margin="Margin.Dense"
-                                   Class="w-100" />
+                    <FormField Label="@T.AllowanceDialog.EffectiveDate" Context="fieldId" Required="true">
+                        <LocalizedDatePicker Disabled="Busy" @bind-Date="_model.EffectiveDate"
+                                       InputId="@fieldId" aria-required="true" aria-label="@T.AllowanceDialog.EffectiveDate"
+                                       Variant="Variant.Outlined"
+                                       Margin="Margin.Dense"
+                                       For="@(() => _model.EffectiveDate)"
+                                       Class="w-100" />
+                    </FormField>
+                </MudItem>
+                <MudItem xs="12" sm="4">
+                    <FormField Label="@T.AllowanceDialog.EndDateOptional" Context="fieldId">
+                        <MudDatePicker Disabled="Busy" @bind-Date="_model.EndDate" MinDate="_model.EffectiveDate"
+                                       InputId="@fieldId" aria-label="@T.AllowanceDialog.EndDateOptional"
+                                       Variant="Variant.Outlined"
+                                       Margin="Margin.Dense"
+                                       Class="w-100" />
+                    </FormField>
                 </MudItem>
                 <MudItem xs="12">
                     <MudSwitch Disabled="Busy" T="bool" @bind-Value="_model.IsPerWorkDay" Color="Color.Primary">@T.AllowanceDialog.PaidPerWorkDay</MudSwitch>
@@ -115,4 +142,4 @@
                        OnCancel="CancelAsync"
                        OnSave="SubmitAsync" />
     </DialogActions>
-</MudDialog>
+</FormDialog>

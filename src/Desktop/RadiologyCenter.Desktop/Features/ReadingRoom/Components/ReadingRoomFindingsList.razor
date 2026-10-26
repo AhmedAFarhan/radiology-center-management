@@ -1,30 +1,32 @@
 @inject AppLocalizer T
 
-<MudText Typo="Typo.subtitle1" Class="font-weight-medium mb-2">@T.ReadingRoom.Findings</MudText>
+<FormSectionHeading Title="@T.ReadingRoom.Findings" First="true" />
 @if (Findings.Any())
 {
     @foreach (var finding in Findings)
     {
         var currentFinding = finding;
-        <div class="d-flex align-center flex-wrap gap-2 mb-2 pa-2" style="border:1px solid var(--mud-palette-lines-default,#e0e0e0);border-radius:8px;">
+        <div class="rr-finding-editor d-flex align-center flex-wrap gap-2">
             <MudStack Spacing="0" Class="flex-grow-1">
                 <MudText Typo="Typo.subtitle2">@currentFinding.Region</MudText>
                 <MudText Typo="Typo.body2" Class="text-secondary">@currentFinding.Description</MudText>
             </MudStack>
             @if (CanEdit)
             {
-                <MudSelect T="string" Disabled="Busy"
-                           Value="@currentFinding.Severity" Label="@T.ReadingRoom.Severity"
-                           ValueChanged="@(s => OnSeverityChanged.InvokeAsync((currentFinding, s)))"
-                           Margin="Margin.Dense"
-                           Variant="Variant.Outlined"
-                           Class="flex-shrink-0"
-                           Style="min-width:120px;">
-                    @foreach (var level in SeverityOptions)
-                    {
-                        <MudSelectItem T="string" Value="@level.Key">@level.Value</MudSelectItem>
-                    }
-                </MudSelect>
+                <FormField Label="@T.ReadingRoom.Severity" Context="fieldId">
+                    <MudSelect T="string" Disabled="Busy"
+                               Value="@currentFinding.Severity" InputId="@fieldId" aria-label="@T.ReadingRoom.Severity"
+                               ValueChanged="@(s => OnSeverityChanged.InvokeAsync((currentFinding, s)))"
+                               Margin="Margin.Dense"
+                               Variant="Variant.Outlined"
+                               Class="flex-shrink-0"
+                               Style="min-width:120px;">
+                        @foreach (var level in SeverityOptions)
+                        {
+                            <MudSelectItem T="string" Value="@level.Key">@level.Value</MudSelectItem>
+                        }
+                    </MudSelect>
+                </FormField>
                 <MudTooltip Placement="Placement.Bottom" Text="@T.ReadingRoom.RemoveFinding">
                     <MudIconButton Disabled="Busy" Icon="@Icons.Material.Filled.Delete"
                                    Size="Size.Small"
@@ -49,32 +51,38 @@ else
 @if (CanEdit)
 {
     <MudDivider Class="my-3" />
-    <MudText Typo="Typo.subtitle1" Class="font-weight-medium mb-2">@T.ReadingRoom.AddFinding</MudText>
-    <MudTextField T="string" Disabled="Busy"
-                  @bind-Value="_newRegion"
-                  Label="@T.ReadingRoom.RegionAnatomy"
-                  Variant="Variant.Outlined"
-                  Margin="Margin.Dense"
-                  Immediate="true" />
-    <MudTextField T="string" Disabled="Busy"
-                  @bind-Value="_newDescription"
-                  Label="@T.ReadingRoom.Description"
-                  Variant="Variant.Outlined"
-                  Margin="Margin.Dense"
-                  Lines="2"
-                  Immediate="true"
-                  Class="mt-2" />
-    <MudSelect T="string" Disabled="Busy"
-               @bind-Value="_newSeverity"
-               Label="@T.ReadingRoom.Severity"
-               Variant="Variant.Outlined"
-               Margin="Margin.Dense"
-               Class="mt-2">
-        @foreach (var level in SeverityOptions)
-        {
-            <MudSelectItem T="string" Value="@level.Key">@level.Value</MudSelectItem>
-        }
-    </MudSelect>
+    <FormSectionHeading Title="@T.ReadingRoom.AddFinding" First="true" />
+    <FormField Label="@T.ReadingRoom.RegionAnatomy" Context="fieldId">
+        <MudTextField T="string" Disabled="Busy"
+                      @bind-Value="_newRegion"
+                      InputId="@fieldId" aria-label="@T.ReadingRoom.RegionAnatomy"
+                      Variant="Variant.Outlined"
+                      Margin="Margin.Dense"
+                      Immediate="true" />
+    </FormField>
+    <FormField Label="@T.ReadingRoom.Description" Context="fieldId">
+        <MudTextField T="string" Disabled="Busy"
+                      @bind-Value="_newDescription"
+                      InputId="@fieldId" aria-label="@T.ReadingRoom.Description"
+                      Variant="Variant.Outlined"
+                      Margin="Margin.Dense"
+                      Lines="2"
+                      Immediate="true"
+                      Class="mt-2" />
+    </FormField>
+    <FormField Label="@T.ReadingRoom.Severity" Context="fieldId">
+        <MudSelect T="string" Disabled="Busy"
+                   @bind-Value="_newSeverity"
+                   InputId="@fieldId" aria-label="@T.ReadingRoom.Severity"
+                   Variant="Variant.Outlined"
+                   Margin="Margin.Dense"
+                   Class="mt-2">
+            @foreach (var level in SeverityOptions)
+            {
+                <MudSelectItem T="string" Value="@level.Key">@level.Value</MudSelectItem>
+            }
+        </MudSelect>
+    </FormField>
     <MudButton Variant="Variant.Filled"
                Color="Color.Primary"
                Size="Size.Small"

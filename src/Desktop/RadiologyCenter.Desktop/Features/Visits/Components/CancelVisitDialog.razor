@@ -2,15 +2,16 @@
 @inject ISnackbar Snackbar
 @inject AppLocalizer T
 
-<MudDialog>
+<FormDialog Title="@(T.FormatValue(T.Visits.CancelVisitTitle, Visit.ExaminationTypeName))" Icon="@Icons.Material.Filled.Cancel" Subtitle="@T["forms.visitSubtitle"]">
     <DialogContent>
-        <DialogHeader Icon="@Icons.Material.Filled.Cancel" Title="@(T.FormatValue(T.Visits.CancelVisitTitle, Visit.ExaminationTypeName))" />
-        <MudTextField Disabled="_busy" @bind-Value="_reason"
-                      Label="@T.Visits.CancellationReasonOptional"
-                      Variant="Variant.Outlined"
-                      Margin="Margin.Dense"
-                      Immediate="true"
-                      FullWidth="true" />
+        <FormField Label="@T.Visits.CancellationReasonOptional" Context="fieldId">
+            <MudTextField Disabled="_busy" @bind-Value="_reason"
+                          InputId="@fieldId" aria-label="@T.Visits.CancellationReasonOptional"
+                          Variant="Variant.Outlined"
+                          Margin="Margin.Dense"
+                          Immediate="true"
+                          FullWidth="true" />
+        </FormField>
     </DialogContent>
     <DialogActions>
         <MudButton Color="Color.Default" OnClick="CancelAsync" Disabled="_busy">@T.Common.Cancel</MudButton>
@@ -19,12 +20,9 @@
             {
                 <MudProgressCircular Size="Size.Small" Indeterminate="true" Class="mx-1" />
             }
-            else
-            {
-                <text>@T.Visits.CancelVisit</text>
-            }
+            <text>@T.Visits.CancelVisit</text>
         </MudButton>
     </DialogActions>
-</MudDialog>
+</FormDialog>
 
 

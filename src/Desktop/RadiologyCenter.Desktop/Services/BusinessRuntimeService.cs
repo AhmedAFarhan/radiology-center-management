@@ -13,7 +13,7 @@ using RadiologyCenter.Desktop.Models;
 
 namespace RadiologyCenter.Desktop.Services;
 
-/// <summary>One in-process business runtime per signed-in SQL identity. Passwords remain in memory.</summary>
+/// <summary>One in-process business runtime per signed-in SQL identity.</summary>
 public sealed class BusinessRuntimeService(ILoggerFactory loggerFactory) : IAsyncDisposable
 {
     private readonly SemaphoreSlim _lifecycle = new(1, 1);
@@ -55,7 +55,29 @@ public sealed class BusinessRuntimeService(ILoggerFactory loggerFactory) : IAsyn
         finally { _lifecycle.Release(); }
     }
 
-    public async Task<TokenResult> SignInAsync(string userName, string password, CancellationToken ct = default)
+    public Task<TokenResult> SignInAsync(string userName, string password, CancellationToken ct = default)
+        => SignInCoreAsync(userName, password, null, ct);
+
+    public async Task<TokenResult> RestoreSessionAsync(AuthTokens saved, string? databasePassword, CancellationToken ct = default)
+    {
+        if (saved.RefreshTokenExpiresAt <= DateTime.UtcNow || saved.MustChangePassword)
+            throw new ApiException(401, "Sign in to continue.");
+        if (IsDevelopment)
+        {
+            await EnsureDevelopmentAsync(ct);
+            // A process restart creates a new signing key. Exchange the saved refresh token
+            // for a token issued by this runtime before showing any authenticated content.
+            var result = await Runtime.Dispatcher.DispatchAsync(new("POST", "auth/refresh",
+                System.Text.Json.JsonSerializer.Serialize(new { token = saved.RefreshToken })), ct);
+            return ApiClient.Unwrap<TokenResult>(result);
+        }
+        if (string.IsNullOrEmpty(databasePassword) || saved.ExpiresAt <= DateTime.UtcNow)
+            throw new ApiException(401, "Sign in to continue.");
+        return await SignInCoreAsync(saved.Username, databasePassword,
+            saved.ExpiresAt < saved.RefreshTokenExpiresAt ? saved.ExpiresAt : saved.RefreshTokenExpiresAt, ct);
+    }
+
+    private async Task<TokenResult> SignInCoreAsync(string userName, string password, DateTime? sessionExpiresAt, CancellationToken ct)
     {
         await _lifecycle.WaitAsync(ct);
         try
@@ -72,8 +94,9 @@ public sealed class BusinessRuntimeService(ILoggerFactory loggerFactory) : IAsyn
                 using var scope = candidate.Services.CreateScope();
                 var principal = await scope.ServiceProvider.GetRequiredService<DatabasePrincipalReader>().ReadAsync(ct);
                 if (principal.Identity?.IsAuthenticated != true) throw new ApiException(401, "This SQL account is not an active clinic user.");
+                var tokens = CreateSession(principal, config, sessionExpiresAt);
                 _runtime = candidate; _userName = userName; _password = password;
-                return CreateSession(principal, config);
+                return tokens;
             }
             catch { await candidate.DisposeAsync(); throw; }
         }
@@ -127,9 +150,10 @@ public sealed class BusinessRuntimeService(ILoggerFactory loggerFactory) : IAsyn
         config["Pacs:UserName"] = userName; config["Pacs:Password"] = password;
         PacsAuthorization = "Basic " + Convert.ToBase64String(Encoding.UTF8.GetBytes(userName + ":" + password));
     }
-    private static TokenResult CreateSession(ClaimsPrincipal principal, IConfiguration config)
+    private static TokenResult CreateSession(ClaimsPrincipal principal, IConfiguration config, DateTime? sessionExpiresAt = null)
     {
-        var expires = DateTime.UtcNow.AddHours(12);
+        var expires = sessionExpiresAt ?? DateTime.UtcNow.AddHours(12);
+        if (expires <= DateTime.UtcNow) throw new ApiException(401, "Your clinic session expired. Sign in again.");
         var uiClaims=principal.Claims.Select(c=>new Claim(c.Type switch
         { ClaimTypes.NameIdentifier=>"sub",ClaimTypes.Name=>"unique_name",ClaimTypes.Role=>"role",ClaimTypes.Email=>"email",_=>c.Type },c.Value));
         var jwt = new JwtSecurityToken(config["Jwt:Issuer"], config["Jwt:Audience"], uiClaims,

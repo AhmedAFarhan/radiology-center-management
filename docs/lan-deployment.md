@@ -26,7 +26,7 @@ Keep an offline kit containing the EGcare Velopack installer, a WebView2 offline
 
 On the admin PC, start EGcare and choose **Admin PC setup / upgrade**. Enter the SQL network name and database. Use **Create a new, empty clinic database** only for a new clinic; it refuses an existing database. Supply a strong initial administrator password. Existing databases require a new backup filename and the current administrator credentials when establishing the first connection. Existing administrators are not silently reset or unlocked. If legacy insurance documents exist, select their original folder; maintenance copies their content into SQL and leaves the originals intact.
 
-Close EGcare on every workstation before an upgrade. Maintenance takes an exclusive database lease and refuses to proceed while a connected production client holds a shared lease. A lost SQL session requires the client to sign in again. A workstation with an incompatible schema/security contract is stopped with an upgrade message.
+Choose **Exit** from EGcare's system tray menu on every workstation before an upgrade. The window's close button keeps EGcare running in the tray and does not release its database connection. Maintenance takes an exclusive database lease and refuses to proceed while a connected production client holds a shared lease. A lost SQL session requires the client to sign in again. A workstation with an incompatible schema/security contract is stopped with an upgrade message.
 
 After setup, sign in with the clinic administrator username/password and change an initial password when prompted. Create the staff accounts and roles inside EGcare. Account creation/reset provisions the matching SQL contained user in the same transaction. Account/role mutations are administrators-only in this architecture; read-only user/role directories remain available to authorized staff. Imported legacy staff need an explicit administrator password reset before their first SQL sign-in, because existing password hashes cannot be converted back into plaintext SQL credentials.
 
@@ -36,9 +36,17 @@ Export the public connection file from clinic settings and import it on every wo
 ./scripts/New-ClinicConfiguration.ps1 -Server 'ADMIN-PC.clinic.test,1433' -Database EGcareClinic -PacsUrl 'https://ADMIN-PC.clinic.test:8042' -UpdatesDirectory '\\ADMIN-PC\EGcareUpdates' -OutputPath EGcare-clinic.json
 ```
 
-Each Windows user's local profile defaults to `%LOCALAPPDATA%\EGcare\clinic.json`. `EGCARE_CLIENT_CONFIG_PATH` can select another profile path. SQL/image passwords are entered by the person using the app and remain in memory; the public file does not carry a shared database administrator password.
+Each Windows user's local profile defaults to `%LOCALAPPDATA%\EGcare\clinic.json`. `EGCARE_CLIENT_CONFIG_PATH` can select another profile path. The public file never contains credentials. To restore sign-in after an app restart, EGcare saves the individual SQL credential, tokens, clinic identity and expiry together using Windows DPAPI protection for the current Windows user. There is no plaintext fallback. Image-server passwords remain in memory.
+
+Closing to the tray keeps the current sign-in. Fully exiting releases the database connection; reopening reconnects and revalidates the account before displaying authenticated pages. Restoring a direct SQL session preserves its original 12-hour expiry. Logout clears the saved session, and expired sessions, changed credentials or a different clinic connection require a fresh sign-in. A LAN failure during startup preserves the saved session and offers connection retry. Initial-password sessions are not persisted until the required password change is complete.
 
 The embedded browser stores its user data under `%LOCALAPPDATA%\EGcare\WebView2`, outside the installed app. Treat browser caches and local diagnostics as clinic data: protect Windows user profiles and use workstation disk encryption. Browser user data must never be copied into a release feed.
+
+## Windows startup and system tray
+
+The installed app opens automatically when the current Windows user signs in. Its startup entry uses Velopack's `Update.exe start` launcher, so application updates do not leave a path to an old version. Startup is enabled on installation or the first launch after upgrading from an older release. Visual Studio builds and portable copies do not register themselves as startup applications. Uninstalling removes EGcare's startup entry.
+
+Closing the window, including **Alt+F4**, hides it in the notification area and preserves the current screen. Click the EGcare tray icon or choose **Open EGcare** to restore it. Opening the installed app again restores the running instance. Right-click the icon and choose **Exit** to disconnect and fully quit. The tray menu also includes **Start with Windows** for enabling or disabling automatic startup; that choice is retained across updates. Windows sign-out and shutdown are allowed to proceed normally.
 
 ## Central images
 
@@ -60,7 +68,7 @@ Copy the complete Velopack release feed (packages and release metadata) into the
 
 The sign-in screen checks the LAN feed and shows when an update is available. Open **Clinic updates** there or in the signed-in profile menu to check, download, and then choose **Install and restart** after saving your work. This entry point remains available before SQL sign-in, so an older client can update when the database rejects its version. Development builds cannot install updates. The updater starts before native UI initialization, following [Velopack's startup guidance](https://docs.velopack.io/integrating/overview).
 
-For an update that changes database migrations or security, close all clients, update the admin PC, run backed-up maintenance there, and then update the other workstations. Normal clients do not modify the schema. A newer database rejects an old client; this prevents silent mixed-version writes. See [Velopack file update sources](https://docs.velopack.io/integrating/update-sources).
+For an update that changes database migrations or security, choose **Exit** from the tray on all clients, update the admin PC, run backed-up maintenance there, and then update the other workstations. Normal clients do not modify the schema. A newer database rejects an old client; this prevents silent mixed-version writes. See [Velopack file update sources](https://docs.velopack.io/integrating/update-sources).
 
 ```powershell
 dotnet publish src/Desktop/RadiologyCenter.Desktop/RadiologyCenter.Desktop.csproj -c Release -f net10.0-windows10.0.19041.0 -r win-x64 --self-contained true -p:WindowsPackageType=None -p:WindowsAppSDKSelfContained=true -o publish/app

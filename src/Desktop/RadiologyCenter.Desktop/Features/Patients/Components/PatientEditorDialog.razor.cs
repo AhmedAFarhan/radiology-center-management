@@ -6,7 +6,7 @@ namespace RadiologyCenter.Desktop.Features.Patients.Components;
 
 public partial class PatientEditorDialog : ComponentBase
 {
-[Parameter] public PatientDto? Patient { get; set; }
+    [Parameter] public PatientDto? Patient { get; set; }
 
     [CascadingParameter] public IMudDialogInstance MudDialog { get; set; } = default!;
 
@@ -16,6 +16,10 @@ public partial class PatientEditorDialog : ComponentBase
     private readonly PatientFormModel _model = new();
     private EditContext _editContext = default!;
     private bool _busy;
+    private bool _detailsOpen;
+    private bool _showValidationSummary;
+    private bool _focusValidationSummary;
+    private ElementReference _validationSummary;
 
     private bool IsEdit => Patient is not null;
 
@@ -45,12 +49,35 @@ public partial class PatientEditorDialog : ComponentBase
         _model.BloodType = Patient.BloodTypeKey;
         _model.Allergies = Patient.Allergies;
         _model.MedicalHistory = Patient.MedicalHistory;
+        _detailsOpen = !string.IsNullOrWhiteSpace(Patient.Email)
+            || !string.IsNullOrWhiteSpace(Patient.NationalId)
+            || !string.IsNullOrWhiteSpace(Patient.BloodTypeKey)
+            || !string.IsNullOrWhiteSpace(Patient.Address);
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (_focusValidationSummary)
+        {
+            _focusValidationSummary = false;
+            await _validationSummary.FocusAsync();
+        }
     }
 
     private async Task SubmitAsync()
     {
-        if (!_editContext.Validate())
+        if (_busy)
             return;
+
+        if (!_editContext.Validate())
+        {
+            _detailsOpen |= _editContext.GetValidationMessages(_editContext.Field(nameof(PatientFormModel.Email))).Any();
+            _showValidationSummary = true;
+            _focusValidationSummary = true;
+            return;
+        }
+
+        _showValidationSummary = false;
 
         var input = new PatientInput
         {
@@ -67,13 +94,27 @@ public partial class PatientEditorDialog : ComponentBase
             MedicalHistory = _model.MedicalHistory,
         };
 
-        if (await SafeExecute.RunAsync(
+        var originalOptions = MudDialog.Options;
+        _busy = true;
+        bool saved;
+        try
+        {
+            await MudDialog.SetOptionsAsync(originalOptions with { BackdropClick = false, CloseOnEscapeKey = false });
+            saved = await SafeExecute.RunAsync(
                 () => IsEdit
                     ? PatientService.UpdateAsync(Patient!.Id, input)
                     : PatientService.CreateAsync(input),
                 Snackbar,
                 () => T.PatientDialog.Unreachable,
-                busy => _busy = busy))
+                busy => _busy = busy);
+        }
+        finally
+        {
+            _busy = false;
+            await MudDialog.SetOptionsAsync(originalOptions);
+        }
+
+        if (saved)
         {
             Snackbar.Add(IsEdit ? T.PatientDialog.Updated : T.PatientDialog.Created, Severity.Success);
             MudDialog.Close(DialogResult.Ok(true));
@@ -81,6 +122,9 @@ public partial class PatientEditorDialog : ComponentBase
     }
 
     private void CancelAsync()
-        => MudDialog.Cancel();
+    {
+        if (!_busy)
+            MudDialog.Cancel();
+    }
 
 }

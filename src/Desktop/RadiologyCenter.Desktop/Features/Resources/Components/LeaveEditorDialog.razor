@@ -2,61 +2,77 @@
 @inject ResourceService ResourceService
 @inject EnumOptionsService EnumOptionsService
 
-<MudDialog>
+<FormDialog Title="@(Leave is null ? T.Leave.NewLeave : T.Leave.EditLeave)" Icon="@Icons.Material.Filled.BeachAccess" Subtitle="@T["forms.resourceSubtitle"]">
     <DialogContent>
-        <DialogHeader Icon="@Icons.Material.Filled.BeachAccess" Title="@(Leave is null ? T.Leave.NewLeave : T.Leave.EditLeave)" />
         <EditForm EditContext="_editContext" OnValidSubmit="SubmitAsync">
             <LocalizedDataAnnotationsValidator />
-            <MudGrid Spacing="2">
-                <MudItem xs="12">
-                    <MudAutocomplete T="StaffDto"
-                                     @bind-Value="_selectedStaff"
-                                     Label="@T.LeaveDialog.StaffSearch"
-                                     Variant="Variant.Outlined"
-                                     Margin="Margin.Dense"
-                                     MinCharacters="1"
-                                     DebounceInterval="300"
-                                     SearchFunc="SearchStaffAsync"
-                                     ToStringFunc="@(s => s is null ? string.Empty : s.FullName)"
-                                     Clearable="true"
-                                     Disabled="Busy" />
-                </MudItem>
-                <MudItem xs="12" sm="6">
-                    <MudSelect Disabled="Busy" T="string"
-                               @bind-Value="_model.LeaveType"
-                               Label="@T.LeaveDialog.LeaveType"
-                               Variant="Variant.Outlined"
-                               Margin="Margin.Dense"
-                               For="@(() => _model.LeaveType)">
-                        @foreach (var type in _leaveTypeOptions)
-                        {
-                            <MudSelectItem T="string" Value="@type.Key">@type.Value</MudSelectItem>
-                        }
-                    </MudSelect>
-                </MudItem>
-                <MudItem xs="12" sm="6">
-                    <MudDatePicker Disabled="Busy" @bind-Date="_model.StartDate"
-                                   Label="@T.Leave.StartDate"
-                                   Variant="Variant.Outlined"
-                                   Margin="Margin.Dense"
-                                   For="@(() => _model.StartDate)"
-                                   Class="w-100" />
-                </MudItem>
-                <MudItem xs="12" sm="6">
-                    <MudDatePicker Disabled="Busy" @bind-Date="_model.EndDate" MinDate="_model.StartDate"
-                                   Label="@T.Leave.EndDate"
-                                   Variant="Variant.Outlined"
-                                   Margin="Margin.Dense"
-                                   For="@(() => _model.EndDate)"
-                                   Class="w-100" />
+            <div role="alert"><ValidationSummary /></div>
+            <MudGrid Spacing="3">
+                <MudItem xs="12" Class="app-form-section-item">
+                    <FormSectionHeading Title="@T["forms.leave"]" Icon="@Icons.Material.Outlined.EventNote" First="true" />
                 </MudItem>
                 <MudItem xs="12">
-                    <MudTextField Disabled="Busy" @bind-Value="_model.Reason"
-                                  Label="@T.Leave.Reason"
-                                  Variant="Variant.Outlined"
-                                  Margin="Margin.Dense"
-                                  Lines="3"
-                                  Immediate="true" />
+                    <FormField Label="@T.LeaveDialog.StaffSearch" Context="fieldId" Required="true">
+                        <MudAutocomplete T="StaffDto"
+                                         @bind-Value="_selectedStaff"
+                                         InputId="@fieldId" aria-required="true" aria-label="@T.LeaveDialog.StaffSearch"
+                                         Variant="Variant.Outlined"
+                                         Margin="Margin.Dense"
+                                         MinCharacters="1"
+                                         DebounceInterval="300"
+                                         SearchFunc="SearchStaffAsync"
+                                         ToStringFunc="@(s => s is null ? string.Empty : s.FullName)"
+                                         Clearable="true"
+                                         Disabled="Busy" />
+                    </FormField>
+                </MudItem>
+                <MudItem xs="12" sm="6">
+                    <FormField Label="@T.LeaveDialog.LeaveType" Context="fieldId" Required="true">
+                        <LocalizedSelect Disabled="Busy" T="string"
+                                   @bind-Value="_model.LeaveType"
+                                   InputId="@fieldId" aria-required="true" aria-label="@T.LeaveDialog.LeaveType"
+                                   Variant="Variant.Outlined"
+                                   Margin="Margin.Dense"
+                                   For="@(() => _model.LeaveType)">
+                            @foreach (var type in _leaveTypeOptions)
+                            {
+                                <MudSelectItem T="string" Value="@type.Key">@type.Value</MudSelectItem>
+                            }
+                        </LocalizedSelect>
+                    </FormField>
+                </MudItem>
+                <MudItem xs="12" Class="app-form-section-item">
+                    <FormSectionHeading Title="@T["forms.period"]" Icon="@Icons.Material.Outlined.DateRange" />
+                </MudItem>
+                <MudItem xs="12" sm="6">
+                    <FormField Label="@T.Leave.StartDate" Context="fieldId" Required="true">
+                        <LocalizedDatePicker Disabled="Busy" @bind-Date="_model.StartDate"
+                                       InputId="@fieldId" aria-required="true" aria-label="@T.Leave.StartDate"
+                                       Variant="Variant.Outlined"
+                                       Margin="Margin.Dense"
+                                       For="@(() => _model.StartDate)"
+                                       Class="w-100" />
+                    </FormField>
+                </MudItem>
+                <MudItem xs="12" sm="6">
+                    <FormField Label="@T.Leave.EndDate" Context="fieldId" Required="true">
+                        <LocalizedDatePicker Disabled="Busy" @bind-Date="_model.EndDate" MinDate="_model.StartDate"
+                                       InputId="@fieldId" aria-required="true" aria-label="@T.Leave.EndDate"
+                                       Variant="Variant.Outlined"
+                                       Margin="Margin.Dense"
+                                       For="@(() => _model.EndDate)"
+                                       Class="w-100" />
+                    </FormField>
+                </MudItem>
+                <MudItem xs="12">
+                    <FormField Label="@T.Leave.Reason" Context="fieldId">
+                        <MudTextField Disabled="Busy" @bind-Value="_model.Reason"
+                                      InputId="@fieldId" aria-label="@T.Leave.Reason"
+                                      Variant="Variant.Outlined"
+                                      Margin="Margin.Dense"
+                                      Lines="3"
+                                      Immediate="true" />
+                    </FormField>
                 </MudItem>
             </MudGrid>
             <button type="submit" style="display:none"></button>
@@ -69,4 +85,4 @@
                        OnCancel="CancelAsync"
                        OnSave="SubmitAsync" />
     </DialogActions>
-</MudDialog>
+</FormDialog>

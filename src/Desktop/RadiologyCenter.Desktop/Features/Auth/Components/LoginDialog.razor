@@ -9,61 +9,57 @@
 @implements IDisposable
 @using RadiologyCenter.Desktop.Shared.Components
 
-<MudDialog Class="login-dialog">
+<FormDialog Class="login-dialog" Title="@T.Login.Title" Subtitle="@T.Login.Subtitle" Icon="@Icons.Material.Outlined.MedicalServices">
     <DialogContent>
-        <div class="text-center mb-4">
-            <MudAvatar Class="mb-3" Color="Color.Primary" Variant="Variant.Filled">
-                <MudIcon Icon="@Icons.Material.Filled.MedicalServices" />
-            </MudAvatar>
-            <MudText Typo="Typo.h5" Class="mb-1">@T.Login.Title</MudText>
-            <MudText Typo="Typo.body2" Class="text-secondary">@T.Login.Subtitle</MudText>
-        </div>
-
-        <EditForm Model="@_model" OnValidSubmit="@SubmitAsync">
+        <EditForm id="clinic-login-form" Model="@_model" OnValidSubmit="@SubmitAsync">
             <LocalizedDataAnnotationsValidator />
-            <MudGrid Spacing="2">
+            <div role="alert"><ValidationSummary /></div>
+            <MudGrid Spacing="3">
                 <MudItem xs="12">
-                    <MudTextField Disabled="_busy" @bind-Value="_model.UserName"
-                                  Label="@T.Login.Username"
-                                  Variant="Variant.Outlined"
-                                  Margin="Margin.Dense"
-                                  Immediate="true"
-                                  autocomplete="username" />
+                    <FormField Label="@T.Login.Username" Context="fieldId" Required="true">
+                        <LocalizedTextField T="string" Disabled="_busy" @bind-Value="_model.UserName" For="@(() => _model.UserName)"
+                                      InputId="@fieldId" aria-required="true" aria-label="@T.Login.Username"
+                                      Variant="Variant.Outlined"
+                                      Margin="Margin.Dense"
+                                      Immediate="true"
+                                      autocomplete="username" />
+                    </FormField>
                 </MudItem>
                 <MudItem xs="12">
-                    <MudTextField AdornmentAriaLabel="@(T.IsRTL ? "إظهار أو إخفاء كلمة المرور" : "Show or hide password")" Disabled="_busy" @bind-Value="_model.Password"
-                                  Label="@T.Login.Password"
-                                  Variant="Variant.Outlined"
-                                  Margin="Margin.Dense"
-                                  InputType="@(_showPassword ? InputType.Text : InputType.Password)"
-                                  Immediate="true"
-                                  autocomplete="current-password"
-                                  Adornment="Adornment.End"
-                                  AdornmentIcon="@(_showPassword ? Icons.Material.Filled.VisibilityOff : Icons.Material.Filled.Visibility)"
-                                  AdornmentColor="Color.Default"
-                                  OnAdornmentClick="@(() => _showPassword = !_showPassword)" />
+                    <FormField Label="@T.Login.Password" Context="fieldId" Required="true">
+                        <LocalizedTextField T="string" AdornmentAriaLabel="@(T.IsRTL ? "إظهار أو إخفاء كلمة المرور" : "Show or hide password")" Disabled="_busy" @bind-Value="_model.Password" For="@(() => _model.Password)"
+                                      InputId="@fieldId" aria-required="true" aria-label="@T.Login.Password"
+                                      Variant="Variant.Outlined"
+                                      Margin="Margin.Dense"
+                                      InputType="@(_showPassword ? InputType.Text : InputType.Password)"
+                                      Immediate="true"
+                                      autocomplete="current-password"
+                                      Adornment="Adornment.End"
+                                      AdornmentIcon="@(_showPassword ? Icons.Material.Filled.VisibilityOff : Icons.Material.Filled.Visibility)"
+                                      AdornmentColor="Color.Default"
+                                      OnAdornmentClick="@(() => _showPassword = !_showPassword)" />
+                    </FormField>
                 </MudItem>
             </MudGrid>
-            <MudButton ButtonType="ButtonType.Submit"
+
+        </EditForm>
+        <MudButton OnClick="OpenClinicSettings" Class="mt-2" FullWidth="true" Disabled="_busy">@(T.IsRTL ? "اتصال العيادة / تحديث المسؤول" : "Clinic connection / admin upgrade")</MudButton>
+        <MudButton OnClick="OpenClinicUpdates" FullWidth="true" Disabled="_busy" StartIcon="@Icons.Material.Filled.SystemUpdate">@(_updateAvailable ? (T.IsRTL ? "تحديث متاح للعيادة" : "Clinic update available") : (T.IsRTL ? "تحديثات العيادة" : "Clinic updates"))</MudButton>
+    </DialogContent>
+    <DialogActions>
+            <MudButton ButtonType="ButtonType.Submit" form="clinic-login-form"
                        Color="Color.Primary"
                        Variant="Variant.Filled"
                        FullWidth="true"
                        Size="Size.Large"
-                       Class="mt-4"
                        StartIcon="@Icons.Material.Filled.Login"
                        Disabled="@_busy">
                 @if (_busy)
                 {
                     <MudProgressCircular Size="Size.Small" Indeterminate="true" Class="mx-1" />
                 }
-                else
-                {
-                    <text>@T.Login.Submit</text>
-                }
+                <text>@T.Login.Submit</text>
             </MudButton>
-        </EditForm>
-        <MudButton OnClick="OpenClinicSettings" Class="mt-2" FullWidth="true" Disabled="_busy">@(T.IsRTL ? "اتصال العيادة / تحديث المسؤول" : "Clinic connection / admin upgrade")</MudButton>
-        <MudButton OnClick="OpenClinicUpdates" FullWidth="true" Disabled="_busy" StartIcon="@Icons.Material.Filled.SystemUpdate">@(_updateAvailable ? (T.IsRTL ? "تحديث متاح للعيادة" : "Clinic update available") : (T.IsRTL ? "تحديثات العيادة" : "Clinic updates"))</MudButton>
-    </DialogContent>
-</MudDialog>
+    </DialogActions>
+</FormDialog>
 

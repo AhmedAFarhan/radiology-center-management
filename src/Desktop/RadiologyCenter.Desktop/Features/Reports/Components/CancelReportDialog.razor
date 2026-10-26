@@ -2,19 +2,20 @@
 @inject ISnackbar Snackbar
 @inject AppLocalizer T
 
-<MudDialog>
+<FormDialog Title="@T.CancelReport.Title" Icon="@Icons.Material.Filled.CancelPresentation" Subtitle="@T["forms.reportSubtitle"]">
     <DialogContent>
-        <DialogHeader Icon="@Icons.Material.Filled.CancelPresentation" Title="@T.CancelReport.Title" />
         <MudText Typo="Typo.body2" Class="text-muted-text mb-2">
             @T.CancelReport.Description
         </MudText>
-        <MudTextField @bind-Value="_reason"
-                      Label="@T.CancelReport.ReasonOptional"
-                      Variant="Variant.Outlined"
-                      Margin="Margin.Dense"
-                      Immediate="true"
-                      FullWidth="true"
-                      Disabled="_busy" />
+        <FormField Label="@T.CancelReport.ReasonOptional" Context="fieldId">
+            <MudTextField @bind-Value="_reason"
+                          InputId="@fieldId" aria-label="@T.CancelReport.ReasonOptional"
+                          Variant="Variant.Outlined"
+                          Margin="Margin.Dense"
+                          Immediate="true"
+                          FullWidth="true"
+                          Disabled="_busy" />
+        </FormField>
     </DialogContent>
     <DialogActions>
         <MudButton Color="Color.Default" OnClick="CancelAsync" Disabled="_busy">@T.Common.Cancel</MudButton>
@@ -23,11 +24,8 @@
             {
                 <MudProgressCircular Size="Size.Small" Indeterminate="true" Class="mx-1" />
             }
-            else
-            {
-                <text>@T.CancelReport.Title</text>
-            }
+            <text>@T.CancelReport.Title</text>
         </MudButton>
     </DialogActions>
-</MudDialog>
+</FormDialog>
 

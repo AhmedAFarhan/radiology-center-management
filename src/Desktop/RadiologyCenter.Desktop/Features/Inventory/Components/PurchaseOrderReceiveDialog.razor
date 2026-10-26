@@ -2,9 +2,8 @@
 @inject ISnackbar Snackbar
 @inject AppLocalizer T
 
-<MudDialog>
+<FormDialog Title="@(_po is null ? T.PoDialog.ReceiveOrder : T.FormatValue(T.PoDialog.ReceiveOrderTitle, _po.OrderNumber))" Icon="@Icons.Material.Filled.ReceiptLong" Subtitle="@T["forms.inventorySubtitle"]">
     <DialogContent>
-        <DialogHeader Icon="@Icons.Material.Filled.ReceiptLong" Title="@(_po is null ? T.PoDialog.ReceiveOrder : T.FormatValue(T.PoDialog.ReceiveOrderTitle, _po.OrderNumber))" />
         @if (_loading)
         {
             <DialogSkeleton Rows="4" />
@@ -23,34 +22,40 @@
                 var remaining = item.QuantityOrdered - item.QuantityReceived;
 
                 <MudDivider Class="my-2" />
-                <MudText Class="font-weight-medium">@item.ItemName</MudText>
+                <FormSectionHeading Title="@item.ItemName" Icon="@Icons.Material.Outlined.Inventory2" First="true" />
                 <MudText Typo="Typo.caption" Class="text-secondary">
                     @T.PoDialog.Ordered @item.QuantityOrdered · @T.PoDialog.Received @item.QuantityReceived · @T.PoDialog.Remaining @remaining
                 </MudText>
 
-                <MudGrid Spacing="2" Class="mt-1">
+                <MudGrid Spacing="3" Class="mt-1">
                     <MudItem xs="12" sm="4">
-                        <MudNumericField Disabled="_busy" T="int?"
-                                         @bind-Value="line.Quantity"
-                                         Label="@T.PoDialog.ReceiveQty"
-                                         Variant="Variant.Outlined"
-                                         Margin="Margin.Dense"
-                                         Min="1"
-                                         Max="@remaining" />
+                        <FormField Label="@T.PoDialog.ReceiveQty" Context="fieldId">
+                            <MudNumericField Disabled="_busy" T="int?"
+                                             @bind-Value="line.Quantity"
+                                             InputId="@fieldId" aria-label="@T.PoDialog.ReceiveQty"
+                                             Variant="Variant.Outlined"
+                                             Margin="Margin.Dense"
+                                             Min="1"
+                                             Max="@remaining" />
+                        </FormField>
                     </MudItem>
                     <MudItem xs="12" sm="4">
-                        <MudTextField Disabled="_busy" @bind-Value="line.LotNumber"
-                                      Label="@T.PoDialog.LotNumber"
-                                      Variant="Variant.Outlined"
-                                      Margin="Margin.Dense"
-                                      Immediate="true" />
+                        <FormField Label="@T.PoDialog.LotNumber" Context="fieldId">
+                            <MudTextField Disabled="_busy" @bind-Value="line.LotNumber"
+                                          InputId="@fieldId" aria-label="@T.PoDialog.LotNumber"
+                                          Variant="Variant.Outlined"
+                                          Margin="Margin.Dense"
+                                          Immediate="true" />
+                        </FormField>
                     </MudItem>
                     <MudItem xs="12" sm="4">
-                        <MudDatePicker Disabled="_busy" @bind-Date="line.ExpiryDate"
-                                       Label="@T.PoDialog.ExpiryDate"
-                                       Variant="Variant.Outlined"
-                                       Margin="Margin.Dense"
-                                       Clearable="true" />
+                        <FormField Label="@T.PoDialog.ExpiryDate" Context="fieldId">
+                            <MudDatePicker Disabled="_busy" @bind-Date="line.ExpiryDate"
+                                           InputId="@fieldId" aria-label="@T.PoDialog.ExpiryDate"
+                                           Variant="Variant.Outlined"
+                                           Margin="Margin.Dense"
+                                           Clearable="true" />
+                        </FormField>
                     </MudItem>
                 </MudGrid>
             }
@@ -63,13 +68,10 @@
             {
                 <MudProgressCircular Size="Size.Small" Indeterminate="true" Class="mx-1" />
             }
-            else
-            {
-                <text>@T.PoDialog.ReceiveItems</text>
-            }
+            <text>@T.PoDialog.ReceiveItems</text>
         </MudButton>
     </DialogActions>
-</MudDialog>
+</FormDialog>
 
 
 

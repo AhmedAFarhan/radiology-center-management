@@ -2,9 +2,8 @@
 @inject ISnackbar Snackbar
 @inject AppLocalizer T
 
-<MudDialog>
+<FormDialog Title="@(_stock?.ItemName ?? T.ItemDialog.ItemStockTitle)" Icon="@Icons.Material.Filled.Inventory2" Subtitle="@T["forms.inventorySubtitle"]">
     <DialogContent>
-        <DialogHeader Icon="@Icons.Material.Filled.Inventory2" Title="@(_stock?.ItemName ?? T.ItemDialog.ItemStockTitle)" />
         @if (_loadError is not null)
         {
             <ErrorState Title="@T.ItemDialog.LoadStockErrorTitle" Message="@_loadError" Action="LoadStockAsync" />
@@ -19,7 +18,7 @@
                 @T.ItemDialog.StockOnHand <b>@_stock.StockOnHand</b>
             </MudText>
 
-            <MudText Typo="Typo.subtitle2" Class="mb-1">@T.ItemDialog.Batches</MudText>
+            <FormSectionHeading Title="@T.ItemDialog.Batches" First="true" />
             <MudSimpleTable Dense="true">
                 <thead>
                     <tr>
@@ -54,31 +53,38 @@
             </MudSimpleTable>
 
             <MudDivider Class="my-4" />
-            <MudText Typo="Typo.subtitle2" Class="mb-1">@T.ItemDialog.IssueStock</MudText>
+            <FormSectionHeading Title="@T.ItemDialog.IssueStock" First="true" />
             <EditForm EditContext="_editContext">
                 <LocalizedDataAnnotationsValidator />
-                <MudGrid Spacing="2">
+            <div role="alert"><ValidationSummary /></div>
+                <MudGrid Spacing="3">
                     <MudItem xs="12" sm="4">
-                        <MudNumericField Disabled="_busy" T="int?" @bind-Value="_model.Quantity"
-                                         For="@(() => _model.Quantity)"
-                                         Label="@T.ItemDialog.Quantity"
-                                         Variant="Variant.Outlined"
-                                         Margin="Margin.Dense"
-                                         Min="1" />
+                        <FormField Label="@T.ItemDialog.Quantity" Context="fieldId">
+                            <LocalizedNumericField Disabled="_busy" T="int?" @bind-Value="_model.Quantity"
+                                             For="@(() => _model.Quantity)"
+                                             InputId="@fieldId" aria-label="@T.ItemDialog.Quantity"
+                                             Variant="Variant.Outlined"
+                                             Margin="Margin.Dense"
+                                             Min="1" />
+                        </FormField>
                     </MudItem>
                     <MudItem xs="12" sm="8">
-                        <MudTextField Disabled="_busy" @bind-Value="_model.Reference"
-                                      Label="@T.ItemDialog.Reference"
-                                      Variant="Variant.Outlined"
-                                      Margin="Margin.Dense"
-                                      Immediate="true" />
+                        <FormField Label="@T.ItemDialog.Reference" Context="fieldId">
+                            <MudTextField Disabled="_busy" @bind-Value="_model.Reference"
+                                          InputId="@fieldId" aria-label="@T.ItemDialog.Reference"
+                                          Variant="Variant.Outlined"
+                                          Margin="Margin.Dense"
+                                          Immediate="true" />
+                        </FormField>
                     </MudItem>
                     <MudItem xs="12">
-                        <MudTextField Disabled="_busy" @bind-Value="_model.Notes"
-                                      Label="@T.ItemDialog.Notes"
-                                      Variant="Variant.Outlined"
-                                      Margin="Margin.Dense"
-                                      Immediate="true" />
+                        <FormField Label="@T.ItemDialog.Notes" Context="fieldId">
+                            <MudTextField Disabled="_busy" @bind-Value="_model.Notes"
+                                          InputId="@fieldId" aria-label="@T.ItemDialog.Notes"
+                                          Variant="Variant.Outlined"
+                                          Margin="Margin.Dense"
+                                          Immediate="true" />
+                        </FormField>
                     </MudItem>
                 </MudGrid>
             </EditForm>
@@ -91,13 +97,10 @@
             {
                 <MudProgressCircular Size="Size.Small" Indeterminate="true" Class="mx-1" />
             }
-            else
-            {
-                <text>@T.ItemDialog.IssueStock</text>
-            }
+            <text>@T.ItemDialog.IssueStock</text>
         </MudButton>
     </DialogActions>
-</MudDialog>
+</FormDialog>
 
 
 

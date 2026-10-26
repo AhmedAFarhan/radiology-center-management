@@ -2,59 +2,75 @@
 @inject CashService CashService
 @inject EnumOptionsService EnumOptionsService
 
-<MudDialog>
+<FormDialog Title="@T.CashEntry.Title" Icon="@Icons.Material.Filled.SwapVert" Subtitle="@T["forms.cashSubtitle"]">
     <DialogContent>
-        <DialogHeader Icon="@Icons.Material.Filled.SwapVert" Title="@T.CashEntry.Title" />
         <EditForm EditContext="_editContext" OnValidSubmit="SubmitAsync">
             <LocalizedDataAnnotationsValidator />
-            <MudGrid Spacing="2">
-                <MudItem xs="12" sm="6">
-                    <MudSelect Disabled="Busy" @bind-Value="_model.Direction"
-                               Label="@T.CashEntry.Direction"
-                               Variant="Variant.Outlined"
-                               Margin="Margin.Dense"
-                               For="@(() => _model.Direction)">
-                        @foreach (var direction in _directionOptions)
-                        {
-                            <MudSelectItem T="string" Value="@direction.Key">@direction.Value</MudSelectItem>
-                        }
-                    </MudSelect>
+            <div role="alert"><ValidationSummary /></div>
+            <MudGrid Spacing="3">
+                <MudItem xs="12" Class="app-form-section-item">
+                    <FormSectionHeading Title="@T["forms.transaction"]" Icon="@Icons.Material.Outlined.Payments" First="true" />
                 </MudItem>
                 <MudItem xs="12" sm="6">
-                    <MudSelect Disabled="Busy" @bind-Value="_model.Reason"
-                               Label="@T.CashEntry.Reason"
-                               Variant="Variant.Outlined"
-                               Margin="Margin.Dense"
-                               For="@(() => _model.Reason)">
-                        @foreach (var reason in _reasonOptions)
-                        {
-                            <MudSelectItem T="string" Value="@reason.Key">@reason.Value</MudSelectItem>
-                        }
-                    </MudSelect>
+                    <FormField Label="@T.CashEntry.Direction" Context="fieldId">
+                        <LocalizedSelect Disabled="Busy" @bind-Value="_model.Direction"
+                                   InputId="@fieldId" aria-label="@T.CashEntry.Direction"
+                                   Variant="Variant.Outlined"
+                                   Margin="Margin.Dense"
+                                   For="@(() => _model.Direction)">
+                            @foreach (var direction in _directionOptions)
+                            {
+                                <MudSelectItem T="string" Value="@direction.Key">@direction.Value</MudSelectItem>
+                            }
+                        </LocalizedSelect>
+                    </FormField>
                 </MudItem>
                 <MudItem xs="12" sm="6">
-                    <MudNumericField Disabled="Busy" @bind-Value="_model.Amount"
-                                     Label="@T.CashEntry.Amount"
-                                     Variant="Variant.Outlined"
-                                     Margin="Margin.Dense"
-                                     Immediate="true"
-                                     For="@(() => _model.Amount)" />
+                    <FormField Label="@T.CashEntry.Reason" Context="fieldId">
+                        <LocalizedSelect Disabled="Busy" @bind-Value="_model.Reason"
+                                   InputId="@fieldId" aria-label="@T.CashEntry.Reason"
+                                   Variant="Variant.Outlined"
+                                   Margin="Margin.Dense"
+                                   For="@(() => _model.Reason)">
+                            @foreach (var reason in _reasonOptions)
+                            {
+                                <MudSelectItem T="string" Value="@reason.Key">@reason.Value</MudSelectItem>
+                            }
+                        </LocalizedSelect>
+                    </FormField>
                 </MudItem>
                 <MudItem xs="12" sm="6">
-                    <MudTextField Disabled="Busy" @bind-Value="_model.ReferenceId"
-                                  Label="@T.CashEntry.Reference"
-                                  Variant="Variant.Outlined"
-                                  Margin="Margin.Dense"
-                                  Immediate="true"
-                                  For="@(() => _model.ReferenceId)" />
+                    <FormField Label="@T.CashEntry.Amount" Context="fieldId">
+                        <LocalizedNumericField Disabled="Busy" @bind-Value="_model.Amount"
+                                         InputId="@fieldId" aria-label="@T.CashEntry.Amount"
+                                         Variant="Variant.Outlined"
+                                         Margin="Margin.Dense"
+                                         Immediate="true"
+                                         For="@(() => _model.Amount)" />
+                    </FormField>
+                </MudItem>
+                <MudItem xs="12" Class="app-form-section-item">
+                    <FormSectionHeading Title="@T["forms.reference"]" Icon="@Icons.Material.Outlined.Subject" />
+                </MudItem>
+                <MudItem xs="12" sm="6">
+                    <FormField Label="@T.CashEntry.Reference" Context="fieldId">
+                        <LocalizedTextField Disabled="Busy" @bind-Value="_model.ReferenceId"
+                                      InputId="@fieldId" aria-label="@T.CashEntry.Reference"
+                                      Variant="Variant.Outlined"
+                                      Margin="Margin.Dense"
+                                      Immediate="true"
+                                      For="@(() => _model.ReferenceId)" />
+                    </FormField>
                 </MudItem>
                 <MudItem xs="12">
-                    <MudTextField Disabled="Busy" @bind-Value="_model.Description"
-                                  Label="@T.CashEntry.Description"
-                                  Variant="Variant.Outlined"
-                                  Margin="Margin.Dense"
-                                  Immediate="true"
-                                  For="@(() => _model.Description)" />
+                    <FormField Label="@T.CashEntry.Description" Context="fieldId">
+                        <LocalizedTextField Disabled="Busy" @bind-Value="_model.Description"
+                                      InputId="@fieldId" aria-label="@T.CashEntry.Description"
+                                      Variant="Variant.Outlined"
+                                      Margin="Margin.Dense"
+                                      Immediate="true"
+                                      For="@(() => _model.Description)" />
+                    </FormField>
                 </MudItem>
             </MudGrid>
             <button type="submit" style="display:none"></button>
@@ -67,5 +83,5 @@
                        OnCancel="CancelAsync"
                        OnSave="SubmitAsync" />
     </DialogActions>
-</MudDialog>
+</FormDialog>
 

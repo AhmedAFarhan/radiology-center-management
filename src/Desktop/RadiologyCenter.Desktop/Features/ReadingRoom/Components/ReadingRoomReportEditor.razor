@@ -56,7 +56,7 @@ else
         }
 
         <div class="d-flex align-center mb-1">
-            <MudText Typo="Typo.subtitle1" Class="font-weight-medium">@T.ReadingRoom.Sections</MudText>
+            <FormSectionHeading Title="@T.ReadingRoom.Sections" First="true" />
             <MudSpacer />
             @if (CanEdit)
             {
@@ -78,15 +78,17 @@ else
         @foreach (var section in Sections)
         {
             var currentSection = section;
-            <MudTextField T="string"
-                          @bind-Value="currentSection.Body"
-                          Label="@currentSection.Label"
-                          Variant="Variant.Outlined"
-                          Margin="Margin.Dense"
-                          Lines="@(currentSection.Position == 3 ? 5 : 3)"
-                          Disabled="@(Busy || !CanEdit || currentSection.Locked)"
-                          Immediate="true"
-                          Class="mb-3" />
+            <FormField Label="@currentSection.Label" Context="fieldId">
+                <MudTextField T="string"
+                              @bind-Value="currentSection.Body"
+                              InputId="@fieldId" aria-label="@currentSection.Label"
+                              Variant="Variant.Outlined"
+                              Margin="Margin.Dense"
+                              Lines="@(currentSection.Position == 3 ? 5 : 3)"
+                              Disabled="@(Busy || !CanEdit || currentSection.Locked)"
+                              Immediate="true"
+                              Class="mb-3" />
+            </FormField>
         }
 
         <MudDivider Class="my-3" />

@@ -2,23 +2,27 @@
 @inject ISnackbar Snackbar
 @inject AppLocalizer T
 
-<MudDialog>
+<FormDialog Title="@(T.FormatValue(T.VisitSchedule.Title, Visit.ExaminationTypeName))" Icon="@Icons.Material.Filled.EventNote" Subtitle="@T["forms.visitSubtitle"]">
     <DialogContent>
-        <DialogHeader Icon="@Icons.Material.Filled.EventNote" Title="@(T.FormatValue(T.VisitSchedule.Title, Visit.ExaminationTypeName))" />
         <EditForm EditContext="_editContext">
             <LocalizedDataAnnotationsValidator />
-            <MudDatePicker Disabled="_busy" @bind-Date="_model.ScheduledDate"
-                           For="@(() => _model.ScheduledDate)"
-                           Label="@T.VisitSchedule.ScheduledDate"
-                           Variant="Variant.Outlined"
-                           Margin="Margin.Dense"
-                           Class="w-100" />
-            <MudTimePicker Disabled="_busy" @bind-Time="_model.ScheduledTime"
-                           For="@(() => _model.ScheduledTime)"
-                           Label="@T.VisitSchedule.ScheduledTime"
-                           Variant="Variant.Outlined"
-                           Margin="Margin.Dense"
-                           Class="w-100" />
+            <div role="alert"><ValidationSummary /></div>
+            <FormField Label="@T.VisitSchedule.ScheduledDate" Context="fieldId" Required="true">
+                <LocalizedDatePicker Disabled="_busy" @bind-Date="_model.ScheduledDate"
+                               For="@(() => _model.ScheduledDate)"
+                               InputId="@fieldId" aria-required="true" aria-label="@T.VisitSchedule.ScheduledDate"
+                               Variant="Variant.Outlined"
+                               Margin="Margin.Dense"
+                               Class="w-100" />
+            </FormField>
+            <FormField Label="@T.VisitSchedule.ScheduledTime" Context="fieldId" Required="true">
+                <LocalizedTimePicker Disabled="_busy" @bind-Time="_model.ScheduledTime"
+                               For="@(() => _model.ScheduledTime)"
+                               InputId="@fieldId" aria-required="true" aria-label="@T.VisitSchedule.ScheduledTime"
+                               Variant="Variant.Outlined"
+                               Margin="Margin.Dense"
+                               Class="w-100" />
+            </FormField>
         </EditForm>
     </DialogContent>
     <DialogActions>
@@ -28,12 +32,9 @@
             {
                 <MudProgressCircular Size="Size.Small" Indeterminate="true" Class="mx-1" />
             }
-            else
-            {
-                <text>@T.VisitSchedule.Schedule</text>
-            }
+            <text>@T.VisitSchedule.Schedule</text>
         </MudButton>
     </DialogActions>
-</MudDialog>
+</FormDialog>
 
 

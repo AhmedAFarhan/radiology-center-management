@@ -35,6 +35,20 @@ public partial class VisitEditorDialog : ComponentBase, IDisposable
     private ReferralDoctorDto? _selectedReferralDoctor;
     private bool _busy;
     private bool _disposed;
+    private bool _submitAttempted, _focusValidation;
+    private ElementReference _validationSummary;
+    private bool _quickRegistrationOpen, _patientSaving, _patientSearchFailed, _patientNotFound, _focusExamination, _focusPatient, _changingPatient;
+    private string? _patientSearchText, _lastPatientQuery, _registrationSeed, _registeredPatientId;
+    private QuickPatientRegistration? _registrationForm;
+    private PatientInput? _patientDraft;
+    private int _patientSearchVersion;
+    private IReadOnlyList<EnumOptionDto> _genderOptions = [];
+    private MudAutocomplete<PatientDto>? _patientLookup;
+    private MudAutocomplete<ExaminationTypeDto>? _examinationLookup;
+    private DialogOptions? _optionsBeforePatientSave;
+
+    private bool IsBusy => _busy || _patientSaving;
+    private bool CanRegisterPatient => Permissions.HasPermission(PatientsPermissions.Create);
 
     private bool IsEdit => Visit is not null;
 
@@ -57,8 +71,13 @@ public partial class VisitEditorDialog : ComponentBase, IDisposable
 
     private void OnEditContextFieldChanged(object? sender, FieldChangedEventArgs e)
     {
-        if (e.FieldIdentifier.FieldName is nameof(VisitFormModel.ScheduledDate) or nameof(VisitFormModel.ScheduledTime))
+        if (_submitAttempted && e.FieldIdentifier.FieldName is nameof(VisitFormModel.ScheduledDate) or nameof(VisitFormModel.ScheduledTime))
             ValidateSchedule();
+    }
+
+    private void OnStatusChanged()
+    {
+        if (_submitAttempted) ValidateSchedule();
     }
 
     public void Dispose()
@@ -72,14 +91,130 @@ public partial class VisitEditorDialog : ComponentBase, IDisposable
 
     private async Task<IEnumerable<PatientDto>> SearchPatientsAsync(string? value, CancellationToken ct)
     {
+        var version = ++_patientSearchVersion;
+        _patientNotFound = false;
+        _patientSearchFailed = false;
         if (string.IsNullOrWhiteSpace(value))
             return Array.Empty<PatientDto>();
+        _lastPatientQuery = value;
+        try
+        {
+            var page = await PatientService.GetPagedAsync(value, "LastName", false, 1, 20, gender: null, isActive: null, ct);
+            ct.ThrowIfCancellationRequested();
+            if (version == _patientSearchVersion) _patientNotFound = page.Items.Count == 0;
+            return page.Items;
+        }
+        catch (OperationCanceledException) when (ct.IsCancellationRequested) { throw; }
+        catch (Exception ex)
+        {
+            if (!_disposed && version == _patientSearchVersion)
+            {
+                _patientSearchFailed = true;
+                Snackbar.Add(ex is ApiException api ? SafeExecute.FormatError(api) : T.VisitDialog.SearchPatientsError, Severity.Error);
+            }
+            return Array.Empty<PatientDto>();
+        }
+    }
 
-        var page = await SafeExecute.RunAsync(
-            () => PatientService.GetPagedAsync(value, "LastName", false, 1, 20, gender: null, isActive: null, ct),
-            Snackbar,
-            () => T.VisitDialog.SearchPatientsError);
-        return page?.Items ?? Array.Empty<PatientDto>();
+    private void PatientSearchTextChanged(string? text) => _patientSearchText = text;
+
+    private void ClearPatientSearch()
+    {
+        _patientSearchText = _lastPatientQuery = null;
+        _patientSearchFailed = false;
+        _patientNotFound = false;
+    }
+
+    private void PatientSelected(PatientDto? patient)
+    {
+        _model.Patient = patient;
+        if (patient is not null) _changingPatient = false;
+        _editContext.NotifyFieldChanged(_editContext.Field(nameof(VisitFormModel.Patient)));
+    }
+
+    private void ChangePatient()
+    {
+        _model.Patient = null;
+        _editContext.NotifyFieldChanged(_editContext.Field(nameof(VisitFormModel.Patient)));
+        _changingPatient = true;
+        _focusPatient = true;
+        ClearPatientSearch();
+    }
+
+    private async Task OpenQuickRegistrationAsync()
+    {
+        if (IsBusy || !CanRegisterPatient || !_patientNotFound || _patientSearchFailed) return;
+        // Capture the query before autocomplete closes and coerces its display text.
+        _registrationSeed = _model.Patient is not null ? null
+            : !string.IsNullOrWhiteSpace(_patientSearchText) ? _patientSearchText : _lastPatientQuery;
+        if (_patientLookup is not null) await _patientLookup.CloseMenuAsync();
+        if (_genderOptions.Count == 0)
+        {
+            var options = await SafeExecute.RunAsync(() => EnumOptionsService.GetOptionsAsync("Gender"), Snackbar, () => T.VisitDialog.Unreachable);
+            if (options is null || options.Count == 0) return;
+            _genderOptions = options;
+        }
+        _quickRegistrationOpen = true;
+    }
+
+    private void CloseQuickRegistration()
+    {
+        if (IsBusy) return;
+        _patientDraft = _registrationForm?.GetDraft();
+        _quickRegistrationOpen = false;
+        _focusPatient = _model.Patient is null || _changingPatient;
+    }
+
+    private Task RegisterPatientAsync() => _registrationForm?.RegisterAsync() ?? Task.CompletedTask;
+
+    private Task<PatientDto?> CreateQuickPatientAsync(PatientInput input)
+        => SafeExecute.RunAsync(() => PatientService.CreateAsync(input), Snackbar, () => T.PatientDialog.Unreachable);
+
+    private async Task PatientSavingChangedAsync(bool saving)
+    {
+        _patientSaving = saving;
+        if (saving)
+        {
+            _optionsBeforePatientSave = MudDialog.Options;
+            await MudDialog.SetOptionsAsync(MudDialog.Options with { BackdropClick = false, CloseOnEscapeKey = false });
+        }
+        else if (_optionsBeforePatientSave is { } original)
+        {
+            _optionsBeforePatientSave = null;
+            await MudDialog.SetOptionsAsync(original);
+        }
+    }
+
+    private Task UseRegisteredPatientAsync(PatientDto patient)
+    {
+        _model.Patient = patient;
+        _patientDraft = null;
+        _changingPatient = false;
+        _registeredPatientId = patient.Id;
+        _editContext.NotifyFieldChanged(_editContext.Field(nameof(VisitFormModel.Patient)));
+        _quickRegistrationOpen = false;
+        _focusExamination = true;
+        Snackbar.Add(T["visitDialog.patientRegistered"], Severity.Success);
+        return Task.CompletedTask;
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (_focusValidation && !_quickRegistrationOpen)
+        {
+            _focusValidation = false;
+            await _validationSummary.FocusAsync();
+        }
+        if (_focusPatient && !_quickRegistrationOpen && _patientLookup is not null)
+        {
+            _focusPatient = false;
+            await _patientLookup.FocusAsync();
+        }
+        if (_focusExamination && _examinationLookup is not null)
+        {
+            _focusExamination = false;
+            await _examinationLookup.FocusAsync();
+        }
     }
 
     private async Task<IEnumerable<ExaminationTypeDto>> SearchTypesAsync(string? value, CancellationToken ct)
@@ -202,10 +337,17 @@ public partial class VisitEditorDialog : ComponentBase, IDisposable
 
     private async Task SubmitAsync()
     {
+        if (IsBusy || _quickRegistrationOpen) return;
+        _submitAttempted = true;
+        // Remove previous conditional errors before checking the current status.
+        _scheduleMessages!.Clear();
         var baseValid = _editContext.Validate();
         var scheduleValid = ValidateSchedule();
         if (!baseValid || !scheduleValid)
+        {
+            _focusValidation = true;
             return;
+        }
 
         string? scheduledAt = null;
         if (_model.Status == "Scheduled")
@@ -265,6 +407,8 @@ public partial class VisitEditorDialog : ComponentBase, IDisposable
     }
 
     private void CancelAsync()
-        => MudDialog.Cancel();
+    {
+        if (!IsBusy) MudDialog.Cancel();
+    }
 }
 

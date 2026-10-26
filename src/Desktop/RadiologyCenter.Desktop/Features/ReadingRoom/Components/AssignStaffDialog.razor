@@ -1,11 +1,8 @@
 @using RadiologyCenter.Desktop.Models
 @using RadiologyCenter.Desktop.Services
 
-<MudDialog>
+<FormDialog Title="@T.AssignStaffDialog.Title" Icon="@Icons.Material.Filled.PersonAdd" Subtitle="@T["forms.assignmentSubtitle"]">
     <DialogContent>
-        <DialogHeader Icon="@Icons.Material.Filled.PersonAdd"
-                      Title="@T.AssignStaffDialog.Title" />
-
         @if (_loading)
         {
             <MudProgressCircular Indeterminate="true" Class="d-flex mx-auto my-4" />
@@ -14,43 +11,50 @@
         {
             <EditForm EditContext="_editContext">
                 <LocalizedDataAnnotationsValidator />
+            <div role="alert"><ValidationSummary /></div>
                 <MudGrid Spacing="3">
                     <MudItem xs="12">
-                        <MudSelect Disabled="_busy" T="string"
-                                   Label="@T.AssignStaffDialog.Radiologist"
-                                   @bind-Value="_radiologistId"
-                                   Variant="Variant.Outlined"
-                                   FullWidth="true">
-                            @foreach (var r in _radiologists)
-                            {
-                                <MudSelectItem Value="@r.Id">@r.FullName</MudSelectItem>
-                            }
-                        </MudSelect>
+                        <FormField Label="@T.AssignStaffDialog.Radiologist" Context="fieldId">
+                            <MudSelect Disabled="_busy" T="string"
+                                       InputId="@fieldId" aria-label="@T.AssignStaffDialog.Radiologist"
+                                       @bind-Value="_radiologistId"
+                                       Variant="Variant.Outlined"
+                                       FullWidth="true">
+                                @foreach (var r in _radiologists)
+                                {
+                                    <MudSelectItem Value="@r.Id">@r.FullName</MudSelectItem>
+                                }
+                            </MudSelect>
+                        </FormField>
                     </MudItem>
                     <MudItem xs="12">
-                        <MudSelect Disabled="_busy" T="string"
-                                   Label="@T.AssignStaffDialog.Technician"
-                                   @bind-Value="_technicianId"
-                                   Variant="Variant.Outlined"
-                                   FullWidth="true">
-                            @foreach (var t in _technicians)
-                            {
-                                <MudSelectItem Value="@t.Id">@t.FullName</MudSelectItem>
-                            }
-                        </MudSelect>
+                        <FormField Label="@T.AssignStaffDialog.Technician" Context="fieldId">
+                            <MudSelect Disabled="_busy" T="string"
+                                       InputId="@fieldId" aria-label="@T.AssignStaffDialog.Technician"
+                                       @bind-Value="_technicianId"
+                                       Variant="Variant.Outlined"
+                                       FullWidth="true">
+                                @foreach (var t in _technicians)
+                                {
+                                    <MudSelectItem Value="@t.Id">@t.FullName</MudSelectItem>
+                                }
+                            </MudSelect>
+                        </FormField>
                     </MudItem>
                     <MudItem xs="12">
-                        <MudSelect Disabled="_busy" T="string"
-                                   Label="@T.AssignStaffDialog.Equipment"
-                                   @bind-Value="_equipmentId"
-                                   Variant="Variant.Outlined"
-                                   FullWidth="true">
-                            <MudSelectItem Value="@((string?)null)">@T.AssignStaffDialog.None</MudSelectItem>
-                            @foreach (var eq in _filteredEquipments)
-                            {
-                                <MudSelectItem Value="@eq.Id">@eq.Name</MudSelectItem>
-                            }
-                        </MudSelect>
+                        <FormField Label="@T.AssignStaffDialog.Equipment" Context="fieldId">
+                            <MudSelect Disabled="_busy" T="string"
+                                       InputId="@fieldId" aria-label="@T.AssignStaffDialog.Equipment"
+                                       @bind-Value="_equipmentId"
+                                       Variant="Variant.Outlined"
+                                       FullWidth="true">
+                                <MudSelectItem Value="@((string?)null)">@T.AssignStaffDialog.None</MudSelectItem>
+                                @foreach (var eq in _filteredEquipments)
+                                {
+                                    <MudSelectItem Value="@eq.Id">@eq.Name</MudSelectItem>
+                                }
+                            </MudSelect>
+                        </FormField>
                     </MudItem>
                 </MudGrid>
             </EditForm>
@@ -66,4 +70,4 @@
             <text>@T.AssignStaffDialog.Assign</text>
         </MudButton>
     </DialogActions>
-</MudDialog>
+</FormDialog>

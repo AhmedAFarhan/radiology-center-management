@@ -1,0 +1,19 @@
+.quick-patient { max-width: 560px; margin-inline: auto; }
+.quick-patient-context { display: flex; align-items: center; gap: 8px; padding: 12px 14px; margin-block-end: 24px; border-radius: 8px; background: var(--mud-palette-primary-hover); color: var(--mud-palette-primary); font-size: .875rem; line-height: 1.6; }
+.quick-patient-context ::deep .mud-icon-root { flex-shrink: 0; }
+.quick-patient-fields { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px; margin: 0; padding: 0; border: 0; min-width: 0; }
+.quick-patient-fields ::deep .app-form-field { margin: 0; }
+.quick-patient-fields ::deep input[type="tel"] { direction: ltr; text-align: start; }
+.quick-patient-wide { grid-column: 1 / -1; min-width: 0; }
+.quick-patient-age { padding-block-start: 4px; }
+.quick-patient-age-mode { display: inline-flex; flex-wrap: wrap; gap: 4px; padding: 4px; margin-block-end: 16px; background: var(--mud-palette-background); border: 1px solid var(--mud-palette-lines-default); border-radius: 10px; }
+.quick-patient-age-mode ::deep .mud-button-root { min-height: 44px; padding-inline: 18px; text-transform: none; }
+.quick-patient-note { display: flex; align-items: flex-start; gap: 8px; margin: 24px 0 0; padding-block-start: 18px; border-top: 1px solid var(--mud-palette-lines-default); color: var(--mud-palette-text-secondary); font-size: .8125rem; line-height: 1.7; }
+.quick-patient-note ::deep .mud-icon-root { flex-shrink: 0; margin-block-start: 2px; }
+.quick-patient-errors { margin-block-end: 20px; padding: 12px 16px; border: 1px solid var(--mud-palette-error); border-radius: 8px; background: var(--mud-palette-error-hover); color: var(--mud-palette-error); font-size: .875rem; }
+.quick-patient-errors:focus-visible { outline: 2px solid var(--mud-palette-primary); outline-offset: 3px; }
+.quick-patient-errors ::deep .validation-errors { margin: 8px 0 0; padding-block: 0; padding-inline: 20px 0; border: 0; background: transparent; }
+.visually-hidden { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; border: 0; }
+@media (max-width: 600px) {
+    .quick-patient-fields { grid-template-columns: minmax(0, 1fr); gap: 16px; }
+}

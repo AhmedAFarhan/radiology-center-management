@@ -1,0 +1,17 @@
+<div class="@(First ? "app-form-section-heading app-form-section-first" : "app-form-section-heading")">
+    <h3>
+        <MudIcon Icon="@Icon" Size="Size.Small" aria-hidden="true" />
+        <span>@Title</span>
+    </h3>
+    @if (!string.IsNullOrWhiteSpace(Description))
+    {
+        <p>@Description</p>
+    }
+</div>
+
+@code {
+    [Parameter, EditorRequired] public string Title { get; set; } = string.Empty;
+    [Parameter] public string Icon { get; set; } = Icons.Material.Outlined.Subject;
+    [Parameter] public string? Description { get; set; }
+    [Parameter] public bool First { get; set; }
+}

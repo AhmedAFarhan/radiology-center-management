@@ -3,81 +3,104 @@
 @inject ISnackbar Snackbar
 @inject AppLocalizer T
 
-<MudDialog>
+<FormDialog Title="@T.SendDialog.Title" Icon="@Icons.Material.Filled.Send" Subtitle="@T["forms.notificationSubtitle"]">
     <DialogContent>
-        <DialogHeader Icon="@Icons.Material.Filled.Send" Title="@T.SendDialog.Title" />
         <MudAlert Severity="Severity.Info" Variant="Variant.Text" Class="mb-3">
             @T.SendDialog.LogOnlyAlert
         </MudAlert>
         <EditForm EditContext="_editContext">
             <LocalizedDataAnnotationsValidator />
-            <MudGrid Spacing="2">
-                <MudItem xs="12" sm="6">
-                    <MudTextField Disabled="_busy" @bind-Value="_model.Recipient"
-                                  Label="@T.SendDialog.RecipientLabel"
-                                  Variant="Variant.Outlined"
-                                  Margin="Margin.Dense"
-                                  Immediate="true"
-                                  For="@(() => _model.Recipient)" />
+            <div role="alert"><ValidationSummary /></div>
+            <MudGrid Spacing="3">
+                <MudItem xs="12" Class="app-form-section-item">
+                    <FormSectionHeading Title="@T["forms.delivery"]" Icon="@Icons.Material.Outlined.Send" First="true" />
                 </MudItem>
                 <MudItem xs="12" sm="6">
-                    <MudSelect Disabled="_busy" T="string"
-                               Value="_model.Channel"
-                               ValueChanged="OnChannelChangedAsync"
-                               Label="@T.SendDialog.Channel"
-                               Variant="Variant.Outlined"
-                               Margin="Margin.Dense"
-                               For="@(() => _model.Channel)">
-                        @foreach (var channel in _channelOptions)
-                        {
-                            <MudSelectItem T="string" Value="@channel.Key">@channel.Value</MudSelectItem>
-                        }
-                    </MudSelect>
+                    <FormField Label="@T.SendDialog.RecipientLabel" Context="fieldId" Required="true">
+                        <LocalizedTextField Disabled="_busy" @bind-Value="_model.Recipient"
+                                      InputId="@fieldId" aria-required="true" aria-label="@T.SendDialog.RecipientLabel"
+                                      Variant="Variant.Outlined"
+                                      Margin="Margin.Dense"
+                                      Immediate="true"
+                                      For="@(() => _model.Recipient)" />
+                    </FormField>
+                </MudItem>
+                <MudItem xs="12" sm="6">
+                    <FormField Label="@T.SendDialog.Channel" Context="fieldId" Required="true">
+                        <LocalizedSelect Disabled="_busy" T="string"
+                                   Value="_model.Channel"
+                                   ValueChanged="OnChannelChangedAsync"
+                                   InputId="@fieldId" aria-required="true" aria-label="@T.SendDialog.Channel"
+                                   Variant="Variant.Outlined"
+                                   Margin="Margin.Dense"
+                                   For="@(() => _model.Channel)">
+                            @foreach (var channel in _channelOptions)
+                            {
+                                <MudSelectItem T="string" Value="@channel.Key">@channel.Value</MudSelectItem>
+                            }
+                        </LocalizedSelect>
+                    </FormField>
                 </MudItem>
                 <MudItem xs="12">
-                    <MudSelect Disabled="_busy" T="string"
-                               Value="_model.TemplateCode"
-                               ValueChanged="OnTemplateCodeChangedAsync"
-                               Label="@T.SendDialog.Template"
-                               Variant="Variant.Outlined"
-                               Margin="Margin.Dense"
-                               HelperText="@T.SendDialog.TemplateHelper">
-                        <MudSelectItem T="string" Value="@(string.Empty)">@T.SendDialog.NoTemplate</MudSelectItem>
-                        @foreach (var template in _templates)
-                        {
-                            <MudSelectItem T="string" Value="@template.Code">@template.Code - @template.Name</MudSelectItem>
-                        }
-                    </MudSelect>
+                    <FormField Label="@T.SendDialog.Template" Context="fieldId">
+                        <MudSelect Disabled="_busy" T="string"
+                                   Value="_model.TemplateCode"
+                                   ValueChanged="OnTemplateCodeChangedAsync"
+                                   InputId="@fieldId" aria-label="@T.SendDialog.Template"
+                                   Variant="Variant.Outlined"
+                                   Margin="Margin.Dense"
+                                   HelperText="@T.SendDialog.TemplateHelper">
+                            <MudSelectItem T="string" Value="@(string.Empty)">@T.SendDialog.NoTemplate</MudSelectItem>
+                            @foreach (var template in _templates)
+                            {
+                                <MudSelectItem T="string" Value="@template.Code">@template.Code - @template.Name</MudSelectItem>
+                            }
+                        </MudSelect>
+                    </FormField>
+                </MudItem>
+                <MudItem xs="12" Class="app-form-section-item">
+                    <FormSectionHeading Title="@T["forms.message"]" Icon="@Icons.Material.Outlined.MailOutline" />
                 </MudItem>
                 <MudItem xs="12">
-                    <MudTextField Disabled="_busy" @bind-Value="_model.Subject"
-                                  Label="@T.SendDialog.Subject"
-                                  Variant="Variant.Outlined"
-                                  Margin="Margin.Dense"
-                                  Immediate="true" />
+                    <FormField Label="@T.SendDialog.Subject" Context="fieldId">
+                        <MudTextField Disabled="_busy" @bind-Value="_model.Subject"
+                                      InputId="@fieldId" aria-label="@T.SendDialog.Subject"
+                                      Variant="Variant.Outlined"
+                                      Margin="Margin.Dense"
+                                      Immediate="true" />
+                    </FormField>
                 </MudItem>
                 <MudItem xs="12">
-                    <MudTextField Disabled="_busy" @bind-Value="_model.Body"
-                                  Label="@T.SendDialog.Body"
-                                  Variant="Variant.Outlined"
-                                  Margin="Margin.Dense"
-                                  Immediate="true"
-                                  Lines="4"
-                                  />
+                    <FormField Label="@T.SendDialog.Body" Context="fieldId">
+                        <MudTextField Disabled="_busy" @bind-Value="_model.Body"
+                                      InputId="@fieldId" aria-label="@T.SendDialog.Body"
+                                      Variant="Variant.Outlined"
+                                      Margin="Margin.Dense"
+                                      Immediate="true"
+                                      Lines="4"
+                                      />
+                    </FormField>
+                </MudItem>
+                <MudItem xs="12" Class="app-form-section-item">
+                    <FormSectionHeading Title="@T["forms.reference"]" Icon="@Icons.Material.Outlined.Subject" />
                 </MudItem>
                 <MudItem xs="12">
-                    <MudTextField Disabled="_busy" @bind-Value="_model.ReferenceId"
-                                  Label="@T.SendDialog.ReferenceOptional"
-                                  Variant="Variant.Outlined"
-                                  Margin="Margin.Dense"
-                                  Immediate="true" />
+                    <FormField Label="@T.SendDialog.ReferenceOptional" Context="fieldId">
+                        <MudTextField Disabled="_busy" @bind-Value="_model.ReferenceId"
+                                      InputId="@fieldId" aria-label="@T.SendDialog.ReferenceOptional"
+                                      Variant="Variant.Outlined"
+                                      Margin="Margin.Dense"
+                                      Immediate="true" />
+                    </FormField>
                 </MudItem>
                 <MudItem xs="12">
-                    <MudTextField Disabled="_busy" @bind-Value="_model.Placeholders"
-                                  Label="@T.SendDialog.PlaceholdersLabel"
-                                  Variant="Variant.Outlined"
-                                  Margin="Margin.Dense"
-                                  Immediate="true" />
+                    <FormField Label="@T.SendDialog.PlaceholdersLabel" Context="fieldId">
+                        <MudTextField Disabled="_busy" @bind-Value="_model.Placeholders"
+                                      InputId="@fieldId" aria-label="@T.SendDialog.PlaceholdersLabel"
+                                      Variant="Variant.Outlined"
+                                      Margin="Margin.Dense"
+                                      Immediate="true" />
+                    </FormField>
                 </MudItem>
             </MudGrid>
         </EditForm>
@@ -101,11 +124,8 @@
             {
                 <MudProgressCircular Size="Size.Small" Indeterminate="true" Class="mx-1" />
             }
-            else
-            {
-                <text>@T.SendDialog.Send</text>
-            }
+            <text>@T.SendDialog.Send</text>
         </MudButton>
     </DialogActions>
-</MudDialog>
+</FormDialog>
 

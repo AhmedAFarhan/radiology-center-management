@@ -1,28 +1,32 @@
 @inherits EditorDialogBase
 @inject CashService CashService
 
-<MudDialog>
+<FormDialog Title="@T.OpenCash.Title" Icon="@Icons.Material.Filled.AccountBalanceWallet" Subtitle="@T["forms.cashSubtitle"]">
     <DialogContent>
-        <DialogHeader Icon="@Icons.Material.Filled.AccountBalanceWallet" Title="@T.OpenCash.Title" />
         <EditForm EditContext="_editContext" OnValidSubmit="SubmitAsync">
             <LocalizedDataAnnotationsValidator />
-            <MudGrid Spacing="2">
+            <div role="alert"><ValidationSummary /></div>
+            <MudGrid Spacing="3">
                 <MudItem xs="12">
                     <MudText Typo="Typo.body2" Class="text-secondary mb-1">@T.OpenCash.OpeningFloatHint</MudText>
-                    <MudNumericField Disabled="Busy" @bind-Value="_model.OpeningFloat"
-                                     Label="@T.OpenCash.OpeningFloat"
-                                     Variant="Variant.Outlined"
-                                     Margin="Margin.Dense"
-                                     Immediate="true"
-                                     For="@(() => _model.OpeningFloat)" />
+                    <FormField Label="@T.OpenCash.OpeningFloat" Context="fieldId">
+                        <LocalizedNumericField Disabled="Busy" @bind-Value="_model.OpeningFloat"
+                                         InputId="@fieldId" aria-label="@T.OpenCash.OpeningFloat"
+                                         Variant="Variant.Outlined"
+                                         Margin="Margin.Dense"
+                                         Immediate="true"
+                                         For="@(() => _model.OpeningFloat)" />
+                    </FormField>
                 </MudItem>
                 <MudItem xs="12">
-                    <MudTextField Disabled="Busy" @bind-Value="_model.Notes"
-                                  Label="@T.OpenCash.Notes"
-                                  Variant="Variant.Outlined"
-                                  Margin="Margin.Dense"
-                                  Immediate="true"
-                                  For="@(() => _model.Notes)" />
+                    <FormField Label="@T.OpenCash.Notes" Context="fieldId">
+                        <LocalizedTextField Disabled="Busy" @bind-Value="_model.Notes"
+                                      InputId="@fieldId" aria-label="@T.OpenCash.Notes"
+                                      Variant="Variant.Outlined"
+                                      Margin="Margin.Dense"
+                                      Immediate="true"
+                                      For="@(() => _model.Notes)" />
+                    </FormField>
                 </MudItem>
             </MudGrid>
             <button type="submit" style="display:none"></button>
@@ -35,5 +39,5 @@
                        OnCancel="CancelAsync"
                        OnSave="SubmitAsync" />
     </DialogActions>
-</MudDialog>
+</FormDialog>
 

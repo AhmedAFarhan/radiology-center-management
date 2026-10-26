@@ -16,11 +16,22 @@
     <PackageReference Include="xunit.runner.visualstudio" Version="3.0.2" PrivateAssets="all" />
   </ItemGroup>
   <ItemGroup>
+    <RazorComponent Include="../RadiologyCenter.Desktop/Features/Patients/Components/QuickPatientRegistration.razor" Link="Features/Patients/Components/QuickPatientRegistration.razor" />
+    <Compile Include="../RadiologyCenter.Desktop/Features/Patients/Models/PatientModels.cs" Link="Models/PatientModels.cs" />
+    <Compile Include="../RadiologyCenter.Desktop/Features/Patients/Models/FormModels.cs" Link="Models/PatientFormModel.cs" />
+    <Compile Include="../RadiologyCenter.Desktop/Shared/Components/LocalizedTextField.cs" Link="Shared/Components/LocalizedTextField.cs" />
+    <Compile Include="../RadiologyCenter.Desktop/Shared/Components/LocalizedInputs.cs" Link="Shared/Components/LocalizedInputs.cs" />
+    <Compile Include="../RadiologyCenter.Desktop/Shared/Components/LocalizedDataAnnotationsValidator.cs" Link="Shared/Components/LocalizedDataAnnotationsValidator.cs" />
+    <Compile Include="../RadiologyCenter.Desktop/Shared/Components/ValidationKeys.cs" Link="Shared/Components/ValidationKeys.cs" />
+    <Compile Include="../RadiologyCenter.Desktop/Services/ClinicTime.cs" Link="Services/ClinicTime.cs" />
     <RazorComponent Include="../RadiologyCenter.Desktop/Features/ReadingRoom/Components/ReadingRoomFindingsList.razor" Link="Features/ReadingRoom/Components/ReadingRoomFindingsList.razor" />
+    <RazorComponent Include="../RadiologyCenter.Desktop/Shared/Components/FormField.razor" Link="Shared/Components/FormField.razor" />
+    <RazorComponent Include="../RadiologyCenter.Desktop/Shared/Components/FormSectionHeading.razor" Link="Shared/Components/FormSectionHeading.razor" />
     <Compile Include="../RadiologyCenter.Desktop/Features/ReadingRoom/Components/ReadingRoomFindingsList.razor.cs" Link="Features/ReadingRoom/Components/ReadingRoomFindingsList.razor.cs" />
     <Compile Include="../RadiologyCenter.Desktop/Features/Reports/Models/ReportModels.cs" Link="Models/ReportModels.cs" />
     <Compile Include="../RadiologyCenter.Desktop/Models/SharedModels.cs" Link="Models/SharedModels.cs" />
     <Compile Include="../RadiologyCenter.Desktop/Localization/AppLocalizer.cs" Link="Localization/AppLocalizer.cs" />
+    <Compile Include="../RadiologyCenter.Desktop/Localization/AppMudLocalizer.cs" Link="Localization/AppMudLocalizer.cs" />
     <Compile Include="../RadiologyCenter.Desktop/Localization/AppLocalizer.Keys.g.cs" Link="Localization/AppLocalizer.Keys.g.cs" />
     <Content Include="../RadiologyCenter.Desktop/Localization/en.json" Link="Localization/en.json" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="../RadiologyCenter.Desktop/Localization/ar.json" Link="Localization/ar.json" CopyToOutputDirectory="PreserveNewest" />

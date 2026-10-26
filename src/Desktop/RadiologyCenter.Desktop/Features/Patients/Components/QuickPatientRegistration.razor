@@ -1,0 +1,198 @@
+@using System.Text.RegularExpressions
+@using RadiologyCenter.Desktop.Features.Patients.Models
+@inject AppLocalizer T
+
+<EditForm EditContext="_editContext" OnSubmit="RegisterAsync">
+    <LocalizedDataAnnotationsValidator />
+    <section class="quick-patient" aria-busy="@_saving.ToString().ToLowerInvariant()">
+        <div class="quick-patient-context">
+            <MudIcon Icon="@Icons.Material.Outlined.EventNote" Size="Size.Small" aria-hidden="true" />
+            <span>@T["visitDialog.visitDraftKept"]</span>
+        </div>
+
+        @if (_showErrors || _saveFailed)
+        {
+            <div class="quick-patient-errors" role="alert" tabindex="-1" @ref="_errorSummary">
+                <strong>@T[_saveFailed ? "visitDialog.registrationFailed" : "patientDialog.reviewFields"]</strong>
+                @if (_showErrors)
+                {
+                    <ValidationSummary />
+                }
+            </div>
+        }
+
+        <fieldset class="quick-patient-fields" disabled="@(_saving || Disabled)">
+            <legend class="visually-hidden">@T["patientDialog.basicDetails"]</legend>
+            <div class="quick-patient-wide">
+                <FormField Label="@T.PatientDialog.FullName" Required="true" Context="fieldId">
+                    <LocalizedTextField T="string" @ref="_nameInput" InputId="@fieldId" @bind-Value="_model.FullName"
+                                        Disabled="@(_saving || Disabled)" Variant="Variant.Outlined" Margin="Margin.Dense"
+                                        Immediate="true" MaxLength="300" For="@(() => _model.FullName)" aria-required="true"
+                                        HelperText="@T["patientDialog.fullNameHint"]" />
+                </FormField>
+            </div>
+            <FormField Label="@T.PatientDialog.PhoneNumber" Required="true" Context="fieldId">
+                <LocalizedTextField T="string" InputId="@fieldId" InputType="InputType.Telephone" @bind-Value="_model.PhoneNumber"
+                                    Disabled="@(_saving || Disabled)" Variant="Variant.Outlined" Margin="Margin.Dense"
+                                    Immediate="true" MaxLength="30" For="@(() => _model.PhoneNumber)" aria-required="true" />
+            </FormField>
+            <FormField Label="@T.PatientDialog.Gender" Required="true" Context="fieldId">
+                <LocalizedSelect T="string" InputId="@fieldId" @bind-Value="_model.Gender" For="@(() => _model.Gender)"
+                           Disabled="@(_saving || Disabled)" Variant="Variant.Outlined" Margin="Margin.Dense"
+                           aria-label="@T.PatientDialog.Gender" aria-required="true">
+                    @foreach (var gender in GenderOptions)
+                    {
+                        <MudSelectItem T="string" Value="@gender.Key">@gender.Value</MudSelectItem>
+                    }
+                </LocalizedSelect>
+            </FormField>
+            <div class="quick-patient-wide quick-patient-age">
+                <div class="quick-patient-age-mode" role="group" aria-label="@T["visitDialog.ageEntryMethod"]">
+                    <MudButton ButtonType="ButtonType.Button" Variant="@(!_useDateOfBirth ? Variant.Filled : Variant.Text)"
+                               Color="Color.Primary" DropShadow="false" Disabled="@(_saving || Disabled)"
+                               aria-pressed="@(!_useDateOfBirth ? "true" : "false")" OnClick="@(() => SetAgeMode(false))">@T.PatientDialog.Age</MudButton>
+                    <MudButton ButtonType="ButtonType.Button" Variant="@(_useDateOfBirth ? Variant.Filled : Variant.Text)"
+                               Color="Color.Primary" DropShadow="false" Disabled="@(_saving || Disabled)"
+                               aria-pressed="@(_useDateOfBirth ? "true" : "false")" OnClick="@(() => SetAgeMode(true))">@T.PatientDialog.DateOfBirth</MudButton>
+                </div>
+                @if (_useDateOfBirth)
+                {
+                    <FormField Label="@T.PatientDialog.DateOfBirth" Required="true" Context="fieldId">
+                        <LocalizedDatePicker InputId="@fieldId" @bind-Date="_model.DateOfBirth" For="@(() => _model.DateOfBirth)"
+                                       Disabled="@(_saving || Disabled)" MaxDate="ClinicTime.Today" Clearable="true"
+                                       Variant="Variant.Outlined" Margin="Margin.Dense" aria-required="true" />
+                    </FormField>
+                }
+                else
+                {
+                    <FormField Label="@T.PatientDialog.Age" Required="true" Context="fieldId">
+                        <LocalizedNumericField T="int?" InputId="@fieldId" @bind-Value="_model.Age" For="@(() => _model.Age)"
+                                         Disabled="@(_saving || Disabled)" Min="0" Max="150"
+                                         Variant="Variant.Outlined" Margin="Margin.Dense" Immediate="true" aria-required="true"
+                                         HelperText="@T["visitDialog.ageInYears"]" />
+                        <ValidationMessage For="@(() => _model.DateOfBirth)" />
+                    </FormField>
+                }
+            </div>
+        </fieldset>
+
+        <p class="quick-patient-note"><MudIcon Icon="@Icons.Material.Outlined.Info" Size="Size.Small" aria-hidden="true" /><span>@T["visitDialog.patientSavedSeparately"]</span></p>
+    </section>
+</EditForm>
+
+@code {
+    [Parameter] public string? SearchText { get; set; }
+    [Parameter] public PatientInput? Draft { get; set; }
+    [Parameter] public bool Disabled { get; set; }
+    [Parameter] public IReadOnlyList<EnumOptionDto> GenderOptions { get; set; } = [];
+    [Parameter, EditorRequired] public Func<PatientInput, Task<PatientDto?>> CreatePatient { get; set; } = default!;
+    [Parameter] public EventCallback<PatientDto> Registered { get; set; }
+    [Parameter] public EventCallback<bool> SavingChanged { get; set; }
+
+    private readonly PatientFormModel _model = new();
+    private EditContext _editContext = default!;
+    private MudTextField<string>? _nameInput;
+    private ElementReference _errorSummary;
+    private bool _saving, _showErrors, _saveFailed, _focusErrors, _useDateOfBirth, _registered;
+
+    protected override void OnInitialized()
+    {
+        if (Draft is { } draft)
+        {
+            _model.FullName = draft.FullName;
+            _model.PhoneNumber = draft.PhoneNumber;
+            _model.Gender = draft.Gender;
+            _model.Age = draft.Age;
+            _model.DateOfBirth = draft.DateOfBirth;
+            _useDateOfBirth = draft.DateOfBirth is not null;
+        }
+        else
+        {
+            var seed = SearchText?.Trim() ?? string.Empty;
+            if (seed.Any(char.IsDigit) && seed.All(c => char.IsDigit(c) || char.IsWhiteSpace(c) || "+()-".Contains(c)))
+                _model.PhoneNumber = seed;
+            else if (seed.Any(char.IsLetter) && !seed.Any(char.IsDigit))
+                _model.FullName = seed;
+        }
+        _editContext = new EditContext(_model);
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (_focusErrors)
+        {
+            _focusErrors = false;
+            await _errorSummary.FocusAsync();
+        }
+        else if (firstRender && _nameInput is not null)
+            await _nameInput.FocusAsync();
+    }
+
+    private void SetAgeMode(bool useDateOfBirth)
+    {
+        if (_saving || Disabled) return;
+        _useDateOfBirth = useDateOfBirth;
+        if (_showErrors) _showErrors = !ValidateActiveAge();
+    }
+
+    public PatientInput GetDraft() => new()
+    {
+        FullName = _model.FullName,
+        PhoneNumber = _model.PhoneNumber,
+        Gender = _model.Gender,
+        DateOfBirth = _useDateOfBirth ? _model.DateOfBirth : null,
+        Age = _useDateOfBirth ? null : _model.Age
+    };
+
+    private bool ValidateActiveAge()
+    {
+        // Validate only the age entry method currently visible to the user.
+        var age = _model.Age;
+        var dateOfBirth = _model.DateOfBirth;
+        if (_useDateOfBirth) _model.Age = null;
+        else _model.DateOfBirth = null;
+        var valid = _editContext.Validate();
+        _model.Age = age;
+        _model.DateOfBirth = dateOfBirth;
+        return valid;
+    }
+
+    public async Task RegisterAsync()
+    {
+        if (_saving || _registered || Disabled || GenderOptions.Count == 0) return;
+        _saveFailed = false;
+        _showErrors = !ValidateActiveAge();
+        if (_showErrors) { _focusErrors = true; StateHasChanged(); return; }
+
+        PatientDto? patient = null;
+        _saving = true;
+        StateHasChanged();
+        try
+        {
+            await SavingChanged.InvokeAsync(true);
+            patient = await CreatePatient(new PatientInput
+            {
+                FullName = Regex.Replace(_model.FullName.Trim(), @"\s+", " "),
+                Gender = _model.Gender,
+                PhoneNumber = _model.PhoneNumber.Trim(),
+                DateOfBirth = _useDateOfBirth ? _model.DateOfBirth : null,
+                Age = _useDateOfBirth ? null : _model.Age,
+            });
+            _registered = patient is not null;
+            _saveFailed = patient is null;
+        }
+        catch { _saveFailed = true; }
+        finally
+        {
+            _saving = false;
+            await SavingChanged.InvokeAsync(false);
+        }
+        if (patient is not null)
+            await Registered.InvokeAsync(patient);
+        else
+        {
+            _focusErrors = true;
+            StateHasChanged();
+        }
+    }
+}

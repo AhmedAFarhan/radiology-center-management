@@ -3,58 +3,74 @@
 @inject InventoryService InventoryService
 @inject EnumOptionsService EnumOptionsService
 
-<MudDialog>
+<FormDialog Title="@(Type is null ? T.ExamDialog.NewTitle : T.ExamDialog.EditTitle)" Icon="@Icons.Material.Filled.MedicalServices" Subtitle="@T["forms.examinationSubtitle"]">
     <DialogContent>
-        <DialogHeader Icon="@Icons.Material.Filled.MedicalServices" Title="@(Type is null ? T.ExamDialog.NewTitle : T.ExamDialog.EditTitle)" />
         <EditForm EditContext="_editContext" OnValidSubmit="SubmitAsync">
             <LocalizedDataAnnotationsValidator />
-            <MudGrid Spacing="2">
+            <div role="alert"><ValidationSummary /></div>
+            <MudGrid Spacing="3">
+                <MudItem xs="12" Class="app-form-section-item">
+                    <FormSectionHeading Title="@T["forms.examinationType"]" Icon="@Icons.Material.Outlined.MedicalServices" First="true" />
+                </MudItem>
                 <MudItem xs="12">
-                    <MudTextField Disabled="Busy" @bind-Value="_model.Name"
-                                  Label="@T.Common.Name"
-                                  Variant="Variant.Outlined"
-                                  Margin="Margin.Dense"
-                                  Immediate="true"
-                                  For="@(() => _model.Name)" />
+                    <FormField Label="@T.Common.Name" Context="fieldId" Required="true">
+                        <LocalizedTextField Disabled="Busy" @bind-Value="_model.Name"
+                                      InputId="@fieldId" aria-required="true" aria-label="@T.Common.Name"
+                                      Variant="Variant.Outlined"
+                                      Margin="Margin.Dense"
+                                      Immediate="true"
+                                      For="@(() => _model.Name)" />
+                    </FormField>
                 </MudItem>
                 <MudItem xs="12" sm="6">
-                    <MudSelect Disabled="Busy" T="string"
-                               @bind-Value="_model.Modality"
-                               Label="@T.ExamDialog.Modality"
-                               Variant="Variant.Outlined"
-                               Margin="Margin.Dense"
-                               For="@(() => _model.Modality)">
-                        @foreach (var option in _modalityOptions)
-                        {
-                            <MudSelectItem T="string" Value="@option.Key">@option.Value</MudSelectItem>
-                        }
-                    </MudSelect>
+                    <FormField Label="@T.ExamDialog.Modality" Context="fieldId" Required="true">
+                        <LocalizedSelect Disabled="Busy" T="string"
+                                   @bind-Value="_model.Modality"
+                                   InputId="@fieldId" aria-required="true" aria-label="@T.ExamDialog.Modality"
+                                   Variant="Variant.Outlined"
+                                   Margin="Margin.Dense"
+                                   For="@(() => _model.Modality)">
+                            @foreach (var option in _modalityOptions)
+                            {
+                                <MudSelectItem T="string" Value="@option.Key">@option.Value</MudSelectItem>
+                            }
+                        </LocalizedSelect>
+                    </FormField>
                 </MudItem>
                 <MudItem xs="12" sm="6">
-                    <MudTextField Disabled="Busy" @bind-Value="_model.BodyPart"
-                                  Label="@T.ExamDialog.BodyPart"
-                                  Variant="Variant.Outlined"
-                                  Margin="Margin.Dense"
-                                  Immediate="true"
-                                  For="@(() => _model.BodyPart)" />
+                    <FormField Label="@T.ExamDialog.BodyPart" Context="fieldId" Required="true">
+                        <LocalizedTextField Disabled="Busy" @bind-Value="_model.BodyPart"
+                                      InputId="@fieldId" aria-required="true" aria-label="@T.ExamDialog.BodyPart"
+                                      Variant="Variant.Outlined"
+                                      Margin="Margin.Dense"
+                                      Immediate="true"
+                                      For="@(() => _model.BodyPart)" />
+                    </FormField>
+                </MudItem>
+                <MudItem xs="12" Class="app-form-section-item">
+                    <FormSectionHeading Title="@T["forms.durationPrice"]" Icon="@Icons.Material.Outlined.Schedule" />
                 </MudItem>
                 <MudItem xs="12" sm="6">
-                    <MudNumericField Disabled="Busy" T="int"
-                                     @bind-Value="_model.StandardDurationMinutes"
-                                     Label="@T.ExamDialog.StandardDuration"
-                                     Variant="Variant.Outlined"
-                                     Margin="Margin.Dense"
-                                     Min="0"
-                                     For="@(() => _model.StandardDurationMinutes)" />
+                    <FormField Label="@T.ExamDialog.StandardDuration" Context="fieldId">
+                        <LocalizedNumericField Disabled="Busy" T="int"
+                                         @bind-Value="_model.StandardDurationMinutes"
+                                         InputId="@fieldId" aria-label="@T.ExamDialog.StandardDuration"
+                                         Variant="Variant.Outlined"
+                                         Margin="Margin.Dense"
+                                         Min="0"
+                                         For="@(() => _model.StandardDurationMinutes)" />
+                    </FormField>
                 </MudItem>
                 <MudItem xs="12" sm="6">
-                    <MudNumericField Disabled="Busy" T="decimal"
-                                     @bind-Value="_model.Price"
-                                     Label="@T.ExamDialog.Price"
-                                     Variant="Variant.Outlined"
-                                     Margin="Margin.Dense"
-                                     Min="0"
-                                     For="@(() => _model.Price)" />
+                    <FormField Label="@T.ExamDialog.Price" Context="fieldId">
+                        <LocalizedNumericField Disabled="Busy" T="decimal"
+                                         @bind-Value="_model.Price"
+                                         InputId="@fieldId" aria-label="@T.ExamDialog.Price"
+                                         Variant="Variant.Outlined"
+                                         Margin="Margin.Dense"
+                                         Min="0"
+                                         For="@(() => _model.Price)" />
+                    </FormField>
                 </MudItem>
                 <MudItem xs="12" sm="6">
                     <MudSwitch Disabled="Busy" T="bool" @bind-Value="_model.RequiresPreparation" Color="Color.Info">@T.ExamDialog.RequiresPreparation</MudSwitch>
@@ -66,45 +82,51 @@
 
             <MudDivider Class="my-3" />
             <div class="d-flex align-center justify-space-between mb-2">
-                <MudText Typo="Typo.subtitle2">@T.ExamDialog.ItemsTitle</MudText>
+                <FormSectionHeading Title="@T.ExamDialog.ItemsTitle" First="true" />
                 <MudButton Variant="Variant.Text" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Add" OnClick="AddItem" Size="Size.Small">@T.ExamDialog.AddItem</MudButton>
             </div>
 
             @foreach (var item in _model.Items)
             {
-                <MudGrid Spacing="2" Class="align-center mb-2">
-                    <MudItem xs="12" sm="5">
-                        <MudSelect Disabled="Busy" T="string"
-                                   @bind-Value="item.ItemId"
-                                   Label="@T.ExamDialog.InventoryItem"
-                                   Variant="Variant.Outlined"
-                                   Margin="Margin.Dense">
-                            @foreach (var invItem in _inventoryItems)
-                            {
-                                <MudSelectItem T="string" Value="@invItem.Id">@invItem.Name</MudSelectItem>
-                            }
-                        </MudSelect>
-                    </MudItem>
-                    <MudItem xs="12" sm="2">
-                        <MudNumericField Disabled="Busy" T="int"
-                                         @bind-Value="item.Quantity"
-                                         Label="@T.ExamDialog.Qty"
-                                         Variant="Variant.Outlined"
-                                         Margin="Margin.Dense"
-                                         Min="1" />
-                    </MudItem>
-                    <MudItem xs="12" sm="4">
-                        <MudSwitch Disabled="Busy" T="bool" @bind-Value="item.IsContrast" Color="Color.Secondary" Class="me-3">@T.ExamDialog.Contrast</MudSwitch>
-                        <MudSwitch Disabled="Busy" T="bool" @bind-Value="item.IsRequired" Color="Color.Primary">@T.ExamDialog.Required</MudSwitch>
-                    </MudItem>
-                    <MudItem xs="12" sm="1">
-                        <MudIconButton Icon="@Icons.Material.Filled.RemoveCircleOutline"
-                                       Size="Size.Small"
-                                       Color="Color.Error"
-                                       aria-label="@T.ExamDialog.RemoveItem"
-                                       OnClick="@(() => RemoveItem(item))" />
-                    </MudItem>
-                </MudGrid>
+                <div class="app-form-line">
+                    <MudGrid Spacing="3" Class="align-center mb-2">
+                        <MudItem xs="12" sm="8">
+                            <FormField Label="@T.ExamDialog.InventoryItem" Context="fieldId">
+                                <MudSelect Disabled="Busy" T="string"
+                                           @bind-Value="item.ItemId"
+                                           InputId="@fieldId" aria-label="@T.ExamDialog.InventoryItem"
+                                           Variant="Variant.Outlined"
+                                           Margin="Margin.Dense">
+                                    @foreach (var invItem in _inventoryItems)
+                                    {
+                                        <MudSelectItem T="string" Value="@invItem.Id">@invItem.Name</MudSelectItem>
+                                    }
+                                </MudSelect>
+                            </FormField>
+                        </MudItem>
+                        <MudItem xs="12" sm="4">
+                            <FormField Label="@T.ExamDialog.Qty" Context="fieldId">
+                                <MudNumericField Disabled="Busy" T="int"
+                                                 @bind-Value="item.Quantity"
+                                                 InputId="@fieldId" aria-label="@T.ExamDialog.Qty"
+                                                 Variant="Variant.Outlined"
+                                                 Margin="Margin.Dense"
+                                                 Min="1" />
+                            </FormField>
+                        </MudItem>
+                        <MudItem xs="10">
+                            <MudSwitch Disabled="Busy" T="bool" @bind-Value="item.IsContrast" Color="Color.Secondary" Class="me-3">@T.ExamDialog.Contrast</MudSwitch>
+                            <MudSwitch Disabled="Busy" T="bool" @bind-Value="item.IsRequired" Color="Color.Primary">@T.ExamDialog.Required</MudSwitch>
+                        </MudItem>
+                        <MudItem xs="2" Class="d-flex justify-end">
+                            <MudIconButton Icon="@Icons.Material.Filled.RemoveCircleOutline"
+                                           Size="Size.Small"
+                                           Color="Color.Error"
+                                           aria-label="@T.ExamDialog.RemoveItem"
+                                           OnClick="@(() => RemoveItem(item))" />
+                        </MudItem>
+                    </MudGrid>
+                </div>
             }
             @if (_model.Items.Count == 0)
             {
@@ -120,6 +142,6 @@
                        OnCancel="CancelAsync"
                        OnSave="SubmitAsync" />
     </DialogActions>
-</MudDialog>
+</FormDialog>
 
 

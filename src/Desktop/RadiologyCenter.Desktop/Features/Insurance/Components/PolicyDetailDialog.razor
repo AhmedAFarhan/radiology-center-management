@@ -3,9 +3,8 @@
 @inject ISnackbar Snackbar
 @inject AppLocalizer T
 
-<MudDialog>
+<FormDialog Title="@(_policy?.PolicyNumber ?? T.PolicyDialog.DetailsTitle)" Icon="@Icons.Material.Outlined.Description" Subtitle="@T["forms.insuranceSubtitle"]">
     <DialogContent>
-        <DialogHeader Icon="@Icons.Material.Filled.Description" Title="@(_policy?.PolicyNumber ?? T.PolicyDialog.DetailsTitle)" />
 
         @if (_loadError is not null)
         {
@@ -27,7 +26,7 @@
             </MudGrid>
 
             <MudDivider Class="my-2" />
-            <MudText Typo="Typo.subtitle2" Class="mb-1">@T.PolicyDialog.Documents</MudText>
+            <FormSectionHeading Title="@T.PolicyDialog.Documents" Icon="@Icons.Material.Outlined.AttachFile" First="true" />
 
             @if (_documents is null)
             {
@@ -61,5 +60,5 @@
     <DialogActions>
         <MudButton Color="Color.Default" OnClick="CancelAsync">@T.Common.Close</MudButton>
     </DialogActions>
-</MudDialog>
+</FormDialog>
 

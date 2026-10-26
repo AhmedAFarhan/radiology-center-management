@@ -1,33 +1,39 @@
 @inherits EditorDialogBase
 @inject PayrollService PayrollService
 
-<MudDialog>
+<FormDialog Title="@T.PayRunDialog.CreateTitle" Icon="@Icons.Material.Filled.ReceiptLong" Subtitle="@T["forms.payrollSubtitle"]">
     <DialogContent>
-        <DialogHeader Icon="@Icons.Material.Filled.ReceiptLong" Title="@T.PayRunDialog.CreateTitle" />
         <EditForm EditContext="_editContext" OnValidSubmit="SubmitAsync">
             <LocalizedDataAnnotationsValidator />
-            <MudGrid Spacing="2">
+            <div role="alert"><ValidationSummary /></div>
+            <MudGrid Spacing="3">
                 <MudItem xs="12" sm="6">
-                    <MudDatePicker Disabled="Busy" @bind-Date="_model.RunFrom"
-                                   Label="@T.PayRunDialog.PeriodFrom"
-                                   Variant="Variant.Outlined"
-                                   Margin="Margin.Dense"
-                                   Class="w-100" />
+                    <FormField Label="@T.PayRunDialog.PeriodFrom" Context="fieldId" Required="true">
+                        <MudDatePicker Disabled="Busy" @bind-Date="_model.RunFrom"
+                                       InputId="@fieldId" aria-required="true" aria-label="@T.PayRunDialog.PeriodFrom"
+                                       Variant="Variant.Outlined"
+                                       Margin="Margin.Dense"
+                                       Class="w-100" />
+                    </FormField>
                 </MudItem>
                 <MudItem xs="12" sm="6">
-                    <MudDatePicker Disabled="Busy" @bind-Date="_model.RunTo" MinDate="_model.RunFrom"
-                                   Label="@T.PayRunDialog.PeriodTo"
-                                   Variant="Variant.Outlined"
-                                   Margin="Margin.Dense"
-                                   Class="w-100" />
+                    <FormField Label="@T.PayRunDialog.PeriodTo" Context="fieldId" Required="true">
+                        <MudDatePicker Disabled="Busy" @bind-Date="_model.RunTo" MinDate="_model.RunFrom"
+                                       InputId="@fieldId" aria-required="true" aria-label="@T.PayRunDialog.PeriodTo"
+                                       Variant="Variant.Outlined"
+                                       Margin="Margin.Dense"
+                                       Class="w-100" />
+                    </FormField>
                 </MudItem>
                 <MudItem xs="12">
-                    <MudTextField Disabled="Busy" @bind-Value="_model.Notes"
-                                  Label="@T.PayRunDialog.Notes"
-                                  Variant="Variant.Outlined"
-                                  Margin="Margin.Dense"
-                                  Lines="3"
-                                  Immediate="true" />
+                    <FormField Label="@T.PayRunDialog.Notes" Context="fieldId">
+                        <MudTextField Disabled="Busy" @bind-Value="_model.Notes"
+                                      InputId="@fieldId" aria-label="@T.PayRunDialog.Notes"
+                                      Variant="Variant.Outlined"
+                                      Margin="Margin.Dense"
+                                      Lines="3"
+                                      Immediate="true" />
+                    </FormField>
                 </MudItem>
             </MudGrid>
             <button type="submit" style="display:none"></button>
@@ -40,4 +46,4 @@
                        OnCancel="CancelAsync"
                        OnSave="SubmitAsync" />
     </DialogActions>
-</MudDialog>
+</FormDialog>

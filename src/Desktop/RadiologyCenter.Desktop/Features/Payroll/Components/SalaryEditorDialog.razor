@@ -3,67 +3,83 @@
 @inject ResourceService ResourceService
 @inject EnumOptionsService EnumOptionsService
 
-<MudDialog>
+<FormDialog Title="@(Salary is null ? T.Salary.NewSalary : T.Salary.EditTitle)" Icon="@Icons.Material.Filled.Calculate" Subtitle="@T["forms.payrollSubtitle"]">
     <DialogContent>
-        <DialogHeader Icon="@Icons.Material.Filled.Calculate" Title="@(Salary is null ? T.Salary.NewSalary : T.Salary.EditTitle)" />
         <EditForm EditContext="_editContext" OnValidSubmit="SubmitAsync">
             <LocalizedDataAnnotationsValidator />
-            <MudGrid Spacing="2">
+            <div role="alert"><ValidationSummary /></div>
+            <MudGrid Spacing="3">
+                <MudItem xs="12" Class="app-form-section-item">
+                    <FormSectionHeading Title="@T["forms.employee"]" Icon="@Icons.Material.Outlined.Badge" First="true" />
+                </MudItem>
                 @if (IsEdit)
                 {
                     <MudItem xs="12">
-                        <MudTextField @bind-Value="_employeeName"
-                                      Label="@T.Salary.Employee"
-                                      Variant="Variant.Outlined"
-                                      Margin="Margin.Dense"
-                                      ReadOnly="true" />
+                        <FormField Label="@T.Salary.Employee" Context="fieldId">
+                            <MudTextField @bind-Value="_employeeName"
+                                          InputId="@fieldId" aria-label="@T.Salary.Employee"
+                                          Variant="Variant.Outlined"
+                                          Margin="Margin.Dense"
+                                          ReadOnly="true" />
+                        </FormField>
                     </MudItem>
                 }
                 else
                 {
                     <MudItem xs="12">
-                        <MudAutocomplete T="StaffDto"
-                                         @bind-Value="_selectedStaff"
-                                         Label="@T.SalaryDialog.EmployeeSearch"
-                                         Variant="Variant.Outlined"
-                                         Margin="Margin.Dense"
-                                         MinCharacters="1"
-                                         DebounceInterval="300"
-                                         SearchFunc="SearchStaffAsync"
-                                         ToStringFunc="@(s => s is null ? string.Empty : s.FullName)"
-                                         Clearable="true"
-                                         Disabled="Busy" />
+                        <FormField Label="@T.SalaryDialog.EmployeeSearch" Context="fieldId" Required="true">
+                            <MudAutocomplete T="StaffDto"
+                                             @bind-Value="_selectedStaff"
+                                             InputId="@fieldId" aria-required="true" aria-label="@T.SalaryDialog.EmployeeSearch"
+                                             Variant="Variant.Outlined"
+                                             Margin="Margin.Dense"
+                                             MinCharacters="1"
+                                             DebounceInterval="300"
+                                             SearchFunc="SearchStaffAsync"
+                                             ToStringFunc="@(s => s is null ? string.Empty : s.FullName)"
+                                             Clearable="true"
+                                             Disabled="Busy" />
+                        </FormField>
                     </MudItem>
                 }
-                <MudItem xs="12" sm="6">
-                    <MudNumericField Disabled="Busy" T="decimal"
-                                     @bind-Value="_model.BaseSalary"
-                                     Label="@T.Salary.BaseSalary"
-                                     Variant="Variant.Outlined"
-                                     Margin="Margin.Dense"
-                                     Min="0"
-                                     For="@(() => _model.BaseSalary)" />
+                <MudItem xs="12" Class="app-form-section-item">
+                    <FormSectionHeading Title="@T["forms.salary"]" Icon="@Icons.Material.Outlined.Payments" />
                 </MudItem>
                 <MudItem xs="12" sm="6">
-                    <MudSelect Disabled="Busy" T="string"
-                               @bind-Value="_model.SalaryType"
-                               Label="@T.SalaryDialog.SalaryType"
-                               Variant="Variant.Outlined"
-                               Margin="Margin.Dense"
-                               For="@(() => _model.SalaryType)">
-                        @foreach (var salaryType in _salaryTypeOptions)
-                        {
-                            <MudSelectItem T="string" Value="@salaryType.Key">@salaryType.Value</MudSelectItem>
-                        }
-                    </MudSelect>
+                    <FormField Label="@T.Salary.BaseSalary" Context="fieldId">
+                        <LocalizedNumericField Disabled="Busy" T="decimal"
+                                         @bind-Value="_model.BaseSalary"
+                                         InputId="@fieldId" aria-label="@T.Salary.BaseSalary"
+                                         Variant="Variant.Outlined"
+                                         Margin="Margin.Dense"
+                                         Min="0"
+                                         For="@(() => _model.BaseSalary)" />
+                    </FormField>
                 </MudItem>
                 <MudItem xs="12" sm="6">
-                    <MudDatePicker Disabled="Busy" @bind-Date="_model.EffectiveDate"
-                                   Label="@T.SalaryDialog.EffectiveDate"
+                    <FormField Label="@T.SalaryDialog.SalaryType" Context="fieldId" Required="true">
+                        <LocalizedSelect Disabled="Busy" T="string"
+                                   @bind-Value="_model.SalaryType"
+                                   InputId="@fieldId" aria-required="true" aria-label="@T.SalaryDialog.SalaryType"
                                    Variant="Variant.Outlined"
                                    Margin="Margin.Dense"
-                                   For="@(() => _model.EffectiveDate)"
-                                   Class="w-100" />
+                                   For="@(() => _model.SalaryType)">
+                            @foreach (var salaryType in _salaryTypeOptions)
+                            {
+                                <MudSelectItem T="string" Value="@salaryType.Key">@salaryType.Value</MudSelectItem>
+                            }
+                        </LocalizedSelect>
+                    </FormField>
+                </MudItem>
+                <MudItem xs="12" sm="6">
+                    <FormField Label="@T.SalaryDialog.EffectiveDate" Context="fieldId" Required="true">
+                        <LocalizedDatePicker Disabled="Busy" @bind-Date="_model.EffectiveDate"
+                                       InputId="@fieldId" aria-required="true" aria-label="@T.SalaryDialog.EffectiveDate"
+                                       Variant="Variant.Outlined"
+                                       Margin="Margin.Dense"
+                                       For="@(() => _model.EffectiveDate)"
+                                       Class="w-100" />
+                    </FormField>
                 </MudItem>
             </MudGrid>
             <button type="submit" style="display:none"></button>
@@ -76,4 +92,4 @@
                        OnCancel="CancelAsync"
                        OnSave="SubmitAsync" />
     </DialogActions>
-</MudDialog>
+</FormDialog>

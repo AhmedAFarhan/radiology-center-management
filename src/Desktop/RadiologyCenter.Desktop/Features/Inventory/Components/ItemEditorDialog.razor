@@ -2,80 +2,100 @@
 @inject InventoryService InventoryService
 @inject EnumOptionsService EnumOptionsService
 
-<MudDialog>
+<FormDialog Title="@(Item is null ? T.ItemDialog.NewItem : T.ItemDialog.EditItem)" Icon="@Icons.Material.Filled.Inventory2" Subtitle="@T["forms.inventorySubtitle"]">
     <DialogContent>
-        <DialogHeader Icon="@Icons.Material.Filled.Inventory2" Title="@(Item is null ? T.ItemDialog.NewItem : T.ItemDialog.EditItem)" />
         <EditForm EditContext="_editContext" OnValidSubmit="SubmitAsync">
             <LocalizedDataAnnotationsValidator />
-            <MudGrid Spacing="2">
+            <div role="alert"><ValidationSummary /></div>
+            <MudGrid Spacing="3">
+                <MudItem xs="12" Class="app-form-section-item">
+                    <FormSectionHeading Title="@T["forms.item"]" Icon="@Icons.Material.Outlined.Inventory2" First="true" />
+                </MudItem>
                 <MudItem xs="12" sm="8">
-                    <MudTextField Disabled="Busy" @bind-Value="_model.Name"
-                                  Label="@T.Common.Name"
-                                  Variant="Variant.Outlined"
-                                  Margin="Margin.Dense"
-                                  Immediate="true"
-                                  For="@(() => _model.Name)" />
+                    <FormField Label="@T.Common.Name" Context="fieldId" Required="true">
+                        <LocalizedTextField Disabled="Busy" @bind-Value="_model.Name"
+                                      InputId="@fieldId" aria-required="true" aria-label="@T.Common.Name"
+                                      Variant="Variant.Outlined"
+                                      Margin="Margin.Dense"
+                                      Immediate="true"
+                                      For="@(() => _model.Name)" />
+                    </FormField>
                 </MudItem>
                 <MudItem xs="12" sm="4">
-                    <MudTextField Disabled="Busy" @bind-Value="_model.Brand"
-                                  Label="@T.ItemDialog.Brand"
-                                  Variant="Variant.Outlined"
-                                  Margin="Margin.Dense"
-                                  Immediate="true" />
+                    <FormField Label="@T.ItemDialog.Brand" Context="fieldId">
+                        <MudTextField Disabled="Busy" @bind-Value="_model.Brand"
+                                      InputId="@fieldId" aria-label="@T.ItemDialog.Brand"
+                                      Variant="Variant.Outlined"
+                                      Margin="Margin.Dense"
+                                      Immediate="true" />
+                    </FormField>
                 </MudItem>
                 <MudItem xs="12" sm="6">
-                    <MudSelect Disabled="Busy" T="string"
-                               @bind-Value="_model.Category"
-                               Label="@T.ItemDialog.Category"
-                               Variant="Variant.Outlined"
-                               Margin="Margin.Dense"
-                               For="@(() => _model.Category)">
-                        @foreach (var category in _categoryOptions)
-                        {
-                            <MudSelectItem T="string" Value="@category.Key">@category.Value</MudSelectItem>
-                        }
-                    </MudSelect>
+                    <FormField Label="@T.ItemDialog.Category" Context="fieldId" Required="true">
+                        <LocalizedSelect Disabled="Busy" T="string"
+                                   @bind-Value="_model.Category"
+                                   InputId="@fieldId" aria-required="true" aria-label="@T.ItemDialog.Category"
+                                   Variant="Variant.Outlined"
+                                   Margin="Margin.Dense"
+                                   For="@(() => _model.Category)">
+                            @foreach (var category in _categoryOptions)
+                            {
+                                <MudSelectItem T="string" Value="@category.Key">@category.Value</MudSelectItem>
+                            }
+                        </LocalizedSelect>
+                    </FormField>
                 </MudItem>
                 <MudItem xs="12" sm="6">
-                    <MudSelect Disabled="Busy" T="string"
-                               @bind-Value="_model.Unit"
-                               Label="@T.ItemDialog.Unit"
-                               Variant="Variant.Outlined"
-                               Margin="Margin.Dense"
-                               For="@(() => _model.Unit)">
-                        @foreach (var unit in _unitOptions)
-                        {
-                            <MudSelectItem T="string" Value="@unit.Key">@unit.Value</MudSelectItem>
-                        }
-                    </MudSelect>
+                    <FormField Label="@T.ItemDialog.Unit" Context="fieldId" Required="true">
+                        <LocalizedSelect Disabled="Busy" T="string"
+                                   @bind-Value="_model.Unit"
+                                   InputId="@fieldId" aria-required="true" aria-label="@T.ItemDialog.Unit"
+                                   Variant="Variant.Outlined"
+                                   Margin="Margin.Dense"
+                                   For="@(() => _model.Unit)">
+                            @foreach (var unit in _unitOptions)
+                            {
+                                <MudSelectItem T="string" Value="@unit.Key">@unit.Value</MudSelectItem>
+                            }
+                        </LocalizedSelect>
+                    </FormField>
+                </MudItem>
+                <MudItem xs="12" Class="app-form-section-item">
+                    <FormSectionHeading Title="@T["forms.stock"]" Icon="@Icons.Material.Outlined.Inventory2" />
                 </MudItem>
                 <MudItem xs="6">
-                    <MudNumericField Disabled="Busy" T="int"
-                                     @bind-Value="_model.ReorderLevel"
-                                     Label="@T.ItemDialog.ReorderLevel"
-                                     Variant="Variant.Outlined"
-                                     Margin="Margin.Dense"
-                                     Min="0"
-                                     For="@(() => _model.ReorderLevel)" />
+                    <FormField Label="@T.ItemDialog.ReorderLevel" Context="fieldId">
+                        <LocalizedNumericField Disabled="Busy" T="int"
+                                         @bind-Value="_model.ReorderLevel"
+                                         InputId="@fieldId" aria-label="@T.ItemDialog.ReorderLevel"
+                                         Variant="Variant.Outlined"
+                                         Margin="Margin.Dense"
+                                         Min="0"
+                                         For="@(() => _model.ReorderLevel)" />
+                    </FormField>
                 </MudItem>
                 <MudItem xs="6">
-                    <MudNumericField Disabled="Busy" T="int"
-                                     @bind-Value="_model.ReorderQuantity"
-                                     Label="@T.ItemDialog.ReorderQuantity"
-                                     Variant="Variant.Outlined"
-                                     Margin="Margin.Dense"
-                                     Min="0"
-                                     For="@(() => _model.ReorderQuantity)" />
+                    <FormField Label="@T.ItemDialog.ReorderQuantity" Context="fieldId">
+                        <LocalizedNumericField Disabled="Busy" T="int"
+                                         @bind-Value="_model.ReorderQuantity"
+                                         InputId="@fieldId" aria-label="@T.ItemDialog.ReorderQuantity"
+                                         Variant="Variant.Outlined"
+                                         Margin="Margin.Dense"
+                                         Min="0"
+                                         For="@(() => _model.ReorderQuantity)" />
+                    </FormField>
                 </MudItem>
                 <MudItem xs="12" sm="6">
-                    <MudSelect Disabled="Busy" T="string"
-                               @bind-Value="_model.LotTracked"
-                               Label="@T.ItemDialog.LotTracking"
-                               Variant="Variant.Outlined"
-                               Margin="Margin.Dense">
-                        <MudSelectItem T="string" Value="@("No")">@T.Common.No</MudSelectItem>
-                        <MudSelectItem T="string" Value="@("Yes")">@T.Common.Yes</MudSelectItem>
-                    </MudSelect>
+                    <FormField Label="@T.ItemDialog.LotTracking" Context="fieldId">
+                        <MudSelect Disabled="Busy" T="string"
+                                   @bind-Value="_model.LotTracked"
+                                   InputId="@fieldId" aria-label="@T.ItemDialog.LotTracking"
+                                   Variant="Variant.Outlined"
+                                   Margin="Margin.Dense">
+                            <MudSelectItem T="string" Value="@("No")">@T.Common.No</MudSelectItem>
+                            <MudSelectItem T="string" Value="@("Yes")">@T.Common.Yes</MudSelectItem>
+                        </MudSelect>
+                    </FormField>
                 </MudItem>
                 <MudItem xs="12" sm="6" Class="d-flex align-items-center">
                     <MudText Typo="Typo.body2" Class="text-secondary">
@@ -83,12 +103,14 @@
                     </MudText>
                 </MudItem>
                 <MudItem xs="12">
-                    <MudTextField Disabled="Busy" @bind-Value="_model.StorageInstructions"
-                                  Label="@T.ItemDialog.StorageInstructions"
-                                  Variant="Variant.Outlined"
-                                  Margin="Margin.Dense"
-                                  Lines="3"
-                                  Immediate="true" />
+                    <FormField Label="@T.ItemDialog.StorageInstructions" Context="fieldId">
+                        <MudTextField Disabled="Busy" @bind-Value="_model.StorageInstructions"
+                                      InputId="@fieldId" aria-label="@T.ItemDialog.StorageInstructions"
+                                      Variant="Variant.Outlined"
+                                      Margin="Margin.Dense"
+                                      Lines="3"
+                                      Immediate="true" />
+                    </FormField>
                 </MudItem>
             </MudGrid>
             <button type="submit" style="display:none"></button>
@@ -101,4 +123,4 @@
                        OnCancel="CancelAsync"
                        OnSave="SubmitAsync" />
     </DialogActions>
-</MudDialog>
+</FormDialog>

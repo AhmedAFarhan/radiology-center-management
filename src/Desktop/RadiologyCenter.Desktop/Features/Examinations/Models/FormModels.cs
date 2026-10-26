@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using RadiologyCenter.Desktop.Models;
 
 namespace RadiologyCenter.Desktop.Features.Examinations.Models;
 
@@ -33,9 +34,26 @@ internal sealed class TypeItemModel
 
 internal sealed class ScheduleExamFormModel
 {
+    [Required(ErrorMessage = "validation.patientRequired")]
+    public PatientDto? Patient { get; set; }
+
+    [Required(ErrorMessage = "validation.examinationTypeRequired")]
+    public ExaminationTypeDto? ExaminationType { get; set; }
+
+    [Required(ErrorMessage = "validation.equipmentRequired")]
+    public string? EquipmentId { get; set; }
+
     [Required(ErrorMessage = "validation.scheduledDateRequired")]
     public DateTime? ScheduledDate { get; set; }
 
     [Required(ErrorMessage = "validation.scheduledTimeRequired")]
     public TimeSpan? ScheduledTime { get; set; }
+
+    public string Priority { get; set; } = "Routine";
+
+    [MaxLength(1000, ErrorMessage = "validation.clinicalIndicationMaxLength")]
+    public string? ClinicalIndication { get; set; }
+
+    [MaxLength(500, ErrorMessage = "validation.notesMaxLength500")]
+    public string? Notes { get; set; }
 }

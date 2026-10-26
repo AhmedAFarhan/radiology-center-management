@@ -3,17 +3,18 @@ namespace RadiologyCenter.Desktop;
 using RadiologyCenter.Desktop.Services;
 using WindowsColor = Windows.UI.Color;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 
 public partial class App : Application
 {
     private readonly PacsService _pacs;
 
     private readonly IServiceProvider _services;
+    private Task? _shutdownTask;
 
     public App(IServiceProvider services)
     {
         InitializeComponent();
-        services.GetRequiredService<TokenStorage>().Clear();
         _services = services;
         _pacs = new PacsService(services.GetRequiredService<IHttpClientFactory>(), services.GetRequiredService<IServiceScopeFactory>());
     }
@@ -65,10 +66,18 @@ public partial class App : Application
         CenterWindowOnLaunch(window);
         window.Destroying += (_, _) =>
         {
-            _ = _services.GetRequiredService<BusinessRuntimeService>().DisposeAsync();
-            _pacs.Dispose();
+            _services.GetRequiredService<WinUI.WindowsTrayService>().Dispose();
+            _ = ShutdownAsync();
         };
         return window;
+    }
+
+    private Task ShutdownAsync() => _shutdownTask ??= ShutdownCoreAsync();
+
+    private async Task ShutdownCoreAsync()
+    {
+        try { await _services.GetRequiredService<BusinessRuntimeService>().DisposeAsync(); }
+        finally { _pacs.Dispose(); }
     }
 
     private void CenterWindowOnLaunch(Window window)
@@ -82,6 +91,16 @@ public partial class App : Application
             var hwnd = WinRT.Interop.WindowNative.GetWindowHandle(native);
             var windowId = Microsoft.UI.Win32Interop.GetWindowIdFromWindow(hwnd);
             var appWindow = Microsoft.UI.Windowing.AppWindow.GetFromWindowId(windowId);
+            try
+            {
+                _services.GetRequiredService<WinUI.WindowsTrayService>().Attach(native, ShutdownAsync);
+            }
+            catch (Exception ex)
+            {
+                // A tray failure must leave the normal visible window usable.
+                _services.GetRequiredService<ILogger<App>>()
+                    .LogError(ex, "Windows tray integration could not be initialized.");
+            }
 
             // Center immediately so the window never flashes at the OS-default position.
             var area = Microsoft.UI.Windowing.DisplayArea

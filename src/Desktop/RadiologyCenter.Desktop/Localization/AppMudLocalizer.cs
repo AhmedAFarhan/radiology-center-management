@@ -9,13 +9,22 @@ public sealed class AppMudLocalizer : MudLocalizer
 
     public AppMudLocalizer(AppLocalizer localizer) => _localizer = localizer;
 
-    public override LocalizedString this[string key] => new(key, GetValue(key));
+    public override LocalizedString this[string key]
+    {
+        get
+        {
+            var value = GetValue(key);
+            // Let MudBlazor use its built-in translation when this app has no override.
+            return new LocalizedString(key, value, resourceNotFound: value == key);
+        }
+    }
 
     public override LocalizedString this[string key, params object[] arguments]
     {
         get
         {
-            var value = GetValue(key);
+            var translation = this[key];
+            var value = translation.Value;
             if (arguments.Length > 0)
             {
                 try
@@ -27,7 +36,7 @@ public sealed class AppMudLocalizer : MudLocalizer
                 }
             }
 
-            return new LocalizedString(key, value);
+            return new LocalizedString(key, value, translation.ResourceNotFound);
         }
     }
 
@@ -41,6 +50,6 @@ public sealed class AppMudLocalizer : MudLocalizer
             "MudTablePager_PreviousPage" => _localizer.Get("mud.tablePager.previous"),
             "MudTablePager_NextPage" => _localizer.Get("mud.tablePager.next"),
             "MudTablePager_LastPage" => _localizer.Get("mud.tablePager.last"),
-            _ => key,
+            _ => _localizer.Get(key),
         };
 }

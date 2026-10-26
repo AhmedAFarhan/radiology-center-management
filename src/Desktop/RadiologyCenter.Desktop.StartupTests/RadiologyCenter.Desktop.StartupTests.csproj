@@ -12,7 +12,11 @@
     <PackageReference Include="xunit" Version="2.9.3" />
     <PackageReference Include="xunit.runner.visualstudio" Version="3.0.2" PrivateAssets="all" />
     <Compile Include="../RadiologyCenter.Desktop/Security/JwtClaimsParser.cs" Link="JwtClaimsParser.cs" />
+    <Compile Include="../RadiologyCenter.Desktop/Security/TokenStorage.cs" Link="TokenStorage.cs" />
+    <Compile Include="../RadiologyCenter.Desktop/Security/DpapiProtector.cs" Link="DpapiProtector.cs" />
+    <Compile Include="../RadiologyCenter.Desktop/Models/SharedModels.cs" Link="SharedModels.cs" />
     <Compile Include="../RadiologyCenter.Desktop/Services/DesktopConfiguration.cs" Link="DesktopConfiguration.cs" />
+    <Compile Include="../RadiologyCenter.Desktop/Services/BackendStatusService.cs" Link="BackendStatusService.cs" />
     <Compile Include="../RadiologyCenter.Desktop/Services/SimpleFileLoggerProvider.cs" Link="SimpleFileLoggerProvider.cs" />
     <Compile Include="../RadiologyCenter.Desktop/Features/Auth/Services/SignInCompletion.cs" Link="SignInCompletion.cs" />
     <Compile Include="../RadiologyCenter.Desktop/Features/Examinations/Models/CalendarTimeline.cs" Link="CalendarTimeline.cs" />

@@ -2,9 +2,8 @@
 @inject ISnackbar Snackbar
 @inject AppLocalizer T
 
-<MudDialog>
+<FormDialog Title="@(T.FormatValue(T.UserDialog.RolesTitle, User.UserName))" Icon="@Icons.Material.Filled.Security" Subtitle="@T["forms.identitySubtitle"]">
     <DialogContent>
-        <DialogHeader Icon="@Icons.Material.Filled.Security" Title="@(T.FormatValue(T.UserDialog.RolesTitle, User.UserName))" />
         <MudText Typo="Typo.body2" Class="text-secondary mb-3">
             @(T.FormatValue(T.UserDialog.RolesDescription, User.UserName))
         </MudText>
@@ -43,13 +42,10 @@
             {
                 <MudProgressCircular Size="Size.Small" Indeterminate="true" Class="mx-1" />
             }
-            else
-            {
-                <text>@T.UserDialog.SaveRoles</text>
-            }
+            <text>@T.UserDialog.SaveRoles</text>
         </MudButton>
     </DialogActions>
-</MudDialog>
+</FormDialog>
 
 
 

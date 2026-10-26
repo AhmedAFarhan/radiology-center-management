@@ -3,26 +3,28 @@
 @inject ISnackbar Snackbar
 @inject AppLocalizer T
 
-<MudDialog>
+<FormDialog Title="@(T.FormatValue(T.Equipment.SetStatusTitle, Equipment.Name))" Icon="@Icons.Material.Filled.Biotech" Subtitle="@T["forms.resourceSubtitle"]">
     <DialogContent>
-        <DialogHeader Icon="@Icons.Material.Filled.Biotech" Title="@(T.FormatValue(T.Equipment.SetStatusTitle, Equipment.Name))" />
         <MudText Typo="Typo.body2" Class="mb-2 text-secondary">
             @(T.Equipment.CurrentStatus): <StatusChip Token="@Equipment.StatusKey">@Equipment.Status</StatusChip>
         </MudText>
         <EditForm EditContext="_editContext">
             <LocalizedDataAnnotationsValidator />
-            <MudSelect Disabled="_busy" T="string"
-                       @bind-Value="_model.Status"
-                       For="@(() => _model.Status)"
-                       Label="@T.Common.Status"
-                       Variant="Variant.Outlined"
-                       Margin="Margin.Dense"
-                       Class="w-100">
-                @foreach (var option in _statusOptions)
-                {
-                    <MudSelectItem T="string" Value="@option.Key">@option.Value</MudSelectItem>
-                }
-            </MudSelect>
+            <div role="alert"><ValidationSummary /></div>
+            <FormField Label="@T.Common.Status" Context="fieldId" Required="true">
+                <LocalizedSelect Disabled="_busy" T="string"
+                           @bind-Value="_model.Status"
+                           For="@(() => _model.Status)"
+                           InputId="@fieldId" aria-required="true" aria-label="@T.Common.Status"
+                           Variant="Variant.Outlined"
+                           Margin="Margin.Dense"
+                           Class="w-100">
+                    @foreach (var option in _statusOptions)
+                    {
+                        <MudSelectItem T="string" Value="@option.Key">@option.Value</MudSelectItem>
+                    }
+                </LocalizedSelect>
+            </FormField>
         </EditForm>
     </DialogContent>
     <DialogActions>
@@ -32,12 +34,9 @@
             {
                 <MudProgressCircular Size="Size.Small" Indeterminate="true" Class="mx-1" />
             }
-            else
-            {
-                <text>@T.EquipmentDialog.SaveStatus</text>
-            }
+            <text>@T.EquipmentDialog.SaveStatus</text>
         </MudButton>
     </DialogActions>
-</MudDialog>
+</FormDialog>
 
 

@@ -49,6 +49,12 @@ public sealed class ApiClient(BusinessRuntimeService business, TokenStorage toke
     }
     private async Task<ClinicResult> DispatchRequestAsync(ClinicRequest request,CancellationToken ct)
     {
+        if (!business.IsDevelopment && (tokens.GetTokens() is not { } session || session.ExpiresAt <= DateTime.UtcNow))
+        {
+            await business.SignOutAsync();
+            await auth.SignOutAsync();
+            throw new ApiException(401, "Your clinic session expired. Sign in again.");
+        }
         var result = await business.Runtime.Dispatcher.DispatchAsync(request,ct);
         if (result.StatusCode==401 && business.IsDevelopment && tokens.GetTokens() is {} current && !request.Operation.TrimStart('/').StartsWith("api/auth/") && !request.Operation.TrimStart('/').StartsWith("auth/"))
         {
@@ -71,7 +77,7 @@ public sealed class ApiClient(BusinessRuntimeService business, TokenStorage toke
         if (result.IsSuccess && result.Value is ClinicFile file) return file.Content;
         _=Unwrap<object>(result); throw new ApiException(500,"The operation did not return a file.");
     }
-    private static T Unwrap<T>(ClinicResult result) {
+    internal static T Unwrap<T>(ClinicResult result) {
         var json=JsonSerializer.Serialize(result.Value,ClinicDispatcher.JsonOptions);
         var envelope=JsonSerializer.Deserialize<ApiEnvelope<T>>(json,ClinicDispatcher.JsonOptions);
         if (!result.IsSuccess || envelope is not { Success:true })

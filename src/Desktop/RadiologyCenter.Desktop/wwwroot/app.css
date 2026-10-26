@@ -38,6 +38,34 @@ html, body {
     font-family: 'Montserrat', 'Cairo', sans-serif;
 }
 
+/* MudBlazor 9.7 adds physical right padding and removes icon buttons while
+   autocomplete searches run. Preserve the normal input and icon geometry so
+   Arabic text stays anchored, and place progress at the logical end in RTL/LTR.
+   These shared rules cover both MudAutocomplete and LocalizedAutocomplete. */
+.mud-select.mud-autocomplete .mud-input-outlined {
+    --app-autocomplete-input-inset: 14px;
+}
+
+.mud-select.mud-autocomplete .mud-input-filled {
+    --app-autocomplete-input-inset: 12px;
+}
+
+.mud-select.mud-autocomplete--with-progress .mud-input-adorned-end input.mud-input-root {
+    padding-inline: var(--app-autocomplete-input-inset, 0px) 0 !important;
+}
+
+.mud-select.mud-autocomplete--with-progress:not(:has(.mud-input-adornment-start)):has(.progress-indicator-circular) .mud-select-input .mud-icon-button {
+    display: inline-flex !important;
+    visibility: hidden;
+}
+
+.mud-select.mud-autocomplete--with-progress .progress-indicator-circular {
+    inset-inline: 0;
+    width: auto;
+    padding-inline: 0 1rem;
+    pointer-events: none;
+}
+
 h1:focus {
     outline: none;
 }
@@ -2291,7 +2319,7 @@ h1:focus {
     outline-offset: 3px;
 }
 /* Shared UI: wrapping actions and accessible keyboard focus at desktop zoom levels. */
-.page-header-toolbar { height:auto; min-height:64px; flex-wrap:wrap; gap:12px; padding-block:8px; }
+.mud-toolbar.page-header-toolbar { height:auto; min-height:64px; flex-wrap:wrap; gap:12px; padding-block:8px; flex-shrink:0; }
 .page-header-heading { min-width:0; flex:1 1 200px; }
 .page-header-heading .page-header-title { overflow-wrap:anywhere; }
 .page-header-actions { display:flex; align-items:center; justify-content:flex-end; gap:8px; flex-wrap:wrap; max-width:100%; }
@@ -2336,3 +2364,124 @@ h1:focus {
 .clinic-setup-modes button { display:flex; flex-direction:column; align-items:stretch; }
 .page-header-tools { display:flex; align-items:center; gap:4px; flex:0 0 auto; }
 .page-header-tools:empty { display:none; }
+
+/* Patient editor: sectioned layout, scoped to this dialog. */
+.mud-dialog.patient-editor { max-width:720px; border-radius:16px; overflow:hidden; }
+.patient-editor .patient-editor-title { padding:22px 28px; border-bottom:1px solid var(--mud-palette-lines-default); }
+.patient-editor-heading { display:flex; align-items:center; gap:14px; min-width:0; }
+.patient-editor-heading h2 { margin:0; color:var(--mud-palette-text-primary); font-size:1.35rem; font-weight:700; line-height:1.5; }
+.patient-editor-heading p { margin:4px 0 0; color:var(--mud-palette-text-secondary); font-size:.875rem; font-weight:400; line-height:1.6; }
+.patient-editor-emblem { display:grid; place-items:center; width:46px; height:46px; flex-shrink:0; border-radius:12px; color:var(--mud-palette-primary); background:var(--mud-palette-primary-hover); }
+.patient-editor-code { margin-inline-start:auto; padding:5px 9px; border-radius:6px; background:var(--mud-palette-background-gray); color:var(--mud-palette-text-secondary); font-size:.75rem; font-weight:500; overflow-wrap:anywhere; }
+.patient-editor .patient-editor-content { padding:22px 28px 8px; }
+.patient-editor form { display:flex; flex-direction:column; gap:24px; }
+.patient-form-section { border:0; margin:0; padding:0; min-width:0; }
+.patient-form-section > legend { display:flex; align-items:center; gap:8px; padding:0; margin-bottom:16px; font-size:.95rem; font-weight:700; color:var(--mud-palette-text-primary); }
+.patient-form-section > legend .mud-icon-root { width:20px; height:20px; color:var(--mud-palette-primary); }
+.patient-form-clinical { border-top:1px solid var(--mud-palette-lines-default); padding-top:14px; }
+.patient-form-clinical > legend { padding-inline-end:12px; }
+.patient-form-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); column-gap:20px; row-gap:16px; }
+.patient-form-wide { grid-column:1/-1; }
+.patient-form-field { min-width:0; }
+.patient-form-field > label { display:block; margin-bottom:6px; color:var(--mud-palette-text-primary); font-size:.875rem; line-height:1.5; font-weight:600; }
+.patient-field-unit { font-weight:400; font-size:.8rem; color:var(--mud-palette-text-secondary); margin-inline-start:4px; }
+.patient-required { color:var(--mud-palette-error); }
+.patient-form-field .mud-input-control { margin-top:0; }
+.patient-form-field .mud-input-outlined { border-radius:8px; font-size:.9375rem; }
+.patient-form-field .mud-input-outlined .mud-input-slot { padding-block:11px; }
+.patient-editor .patient-form-field .mud-input.mud-input-outlined > .mud-input-outlined-border { border-radius:8px; border-color:color-mix(in srgb,var(--mud-palette-text-primary) 50%,var(--mud-palette-surface)); }
+.patient-form-field .mud-input-outlined:hover:not(.mud-disabled) .mud-input-outlined-border { border-color:var(--mud-palette-text-primary); }
+.patient-editor .patient-form-field .mud-input.mud-input-outlined:focus-within > .mud-input-outlined-border { border-color:var(--mud-palette-primary); }
+.patient-form-field .mud-input-error .mud-input-outlined-border { border-color:var(--mud-palette-error); }
+.patient-form-field .mud-input-error:focus-within .mud-input-outlined-border { border-color:var(--mud-palette-error); }
+.patient-form-ltr-value input { direction:ltr; text-align:start; }
+.patient-form-hint { color:var(--mud-palette-text-secondary); font-size:.8rem; line-height:1.6; margin:-6px 0 0; }
+.patient-editor .patient-form-additional { border-top:1px solid var(--mud-palette-lines-default); border-radius:0; }
+.patient-editor .patient-form-additional .mud-expand-panel { background:transparent; }
+.patient-editor .patient-form-additional .mud-expand-panel-header { padding:12px 0; min-height:48px; color:var(--mud-palette-primary); font-weight:600; }
+.patient-editor .patient-form-additional .mud-expand-panel-content { padding:8px 0 18px; }
+.patient-editor .patient-editor-actions { padding:16px 28px; border-top:1px solid var(--mud-palette-lines-default); background:var(--mud-palette-background); justify-content:space-between; gap:12px; flex-shrink:0; }
+.patient-form-buttons { margin-inline-start:auto; display:flex; gap:8px; align-items:center; flex-wrap:wrap; }
+.patient-form-buttons .mud-button-root { border-radius:8px; min-height:44px; padding-inline:20px; text-transform:none; }
+.patient-form-errors { padding:12px 16px; border:1px solid var(--mud-palette-error); border-radius:8px; background:var(--mud-palette-error-hover); color:var(--mud-palette-error); font-size:.875rem; }
+.patient-form-errors .validation-errors { padding-inline-start:20px; margin:6px 0 0; }
+.patient-form-errors:focus { outline:2px solid var(--mud-palette-error); outline-offset:2px; }
+@media(max-width:600px) {
+  .patient-editor .patient-editor-title { padding:18px; }
+  .patient-editor .patient-editor-content { padding:18px 18px 8px; }
+  .patient-editor .patient-editor-actions { padding:14px 18px; }
+  .patient-form-grid { grid-template-columns:1fr; }
+  .patient-editor-heading { flex-wrap:wrap; gap:10px; }
+  .patient-editor-code { margin-inline-start:0; }
+}
+@media(prefers-reduced-motion:reduce) {
+  .patient-editor .mud-collapse-container { transition:none; }
+}
+
+/* Shared sectioned forms. Filters and list search bars keep their compact layout. */
+.mud-dialog.app-form-dialog { border-radius:16px; overflow:hidden; }
+.mud-dialog.app-form-dialog.mud-dialog-width-md { max-width:720px; }
+.app-form-dialog .app-form-dialog-title { padding:22px 28px; border-bottom:1px solid var(--mud-palette-lines-default); flex-shrink:0; }
+.app-form-heading { display:flex; align-items:center; gap:14px; min-width:0; }
+.app-form-heading > div { min-width:0; }
+.app-form-heading h2 { margin:0; font-size:1.35rem; font-weight:700; line-height:1.5; color:var(--mud-palette-text-primary); overflow-wrap:anywhere; }
+.app-form-heading p { margin:4px 0 0; font-size:.875rem; font-weight:400; line-height:1.6; color:var(--mud-palette-text-secondary); }
+.app-form-emblem { display:grid; place-items:center; width:46px; height:46px; flex-shrink:0; border-radius:12px; color:var(--mud-palette-primary); background:var(--mud-palette-primary-hover); }
+.app-form-dialog .app-form-dialog-content { padding:22px 28px 24px; min-height:0; overscroll-behavior:contain; }
+.app-form-dialog .app-form-dialog-actions { padding:16px 28px; border-top:1px solid var(--mud-palette-lines-default); background:var(--mud-palette-background); gap:8px; flex-shrink:0; flex-wrap:wrap; }
+.app-form-dialog .app-form-dialog-actions:empty { display:none; }
+.app-form-dialog .app-form-dialog-actions > .mud-button-root { margin:0; }
+.app-form-dialog-buttons { display:flex; align-items:center; justify-content:flex-end; gap:8px; flex-wrap:wrap; margin-inline-start:auto; }
+.app-form-dialog-buttons > .mud-button-root { margin:0; }
+.app-form-dialog.login-dialog .app-form-dialog-buttons { width:100%; }
+.app-form-dialog .mud-button-root:not(.mud-icon-button), .clinic-setup .mud-button-root { min-height:44px; border-radius:8px; text-transform:none; }
+.app-form-dialog .app-form-dialog-actions .mud-button-root { padding-inline:20px; }
+.app-form-section-heading { border-top:1px solid var(--mud-palette-lines-default); padding-block-start:18px; margin-block:8px 14px; }
+.app-form-section-heading.app-form-section-first { border-top:0; padding-block-start:0; margin-block-start:0; }
+.app-form-section-heading h3 { display:flex; align-items:center; gap:8px; margin:0; font-size:.95rem; font-weight:700; line-height:1.6; color:var(--mud-palette-text-primary); }
+.app-form-section-heading h3 .mud-icon-root { color:var(--mud-palette-primary); flex-shrink:0; }
+.app-form-section-heading p { margin:4px 0 0; font-size:.8rem; line-height:1.6; color:var(--mud-palette-text-secondary); }
+.app-form-dialog .app-form-section-item .app-form-section-heading { margin-block-end:0; }
+.app-form-field { min-width:0; width:100%; }
+.app-form-field + .app-form-field { margin-block-start:16px; }
+.app-form-label { display:block; margin-block-end:6px; font-size:.875rem; font-weight:600; line-height:1.5; color:var(--mud-palette-text-primary); }
+.app-form-required { color:var(--mud-palette-error); margin-inline-start:3px; }
+.app-form-field .mud-input-control { margin-top:0; }
+.app-form-field .mud-input-outlined { border-radius:8px; font-size:.9375rem; }
+.app-form-field .mud-input-outlined .mud-input-slot { padding-block:11px; }
+.app-form-field .mud-input.mud-input-outlined > .mud-input-outlined-border { border-radius:8px; border-color:color-mix(in srgb,var(--mud-palette-text-primary) 50%,var(--mud-palette-surface)); }
+.app-form-field .mud-input.mud-input-outlined:hover:not(.mud-disabled) > .mud-input-outlined-border { border-color:var(--mud-palette-text-primary); }
+.app-form-field .mud-input.mud-input-outlined:focus-within > .mud-input-outlined-border { border-color:var(--mud-palette-primary); }
+.app-form-field .mud-input.mud-input-outlined.mud-input-error > .mud-input-outlined-border { border-color:var(--mud-palette-error); }
+.app-form-field .mud-input.mud-disabled { background:var(--mud-palette-background-gray); }
+.app-form-field input[type="email"], .app-form-field input[type="tel"], .app-form-field input[type="number"], .app-form-field .app-form-ltr input { direction:ltr; text-align:start; }
+.app-form-dialog .validation-errors { margin:0 0 20px; padding:12px 16px; padding-inline-start:36px; border:1px solid var(--mud-palette-error); border-radius:8px; color:var(--mud-palette-error); background:var(--mud-palette-error-hover); font-size:.875rem; }
+.app-form-dialog .validation-errors:empty { display:none; }
+.app-form-dialog .permission-group { border:1px solid var(--mud-palette-lines-default); border-radius:12px; }
+.app-form-dialog .permission-scroll { max-height:none; overflow:visible; }
+.app-form-dialog .mud-list-item { border-radius:8px; }
+.app-form-line { border:1px solid var(--mud-palette-lines-default); background:var(--mud-palette-background); border-radius:12px; padding:16px; margin-block:12px; }
+.app-form-line .mud-grid { margin-bottom:0; }
+.clinic-setup .app-form-section-heading { margin-block-start:24px; }
+.app-form-dialog .clinic-setup { padding:0; max-width:none; }
+.clinic-setup .app-form-section-first { margin-block-start:0; }
+.clinic-setup .mud-expand-panel { background:transparent; }
+.clinic-setup .mud-expand-panel-header { min-height:48px; font-weight:600; color:var(--mud-palette-primary); }
+.app-form-dialog.login-dialog .mud-input-control, .app-form-dialog.change-password-dialog .mud-input-control { margin-top:0; }
+.rr-report-body .app-form-field { margin-block-end:16px; }
+.rr-report-body .mud-button-root:not(.mud-icon-button) { min-height:44px; border-radius:8px; }
+.rr-report-body .app-form-field .mud-input-control { margin-top:0 !important; margin-bottom:0 !important; }
+.rr-finding-editor { border:1px solid var(--mud-palette-lines-default); border-radius:12px; padding:16px; margin-block:12px; }
+.rr-finding-editor > .app-form-field { max-width:220px; flex:0 1 220px; margin:0; }
+@media(max-width:600px) {
+  .app-form-dialog .app-form-dialog-title { padding:18px; }
+  .app-form-dialog .app-form-dialog-content { padding:18px; }
+  .app-form-dialog .app-form-dialog-actions { padding:14px 18px; }
+  .app-form-heading { gap:10px; align-items:flex-start; }
+  .app-form-heading h2 { font-size:1.15rem; }
+  .app-form-line { padding:12px; }
+  .rr-finding-editor > .app-form-field { max-width:none; flex-basis:100%; }
+}
+@media(prefers-reduced-motion:reduce) {
+  .app-form-dialog .mud-collapse-container, .clinic-setup .mud-collapse-container { transition:none; }
+}

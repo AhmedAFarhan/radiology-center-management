@@ -2,9 +2,8 @@
 @inject ISnackbar Snackbar
 @inject AppLocalizer T
 
-<MudDialog>
+<FormDialog Title="@(T.FormatValue(T.RoleDialog.PermissionsTitle, Role.Name))" Icon="@Icons.Material.Filled.Security" Subtitle="@T["forms.identitySubtitle"]">
     <DialogContent>
-        <DialogHeader Icon="@Icons.Material.Filled.Security" Title="@(T.FormatValue(T.RoleDialog.PermissionsTitle, Role.Name))" />
         <MudText Typo="Typo.body2" Class="text-secondary mb-3">
             @T.RoleDialog.PermissionsDescription
         </MudText>
@@ -27,7 +26,7 @@
         else
         {
             <div class="permission-scroll">
-                <MudGrid Spacing="2">
+                <MudGrid Spacing="3">
                     @foreach (var group in _groups)
                     {
                         <MudItem xs="12" sm="6">
@@ -59,11 +58,8 @@
             {
                 <MudProgressCircular Size="Size.Small" Indeterminate="true" Class="mx-1" />
             }
-            else
-            {
-                <text>@T.RoleDialog.SavePermissions</text>
-            }
+            <text>@T.RoleDialog.SavePermissions</text>
         </MudButton>
     </DialogActions>
-</MudDialog>
+</FormDialog>
 

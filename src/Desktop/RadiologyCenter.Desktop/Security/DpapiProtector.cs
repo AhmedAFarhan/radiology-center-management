@@ -1,12 +1,12 @@
-using System.Diagnostics;
+using System.ComponentModel;
 using System.Runtime.InteropServices;
+using System.Security.Cryptography;
 using System.Text;
 
 namespace RadiologyCenter.Desktop.Security;
 
 internal static class DpapiProtector
 {
-    private const string PlainPrefix = "plain:";
     private const string DpapiPrefix = "dpapi:";
 
     [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
@@ -61,29 +61,28 @@ internal static class DpapiProtector
                             LocalFree(output.pbData);
                         return DpapiPrefix + Convert.ToBase64String(outBytes);
                     }
+                    throw new Win32Exception(Marshal.GetLastWin32Error(), "Windows could not protect the saved clinic session.");
                 }
                 finally
                 {
+                    CryptographicOperations.ZeroMemory(bytes);
+                    Marshal.Copy(bytes, 0, input.pbData, bytes.Length);
                     Marshal.FreeHGlobal(input.pbData);
                 }
             }
         }
-        catch
+        catch (Exception ex)
         {
-            // DPAPI unavailable (e.g. elevated process restrictions) - fall through to plaintext.
+            throw new InvalidOperationException("The clinic session could not be saved securely on this Windows account.", ex);
         }
 
-        Debug.WriteLine("[DpapiProtector] DPAPI unavailable – falling back to plaintext protection.");
-        return PlainPrefix + value;
+        throw new PlatformNotSupportedException("Saved clinic sessions require Windows data protection.");
     }
 
     public static string Unprotect(string value)
     {
         if (string.IsNullOrEmpty(value))
             return value;
-
-        if (value.StartsWith(PlainPrefix, StringComparison.Ordinal))
-            return value[PlainPrefix.Length..];
 
         if (value.StartsWith(DpapiPrefix, StringComparison.Ordinal))
         {
@@ -98,9 +97,13 @@ internal static class DpapiProtector
                     {
                         var outBytes = new byte[output.cbData];
                         Marshal.Copy(output.pbData, outBytes, 0, output.cbData);
-                        if (output.pbData != IntPtr.Zero)
-                            LocalFree(output.pbData);
-                        return Encoding.UTF8.GetString(outBytes);
+                        try { return Encoding.UTF8.GetString(outBytes); }
+                        finally
+                        {
+                            CryptographicOperations.ZeroMemory(outBytes);
+                            Marshal.Copy(outBytes, 0, output.pbData, outBytes.Length);
+                            if (output.pbData != IntPtr.Zero) LocalFree(output.pbData);
+                        }
                     }
                 }
                 finally
@@ -114,6 +117,6 @@ internal static class DpapiProtector
             }
         }
 
-        return value;
+        return string.Empty;
     }
 }

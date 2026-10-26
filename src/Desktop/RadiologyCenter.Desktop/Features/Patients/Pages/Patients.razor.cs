@@ -14,6 +14,15 @@ public partial class Patients : ListPageBase<PatientDto>
 
     protected override string UnreachableMessage => T.Patients.Unreachable;
 
+    private static DialogOptions PatientDialogOptions => new()
+    {
+        MaxWidth = MaxWidth.Medium,
+        FullWidth = true,
+        NoHeader = false,
+        BackdropClick = false,
+        CloseOnEscapeKey = true,
+    };
+
     protected override async Task<PagedResult<PatientDto>> LoadPageAsync(
         string? search,
         string? sortBy,
@@ -34,7 +43,7 @@ public partial class Patients : ListPageBase<PatientDto>
         if (ok && patient is not null)
         {
             var parameters = new DialogParameters { ["Patient"] = patient };
-            var dialog = await DialogService.ShowAsync<PatientEditorDialog>(T.Patients.EditPatient, parameters, EditorDialogOptions);
+            var dialog = await DialogService.ShowAsync<PatientEditorDialog>(T.Patients.EditPatient, parameters, PatientDialogOptions);
             await ReloadIfSavedAsync(dialog);
         }
 
@@ -68,14 +77,14 @@ public partial class Patients : ListPageBase<PatientDto>
 
     private async Task OpenCreateDialogAsync()
     {
-        var dialog = await DialogService.ShowAsync<PatientEditorDialog>(T.Patients.NewPatient, EditorDialogOptions);
+        var dialog = await DialogService.ShowAsync<PatientEditorDialog>(T.Patients.NewPatient, PatientDialogOptions);
         await ReloadIfSavedAsync(dialog);
     }
 
     private async Task OpenEditDialogAsync(PatientDto patient)
     {
         var parameters = new DialogParameters { ["Patient"] = patient };
-        var dialog = await DialogService.ShowAsync<PatientEditorDialog>(T.Patients.EditPatient, parameters, EditorDialogOptions);
+        var dialog = await DialogService.ShowAsync<PatientEditorDialog>(T.Patients.EditPatient, parameters, PatientDialogOptions);
         await ReloadIfSavedAsync(dialog);
     }
 

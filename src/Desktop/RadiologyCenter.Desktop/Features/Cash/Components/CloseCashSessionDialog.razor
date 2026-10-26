@@ -1,52 +1,60 @@
 @inherits EditorDialogBase
 @inject CashService CashService
 
-<MudDialog>
+<FormDialog Title="@T.CloseCash.Title" Icon="@Icons.Material.Filled.Lock" Subtitle="@T["forms.cashSubtitle"]">
     <DialogContent>
-        <DialogHeader Icon="@Icons.Material.Filled.Lock" Title="@T.CloseCash.Title" />
         <EditForm EditContext="_editContext" OnValidSubmit="SubmitAsync">
             <LocalizedDataAnnotationsValidator />
-            <MudGrid Spacing="2">
+            <div role="alert"><ValidationSummary /></div>
+            <MudGrid Spacing="3">
+                <MudItem xs="12" Class="app-form-section-item">
+                    <FormSectionHeading Title="@T["forms.cashCount"]" Icon="@Icons.Material.Outlined.AccountBalanceWallet" First="true" />
+                </MudItem>
                 <MudItem xs="12">
                     <MudText Typo="Typo.body2" Class="text-secondary mb-1">
                         @(T.FormatValue(T.CloseCash.ExpectedTotalHint, _expectedTotal.ToString("C")))
                     </MudText>
-                    <MudNumericField Disabled="Busy" @bind-Value="_model.CountedTotal"
-                                     Label="@T.CloseCash.CountedTotal"
-                                     Variant="Variant.Outlined"
-                                     Margin="Margin.Dense"
-                                     Immediate="true"
-                                     For="@(() => _model.CountedTotal)" />
+                    <FormField Label="@T.CloseCash.CountedTotal" Context="fieldId">
+                        <LocalizedNumericField Disabled="Busy" @bind-Value="_model.CountedTotal"
+                                         InputId="@fieldId" aria-label="@T.CloseCash.CountedTotal"
+                                         Variant="Variant.Outlined"
+                                         Margin="Margin.Dense"
+                                         Immediate="true"
+                                         For="@(() => _model.CountedTotal)" />
+                    </FormField>
                 </MudItem>
                 <MudItem xs="12">
-                    <MudDivider />
-                    <MudText Typo="Typo.caption" Class="text-secondary mt-2">
-                        @T.CloseCash.HandoverHint
-                    </MudText>
+                    <FormSectionHeading Title="@T["forms.handover"]" Description="@T.CloseCash.HandoverHint" Icon="@Icons.Material.Outlined.SwapHoriz" />
                 </MudItem>
                 <MudItem xs="12" sm="6">
-                    <MudTextField Disabled="Busy" @bind-Value="_model.ReceivingUserId"
-                                  Label="@T.CloseCash.ReceivingUserId"
-                                  Variant="Variant.Outlined"
-                                  Margin="Margin.Dense"
-                                  Immediate="true"
-                                  For="@(() => _model.ReceivingUserId)" />
+                    <FormField Label="@T.CloseCash.ReceivingUserId" Context="fieldId">
+                        <LocalizedTextField Disabled="Busy" @bind-Value="_model.ReceivingUserId"
+                                      InputId="@fieldId" aria-label="@T.CloseCash.ReceivingUserId"
+                                      Variant="Variant.Outlined"
+                                      Margin="Margin.Dense"
+                                      Immediate="true"
+                                      For="@(() => _model.ReceivingUserId)" />
+                    </FormField>
                 </MudItem>
                 <MudItem xs="12" sm="6">
-                    <MudNumericField Disabled="Busy" @bind-Value="_model.ReceivingOpeningFloat"
-                                     Label="@T.CloseCash.ReceivingOpeningFloat"
-                                     Variant="Variant.Outlined"
-                                     Margin="Margin.Dense"
-                                     Immediate="true"
-                                     For="@(() => _model.ReceivingOpeningFloat)" />
+                    <FormField Label="@T.CloseCash.ReceivingOpeningFloat" Context="fieldId">
+                        <LocalizedNumericField Disabled="Busy" @bind-Value="_model.ReceivingOpeningFloat"
+                                         InputId="@fieldId" aria-label="@T.CloseCash.ReceivingOpeningFloat"
+                                         Variant="Variant.Outlined"
+                                         Margin="Margin.Dense"
+                                         Immediate="true"
+                                         For="@(() => _model.ReceivingOpeningFloat)" />
+                    </FormField>
                 </MudItem>
                 <MudItem xs="12">
-                    <MudTextField Disabled="Busy" @bind-Value="_model.Notes"
-                                  Label="@T.CloseCash.Notes"
-                                  Variant="Variant.Outlined"
-                                  Margin="Margin.Dense"
-                                  Immediate="true"
-                                  For="@(() => _model.Notes)" />
+                    <FormField Label="@T.CloseCash.Notes" Context="fieldId">
+                        <LocalizedTextField Disabled="Busy" @bind-Value="_model.Notes"
+                                      InputId="@fieldId" aria-label="@T.CloseCash.Notes"
+                                      Variant="Variant.Outlined"
+                                      Margin="Margin.Dense"
+                                      Immediate="true"
+                                      For="@(() => _model.Notes)" />
+                    </FormField>
                 </MudItem>
             </MudGrid>
             <button type="submit" style="display:none"></button>
@@ -59,5 +67,5 @@
                        OnCancel="CancelAsync"
                        OnSave="SubmitAsync" />
     </DialogActions>
-</MudDialog>
+</FormDialog>
 

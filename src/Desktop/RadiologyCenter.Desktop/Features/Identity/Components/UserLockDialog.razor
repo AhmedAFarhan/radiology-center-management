@@ -2,26 +2,30 @@
 @inject ISnackbar Snackbar
 @inject AppLocalizer T
 
-<MudDialog>
+<FormDialog Title="@(T.FormatValue(T.UserDialog.LockTitle, User.UserName))" Icon="@Icons.Material.Filled.Lock" Subtitle="@T["forms.identitySubtitle"]">
     <DialogContent>
-        <DialogHeader Icon="@Icons.Material.Filled.Lock" Title="@(T.FormatValue(T.UserDialog.LockTitle, User.UserName))" />
         <MudText Typo="Typo.body2" Class="text-secondary mb-3">
             @(T.FormatValue(T.UserDialog.LockDescription, User.UserName))
         </MudText>
         <EditForm EditContext="_editContext">
             <LocalizedDataAnnotationsValidator />
-            <MudDatePicker Disabled="_busy" @bind-Date="_model.LockUntilDate"
-                           For="@(() => _model.LockUntilDate)"
-                           Label="@T.UserDialog.LockUntil"
-                           Variant="Variant.Outlined"
-                           Margin="Margin.Dense"
-                           Class="w-100" />
-            <MudTimePicker Disabled="_busy" @bind-Time="_model.LockUntilTime"
-                           For="@(() => _model.LockUntilTime)"
-                           Label="@T.UserDialog.LockUntilTime"
-                           Variant="Variant.Outlined"
-                           Margin="Margin.Dense"
-                           Class="w-100" />
+            <div role="alert"><ValidationSummary /></div>
+            <FormField Label="@T.UserDialog.LockUntil" Context="fieldId" Required="true">
+                <LocalizedDatePicker Disabled="_busy" @bind-Date="_model.LockUntilDate"
+                               For="@(() => _model.LockUntilDate)"
+                               InputId="@fieldId" aria-required="true" aria-label="@T.UserDialog.LockUntil"
+                               Variant="Variant.Outlined"
+                               Margin="Margin.Dense"
+                               Class="w-100" />
+            </FormField>
+            <FormField Label="@T.UserDialog.LockUntilTime" Context="fieldId" Required="true">
+                <LocalizedTimePicker Disabled="_busy" @bind-Time="_model.LockUntilTime"
+                               For="@(() => _model.LockUntilTime)"
+                               InputId="@fieldId" aria-required="true" aria-label="@T.UserDialog.LockUntilTime"
+                               Variant="Variant.Outlined"
+                               Margin="Margin.Dense"
+                               Class="w-100" />
+            </FormField>
         </EditForm>
     </DialogContent>
     <DialogActions>
@@ -31,12 +35,9 @@
             {
                 <MudProgressCircular Size="Size.Small" Indeterminate="true" Class="mx-1" />
             }
-            else
-            {
-                <text>@T.UserDialog.LockUser</text>
-            }
+            <text>@T.UserDialog.LockUser</text>
         </MudButton>
     </DialogActions>
-</MudDialog>
+</FormDialog>
 
 
