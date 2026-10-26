@@ -33,7 +33,6 @@ try {
     if ($mainHead -eq $remoteHead) { throw 'There are no development changes to release.' }
     $production = Get-GitReleaseVersion origin/main -AllowMissing
     $candidate = Get-GitReleaseVersion origin/development
-    Assert-ReleaseTransition $candidate $production
     $notesPath = Join-Path $repoRoot "docs/releases/$($candidate.Version).md"
     if (!(Test-Path -LiteralPath $notesPath -PathType Leaf)) { throw "Add reviewed release notes at $notesPath before preparing the PR." }
 
@@ -59,6 +58,7 @@ try {
     } elseif ($latest.StatusCode -ne 404) { throw "Release lookup failed: HTTP $($latest.StatusCode)." }
     $existingRelease = Invoke-WebRequest "$api/releases/tags/v$($candidate.Version)" -Headers $headers -SkipHttpErrorCheck
     if ($existingRelease.StatusCode -ne 404) { throw 'This version already has a release/draft, or its lookup failed. Inspect it before proceeding.' }
+    Assert-ReleaseTransition $candidate $production -AllowUnpublishedRepair
     $previous = if ($production) { "$($production.Version), build $($production.Build)" } else { 'No tracked/published release (first release)' }
     $notes = Get-Content -LiteralPath $notesPath -Raw
     $body = @"
@@ -91,6 +91,9 @@ After merging, merge main back into development before preparing the next releas
     $pulls = @($pullResponse)
     if ($pulls.Count -gt 1) { throw 'More than one release PR is open; inspect them before continuing.' }
     $title = "Release $($candidate.Version) — development to main"
+    if ($production -and $candidate.Version -ceq $production.Version -and $candidate.Build -eq $production.Build) {
+        $title = "Repair release $($candidate.Version) — development to main"
+    }
     if ($pulls.Count -eq 1) {
         $payload = @{ title = $title; body = $body } | ConvertTo-Json
         $pull = Invoke-RestMethod "$api/pulls/$($pulls[0].number)" -Method Patch -Headers $headers -ContentType 'application/json; charset=utf-8' -Body ([Text.Encoding]::UTF8.GetBytes($payload))

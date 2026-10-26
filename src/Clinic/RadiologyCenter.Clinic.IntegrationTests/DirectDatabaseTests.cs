@@ -149,6 +149,10 @@ public sealed class DirectDatabaseTests(DirectSqlFixture fixture)
         await using var admin=new SqlConnection(fixture.MaintenanceConnection); await admin.OpenAsync();
         await DirectSqlFixture.Execute(admin,$"KILL {session}");
         Assert.Equal(401,(await runtime.Dispatcher.DispatchAsync(new("POST","patients/all","{}"))).StatusCode);
+        // Cleanup must also succeed after a killed lease, including drivers that still report Open.
+        await runtime.DisposeAsync();
+        Assert.Equal(System.Data.ConnectionState.Closed,guard.Lease.State);
+        await runtime.DisposeAsync();
     }
     [Fact]
     public async Task AWorkstationRejectsAnIncompatibleDatabaseContract()

@@ -127,15 +127,26 @@ public sealed class ClinicRuntime : IAsyncDisposable
             {
                 if(_databaseLease?.State==System.Data.ConnectionState.Open)
                 {
-                    await using var release=_databaseLease.CreateCommand();
-                    release.CommandText="EXEC sys.sp_releaseapplock @Resource=N'EGcare.SchemaMaintenance',@LockOwner=N'Session';";
-                    await release.ExecuteNonQueryAsync();
+                    try
+                    {
+                        await using var release=_databaseLease.CreateCommand();
+                        release.CommandText="EXEC sys.sp_releaseapplock @Resource=N'EGcare.SchemaMaintenance',@LockOwner=N'Session';";
+                        await release.ExecuteNonQueryAsync();
+                    }
+                    catch (Exception ex) when (ex is SqlException or InvalidOperationException)
+                    {
+                        // A killed SQL session can still report Open until the driver observes it.
+                        // Do not return an unusable or still-locked physical session to the pool.
+                        SqlConnection.ClearPool(_databaseLease);
+                        Services.GetRequiredService<ILogger<ClinicRuntime>>().LogWarning(
+                            "The database maintenance lease could not be released during shutdown ({FailureType}); its connection pool was cleared.", ex.GetType().Name);
+                    }
                 }
             }
             finally
             {
-                if(_databaseLease is not null) await _databaseLease.DisposeAsync();
-                if (_host is IAsyncDisposable asyncHost) await asyncHost.DisposeAsync(); else _host.Dispose();
+                try { if(_databaseLease is not null) await _databaseLease.DisposeAsync(); }
+                finally { if (_host is IAsyncDisposable asyncHost) await asyncHost.DisposeAsync(); else _host.Dispose(); }
             }
         }
     }
