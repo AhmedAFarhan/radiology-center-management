@@ -1,4 +1,5 @@
 <Project Sdk="Microsoft.NET.Sdk.Razor">
+    <Import Project="../../../ReleaseVersion.props" />
     <ItemGroup>
         <!-- Include the October 2026 runtime security fixes in self-contained publications. -->
         <FrameworkReference Update="Microsoft.NETCore.App" RuntimeFrameworkVersion="10.0.13" />
@@ -38,9 +39,12 @@
         <ApplicationId>com.companyname.radiologycenter.desktop</ApplicationId>
 
         <!-- Versions -->
-        <ApplicationDisplayVersion Condition="'$(ApplicationDisplayVersion)' == ''">1.0.0</ApplicationDisplayVersion>
+        <ApplicationDisplayVersion Condition="'$(ApplicationDisplayVersion)' == ''">$(EgcareReleaseVersion)</ApplicationDisplayVersion>
         <UpdateFeedUrl Condition="'$(UpdateFeedUrl)' == ''">https://github.com/AhmedAFarhan/radiology-center-management/releases/latest/download</UpdateFeedUrl>
-        <ApplicationVersion Condition="'$(ApplicationVersion)' == ''">1</ApplicationVersion>
+        <ApplicationVersion Condition="'$(ApplicationVersion)' == ''">$(EgcareReleaseBuild)</ApplicationVersion>
+        <Version>$(ApplicationDisplayVersion)</Version>
+        <AssemblyVersion>$(ApplicationDisplayVersion).0</AssemblyVersion>
+        <FileVersion>$(ApplicationDisplayVersion).0</FileVersion>
 
         <!-- To develop, package, and publish an app to the Microsoft Store, see: https://aka.ms/MauiTemplateUnpackaged -->
         <WindowsPackageType>None</WindowsPackageType>

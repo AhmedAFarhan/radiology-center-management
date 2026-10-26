@@ -1,0 +1,6 @@
+<Project>
+  <PropertyGroup>
+    <EgcareReleaseVersion>1.0.0</EgcareReleaseVersion>
+    <EgcareReleaseBuild>1</EgcareReleaseBuild>
+  </PropertyGroup>
+</Project>
