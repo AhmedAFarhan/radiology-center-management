@@ -66,8 +66,6 @@ jobs:
       - name: Test release version policy
         shell: pwsh
         run: ./scripts/Test-ReleaseVersion.ps1
-      - name: Test desktop startup lifecycle
-        run: dotnet test src/Desktop/RadiologyCenter.Desktop.StartupTests/RadiologyCenter.Desktop.StartupTests.csproj -c Release --logger "trx;LogFileName=desktop-startup.trx" --results-directory test-results
       - name: Test desktop forms and validation
         run: dotnet test src/Desktop/RadiologyCenter.Desktop.ComponentTests/RadiologyCenter.Desktop.ComponentTests.csproj -c Release --logger "trx;LogFileName=desktop-components.trx" --results-directory test-results
       - name: Enable contained users on the isolated CI database server
@@ -90,6 +88,13 @@ jobs:
       - name: Audit desktop dependencies (including transitive packages)
         run: dotnet restore src/Desktop/RadiologyCenter.Desktop/RadiologyCenter.Desktop.csproj --force-evaluate -p:EgcareSecurityAudit=true
       - run: dotnet build src/Desktop/RadiologyCenter.Desktop/RadiologyCenter.Desktop.csproj -c Release -f net10.0-windows10.0.19041.0
+      - name: Test Windows desktop startup and protected sessions
+        run: dotnet test src/Desktop/RadiologyCenter.Desktop.StartupTests/RadiologyCenter.Desktop.StartupTests.csproj -c Release --logger "trx;LogFileName=desktop-startup.trx" --results-directory test-results
       - name: Verify release payload and offline feed safeguards
         shell: pwsh
         run: ./scripts/Test-ReleaseTooling.ps1
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: desktop-test-results
+          path: test-results/*.trx
