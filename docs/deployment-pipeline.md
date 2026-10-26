@@ -4,15 +4,27 @@ EGcare remains one Windows application. SQL and PACS stay on the clinic LAN. App
 
 ## Prepare a release
 
-1. Merge the intended changes into `main`. Choose a new numeric `major.minor.patch` version, for example `1.1.0`. Versions must increase and existing releases are never overwritten.
-2. Open GitHub **Actions → Package and release EGcare → Run workflow**. Choose `main`, enter the version, and leave **publish_release** unchecked for the first review build. The optional Windows build number defaults to the workflow run number; it must be 1–65535.
-3. The workflow validates inputs, runs the complete application CI, publishes the self-contained Windows app, rejects private/configuration/database files, downloads the previous release when present, and packs the installer/full package/delta update with pinned Velopack 1.2.0.
-4. Download the `EGcare-win-VERSION` workflow artifact and verify installation, the visible app version, clinic sign-in and updating from the previous installed version on staging PCs. Review artifacts may be unsigned when no signing credentials are configured. They are not production releases.
-5. Configure signing below, then run the same workflow/version with **publish_release** checked. Alternatively, deliberately push a `vVERSION` tag pointing to code already on `main`; tag runs publish automatically after verification. Do not publish both ways for the same version.
+1. Work on `development`. Before preparing a release, merge `main` back into `development`, then update the root `ReleaseVersion.props` and add `docs/releases/VERSION.md`. Both the semantic version and build number must exceed those on `main`. The initial tracked release is **1.0.0, build 1**; the older unversioned main branch is treated as the bootstrap baseline, not an already-published 1.0.0 release.
+2. Commit and push the reviewed development changes, then run `./scripts/New-ReleasePullRequest.ps1`. It compares the two remote branches and published releases, creates or refreshes one `development` → `main` PR, and includes the exact manual pipeline parameters. It uses an existing Git Credential Manager sign-in or the process's `GH_TOKEN`/`GITHUB_TOKEN`; it never stores credentials, merges, creates a tag or starts deployment. CI checks that the release comes from this repository's `development` branch and increases both tracked numbers. Review and merge using **Create a merge commit** or **Squash and merge**. Keep both permanent branches; do not delete `development`.
+3. Open GitHub **Actions → Package and release EGcare → Run workflow**. Choose `main`, enter the version from the merged PR, and leave **publish_release** unchecked for the first review build. Enter the PR's build number, or use `0` to read it from `ReleaseVersion.props`. The workflow rejects different version/build inputs and requires main to be the release PR's merge commit.
+4. The workflow validates inputs, runs the complete application CI, publishes the self-contained Windows app, rejects private/configuration/database files, downloads the previous release when present, and packs the installer/full package/delta update with pinned Velopack 1.2.0.
+5. Download the `EGcare-win-VERSION` workflow artifact and verify installation, the visible app version, clinic sign-in and updating from the previous installed version on staging PCs. Review artifacts may be unsigned when no signing credentials are configured. They are not production releases.
+6. Configure signing below, then manually run the same workflow/version with **publish_release** checked. A push, tag or PR merge never deploys automatically. Publication creates the release tag; do not create it in advance. Merge `main` back into `development` before the next release, then increase both numbers and prepare a new PR.
+
+For the first release after its PR is merged:
+
+| Manual input | Review artifact | Production publication |
+|---|---|---|
+| Branch | `main` | `main` |
+| `version` | `1.0.0` | `1.0.0` |
+| `build_number` | `1` | `1` |
+| `publish_release` | `false` | `true` |
+
+Later releases follow the same sequence. Updating the version file alone does not open a PR: run the preparation script (or ask Codex to prepare the next release) after committing/pushing. An existing open release PR is refreshed instead of duplicated. Enable the **Compare release versions** and application test/build checks in main's branch protection if you want GitHub to enforce successful checks before merging; this guide does not change repository protection settings automatically.
 
 Publishing uses this repository's `GITHUB_TOKEN` with Contents write permission only in the publishing job. No separate release repository, GitHub App or personal access token is required. Uploads first go into a draft; only after all assets are uploaded is the release made public/latest, so clients never discover a partially uploaded feed. A failed publish can leave a draft for manual inspection; the workflow refuses to overwrite it automatically.
 
-The application display version, assembly/file version, Velopack package version and GitHub tag use the same supplied release version. The app displays it on the login form, clinic setup header, expanded sidebar, profile menu and update dialog. The installed/current and available versions use left-to-right number rendering in both Arabic and English.
+The tracked `ReleaseVersion.props` also supplies the version for ordinary Visual Studio builds. The application display version, assembly/file version, Velopack package version and GitHub tag use the same reviewed release version. The app displays it on the login form, clinic setup header, expanded sidebar, profile menu and update dialog. The installed/current and available versions use left-to-right number rendering in both Arabic and English.
 
 ## Code signing
 

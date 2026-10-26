@@ -1,16 +1,14 @@
 name: Package and release EGcare
 
 on:
-  push:
-    tags: ['v*']
   workflow_dispatch:
     inputs:
       version:
-        description: 'Release version (major.minor.patch, for example 1.1.0)'
+        description: 'Version approved in the release PR (must match ReleaseVersion.props on main)'
         required: true
         type: string
       build_number:
-        description: 'Windows build number (1-65535; 0 uses the workflow run number)'
+        description: 'Build approved in the release PR (0 uses ReleaseVersion.props on main)'
         default: 0
         type: number
       publish_release:
@@ -28,6 +26,9 @@ concurrency:
 jobs:
   validate:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: read
     outputs:
       version: ${{ steps.inputs.outputs.version }}
       build: ${{ steps.inputs.outputs.build }}
@@ -43,23 +44,27 @@ jobs:
         shell: pwsh
         env:
           GH_TOKEN: ${{ github.token }}
-          REQUESTED_VERSION: ${{ inputs.version || github.ref_name }}
+          REQUESTED_VERSION: ${{ inputs.version }}
           REQUESTED_BUILD: ${{ inputs.build_number }}
           REQUESTED_PUBLISH: ${{ inputs.publish_release }}
         run: |
           $ErrorActionPreference = 'Stop'
-          $version = $env:REQUESTED_VERSION -replace '^v', ''
-          if ($version -notmatch '^(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)$') { throw 'Use numeric major.minor.patch without leading zeros.' }
-          $parts = $version.Split('.') | ForEach-Object { [int]$_ }
-          if (@($parts | Where-Object { $_ -gt 65535 }).Count) { throw 'Windows version components cannot exceed 65535.' }
-          $build = if ([string]::IsNullOrEmpty($env:REQUESTED_BUILD) -or $env:REQUESTED_BUILD -eq '0') { [int]$env:GITHUB_RUN_NUMBER } else { [int]$env:REQUESTED_BUILD }
-          if ($build -lt 1 -or $build -gt 65535) { throw 'Build number must be 1-65535.' }
-          if ($env:GITHUB_EVENT_NAME -eq 'workflow_dispatch' -and $env:GITHUB_REF -ne 'refs/heads/main') { throw 'Run production packaging from main.' }
-          git merge-base --is-ancestor HEAD origin/main
-          if ($LASTEXITCODE -ne 0) { throw 'Release code must already be on main.' }
+          if ($env:GITHUB_EVENT_NAME -ne 'workflow_dispatch' -or $env:GITHUB_REF -ne 'refs/heads/main') { throw 'Run production packaging manually from main.' }
+          . ./scripts/ReleaseVersion.ps1
+          $tracked = Get-GitReleaseVersion HEAD
+          Assert-ReleaseInputs $tracked $env:REQUESTED_VERSION $env:REQUESTED_BUILD
+          $version = $tracked.Version
+          $build = $tracked.Build
+          $main = git rev-parse origin/main
+          if ($LASTEXITCODE -ne 0 -or $main -ne $env:GITHUB_SHA) { throw 'Main changed after this run was requested. Run again from the current main branch.' }
           $headers = @{ Authorization = "Bearer $env:GH_TOKEN"; 'X-GitHub-Api-Version' = '2022-11-28' }
           $repo = Invoke-RestMethod "https://api.github.com/repos/$env:GITHUB_REPOSITORY" -Headers $headers
           if ($repo.private) { throw 'Anonymous app updates require this release repository to be public. Never embed a GitHub token in EGcare.' }
+          $pulls = Invoke-RestMethod "https://api.github.com/repos/$env:GITHUB_REPOSITORY/commits/$env:GITHUB_SHA/pulls?per_page=100" -Headers $headers
+          $approved = @($pulls | Where-Object { $_.merged_at -and $_.base.ref -eq 'main' -and $_.head.ref -eq 'development' -and $_.head.repo.full_name -eq $env:GITHUB_REPOSITORY -and $_.merge_commit_sha -eq $env:GITHUB_SHA })
+          if (!$approved.Count) { throw 'Main must be the merge commit of a development-to-main release PR. Merge the release PR before running this workflow.' }
+          $previousMain = Get-GitReleaseVersion 'HEAD^1' -AllowMissing
+          Assert-ReleaseTransition $tracked $previousMain
           $release = Invoke-WebRequest "https://api.github.com/repos/$env:GITHUB_REPOSITORY/releases/latest" -Headers $headers -SkipHttpErrorCheck
           $previous = ''
           if ($release.StatusCode -eq 200) {
@@ -70,12 +75,20 @@ jobs:
           } elseif ($release.StatusCode -ne 404) { throw "Cannot read release history: HTTP $($release.StatusCode)." }
           $existing = Invoke-WebRequest "https://api.github.com/repos/$env:GITHUB_REPOSITORY/releases/tags/v$version" -Headers $headers -SkipHttpErrorCheck
           if ($existing.StatusCode -ne 404) { throw 'This release already exists, or release lookup failed. Existing releases are never overwritten.' }
-          $publish = $env:GITHUB_EVENT_NAME -eq 'push' -or $env:REQUESTED_PUBLISH -eq 'true'
+          $publish = $env:REQUESTED_PUBLISH -eq 'true'
           "version=$version" >> $env:GITHUB_OUTPUT
           "build=$build" >> $env:GITHUB_OUTPUT
           "feed=https://github.com/$env:GITHUB_REPOSITORY/releases/latest/download" >> $env:GITHUB_OUTPUT
           "publish=$($publish.ToString().ToLowerInvariant())" >> $env:GITHUB_OUTPUT
           "previous=$previous" >> $env:GITHUB_OUTPUT
+          @"
+          ### Approved release parameters
+          - Branch: main
+          - Version: $version
+          - Build: $build
+          - Publish: $publish
+          - Release PR: $($approved[0].html_url)
+          "@ >> $env:GITHUB_STEP_SUMMARY
 
   verify:
     needs: validate

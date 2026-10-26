@@ -3,13 +3,43 @@ name: Verify application
 on:
   pull_request:
   push:
-    branches: [main, master]
+    branches: [main, development]
   workflow_call:
 
 permissions:
   contents: read
 
 jobs:
+  release-version:
+    name: Compare release versions
+    if: github.event_name == 'pull_request' && github.base_ref == 'main'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Require a newer release from development
+        shell: pwsh
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+          HEAD_BRANCH: ${{ github.head_ref }}
+          HEAD_REPOSITORY: ${{ github.event.pull_request.head.repo.full_name }}
+        run: |
+          $ErrorActionPreference = 'Stop'
+          if ($env:HEAD_BRANCH -ne 'development' -or $env:HEAD_REPOSITORY -ne $env:GITHUB_REPOSITORY) { throw 'Production releases must use a development-to-main PR in this repository.' }
+          . ./scripts/ReleaseVersion.ps1
+          $production = Get-GitReleaseVersion $env:BASE_SHA -AllowMissing
+          $candidate = Get-GitReleaseVersion $env:HEAD_SHA
+          Assert-ReleaseTransition $candidate $production
+          $previous = if ($production) { "$($production.Version) (build $($production.Build))" } else { 'No tracked release yet' }
+          @"
+          ### Release comparison
+          - Main: $previous
+          - Development: $($candidate.Version) (build $($candidate.Build))
+          - After merging, manually run Package and release EGcare from main.
+          - Inputs: version=$($candidate.Version), build_number=$($candidate.Build), publish_release=false for review or true for signed publication.
+          "@ >> $env:GITHUB_STEP_SUMMARY
   backend:
     runs-on: ubuntu-latest
     services:
@@ -33,6 +63,9 @@ jobs:
       - name: Test all backend modules
         shell: pwsh
         run: ./scripts/Test-Backend.ps1 -ResultsDirectory test-results
+      - name: Test release version policy
+        shell: pwsh
+        run: ./scripts/Test-ReleaseVersion.ps1
       - name: Test desktop startup lifecycle
         run: dotnet test src/Desktop/RadiologyCenter.Desktop.StartupTests/RadiologyCenter.Desktop.StartupTests.csproj -c Release --logger "trx;LogFileName=desktop-startup.trx" --results-directory test-results
       - name: Test desktop forms and validation
