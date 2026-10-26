@@ -64,7 +64,6 @@ jobs:
           $approved = @($pulls | Where-Object { $_.merged_at -and $_.base.ref -eq 'main' -and $_.head.ref -eq 'development' -and $_.head.repo.full_name -eq $env:GITHUB_REPOSITORY -and $_.merge_commit_sha -eq $env:GITHUB_SHA })
           if (!$approved.Count) { throw 'Main must be the merge commit of a development-to-main release PR. Merge the release PR before running this workflow.' }
           $previousMain = Get-GitReleaseVersion 'HEAD^1' -AllowMissing
-          Assert-ReleaseTransition $tracked $previousMain
           $release = Invoke-WebRequest "https://api.github.com/repos/$env:GITHUB_REPOSITORY/releases/latest" -Headers $headers -SkipHttpErrorCheck
           $previous = ''
           if ($release.StatusCode -eq 200) {
@@ -75,6 +74,7 @@ jobs:
           } elseif ($release.StatusCode -ne 404) { throw "Cannot read release history: HTTP $($release.StatusCode)." }
           $existing = Invoke-WebRequest "https://api.github.com/repos/$env:GITHUB_REPOSITORY/releases/tags/v$version" -Headers $headers -SkipHttpErrorCheck
           if ($existing.StatusCode -ne 404) { throw 'This release already exists, or release lookup failed. Existing releases are never overwritten.' }
+          Assert-ReleaseTransition $tracked $previousMain -AllowUnpublishedRepair
           $publish = $env:REQUESTED_PUBLISH -eq 'true'
           "version=$version" >> $env:GITHUB_OUTPUT
           "build=$build" >> $env:GITHUB_OUTPUT

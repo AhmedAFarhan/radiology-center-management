@@ -22,6 +22,8 @@ For the first release after its PR is merged:
 
 Later releases follow the same sequence. Updating the version file alone does not open a PR: run the preparation script (or ask Codex to prepare the next release) after committing/pushing. An existing open release PR is refreshed instead of duplicated. Enable the **Compare release versions** and application test/build checks in main's branch protection if you want GitHub to enforce successful checks before merging; this guide does not change repository protection settings automatically.
 
+If a candidate has merged but publication fails, a repair PR may retain the same version/build while that version has no GitHub release or draft. PR preparation, CI and publication confirm that absence before allowing the repair. Once a release exists, use a higher version/build; existing releases are never overwritten. A repair still goes from development to main and publication remains manual.
+
 Application verification runs for pull requests and as part of the manually started release workflow. Branch pushes and PR merges do not start a separate verification run. This avoids duplicate development/PR checks and the extra run after merging into main; the manual release still verifies the exact production code before packaging.
 
 Publishing uses this repository's `GITHUB_TOKEN` with Contents write permission only in the publishing job. No separate release repository, GitHub App or personal access token is required. Uploads first go into a draft; only after all assets are uploaded is the release made public/latest, so clients never discover a partially uploaded feed. A failed publish can leave a draft for manual inspection; the workflow refuses to overwrite it automatically.

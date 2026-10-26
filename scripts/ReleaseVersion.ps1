@@ -31,11 +31,13 @@ function Get-GitReleaseVersion([string]$Ref, [switch]$AllowMissing) {
     ConvertFrom-ReleaseVersionXml ($content -join "`n")
 }
 
-function Assert-ReleaseTransition($Candidate, $Production) {
+function Assert-ReleaseTransition($Candidate, $Production, [switch]$AllowUnpublishedRepair) {
     if ($null -eq $Production) {
         if ($Candidate.Version -ne '1.0.0' -or $Candidate.Build -ne 1) { throw 'The first tracked release must be 1.0.0, build 1.' }
         return
     }
+    # Callers may opt in only after confirming this version has no GitHub release or draft.
+    if ($AllowUnpublishedRepair -and $Candidate.Version -ceq $Production.Version -and $Candidate.Build -eq $Production.Build) { return }
     if ([version]$Candidate.Version -le [version]$Production.Version) { throw "Development version $($Candidate.Version) must be newer than main version $($Production.Version)." }
     if ($Candidate.Build -le $Production.Build) { throw "Development build $($Candidate.Build) must be newer than main build $($Production.Build)." }
 }

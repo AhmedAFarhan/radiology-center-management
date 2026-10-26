@@ -14,11 +14,14 @@ $first = Read-Fixture '1.0.0' '1'
 $next = Read-Fixture '1.0.1' '2'
 Assert-ReleaseTransition $first $null
 Assert-ReleaseTransition $next $first
+Assert-ReleaseTransition $first $first -AllowUnpublishedRepair
 Assert-ReleaseInputs $first '1.0.0' '0'
 Assert-ReleaseInputs $first '1.0.0' '1'
 Write-Output 'PASS: first release, increasing release and matching manual inputs'
 Expect-Failure { Assert-ReleaseTransition $first $first } 'same version rejected'
 Expect-Failure { Assert-ReleaseTransition $first $next } 'downgrade rejected'
+Expect-Failure { Assert-ReleaseTransition $first $next -AllowUnpublishedRepair } 'repair mode cannot downgrade a release'
+Expect-Failure { Assert-ReleaseTransition (Read-Fixture '1.0.0' '2') $first -AllowUnpublishedRepair } 'repair mode cannot change the build without increasing the version'
 Expect-Failure { Assert-ReleaseTransition (Read-Fixture '1.0.2' '1') $first } 'reused build rejected'
 Expect-Failure { Assert-ReleaseTransition $next $null } 'unexpected first release rejected'
 Expect-Failure { Assert-ReleaseInputs $first '1.0.1' '1' } 'unreviewed version rejected'

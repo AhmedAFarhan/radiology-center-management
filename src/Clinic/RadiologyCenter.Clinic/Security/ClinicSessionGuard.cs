@@ -54,7 +54,7 @@ public sealed class ClinicSessionGuard
             command.CommandText = "SELECT APPLOCK_MODE('public',N'EGcare.SchemaMaintenance','Session')";
             return (await command.ExecuteScalarAsync(ct)) as string == "Shared";
         }
-        catch (SqlException) { return false; }
+        catch (Exception ex) when (ex is SqlException or InvalidOperationException) { return false; }
         finally { _gate.Release(); }
     }
 }
