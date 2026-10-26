@@ -25,7 +25,7 @@ public partial class MainLayout : LayoutComponentBase, IDisposable
     private Task<AuthenticationState>? AuthStateTask { get; set; }
 
 private bool _shouldRender = true;
-    private async Task OpenClinicUpdates() => await DialogService.ShowAsync<RadiologyCenter.Desktop.Shared.Components.ClinicUpdateDialog>("EGcare", new DialogOptions { MaxWidth = MaxWidth.Small, FullWidth = true, BackdropClick = false, CloseOnEscapeKey = false });
+    private Task OpenClinicUpdates() => UpdateDialogs.ShowAsync();
     private async Task OpenPacsAccount()=>await DialogService.ShowAsync<RadiologyCenter.Desktop.Shared.Components.PacsAccountDialog>("EGcare",new DialogOptions { MaxWidth=MaxWidth.Small,FullWidth=true });
 private bool _drawerOpen = true;
     private bool _loggingOut;

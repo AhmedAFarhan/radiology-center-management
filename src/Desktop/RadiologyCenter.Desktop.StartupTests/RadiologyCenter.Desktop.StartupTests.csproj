@@ -11,6 +11,8 @@
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.14.0" />
     <PackageReference Include="xunit" Version="2.9.3" />
     <PackageReference Include="xunit.runner.visualstudio" Version="3.0.2" PrivateAssets="all" />
+    <Compile Include="../RadiologyCenter.Desktop/Services/Updates/ReleaseInfo.cs" Link="Updates/ReleaseInfo.cs" />
+    <Compile Include="../RadiologyCenter.Desktop/Services/Updates/AppUpdateService.cs" Link="Updates/AppUpdateService.cs" />
     <Compile Include="../RadiologyCenter.Desktop/Security/JwtClaimsParser.cs" Link="JwtClaimsParser.cs" />
     <Compile Include="../RadiologyCenter.Desktop/Security/TokenStorage.cs" Link="TokenStorage.cs" />
     <Compile Include="../RadiologyCenter.Desktop/Security/DpapiProtector.cs" Link="DpapiProtector.cs" />

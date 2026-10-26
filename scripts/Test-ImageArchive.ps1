@@ -34,9 +34,11 @@ $process.StartInfo.ArgumentList.Add($configPath)
 $process.StartInfo.UseShellExecute = $false; $process.StartInfo.CreateNoWindow = $true
 $process.StartInfo.RedirectStandardOutput = $true; $process.StartInfo.RedirectStandardError = $true
 $base = "https://127.0.0.1:$port"
+$started = $false
 function Header([string]$user, [string]$password) { @{ Authorization = 'Basic ' + [Convert]::ToBase64String([Text.Encoding]::UTF8.GetBytes($user + ':' + $password)) } }
 try {
     [void]$process.Start()
+    $started = $true
     $stdout = $process.StandardOutput.ReadToEndAsync(); $stderr = $process.StandardError.ReadToEndAsync()
     $adminHeaders = Header 'archive-admin' $adminPassword; $viewerHeaders = Header 'test-viewer' $viewerPassword
     $ready = $false
@@ -72,8 +74,43 @@ try {
     $anonymous = Invoke-WebRequest "$base/dicom-web/studies" -SkipCertificateCheck -SkipHttpErrorCheck
     if ($anonymous.StatusCode -notin @(401,403)) { throw 'Anonymous image access was allowed.' }
     Write-Output 'PASS: installed DICOMweb/OHIF plugins, HTTPS endpoint, exact synthetic patient/accession, series/instance/frame retrieval, authenticated viewer, anonymous denial and read-only image permissions.'
+    # A consistent SQLite/index + object backup requires the archive to be stopped.
+    # Verify a restored copy independently of the original synthetic archive.
+    $originalFile = Invoke-WebRequest "$base/instances/$($created.ID)/file" -Headers $adminHeaders -SkipCertificateCheck
+    $originalHash = [Convert]::ToHexString([Security.Cryptography.SHA256]::HashData([byte[]]$originalFile.Content))
+    $process.Kill(); $process.WaitForExit(); $started = $false
+    [IO.File]::WriteAllText((Join-Path $directory 'original-stdout.log'), $stdout.GetAwaiter().GetResult())
+    [IO.File]::WriteAllText((Join-Path $directory 'original-stderr.log'), $stderr.GetAwaiter().GetResult())
+    $process.Dispose()
+    $restored = Join-Path $directory 'restored-archive'
+    Copy-Item -LiteralPath $config.StorageDirectory -Destination $restored -Recurse
+    $config.StorageDirectory = $restored; $config.IndexDirectory = $restored
+    $config | ConvertTo-Json -Depth 8 | Set-Content -LiteralPath $configPath -Encoding utf8
+    $process = [Diagnostics.Process]::new()
+    $process.StartInfo = [Diagnostics.ProcessStartInfo]::new($binary)
+    $process.StartInfo.ArgumentList.Add($configPath)
+    $process.StartInfo.UseShellExecute = $false; $process.StartInfo.CreateNoWindow = $true
+    $process.StartInfo.RedirectStandardOutput = $true; $process.StartInfo.RedirectStandardError = $true
+    [void]$process.Start()
+    $started = $true
+    $stdout = $process.StandardOutput.ReadToEndAsync(); $stderr = $process.StandardError.ReadToEndAsync()
+    $ready = $false
+    for ($attempt = 0; $attempt -lt 60; $attempt++) {
+        if ($process.HasExited) { throw 'The restored archive process exited during startup.' }
+        try {
+            $restoredStudies = @(Invoke-RestMethod "$base/dicom-web/studies?PatientID=$patient" -Headers $viewerHeaders -SkipCertificateCheck -TimeoutSec 2)
+            $ready = $true; break
+        } catch { Start-Sleep -Milliseconds 250 }
+    }
+    if (!$ready -or $restoredStudies.Count -ne 1 -or $restoredStudies[0].'0020000D'.Value[0] -ne $studyUid -or $restoredStudies[0].'00080050'.Value[0] -ne $accession) { throw 'The restored archive did not preserve the study identity.' }
+    $restoredFrame = Invoke-WebRequest "$base/dicom-web/studies/$studyUid/series/$seriesUid/instances/$instanceUid/frames/1" -Headers $frameHeaders -SkipCertificateCheck
+    # Compare the exact stored DICOM file; multipart frame boundaries can change per response.
+    $restoredFile = Invoke-WebRequest "$base/instances/$($created.ID)/file" -Headers $adminHeaders -SkipCertificateCheck
+    $restoredHash = [Convert]::ToHexString([Security.Cryptography.SHA256]::HashData([byte[]]$restoredFile.Content))
+    if ($restoredFrame.RawContentLength -le 0 -or $originalHash -ne $restoredHash) { throw 'Restored image content differs from the original.' }
+    Write-Output 'PASS: stopped-archive backup restored into separate storage; study identity, exact DICOM file hash and image retrieval survived recovery.'
 } finally {
-    if ($process.Id -and !$process.HasExited) { $process.Kill(); $process.WaitForExit() }
+    if ($started -and !$process.HasExited) { $process.Kill(); $process.WaitForExit() }
     if ($stdout) { [IO.File]::WriteAllText((Join-Path $directory 'stdout.log'), $stdout.GetAwaiter().GetResult()) }
     if ($stderr) { [IO.File]::WriteAllText((Join-Path $directory 'stderr.log'), $stderr.GetAwaiter().GetResult()) }
     $process.Dispose(); $certificate.Dispose(); $key.Dispose()

@@ -5,7 +5,8 @@
 @inject NavigationManager Navigation
 @inject AppLocalizer T
 @inject ReturnUrlService ReturnUrl
-@inject UpdateService Updates
+@inject RadiologyCenter.Desktop.Services.Updates.IAppUpdates Updates
+@inject RadiologyCenter.Desktop.Services.Updates.UpdateDialogLauncher UpdateDialogs
 @implements IDisposable
 @using RadiologyCenter.Desktop.Shared.Components
 
@@ -45,6 +46,7 @@
         </EditForm>
         <MudButton OnClick="OpenClinicSettings" Class="mt-2" FullWidth="true" Disabled="_busy">@(T.IsRTL ? "اتصال العيادة / تحديث المسؤول" : "Clinic connection / admin upgrade")</MudButton>
         <MudButton OnClick="OpenClinicUpdates" FullWidth="true" Disabled="_busy" StartIcon="@Icons.Material.Filled.SystemUpdate">@(_updateAvailable ? (T.IsRTL ? "تحديث متاح للعيادة" : "Clinic update available") : (T.IsRTL ? "تحديثات العيادة" : "Clinic updates"))</MudButton>
+        <div class="mt-2 text-center"><ReleaseVersion /></div>
     </DialogContent>
     <DialogActions>
             <MudButton ButtonType="ButtonType.Submit" form="clinic-login-form"

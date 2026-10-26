@@ -1,0 +1,67 @@
+@implements IDisposable
+@using RadiologyCenter.Desktop.Services.Updates
+@inject IAppUpdates Updates
+@inject UpdateDialogLauncher UpdateDialogs
+@inject ISnackbar Snackbar
+@inject AppLocalizer T
+
+@code {
+    private readonly CancellationTokenSource _lifetime = new();
+    private string? _announcedVersion;
+    private bool _disposed;
+    private Snackbar? _notice;
+
+    protected override Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender) _ = RunAsync(_lifetime.Token);
+        return Task.CompletedTask;
+    }
+
+    private async Task RunAsync(CancellationToken token)
+    {
+        try
+        {
+            while (!token.IsCancellationRequested)
+            {
+                try
+                {
+                    var update = await Updates.CheckAsync(token);
+                    if (update is null && _notice is not null)
+                    {
+                        await InvokeAsync(() => { if (_notice is not null) Snackbar.Remove(_notice); _notice = null; _announcedVersion = null; });
+                    }
+                    if (update is not null && update.Version != _announcedVersion)
+                    {
+                        await InvokeAsync(() =>
+                        {
+                            if (_disposed) return;
+                            _announcedVersion = update.Version;
+                            if (_notice is not null) Snackbar.Remove(_notice);
+                            _notice = Snackbar.Add(
+                                T.IsRTL ? $"يتوفر إصدار جديد من EGcare: {update.Version}" : $"EGcare {update.Version} is available.",
+                                Severity.Info, options =>
+                                {
+                                    options.RequireInteraction = true;
+                                    options.Action = T.IsRTL ? "عرض التحديث" : "View update";
+                                    options.OnClick = _ => UpdateDialogs.ShowAsync();
+                                }, "egcare-update");
+                        });
+                    }
+                }
+                catch (UpdateFailure ex) when (ex.Reason == UpdateFailureReason.NotInstalled) { return; }
+                catch (OperationCanceledException) when (token.IsCancellationRequested) { return; }
+                catch { /* Automatic checks stay quiet offline. Manual checks expose a useful error. */ }
+                await Task.Delay(TimeSpan.FromMinutes(5), token);
+            }
+        }
+        catch (OperationCanceledException) when (token.IsCancellationRequested) { }
+    }
+
+    public void Dispose()
+    {
+        _disposed = true;
+        _lifetime.Cancel();
+        _lifetime.Dispose();
+        if (_notice is not null) Snackbar.Remove(_notice);
+    }
+}

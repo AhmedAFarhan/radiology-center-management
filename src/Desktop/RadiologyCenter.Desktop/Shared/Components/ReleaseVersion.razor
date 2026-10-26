@@ -1,0 +1,4 @@
+@using RadiologyCenter.Desktop.Services.Updates
+@inject AppLocalizer T
+
+<span class="release-version">EGcare · @(T.IsRTL ? "الإصدار" : "Version") <bdi dir="ltr">@ReleaseInfo.Version</bdi></span>

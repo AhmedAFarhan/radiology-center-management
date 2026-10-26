@@ -1,5 +1,6 @@
 @inject BackendStatusService Backend
 @inject AppLocalizer T
+@inject RadiologyCenter.Desktop.Services.Updates.UpdateDialogLauncher UpdateDialogs
 @implements IDisposable
 
 @if (Backend.NeedsSetup || _configure)
@@ -36,6 +37,7 @@ else
                 @if (_retrying) { @T.BootSplash.Retrying } else { @T.BootSplash.TryAgain }
             </MudButton>
             <MudButton OnClick="() => _configure = true">@(T.IsRTL?"إعداد / تحديث العيادة":"Clinic setup / upgrade")</MudButton>
+            <MudButton OnClick="UpdateDialogs.ShowAsync">@(T.IsRTL ? "تحديث التطبيق" : "Update application")</MudButton>
         }
         else
         {

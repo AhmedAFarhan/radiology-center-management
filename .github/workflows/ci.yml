@@ -35,6 +35,8 @@ jobs:
         run: ./scripts/Test-Backend.ps1 -ResultsDirectory test-results
       - name: Test desktop startup lifecycle
         run: dotnet test src/Desktop/RadiologyCenter.Desktop.StartupTests/RadiologyCenter.Desktop.StartupTests.csproj -c Release --logger "trx;LogFileName=desktop-startup.trx" --results-directory test-results
+      - name: Test desktop forms and validation
+        run: dotnet test src/Desktop/RadiologyCenter.Desktop.ComponentTests/RadiologyCenter.Desktop.ComponentTests.csproj -c Release --logger "trx;LogFileName=desktop-components.trx" --results-directory test-results
       - name: Enable contained users on the isolated CI database server
         run: docker exec ${{ job.services.sqlserver.id }} /opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P 'IntegrationOnly@2026Strong!' -C -Q "EXEC sp_configure 'contained database authentication', 1; RECONFIGURE;"
       - name: Verify direct database accounts and clinical workflows
@@ -52,4 +54,9 @@ jobs:
         with:
           dotnet-version: '10.0.x'
       - run: dotnet workload install maui-windows
+      - name: Audit desktop dependencies (including transitive packages)
+        run: dotnet restore src/Desktop/RadiologyCenter.Desktop/RadiologyCenter.Desktop.csproj --force-evaluate -p:EgcareSecurityAudit=true
       - run: dotnet build src/Desktop/RadiologyCenter.Desktop/RadiologyCenter.Desktop.csproj -c Release -f net10.0-windows10.0.19041.0
+      - name: Verify release payload and offline feed safeguards
+        shell: pwsh
+        run: ./scripts/Test-ReleaseTooling.ps1

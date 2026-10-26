@@ -26,7 +26,11 @@ public static class MauiProgram
         builder.Services.AddAuthorizationCore();
         builder.Services.AddScoped<IAuthorizationHandler, PermissionAuthorizationHandler>();
         builder.Services.AddSingleton<IAuthorizationPolicyProvider, PermissionPolicyProvider>();
-        builder.Services.AddSingleton<UpdateService>();
+        builder.Services.AddSingleton<Services.Updates.IAppUpdates>(sp => new Services.Updates.AppUpdateService(
+            () => Services.Updates.ReleaseInfo.ReadFeed(DesktopConfiguration.ProfilePath, Services.Updates.ReleaseInfo.FeedUrl),
+            feed => new Services.Updates.VelopackUpdateClient(feed),
+            () => sp.GetRequiredService<BusinessRuntimeService>().DisposeRuntimeAsync()));
+        builder.Services.AddScoped<Services.Updates.UpdateDialogLauncher>();
 #if WINDOWS
         builder.Services.AddSingleton<WinUI.WindowsTrayService>();
 #endif

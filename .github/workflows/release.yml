@@ -1,110 +1,201 @@
-name: Build and Release
+name: Package and release EGcare
 
 on:
   push:
-    tags:
-      - "v*"
+    tags: ['v*']
   workflow_dispatch:
     inputs:
       version:
-        description: 'Release version, e.g. 1.0.0'
+        description: 'Release version (major.minor.patch, for example 1.1.0)'
         required: true
         type: string
+      build_number:
+        description: 'Windows build number (1-65535; 0 uses the workflow run number)'
+        default: 0
+        type: number
+      publish_release:
+        description: 'Publish the signed release in this repository (otherwise build review artifacts only)'
+        default: false
+        type: boolean
 
 permissions:
-  contents: write
+  contents: read
+
+concurrency:
+  group: egcare-production-release
+  cancel-in-progress: false
 
 jobs:
+  validate:
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.inputs.outputs.version }}
+      build: ${{ steps.inputs.outputs.build }}
+      feed: ${{ steps.inputs.outputs.feed }}
+      publish: ${{ steps.inputs.outputs.publish }}
+      previous: ${{ steps.inputs.outputs.previous }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Validate release version, branch and public feed
+        id: inputs
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REQUESTED_VERSION: ${{ inputs.version || github.ref_name }}
+          REQUESTED_BUILD: ${{ inputs.build_number }}
+          REQUESTED_PUBLISH: ${{ inputs.publish_release }}
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $version = $env:REQUESTED_VERSION -replace '^v', ''
+          if ($version -notmatch '^(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)$') { throw 'Use numeric major.minor.patch without leading zeros.' }
+          $parts = $version.Split('.') | ForEach-Object { [int]$_ }
+          if (@($parts | Where-Object { $_ -gt 65535 }).Count) { throw 'Windows version components cannot exceed 65535.' }
+          $build = if ([string]::IsNullOrEmpty($env:REQUESTED_BUILD) -or $env:REQUESTED_BUILD -eq '0') { [int]$env:GITHUB_RUN_NUMBER } else { [int]$env:REQUESTED_BUILD }
+          if ($build -lt 1 -or $build -gt 65535) { throw 'Build number must be 1-65535.' }
+          if ($env:GITHUB_EVENT_NAME -eq 'workflow_dispatch' -and $env:GITHUB_REF -ne 'refs/heads/main') { throw 'Run production packaging from main.' }
+          git merge-base --is-ancestor HEAD origin/main
+          if ($LASTEXITCODE -ne 0) { throw 'Release code must already be on main.' }
+          $headers = @{ Authorization = "Bearer $env:GH_TOKEN"; 'X-GitHub-Api-Version' = '2022-11-28' }
+          $repo = Invoke-RestMethod "https://api.github.com/repos/$env:GITHUB_REPOSITORY" -Headers $headers
+          if ($repo.private) { throw 'Anonymous app updates require this release repository to be public. Never embed a GitHub token in EGcare.' }
+          $release = Invoke-WebRequest "https://api.github.com/repos/$env:GITHUB_REPOSITORY/releases/latest" -Headers $headers -SkipHttpErrorCheck
+          $previous = ''
+          if ($release.StatusCode -eq 200) {
+            $tag = ($release.Content | ConvertFrom-Json).tag_name
+            if ($tag -notmatch '^v(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)$') { throw "Unexpected previous stable release tag: $tag" }
+            $previous = $tag.Substring(1)
+            if ([version]$version -le [version]$previous) { throw "Version must be newer than $previous." }
+          } elseif ($release.StatusCode -ne 404) { throw "Cannot read release history: HTTP $($release.StatusCode)." }
+          $existing = Invoke-WebRequest "https://api.github.com/repos/$env:GITHUB_REPOSITORY/releases/tags/v$version" -Headers $headers -SkipHttpErrorCheck
+          if ($existing.StatusCode -ne 404) { throw 'This release already exists, or release lookup failed. Existing releases are never overwritten.' }
+          $publish = $env:GITHUB_EVENT_NAME -eq 'push' -or $env:REQUESTED_PUBLISH -eq 'true'
+          "version=$version" >> $env:GITHUB_OUTPUT
+          "build=$build" >> $env:GITHUB_OUTPUT
+          "feed=https://github.com/$env:GITHUB_REPOSITORY/releases/latest/download" >> $env:GITHUB_OUTPUT
+          "publish=$($publish.ToString().ToLowerInvariant())" >> $env:GITHUB_OUTPUT
+          "previous=$previous" >> $env:GITHUB_OUTPUT
+
   verify:
+    needs: validate
     uses: ./.github/workflows/ci.yml
     permissions:
       contents: read
-      actions: write
-  build:
-    needs: verify
-    runs-on: windows-latest
 
+  package:
+    needs: [validate, verify]
+    runs-on: windows-latest
+    env:
+      RELEASE_VERSION: ${{ needs.validate.outputs.version }}
+      RELEASE_BUILD: ${{ needs.validate.outputs.build }}
+      RELEASE_FEED: ${{ needs.validate.outputs.feed }}
+      PREVIOUS_VERSION: ${{ needs.validate.outputs.previous }}
+      PUBLISH_RELEASE: ${{ needs.validate.outputs.publish }}
     steps:
       - uses: actions/checkout@v4
-
-      - name: Setup .NET
-        uses: actions/setup-dotnet@v4
+      - uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: "10.0.x"
-
-      - name: Install MAUI workload
-        run: dotnet workload install maui-windows
-
-      - name: Install Velopack CLI
-        run: dotnet tool install -g vpk --version 1.2.0
-
-      - name: Get version from tag
-        id: version
-        shell: pwsh
-        env:
-          REQUESTED_VERSION: ${{ inputs.version || github.ref_name }}
-        run: |
-          $version = $env:REQUESTED_VERSION -replace '^v', ''
-          if ($version -notmatch '^\d+\.\d+\.\d+$') { throw 'Use a numeric major.minor.patch version.' }
-          "VERSION=$version" >> $env:GITHUB_OUTPUT
-
-      - name: Restore dependencies
-        run: dotnet restore src\Desktop\RadiologyCenter.Desktop\RadiologyCenter.Desktop.csproj
-
-      - name: Publish Desktop app
-        run: |
-          dotnet publish src\Desktop\RadiologyCenter.Desktop\RadiologyCenter.Desktop.csproj `
-            -c Release `
-            -f net10.0-windows10.0.19041.0 `
-            -p:ApplicationDisplayVersion=${{ steps.version.outputs.VERSION }} `
-            -p:ApplicationVersion=${{ github.run_number }} `
-            -p:AssemblyVersion=${{ steps.version.outputs.VERSION }}.0 `
-            -p:FileVersion=${{ steps.version.outputs.VERSION }}.0 `
-            -p:WindowsPackageType=None `
-            -p:WindowsAppSDKSelfContained=true `
-            -r win-x64 `
-            --self-contained true `
-            -o publish\app
-
-      - name: Verify single application payload
+          dotnet-version: '10.0.x'
+      - run: dotnet workload install maui-windows
+      - run: dotnet tool restore
+      - name: Publish the self-contained Windows application
         shell: pwsh
         run: |
-          if (Get-ChildItem publish\app -Recurse -Filter 'appsettings.Development.json') { throw 'Private development settings cannot be packaged.' }
-          if (Get-ChildItem publish\app -Recurse -Filter 'RadiologyCenter.Localhost*') { throw 'The old server must not be packaged.' }
-          if (Get-ChildItem publish\app -Recurse -Directory -Filter '*WebView2*') { throw 'Browser user data must not be packaged.' }
-          Copy-Item docs\lan-deployment.md publish\app\
-
-      - name: Pack with Velopack
+          dotnet publish src/Desktop/RadiologyCenter.Desktop/RadiologyCenter.Desktop.csproj `
+            -c Release -f net10.0-windows10.0.19041.0 -r win-x64 --self-contained true `
+            -p:WindowsPackageType=None -p:WindowsAppSDKSelfContained=true -p:EgcareSecurityAudit=true `
+            "-p:ApplicationDisplayVersion=$env:RELEASE_VERSION" "-p:ApplicationVersion=$env:RELEASE_BUILD" `
+            "-p:AssemblyVersion=$env:RELEASE_VERSION.0" "-p:FileVersion=$env:RELEASE_VERSION.0" `
+            "-p:UpdateFeedUrl=$env:RELEASE_FEED" -o artifacts/app
+          if ($LASTEXITCODE -ne 0) { throw 'Application publication failed.' }
+          ./scripts/Assert-ReleasePayload.ps1 -AppDirectory artifacts/app
+      - name: Download the previous release for delta updates
+        if: needs.validate.outputs.previous != ''
+        shell: pwsh
+        run: |
+          dotnet tool run vpk download http --url "$env:RELEASE_FEED" -o artifacts/release
+          if ($LASTEXITCODE -ne 0) { throw 'Previous release download failed; do not silently package against a missing feed.' }
+      - name: Pack and optionally sign with Velopack
         shell: pwsh
         env:
           EGCARE_SIGN_TEMPLATE: ${{ secrets.EGCARE_SIGN_TEMPLATE }}
+          EGCARE_SIGN_PFX_BASE64: ${{ secrets.EGCARE_SIGN_PFX_BASE64 }}
+          EGCARE_SIGN_PFX_PASSWORD: ${{ secrets.EGCARE_SIGN_PFX_PASSWORD }}
         run: |
-          if ([string]::IsNullOrWhiteSpace($env:EGCARE_SIGN_TEMPLATE)) { throw 'Configure the CI signing provider and EGCARE_SIGN_TEMPLATE before publishing clinic releases. Unsigned local candidates are for staging.' }
-          vpk pack -u RadiologyCenter --packTitle EGcare -v ${{ steps.version.outputs.VERSION }} -p publish\app --mainExe RadiologyCenter.Desktop.exe --icon src\Desktop\RadiologyCenter.Desktop\Resources\taskbar.ico --signTemplate $env:EGCARE_SIGN_TEMPLATE -o release
-          if ($LASTEXITCODE -ne 0) { throw 'Velopack signing/packaging failed.' }
-          Copy-Item docs\lan-deployment.md release\
-          Copy-Item scripts\New-ClinicConfiguration.ps1 release\
-          Copy-Item scripts\OrthancReadOnly.lua release\
+          $ErrorActionPreference = 'Stop'
+          $packArguments = @('pack','-u','RadiologyCenter','--packTitle','EGcare','-v',$env:RELEASE_VERSION,
+            '-p','artifacts/app','--mainExe','RadiologyCenter.Desktop.exe','--channel','win',
+            '--icon','src/Desktop/RadiologyCenter.Desktop/Resources/taskbar.ico','-o','artifacts/release')
+          $cert = $null; $pfx = $null
+          try {
+            if ($env:EGCARE_SIGN_PFX_BASE64 -and $env:EGCARE_SIGN_TEMPLATE) { throw 'Configure one signing method, not both.' }
+            if ($env:EGCARE_SIGN_PFX_BASE64) {
+              $pfx = Join-Path $env:RUNNER_TEMP ('EGcare-sign-' + [guid]::NewGuid().ToString('N') + '.pfx')
+              [IO.File]::WriteAllBytes($pfx, [Convert]::FromBase64String($env:EGCARE_SIGN_PFX_BASE64))
+              $password = ConvertTo-SecureString $env:EGCARE_SIGN_PFX_PASSWORD -AsPlainText -Force
+              $cert = Import-PfxCertificate -FilePath $pfx -CertStoreLocation Cert:\CurrentUser\My -Password $password
+              if (@($cert).Count -ne 1 -or !$cert.HasPrivateKey) { throw 'Provide one code-signing certificate with its private key.' }
+              $packArguments += @('--signParams', "/sha1 $($cert.Thumbprint) /s My /fd SHA256 /tr https://timestamp.digicert.com /td SHA256")
+            } elseif ($env:EGCARE_SIGN_TEMPLATE) {
+              $packArguments += @('--signTemplate', $env:EGCARE_SIGN_TEMPLATE)
+            } elseif ($env:PUBLISH_RELEASE -eq 'true') { throw 'Configure a code-signing certificate or EGCARE_SIGN_TEMPLATE before publishing.' }
+            else { Write-Warning 'Building unsigned review artifacts only. These cannot be published by this workflow.' }
+            dotnet tool run vpk @packArguments
+            if ($LASTEXITCODE -ne 0) { throw 'Velopack packaging failed.' }
+            if ($cert -or $env:EGCARE_SIGN_TEMPLATE) {
+              ./scripts/Assert-ReleaseSignatures.ps1 -ReleaseDirectory artifacts/release -Version $env:RELEASE_VERSION
+            }
+          } finally {
+            if ($cert) { $cert | ForEach-Object { Remove-Item -LiteralPath $_.PSPath -Force } }
+            if ($pfx -and (Test-Path -LiteralPath $pfx)) { Remove-Item -LiteralPath $pfx -Force }
+          }
+          Copy-Item docs/lan-deployment.md,docs/deployment-pipeline.md artifacts/release/
+          Copy-Item scripts/Publish-ClinicUpdateFeed.ps1,scripts/Assert-ReleaseSignatures.ps1,scripts/New-ClinicConfiguration.ps1,scripts/OrthancReadOnly.lua artifacts/release/
+          Get-ChildItem artifacts/release -File | Sort-Object Name | ForEach-Object { "$((Get-FileHash -LiteralPath $_.FullName -Algorithm SHA256).Hash.ToLowerInvariant())  $($_.Name)" } | Set-Content artifacts/release/SHA256SUMS.txt
+      - uses: actions/upload-artifact@v4
+        with:
+          name: EGcare-win-${{ needs.validate.outputs.version }}
+          path: artifacts/release/
+          if-no-files-found: error
+          retention-days: 7
 
-      - name: Verify release signatures
+  publish:
+    needs: [validate, package]
+    if: needs.validate.outputs.publish == 'true'
+    runs-on: windows-latest
+    permissions:
+      contents: write
+    env:
+      GH_TOKEN: ${{ github.token }}
+      RELEASE_VERSION: ${{ needs.validate.outputs.version }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: EGcare-win-${{ needs.validate.outputs.version }}
+          path: artifacts/release
+      - name: Verify signatures and publish atomically
         shell: pwsh
         run: |
-          if ((Get-AuthenticodeSignature release\RadiologyCenter-win-Setup.exe).Status -ne 'Valid') { throw 'The installer signature is missing or invalid.' }
-          $package = [IO.Compression.ZipFile]::OpenRead((Resolve-Path 'release\RadiologyCenter-${{ steps.version.outputs.VERSION }}-full.nupkg').Path)
-          $probe = Join-Path $env:RUNNER_TEMP ('EGcare-signature-' + [guid]::NewGuid().ToString('N') + '.exe')
-          try {
-            $entry = $package.Entries | Where-Object { $_.FullName.EndsWith('/RadiologyCenter.Desktop.exe') } | Select-Object -First 1
-            if ($null -eq $entry) { throw 'The signed application executable is missing.' }
-            [IO.Compression.ZipFileExtensions]::ExtractToFile($entry, $probe)
-            if ((Get-AuthenticodeSignature $probe).Status -ne 'Valid') { throw 'The packaged application signature is missing or invalid.' }
-          } finally {
-            $package.Dispose()
-            if (Test-Path -LiteralPath $probe) { Remove-Item -LiteralPath $probe }
-          }
+          ./scripts/Assert-ReleaseSignatures.ps1 -ReleaseDirectory artifacts/release -Version $env:RELEASE_VERSION
+          $headers = @{ Authorization = "Bearer $env:GH_TOKEN"; 'X-GitHub-Api-Version' = '2022-11-28' }
+          $latest = Invoke-WebRequest "https://api.github.com/repos/$env:GITHUB_REPOSITORY/releases/latest" -Headers $headers -SkipHttpErrorCheck
+          if ($latest.StatusCode -eq 200) {
+            $tag = ($latest.Content | ConvertFrom-Json).tag_name
+            if ($tag -notmatch '^v\d+\.\d+\.\d+$' -or [version]$env:RELEASE_VERSION -le [version]$tag.Substring(1)) { throw 'A newer or equal version was already published.' }
+          } elseif ($latest.StatusCode -ne 404) { throw 'Cannot safely verify the latest release.' }
+          $assets = @(Get-ChildItem artifacts/release -File | ForEach-Object { $_.FullName })
+          $notes = Join-Path $env:RUNNER_TEMP 'egcare-release-notes.txt'
+          @"
+          EGcare $env:RELEASE_VERSION for Windows x64.
 
-      - name: Create GitHub Release
-        uses: softprops/action-gh-release@v2
-        with:
-          tag_name: v${{ steps.version.outputs.VERSION }}
-          files: release/*
-          generate_release_notes: true
+          Built from $env:GITHUB_REPOSITORY at $env:GITHUB_SHA. Includes the .NET runtime.
+          Install RadiologyCenter-win-Setup.exe. Existing installations check this release feed automatically.
+          Offline clinics can distribute the same feed using Publish-ClinicUpdateFeed.ps1.
+          For database-changing releases, fully exit every client and run backed-up admin maintenance before reconnecting.
+          "@ | Set-Content -LiteralPath $notes
+          gh release create "v$env:RELEASE_VERSION" @assets --repo $env:GITHUB_REPOSITORY --target $env:GITHUB_SHA --draft --title "EGcare $env:RELEASE_VERSION" --notes-file $notes
+          if ($LASTEXITCODE -ne 0) { throw 'Draft creation/upload failed. Existing releases are never overwritten.' }
+          gh release edit "v$env:RELEASE_VERSION" --repo $env:GITHUB_REPOSITORY --draft=false --latest
+          if ($LASTEXITCODE -ne 0) { throw 'Publication failed; inspect the draft and retry deliberately.' }

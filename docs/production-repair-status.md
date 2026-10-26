@@ -1,5 +1,32 @@
 # Production repair status
 
+## Release pipeline follow-up — 26 October 2026
+
+The later deployment request explicitly includes installer/update work. Releases now target the same public GitHub repository, with an optional clinic-folder feed for offline workstations. See [Deployment pipeline](deployment-pipeline.md) for artifact builds, production signing, publishing and clinic-share promotion. Clinic business data still stays on the LAN.
+
+- Added checks on launch and every five minutes, a nonmodal update notice, cancellable download and a separate explicit install/restart action. The updater works before sign-in or database setup and retains the runtime-drain behavior. The supplied release version appears on login, setup, sidebar, profile and update screens in Arabic and English.
+- **89 targeted tests passed:** 58 startup/service tests and 31 component tests. Workflow lint and embedded PowerShell syntax checks passed. Release tooling tests verified sequential/idempotent promotion, old-package retention, rejection of downgrade/corruption/path traversal/unsigned production promotion and private-payload rejection.
+- Final self-contained Windows publication completed without warnings/errors. Real unsigned staging packages for 1.0.0 and 1.0.1 were generated, including the 1.0.0-to-1.0.1 delta. Published file version is 1.0.1.0 and display metadata is 1.0.1. A workspace-only share promotion and Velopack test-locator probe discovered/downloaded the actual 1.0.1 package, verified its SHA-256 and confirmed that a current 1.0.1 client receives no repeat offer.
+- Evidence: ignored `audit-results/updates`, `updates-publish-v2.log`, `updates-pack-v2.log`, `updates-release-tooling.log`, `updates-share-promotion.log` and `updates-download-probe.log`. Packages remain under `audit-results/updates-feed`; they are unsigned staging artifacts.
+
+No GitHub workflow/release was run or published, no installed application was replaced, and no SQL/PACS settings or data were changed. Production signing credentials and a clean-machine installed upgrade/restart walkthrough remain required before publishing to clinic users. The real clinic acceptance checks below still apply.
+
+## Current verification — 26 October 2026
+
+The development PC remains for development/testing. Keep its `RadiologyCenter` demo database and accounts. The real clinic will use a new empty database on the actual clinic server. Installer, signing and update changes were excluded from this earlier repair pass and subsequently handled in the follow-up above.
+
+- Patched the SqlClient dependency chain with `System.Security.Cryptography.Pkcs` 9.0.21 and selected .NET/ASP.NET Core 10.0.13 for the self-contained desktop runtime, following [Microsoft's security advisory](https://github.com/dotnet/announcements/issues/468). Removed redundant framework package references and the EF translation entity's nullable initialization warnings.
+- Added repository-wide transitive NuGet auditing. CI treats vulnerability warnings and unavailable audit data as failures; ordinary development builds can still run offline. A disposable project with the old vulnerable package confirmed that the gate rejects it. CI now also runs the desktop form/component tests. Remote GitHub CI has not been run in this session.
+- **564 tests passed, zero failed or skipped:** 474 backend module tests, 20 direct-database/maintenance tests, 44 startup/session/calendar tests and 26 form/component tests. Fresh-clinic setup creates one administrator and no patients or examinations, provisions its SQL sign-in and rejects a repeated create operation. Test databases were isolated and removed after verification.
+- Created checksum-protected copy-only backups of the development database and successfully restored disposable copies on LocalDB and on the same SQL Server major version as the source. Full `DBCC CHECKDB` passed. Restored data included 25 patients, 42 examinations and seven insurance document contents. The source records and retained backups were preserved; temporary restored databases were removed.
+- The installed Orthanc DICOMweb/OHIF plugins passed authenticated synthetic image retrieval, anonymous denial and viewer-write denial. Restoring a separate copy of the stopped synthetic archive preserved study identity, the exact DICOM file hash and frame retrieval. The installed Orthanc service and its actual archive were not changed.
+- Added administrator connection and recovery tools, documented in [Connection and recovery checks](lan-deployment.md#connection-and-recovery-checks). Production connection checks require trusted certificates and TCP; they never weaken certificate validation or change services.
+- Final self-contained publication succeeded with **zero warnings and errors** in `audit-results/repair-final-publish`. Both bundled frameworks and the published cryptography DLL are 10.0.13; development settings and legacy localhost binaries are absent. The transitive-package audit found no known vulnerable packages. Invalid profiles and this development PC's unconfigured TCP endpoint were correctly rejected by the connection checker; a successful real-clinic connection remains unverified.
+
+Evidence is retained locally under ignored `audit-results/repair-tests`, `repair-security-gate-negative.log`, `repair-database-recovery-same-version.log`, `repair-image-archive.log` and the final publication logs. This is not full production sign-off: the actual clinic server/workstations are not connected to this development environment. Their TLS/firewall configuration, routine protected backups and restore rehearsal, two-PC workflows, real-scanner mapping and representative-load acceptance still need completion there. Use the new empty clinic database rather than transferring demo records.
+
+The sections below retain the earlier 9 October implementation and verification history; the current decisions and evidence above take precedence.
+
 Updated 9 October 2026. EGcare is one Windows desktop application on every clinic computer. Business operations run inside the app and connect directly to the same SQL Server database on the admin PC. No localhost business server, API process, IIS installation or internet connection is required for routine use. SQL Server and the central Orthanc image archive are background infrastructure on the admin PC.
 
 The [original audit](production-readiness-review.md) records the earlier architecture and pre-repair findings. The [installation guide](lan-deployment.md) describes the approved shared-database architecture.

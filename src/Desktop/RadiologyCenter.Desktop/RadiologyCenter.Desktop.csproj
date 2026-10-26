@@ -1,4 +1,9 @@
 <Project Sdk="Microsoft.NET.Sdk.Razor">
+    <ItemGroup>
+        <!-- Include the October 2026 runtime security fixes in self-contained publications. -->
+        <FrameworkReference Update="Microsoft.NETCore.App" RuntimeFrameworkVersion="10.0.13" />
+        <FrameworkReference Include="Microsoft.AspNetCore.App" RuntimeFrameworkVersion="10.0.13" />
+    </ItemGroup>
 
     <PropertyGroup>
         <TargetFramework>net10.0-windows10.0.19041.0</TargetFramework>
@@ -33,7 +38,8 @@
         <ApplicationId>com.companyname.radiologycenter.desktop</ApplicationId>
 
         <!-- Versions -->
-        <ApplicationDisplayVersion Condition="'$(ApplicationDisplayVersion)' == ''">1.0</ApplicationDisplayVersion>
+        <ApplicationDisplayVersion Condition="'$(ApplicationDisplayVersion)' == ''">1.0.0</ApplicationDisplayVersion>
+        <UpdateFeedUrl Condition="'$(UpdateFeedUrl)' == ''">https://github.com/AhmedAFarhan/radiology-center-management/releases/latest/download</UpdateFeedUrl>
         <ApplicationVersion Condition="'$(ApplicationVersion)' == ''">1</ApplicationVersion>
 
         <!-- To develop, package, and publish an app to the Microsoft Store, see: https://aka.ms/MauiTemplateUnpackaged -->
@@ -48,6 +54,8 @@
 
     <ItemGroup>
         <!-- App Icon -->
+        <AssemblyMetadata Include="ReleaseVersion" Value="$(ApplicationDisplayVersion)" />
+        <AssemblyMetadata Include="UpdateFeedUrl" Value="$(UpdateFeedUrl)" />
         <MauiIcon Include="Resources\Splash\egcare.png" Color="#4C58E0" />
 
         <!-- Splash Screen -->
@@ -73,10 +81,7 @@
     <ItemGroup>
         <PackageReference Include="Blazor-ApexCharts-MAUI" Version="6.1.0" />
         <PackageReference Include="Microsoft.Maui.Controls" Version="$(MauiVersion)" />
-        <PackageReference Include="Microsoft.AspNetCore.Components.Authorization" Version="10.0.4" />
         <PackageReference Include="Microsoft.AspNetCore.Components.WebView.Maui" Version="$(MauiVersion)" />
-        <PackageReference Include="Microsoft.Extensions.Http" Version="10.0.0" />
-        <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="10.0.0" />
 
         <PackageReference Include="MudBlazor" Version="9.7.0" />
         <PackageReference Include="Velopack" Version="1.2.0" />

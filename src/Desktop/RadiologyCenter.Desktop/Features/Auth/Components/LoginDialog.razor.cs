@@ -27,18 +27,20 @@ public partial class LoginDialog : ComponentBase
     private bool _showPassword;
     private bool _updateAvailable, _disposed;
 
-    protected override async Task OnAfterRenderAsync(bool firstRender)
+    protected override void OnInitialized()
     {
-        if (!firstRender) return;
-        var update = await Task.Run(() => Updates.CheckForUpdatesAsync());
-        if (_disposed) return;
-        _updateAvailable = update is not null;
-        await InvokeAsync(StateHasChanged);
+        _updateAvailable = Updates.Available is not null;
+        Updates.Changed += OnUpdatesChanged;
     }
 
-    public void Dispose() => _disposed = true;
+    private void OnUpdatesChanged()
+    {
+        if (!_disposed) _ = InvokeAsync(() => { _updateAvailable = Updates.Available is not null; StateHasChanged(); });
+    }
 
-    private async Task OpenClinicUpdates() => await DialogService.ShowAsync<RadiologyCenter.Desktop.Shared.Components.ClinicUpdateDialog>("EGcare", new DialogOptions { MaxWidth = MaxWidth.Small, FullWidth = true, BackdropClick = false, CloseOnEscapeKey = false });
+    public void Dispose() { _disposed = true; Updates.Changed -= OnUpdatesChanged; }
+
+    private Task OpenClinicUpdates() => UpdateDialogs.ShowAsync();
 
     private async Task OpenClinicSettings()
     {

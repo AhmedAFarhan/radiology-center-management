@@ -11,6 +11,7 @@
 @inject SearchHistoryService SearchHistory
 @inject ConnectionMonitorService Connection
 @inject IJSRuntime JS
+@inject RadiologyCenter.Desktop.Services.Updates.UpdateDialogLauncher UpdateDialogs
 @inject GlobalSearchService SearchSvc
 
 <div class="app-shell @SidebarModeClass" @onkeydown="HandleGlobalKeyDown">
@@ -23,6 +24,10 @@
             <img src="images/healthcare-logo-64.png" alt="EGcare" class="app-brand-logo" />
             <span class="app-brand-text">EGcare</span>
         </div>
+        @if (_drawerOpen)
+        {
+            <div class="px-4 pb-2"><ReleaseVersion /></div>
+        }
         <NavMenu IsCollapsed="@(!_drawerOpen)" />
     </aside>
 
@@ -77,6 +82,7 @@
                         <div class="profile-menu-meta">
                             <div class="profile-menu-name">@_userFullName</div>
                             <div class="profile-menu-email">@_userEmail</div>
+                            <ReleaseVersion />
                         </div>
                     </div>
                     <MudDivider />

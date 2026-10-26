@@ -1,0 +1,6 @@
+.release-version {
+    display: inline-block;
+    color: var(--mud-palette-text-secondary);
+    font-size: 0.75rem;
+    line-height: 1.5;
+}

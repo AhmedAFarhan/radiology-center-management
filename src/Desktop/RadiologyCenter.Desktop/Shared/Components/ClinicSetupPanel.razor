@@ -11,7 +11,7 @@
     {
         <div class="app-form-heading mb-4">
             <span class="app-form-emblem" aria-hidden="true"><MudIcon Icon="@Icons.Material.Outlined.Settings" /></span>
-            <div><h2>@T["forms.setupTitle"]</h2><p>@T["forms.setupSubtitle"]</p></div>
+            <div><h2>@T["forms.setupTitle"]</h2><p>@T["forms.setupSubtitle"]</p><ReleaseVersion /></div>
         </div>
     }
     <div class="clinic-setup-modes" role="group" aria-label="@L("Choose this computer's role", "اختر دور هذا الجهاز")">
@@ -43,7 +43,8 @@
         <MudTextField @bind-Value="_pacs" InputId="@fieldId" aria-label="@L("Image server HTTPS address (optional)", "عنوان HTTPS لخادم الصور (اختياري)")" Disabled="_busy" Variant="Variant.Outlined" Class="app-form-ltr" />
     </FormField>
     <FormField Label="@L("Clinic update folder (optional)", "مجلد تحديثات العيادة (اختياري)")" Context="fieldId">
-        <MudTextField @bind-Value="_updates" InputId="@fieldId" aria-label="@L("Clinic update folder (optional)", "مجلد تحديثات العيادة (اختياري)")" Disabled="_busy" Variant="Variant.Outlined" Class="app-form-ltr" />
+        <MudTextField @bind-Value="_updates" InputId="@fieldId" aria-label="@L("Clinic update folder (optional)", "مجلد تحديثات العيادة (اختياري)")" Disabled="_busy" Variant="Variant.Outlined" Class="app-form-ltr"
+                      HelperText="@L("Leave empty for GitHub updates. Set a clinic share for PCs that update only over the LAN.", "اتركه فارغًا للتحديث من GitHub، أو أدخل مجلد العيادة للأجهزة التي تتحدث عبر الشبكة المحلية فقط.")" />
     </FormField>
     </MudExpansionPanel></MudExpansionPanels>
     @if (_admin)

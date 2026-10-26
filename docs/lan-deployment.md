@@ -14,6 +14,8 @@ flowchart LR
 
 ## Prepare the admin PC
 
+The agreed production setup uses a **new empty clinic database** on the actual clinic server. Keep `RadiologyCenter` and its demo accounts/records on the development PC for testing. Do not copy the demo database into production or enable LAN services on the development PC as a substitute for configuring the clinic server. Use **Create a new, empty clinic database** in EGcare on the clinic server, then create real staff accounts there.
+
 1. Give the admin PC a stable LAN address and network name. Use that same name in every connection file, including the admin PC's file. Do not use localhost, a workstation's SQL instance or a different database for each computer.
 2. Install and maintain a supported SQL Server instance. SQL Server Express has capacity limits; check those against the clinic's expected database size before choosing an edition. Insurance documents are stored in the shared database; DICOM image files are stored in Orthanc.
 3. Enable SQL TCP/IP and choose a fixed port. Configure a SQL Server TLS certificate matching the connection hostname. Install the issuing CA certificate in every workstation's trusted certificate store. The app uses `Encrypt=True;TrustServerCertificate=False`; do not disable certificate validation to work around a certificate error. Limit inbound SQL traffic to the clinic subnet and avoid internet port forwarding. See [Microsoft's SQL certificate configuration](https://learn.microsoft.com/en-us/sql/database-engine/configure-windows/configure-sql-server-encryption).
@@ -22,7 +24,7 @@ flowchart LR
 
 ## Install and connect EGcare
 
-Keep an offline kit containing the EGcare Velopack installer, a WebView2 offline installer, SQL Server setup and the selected Orthanc Windows distribution/plugins. The EGcare package contains the required .NET and Windows App SDK runtime files. Install WebView2 where absent. Routine use and updates from the clinic share do not require internet access.
+Keep an offline kit containing the EGcare Velopack installer, a WebView2 offline installer, SQL Server setup and the selected Orthanc Windows distribution/plugins. The EGcare package contains the required .NET and Windows App SDK runtime files. Install WebView2 where absent. Routine clinic use remains on the LAN. App updates default to GitHub; configuring the optional clinic update share allows updates without internet access.
 
 On the admin PC, start EGcare and choose **Admin PC setup / upgrade**. Enter the SQL network name and database. Use **Create a new, empty clinic database** only for a new clinic; it refuses an existing database. Supply a strong initial administrator password. Existing databases require a new backup filename and the current administrator credentials when establishing the first connection. Existing administrators are not silently reset or unlocked. If legacy insurance documents exist, select their original folder; maintenance copies their content into SQL and leaves the originals intact.
 
@@ -62,11 +64,11 @@ Back up both the Orthanc index and image storage using a consistent archive back
 
 ## Updates and builds
 
-The release workflow verifies tests and creates one Velopack Windows application installer. It no longer publishes a separate EGcare server ZIP. Configure the CI signing provider/credentials and repository secret `EGCARE_SIGN_TEMPLATE` (Velopack's custom signing command with its `{{file}}` placeholder). The workflow refuses to publish without signing and checks both the installer and packaged application signatures before creating a release. Unsigned local candidates are for staging.
+The release workflow verifies tests and creates one Velopack Windows application installer. It publishes releases in the same public `AhmedAFarhan/radiology-center-management` repository. Manual runs build review artifacts by default; publishing is an explicit workflow option or a deliberate `vVERSION` tag push. Configure the signing certificate secrets or existing `EGCARE_SIGN_TEMPLATE` provider. Production publishing verifies installer/application signatures; unsigned review builds remain available for staging. See [Deployment pipeline](deployment-pipeline.md) for workflow inputs, signing, first release and update testing.
 
-Copy the complete Velopack release feed (packages and release metadata) into the configured LAN update folder. Only trusted administrators should be able to write to that folder; workstations need read access. Sign release executables/installers with the clinic's chosen release-signing process before distributing them.
+For offline PCs, promote the complete signed Velopack feed with `Publish-ClinicUpdateFeed.ps1` into the configured LAN update folder. The script verifies the packages and switches the feed last. Only trusted administrators should be able to write there; workstations need read access. An explicit clinic share overrides GitHub and never falls back to the internet if that share is unavailable.
 
-The sign-in screen checks the LAN feed and shows when an update is available. Open **Clinic updates** there or in the signed-in profile menu to check, download, and then choose **Install and restart** after saving your work. This entry point remains available before SQL sign-in, so an older client can update when the database rejects its version. Development builds cannot install updates. The updater starts before native UI initialization, following [Velopack's startup guidance](https://docs.velopack.io/integrating/overview).
+EGcare checks on launch and every five minutes across the application. Available updates produce a nonmodal notification; offline checks do not interrupt work. Open **Clinic updates** on the sign-in screen or profile menu to check/download, then choose **Install and restart** after saving your work. Failed startup also exposes the updater, so an older client can update when the database rejects its version. Downloads can be cancelled and never install without the restart action. Development builds cannot install updates. The updater starts before native UI initialization, following [Velopack's startup guidance](https://docs.velopack.io/integrating/overview).
 
 For an update that changes database migrations or security, choose **Exit** from the tray on all clients, update the admin PC, run backed-up maintenance there, and then update the other workstations. Normal clients do not modify the schema. A newer database rejects an old client; this prevents silent mixed-version writes. See [Velopack file update sources](https://docs.velopack.io/integrating/update-sources).
 
@@ -93,3 +95,23 @@ Use synthetic data on a staging server and two separately installed Windows work
 6. Disconnect/reconnect the LAN, restart the server, test backup overwrite protection and maintenance with an open client, and install an update from the local feed. Restore SQL and PACS backups into a separate environment and compare records, documents and images.
 
 The app depends on the admin PC being available. It does not create per-workstation patient databases or support offline writes. Direct SQL assumes managed, trusted workstations: authorized table access can bypass some app workflow checks outside EGcare, even though SQL permissions and account controls are enforced. Keep SQL access restricted to the clinic LAN and grant staff only the permissions they need.
+
+## Connection and recovery checks
+
+Run these administrator tools with PowerShell 7 and Microsoft `sqlcmd` on PATH. They do not install or reconfigure SQL, certificates, firewalls or Orthanc. The connection check uses Windows SQL administrator access and must be run from each intended workstation after creating the clinic database. It forces TCP, requires trusted TLS certificates, checks contained authentication/security configuration, and rejects a database with demo accounts. For configured images, supply a personal image-viewing credential; no password is written to the connection file or log.
+
+```powershell
+./scripts/Test-ClinicConnection.ps1 -ProfilePath .\EGcare-clinic.json -ImageCredential (Get-Credential)
+```
+
+Omit `-ImageCredential` when the clinic does not use images and `PacsUrl` is absent. This verifies connectivity, DICOMweb/OHIF availability and anonymous-access denial. It does not replace staff sign-in, image write-denial, two-PC workflow or real-scanner acceptance tests.
+
+The SQL recovery drill creates a new checksum-protected `COPY_ONLY` backup, verifies it, restores every data/log file into a uniquely named disposable database, runs full `DBCC CHECKDB`, records restored table totals and removes only that restored copy. It retains the backup and never restores over the source. Use a separate staging instance at the same SQL major version as production when validating the production recovery plan. A newer test engine can verify backup readability but cannot prove restoration back to the older production engine. Both SQL service identities need access to the backup location; source and restore paths refer to their respective servers.
+
+```powershell
+./scripts/Test-ClinicDatabaseRecovery.ps1 -SourceServer 'ADMIN-PC.clinic.test,1433' -Database EGcareClinic -BackupDirectory '\\BACKUP-PC\ClinicBackups' -RecoveryServer 'STAGING-PC.clinic.test,1433'
+```
+
+`-TrustLocalSourceCertificate` and `-TrustLocalRecoveryCertificate` exist solely for local development/test instances and reject remote hosts. They are not production connection workarounds. LocalDB uses a Windows-user-local named pipe; ordinary SQL connections in the drill require encryption. This drill is additional verification, not a scheduled backup, retention policy or offsite backup. Configure and rehearse those on the actual clinic server.
+
+`./scripts/Test-ImageArchive.ps1` exercises the installed Orthanc plugins against disposable synthetic storage, including a stopped-archive copy restored to separate storage. It compares the exact DICOM file hash and verifies study identity/frame retrieval after restoration. It never starts or changes the installed Orthanc service. For the real archive, back up the index, object storage and protected configuration consistently while the service is stopped (or use the selected database plugin's documented consistent-backup procedure), then restore to staging and compare actual clinic studies.

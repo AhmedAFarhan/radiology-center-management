@@ -1,0 +1,7 @@
+.clinic-update { display: flex; flex-direction: column; gap: 1rem; }
+.clinic-update-heading { display: flex; align-items: center; gap: .75rem; }
+.clinic-update-versions { display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: 1rem; border-radius: 12px; background: var(--mud-palette-background-grey); }
+.clinic-update-versions > div { display: flex; flex-direction: column; gap: .25rem; }
+.clinic-update-versions span { color: var(--mud-palette-text-secondary); font-size: .875rem; }
+.clinic-update-versions strong { font-size: 1.125rem; color: var(--mud-palette-primary); }
+.clinic-update-status { min-height: 3rem; }

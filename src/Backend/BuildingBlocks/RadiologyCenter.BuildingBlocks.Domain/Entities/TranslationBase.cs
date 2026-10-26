@@ -4,8 +4,8 @@ namespace RadiologyCenter.BuildingBlocks.Domain.Entities;
 
 public abstract class TranslationBase : Entity<Guid>
 {
-    public string Language { get; protected set; }
-    public string Name { get; protected set; }
+    public string Language { get; protected set; } = null!;
+    public string Name { get; protected set; } = null!;
 
     protected TranslationBase(string language, string name)
     {

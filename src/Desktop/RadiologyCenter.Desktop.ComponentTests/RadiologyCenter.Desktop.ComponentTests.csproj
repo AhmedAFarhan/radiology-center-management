@@ -9,6 +9,7 @@
   </PropertyGroup>
   <ItemGroup>
     <FrameworkReference Include="Microsoft.AspNetCore.App" />
+    <AssemblyMetadata Include="ReleaseVersion" Value="9.8.7" />
     <PackageReference Include="bunit" Version="2.11.3" />
     <PackageReference Include="MudBlazor" Version="9.7.0" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.14.0" />
@@ -16,6 +17,10 @@
     <PackageReference Include="xunit.runner.visualstudio" Version="3.0.2" PrivateAssets="all" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="../RadiologyCenter.Desktop/Services/Updates/ReleaseInfo.cs" Link="Updates/ReleaseInfo.cs" />
+    <RazorComponent Include="../RadiologyCenter.Desktop/Shared/Components/ReleaseVersion.razor" Link="Shared/Components/ReleaseVersion.razor" />
+    <RazorComponent Include="../RadiologyCenter.Desktop/Shared/Components/ClinicUpdateDialog.razor" Link="Shared/Components/ClinicUpdateDialog.razor" />
+    <Compile Include="../RadiologyCenter.Desktop/Shared/Components/ClinicUpdateDialog.razor.cs" Link="Shared/Components/ClinicUpdateDialog.razor.cs" />
     <RazorComponent Include="../RadiologyCenter.Desktop/Features/Patients/Components/QuickPatientRegistration.razor" Link="Features/Patients/Components/QuickPatientRegistration.razor" />
     <Compile Include="../RadiologyCenter.Desktop/Features/Patients/Models/PatientModels.cs" Link="Models/PatientModels.cs" />
     <Compile Include="../RadiologyCenter.Desktop/Features/Patients/Models/FormModels.cs" Link="Models/PatientFormModel.cs" />
