@@ -12,7 +12,7 @@ on:
         default: 0
         type: number
       publish_release:
-        description: 'Publish the signed release in this repository (otherwise build review artifacts only)'
+        description: 'Publish this release in the repository (otherwise build review artifacts only)'
         default: false
         type: boolean
 
@@ -99,6 +99,8 @@ jobs:
   package:
     needs: [validate, verify]
     runs-on: windows-latest
+    outputs:
+      signed: ${{ steps.pack.outputs.signed }}
     env:
       RELEASE_VERSION: ${{ needs.validate.outputs.version }}
       RELEASE_BUILD: ${{ needs.validate.outputs.build }}
@@ -130,6 +132,7 @@ jobs:
           dotnet tool run vpk download http --url "$env:RELEASE_FEED" -o artifacts/release
           if ($LASTEXITCODE -ne 0) { throw 'Previous release download failed; do not silently package against a missing feed.' }
       - name: Pack and optionally sign with Velopack
+        id: pack
         shell: pwsh
         env:
           EGCARE_SIGN_TEMPLATE: ${{ secrets.EGCARE_SIGN_TEMPLATE }}
@@ -152,19 +155,21 @@ jobs:
               $packArguments += @('--signParams', "/sha1 $($cert.Thumbprint) /s My /fd SHA256 /tr https://timestamp.digicert.com /td SHA256")
             } elseif ($env:EGCARE_SIGN_TEMPLATE) {
               $packArguments += @('--signTemplate', $env:EGCARE_SIGN_TEMPLATE)
-            } elseif ($env:PUBLISH_RELEASE -eq 'true') { throw 'Configure a code-signing certificate or EGCARE_SIGN_TEMPLATE before publishing.' }
-            else { Write-Warning 'Building unsigned review artifacts only. These cannot be published by this workflow.' }
+            } else { Write-Output 'No signing certificate configured. Building an unsigned release.' }
             dotnet tool run vpk @packArguments
             if ($LASTEXITCODE -ne 0) { throw 'Velopack packaging failed.' }
             if ($cert -or $env:EGCARE_SIGN_TEMPLATE) {
               ./scripts/Assert-ReleaseSignatures.ps1 -ReleaseDirectory artifacts/release -Version $env:RELEASE_VERSION
+              'signed=true' >> $env:GITHUB_OUTPUT
+            } else {
+              'signed=false' >> $env:GITHUB_OUTPUT
             }
           } finally {
             if ($cert) { $cert | ForEach-Object { Remove-Item -LiteralPath $_.PSPath -Force } }
             if ($pfx -and (Test-Path -LiteralPath $pfx)) { Remove-Item -LiteralPath $pfx -Force }
           }
           Copy-Item docs/lan-deployment.md,docs/deployment-pipeline.md artifacts/release/
-          Copy-Item scripts/Publish-ClinicUpdateFeed.ps1,scripts/Assert-ReleaseSignatures.ps1,scripts/New-ClinicConfiguration.ps1,scripts/OrthancReadOnly.lua artifacts/release/
+          Copy-Item scripts/Publish-ClinicUpdateFeed.ps1,scripts/Assert-ReleaseSignatures.ps1,scripts/Assert-ReleaseChecksums.ps1,scripts/New-ClinicConfiguration.ps1,scripts/OrthancReadOnly.lua artifacts/release/
           Get-ChildItem artifacts/release -File | Sort-Object Name | ForEach-Object { "$((Get-FileHash -LiteralPath $_.FullName -Algorithm SHA256).Hash.ToLowerInvariant())  $($_.Name)" } | Set-Content artifacts/release/SHA256SUMS.txt
       - uses: actions/upload-artifact@v4
         with:
@@ -182,16 +187,20 @@ jobs:
     env:
       GH_TOKEN: ${{ github.token }}
       RELEASE_VERSION: ${{ needs.validate.outputs.version }}
+      RELEASE_SIGNED: ${{ needs.package.outputs.signed }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/download-artifact@v4
         with:
           name: EGcare-win-${{ needs.validate.outputs.version }}
           path: artifacts/release
-      - name: Verify signatures and publish atomically
+      - name: Verify release files and publish atomically
         shell: pwsh
         run: |
-          ./scripts/Assert-ReleaseSignatures.ps1 -ReleaseDirectory artifacts/release -Version $env:RELEASE_VERSION
+          ./scripts/Assert-ReleaseChecksums.ps1 -ReleaseDirectory artifacts/release
+          if ($env:RELEASE_SIGNED -eq 'true') {
+            ./scripts/Assert-ReleaseSignatures.ps1 -ReleaseDirectory artifacts/release -Version $env:RELEASE_VERSION
+          } elseif ($env:RELEASE_SIGNED -ne 'false') { throw 'Package signing status is missing or invalid.' }
           $headers = @{ Authorization = "Bearer $env:GH_TOKEN"; 'X-GitHub-Api-Version' = '2022-11-28' }
           $latest = Invoke-WebRequest "https://api.github.com/repos/$env:GITHUB_REPOSITORY/releases/latest" -Headers $headers -SkipHttpErrorCheck
           if ($latest.StatusCode -eq 200) {
@@ -202,6 +211,8 @@ jobs:
           $notes = Join-Path $env:RUNNER_TEMP 'egcare-release-notes.txt'
           @"
           EGcare $env:RELEASE_VERSION for Windows x64.
+
+          Code signed: $env:RELEASE_SIGNED.
 
           Built from $env:GITHUB_REPOSITORY at $env:GITHUB_SHA. Includes the .NET runtime.
           Install RadiologyCenter-win-Setup.exe. Existing installations check this release feed automatically.

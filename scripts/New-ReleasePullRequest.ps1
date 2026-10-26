@@ -75,13 +75,13 @@ $notes
 
 Workflow: **Package and release EGcare**. Select branch **main**.
 
-| Parameter | Review artifact | Signed production release |
+| Parameter | Review artifact | Production release |
 |---|---|---|
 | version | $($candidate.Version) | $($candidate.Version) |
 | build_number | $($candidate.Build) | $($candidate.Build) |
 | publish_release | false | true |
 
-Merging this PR does not deploy. Run the review artifact manually, complete installation/upgrade acceptance, then run signed publication manually. Signing secrets are required for production publication. Both runs use the same version from ReleaseVersion.props.
+Merging this PR does not deploy. Run the review artifact manually, complete installation/upgrade acceptance, then run publication manually. Code signing is optional; this release can be published without a certificate. Both runs use the same version from ReleaseVersion.props, and package checksum checks remain required.
 
 After merging, merge main back into development before preparing the next release. Keep development as a permanent branch. Do not delete it after merging.
 "@

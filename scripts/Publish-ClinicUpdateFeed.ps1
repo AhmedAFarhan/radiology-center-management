@@ -10,7 +10,7 @@ the release manifest is replaced last. Existing versions cannot be downgraded or
 param(
     [Parameter(Mandatory)][string]$ReleaseDirectory,
     [Parameter(Mandatory)][string]$Destination,
-    [switch]$AllowUnsignedForTesting
+    [switch]$RequireSignature
 )
 $ErrorActionPreference = 'Stop'
 Set-StrictMode -Version Latest
@@ -38,7 +38,7 @@ $full = @($assets | Where-Object Type -eq 'Full' | Sort-Object { [version]$_.Ver
 if (!$full.Count) { throw 'A complete full package is required.' }
 $version = [string]$full[0].Version
 if (@($assets | Where-Object { [version]$_.Version -gt [version]$version }).Count) { throw 'A delta update has no corresponding latest full package.' }
-if (!$AllowUnsignedForTesting) {
+if ($RequireSignature) {
     & (Join-Path $PSScriptRoot 'Assert-ReleaseSignatures.ps1') -ReleaseDirectory $source -Version $version
 }
 [IO.Directory]::CreateDirectory($target) | Out-Null

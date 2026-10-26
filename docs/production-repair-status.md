@@ -1,5 +1,9 @@
 # Production repair status
 
+## First release preparation — 26 October 2026
+
+The first release is prepared through a `development` → `main` PR with tracked version **1.0.0**, build **1**, and manual-only publication. The owner explicitly chose to publish without a code-signing certificate. Signing is now optional for GitHub publication and clinic-share promotion; package integrity/version checks remain mandatory. The signing prerequisites recorded in the older history below are superseded by this decision. See [Deployment pipeline](deployment-pipeline.md) and [1.0.0 release notes](releases/1.0.0.md).
+
 ## Release pipeline follow-up — 26 October 2026
 
 The later deployment request explicitly includes installer/update work. Releases now target the same public GitHub repository, with an optional clinic-folder feed for offline workstations. See [Deployment pipeline](deployment-pipeline.md) for artifact builds, production signing, publishing and clinic-share promotion. Clinic business data still stays on the LAN.

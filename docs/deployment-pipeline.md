@@ -9,7 +9,7 @@ EGcare remains one Windows application. SQL and PACS stay on the clinic LAN. App
 3. Open GitHub **Actions → Package and release EGcare → Run workflow**. Choose `main`, enter the version from the merged PR, and leave **publish_release** unchecked for the first review build. Enter the PR's build number, or use `0` to read it from `ReleaseVersion.props`. The workflow rejects different version/build inputs and requires main to be the release PR's merge commit.
 4. The workflow validates inputs, runs the complete application CI, publishes the self-contained Windows app, rejects private/configuration/database files, downloads the previous release when present, and packs the installer/full package/delta update with pinned Velopack 1.2.0.
 5. Download the `EGcare-win-VERSION` workflow artifact and verify installation, the visible app version, clinic sign-in and updating from the previous installed version on staging PCs. Review artifacts may be unsigned when no signing credentials are configured. They are not production releases.
-6. Configure signing below, then manually run the same workflow/version with **publish_release** checked. A push, tag or PR merge never deploys automatically. Publication creates the release tag; do not create it in advance. Merge `main` back into `development` before the next release, then increase both numbers and prepare a new PR.
+6. After acceptance, manually run the same workflow/version with **publish_release** checked. A push, tag or PR merge never deploys automatically. Publication creates the release tag; do not create it in advance. Merge `main` back into `development` before the next release, then increase both numbers and prepare a new PR.
 
 For the first release after its PR is merged:
 
@@ -28,14 +28,16 @@ The tracked `ReleaseVersion.props` also supplies the version for ordinary Visual
 
 ## Code signing
 
-Production publishing retains the existing signed-release requirement. Configure **one** signing method in this repository's Actions secrets:
+Code signing is optional. With no signing secrets configured, both review artifacts and production releases are unsigned. No certificate is required to publish or update EGcare. If you choose to sign later, configure **one** method in this repository's Actions secrets:
 
 | Method | Secrets | Requirement |
 |---|---|---|
 | Exportable code-signing certificate | `EGCARE_SIGN_PFX_BASE64`, `EGCARE_SIGN_PFX_PASSWORD` | A trusted code-signing certificate/private key in PFX format. The workflow imports it into the ephemeral runner's CurrentUser store, timestamps signatures and removes the imported certificate/PFX afterward. |
 | Existing signing provider | `EGCARE_SIGN_TEMPLATE` | Velopack custom signing command containing `{{file}}`. Configure the provider's required tools/authentication on the runner before the pack step. |
 
-Never commit a PFX/password or embed signing credentials in the app. A certificate stored on a hardware device or cloud signing provider may not support PFX export; use that provider's signing integration. The workflow validates both the installer and packaged app signatures and requires their signing certificates to match. Without usable signing credentials, artifact builds work but publication is blocked.
+Never commit a PFX/password or embed signing credentials in the app. A certificate stored on a hardware device or cloud signing provider may not support PFX export; use that provider's signing integration. When signing is configured, the workflow validates both the installer and packaged app signatures and requires their certificates to match; signing failures stop the release rather than silently falling back to unsigned files. With signing absent, publication verifies release-file SHA-256 checksums.
+
+Unsigned installers may show an unknown-publisher/SmartScreen prompt, and managed Windows policies may block them. Include this in the intended-PC installation check; see [Microsoft's SmartScreen guidance](https://learn.microsoft.com/windows/apps/package-and-deploy/smartscreen-reputation).
 
 ## Installed application behavior
 
@@ -56,9 +58,9 @@ Download all release assets into a directory on an administrator PC. Keep `Publi
 ./Publish-ClinicUpdateFeed.ps1 -ReleaseDirectory C:\EGcareReleases\1.1.0 -Destination '\\ADMIN-PC\EGcareUpdates'
 ```
 
-The script verifies release identity, package sizes/SHA-256 and the production signatures. It serializes promotion with a share lock, copies immutable packages first, atomically replaces the setup file, and switches `releases.win.json` last. It rejects downgrades, path traversal, missing/corrupt files and changed contents for an existing version. Give staff read access and only release administrators write access. Old packages are retained so a client already downloading an earlier feed is not interrupted.
+The script verifies release identity and package sizes/SHA-256. Unsigned clinic updates are supported by default; use `-RequireSignature` only if the clinic later adopts signed releases. It serializes promotion with a share lock, copies immutable packages first, atomically replaces the setup file, and switches `releases.win.json` last. It rejects downgrades, path traversal, missing/corrupt files and changed contents for an existing version. Give staff read access and only release administrators write access. Old packages are retained so a client already downloading an earlier feed is not interrupted.
 
-`-AllowUnsignedForTesting` exists only for disposable local test feeds. Never use it to promote an unsigned clinic release. Hash verification alone is not proof of a trusted publisher.
+Hashes detect corrupted or changed files; they do not identify a publisher. Distribute release assets through this repository or the administrator-controlled clinic share.
 
 ## Prerequisites and database upgrades
 
